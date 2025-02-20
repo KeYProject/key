@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -217,7 +219,7 @@ public class ValueInjector {
      * @return null or a suitable converter (registered) converter for the requested class.
      */
     @SuppressWarnings("unchecked")
-    public <T> StringConverter<T> getConverter(Class<T> clazz) {
+    public <@NonNull T> @Nullable StringConverter<@NonNull T> getConverter(Class<T> clazz) {
         return (StringConverter<T>) converters.get(clazz);
     }
 }

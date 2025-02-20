@@ -73,6 +73,7 @@ public class TryCloseCommand extends AbstractCommand<TryCloseCommand.TryCloseArg
         return "tryclose";
     }
 
+    @SuppressWarnings("initialization")
     public static class TryCloseArguments {
         @Option(value = "steps", required = false)
         public Integer steps;

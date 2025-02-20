@@ -6,7 +6,7 @@ package de.uka.ilkd.key.nparser;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
@@ -59,11 +59,11 @@ public final class ParsingFacade {
         return ast.ctx;
     }
 
-    public static List<KeyAst.File> parseFiles(URL url) throws IOException {
+    public static List<KeyAst.File> parseFiles(URI url) throws IOException {
         List<KeyAst.File> ctxs = new LinkedList<>();
-        ArrayDeque<URL> queue = new ArrayDeque<>();
+        ArrayDeque<URI> queue = new ArrayDeque<>();
         queue.push(url);
-        Set<URL> reached = new HashSet<>();
+        Set<URI> reached = new HashSet<>();
 
         while (!queue.isEmpty()) {
             url = queue.pop();
@@ -73,7 +73,7 @@ public final class ParsingFacade {
             Collection<RuleSource> includes = ctx.getIncludes(url).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
-                    queue.push(u.url());
+                    queue.push(u.uri());
                 }
             }
         }
@@ -107,9 +107,9 @@ public final class ParsingFacade {
         return new KeYLexer(stream);
     }
 
-    public static KeyAst.File parseFile(URL url) throws IOException {
+    public static KeyAst.File parseFile(URI url) throws IOException {
         long start = System.currentTimeMillis();
-        try (BufferedInputStream is = new BufferedInputStream(url.openStream());
+        try (BufferedInputStream is = new BufferedInputStream(url.toURL().openStream());
                 ReadableByteChannel channel = Channels.newChannel(is)) {
             CodePointCharStream stream = CharStreams.fromChannel(channel, Charset.defaultCharset(),
                 4096, CodingErrorAction.REPLACE, url.toString(), -1);

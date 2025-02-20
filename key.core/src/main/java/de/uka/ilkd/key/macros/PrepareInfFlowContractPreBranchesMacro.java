@@ -17,7 +17,11 @@ import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFea
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
+import org.checkerframework.dataflow.qual.Pure;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+
+import java.util.Objects;
 
 
 /**
@@ -53,7 +57,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new RemovePostStrategy(proof);
     }
 
@@ -109,8 +113,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             // and
             // - we are in the branch where we have to show the left hand side
             // of the implication
-            if (goal.node().parent() != null && goal.node().parent().parent() != null) {
-                Node parent = goal.node().parent();
+            Node parent = goal.node().parent();
+            if (parent != null && parent.parent() != null) {
                 return getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
                         && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)
                         && parent.child(0) == goal.node()
@@ -123,9 +127,10 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
         }
 
 
+        @Pure
         private String getAppRuleName(Node parent) {
             RuleApp parentRuleApp = parent.getAppliedRuleApp();
-            String parentRuleName = parentRuleApp.rule().name().toString();
+            String parentRuleName = Objects.requireNonNull(parentRuleApp).rule().name().toString();
             return parentRuleName;
         }
 

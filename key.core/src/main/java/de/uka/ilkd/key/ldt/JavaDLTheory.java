@@ -170,31 +170,26 @@ public class JavaDLTheory extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        assert false;
-        return null;
+        throw new IllegalStateException("Not implemented.");
     }
 
     @Override
     public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        assert false;
-        return null;
+        throw new IllegalStateException("Not implemented.");
     }
 
     @Override
     public boolean hasLiteralFunction(JFunction f) {
-        assert false;
-        return false;
+        throw new IllegalStateException("Not implemented.");
     }
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        assert false;
-        return null;
+        throw new IllegalStateException("Not implemented.");
     }
 
     @Override
     public Type getType(Term t) {
-        assert false;
-        return null;
+        throw new IllegalStateException("Not implemented.");
     }
 }

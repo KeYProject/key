@@ -81,7 +81,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }

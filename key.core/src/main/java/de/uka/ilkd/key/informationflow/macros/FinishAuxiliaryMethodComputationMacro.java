@@ -23,6 +23,8 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author christoph
@@ -41,7 +43,8 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener) {
 
         final ProofOblInput poForProof =
             proof.getServices().getSpecificationRepository().getProofOblInput(proof);

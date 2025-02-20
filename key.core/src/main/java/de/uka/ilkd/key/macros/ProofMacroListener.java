@@ -8,6 +8,7 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Listener for the application of proof macros (which may be run in a separate worker thread). They
@@ -21,10 +22,10 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
  */
 public class ProofMacroListener implements ProverTaskListener {
     private int numOfInvokedMacros;
-    private final ProverTaskListener superordinateListener;
+    private final @Nullable ProverTaskListener superordinateListener;
     private final String macroName;
 
-    public ProofMacroListener(String macroName, ProverTaskListener listener) {
+    public ProofMacroListener(String macroName, @Nullable ProverTaskListener listener) {
         this.macroName = macroName;
         this.numOfInvokedMacros = 0;
         this.superordinateListener = listener;

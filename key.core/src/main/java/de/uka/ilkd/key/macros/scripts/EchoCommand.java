@@ -4,9 +4,11 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A simple "echo" command for giving feedback to human observers during lengthy executions.
@@ -36,6 +38,7 @@ public class EchoCommand extends AbstractCommand<EchoCommand.Parameters> {
         }
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The message to show.

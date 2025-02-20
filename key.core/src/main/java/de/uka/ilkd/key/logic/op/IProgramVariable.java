@@ -10,11 +10,16 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 
 import org.key_project.logic.Named;
 
+import org.jspecify.annotations.Nullable;
+
 public interface IProgramVariable
         extends TerminalProgramElement, Named, org.key_project.logic.op.SortedOperator, Operator {
+    @Nullable
     KeYJavaType getKeYJavaType();
 
+    @Nullable
     KeYJavaType getKeYJavaType(Services javaServ);
 
+    @Nullable
     KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
 }

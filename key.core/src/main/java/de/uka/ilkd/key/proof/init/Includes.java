@@ -4,11 +4,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
 
@@ -57,7 +53,7 @@ public class Includes {
      * returns the corresponding RuleSource to the filename <code>name</name>
      */
     public RuleSource get(String name) {
-        return name2Source.get(name);
+        return Objects.requireNonNull(name2Source.get(name));
     }
 
     public List<File> getFiles() {

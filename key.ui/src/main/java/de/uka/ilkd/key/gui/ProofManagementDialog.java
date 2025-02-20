@@ -650,7 +650,7 @@ public final class ProofManagementDialog extends JDialog {
             }
 
             @Override
-            public boolean equals(Object o) {
+            public boolean equals(@org.jspecify.annotations.Nullable Object o) {
                 return o instanceof final ProofWrapper pw && proof.equals(pw.proof);
             }
 

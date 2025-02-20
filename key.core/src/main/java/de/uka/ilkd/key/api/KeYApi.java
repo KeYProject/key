@@ -10,6 +10,8 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The Entry Point.
  * <p>
@@ -33,7 +35,6 @@ public abstract class KeYApi {
     }
 
     /**
-     *
      * @return
      */
     public static String getVersion() {
@@ -72,8 +73,10 @@ public abstract class KeYApi {
      * @return
      * @throws ProblemLoaderException
      */
-    public static ProofManagementApi loadProof(File location, List<File> classPath,
-            File bootClassPath, List<File> includes) throws ProblemLoaderException {
+    public static ProofManagementApi loadProof(File location,
+            @Nullable List<File> classPath,
+            @Nullable File bootClassPath,
+            @Nullable List<File> includes) throws ProblemLoaderException {
         return new ProofManagementApi(
             KeYEnvironment.load(location, classPath, bootClassPath, includes));
     }

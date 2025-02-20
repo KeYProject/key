@@ -60,8 +60,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private long nextRuleTime;
 
     @Override
-    public void setGoal(Goal p_goal) {
-        goal = p_goal;
+    public void setGoal(Goal goal) {
+        this.goal = goal;
     }
 
     /**

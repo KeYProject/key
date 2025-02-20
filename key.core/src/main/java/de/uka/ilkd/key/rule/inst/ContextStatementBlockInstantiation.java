@@ -13,16 +13,24 @@ import de.uka.ilkd.key.logic.PosInProgram;
  */
 public class ContextStatementBlockInstantiation {
 
-    /** the end position of the prefix omega */
+    /**
+     * the end position of the prefix omega
+     */
     private final PosInProgram prefixEnd;
 
-    /** the start position of the suffix omega */
+    /**
+     * the start position of the suffix omega
+     */
     private final PosInProgram suffixStart;
 
-    /** the execution context of the first active statement */
+    /**
+     * the execution context of the first active statement
+     */
     private final ExecutionContext activeStatementContext;
 
-    /** the whole program element this context term inst refers to */
+    /**
+     * the whole program element this context term inst refers to
+     */
     private final ProgramElement programElement;
 
     /**
@@ -75,7 +83,8 @@ public class ContextStatementBlockInstantiation {
         return programElement;
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof ContextStatementBlockInstantiation inst)) {
             return false;
         }
@@ -121,7 +130,9 @@ public class ContextStatementBlockInstantiation {
         return hashCode;
     }
 
-    /** toString */
+    /**
+     * toString
+     */
     public String toString() {
         String result = "ContextStatementBlockInstantiation:\n";
         result += "Prefix ends before " + prefixEnd.toString();

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.nparser;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Position;
@@ -107,7 +106,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return null;
         }
 
-        public Includes getIncludes(URL base) {
+        public Includes getIncludes(URI base) {
             IncludeFinder finder = new IncludeFinder(base);
             accept(finder);
             return finder.getIncludes();

@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public final class DescriptionFacade {
      *
      * @see #getProperties
      */
-    private static Properties properties = null;
+    private static @Nullable Properties properties = null;
 
     private DescriptionFacade() {
     }
@@ -57,7 +58,7 @@ public final class DescriptionFacade {
 
     /**
      * Looks up the documentation for the given command in the properties file. If no documentation
-     * is available an empty string is returned.
+     * is available, an empty string is returned.
      *
      * @param cmd non-null proof script command
      * @return a non-null string
@@ -69,16 +70,13 @@ public final class DescriptionFacade {
 
     /**
      * Looks up the documentation for the given proof script argument. If no documentation is
-     * available an empty string is returned.
+     * available, an empty string is returned.
      *
      * @param arg non-null proof script argument
      * @return a string or null, if {@code arg} is null or {@code arg.getCommand} returns null
      * @see ProofScriptArgument#getDocumentation()
      */
     public static String getDocumentation(ProofScriptArgument<?> arg) {
-        if (arg == null || arg.getCommand() == null) {
-            return null;
-        }
         String key = arg.getCommand().getName() + "." + arg.getName();
         return getString(key);
     }

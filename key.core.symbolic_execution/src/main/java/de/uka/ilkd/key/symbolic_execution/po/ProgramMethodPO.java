@@ -245,7 +245,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (obj instanceof ProgramMethodPO other) {
             return Objects.equals(pm, other.getProgramMethod())
                     && Objects.equals(precondition, other.getPrecondition());

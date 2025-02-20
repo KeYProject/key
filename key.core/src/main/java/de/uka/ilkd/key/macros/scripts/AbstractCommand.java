@@ -14,6 +14,8 @@ import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * <b>Inheritance:</b>
@@ -23,22 +25,22 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Alexander Weigl
  */
 public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
-    protected Proof proof;
-    protected Services service;
-    protected EngineState state;
+    protected @Nullable Proof proof;
+    protected @Nullable Services service;
+    protected @Nullable EngineState state;
     protected AbstractUserInterfaceControl uiControl;
 
     /**
      * Documentation of this command.
      */
-    protected String documentation = null;
+    protected @Nullable String documentation = null;
 
     /**
      * ...
      */
-    private final Class<T> parameterClazz;
+    private final @Nullable Class<T> parameterClazz;
 
-    public AbstractCommand(Class<T> clazz) {
+    public AbstractCommand(@Nullable Class<T> clazz) {
         this.parameterClazz = clazz;
     }
 
@@ -51,7 +53,8 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
 
 
     @Override
-    public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
+    public @Nullable T evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
         if (parameterClazz != null) {
             T obj = parameterClazz.getDeclaredConstructor().newInstance();
             return state.getValueInjector().inject(this, obj, arguments);

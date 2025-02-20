@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.LRUCache;
 
 /**
@@ -26,7 +27,7 @@ public class ModalityCache {
      * a single element cache for the sequent
      * -> Caching more than one sequent did not help since the autopilot rarely revisits nodes
      */
-    private Sequent sequent = null;
+    private @Nullable Sequent sequent = null;
     /**
      * the value of the sequent cache
      */

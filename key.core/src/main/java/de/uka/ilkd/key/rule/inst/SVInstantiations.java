@@ -13,18 +13,16 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
@@ -36,7 +34,9 @@ import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRE
  * this means changing its content results in creating a new object.
  */
 public class SVInstantiations implements EqualsModProofIrrelevancy {
-    /** the empty instantiation */
+    /**
+     * the empty instantiation
+     */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
 
     /**
@@ -51,7 +51,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         }, false); // just a dummy SV for context
 
 
-    /** the map with the instantiations to logic terms */
+    /**
+     * the map with the instantiations to logic terms
+     */
     private final ImmutableMap<SchemaVariable, InstantiationEntry<?>> map;
 
     /**
@@ -66,14 +68,20 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      */
     private final ImmutableList<UpdateLabelPair> updateContext;
 
-    /** instantiations of generic sorts */
+    /**
+     * instantiations of generic sorts
+     */
     private GenericSortInstantiations genericSortInstantiations =
         GenericSortInstantiations.EMPTY_INSTANTIATIONS;
 
-    /** additional conditions for the generic sorts */
+    /**
+     * additional conditions for the generic sorts
+     */
     private final ImmutableList<GenericSortCondition> genericSortConditions;
 
-    /** creates a new SVInstantions object with an empty map */
+    /**
+     * creates a new SVInstantions object with an empty map
+     */
     private SVInstantiations() {
         genericSortConditions = ImmutableSLList.nil();
         updateContext = ImmutableSLList.nil();
@@ -158,7 +166,6 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
 
-
     /**
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
@@ -182,7 +189,6 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         return addInteresting(sv,
             new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)), services);
     }
-
 
 
     /**
@@ -439,7 +445,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     public record UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof UpdateLabelPair) {
                 return update.equals(((UpdateLabelPair) obj).update()) && updateApplicationlabels
                         .equals(((UpdateLabelPair) obj).updateApplicationlabels());
@@ -450,7 +456,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
         @Override
         public int hashCode() {
-            return update.hashCode() + 13*updateApplicationlabels.hashCode();
+            return update.hashCode() + 13 * updateApplicationlabels.hashCode();
         }
     }
 
@@ -531,7 +537,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      *
      * @return true if the given object and this one have the same mappings
      */
-    public boolean equals(Object obj) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         final SVInstantiations cmp;
         if (!(obj instanceof SVInstantiations)) {
             return false;

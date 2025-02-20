@@ -20,12 +20,18 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  */
 public class Semisequent implements Iterable<SequentFormula> {
 
-    /** the empty semisequent (using singleton pattern) */
+    /**
+     * the empty semisequent (using singleton pattern)
+     */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
-    /** list with the {@link SequentFormula}s of the Semisequent */
+    /**
+     * list with the {@link SequentFormula}s of the Semisequent
+     */
     private final ImmutableList<SequentFormula> seqList;
 
-    /** used by inner class Empty */
+    /**
+     * used by inner class Empty
+     */
     private Semisequent() {
         seqList = ImmutableSLList.nil();
     }
@@ -331,7 +337,9 @@ public class Semisequent implements Iterable<SequentFormula> {
         return insertAndRemoveRedundancy(idx, replacements, remove(idx));
     }
 
-    /** @return int counting the elements of this semisequent */
+    /**
+     * @return int counting the elements of this semisequent
+     */
     public int size() {
         return seqList.size();
     }
@@ -412,7 +420,9 @@ public class Semisequent implements Iterable<SequentFormula> {
         return seqList.take(idx).head();
     }
 
-    /** @return the first {@link SequentFormula} of this Semisequent */
+    /**
+     * @return the first {@link SequentFormula} of this Semisequent
+     */
     public SequentFormula getFirst() {
         return seqList.head();
     }
@@ -452,7 +462,7 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof Semisequent)) {
             return false;
         }
@@ -466,12 +476,13 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
 
 
-    /** @return String representation of this Semisequent */
+    /**
+     * @return String representation of this Semisequent
+     */
     @Override
     public String toString() {
         return seqList.toString();
     }
-
 
 
     // inner class used to represent an empty semisequent
@@ -545,7 +556,9 @@ public class Semisequent implements Iterable<SequentFormula> {
             return insertFirst(sequentFormula);
         }
 
-        /** @return int counting the elements of this semisequent */
+        /**
+         * @return int counting the elements of this semisequent
+         */
         @Override
         public int size() {
             return 0;
@@ -604,7 +617,7 @@ public class Semisequent implements Iterable<SequentFormula> {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             return o == this;
         }
 
@@ -613,7 +626,9 @@ public class Semisequent implements Iterable<SequentFormula> {
             return 34567;
         }
 
-        /** @return String representation of this Semisequent */
+        /**
+         * @return String representation of this Semisequent
+         */
         @Override
         public String toString() {
             return "[]";

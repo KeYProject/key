@@ -9,6 +9,8 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A {@link ProofScriptCommand} is an executable mutation on the given proof. It abstracts complex
  * operations, and made them accessible for an API.
@@ -35,6 +37,7 @@ public interface ProofScriptCommand<T> {
      * @param arguments
      * @return
      */
+    @Nullable
     T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception;
 
     /**

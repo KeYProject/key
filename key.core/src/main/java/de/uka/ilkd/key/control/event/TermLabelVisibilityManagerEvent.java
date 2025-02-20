@@ -14,11 +14,6 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
  */
 public class TermLabelVisibilityManagerEvent extends EventObject {
     /**
-     * Generated UID.
-     */
-    private static final long serialVersionUID = 2827200355462914026L;
-
-    /**
      * Constructor.
      *
      * @param source The source {@link TermLabelVisibilityManager}.

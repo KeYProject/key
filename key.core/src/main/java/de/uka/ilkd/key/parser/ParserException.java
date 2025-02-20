@@ -21,7 +21,7 @@ public final class ParserException extends Exception implements HasLocation {
      * @param location The location on which the error occured. The location may be null, if the
      *        location is unknown or the error is independent of a location.
      */
-    public ParserException(String message, Location location) {
+    public ParserException(String message, @Nullable Location location) {
         super(message);
         this.location = location;
     }
@@ -44,6 +44,6 @@ public final class ParserException extends Exception implements HasLocation {
     }
 
     /* --- fields --- */
-    private final Location location;
+    private final @Nullable Location location;
 
 }

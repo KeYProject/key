@@ -6,9 +6,11 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import org.jspecify.annotations.Nullable;
 
 public class AllCommand extends AbstractCommand<Map<String, String>> {
 
@@ -17,7 +19,7 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
     }
 
     @Override
-    public Map<String, String> evaluateArguments(EngineState state, Map<String, String> arguments) {
+    public Map<String, String> evaluateArguments(@Nullable EngineState state, Map<String, String> arguments) {
         return arguments;
     }
 
@@ -63,6 +65,7 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
         return newArgs;
     }
 
+    @SuppressWarnings("nullness")
     private <A> void executeWrappedCommand(ProofScriptCommand<A> command,
             HashMap<String, String> newArgs) throws Exception {
         A params = command.evaluateArguments(state, newArgs);

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -21,6 +22,8 @@ import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
@@ -48,6 +51,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
+    @SuppressWarnings("override.param.invalid")
     public void execute(AbstractUserInterfaceControl uiControl, Parameters arguments,
             EngineState state) throws ScriptException, InterruptedException {
         final Services services = state.getProof().getServices();
@@ -130,6 +134,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option(value = "all", required = false)
         public boolean onAllOpenGoals = false;
@@ -139,10 +144,12 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         /** Run on formula matching the given regex */
         @Option(value = "matches", required = false)
+        @Nullable
         public String matches = null;
 
         /** Run on formula matching the given regex */
         @Option(value = "breakpoint", required = false)
+        @Nullable
         public String breakpoint = null;
 
         public boolean isOnAllOpenGoals() {

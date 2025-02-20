@@ -32,8 +32,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
         } else if (heapLDT.getSortOfSelect(op) != null) {
             return term.sub(0).sub(2);
         } else {
-            assert false;
-            return null;
+            throw new RuntimeException("Not Implemented");
         }
     }
 }

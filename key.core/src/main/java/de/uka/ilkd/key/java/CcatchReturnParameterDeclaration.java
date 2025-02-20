@@ -24,7 +24,7 @@ public class CcatchReturnParameterDeclaration extends CcatchNonstandardParameter
 
     @Override
     public ProgramElement getChildAt(int index) {
-        return null;
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override

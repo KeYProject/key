@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -29,31 +30,31 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     private final Map<String, Object> proofMacroSpecificData = new HashMap<>();
 
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof, long time,
+    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, @Nullable Proof proof, long time,
             int appliedRules, int closedGoals) {
         super(macro, goals, proof, time, appliedRules, closedGoals);
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof, long time, int appliedRules,
+    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, @Nullable Proof proof, long time, int appliedRules,
             int closedGoals) {
         this(macro, ImmutableSLList.<Goal>nil().prepend(goal), proof, time, appliedRules,
             closedGoals);
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof,
-            Statistics statistics) {
+    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, @Nullable Proof proof,
+            @Nullable Statistics statistics) {
         this(macro, goals, proof, statistics == null ? 0 : statistics.timeInMillis,
             statistics == null ? 0 : statistics.nodes - statistics.branches,
             proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof, Statistics statistics) {
+    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, @Nullable Proof proof, @Nullable Statistics statistics) {
         this(macro, goal, proof, statistics == null ? 0 : statistics.timeInMillis,
             statistics == null ? 0 : statistics.nodes - statistics.branches,
             proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof) {
+    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, @Nullable Proof proof) {
         this(macro, goals, proof, proof == null ? null : proof.getStatistics());
     }
 
@@ -107,7 +108,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
         proofMacroSpecificData.put(key, value);
     }
 
-    public Object getValueFor(String key) {
+    public @Nullable Object getValueFor(String key) {
         return proofMacroSpecificData.get(key);
     }
 

@@ -88,6 +88,7 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
         return "unhide";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public Sequent sequent;

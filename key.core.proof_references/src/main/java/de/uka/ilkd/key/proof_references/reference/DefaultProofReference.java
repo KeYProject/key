@@ -96,7 +96,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (obj instanceof IProofReference<?> other) {
             return Objects.equals(getKind(), other.getKind())
                     && Objects.equals(getSource(), other.getSource())

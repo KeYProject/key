@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import org.checkerframework.dataflow.qual.Pure;
 
 /**
  * The unique environment a proof is performed in. The environment consists of a java model,
@@ -60,6 +61,7 @@ public class ProofEnvironment {
      * returns the initial configuration of which a copy can be used to load proofs belonging to
      * this environment.
      */
+    @Pure
     public InitConfig getInitConfigForEnvironment() {
         return initConfig;
     }
@@ -80,15 +82,11 @@ public class ProofEnvironment {
     }
 
     public void addProofEnvironmentListener(ProofEnvironmentListener l) {
-        if (l != null) {
-            listeners.add(l);
-        }
+        listeners.add(l);
     }
 
     public void removeProofEnvironmentListener(ProofEnvironmentListener l) {
-        if (l != null) {
-            listeners.remove(l);
-        }
+        listeners.remove(l);
     }
 
     public ProofEnvironmentListener[] getProofEnvironmentListeners() {
@@ -135,7 +133,8 @@ public class ProofEnvironment {
      * returns true iff the java model equals those of the argument proof environment. TODO: extend
      * to available rules and specs.
      */
-    public boolean equals(Object cmp) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object cmp) {
         if (!(cmp instanceof ProofEnvironment pe)) {
             return false;
         }

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +99,7 @@ public class KeYSelectionModel {
      *
      * @param n the selected node
      */
-    public synchronized void setSelectedNode(Node n) {
+    public synchronized void setSelectedNode(@Nullable Node n) {
         final Node previousSelectedNode = selectedNode;
         // switch proof if needed
         if (n.proof() != getSelectedProof()) {
