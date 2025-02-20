@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -50,6 +51,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
+    @SuppressWarnings("override.param.invalid")
     public void execute(AbstractUserInterfaceControl uiControl, Parameters arguments,
             EngineState state) throws ScriptException, InterruptedException {
         final Services services = state.getProof().getServices();

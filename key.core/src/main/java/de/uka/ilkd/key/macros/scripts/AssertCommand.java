@@ -4,8 +4,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Halts the script if some condition is not met.
@@ -33,7 +35,7 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
             throw new ScriptException("No parameter specified!");
         }
 
-        if (state.getProof().openEnabledGoals().size() != args.goals) {
+        if (Objects.requireNonNull(state).getProof().openEnabledGoals().size() != args.goals) {
             throw new ScriptException("Assertion failed: number of open goals is "
                 + state.getProof().openGoals().size() + ", but should be " + args.goals);
         }

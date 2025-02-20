@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
 /**
@@ -46,6 +48,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
      * @throws InterruptedException
      */
     @Override
+    @SuppressWarnings("override.param.invalid")
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
