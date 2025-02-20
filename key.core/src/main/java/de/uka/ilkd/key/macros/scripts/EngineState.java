@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
@@ -74,6 +75,7 @@ public class EngineState {
         lastSetGoalNode = g != null ? g.node() : null;
     }
 
+    @Pure
     public Proof getProof() {
         return proof;
     }
@@ -88,7 +90,7 @@ public class EngineState {
      * @throws ScriptException If there is no such {@link Goal}, or something else goes wrong.
      */
     @SuppressWarnings("unused")
-    public @Nullable Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
+    public Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }
@@ -124,7 +126,7 @@ public class EngineState {
      *
      * @throws ScriptException If there is no such {@link Goal}.
      */
-    public @Nullable Goal getFirstOpenAutomaticGoal() throws ScriptException {
+    public Goal getFirstOpenAutomaticGoal() throws ScriptException {
         return getFirstOpenGoal(true);
     }
 
@@ -198,7 +200,7 @@ public class EngineState {
 
     private @NonNull KeyIO getKeyIO() throws ScriptException {
         Services services = proof.getServices();
-        KeyIO io = new KeyIO(services, Objects.requireNonNull(getFirstOpenAutomaticGoal()).getLocalNamespaces());
+        KeyIO io = new KeyIO(services, getFirstOpenAutomaticGoal().getLocalNamespaces());
         io.setAbbrevMap(abbrevMap);
         return io;
     }
