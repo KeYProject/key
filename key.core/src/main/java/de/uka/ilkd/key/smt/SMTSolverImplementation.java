@@ -332,7 +332,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
             SMTObjTranslator objTrans =
                 new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
-            problemString = objTrans.translateProblem(sequent, services, smtSettings).toString();
+            problemString = objTrans.translateProblem(problem.getGoal(), services, smtSettings).toString();
             ModelExtractor transQuery = objTrans.getQuery();
             getSocket().setQuery(transQuery);
             tacletTranslation = null;
@@ -340,7 +340,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         } else {
             SMTTranslator trans = getType().createTranslator();
             problemString =
-                indent(trans.translateProblem(sequent, services, smtSettings).toString());
+                indent(trans.translateProblem(problem.getGoal(), services, smtSettings).toString());
             if (trans instanceof AbstractSMTTranslator) {
                 // Since taclet translation in the old form is no longer used,
                 // this will likely disappear.

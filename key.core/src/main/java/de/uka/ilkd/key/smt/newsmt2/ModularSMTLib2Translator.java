@@ -10,13 +10,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -108,8 +113,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     }
 
     @Override
-    public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
-
+    public CharSequence translateProblem(Goal goal, Services services, SMTSettings settings) {
         MasterHandler master;
         try {
             master = new MasterHandler(services, settings, handlerNames, handlerOptions);
@@ -117,7 +121,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             throw new RuntimeException(ex);
         }
 
-        List<Term> sequentAsserts = getTermsFromSequent(sequent, services);
+        List<Term> sequentAsserts = getTermsFromSequent(goal.sequent(), services);
         List<SExpr> sequentSMTAsserts = makeSMTAsserts(master, sequentAsserts);
 
         StringBuilder sb = new StringBuilder();
@@ -125,6 +129,24 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append("; --- Preamble\n");
         sb.append(preamble);
         sb.append(System.lineSeparator());
+
+        // add invariant axioms
+        // TODO: static axioms, represents axioms, ...
+        Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
+        var filtered = set.stream()
+            .filter(t -> t.taclet().name().toString().startsWith("Class_invariant_axiom_for_"))
+            .toList();
+        for (NoPosTacletApp npta : filtered) {
+            Taclet taclet = npta.taclet();
+            SMTTacletTranslator tacletTranslator = new SMTTacletTranslator(services);
+            try {
+                Term formula = tacletTranslator.translate(taclet);
+                SExpr smt = master.translate(formula);
+                master.addAxiom(SExprs.assertion(smt));
+            } catch (SMTTranslationException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         sb.append("; --- Declarations\n");
         extractSortDeclarations(services, master);

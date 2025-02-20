@@ -12,6 +12,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
@@ -176,10 +177,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     @Override
-    public final StringBuilder translateProblem(Sequent sequent, Services services,
-            SMTSettings settings) throws IllegalFormulaException {
+    public final StringBuilder translateProblem(Goal goal, Services services,
+                                                SMTSettings settings) throws IllegalFormulaException {
         smtSettings = settings;
-        Term problem = sequentToTerm(sequent, services);
+        Term problem = sequentToTerm(goal.sequent(), services);
         StringBuilder hb = translateTerm(problem, new ArrayList<>(), services);
 
         // add one variable for each sort
