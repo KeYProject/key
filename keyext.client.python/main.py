@@ -1,6 +1,6 @@
 import socket
 from keyapi import LspEndpoint, LoadParams, StreategyOptions
-from keyapi.server import NetKeY
+from keyapi.server import NetKeY, KeYEnv, KeYProof
 from keyapi.rpc import JsonRpcEndpoint
 
 def configure_callbacks(key):
@@ -14,27 +14,26 @@ if __name__ == "__main__":
     with NetKeY(target) as key:
         print(key.meta_version())
         configure_callbacks(key)
-        envHandle = key.loading_load(
-            LoadParams("/home/samuel/Dokumente/Projects/KeY/key/key.core.example/example/IntegerUtil.java",
-                       None,
-                       None,
-                       None))
 
-        contracts = key.env_contracts(envHandle)
+        params = LoadParams("/home/samuel/Dokumente/Projects/KeY/key/key.core.example/example/IntegerUtil.java",
+       None,
+       None,
+       None)
 
-        print([c.contractId for c in contracts])
+        with KeYEnv(key, params) as env:
+            contracts = env.contracts()
 
-        proof_id = key.env_openContract(contracts[1].contractId)
+            print("Found the following contracts: ")
+            print("\n".join([("- "+str(c.contractId)) for c in contracts]))
 
-        print(proof_id.proofId)
+            i = 0
+            with KeYProof(key, contracts[i]) as proof:
+                print("Proof for contract: ", contracts[i].contractId)
 
-        print("Loading Root Node:")
-        root_node = key.proofTree_root(proof_id)
+                root = proof.root()
+                print("Root Node: ", root.name)
 
-        print("Root Node: ",root_node.name)
-
-        proof_status = key.proof_auto(proof_id, StreategyOptions())
-        print("Open goals: ", proof_status.openGoals)
-        #print("Closed goals: ", proof_status.closedGoals)
+                status = proof.auto(StreategyOptions())
+                print("Open goals: ", status.openGoals)
 
     print("Terminating")

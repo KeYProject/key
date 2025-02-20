@@ -61,6 +61,13 @@ public class KeyIdentifications {
         c.dispose();
     }
 
+    public void dispose(EnvironmentId id) {
+        var c = getContainer(id);
+        c.mapProof.forEach(((proofId, proofContainer) -> this.dispose(proofId)));
+        mapEnv.remove(id);
+        c.dispose();
+    }
+
     public Node find(NodeId nodeId) {
         @NonNull
         Proof p = find(nodeId.proofId);
