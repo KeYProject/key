@@ -274,7 +274,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         }
 
         @Override
-        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj instanceof ElementWrapper<?> other) {
                 return key.equalsModProperty(other.key, property);
             }

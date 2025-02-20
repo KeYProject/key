@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 
@@ -46,7 +48,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private final Goal goalForVariableRegistration;
 
 
-    public InfFlowProgVarRenamer(Term[] terms, Map<Term, Term> preInitialisedReplaceMap,
+    public InfFlowProgVarRenamer(Term[] terms, @Nullable Map<Term, Term> preInitialisedReplaceMap,
             String postfix, Goal goalForVariableRegistration, Services services) {
         super(services.getTermFactory(), services);
         this.terms = terms;
@@ -88,14 +90,10 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private Term renameFormulasWithoutPrograms(Term term) {
-        if (term == null) {
-            return null;
-        }
-
         if (!replaceMap.containsKey(term)) {
             renameAndAddToReplaceMap(term);
         }
-        return replaceMap.get(term);
+        return Objects.requireNonNull(replaceMap.get(term));
     }
 
 

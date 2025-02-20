@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.util.properties;
 
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -39,12 +41,12 @@ public interface Properties {
     }
 
     interface PropertyListener {
-        <T> void propertyChanged(Property<T> property, T oldValue, T newValue);
+        <T> void propertyChanged(Property<T> property, @Nullable T oldValue, T newValue);
     }
 
     <T> void put(Property<T> property, T value);
 
-    <T> T get(Property<T> property);
+    <T> @Nullable T get(Property<T> property);
 
     <T> void remove(Property<T> property);
 

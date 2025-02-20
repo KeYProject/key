@@ -15,6 +15,7 @@ import java.util.zip.ZipFile;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.checkerframework.checker.units.qual.N;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,11 @@ public class ZipFileCollection implements FileCollection {
             if (currentEntry == null || zipFile == null) {
                 throw new NoSuchElementException();
             } else {
-                return zipFile.getInputStream(currentEntry);
+                InputStream res = zipFile.getInputStream(currentEntry);
+                if (res == null) {
+                    throw new NoSuchElementException();
+                }
+                return res;
             }
         }
 
@@ -88,8 +93,8 @@ public class ZipFileCollection implements FileCollection {
                 throw new NoSuchElementException();
             } else if (fileRepo != null) {
                 // request an InputStream from the FileRepo
-                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile),
-                    currentEntry.getName());
+                String name = currentEntry.getName();
+                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile), name);
                 return fileRepo.getInputStream(uri.toURL());
             } else {
                 return openCurrent(); // fallback without FileRepo
@@ -118,13 +123,17 @@ public class ZipFileCollection implements FileCollection {
 
         public DataLocation getCurrentDataLocation() {
             // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
-            try {
-                // since we actually return a zip/jar, we use URLDataLocation
-                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile),
-                    currentEntry.getName());
-                return new URLDataLocation(uri.toURL());
-            } catch (IOException e) {
-                LOGGER.warn("Failed to get zip entry uri", e);
+            if (currentEntry != null) {
+                try {
+                    // since we actually return a zip/jar, we use URLDataLocation
+                    String name = currentEntry.getName();
+                    URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile), name);
+                    return new URLDataLocation(uri.toURL());
+                } catch (IOException e) {
+                    LOGGER.warn("Failed to get zip entry uri", e);
+                }
+            } else {
+                LOGGER.warn("Failed to get zip entry uri of entry == null");
             }
             return SpecDataLocation.UNKNOWN_LOCATION; // fallback
         }

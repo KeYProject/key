@@ -71,7 +71,7 @@ public class AutoSaver implements ProverTaskListener {
      * Create a new instance using default values, or null if auto save is disabled by default. The
      * default values can be set through <code>AutoSaver.setDefaultValues()</code>
      */
-    public static AutoSaver getDefaultInstance() {
+    public static @Nullable AutoSaver getDefaultInstance() {
         return DEFAULT_INSTANCE;
     }
 
@@ -99,7 +99,7 @@ public class AutoSaver implements ProverTaskListener {
      *
      * @param p proof to save, must not be null
      */
-    public void setProof(Proof p) {
+    public void setProof(@Nullable Proof p) {
         proof = p;
     }
 
