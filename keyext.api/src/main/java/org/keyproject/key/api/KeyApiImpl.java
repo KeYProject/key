@@ -206,12 +206,8 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     public CompletableFuture<Boolean> dispose(ProofId id) {
-        return CompletableFuture.supplyAsync(() -> {
-            var proof = data.find(id);
-            data.dispose(id);
-            proof.dispose();
-            return true;
-        });
+        data.dispose(id);
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override
@@ -351,6 +347,14 @@ public final class KeyApiImpl implements KeyApi {
                 return null;
             }
         });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> dispose(EnvironmentId environmentId) {
+        data.dispose(environmentId);
+        return CompletableFuture.completedFuture(
+                true
+        );
     }
 
     @Override
