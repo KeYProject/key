@@ -92,7 +92,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return new SemanticsBlastingStrategy();
     }
 
-    private boolean containsSubTypes(@Nullable Sort s, Set<Sort> sorts) {
+    private boolean containsSubTypes(Sort s, Set<Sort> sorts) {
         for (Sort st : sorts) {
             if (st.extendsTrans(s)) {
                 return true;
@@ -115,6 +115,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
             Sort sort = kjt.getSort();
 
+            if (sort == null){
+                continue;
+            }
             if (!containsSubTypes(sort, sorts)) {
                 continue;
             }
@@ -125,20 +128,20 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 continue;
             }
 
-            LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
+            LogicVariable o = new LogicVariable(new Name("o"), sort);
             for (ClassAxiom c : spec.getClassAxioms(kjt)) {
                 if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
-                    addFormulas(result, kjt, c, o, h, services);
+                    addFormulas(result, sort, c, o, h, services);
                 }
             }
         }
         return result;
     }
 
-    private static void addFormulas(List<SequentFormula> result, KeYJavaType kjt, ClassAxiom c,
+    private static void addFormulas(List<SequentFormula> result, Sort sort, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
-        Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
+        Term exactInstance = tb.exactInstance(sort, tb.var(o));
         RepresentsAxiom ra = (RepresentsAxiom) c;
 
         try {
