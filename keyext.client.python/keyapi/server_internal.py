@@ -96,6 +96,51 @@ class KeyServer(ServerBase):
 
        return self._call_sync("meta/version", [])
 
+    def proof_auto(self, proof : ProofId, options : StreategyOptions) -> MacroStatistic:
+       """"""
+
+       return self._call_sync("proof/auto", [proof , options])
+
+    def proof_children(self, nodeId : NodeId) -> typing.List[NodeDesc]:
+       """"""
+
+       return self._call_sync("proof/children", [nodeId])
+
+    def proof_dispose(self, proof : ProofId) -> bool:
+       """"""
+
+       return self._call_sync("proof/dispose", [proof])
+
+    def proof_goals(self, proof : ProofId, onlyOpened : bool, onlyEnabled : bool) -> typing.List[NodeDesc]:
+       """"""
+
+       return self._call_sync("proof/goals", [proof , onlyOpened , onlyEnabled])
+
+    def proof_macro(self, proof : ProofId, macroId : str, options : StreategyOptions) -> MacroStatistic:
+       """"""
+
+       return self._call_sync("proof/macro", [proof , macroId , options])
+
+    def proof_pruneTo(self, nodeId : NodeId) -> typing.List[NodeDesc]:
+       """"""
+
+       return self._call_sync("proof/pruneTo", [nodeId])
+
+    def proof_root(self, proof : ProofId) -> NodeDesc:
+       """"""
+
+       return self._call_sync("proof/root", [proof])
+
+    def proof_script(self, proof : ProofId, scriptLine : str, options : StreategyOptions) -> MacroStatistic:
+       """"""
+
+       return self._call_sync("proof/script", [proof , scriptLine , options])
+
+    def proof_tree(self, proof : ProofId) -> NodeDesc:
+       """"""
+
+       return self._call_sync("proof/tree", [proof])
+
     def proofTree_children(self, proof : ProofId, nodeId : TreeNodeId) -> typing.List[TreeNodeDesc]:
        """"""
 

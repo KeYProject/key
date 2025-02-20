@@ -17,13 +17,6 @@ class ExampleDesc:
         self.name = name
         self.description = description
 
-class ProofScriptCommandDesc:
-    """"""
-
-    def __init__(self, ):
-        pass
-
-
 class ProofMacroDesc:
     """"""
 
@@ -44,6 +37,13 @@ class ProofMacroDesc:
         self.category = category
         self.description = description
         self.scriptCommandName = scriptCommandName
+
+class ProofScriptCommandDesc:
+    """"""
+
+    def __init__(self, ):
+        pass
+
 
 class TraceValue(enum.Enum):
     """"""
@@ -95,6 +95,62 @@ class NodeId:
     def __init__(self, proofId, nodeId):
         self.proofId = proofId
         self.nodeId = nodeId
+
+class List:
+    """"""
+
+    def __init__(self, ):
+        pass
+
+
+class NodeDesc:
+    """"""
+
+    nodeid : NodeId
+    """"""
+
+    branchLabel : str
+    """"""
+
+    scriptRuleApplication : bool
+    """"""
+
+    children : List
+    """"""
+
+    def __init__(self, nodeid, branchLabel, scriptRuleApplication, children):
+        self.nodeid = nodeid
+        self.branchLabel = branchLabel
+        self.scriptRuleApplication = scriptRuleApplication
+        self.children = children
+
+class StreategyOptions:
+    """"""
+
+    def __init__(self, ):
+        pass
+
+
+class MacroStatistic:
+    """"""
+
+    proofId : ProofId
+    """"""
+
+    macroId : str
+    """"""
+
+    appliedRules : int
+    """"""
+
+    closedGoals : int
+    """"""
+
+    def __init__(self, proofId, macroId, appliedRules, closedGoals):
+        self.proofId = proofId
+        self.macroId = macroId
+        self.appliedRules = appliedRules
+        self.closedGoals = closedGoals
 
 class TreeNodeDesc:
     """"""
@@ -218,13 +274,6 @@ class TermActionDesc:
         self.description = description
         self.category = category
         self.kind = kind
-
-class List:
-    """"""
-
-    def __init__(self, ):
-        pass
-
 
 class SortDesc:
     """"""
@@ -491,5 +540,5 @@ class TaskStartedInfo:
         pass
 
 
-KEY_DATA_CLASSES = { "ExampleDesc": ExampleDesc,"ProofScriptCommandDesc": ProofScriptCommandDesc,"ProofMacroDesc": ProofMacroDesc,"TraceValue": TraceValue,"SetTraceParams": SetTraceParams,"EnvironmentId": EnvironmentId,"ProofId": ProofId,"NodeId": NodeId,"TreeNodeDesc": TreeNodeDesc,"TreeNodeId": TreeNodeId,"PrintOptions": PrintOptions,"NodeTextId": NodeTextId,"NodeTextDesc": NodeTextDesc,"TermActionId": TermActionId,"TermActionKind": TermActionKind,"TermActionDesc": TermActionDesc,"List": List,"SortDesc": SortDesc,"FunctionDesc": FunctionDesc,"ContractId": ContractId,"ContractDesc": ContractDesc,"LoadParams": LoadParams,"ProblemDefinition": ProblemDefinition,"LogTraceParams": LogTraceParams,"MessageType": MessageType,"ShowMessageParams": ShowMessageParams,"ShowMessageRequestParams": ShowMessageRequestParams,"MessageActionItem": MessageActionItem,"Range": Range,"ShowDocumentParams": ShowDocumentParams,"ShowDocumentResult": ShowDocumentResult,"TaskFinishedInfo": TaskFinishedInfo,"TaskStartedInfo": TaskStartedInfo }
+KEY_DATA_CLASSES = { "ExampleDesc": ExampleDesc,"ProofMacroDesc": ProofMacroDesc,"ProofScriptCommandDesc": ProofScriptCommandDesc,"TraceValue": TraceValue,"SetTraceParams": SetTraceParams,"EnvironmentId": EnvironmentId,"ProofId": ProofId,"NodeId": NodeId,"List": List,"NodeDesc": NodeDesc,"StreategyOptions": StreategyOptions,"MacroStatistic": MacroStatistic,"TreeNodeDesc": TreeNodeDesc,"TreeNodeId": TreeNodeId,"PrintOptions": PrintOptions,"NodeTextId": NodeTextId,"NodeTextDesc": NodeTextDesc,"TermActionId": TermActionId,"TermActionKind": TermActionKind,"TermActionDesc": TermActionDesc,"SortDesc": SortDesc,"FunctionDesc": FunctionDesc,"ContractId": ContractId,"ContractDesc": ContractDesc,"LoadParams": LoadParams,"ProblemDefinition": ProblemDefinition,"LogTraceParams": LogTraceParams,"MessageType": MessageType,"ShowMessageParams": ShowMessageParams,"ShowMessageRequestParams": ShowMessageRequestParams,"MessageActionItem": MessageActionItem,"Range": Range,"ShowDocumentParams": ShowDocumentParams,"ShowDocumentResult": ShowDocumentResult,"TaskFinishedInfo": TaskFinishedInfo,"TaskStartedInfo": TaskStartedInfo }
 
