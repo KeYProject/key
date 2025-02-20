@@ -123,7 +123,7 @@ public interface ProofControl {
      *
      * @param proof The {@link Proof} to start auto mode of.
      */
-    default void startAutoMode(Proof proof) { startAutoMode(proof, proof.openEnabledGoals()); }
+    void startAutoMode(Proof proof);
 
     /**
      * Starts the auto mode for the given {@link Proof} and the given {@link Goal}s.
@@ -143,13 +143,13 @@ public interface ProofControl {
      * Stops the currently running auto mode and blocks the current {@link Thread} until auto mode
      * has stopped.
      */
-    void stopAndWaitAutoMode() throws InterruptedException;
+    void stopAndWaitAutoMode();
 
     /**
      * Blocks the current {@link Thread} while the auto mode of this {@link UserInterfaceControl} is
      * active.
      */
-    void waitWhileAutoMode() throws InterruptedException;
+    void waitWhileAutoMode();
 
     /**
      * Starts the auto mode for the given proof which must be contained in this user interface and
@@ -158,8 +158,7 @@ public interface ProofControl {
      * @param proof The {@link Proof} to start auto mode and to wait for.
      * @param goals The {@link Goal}s to close.
      */
-    void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals)
-            throws InterruptedException;
+    void startAndWaitForAutoMode(Proof proof, ImmutableList<Goal> goals);
 
     /**
      * Starts the auto mode for the given proof which must be contained in this user interface and
@@ -167,7 +166,7 @@ public interface ProofControl {
      *
      * @param proof The {@link Proof} to start auto mode and to wait for.
      */
-    void startAndWaitForAutoMode(Proof proof) throws InterruptedException;
+    void startAndWaitForAutoMode(Proof proof);
 
     void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
 
