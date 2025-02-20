@@ -17,7 +17,7 @@ public interface SMTTranslator {
      * Translates a problem into the given syntax. The only difference to
      * <code>translate(Term t, Services services)</code> is that assumptions will be added.
      *
-     * @param goal     the sequent to be translated.
+     * @param goal the sequent to be translated.
      * @param services
      * @return a representation of the term in the given syntax.
      * @throws IllegalFormulaException

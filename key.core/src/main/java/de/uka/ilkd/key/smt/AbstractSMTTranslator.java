@@ -178,7 +178,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     @Override
     public final StringBuilder translateProblem(Goal goal, Services services,
-                                                SMTSettings settings) throws IllegalFormulaException {
+            SMTSettings settings) throws IllegalFormulaException {
         smtSettings = settings;
         Term problem = sequentToTerm(goal.sequent(), services);
         StringBuilder hb = translateTerm(problem, new ArrayList<>(), services);

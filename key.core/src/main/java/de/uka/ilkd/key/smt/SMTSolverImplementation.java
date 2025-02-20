@@ -332,7 +332,8 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
             SMTObjTranslator objTrans =
                 new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
-            problemString = objTrans.translateProblem(problem.getGoal(), services, smtSettings).toString();
+            problemString =
+                objTrans.translateProblem(problem.getGoal(), services, smtSettings).toString();
             ModelExtractor transQuery = objTrans.getQuery();
             getSocket().setQuery(transQuery);
             tacletTranslation = null;

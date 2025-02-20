@@ -45,6 +45,19 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
 
+    // TODO: check this list ... Represents axioms?
+    private static final String[] AXIOM_TACLET_PREFIXES = {
+        "Class_invariant_axiom_for",
+        "Static_class_invariant_axiom_for",
+        "Definition_axiom_for_",
+        "Free_class_invariant_axiom_for_",
+        "Free_static_class_invariant_axiom_for_",
+        "Partial_inv_axiom_for_JML_class_invariant_",
+            // "Query_axiom_for_" // Do we need those (not translatable at the moment (SkolemSV))?
+    };
+
+    public static final String UNSAT_CORE_PREFIX = "L_";
+
     /**
      * Handler option. If provided, the translator will label translations of sequent formulas such
      * that {@link de.uka.ilkd.key.smt.SMTFocusResults} can interpret the unsat core.
@@ -130,18 +143,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append(preamble);
         sb.append(System.lineSeparator());
 
-        // TODO: check this list ... Represents axioms?
-        String[] axiomTacletPrefixes = {
-            "Class_invariant_axiom_for",
-            "Static_class_invariant_axiom_for",
-            "Definition_axiom_for_",
-            "Free_class_invariant_axiom_for_",
-            "Free_static_class_invariant_axiom_for_",
-            "Partial_inv_axiom_for_JML_class_invariant_",
-            //"Query_axiom_for_"  // Do we need those? These contain skolem schema vars ...
-        };
         // add axioms for invariants, static invariants, represents axioms, ...
-        for (String prefix : axiomTacletPrefixes) {
+        for (String prefix : AXIOM_TACLET_PREFIXES) {
             addAxioms(prefix, goal, services, master);
         }
 
@@ -163,7 +166,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         int i = 1;
         for (SExpr ass : sequentSMTAsserts) {
             if (getUnsatCore) {
-                String label = "L_" + i;
+                String label = UNSAT_CORE_PREFIX + i;
                 i++;
                 ass = SExprs.named(ass, label);
             }
@@ -202,8 +205,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private void addAxioms(String prefix, Goal goal, Services services, MasterHandler master) {
         Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
         List<NoPosTacletApp> filtered = set.stream()
-            .filter(t -> t.taclet().name().toString().startsWith(prefix))
-            .toList();
+                .filter(t -> t.taclet().name().toString().startsWith(prefix))
+                .toList();
         for (NoPosTacletApp npta : filtered) {
             Taclet taclet = npta.taclet();
             SMTTacletTranslator tacletTranslator = new SMTTacletTranslator(services);

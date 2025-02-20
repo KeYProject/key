@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
@@ -177,7 +178,9 @@ public final class SMTFocusResults {
 
         String[] labels = lastLine.trim().split(" +");
         // some labels (for non-sequent formulas) are not for the unsat core -> filter them
-        String[] filtered = Arrays.stream(labels).filter(s -> s.startsWith("L_")).toArray(String[]::new);
+        String[] filtered = Arrays.stream(labels)
+                .filter(s -> s.startsWith(ModularSMTLib2Translator.UNSAT_CORE_PREFIX))
+                .toArray(String[]::new);
         Integer[] numbers = new Integer[filtered.length];
         for (int i = 0; i < numbers.length; i++) {
             numbers[i] = Integer.parseInt(filtered[i].substring(2));
@@ -203,6 +206,7 @@ public final class SMTFocusResults {
             if (lines[i].equals("(")) {
                 Integer[] numbers = new Integer[lines.length - 2 - i];
                 for (int j = i + 1; j < lines.length - 1; j++) {
+                    // TODO: substring here is dangerous, should check for UNSAT_CORE_PREFIX ...
                     numbers[j - i - 1] = Integer.parseInt(lines[j].substring(2));
                 }
                 return numbers;
