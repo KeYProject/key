@@ -186,7 +186,7 @@ public interface ProofMacro {
      * @param listener the listener to use for progress reports (may be <code>null</code>)
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
-    ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+    ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals,
             @Nullable PosInOccurrence posInOcc,
             @Nullable ProverTaskListener listener)
@@ -212,7 +212,7 @@ public interface ProofMacro {
      * @param listener the listener to use for progress reports (may be <code>null</code>)
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
-    ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
+    ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Node node,
             @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception;
 

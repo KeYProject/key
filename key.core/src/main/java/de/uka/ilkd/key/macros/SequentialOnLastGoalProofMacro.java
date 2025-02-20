@@ -31,7 +31,7 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      * @throws InterruptedException if one of the wrapped macros is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
             final @Nullable ProverTaskListener listener)
             throws Exception {
