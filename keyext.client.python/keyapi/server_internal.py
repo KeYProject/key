@@ -16,6 +16,11 @@ class KeyServer(ServerBase):
 
        return self._call_sync("env/contracts", [env])
 
+    def env_dispose(self, env : EnvironmentId) -> bool:
+       """"""
+
+       return self._call_sync("env/dispose", [env])
+
     def env_functions(self, env : EnvironmentId) -> typing.List[FunctionDesc]:
        """"""
 
