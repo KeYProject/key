@@ -11,13 +11,19 @@ class NetKeY(object):
         self.outStream = self.socket.makefile("w", newline="\r\n")
 
         self.rpc_endpoint = JsonRpcEndpoint(self.inStream, self.outStream)
-        endpoint = LspEndpoint(self.rpc_endpoint)
-        endpoint.start()
+        self.endpoint = LspEndpoint(self.rpc_endpoint)
+        self.endpoint.start()
 
-        self.key = KeyServer(endpoint)
+        self.key = KeyServer(self.endpoint)
 
     def __enter__(self):
-        return self.key
+        return self
+
+    def __getattr__(self, item):
+        return getattr(self.key, item)
+
+    def register_notification(self, method, callback):
+        self.endpoint.notify_callbacks[method] = callback
 
     def __exit__(self, type, value, traceback):
         self.key.server_exit()
