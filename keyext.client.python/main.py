@@ -1,5 +1,5 @@
 import socket
-from keyapi import LspEndpoint, LoadParams
+from keyapi import LspEndpoint, LoadParams, StreategyOptions
 from keyapi.server import NetKeY
 from keyapi.rpc import JsonRpcEndpoint
 
@@ -27,6 +27,6 @@ if __name__ == "__main__":
 
         print("Root Node: ",root_node.name)
 
-        key.auto
+        key.proof_auto(proof_id, StreategyOptions())
 
     print("Terminating")
