@@ -130,24 +130,19 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append(preamble);
         sb.append(System.lineSeparator());
 
-        // add invariant axioms
-        // TODO: static axioms, represents axioms, ...
-        Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
-        var filtered = set.stream()
-            .filter(t -> t.taclet().name().toString().startsWith("Class_invariant_axiom_for_"))
-            .toList();
-        for (NoPosTacletApp npta : filtered) {
-            Taclet taclet = npta.taclet();
-            SMTTacletTranslator tacletTranslator = new SMTTacletTranslator(services);
-            try {
-                Term formula = tacletTranslator.translate(taclet);
-                SExpr smt = master.translate(formula);
-                // we name assertions just for the user, so that it is easier to find them
-                smt = SExprs.named(smt, taclet.name().toString());
-                master.addAxiom(SExprs.assertion(smt));
-            } catch (SMTTranslationException e) {
-                throw new RuntimeException(e);
-            }
+        // TODO: check this list ... Represents axioms?
+        String[] axiomTacletPrefixes = {
+            "Class_invariant_axiom_for",
+            "Static_class_invariant_axiom_for",
+            "Definition_axiom_for_",
+            "Free_class_invariant_axiom_for_",
+            "Free_static_class_invariant_axiom_for_",
+            "Partial_inv_axiom_for_JML_class_invariant_",
+            //"Query_axiom_for_"  // Do we need those? These contain skolem schema vars ...
+        };
+        // add axioms for invariants, static invariants, represents axioms, ...
+        for (String prefix : axiomTacletPrefixes) {
+            addAxioms(prefix, goal, services, master);
         }
 
         sb.append("; --- Declarations\n");
@@ -201,6 +196,27 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         return sb;
+    }
+
+    // Adds all taclets that start with the given prefix as axioms to the MasterHandler.
+    private void addAxioms(String prefix, Goal goal, Services services, MasterHandler master) {
+        Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
+        List<NoPosTacletApp> filtered = set.stream()
+            .filter(t -> t.taclet().name().toString().startsWith(prefix))
+            .toList();
+        for (NoPosTacletApp npta : filtered) {
+            Taclet taclet = npta.taclet();
+            SMTTacletTranslator tacletTranslator = new SMTTacletTranslator(services);
+            try {
+                Term formula = tacletTranslator.translate(taclet);
+                SExpr smt = master.translate(formula);
+                // we name assertions just for the user, so that it is easier to find them
+                smt = SExprs.named(smt, taclet.name().toString());
+                master.addAxiom(SExprs.assertion(smt));
+            } catch (SMTTranslationException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
