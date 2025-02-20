@@ -11,6 +11,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.data.MacroStatistic;
 import org.keyproject.key.api.data.NodeDesc;
+import org.keyproject.key.api.data.ProofStatus;
 import org.keyproject.key.api.data.StreategyOptions;
 
 /**
@@ -28,7 +29,7 @@ public interface ProofApi {
             StreategyOptions options);
 
     @JsonRequest
-    CompletableFuture<MacroStatistic> auto(ProofId proof, StreategyOptions options);
+    CompletableFuture<ProofStatus> auto(ProofId proof, StreategyOptions options);
 
     @JsonRequest
     CompletableFuture<Boolean> dispose(ProofId proof);
