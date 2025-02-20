@@ -1884,11 +1884,11 @@ public class MergeRuleUtils {
 
         @Override
         public boolean containsValue(@Nullable Object value) {
-            return false;
+            throw new UnsupportedOperationException();
         }
 
         @Override
-        public @Nullable LocationVariable get(Object key) {
+        public @Nullable LocationVariable get(@Nullable Object key) {
             if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) {
@@ -1909,28 +1909,30 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public LocationVariable put(LocationVariable key, LocationVariable value) {
-            return null;
+        @SuppressWarnings("keyfor")
+        public @Nullable LocationVariable put(LocationVariable key, LocationVariable value) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
-        public LocationVariable remove(Object key) {
-            return null;
+        public @Nullable LocationVariable remove(@Nullable Object key) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
+        @SuppressWarnings("keyfor")
         public Set<LocationVariable> keySet() {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public Collection<LocationVariable> values() {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
-            return null;
+            throw new UnsupportedOperationException();
         }
     }
 
