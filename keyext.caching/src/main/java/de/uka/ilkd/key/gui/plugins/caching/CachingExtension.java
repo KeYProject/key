@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -312,13 +309,22 @@ public class CachingExtension
                         });
                 }
             } else {
-                newProof.closedGoals().stream()
+                var referencingGoals = newProof.closedGoals().stream()
                         .filter(x -> x.node().lookup(ClosedBy.class) != null
                                 && x.node().lookup(ClosedBy.class).proof() == referencedProof)
-                        .forEach(x -> {
-                            newProof.reOpenGoal(x);
-                            x.node().deregister(x.node().lookup(ClosedBy.class), ClosedBy.class);
-                        });
+                        .toList();
+                if (!referencingGoals.isEmpty()) {
+                    int answer = JOptionPane.showConfirmDialog(MainWindow.getInstance(),
+                        "Certain steps of this proof are reused in other proofs. By closing this proof, please note that the dependent proofs will reopen the corresponding proof goals",
+                        "Warning", JOptionPane.YES_NO_OPTION);
+                    if (answer == JOptionPane.YES_OPTION) {
+                        for (var goal : referencingGoals) {
+                            newProof.reOpenGoal(goal);
+                            goal.node().deregister(goal.node().lookup(ClosedBy.class),
+                                ClosedBy.class);
+                        }
+                    }
+                }
             }
         }
 

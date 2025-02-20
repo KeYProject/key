@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.caching;
 
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -46,6 +48,9 @@ public class CachingPruneHandler implements ProofTreeListener {
     @Override
     public void proofIsBeingPruned(ProofTreeEvent e) {
         Proof proofToBePruned = e.getSource();
+        boolean copySteps = CachingSettingsProvider.getCachingSettings().getPrune()
+                .equals(ProofCachingSettings.PRUNE_COPY);
+        boolean userWasAsked = false;
         // check other proofs for any references to this proof
         for (Proof p : mediator.getCurrentlyOpenedProofs()) {
             for (Goal g : p.closedGoals()) {
@@ -55,12 +60,19 @@ public class CachingPruneHandler implements ProofTreeListener {
                 }
                 var commonAncestor = e.getNode().commonAncestor(c.node());
                 if (commonAncestor == c.node()) {
-                    boolean copySteps = CachingSettingsProvider.getCachingSettings().getPrune()
-                            .equals(ProofCachingSettings.PRUNE_COPY);
                     // proof is now open
                     // => remove caching reference
                     g.node().deregister(c, ClosedBy.class);
                     p.reOpenGoal(g);
+                    if (!userWasAsked && !copySteps) {
+                        int answer = JOptionPane.showConfirmDialog(MainWindow.getInstance(),
+                            "Certain steps of this proof are reused in other proofs. By pruning this proof, please note that the dependent proofs will reopen the corresponding proof goals",
+                            "Warning", JOptionPane.YES_NO_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            copySteps = true;
+                        }
+                        userWasAsked = true;
+                    }
                     if (copySteps) {
                         // quickly copy the proof before it is pruned
                         try {
