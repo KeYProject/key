@@ -96,7 +96,7 @@ class KeyServer(ServerBase):
 
        return self._call_sync("meta/version", [])
 
-    def proof_auto(self, proof : ProofId, options : StreategyOptions) -> MacroStatistic:
+    def proof_auto(self, proof : ProofId, options : StreategyOptions) -> ProofStatus:
        """"""
 
        return self._call_sync("proof/auto", [proof , options])
@@ -192,6 +192,24 @@ class Client(abc.ABCMeta):
 
     @abstractmethod
     def client_sm(self, params : ShowMessageParams):
+        """"""
+
+        pass
+
+    @abstractmethod
+    def client_taskFinished(self, info : TaskFinishedInfo):
+        """"""
+
+        pass
+
+    @abstractmethod
+    def client_taskProgress(self, position : int):
+        """"""
+
+        pass
+
+    @abstractmethod
+    def client_taskStarted(self, info : TaskStartedInfo):
         """"""
 
         pass
