@@ -30,4 +30,7 @@ public interface EnvApi {
 
     @JsonRequest
     CompletableFuture<ProofId> openContract(ContractId contractId);
+
+    @JsonRequest
+    CompletableFuture<Boolean> dispose(EnvironmentId env);
 }
