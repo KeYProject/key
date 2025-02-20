@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import org.checkerframework.dataflow.qual.Pure;
 
 /**
  * The unique environment a proof is performed in. The environment consists of a java model,
@@ -60,6 +61,7 @@ public class ProofEnvironment {
      * returns the initial configuration of which a copy can be used to load proofs belonging to
      * this environment.
      */
+    @Pure
     public InitConfig getInitConfigForEnvironment() {
         return initConfig;
     }

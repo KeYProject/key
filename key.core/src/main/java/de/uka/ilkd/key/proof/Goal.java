@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -190,6 +191,7 @@ public final class Goal {
     /**
      * returns the referenced node
      */
+    @Pure
     public Node node() {
         return node;
     }
@@ -325,6 +327,7 @@ public final class Goal {
      *
      * @return true, if is automatic
      */
+    @Pure
     public boolean isAutomatic() {
         return automatic;
     }
@@ -346,6 +349,7 @@ public final class Goal {
      *
      * @return true iff this goal is linked to another node.
      */
+    @Pure
     public boolean isLinked() {
         return this.linkedGoal != null;
     }
