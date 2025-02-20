@@ -6,9 +6,10 @@ package de.uka.ilkd.key.util;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.key_project.util.collection.Pair;
 
-public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
+public class LinkedHashMap<K, @Nullable V extends @Nullable Object> extends java.util.LinkedHashMap<K, V>
         implements Iterable<Pair<K, V>> {
 
 
@@ -65,14 +66,14 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
     }
 
     public Iterator<Pair<K, V>> iterator() {
-        return new PairIterator<>(this);
+        return new PairIterator<K, V>(this);
     }
 
-    private static class PairIterator<K, V> implements Iterator<Pair<K, V>> {
+    private static class PairIterator<K, @Nullable V extends @Nullable Object> implements Iterator<Pair<K, V>> {
 
         private final Iterator<K> keyIt;
         private final LinkedHashMap<K, V> map;
-        private K last = null;
+        private @Nullable K last = null;
 
         public PairIterator(final LinkedHashMap<K, V> map) {
             this.map = map;

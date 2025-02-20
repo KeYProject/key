@@ -276,7 +276,8 @@ checkerFramework {
         extraJavacArgs = [
                 ///home/weigl/work/key/key.core/src/main/java/de/uka/ilkd/key/nparser/varexp
                 //"-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.(nparser\\.varexp|ldt|util|proof|control|macros|settings)(\\.*)?",
-                "-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.proof(\\.*)?",
+                //"-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.proof(\\.*)?",
+                "-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.util(\\.*)?",
                 "-AassumeAssertionsAreEnabled",
                 "-AassumePureGetters",
                 "-AassumeInitialized",

@@ -77,7 +77,7 @@ public interface ImmutableSet<T extends @Nullable Object>
     boolean exists(Predicate<T> predicate);
 
     /** @return true iff obj in set */
-    boolean contains(T obj);
+    boolean contains(@Nullable T obj);
 
     /** @return true iff this set is subset of set s */
     boolean subset(ImmutableSet<T> s);
