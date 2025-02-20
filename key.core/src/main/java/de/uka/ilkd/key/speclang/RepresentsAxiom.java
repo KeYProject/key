@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -109,7 +110,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                         .equals(originalSelfVar));
     }
 
-    public Term getAxiom(AbstractSortedOperator heapVar, AbstractSortedOperator selfVar,
+    public Term getAxiom(AbstractSortedOperator heapVar, @Nullable AbstractSortedOperator selfVar,
             Services services) {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
