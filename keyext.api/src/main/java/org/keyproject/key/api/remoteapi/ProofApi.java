@@ -6,9 +6,8 @@ package org.keyproject.key.api.remoteapi;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import de.uka.ilkd.key.proof.Statistics;
-
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
+import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.data.MacroStatistic;
 import org.keyproject.key.api.data.NodeDesc;
@@ -18,6 +17,7 @@ import org.keyproject.key.api.data.StreategyOptions;
  * @author Alexander Weigl
  * @version 1 (13.10.23)
  */
+@JsonSegment("proof")
 public interface ProofApi {
     @JsonRequest
     CompletableFuture<MacroStatistic> script(ProofId proof, String scriptLine,
@@ -48,6 +48,6 @@ public interface ProofApi {
     @JsonRequest
     CompletableFuture<List<NodeDesc>> pruneTo(NodeId nodeId);
 
-    @JsonRequest
-    CompletableFuture<Statistics> statistics(ProofId proof);
+    // @JsonRequest
+    // CompletableFuture<Statistics> statistics(ProofId proof);
 }
