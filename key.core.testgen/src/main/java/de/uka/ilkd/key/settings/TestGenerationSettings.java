@@ -4,11 +4,12 @@
 package de.uka.ilkd.key.settings;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class TestGenerationSettings extends AbstractSettings {
     // region Default Values for option fields
     private static final boolean DEFAULT_APPLYSYMBOLICEX = false;
@@ -85,14 +86,14 @@ public class TestGenerationSettings extends AbstractSettings {
     }
 
     /**
-     * @deprecated weigl: This method seems broken. I would expect: clone() = new TGS(this)
+     * @deprecated weigl: This method seems broken. I would expect: copy() = new TGS(this)
      */
     @Deprecated(forRemoval = true)
-    public TestGenerationSettings clone(TestGenerationSettings data) {
+    public TestGenerationSettings copy(TestGenerationSettings data) {
         return new TestGenerationSettings(data);
     }
 
-    public TestGenerationSettings clone() {
+    public TestGenerationSettings copy() {
         return new TestGenerationSettings(this);
     }
 
@@ -124,28 +125,6 @@ public class TestGenerationSettings extends AbstractSettings {
 
     public boolean includePostCondition() {
         return includePostCondition;
-    }
-
-    @Override
-    public void readSettings(Properties props) {
-        var prefix = "[" + CATEGORY + "]";
-        setApplySymbolicExecution(SettingsConverter.read(props,
-            prefix + PROP_APPLY_SYMBOLIC_EXECUTION, DEFAULT_APPLYSYMBOLICEX));
-        setMaxUnwinds(SettingsConverter.read(props, prefix + PROP_MAX_UWINDS, DEFAULT_MAXUNWINDS));
-        setOutputPath(SettingsConverter.read(props, prefix + PROP_OUTPUT_PATH, DEFAULT_OUTPUTPATH));
-        setRemoveDuplicates(SettingsConverter.read(props,
-            prefix + PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
-        setRFL(SettingsConverter.read(props, prefix + PROP_USE_RFL, DEFAULT_USERFL));
-        setUseJunit(SettingsConverter.read(props, prefix + PROP_USE_JUNIT, DEFAULT_USEJUNIT));
-        setConcurrentProcesses(SettingsConverter.read(props,
-            prefix + PROP_CONCURRENT_PROCESSES, DEFAULT_CONCURRENTPROCESSES));
-        setInvariantForAll(SettingsConverter.read(props,
-            prefix + PROP_INVARIANT_FOR_ALL, DEFAULT_INVARIANTFORALL));
-        setOpenjmlPath(
-            SettingsConverter.read(props, prefix + PROP_OPENJML_PATH, DEFAULT_OPENJMLPATH));
-        setObjenesisPath(SettingsConverter.read(props, PROP_OBJENESIS_PATH, DEFAULT_OBJENESISPATH));
-        setIncludePostCondition(SettingsConverter.read(props,
-            PROP_INCLUDE_POST_CONDITION, DEFAULT_INCLUDEPOSTCONDITION));
     }
 
     public boolean removeDuplicates() {
@@ -234,24 +213,6 @@ public class TestGenerationSettings extends AbstractSettings {
         return useJunit;
     }
 
-
-    @Override
-    public void writeSettings(Properties props) {
-        var prefix = "[" + CATEGORY + "]";
-        SettingsConverter.store(props, prefix + PROP_APPLY_SYMBOLIC_EXECUTION,
-            applySymbolicExecution);
-        SettingsConverter.store(props, prefix + PROP_CONCURRENT_PROCESSES, concurrentProcesses);
-        SettingsConverter.store(props, prefix + PROP_INVARIANT_FOR_ALL, invariantForAll);
-        SettingsConverter.store(props, prefix + PROP_MAX_UWINDS, maxUnwinds);
-        SettingsConverter.store(props, prefix + PROP_OUTPUT_PATH, outputPath);
-        SettingsConverter.store(props, prefix + PROP_REMOVE_DUPLICATES, removeDuplicates);
-        SettingsConverter.store(props, prefix + PROP_USE_RFL, useRFL);
-        SettingsConverter.store(props, prefix + PROP_USE_JUNIT, useJunit);
-        SettingsConverter.store(props, prefix + PROP_OPENJML_PATH, openjmlPath);
-        SettingsConverter.store(props, prefix + PROP_OBJENESIS_PATH, objenesisPath);
-        SettingsConverter.store(props, prefix + PROP_INCLUDE_POST_CONDITION, includePostCondition);
-    }
-
     @Override
     public void readSettings(Configuration props) {
         var cat = props.getSection(CATEGORY);
@@ -290,7 +251,7 @@ public class TestGenerationSettings extends AbstractSettings {
     }
 
     public void set(TestGenerationSettings settings) {
-        Properties p = new Properties();
+        Configuration p = new Configuration();
         settings.writeSettings(p);
         readSettings(p);
     }
