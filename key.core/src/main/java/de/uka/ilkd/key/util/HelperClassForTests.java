@@ -302,7 +302,9 @@ public class HelperClassForTests {
     }
 
     public static Services createServices(File keyFile) {
-        JavaInfo javaInfo = new HelperClassForTests().parse(keyFile).getFirstProof().getJavaInfo();
+        Proof proof = new HelperClassForTests().parse(keyFile).getFirstProof();
+        assert proof != null;
+        JavaInfo javaInfo = proof.getJavaInfo();
         return javaInfo.getServices();
     }
 

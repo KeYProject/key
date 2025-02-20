@@ -81,7 +81,7 @@ public class InitConfig {
 
     private String originalKeYFileName;
 
-    private ProofSettings settings;
+    private @Nullable ProofSettings settings;
 
 
 
@@ -118,6 +118,7 @@ public class InitConfig {
     }
 
 
+    @Pure
     public Profile getProfile() {
         return services.getProfile();
     }
@@ -394,7 +395,7 @@ public class InitConfig {
     }
 
 
-    public void setSettings(ProofSettings newSettings) {
+    public void setSettings(@Nullable ProofSettings newSettings) {
         this.settings = newSettings;
     }
 

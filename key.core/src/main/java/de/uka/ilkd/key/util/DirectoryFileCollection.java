@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.jspecify.annotations.Nullable;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
 
@@ -46,7 +47,7 @@ public class DirectoryFileCollection implements FileCollection {
     /*
      * add all files in or under dir to a file list. Extension is tested
      */
-    private static void addAllFiles(File dir, String extension, List<File> files) {
+    private static void addAllFiles(File dir, @Nullable String extension, List<File> files) {
         File[] listFiles = dir.listFiles();
 
         if (listFiles == null) {
@@ -132,7 +133,7 @@ public class DirectoryFileCollection implements FileCollection {
     private static class Walker implements FileCollection.Walker {
 
         private final Iterator<File> iterator;
-        private File currentFile;
+        private @Nullable File currentFile;
 
         public Walker(Iterator<File> iterator) {
             this.iterator = iterator;
@@ -157,10 +158,10 @@ public class DirectoryFileCollection implements FileCollection {
 
         @Override
         public InputStream openCurrent(FileRepo fileRepo) throws IOException {
-            if (fileRepo != null) {
-                return fileRepo.getInputStream(currentFile.toPath());
+            if (currentFile == null) {
+                throw new NoSuchElementException();
             } else {
-                return openCurrent(); // fallback without FileRepo
+                return fileRepo.getInputStream(currentFile.toPath());
             }
         }
 

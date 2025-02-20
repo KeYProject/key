@@ -1931,6 +1931,7 @@ public class MergeRuleUtils {
         }
 
         @Override
+        @SuppressWarnings("keyfor")
         public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
             throw new UnsupportedOperationException();
         }

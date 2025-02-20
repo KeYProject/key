@@ -825,11 +825,11 @@ public class OutputStreamProofSaver {
         return logicPrinter.result();
     }
 
-    public static String printAnything(Object val, Services services) {
+    public static @Nullable String printAnything(Object val, @Nullable Services services) {
         return printAnything(val, services, true);
     }
 
-    public static String printAnything(Object val, Services services,
+    public static @Nullable String printAnything(@Nullable Object val, @Nullable Services services,
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
@@ -850,7 +850,7 @@ public class OutputStreamProofSaver {
         }
     }
 
-    private static String printSequent(Sequent val, Services services) {
+    private static String printSequent(Sequent val, @Nullable Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.result();
