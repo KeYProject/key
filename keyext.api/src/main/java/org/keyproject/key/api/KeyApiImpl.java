@@ -35,7 +35,9 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.util.collection.ImmutableList;
@@ -169,7 +171,7 @@ public final class KeyApiImpl implements KeyApi {
             try {
                 env.getProofControl().startAndWaitForAutoMode(proof);
                 // clientListener);
-                return null;// MacroStatistic.from(proofId, info);
+                return null; //MacroStatistic.from(proofId, info);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -253,13 +255,13 @@ public final class KeyApiImpl implements KeyApi {
         return null;
     }
 
-    @Override
+    /*@Override
     public CompletableFuture<Statistics> statistics(ProofId proofId) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             return proof.getStatistics();
         });
-    }
+    }*/
 
     @Override
     public CompletableFuture<TreeNodeDesc> treeRoot(ProofId proof) {
