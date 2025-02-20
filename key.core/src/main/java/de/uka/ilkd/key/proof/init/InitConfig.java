@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -80,7 +81,7 @@ public class InitConfig {
 
     private String originalKeYFileName;
 
-    private ProofSettings settings;
+    private @Nullable ProofSettings settings;
 
 
 
@@ -111,11 +112,13 @@ public class InitConfig {
      *
      * @return the Services of this initial configuration
      */
+    @Pure
     public final Services getServices() {
         return services;
     }
 
 
+    @Pure
     public Profile getProfile() {
         return services.getProfile();
     }
@@ -392,7 +395,7 @@ public class InitConfig {
     }
 
 
-    public void setSettings(ProofSettings newSettings) {
+    public void setSettings(@Nullable ProofSettings newSettings) {
         this.settings = newSettings;
     }
 
