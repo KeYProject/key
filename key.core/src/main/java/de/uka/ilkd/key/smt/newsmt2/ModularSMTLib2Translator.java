@@ -142,6 +142,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             try {
                 Term formula = tacletTranslator.translate(taclet);
                 SExpr smt = master.translate(formula);
+                // we name assertions just for the user, so that it is easier to find them
+                smt = SExprs.named(smt, taclet.name().toString());
                 master.addAxiom(SExprs.assertion(smt));
             } catch (SMTTranslationException e) {
                 throw new RuntimeException(e);

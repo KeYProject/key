@@ -73,7 +73,7 @@ public class SMTTacletTranslator {
 
         Operator op = term.op();
         if (op instanceof OperatorSV sv) {
-            if (!(sv instanceof TermSV || sv instanceof FormulaSV)) {
+            if (!(sv instanceof TermSV || sv instanceof FormulaSV || sv instanceof VariableSV)) {
                 throw new SMTTranslationException("Only a few schema variables can be translated. "
                     + "This one cannot. Type " + sv.getClass());
             }
