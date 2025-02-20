@@ -32,6 +32,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
@@ -351,6 +352,7 @@ public class Proof implements Named {
     /**
      * returns the Services with the java service classes
      */
+    @Pure
     public Services getServices() {
         return Objects.requireNonNull(initConfig, PROOF_OBJECT_WAS_DISPOSED).getServices();
     }
@@ -377,6 +379,7 @@ public class Proof implements Named {
         fstGoal.makeLocalNamespacesFrom(ns);
     }
 
+    @Pure
     public ProofEnvironment getEnv() {
         return env;
     }
@@ -498,6 +501,7 @@ public class Proof implements Named {
      * @return list of open and enabled goals, never null
      * @author mulbrich
      */
+    @Pure
     public ImmutableList<Goal> openEnabledGoals() {
         return filterEnabledGoals(openGoals());
     }
@@ -511,6 +515,7 @@ public class Proof implements Named {
      * @author mulbrich
      * @see Goal#isAutomatic()
      */
+    @Pure
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
         ImmutableList<Goal> enabledGoals = ImmutableSLList.nil();
         for (Goal g : goals) {

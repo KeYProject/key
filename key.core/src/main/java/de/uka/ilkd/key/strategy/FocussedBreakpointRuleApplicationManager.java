@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -34,7 +35,7 @@ public class FocussedBreakpointRuleApplicationManager
         this.breakpoint = breakpoint;
     }
 
-    public FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
+    public FocussedBreakpointRuleApplicationManager(@Nullable AutomatedRuleApplicationManager delegate,
             Goal goal, Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
         this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
                 .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),

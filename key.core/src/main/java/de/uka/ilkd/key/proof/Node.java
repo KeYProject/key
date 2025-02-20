@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.util.collection.*;
 import org.key_project.util.lookup.Lookup;
 
@@ -222,6 +223,7 @@ public class Node implements Iterable<Node> {
         return renamings;
     }
 
+    @Pure
     public @Nullable RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
@@ -279,6 +281,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
+    @Pure
     public @Nullable Node parent() {
         return parent;
     }
@@ -485,6 +488,7 @@ public class Node implements Iterable<Node> {
      * @param i an index (starting at 0).
      * @return the i-th child of this node.
      */
+    @Pure
     public Node child(int i) {
         return children.get(i);
     }

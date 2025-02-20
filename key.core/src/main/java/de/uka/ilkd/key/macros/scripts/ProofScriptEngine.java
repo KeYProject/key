@@ -146,7 +146,7 @@ public class ProofScriptEngine {
                     LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
                         firstNode.serialNr(), parsed.start().getPosition().line(), cmd);
                 }
-                command.execute(uiControl, o, stateMap);
+                command.execute(uiControl, Objects.requireNonNull(o), stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
                 throw ie;

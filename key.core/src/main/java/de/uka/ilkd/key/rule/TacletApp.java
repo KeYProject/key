@@ -729,7 +729,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @param term the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
-    public abstract @Nullable TacletApp addInstantiation(SchemaVariable sv, Term term,
+    public abstract TacletApp addInstantiation(SchemaVariable sv, Term term,
             boolean interesting,
             Services services);
 

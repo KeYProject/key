@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.util.Strings;
 
 import org.jspecify.annotations.NonNull;
@@ -364,6 +365,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         /** @return int the number of elements in list */
         @Override
+        @Pure
         public int size() {
             return size;
         }
@@ -540,6 +542,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         @Override
+        @Pure
         public int size() {
             return 0;
         }
