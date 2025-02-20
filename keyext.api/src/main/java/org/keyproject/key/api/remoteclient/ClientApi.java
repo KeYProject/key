@@ -6,9 +6,6 @@ package org.keyproject.key.api.remoteclient;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
@@ -77,10 +74,13 @@ public interface ClientApi {
     CompletableFuture<ShowDocumentResult> showDocument(ShowDocumentParams params);
 
 
-    void taskFinished(TaskFinishedInfo info);
+    @JsonNotification
+    void taskFinished(org.keyproject.key.api.data.TaskFinishedInfo info);
 
+    @JsonNotification
     void taskProgress(int position);
 
-    void taskStarted(TaskStartedInfo info);
+    @JsonNotification
+    void taskStarted(org.keyproject.key.api.data.TaskStartedInfo info);
     // endregion
 }
