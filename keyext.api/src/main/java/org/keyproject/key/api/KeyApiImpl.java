@@ -61,7 +61,7 @@ public final class KeyApiImpl implements KeyApi {
     private final ProverTaskListener clientListener = new ProverTaskListener() {
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            clientApi.taskStarted(info);
+            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
         @Override
@@ -71,7 +71,7 @@ public final class KeyApiImpl implements KeyApi {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-            clientApi.taskFinished(info);
+            clientApi.taskFinished(org.keyproject.key.api.data.TaskFinishedInfo.from(info));
         }
     };
     private final AtomicInteger uniqueCounter = new AtomicInteger();
@@ -162,19 +162,44 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     @Override
-    public CompletableFuture<MacroStatistic> auto(ProofId proofId, StreategyOptions options) {
+    public CompletableFuture<ProofStatus> auto(ProofId proofId, StreategyOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
+            configureProofMode(proof, options);
             try {
                 env.getProofControl().startAndWaitForAutoMode(proof);
                 // clientListener);
-                return null; // MacroStatistic.from(proofId, info);
+                return ProofStatus.from(proofId, proof);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
 
+    }
+
+    private static void configureProofMode(Proof proof, StreategyOptions options) {
+        StrategyProperties sp =
+            proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
+            StrategyProperties.METHOD_CONTRACT);
+        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+            StrategyProperties.DEP_ON);
+        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
+            StrategyProperties.QUERY_ON);
+        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
+            StrategyProperties.STOPMODE_NONCLOSE);
+        proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+        // Make sure that the new options are used
+        int maxSteps = 10000;
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxSteps);
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                .setActiveStrategyProperties(sp);
+        proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
+        proof.setActiveStrategy(proof.getServices().getProfile()
+                .getDefaultStrategyFactory().create(proof, sp));
     }
 
     @Override
@@ -499,7 +524,7 @@ public final class KeyApiImpl implements KeyApi {
     private class MyDefaultUserInterfaceControl extends DefaultUserInterfaceControl {
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            clientApi.taskStarted(info);
+            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
         @Override
@@ -509,17 +534,17 @@ public final class KeyApiImpl implements KeyApi {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-            clientApi.taskFinished(info);
+            clientApi.taskFinished(org.keyproject.key.api.data.TaskFinishedInfo.from(info));
         }
 
         @Override
         protected void macroStarted(TaskStartedInfo info) {
-            clientApi.taskStarted(info);
+            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
         @Override
         protected synchronized void macroFinished(ProofMacroFinishedInfo info) {
-            clientApi.taskFinished(info);
+            clientApi.taskFinished(org.keyproject.key.api.data.TaskFinishedInfo.from(info));
         }
 
         @Override
