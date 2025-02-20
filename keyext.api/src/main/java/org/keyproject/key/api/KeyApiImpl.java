@@ -169,7 +169,7 @@ public final class KeyApiImpl implements KeyApi {
             try {
                 env.getProofControl().startAndWaitForAutoMode(proof);
                 // clientListener);
-                return null;// MacroStatistic.from(proofId, info);
+                return null; // MacroStatistic.from(proofId, info);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -253,13 +253,15 @@ public final class KeyApiImpl implements KeyApi {
         return null;
     }
 
-    @Override
-    public CompletableFuture<Statistics> statistics(ProofId proofId) {
-        return CompletableFuture.supplyAsync(() -> {
-            var proof = data.find(proofId);
-            return proof.getStatistics();
-        });
-    }
+    /*
+     * @Override
+     * public CompletableFuture<Statistics> statistics(ProofId proofId) {
+     * return CompletableFuture.supplyAsync(() -> {
+     * var proof = data.find(proofId);
+     * return proof.getStatistics();
+     * });
+     * }
+     */
 
     @Override
     public CompletableFuture<TreeNodeDesc> treeRoot(ProofId proof) {
