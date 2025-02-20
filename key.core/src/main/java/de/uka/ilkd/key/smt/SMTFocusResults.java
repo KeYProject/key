@@ -176,9 +176,11 @@ public final class SMTFocusResults {
         lastLine = lastLine.substring(1, lastLine.length() - 1);
 
         String[] labels = lastLine.trim().split(" +");
-        Integer[] numbers = new Integer[labels.length];
+        // some labels (for non-sequent formulas) are not for the unsat core -> filter them
+        String[] filtered = Arrays.stream(labels).filter(s -> s.startsWith("L_")).toArray(String[]::new);
+        Integer[] numbers = new Integer[filtered.length];
         for (int i = 0; i < numbers.length; i++) {
-            numbers[i] = Integer.parseInt(labels[i].substring(2));
+            numbers[i] = Integer.parseInt(filtered[i].substring(2));
         }
         return numbers;
     }
