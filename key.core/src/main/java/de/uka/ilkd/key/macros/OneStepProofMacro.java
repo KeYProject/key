@@ -12,6 +12,7 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
 /**
@@ -42,7 +43,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new OneStepStrategy(proof.getActiveStrategy());
     }
 
