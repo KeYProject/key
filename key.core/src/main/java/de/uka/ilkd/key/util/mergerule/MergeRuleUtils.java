@@ -32,6 +32,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.checkerframework.checker.nullness.qual.KeyFor;
+import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
@@ -39,6 +41,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +85,7 @@ public class MergeRuleUtils {
      * @param obj The object to wrap.
      * @return None iff obj is null, Some(obj) otherwise.
      */
-    public static <T> Optional<T> wrapOption(T obj) {
+    public static <T> Optional<@NonNull T> wrapOption(@Nullable T obj) {
         if (obj == null) {
             return Optional.empty();
         } else {
@@ -1043,11 +1046,14 @@ public class MergeRuleUtils {
      * not effected by the switch to branch-unique names. However, merged nodes are then of course
      * potentially different from their predecessors concerning the involved local variable symbols.
      *
+     * TODO calls SymbolicExecutionStateWithProgCnt() with updateTerm=null, check if this is OK!
+     *
      * @param node Current node.
      * @param pio Position of update-program counter formula in goal.
      * @param services The services object.
      * @return An SE state (U,C,p).
      */
+    @SuppressWarnings("nullness")
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
             PosInOccurrence pio, Services services) {
 
@@ -1114,6 +1120,7 @@ public class MergeRuleUtils {
      * @param services The {@link Services} object.
      * @return The renamed {@link SymbolicExecutionState} of the second merge partner.
      */
+    @SuppressWarnings("nullness")
     public static Pair<SymbolicExecutionState, SymbolicExecutionState> handleNameClashes(
             SymbolicExecutionState mergeState, SymbolicExecutionState mergePartnerState,
             Services services) {
@@ -1294,6 +1301,7 @@ public class MergeRuleUtils {
             throw new RuntimeException(
                 "An abstraction predicate must contain exactly one placeholder.");
         }
+        assert usedPlaceholder != null;
 
         return AbstractionPredicate.create(formula, usedPlaceholder, services);
     }
@@ -1650,7 +1658,8 @@ public class MergeRuleUtils {
      * @param name Name to find a PV for.
      * @return The PV with the given name in the global namespace, or null if there is none.
      */
-    private static LocationVariable lookupVarInNS(String name, Services services) {
+    @Pure
+    private static @Nullable LocationVariable lookupVarInNS(String name, Services services) {
         return (LocationVariable) services.getNamespaces().programVariables()
                 .lookup(new Name(name));
     }
@@ -1868,17 +1877,18 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public boolean containsKey(Object key) {
+        @SuppressWarnings("keyfor")
+        public boolean containsKey(@Nullable Object key) {
             return key instanceof LocationVariable;
         }
 
         @Override
-        public boolean containsValue(Object value) {
+        public boolean containsValue(@Nullable Object value) {
             return false;
         }
 
         @Override
-        public LocationVariable get(Object key) {
+        public @Nullable LocationVariable get(Object key) {
             if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) {
