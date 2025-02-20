@@ -152,6 +152,23 @@ class MacroStatistic:
         self.appliedRules = appliedRules
         self.closedGoals = closedGoals
 
+class ProofStatus:
+    """"""
+
+    id : ProofId
+    """"""
+
+    openGoals : int
+    """"""
+
+    closedGoals : int
+    """"""
+
+    def __init__(self, id, openGoals, closedGoals):
+        self.id = id
+        self.openGoals = openGoals
+        self.closedGoals = closedGoals
+
 class TreeNodeDesc:
     """"""
 
@@ -540,5 +557,5 @@ class TaskStartedInfo:
         pass
 
 
-KEY_DATA_CLASSES = { "ExampleDesc": ExampleDesc,"ProofMacroDesc": ProofMacroDesc,"ProofScriptCommandDesc": ProofScriptCommandDesc,"TraceValue": TraceValue,"SetTraceParams": SetTraceParams,"EnvironmentId": EnvironmentId,"ProofId": ProofId,"NodeId": NodeId,"List": List,"NodeDesc": NodeDesc,"StreategyOptions": StreategyOptions,"MacroStatistic": MacroStatistic,"TreeNodeDesc": TreeNodeDesc,"TreeNodeId": TreeNodeId,"PrintOptions": PrintOptions,"NodeTextId": NodeTextId,"NodeTextDesc": NodeTextDesc,"TermActionId": TermActionId,"TermActionKind": TermActionKind,"TermActionDesc": TermActionDesc,"SortDesc": SortDesc,"FunctionDesc": FunctionDesc,"ContractId": ContractId,"ContractDesc": ContractDesc,"LoadParams": LoadParams,"ProblemDefinition": ProblemDefinition,"LogTraceParams": LogTraceParams,"MessageType": MessageType,"ShowMessageParams": ShowMessageParams,"ShowMessageRequestParams": ShowMessageRequestParams,"MessageActionItem": MessageActionItem,"Range": Range,"ShowDocumentParams": ShowDocumentParams,"ShowDocumentResult": ShowDocumentResult,"TaskFinishedInfo": TaskFinishedInfo,"TaskStartedInfo": TaskStartedInfo }
+KEY_DATA_CLASSES = { "ExampleDesc": ExampleDesc,"ProofMacroDesc": ProofMacroDesc,"ProofScriptCommandDesc": ProofScriptCommandDesc,"TraceValue": TraceValue,"SetTraceParams": SetTraceParams,"EnvironmentId": EnvironmentId,"ProofId": ProofId,"NodeId": NodeId,"List": List,"NodeDesc": NodeDesc,"StreategyOptions": StreategyOptions,"MacroStatistic": MacroStatistic,"ProofStatus": ProofStatus,"TreeNodeDesc": TreeNodeDesc,"TreeNodeId": TreeNodeId,"PrintOptions": PrintOptions,"NodeTextId": NodeTextId,"NodeTextDesc": NodeTextDesc,"TermActionId": TermActionId,"TermActionKind": TermActionKind,"TermActionDesc": TermActionDesc,"SortDesc": SortDesc,"FunctionDesc": FunctionDesc,"ContractId": ContractId,"ContractDesc": ContractDesc,"LoadParams": LoadParams,"ProblemDefinition": ProblemDefinition,"LogTraceParams": LogTraceParams,"MessageType": MessageType,"ShowMessageParams": ShowMessageParams,"ShowMessageRequestParams": ShowMessageRequestParams,"MessageActionItem": MessageActionItem,"Range": Range,"ShowDocumentParams": ShowDocumentParams,"ShowDocumentResult": ShowDocumentResult,"TaskFinishedInfo": TaskFinishedInfo,"TaskStartedInfo": TaskStartedInfo }
 
