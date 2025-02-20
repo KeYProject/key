@@ -26,6 +26,16 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+
+/**
+ * A strict proof obligation for dependency contracts on methods.
+ * The relaxed proof obligation (DependencyContractPO) only verifies that
+ * the return value of a method only depends on the locations in the accessible
+ * clause. In contrast, this proof obligation additionally verifies that any
+ * objects on the heap (except those newly created) only depend on the locations
+ * in the accessible clause.
+ * For non-methods, this proof obligation is identical to DependencyContractPO.
+ */
 public class StrictDependencyContractPO extends DependencyContractPO {
     // -------------------------------------------------------------------------
     // constructors
