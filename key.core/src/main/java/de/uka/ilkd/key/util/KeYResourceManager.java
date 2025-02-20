@@ -30,9 +30,9 @@ public class KeYResourceManager {
     private static final KeYResourceManager instance = new KeYResourceManager();
 
 
-    private String version = null;
-    private String sha1 = null;
-    private String branch = null;
+    private @Nullable String version;
+    private @Nullable String sha1;
+    private @Nullable String branch;
 
     private KeYResourceManager() {
     }
@@ -48,7 +48,7 @@ public class KeYResourceManager {
     /**
      * reads a version string or returns "x.z.y" in case of failures
      */
-    private String readVersionString(URL url) {
+    private String readVersionString(@Nullable URL url) {
         StringBuilder result = new StringBuilder();
         if (url != null) {
             try (InputStream io = new BufferedInputStream(url.openStream())) {
@@ -209,7 +209,7 @@ public class KeYResourceManager {
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public URL getResourceFile(Object o, String resourcename) {
+    public @Nullable URL getResourceFile(Object o, String resourcename) {
         return getResourceFile(o.getClass(), resourcename);
     }
 

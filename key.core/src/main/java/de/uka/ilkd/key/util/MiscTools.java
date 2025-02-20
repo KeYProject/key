@@ -89,7 +89,7 @@ public final class MiscTools {
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
-    public static LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
+    public static @Nullable LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
             final Services services) {
         assert loopTerm.op() instanceof Modality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
@@ -870,6 +870,7 @@ public final class MiscTools {
         if (m.matches() && m.groupCount() == 2) {
             scheme = Objects.requireNonNull(m.group(1));
             schemeSpecPart = m.group(2);
+            assert schemeSpecPart != null;
         }
         switch (scheme) {
         case "URL" -> {

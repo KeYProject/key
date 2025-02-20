@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.util.properties;
 
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -48,7 +50,7 @@ public abstract class AbstractProperties implements Properties {
         }
     }
 
-    protected <T> void firePropertyChange(Property<T> property, T oldValue, T newValue) {
+    protected <T> void firePropertyChange(Property<T> property, @Nullable T oldValue, T newValue) {
         if (oldValue == null || !oldValue.equals(newValue)) {
             Set<PropertyListener> list = listenerMap.get(property);
             if (list != null) {
