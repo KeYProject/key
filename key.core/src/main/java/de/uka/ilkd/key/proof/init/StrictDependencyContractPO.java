@@ -11,16 +11,14 @@ import java.util.Map;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
@@ -28,80 +26,13 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-public class StrictDependencyContractPO extends AbstractPO implements ContractPO {
-    private Term mbyAtPre;
-    private final DependencyContract contract;
-
-    private InitConfig proofConfig;
-    private TermBuilder tb;
-
+public class StrictDependencyContractPO extends DependencyContractPO {
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
     public StrictDependencyContractPO(InitConfig initConfig, DependencyContract contract) {
-        super(initConfig, contract.getName());
-        assert !(contract instanceof FunctionalOperationContract);
-        this.contract = contract;
-    }
-
-    // -------------------------------------------------------------------------
-    // internal methods
-    // -------------------------------------------------------------------------
-
-    private Term buildFreePre(List<LocationVariable> heaps, LocationVariable selfVar,
-            KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, Term wellFormedHeaps,
-            Services services) throws ProofInputException {
-        // "self != null"
-        final Term selfNotNull =
-            selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
-
-        // "self.<created> = TRUE" for all heaps
-
-        Term selfCreated = null;
-        if (selfVar != null) {
-            for (LocationVariable h : heaps) {
-                final Term sc = tb.created(tb.var(h), tb.var(selfVar));
-                if (selfCreated == null) {
-                    selfCreated = sc;
-                } else {
-                    selfCreated = tb.and(selfCreated, sc);
-                }
-            }
-        } else {
-            selfCreated = tb.tt();
-        }
-
-        // "MyClass::exactInstance(self) = TRUE"
-        final Term selfExactType =
-            selfVar == null ? tb.tt() : tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
-
-        // conjunction of...
-        // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
-        // - "inBounds(p_i)" for integer parameters
-        Term paramsOK = tb.tt();
-        for (var paramVar : paramVars) {
-            paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
-        }
-
-        // initial value of measured_by clause
-        final Term mbyAtPreDef;
-        if (contract.hasMby()) {
-            /*
-             * final Function mbyAtPreFunc = new Function(new Name(TB.newName(services,
-             * "mbyAtPre")), services.getTypeConverter() .getIntegerLDT() .targetSort());
-             * register(mbyAtPreFunc); mbyAtPre = TB.func(mbyAtPreFunc);
-             */
-            final Term mby = contract.getMby(selfVar, paramVars, services);
-            // mbyAtPreDef = TB.equals(mbyAtPre, mby);
-            mbyAtPreDef = tb.measuredBy(mby);
-        } else {
-            // mbyAtPreDef = TB.tt();
-            mbyAtPreDef = tb.measuredByEmpty();
-        }
-
-        return tb.and(wellFormedHeaps, selfNotNull, selfCreated, selfExactType, paramsOK,
-            mbyAtPreDef);
+        super(initConfig, contract);
     }
 
     // -------------------------------------------------------------------------
@@ -109,22 +40,24 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
     // -------------------------------------------------------------------------
 
     @Override
-    protected InitConfig getCreatedInitConfigForSingleProof() {
-        return proofConfig;
-    }
-
-    @Override
     public void readProblem() throws ProofInputException {
         assert proofConfig == null;
         IObserverFunction target = contract.getTarget();
-        if (target instanceof IProgramMethod) {
-            target = javaInfo.getToplevelPM(contract.getKJT(), (IProgramMethod) target);
-            // FIXME: for some reason the above method call returns null now and then, the
-            // following
-            // line (hopefully) is a work-around
-            if (target == null) {
-                target = contract.getTarget();
-            }
+
+        // This StrictDependencyPO can only handle accessible clauses on methods.
+        // Therefore, dispatch to the relaxed DependencyPO when not applicable.
+        if (!(target instanceof IProgramMethod)) {
+            super.readProblem();
+            return;
+        }
+        target = javaInfo.getToplevelPM(contract.getKJT(), (IProgramMethod) target);
+
+        // NOTE: This FIXME is duplicated from DependencyPO::readProblem.
+        // FIXME: for some reason the above method call returns null now and then, the
+        // following
+        // line (hopefully) is a work-around
+        if (target == null) {
+            target = contract.getTarget();
         }
 
         final boolean isVoid = target.getType() == KeYJavaType.VOID_TYPE;
@@ -223,9 +156,10 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         LocationVariable heapVar = (LocationVariable) tb.getBaseHeap().op();
         final Term dep =
             contract.getDep(heapVar, false, selfVar, paramVars, preHeapVars, proofServices);
-        final Term assignable = tb.empty(); // TODO: contract.getModifiable(heapVar);
+        final Term assignable = contract.getModifiable(heapVar, selfVar, paramVars, proofServices);
 
-        final Sort heapSort = proofServices.getTypeConverter().getHeapLDT().targetSort();
+        final HeapLDT heapldt = proofServices.getTypeConverter().getHeapLDT();
+        final Sort heapSort = heapldt.targetSort();
         final var heapVar1 = new JFunction(new Name(tb.newName(heapSort)), heapSort);
         register(heapVar1, proofServices);
         final var heapVar2 = new JFunction(new Name(tb.newName(heapSort)), heapSort);
@@ -242,7 +176,9 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         Term fieldTerm = tb.var(fieldVar);
         final Term heapCheck = tb.all(objectVar,
             tb.all(fieldVar,
-                tb.imp(tb.subset(tb.singleton(objectTerm, fieldTerm), assignable),
+                tb.imp(tb.and(tb.subset(tb.singleton(objectTerm, fieldTerm), assignable),
+                    tb.not(tb.elementOf(objectTerm, fieldTerm, tb.freshLocs(tb.getBaseHeap()))),
+                    tb.not(tb.equals(fieldTerm, tb.func(heapldt.getCreated())))),
                     tb.equals(tb.select(JavaDLTheory.ANY, heapTerm1, objectTerm, fieldTerm),
                         tb.select(JavaDLTheory.ANY, heapTerm2, objectTerm, fieldTerm)))));
 
@@ -316,46 +252,11 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
     }
 
     @Override
-    public DependencyContract getContract() {
-        return contract;
-    }
-
-    @Override
-    public Term getMbyAtPre() {
-        return mbyAtPre;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (!(o instanceof StrictDependencyContractPO sdpo)) {
             return false;
         } else {
             return contract.equals(sdpo.contract);
         }
-    }
-
-    @Override
-    public int hashCode() {
-        return contract.hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
-    @Override
-    public Configuration createLoaderConfig() {
-        var c = super.createLoaderConfig();
-        c.set("contract", contract.getName());
-        return c;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public KeYJavaType getContainerType() {
-        return getContract().getKJT();
     }
 }

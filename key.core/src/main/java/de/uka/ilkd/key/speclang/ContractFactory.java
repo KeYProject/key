@@ -183,12 +183,13 @@ public class ContractFactory {
 
     public DependencyContract dep(KeYJavaType containerType, IObserverFunction pm,
             KeYJavaType specifiedIn, Map<LocationVariable, Term> requires, Term measuredBy,
-            Map<LocationVariable, Term> accessibles, LocationVariable selfVar,
+            Map<LocationVariable, Term> accessibles, Map<LocationVariable, Term> modifiables,
+            LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Term globalDefs) {
         assert (selfVar == null) == pm.isStatic();
         return dep("JML accessible clause", containerType, pm, specifiedIn, requires, measuredBy,
-            accessibles, selfVar, paramVars, atPreVars, globalDefs);
+            accessibles, modifiables, selfVar, paramVars, atPreVars, globalDefs);
     }
 
     public DependencyContract dep(KeYJavaType kjt, LocationVariable targetHeap,
@@ -209,18 +210,19 @@ public class ContractFactory {
         }
         // TODO: insert static invariant??
         return dep(kjt, dep.observerFunction(), dep.observerFunction().getContainerType(), pres,
-            dep.mby(), accessibles,
+            dep.mby(), accessibles, null,
             selfVar, paramVars, null, null);
     }
 
     public DependencyContract dep(String string, KeYJavaType containerType, IObserverFunction pm,
             KeYJavaType specifiedIn, Map<LocationVariable, Term> requires, Term measuredBy,
-            Map<LocationVariable, Term> accessibles, LocationVariable selfVar,
+            Map<LocationVariable, Term> accessibles, Map<LocationVariable, Term> modifiables,
+            LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Term globalDefs) {
         assert (selfVar == null) == pm.isStatic();
         return new DependencyContractImpl(string, null, containerType, pm, specifiedIn, requires,
-            measuredBy, accessibles, selfVar, paramVars, atPreVars, globalDefs,
+            measuredBy, accessibles, modifiables, selfVar, paramVars, atPreVars, globalDefs,
             Contract.INVALID_ID);
     }
 

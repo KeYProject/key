@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,19 +12,24 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.DependencyContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.StrictDependencyContractPO;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.MapUtil;
+
+import static de.uka.ilkd.key.util.Assert.assertEqualSort;
+import static de.uka.ilkd.key.util.Assert.assertSubSort;
 
 /**
  * Standard implementation of the DependencyContract interface.
@@ -37,12 +43,12 @@ public final class DependencyContractImpl implements DependencyContract {
     final Map<LocationVariable, Term> originalPres;
     final Term originalMby;
     final Map<LocationVariable, Term> originalDeps;
+    final Map<LocationVariable, Term> originalModifiables;
     final LocationVariable originalSelfVar;
     final ImmutableList<LocationVariable> originalParamVars;
     final Map<LocationVariable, LocationVariable> originalAtPreVars;
     final Term globalDefs;
     final int id;
-
 
     // -------------------------------------------------------------------------
     // constructors
@@ -50,7 +56,8 @@ public final class DependencyContractImpl implements DependencyContract {
 
     DependencyContractImpl(String baseName, String name, KeYJavaType kjt, IObserverFunction target,
             KeYJavaType specifiedIn, Map<LocationVariable, Term> pres, Term mby,
-            Map<LocationVariable, Term> deps, LocationVariable selfVar,
+            Map<LocationVariable, Term> deps, Map<LocationVariable, Term> modifiables,
+            LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Term globalDefs, int id) {
         assert baseName != null;
@@ -73,6 +80,7 @@ public final class DependencyContractImpl implements DependencyContract {
         this.originalPres = pres;
         this.originalMby = mby;
         this.originalDeps = deps;
+        this.originalModifiables = modifiables;
         this.originalSelfVar = selfVar;
         this.originalParamVars = paramVars;
         this.originalAtPreVars = atPreVars;
@@ -80,14 +88,15 @@ public final class DependencyContractImpl implements DependencyContract {
         this.id = id;
     }
 
-
     @Deprecated
     DependencyContractImpl(String baseName, KeYJavaType kjt, IObserverFunction target,
             KeYJavaType specifiedIn, Map<LocationVariable, Term> pres, Term mby,
-            Map<LocationVariable, Term> deps, LocationVariable selfVar,
+            Map<LocationVariable, Term> deps, Map<LocationVariable, Term> modifiables,
+            LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
-        this(baseName, null, kjt, target, specifiedIn, pres, mby, deps, selfVar, paramVars,
+        this(baseName, null, kjt, target, specifiedIn, pres, mby, deps, modifiables, selfVar,
+            paramVars,
             atPreVars, null, INVALID_ID);
     }
 
@@ -102,9 +111,12 @@ public final class DependencyContractImpl implements DependencyContract {
         Term newMby = op.apply(originalMby);
         Map<LocationVariable, Term> newDeps = originalDeps.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newModifiables = originalModifiables.entrySet().stream()
+                .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
 
         return new DependencyContractImpl(baseName, name, kjt, target, specifiedIn, newPres, newMby,
-            newDeps, originalSelfVar, originalParamVars, originalAtPreVars, globalDefs, id);
+            newDeps, newModifiables, originalSelfVar, originalParamVars, originalAtPreVars,
+            globalDefs, id);
     }
 
     @Override
@@ -112,30 +124,25 @@ public final class DependencyContractImpl implements DependencyContract {
         return name;
     }
 
-
     @Override
     public int id() {
         return id;
     }
-
 
     @Override
     public KeYJavaType getKJT() {
         return kjt;
     }
 
-
     @Override
     public IObserverFunction getTarget() {
         return target;
     }
 
-
     @Override
     public boolean hasMby() {
         return originalMby != null;
     }
-
 
     @Override
     public Term getPre(LocationVariable heap, LocationVariable selfVar,
@@ -183,7 +190,6 @@ public final class DependencyContractImpl implements DependencyContract {
         return result;
     }
 
-
     @Override
     public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
@@ -212,7 +218,6 @@ public final class DependencyContractImpl implements DependencyContract {
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalPres.get(heap));
     }
-
 
     @Override
     public Term getPre(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
@@ -272,7 +277,6 @@ public final class DependencyContractImpl implements DependencyContract {
         return or.replace(originalMby);
     }
 
-
     @Override
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
@@ -304,7 +308,6 @@ public final class DependencyContractImpl implements DependencyContract {
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalMby);
     }
-
 
     @Override
     public String getPlainText(Services services) {
@@ -348,20 +351,17 @@ public final class DependencyContractImpl implements DependencyContract {
         }
     }
 
-
     @Override
     public boolean toBeSaved() {
         return false; // because dependency contracts currently cannot be
         // specified directly in DL
     }
 
-
     @Override
     public String proofToString(Services services) {
         assert false;
         return null;
     }
-
 
     @Override
     public Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
@@ -391,7 +391,6 @@ public final class DependencyContractImpl implements DependencyContract {
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
-
 
     @Override
     public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm, Term selfTerm,
@@ -440,18 +439,15 @@ public final class DependencyContractImpl implements DependencyContract {
         return originalDeps.toString();
     }
 
-
     @Override
     public String getDisplayName() {
         return ContractFactory.generateDisplayName(baseName, kjt, target, specifiedIn, id);
     }
 
-
     @Override
     public VisibilityModifier getVisibility() {
         return null;
     }
-
 
     @Override
     public boolean transactionApplicableContract() {
@@ -468,40 +464,36 @@ public final class DependencyContractImpl implements DependencyContract {
         }
     }
 
-
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-        return new DependencyContractPO(initConfig, (DependencyContract) contract);
+        return new StrictDependencyContractPO(initConfig, (DependencyContract) contract);
     }
-
 
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
         return (ContractPO) createProofObl(initConfig, this);
     }
 
-
     @Override
     public ProofOblInput getProofObl(Services services) {
         return services.getSpecificationRepository().getPO(this);
     }
 
-
     @Override
     public DependencyContract setID(int newId) {
         return new DependencyContractImpl(baseName, null, kjt, target, specifiedIn, originalPres,
-            originalMby, originalDeps, originalSelfVar, originalParamVars, originalAtPreVars,
+            originalMby, originalDeps, originalModifiables, originalSelfVar, originalParamVars,
+            originalAtPreVars,
             globalDefs, newId);
     }
-
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new DependencyContractImpl(baseName, null, newKJT, newPM, specifiedIn, originalPres,
-            originalMby, originalDeps, originalSelfVar, originalParamVars, originalAtPreVars,
+            originalMby, originalDeps, originalModifiables, originalSelfVar, originalParamVars,
+            originalAtPreVars,
             globalDefs, id);
     }
-
 
     @Override
     public String getTypeName() {
@@ -515,13 +507,102 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public OriginalVariables getOrigVars() {
-        Map<LocationVariable, LocationVariable> atPreVars =
-            new LinkedHashMap<>();
+        Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
         if (originalAtPreVars != null) {
             for (LocationVariable h : originalAtPreVars.keySet()) {
                 atPreVars.put(h, originalAtPreVars.get(h));
             }
         }
         return new OriginalVariables(originalSelfVar, null, null, atPreVars, originalParamVars);
+    }
+
+    @Override
+    public Term getModifiable(LocationVariable heapVar, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
+        return getAnyModifiable(this.originalModifiables.get(heapVar), selfVar, paramVars,
+            services);
+    }
+
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
+
+    private Term getAnyModifiable(Term modifiable, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        paramVars = addGhostParams(paramVars);
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+        final Map<LocationVariable, LocationVariable> replaceMap =
+            getReplaceMap(selfVar, paramVars, null, null, null,
+                services);
+        final OpReplacer or =
+            new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+        return or.replace(modifiable);
+    }
+
+    /** Make sure ghost parameters appear in the list of parameter variables. */
+    private ImmutableList<LocationVariable> addGhostParams(
+            ImmutableList<LocationVariable> paramVars) {
+        // make sure ghost parameters are present
+        ImmutableList<LocationVariable> ghostParams = ImmutableSLList.nil();
+        for (LocationVariable param : originalParamVars) {
+            if (param.isGhost()) {
+                ghostParams = ghostParams.append(param);
+            }
+        }
+        paramVars = paramVars.append(ghostParams);
+        return paramVars;
+    }
+
+    /**
+     * Get the according replace map for the given variables.
+     *
+     * @param selfVar the self variable
+     * @param paramVars the parameter variables
+     * @param resultVar the result variable
+     * @param excVar the exception variable
+     * @param atPreVars a map of pre-heaps to their variables
+     * @param services the services object
+     * @return the replacement map
+     */
+    protected Map<LocationVariable, LocationVariable> getReplaceMap(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
+        final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<>();
+
+        // self
+        if (selfVar != null) {
+            assertSubSort(selfVar, originalSelfVar);
+            result.put(originalSelfVar, selfVar);
+        }
+
+        // parameters
+        if (paramVars != null) {
+            assert originalParamVars.size() == paramVars.size();
+            final Iterator<LocationVariable> it1 = originalParamVars.iterator();
+            final Iterator<LocationVariable> it2 = paramVars.iterator();
+            while (it1.hasNext()) {
+                LocationVariable originalParamVar = it1.next();
+                LocationVariable paramVar = it2.next();
+                // allow contravariant parameter types
+                assertSubSort(originalParamVar, paramVar);
+                result.put(originalParamVar, paramVar);
+            }
+        }
+
+        if (atPreVars != null) {
+            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            for (LocationVariable h : heapLDT.getAllHeaps()) {
+                if (atPreVars.get(h) != null) {
+                    assertEqualSort(originalAtPreVars.get(h), atPreVars.get(h));
+                    result.put(originalAtPreVars.get(h), atPreVars.get(h));
+                }
+            }
+        }
+
+        return result;
     }
 }

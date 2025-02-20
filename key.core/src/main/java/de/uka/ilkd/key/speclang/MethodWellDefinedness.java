@@ -111,6 +111,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             ContractFactory.generateContractName("JML model field", rep.getKJT(), rep.getTarget(),
                 rep.getTarget().getContainerType(), 0),
             rep.getKJT(), rep.getTarget(), rep.getTarget().getContainerType(), pres, null, deps,
+            null,
             rep.getOrigVars().self, rep.getOrigVars().params, rep.getOrigVars().atPres, null, 0);
         this.modelField = true;
         final OriginalVariables origVars = contract.getOrigVars();
