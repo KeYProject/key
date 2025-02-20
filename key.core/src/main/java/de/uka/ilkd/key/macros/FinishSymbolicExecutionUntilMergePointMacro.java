@@ -63,7 +63,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
             @Nullable ProverTaskListener listener)
             throws InterruptedException {
@@ -72,7 +72,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
@@ -116,6 +116,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             // Undo until a break condition is the first active statement again.
             while (!hasBreakPoint(lastNode.sequent().succedent())) {
                 lastNode = lastNode.parent();
+                assert lastNode != null;
                 proof.pruneProof(lastNode);
             }
 

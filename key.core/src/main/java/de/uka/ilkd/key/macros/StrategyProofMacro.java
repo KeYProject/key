@@ -71,7 +71,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      * If the automation is interrupted, report the interruption as an exception.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
             @Nullable ProverTaskListener listener)
             throws InterruptedException {

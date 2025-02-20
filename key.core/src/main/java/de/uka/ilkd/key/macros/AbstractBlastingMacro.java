@@ -56,7 +56,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     protected abstract Set<String> getAllowedPullOut();
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
             @Nullable ProverTaskListener listener)
             throws InterruptedException {

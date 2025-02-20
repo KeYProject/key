@@ -69,7 +69,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      * @throws InterruptedException if the macro is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals,
             @Nullable PosInOccurrence posInOcc,
             @Nullable ProverTaskListener listener)
