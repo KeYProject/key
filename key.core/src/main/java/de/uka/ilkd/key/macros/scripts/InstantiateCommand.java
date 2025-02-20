@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -133,7 +134,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
+    private @Nullable TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,

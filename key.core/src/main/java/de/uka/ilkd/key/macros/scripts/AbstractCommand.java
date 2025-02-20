@@ -25,15 +25,15 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  */
 public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
-    protected Proof proof;
-    protected Services service;
-    protected EngineState state;
+    protected @Nullable Proof proof;
+    protected @Nullable Services service;
+    protected @Nullable EngineState state;
     protected AbstractUserInterfaceControl uiControl;
 
     /**
      * Documentation of this command.
      */
-    protected String documentation = null;
+    protected @Nullable String documentation = null;
 
     /**
      * ...

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.*;
@@ -65,7 +66,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @throws ScriptException if no goal is currently open
      */
     private void hideAll(Sequent toKeep) throws ScriptException {
-        Goal goal = state.getFirstOpenAutomaticGoal();
+        Goal goal = Objects.requireNonNull(state).getFirstOpenAutomaticGoal();
         assert goal != null : "not null by contract of the method";
 
         // The formulas to keep in the antecedent
@@ -95,7 +96,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
     // determine where formula in sequent and apply either hide_left or hide_right
     private Taclet getHideTaclet(String pos) {
         String ruleName = "hide_" + pos;
-        return proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(ruleName));
+        return Objects.requireNonNull(proof).getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(ruleName));
     }
 
     /**
@@ -121,8 +122,8 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
         TacletApp app =
-            PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
-        app = app.addCheckedInstantiation(sv, toHide.formula(), proof.getServices(), true);
+            PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, Objects.requireNonNull(proof).getServices());
+        app = app.addCheckedInstantiation(sv, toHide.formula(), Objects.requireNonNull(proof).getServices(), true);
         g.apply(app);
 
     }

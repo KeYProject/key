@@ -5,6 +5,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Command for re-activating the first open (not necessarily enabled) {@link Goal} after a "leave"
@@ -20,7 +21,7 @@ public class ActivateCommand extends NoArgumentCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Void args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @Nullable Void args, EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenGoal(false);
         goal.setEnabled(true);

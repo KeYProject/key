@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -12,6 +13,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
 /**
@@ -40,13 +42,13 @@ public class AxiomCommand extends AbstractCommand<AxiomCommand.FormulaParameter>
     @Override
     public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
         Taclet cut =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
+            Objects.requireNonNull(state).getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
+        app = app.addCheckedInstantiation(sv, parameter.formula, Objects.requireNonNull(state).getProof().getServices(),
             true);
-        state.getFirstOpenAutomaticGoal().apply(app);
+        Objects.requireNonNull(state).getFirstOpenAutomaticGoal().apply(app);
     }
 
     @SuppressWarnings("initialization")
