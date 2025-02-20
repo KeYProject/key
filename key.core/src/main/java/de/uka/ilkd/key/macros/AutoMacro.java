@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
 /**
@@ -150,7 +151,7 @@ public class AutoMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new AutoMacroFilterStrategy(proof.getActiveStrategy(), breakpoint,
                 allowSplits, whitelist, symbexOnly, onlyHumanReadable);
     }
