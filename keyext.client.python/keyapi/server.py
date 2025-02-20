@@ -1,5 +1,5 @@
 import socket
-from keyapi import LspEndpoint, LoadParams
+from keyapi import LspEndpoint, LoadParams, StreategyOptions
 from keyapi.server_internal import KeyServer
 from keyapi.rpc import JsonRpcEndpoint
 
@@ -30,3 +30,34 @@ class NetKeY(object):
         self.inStream.close()
         self.outStream.close()
         self.socket.close()
+
+class KeYEnv(object):
+    def __init__(self, key, load_params : LoadParams):
+        self.key = key
+        self.envHandle = self.key.loading_load(load_params)
+
+    def contracts(self):
+        return self.key.env_contracts(self.envHandle)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.key.env_dispose(self.envHandle)
+
+class KeYProof(object):
+    def __init__(self, key, contract):
+        self.key = key
+        self.proofHandle = self.key.env_openContract(contract.contractId)
+
+    def __enter__(self):
+        return self
+
+    def root(self):
+        return self.key.proofTree_root(self.proofHandle)
+
+    def auto(self, options = StreategyOptions()):
+        return self.key.proof_auto(self.proofHandle, options)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.key.proof_dispose(self.proofHandle)
