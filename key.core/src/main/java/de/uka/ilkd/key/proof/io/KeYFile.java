@@ -34,11 +34,11 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -217,10 +217,9 @@ public class KeYFile implements EnvInput {
                 KeyAst.File ctx = getParseContext();
                 includes =
                     ctx.getIncludes(file.file().getAbsoluteFile().getParentFile().toURI().toURL());
-            } catch (ParseCancellationException e){
+            } catch (ParseCancellationException e) {
                 throw new ParseCancellationException(e);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ProofInputException(e);
             }
         }
