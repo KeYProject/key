@@ -10,7 +10,7 @@ remain since they will be invisible when showing the PR.
 
 <!-- Please remove if this PR is not related to an issue. -->
 <!-- Please add number if it is in answer to an issue. -->
-This pull request addresses #.
+This pull request resolves #.
 
 ## Intended Change
 
