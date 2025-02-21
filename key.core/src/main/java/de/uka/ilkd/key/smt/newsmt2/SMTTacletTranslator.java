@@ -72,7 +72,7 @@ public class SMTTacletTranslator {
 
         Operator op = term.op();
         if (op instanceof OperatorSV sv) {
-            if (!(sv instanceof TermSV || sv instanceof FormulaSV)) {
+            if (!(sv instanceof TermSV || sv instanceof FormulaSV || sv instanceof VariableSV)) {
                 throw new SMTTranslationException("Only a few schema variables can be translated. "
                     + "This one cannot. Type " + sv.getClass());
             }
@@ -93,18 +93,20 @@ public class SMTTacletTranslator {
         }
 
         List<QuantifiableVariable> qvars = new ArrayList<>();
-        if (op instanceof Quantifier) {
-            for (QuantifiableVariable boundVar : term.boundVars()) {
-                if (boundVar instanceof OperatorSV sv) {
-                    LogicVariable lv =
-                        variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
-                    qvars.add(lv);
-                    changes = true;
-                } else {
-                    qvars.add(boundVar);
-                }
+        // Probably works for binding operators other than Quantifier, such as bsum. It would be
+        // desirable to not create incorrect terms here.
+        // if (op instanceof Quantifier) {
+        for (QuantifiableVariable boundVar : term.boundVars()) {
+            if (boundVar instanceof OperatorSV sv) {
+                LogicVariable lv =
+                    variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
+                qvars.add(lv);
+                changes = true;
+            } else {
+                qvars.add(boundVar);
             }
         }
+        // }
 
         if (changes) {
             var bvars = new ImmutableArray<>(qvars);
