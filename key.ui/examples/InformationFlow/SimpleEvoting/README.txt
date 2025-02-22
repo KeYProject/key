@@ -17,4 +17,4 @@ Voters send their secrete votes (encrypted, but this not modeled throughout in t
 
 The difficult part in this case-study is to show that indeed only the correct result of the election is declassified.
 
-
+(This example expands constructors for classes with final fields. For this to work, final fields are treated like ordinary fields.)
