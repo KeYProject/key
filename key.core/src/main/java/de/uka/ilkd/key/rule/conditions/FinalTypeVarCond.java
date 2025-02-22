@@ -36,10 +36,6 @@ public final class FinalTypeVarCond extends VariableConditionAdapter {
         return negated;
     }
 
-    public TypeResolver getTypeResolver() {
-        return resolver;
-    }
-
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
