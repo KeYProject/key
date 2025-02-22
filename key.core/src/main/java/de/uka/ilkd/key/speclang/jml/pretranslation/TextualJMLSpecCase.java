@@ -117,12 +117,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
-        super(modifiers);
-        if (behavior == null) {
-            throw new IllegalArgumentException();
-        }
-        this.behavior = behavior;
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> mods, Behavior behavior) {
+        super(mods);
+        this.behavior = Objects.requireNonNull(behavior);
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
@@ -197,7 +194,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
             + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
-
 
     // region legacy api
     public void addRequires(LabeledParserRuleContext label) {

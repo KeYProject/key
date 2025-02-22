@@ -1024,6 +1024,9 @@ public final class MainWindow extends JFrame {
         proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this, selected));
         proof.add(new ShowKnownTypesAction(this, selected));
+        proof.addSeparator();
+        proof.add(new MakeNamedFormulaToAbbrevAction(this));
+        proof.addSeparator();
         return proof;
     }
 

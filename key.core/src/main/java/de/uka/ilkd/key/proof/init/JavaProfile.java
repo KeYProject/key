@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
+import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -43,6 +40,7 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
 
 /**
  * This profile sets up KeY for verification of JavaCard programs.
@@ -132,6 +130,9 @@ public class JavaProfile extends AbstractProfile {
             result.prepend(new TermLabelConfiguration(DefinedSymbolsHandler.TRIGGER_LABEL.name(),
                 new SingletonLabelFactory<>(DefinedSymbolsHandler.TRIGGER_LABEL)));
 
+        result =
+            result.prepend(new TermLabelConfiguration(SpecNameLabel.NAME,
+                (arguments, services) -> new SpecNameLabel(arguments.get(0))));
         return result;
     }
 
