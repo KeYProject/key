@@ -1,0 +1,11 @@
+key: |
+  \predicates { a; b; c; d; e; f; }
+  \problem { a -> b }
+script: |
+  macro split-prop;
+  hide "b ==>";
+exception: |2
+
+  Error while executing script: This formula is not on the sequent: b
+
+  Command: hide "b ==>";
