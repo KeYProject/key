@@ -25,7 +25,9 @@ import javax.swing.text.html.HTMLDocument;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.sourceview.JavaDocument;
+import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
+import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
+import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
@@ -687,7 +689,9 @@ public final class IssueDialog extends JDialog {
                     }), "\n");
 
                 if (isJava(uri.getPath())) {
-                    showJavaSourceCode(source);
+                    showSourceCode(source, new JavaJMLEditorLexer());
+                } else if (isKeY(uri.getPath())) {
+                    showSourceCode(source, new KeYEditorLexer());
                 } else {
                     txtSource.setText(source);
                 }
@@ -709,9 +713,9 @@ public final class IssueDialog extends JDialog {
         txtStacktrace.setText(issue.getAdditionalInfo());
     }
 
-    private void showJavaSourceCode(String source) {
+    private void showSourceCode(String source, SourceHighlightDocument.EditorLexer lexer) {
         try {
-            JavaDocument doc = new JavaDocument();
+            SourceHighlightDocument doc = new SourceHighlightDocument(lexer);
             txtSource.setDocument(doc);
             doc.insertString(0, source, new SimpleAttributeSet());
         } catch (BadLocationException e) {
@@ -750,6 +754,10 @@ public final class IssueDialog extends JDialog {
     private boolean isJava(String fileName) {
         // fileName can be null for URIs like "jar:file:/xxx/yyy.jar!aaa.java"
         return fileName != null && fileName.endsWith(".java");
+    }
+
+    private boolean isKeY(String fileName) {
+        return fileName != null && (fileName.endsWith(".key") || fileName.endsWith(".proof"));
     }
 
     public static int getOffsetFromLineColumn(String source, Position pos) {

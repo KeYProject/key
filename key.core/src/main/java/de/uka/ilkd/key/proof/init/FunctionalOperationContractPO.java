@@ -35,6 +35,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
 
@@ -228,7 +229,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFrameClause(List<LocationVariable> modifiableHeaps,
+    protected @Nullable Term buildFrameClause(List<LocationVariable> modifiableHeaps,
             Map<Term, Term> heapToAtPre, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
         Term frameTerm = null;
