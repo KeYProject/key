@@ -483,7 +483,7 @@ public class JMLSpecFactory {
                 || (axioms.size() == 1 // or the first element is an empty method_decl
                         && axioms.head().first instanceof JmlParser.Method_declarationContext
                         && ((JmlParser.Method_declarationContext) axioms.head().first)
-                                .method_body() == null);
+                                .method_body == null);
         if (empty) {
             clauses.axioms.put(heap, null);
         } else {

@@ -38,6 +38,7 @@ import de.uka.ilkd.key.util.TermUtil;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.antlr.v4.runtime.RuleContext;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -2346,7 +2347,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
-        if (ctx.method_body() == null) {
+        if (ctx.method_body == null) {
             return new SLExpression(tb.tt());
         }
 
@@ -2363,14 +2364,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         ParserRuleContext equal = JmlFacade.parseExpr(ctx.IDENT() + paramsString);
         Object a = accept(equal);
 
-        SLExpression body = accept(ctx.method_body().expression());
+        SLExpression body = accept(ctx.method_body);
         SLParameters params = visitParameters(ctx.param_list());
         SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
 
         var forbiddenHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
         boolean applyContainsHeap = TermUtil.contains(apply.getTerm(), forbiddenHeapVar);
         boolean bodyContainsHeap = TermUtil.contains(body.getTerm(), forbiddenHeapVar);
-
 
         if (!applyContainsHeap && bodyContainsHeap) {
             // NOT (no heap in applies --> no heap in body)
@@ -2380,6 +2380,39 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return termFactory.eq(apply, body);
     }
 
+    @Override
+    public SLExpression visitMbody_return(JmlParser.Mbody_returnContext ctx) {
+        return accept(ctx.expression());
+    }
+
+    @Override
+    public SLExpression visitMbody_block(JmlParser.Mbody_blockContext ctx) {
+        resolverManager.pushLocalVariablesNamespace();
+        List<Pair<LogicVariable, Term>> substList = new ArrayList<>();
+        for (JmlParser.Mbody_varContext varCtx : ctx.mbody_var()) {
+            String name = varCtx.IDENT().getText();
+            SLExpression expr = accept(varCtx.expression());
+            Term term = expr.getTerm();
+            LogicVariable logVar = new LogicVariable(new Name(name), term.sort());
+            substList.add(new Pair<>(logVar, term));
+            resolverManager.putIntoTopLocalVariablesNamespace(ImmutableList.of(logVar), javaInfo.getKeYJavaType(term.sort()));
+        }
+        SLExpression stmExpr = accept(ctx.mbody_statement());
+        Term term = stmExpr.getTerm();
+        for (Pair<LogicVariable, Term> lv : substList.reversed()) {
+            term = tb.subst(lv.first, lv.second, term);
+        }
+        resolverManager.popLocalVariablesNamespace();
+        return new SLExpression(term);
+    }
+
+    @Override
+    public SLExpression visitMbody_if(JmlParser.Mbody_ifContext ctx) {
+        SLExpression cond = accept(ctx.getChild(ParserRuleContext.class, 0));
+        SLExpression then = accept(ctx.getChild(ParserRuleContext.class, 1));
+        SLExpression elze = accept(ctx.getChild(ParserRuleContext.class, 2));
+        return new SLExpression(tb.ife(cond.getTerm(), then.getTerm(), elze.getTerm()));
+    }
 
     @Override
     public Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {
