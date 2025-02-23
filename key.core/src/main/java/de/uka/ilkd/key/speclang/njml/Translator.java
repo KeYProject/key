@@ -38,7 +38,6 @@ import de.uka.ilkd.key.util.TermUtil;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
-import org.antlr.v4.runtime.RuleContext;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -2395,7 +2394,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
             Term term = expr.getTerm();
             LogicVariable logVar = new LogicVariable(new Name(name), term.sort());
             substList.add(new Pair<>(logVar, term));
-            resolverManager.putIntoTopLocalVariablesNamespace(ImmutableList.of(logVar), javaInfo.getKeYJavaType(term.sort()));
+            resolverManager.putIntoTopLocalVariablesNamespace(ImmutableList.of(logVar),
+                javaInfo.getKeYJavaType(term.sort()));
         }
         SLExpression stmExpr = accept(ctx.mbody_statement());
         Term term = stmExpr.getTerm();

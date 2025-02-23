@@ -158,7 +158,7 @@ mbody_statement:
     RETURN expression SEMI_TOPLEVEL #mbody_return
   | IF LPAREN expression RPAREN (mbody_statement | mbody_block) ELSE (mbody_statement | mbody_block) #mbody_if
   ;
-mbody_var: VAR IDENT EQUAL_SINGLE expression SEMI_TOPLEVEL;
+mbody_var: VAR? IDENT EQUAL_SINGLE expression SEMI_TOPLEVEL;
 
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? typespec p=IDENT (LBRACKET RBRACKET)*;
