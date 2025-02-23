@@ -4,6 +4,9 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 
@@ -93,8 +96,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
      * @param preamble also also not used
      */
     @SuppressWarnings("unused") // can be called via reflection
-    public SmtLib2Translator(String[] handlerNames, String[] handlerOptions,
-            @Nullable String preamble) {
+    public SmtLib2Translator(List<String> handlerNames, Collection<String> handlerOptions,
+                             @Nullable String preamble) {
     }
 
     @Override

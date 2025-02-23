@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
