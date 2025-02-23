@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Mattias Ulbrich
  */
-public class PPRoundtripTest {
+public class PrettyPrinterRoundtripTest {
 
     public static final Choice WITH_FINAL = new Choice("immutable", "finalFields");
     public static final Choice WITHOUT_FINAL = new Choice("onHeap", "finalFields");
@@ -56,7 +56,10 @@ public class PPRoundtripTest {
         // "-1r",
         "-1f",
         "1.1f+0f",
-            // "union(empty, empty)",
+        // "union(empty, empty)",
+        "(1 + 2) + 3", "1 + (2 + 3)", // for associativity checks
+        "(true -> true) -> true", "true -> (true -> true)", // for associativity checks
+        "(true & true) & true", "true & (true & true)", // for associativity checks
     };
 
     private static final String[] HEAP_CASES = {
@@ -118,7 +121,7 @@ public class PPRoundtripTest {
     }
 
     private static Services getServices() {
-        URL url = PPRoundtripTest.class.getResource("roundTripTest.key");
+        URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
         assert url != null : "Could not find roundTripTest.key";
         assert "file".equals(url.getProtocol()) : "URL is not a file URL";
         File keyFile = new File(url.getPath());

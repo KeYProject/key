@@ -386,8 +386,7 @@ subprojects {
 //            "-Astubs=$projectDir/src/main/checkerframework",
 //            "-Werror",
 //            "-Aversion",
-//
-//     skipCheckerFramework = true
+//        ]
 //    }
 
     afterEvaluate { // required so project.description is non-null as set by sub build.gradle

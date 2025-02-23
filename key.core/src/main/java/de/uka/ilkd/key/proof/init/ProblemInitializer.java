@@ -600,6 +600,7 @@ public final class ProblemInitializer {
             proofCreated(pa);
             return pa;
         } catch (Exception e) {
+            // This has been generalised from ProofInputException to not miss exceptions
             reportException(po, e);
             throw e;
         } finally {

@@ -59,7 +59,7 @@ public class FinalPrinterTest {
     @MethodSource("casesWithFinal")
     public void testPPWithFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()
-                .updateWith(List.of(PPRoundtripTest.WITH_FINAL));
+                .updateWith(List.of(PrettyPrinterRoundtripTest.WITH_FINAL));
         Term term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
@@ -82,7 +82,7 @@ public class FinalPrinterTest {
     @MethodSource("casesWithoutFinal")
     public void testPPWithoutFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()
-                .updateWith(List.of(PPRoundtripTest.WITHOUT_FINAL));
+                .updateWith(List.of(PrettyPrinterRoundtripTest.WITHOUT_FINAL));
         Term term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
@@ -102,7 +102,7 @@ public class FinalPrinterTest {
     }
 
     private static Services getServices() {
-        URL url = de.uka.ilkd.key.pp.PPRoundtripTest.class.getResource("roundTripTest.key");
+        URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
         assert url != null : "Could not find roundTripTest.key";
         assert "file".equals(url.getProtocol()) : "URL is not a file URL";
         File keyFile = new File(url.getPath());

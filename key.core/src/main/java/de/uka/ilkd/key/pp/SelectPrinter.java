@@ -78,7 +78,7 @@ class SelectPrinter extends FieldPrinter {
             } else if (ni.isFinalImmutable() && isFinalFieldConstant(fieldTerm)) {
                 // final field access: do not pretty print the sect term but only the final term.
                 lp.printFunctionTerm(t);
-            } else if (isStaticFieldConstant(objectTerm, fieldTerm)
+            } else if (isStaticFieldConstant(fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
                 // static field access
                 printStaticJavaFieldConstant(lp, fieldTerm, heapTerm, tacitHeap);
