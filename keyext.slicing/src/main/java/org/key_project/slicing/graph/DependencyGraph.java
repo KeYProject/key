@@ -47,6 +47,9 @@ public class DependencyGraph {
      */
     private final Map<Node, Collection<AnnotatedEdge>> edgeDataReversed = new IdentityHashMap<>();
 
+    /**
+     * Create a new empty dependency graph.
+     */
     public DependencyGraph() {
         graph = new EquivalenceDirectedGraph();
     }
