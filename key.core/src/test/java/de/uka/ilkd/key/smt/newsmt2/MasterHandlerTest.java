@@ -10,11 +10,13 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -31,16 +33,14 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.Streams;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +56,13 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
  */
 public class MasterHandlerTest {
     /**
-     * If this variable is set when running this test class, then those cases with expected result
-     * "weak_valid" will raise an exception unless they can be proved using the solver.
+     * If this variable is set when running this test class, then those cases with
+     * expected result
+     * "weak_valid" will raise an exception unless they can be proved using the
+     * solver.
      * <p>
-     * Otherwise, a "timeout" or "unknown" is accepted. This can be used to deal with test cases
+     * Otherwise, a "timeout" or "unknown" is accepted. This can be used to deal
+     * with test cases
      * that
      * should verify but do not yet do so.
      * <p>
@@ -73,53 +76,76 @@ public class MasterHandlerTest {
                     && it.getName().equals("Z3 (Legacy Translation)"))
             .findFirst().orElse(null);
 
-    public static List<Arguments> data()
+    private static List<LoadedTestData> data = null;
+
+    public static List<LoadedTestData> data()
             throws IOException, URISyntaxException, ProblemLoaderException {
-        try (var input = MasterHandlerTest.class.getResourceAsStream("cases.yml")) {
-            var om = new ObjectMapper(new YAMLFactory());
-            TypeReference<HashMap<String, TestData>> typeRef = new TypeReference<>() {
-            };
-            Map<String, TestData> preData = om.readValue(input, typeRef);
-            var result = new ArrayList<Arguments>(preData.size());
-            for (var entry : preData.entrySet()) {
-                final var value = entry.getValue();
+        if (data != null)
+            return data;
 
-                if (value.state == TestDataState.IGNORE) {
-                    LOGGER.info("Test {} case has been marked ignore", entry.getKey());
-                    continue;
+        var om = new ObjectMapper(new YAMLFactory());
+        var path = Paths.get("src/test/resources/de/uka/ilkd/key/smt/newsmt2/cases/");
+        try (var walker = Files.walk(path)) {
+            List<Path> files =
+                walker.filter(it -> it.getFileName().toString().endsWith(".yml")).toList();
+            data = new ArrayList<>(files.size());
+
+            for (Path pFile : files) {
+                try {
+                    var file = pFile.toFile();
+
+                    TestData value = om.readValue(file, TestData.class);
+
+                    if (value.state == TestDataState.IGNORE) {
+                        LOGGER.info("Test {} case has been marked ignore", file);
+                        continue;
+                    }
+
+                    System.err.println(pFile);
+                    final var testData = value.load(file.getName().replace(".yml", ""));
+                    data.add(testData);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw e;
                 }
-
-                final var testData = value.load(entry.getKey());
-                result.add(Arguments.of(testData));
             }
-            return result;
+            System.out.println(data);
+            return data;
         }
     }
 
+    /**
+     * Describes the state of a test instance.
+     */
     public enum TestDataState {
         EMPTY, EXTENDED, IGNORE
     }
 
+    /**
+     * Expected outcome of a test instance.
+     */
     public enum Expectation {
         VALID, FAIL, IRRELEVANT
     }
 
     /**
-     * This class contains the information about the test fixtures that is loaded via the YAML.
-     * @param contains a list of strings that are expected in the SMT translation
+     * This class contains the information about the test fixtures that is loaded
+     * via the YAML.
+     *
+     * @param contains    a list of strings that are expected in the SMT translation
      * @param smtSettings required key/values in the smt settings.
-     * @param expected expected output of Z3
-     * @param state    state of the test
-     * @param javaSrc  path to necessary java sources
-     * @param keySrc   contents of the key file to be loaded.
+     * @param expected    expected output of Z3
+     * @param state       state of the test
+     * @param javaSrc     path to necessary java sources
+     * @param keySrc      contents of the key file to be loaded.
      */
     public record TestData(List<String> contains,
-                           Properties smtSettings,
-                           Expectation expected,
-                           TestDataState state,
-                           String javaSrc,
-                           String keySrc
-    ) {
+            Properties smtSettings,
+            Expectation expected,
+            TestDataState state,
+            String javaSrc,
+            String keySrc) {
 
         private LoadedTestData load(String name) throws IOException, ProblemLoaderException {
             var keySrc = keySrc();
@@ -148,6 +174,7 @@ public class MasterHandlerTest {
 
             ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
             var translation = translator.translateProblem(sequent, env.getServices(), settings).toString();
+            env.dispose();
             return new LoadedTestData(name, this, translation);
         }
     }
@@ -159,8 +186,12 @@ public class MasterHandlerTest {
         }
     }
 
-    @ParameterizedTest
-    @MethodSource("data")
+    @TestFactory
+    Stream<DynamicTest> testTranslation() throws Exception {
+        return data().stream()
+                .map(it -> DynamicTest.dynamicTest(it.name, () -> testTranslation(it)));
+    }
+
     void testTranslation(LoadedTestData data) throws Exception {
         if (DUMP_SMT) {
             Path tmpSmt = Files.createTempFile("SMT_key_%s".formatted(data.name), ".smt2");
@@ -172,9 +203,12 @@ public class MasterHandlerTest {
                 .containsIgnoringWhitespaces(data.data.contains().toArray(new String[0]));
     }
 
+    @TestFactory
+    Stream<DynamicTest> testZ3() throws Exception {
+        return data().stream()
+                .map(it -> DynamicTest.dynamicTest(it.name, () -> testZ3(it)));
+    }
 
-    @ParameterizedTest
-    @MethodSource("data")
     void testZ3(LoadedTestData data) throws Exception {
         SmtTestUtils.assumeZ3Installed();
         Assumptions.assumeTrue(Z3_SOLVER != null);

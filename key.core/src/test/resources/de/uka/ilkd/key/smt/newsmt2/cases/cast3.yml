@@ -1,0 +1,6 @@
+---
+contains:
+  - (assert (not (= (cast (i2u 42) sort_any) (i2u 42))))
+expected: VALID
+state: EXTENDED
+keySrc: "\\problem { (any)42 = 42 }"
