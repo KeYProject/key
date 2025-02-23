@@ -55,7 +55,7 @@ class FinalPrinter extends FieldPrinter {
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 // object properties denoted like o.<created>
                 printBuiltinObjectProperty(lp, t, objectTerm, fieldTerm);
-            } else if (isStaticFieldConstant(objectTerm, fieldTerm)
+            } else if (isStaticFieldConstant(fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
                 // static field access
                 printStaticJavaFieldConstant(lp, fieldTerm);

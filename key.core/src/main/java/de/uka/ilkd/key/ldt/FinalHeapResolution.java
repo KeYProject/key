@@ -56,7 +56,7 @@ public class FinalHeapResolution {
     }
 
     /**
-     * Remembers the final fields are treated different from normal fields as immutable data
+     * Remembers if final fields are treated differently from normal fields as immutable flag
      * in a thread-local variable that can be recalled later using {@link #recallIsFinalEnabled()}.
      *
      * @param initConfig the configuration to read the settings from

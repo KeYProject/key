@@ -679,8 +679,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         .getFieldSymbolForPV((LocationVariable) pv, getServices());
                 if (pv.isFinal() && FinalHeapResolution.isFinalEnabled(getServices().getProof().getSettings())) {
                     if(pv.isStatic()) {
-                        // TODO! Make a staticFinalDot method
-                        throw new UnsupportedOperationException("Static final fields are not supported yet. (easy to be added)");
+                        result = getServices().getTermBuilder().staticFinalDot(pv.sort(), fieldSymbol);
                     } else {
                         result = getServices().getTermBuilder().finalDot(pv.sort(), result, fieldSymbol);
                     }

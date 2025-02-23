@@ -156,7 +156,7 @@ class FieldPrinter {
     /*
      * Determine whether a field constant is static.
      */
-    protected boolean isStaticFieldConstant(Term objectTerm, Term fieldTerm) {
+    protected boolean isStaticFieldConstant(Term fieldTerm) {
         try {
             ProgramVariable pv =
                 getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);

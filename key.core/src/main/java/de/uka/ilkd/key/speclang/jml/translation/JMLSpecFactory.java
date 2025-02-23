@@ -1567,6 +1567,13 @@ public class JMLSpecFactory {
             new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value)));
     }
 
+    /**
+     * If the LHS of a set statement has been translated into a final term, this method undoes this
+     * encoding since LHS need to be encoded as select terms for KeY's mechanisms to works.
+     *
+     * @param assignee the LHS term of an assignment
+     * @return the term that should be used as the LHS of the assignment
+     */
     private Term resolveFinalAssignee(Term assignee) {
         if (services.getTypeConverter().getHeapLDT().isFinalOp(assignee.op())) {
             SortDependingFunction finalOp = assignee.op(SortDependingFunction.class);
