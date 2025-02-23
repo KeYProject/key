@@ -1,0 +1,7 @@
+contains:
+  - (assert (not (= (fp.isNaN (u2d u_doubleNaN)) (not (fp.eq (u2d u_doubleNaN) (u2d
+    u_doubleNaN))))))
+expected: VALID
+keySrc: |-
+  \programVariables { double doubleNaN; }
+  \problem { doubleIsNaN(doubleNaN) <-> !eqDouble(doubleNaN, doubleNaN) }

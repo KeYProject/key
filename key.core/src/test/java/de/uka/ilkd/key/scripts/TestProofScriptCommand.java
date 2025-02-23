@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -34,32 +33,42 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 /**
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
-    public record TestInstance(String name, String key, String script, String exception,
+    public record TestInstance(String key, String script, String exception,
             String[] goals, Integer selectedGoal) {
     }
 
-
     public static List<Arguments> data() throws IOException, URISyntaxException {
-        URL url = TestProofScriptCommand.class.getResource("cases.yml");
-        if (url == null) {
-            throw new FileNotFoundException("Cannot find resource 'cases'.");
-        }
+        var folder = Paths.get("src/test/resources/de/uka/ilkd/key/macros/scripts");
+        try (var walker = Files.walk(folder)) {
+            List<Path> files =
+                walker.filter(it -> it.getFileName().toString().endsWith(".yml")).toList();
+            var objectMapper = new ObjectMapper(new YAMLFactory());
+            objectMapper.findAndRegisterModules();
 
-        var objectMapper = new ObjectMapper(new YAMLFactory());
-        objectMapper.findAndRegisterModules();
-        TestInstance[] instances = objectMapper.readValue(url, TestInstance[].class);
-        return Arrays.stream(instances).map(Arguments::of).toList();
+            List<Arguments> args = new ArrayList(files.size());
+            for (Path path : files) {
+                try {
+                    TestInstance instance =
+                        objectMapper.readValue(path.toFile(), TestInstance.class);
+                    args.add(Arguments.of(path.toFile(), instance));
+                } catch (Exception e) {
+                    System.out.println(path);
+                    e.printStackTrace();
+                    throw e;
+                }
+            }
+            return args;
+        }
     }
 
     @ParameterizedTest
     @MethodSource("data")
-    void testProofScript(TestInstance data) throws Exception {
-        var name = data.name();
+    void testProofScript(File file, TestInstance data) throws Exception {
+        var name = file.getName().replace(".yml", "");
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
         Files.writeString(tmpKey, data.key());
 

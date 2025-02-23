@@ -1,0 +1,8 @@
+contains:
+  - (assert (not (= (cast (k_select u_heap u_o u_FF) sort_int) (cast (k_seqGet u_s
+    (i2u 42)) sort_int))))
+expected: IRRELEVANT
+keySrc: |-
+  \functions { Field FF; Seq s; java.lang.Object o; }
+
+  \problem { int::select(heap, o, FF) = int::seqGet(s, 42) }
