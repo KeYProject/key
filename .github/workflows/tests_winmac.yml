@@ -72,8 +72,8 @@ jobs:
           path: smt-solvers
           key: ${{ runner.os }}-smt-solvers
 
-      - name: Install SMT-Solvers
-        run: .github/dlsmt.sh
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
