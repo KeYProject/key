@@ -381,7 +381,7 @@ GREATEREQUAL
 :   '>' '=' | '\u2265'
       ;
 
-
+      
 WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
 STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
 LESS: '<';
@@ -481,6 +481,7 @@ MODAILITYGENERIC:
       -> more, pushMode(modGeneric);
 */
 //BACKSLASH:  '\\';
+ESC_IDENT:  ( '\\' (LETTER | '_' | '#' | '$') (IDCHAR)*);
 ERROR_CHAR: .;
 
 mode modDiamond;

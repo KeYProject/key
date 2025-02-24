@@ -3,28 +3,28 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.Objects;
+
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
-
-import org.antlr.v4.runtime.ParserRuleContext;
-
 
 /**
  * A JML class invariant declaration in textual form.
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
-    private final ParserRuleContext inv;
+    private final JmlParser.Class_invariantContext inv;
     private final boolean free;
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers, ParserRuleContext inv,
-            String name, boolean free) {
-        super(modifiers, name);
-        assert inv != null;
-        this.inv = inv;
+    public TextualJMLClassInv(ImmutableList<JMLModifier> mods,
+            JmlParser.Class_invariantContext ctx, String name, boolean free) {
+        super(mods, null);
+        inv = Objects.requireNonNull(ctx);
+        setPosition(ctx);
         this.name = name;
         this.free = free;
-        setPosition(inv);
     }
 
     public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers,
@@ -32,8 +32,20 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         this(modifiers, inv, null, free);
     }
 
-    public ParserRuleContext getInv() {
-        return inv;
+    /**
+     * User-defined name of the class invariant.
+     */
+    public String getName() {
+        if (name == null && inv.entity_name() != null) {
+            name = inv.entity_name().ident().getText();
+        }
+        return name;
+    }
+
+    public LabeledParserRuleContext getInv() {
+        return new LabeledParserRuleContext(inv, createTermLabel(
+            OriginTermLabel.SpecType.INVARIANT,
+            inv.start, getName()));
     }
 
 
@@ -54,7 +66,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
     @Override
     public int hashCode() {
-        return modifiers.hashCode() + inv.hashCode();
+        return Objects.hash(modifiers, inv);
     }
 
     public String getName() {
