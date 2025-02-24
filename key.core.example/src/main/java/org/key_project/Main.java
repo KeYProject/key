@@ -38,6 +38,7 @@ public class Main {
      * @param args The start parameters.
      */
     public static void main(String[] args) {
+        LOGGER.info("Starting KeY example application.");
         File location = args.length == 1 ? new File(args[0]) : new File("example");
         // Path to the source code folder/file or to a *.proof file
         try {
@@ -90,6 +91,7 @@ public class Main {
             final List<Contract> proofContracts = getContracts(env);
 
             for (Contract contract : proofContracts) {
+                LOGGER.info("Found contract '" + contract.getDisplayName());
                 proveContract(env, contract);
             }
         } finally {
