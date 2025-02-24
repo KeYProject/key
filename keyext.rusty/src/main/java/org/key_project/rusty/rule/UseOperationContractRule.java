@@ -14,7 +14,6 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
-import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.visitor.ProgramContextAdder;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.Modality;
@@ -368,7 +367,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         if (inst.actualResult == null) {
             resultAssign = new ContextBlockExpression(ImmutableList.of(), TupleExpression.UNIT);
         } else {
-            resultAssign = new ContextBlockExpression(ImmutableList.of(), new AssignmentExpression(inst.actualResult, resultVar));
+            resultAssign = new ContextBlockExpression(ImmutableList.of(),
+                new AssignmentExpression(inst.actualResult, resultVar));
         }
         final BlockExpression postBE = replaceBlock(rb, resultAssign);
         final RustyBlock postRustyBlock = new RustyBlock(postBE);
