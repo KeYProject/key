@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.nparser.format;
 
+/**
+ * Output class for managing formatted output with indentation.
+ *
+ * This class provides methods to manage and format output with proper
+ * indentation and spacing. It supports adding tokens, characters, and
+ * handling new lines and indentation levels.
+ *
+ * @author Julian Wiesler
+ * @see ExpressionVisitor
+ */
 class Output {
     public static final int INDENT_STEP = 4;
 
