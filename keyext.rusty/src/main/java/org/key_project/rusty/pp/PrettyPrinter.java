@@ -307,11 +307,11 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnBorrowExpression(BorrowExpression x) {
         layouter.print("&");
-        if (x.mut()) {
+        if (x.isMut()) {
             layouter.keyWord("mut");
             layouter.print(" ");
         }
-        x.expr().visit(this);
+        x.getExpr().visit(this);
     }
 
     @Override

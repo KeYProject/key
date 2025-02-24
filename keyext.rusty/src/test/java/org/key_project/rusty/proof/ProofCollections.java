@@ -12,7 +12,7 @@ public class ProofCollections {
 
         /*
          * Defines a base directory.
-         * All paths in this file are treated relative to base directory (except path for base
+         * All paths in this file are treated relative to base directory (except rustSrc for base
          * directory itself).
          */
         settings.setBaseDirectory("src/test/resources/testcase/examples");
@@ -52,8 +52,11 @@ public class ProofCollections {
         var contracts = c.group("contracts");
         contracts.loadable("use-contract.proof");
 
-        var path = c.group("path");
-        path.loadable("rust-path.proof");
+        var rustSrc = c.group("rustSrc");
+        rustSrc.loadable("loop-mul.proof");
+        rustSrc.loadable("add-no-bounds.proof");
+        rustSrc.loadable("mut-ref-src.proof");
+        rustSrc.loadable("if-src.proof");
 
         return c;
     }

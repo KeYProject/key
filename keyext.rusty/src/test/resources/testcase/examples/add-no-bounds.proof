@@ -1,0 +1,41 @@
+\programSource "./rustSrc";
+
+\proofObligation
+{
+    "class": "org.key_project.rusty.proof.init.loader.FunctionOperationContractPOLoader",
+    "contract": "add.add_no_bounds.0",
+    "name": "add.add_no_bounds.0"
+}
+
+\proof {
+    (branch "dummy ID"
+        (rule "impRight" (formula "1"))
+        (rule "functionBodyExpand" (formula "2") (term "1"))
+        (rule "unfoldImplicitReturn" (formula "2") (term "1"))
+        (rule "letIdentPatAssignNoType" (formula "2") (term "1"))
+        (rule "letIdentPatNoType" (formula "2") (term "1"))
+        (rule "assignmentAdditionU32" (formula "2") (term "1"))
+        (rule "simpleExprStmt" (formula "2") (term "1,1"))
+        (rule "implicitReturn" (formula "2") (term "1,1"))
+        (rule "assignment" (formula "2") (term "1,1"))
+        (rule "simpleExprStmt" (formula "2") (term "1,1,1"))
+        (rule "emptyModality" (formula "2") (term "1,1,1"))
+        (rule "sequentialToParallel2" (formula "2"))
+        (rule "applyOnElementary" (formula "2") (term "1,0"))
+        (rule "applyOnRigidTerm" (formula "2") (term "0,1,0"))
+        (rule "simplifyUpdate1" (formula "2") (term "0,0,1,0"))
+        (rule "applyOnPV" (formula "2") (term "0,0,1,0"))
+        (rule "simplifyUpdate1" (formula "2") (term "1,0,1,0"))
+        (rule "applyOnPV" (formula "2") (term "1,0,1,0"))
+        (rule "sequentialToParallel2" (formula "2"))
+        (rule "simplifyUpdate3" (formula "2") (term "1,0"))
+        (rule "applyOnElementary" (formula "2") (term "1,0"))
+        (rule "applyOnPV" (formula "2") (term "0,1,0"))
+        (rule "simplifyUpdate2" (formula "2"))
+        (rule "applyOnRigidFormula" (formula "2"))
+        (rule "simplifyUpdate1" (formula "2") (term "1"))
+        (rule "applyOnPV" (formula "2") (term "0"))
+        (rule "eqClose" (formula "2"))
+        (rule "closeTrue" (formula "2"))
+    )
+}

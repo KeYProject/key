@@ -1,6 +1,6 @@
 // First verification of a Rust function!
 
-\programSource "./rustPath";
+\programSource "./rustSrc";
 
 \withOptions intRules:rustSemantics;
 

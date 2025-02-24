@@ -187,7 +187,7 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             @Override
             RustyProgramElement createNewElement(ExtList changeList) {
-                return new IfExpression(changeList);
+                return new IfExpression(services, changeList);
             }
         };
         def.doAction(x);
@@ -199,6 +199,29 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
             @Override
             RustyProgramElement createNewElement(ExtList changeList) {
                 return new BinaryExpression(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnFunctionFrame(FunctionFrame x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                changeList.add(x.getFunction());
+                return new FunctionFrame(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnBorrowExpression(BorrowExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new BorrowExpression(x.isMut(), changeList);
             }
         };
         def.doAction(x);

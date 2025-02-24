@@ -29,11 +29,11 @@ public final class IfExpression implements Expr, ElseBranch {
         this.type = type;
     }
 
-    public IfExpression(ExtList children) {
+    public IfExpression(Services services, ExtList children) {
         condition = children.removeFirstOccurrence(Expr.class);
         thenExpr = children.removeFirstOccurrence(ThenBranch.class);
         elseExpr = children.removeFirstOccurrence(ElseBranch.class);
-        type = null;
+        type = thenExpr.type(services);
     }
 
     @Override

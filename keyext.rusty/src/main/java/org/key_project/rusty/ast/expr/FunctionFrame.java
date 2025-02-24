@@ -13,6 +13,7 @@ import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.logic.PossibleProgramPrefix;
 import org.key_project.rusty.logic.op.IProgramVariable;
 import org.key_project.rusty.logic.op.ProgramFunction;
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
@@ -39,6 +40,19 @@ public class FunctionFrame implements Expr, PossibleProgramPrefix {
         prefixLength = info.length();
         innermostFunctionFrame = info.innermostFunctionFrame();
         this.function = function;
+    }
+
+    public FunctionFrame(ExtList children) {
+        resultVar = children.get(IProgramVariable.class);
+        function = children.get(ProgramFunction.class);
+        body = children.get(BlockExpression.class);
+
+        firstActiveChildPos = body.getChildCount() == 0 ? PosInProgram.TOP
+                : PosInProgram.TOP.down(getChildCount() - 1).down(0);
+
+        var info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.length();
+        innermostFunctionFrame = info.innermostFunctionFrame();
     }
 
     public @Nullable IProgramVariable getResultVar() {
@@ -131,6 +145,7 @@ public class FunctionFrame implements Expr, PossibleProgramPrefix {
 
     @Override
     public String toString() {
-        return "fn_frame!(result->" + resultVar + ", " + function.name() + ")" + body;
+        return "fn_frame!(result->" + resultVar + ", " + (function == null ? null : function.name())
+            + ")" + body;
     }
 }

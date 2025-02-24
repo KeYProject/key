@@ -4,12 +4,34 @@
 extern crate rml_contracts;
 use rml_contracts::*;
 
-#[spec { name = "my_contract",
-    requires(0 <= a && 0 <= b && a <= 100 && b <= 200),
+#[spec { name = "add_no_bounds",
     ensures(result == a + b)
     }]
 pub fn add(a: u32, b: u32) -> u32 {
     a + b
+}
+
+#[spec {
+    ensures(result == 4)
+    }]
+pub fn mut_example(mut a: u32, mut b: u32) -> u32 {
+    let mut x = &mut a;
+    *x = 0;
+    x = &mut b;
+    *x = 4;
+    let c = a + b;
+    c
+}
+
+#[spec {
+    ensures(result > a && result > b)
+    }]
+pub fn if_example(a: u32, b: u32) -> u32 {
+    if a > b {
+        a + 1
+    } else {
+        b + 2
+    }
 }
 
 // First verified function

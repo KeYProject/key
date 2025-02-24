@@ -76,8 +76,6 @@
         (rule "simplifyUpdate3" (formula "1") (term "1,0"))
         (rule "simplifyUpdate2" (formula "1"))
         (rule "simpleExprStmt" (formula "1") (term "1"))
-        (rule "emptyBlock" (formula "1") (term "1"))
-        (rule "simpleExprStmt" (formula "1") (term "1"))
         (rule "ifElse" (formula "1") (term "1"))
         (rule "applyOnRigidFormula" (formula "1"))
         (rule "applyOnRigidFormula" (formula "1") (term "0"))
