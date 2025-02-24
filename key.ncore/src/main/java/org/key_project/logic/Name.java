@@ -22,7 +22,7 @@ public class Name implements Comparable<Name> {
      * creates a name object
      */
     public Name(String n) {
-        nameString = (n == null ? NONAME : n).intern();
+        nameString = n.intern();
     }
 
     @Override

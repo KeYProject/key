@@ -15,7 +15,11 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <T1> type of first element
  * @param <T2> type of second element
+ * @deprecated weigl: You should not use this class.
+ *             Since Java 17+ we have records, aka. NamedTuples.
+ *             Use records; They can be documented; They avoid auto-boxing.
  */
+@Deprecated
 public class Pair<T1, T2> {
     /**
      * First element.
