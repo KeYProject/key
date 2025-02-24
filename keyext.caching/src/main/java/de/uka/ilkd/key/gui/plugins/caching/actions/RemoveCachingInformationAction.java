@@ -5,10 +5,10 @@ package de.uka.ilkd.key.gui.plugins.caching.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 /**
  * Action to remove caching information on a goal closed by caching.

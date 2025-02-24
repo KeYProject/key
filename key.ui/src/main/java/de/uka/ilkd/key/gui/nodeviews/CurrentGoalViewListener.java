@@ -8,11 +8,11 @@ import java.awt.dnd.*;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 import org.key_project.util.collection.ImmutableList;
 
