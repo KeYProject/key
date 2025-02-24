@@ -26,7 +26,7 @@ public class TacletOptionsAction extends MainWindowAction {
         setName("Show Taclet Options");
         setIcon(IconFactory.configure(16));
 
-        getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
     }
 
     @Override
