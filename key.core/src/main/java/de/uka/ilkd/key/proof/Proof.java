@@ -1273,7 +1273,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return null or the previous data
      * @see #register(Object, Class)
      */
-    public <T> T lookup(Class<T> service) {
+    public <T> @Nullable T lookup(Class<T> service) {
         try {
             if (userData == null) {
                 return null;
