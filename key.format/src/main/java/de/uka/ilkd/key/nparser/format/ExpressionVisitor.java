@@ -10,7 +10,17 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
+ * Visitor class for formatting expressions in the KeY language.
+ *
+ * This class extends the `KeYParserBaseVisitor` and provides custom
+ * implementations for visiting terminal nodes and if-then-else terms.
+ * It uses an `Output` object to format and output the tokens.
+ *
+ * The class handles specific formatting rules for operators, braces,
+ * and modalities, ensuring proper indentation and spacing.
+ *
  * @author Julian Wiesler
+ * @see Output
  */
 class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     private static final Set<Integer> OPERATORS = Set.of(
