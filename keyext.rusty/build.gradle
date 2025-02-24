@@ -27,3 +27,11 @@ test {
 generateGrammarSource {
     arguments += ["-visitor", "-lib" , "../key.ncore/src/main/antlr/"]
 }
+
+task testRunAllProofs(type: Test) {
+    description 'Prove/reload all .key/.proof files tagged for regression testing'
+    group "verification"
+    filter {
+        includeTestsMatching "RunAllProofs"
+    }
+}

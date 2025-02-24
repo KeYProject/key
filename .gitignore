@@ -75,4 +75,4 @@ checkstyle-diff.txt
 /keyext.rusty/src/main/gen/
 
 # to be generated
-keyext.rusty/src/main/resources/librust_wrapper.a
+rust-wrapper/rml/crates/rml-contracts/hir.json
