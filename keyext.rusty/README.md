@@ -8,7 +8,7 @@ This folder contains the KeY version for Rust, implementing RustyDL.
 
 To run Rusty KeY, one requires Rust, Cargo, and rustup. For details see [the Rust home page](https://www.rust-lang.org/).
 
-For a quick install run
+For a quick install of rustup, which manages all Rust utilities, run
 ```sh
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
