@@ -43,24 +43,32 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
-      # - run: "git diff --name-only origin/main"
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: '21'
           cache: 'gradle'
+
       - name: Build with Gradle
         run: ./gradlew --parallel --continue checkstyleMainChanged
+
       - name: "Touch files to avoid errors"
-        run: "mkdir -p build/reports/checkstyle/ && touch build/reports/checkstyle/main_diff.{md,sarif.json}"
+        run: |
+          mkdir -p build/reports/checkstyle/ 
+          touch build/reports/checkstyle/main_diff.md
+          echo '{ "$schema": "https://json.schemastore.org/sarif-2.1.0.json", "version": "2.1.0", "runs": []}' > build/reports/checkstyle/main_diff.mdsarif.json
+
       - name: "Job summary"
         run: "cat build/reports/checkstyle/main_diff.md >> $GITHUB_STEP_SUMMARY"
+
       - name: Upload checkstyle report
         uses: actions/upload-artifact@v4
         if: (success() || failure())
         with:
           name: checkstyle-report
           path: build/reports/checkstyle/main_diff.html
+
       - name: "Publish in Github code scanning"
         uses: github/codeql-action/upload-sarif@v3
         if: (success() || failure())
