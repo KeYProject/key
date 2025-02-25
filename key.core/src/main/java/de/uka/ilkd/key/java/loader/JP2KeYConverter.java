@@ -329,7 +329,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Extends extending = new Extends(e);
         Implements implementing = new Implements(i);
 
-        var kjt = getKeYJavaType(new ReferenceTypeImpl(n.resolve()));
+        //TODO register type
+        // class String { String foo(); }
+        final var ref = new ReferenceTypeImpl(n.resolve());
+        var kjt = getKeYJavaType(ref);
+        //TODO Maybe regsiter the datatype early. typeConverter.register(ref, kjt);
+        mapping.registerType(ref, kjt);
+
 
         TypeDeclaration td;
         if (n.isInterface()) {
@@ -471,6 +477,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var containing = getContainingClass(n).resolve();
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
         Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
+
+        //store container type as member when visiting type declaration.
         final KeYJavaType containerKJT = getKeYJavaType(new ReferenceTypeImpl(containing));
         var method =
                 new ProgramMethod(cd, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,

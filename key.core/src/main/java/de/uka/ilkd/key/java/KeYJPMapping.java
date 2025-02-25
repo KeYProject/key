@@ -3,20 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import java.util.*;
-
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.resolution.declarations.AssociableToAST;
+import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.resolution.types.ResolvedType;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
-
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
-import com.github.javaparser.resolution.types.ResolvedType;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -91,15 +91,22 @@ public class KeYJPMapping {
         this.converter = o.converter;
     }
 
+    public KeYJavaType resolvedTypeToKeY(ResolvedType pe) {
+        return resolvedTypeToKeY(pe, false);
+    }
+
     /**
      * returns a matching ModelElement (KeY) to a given recoder.ModelElement
      *
      * @param pe a recoder.ModelElement
      */
     @Nullable
-    public KeYJavaType resolvedTypeToKeY(ResolvedType pe) {
+    public KeYJavaType resolvedTypeToKeY(ResolvedType pe, boolean processOnDemand) {
         var type = typeMap.get(pe);
-        if (type != null && type.getJavaType() == null && pe.isReferenceType()) {
+
+        //var ast = pe.asReferenceType().getTypeDeclaration().get().toAst();
+
+        if (processOnDemand && type == null  && pe.isReferenceType()) {
             try {
                 pe.asReferenceType()
                         .getTypeDeclaration()
@@ -236,5 +243,10 @@ public class KeYJPMapping {
 
     public void setParsingLibraries(boolean parsingLibraries) {
         this.parsingLibraries = parsingLibraries;
+    }
+
+    public void registerType(ResolvedType ref, KeYJavaType kjt) {
+        this.typeMap.put(ref, kjt);
+        this.typeMapRev.put(kjt, ref);
     }
 }

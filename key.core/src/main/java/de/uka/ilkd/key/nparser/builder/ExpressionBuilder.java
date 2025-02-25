@@ -730,14 +730,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.sortId() == null) { return result; }
 
         Sort s = accept(ctx.sortId());
-        Sort objectSort = getServices().getJavaInfo().objectSort();
+        //Sort objectSort = getServices().getJavaInfo().objectSort();
         if (s == null) {
             semanticError(ctx, "Tried to cast to unknown type.");
-        } else if (objectSort != null && !s.extendsTrans(objectSort)
+        }/* else if (objectSort != null && !s.extendsTrans(objectSort)
                 && result.sort().extendsTrans(objectSort)) {
             semanticError(ctx, "Illegal cast from " + result.sort() + " to sort " + s
                     + ". Casts between primitive and reference types are not allowed. ");
-        }
+        }*/
         assert s != null;
         SortDependingFunction castSymbol = getServices().getJavaDLTheory().getCastSymbol(s, services);
         return getTermFactory().createTerm(castSymbol, result);

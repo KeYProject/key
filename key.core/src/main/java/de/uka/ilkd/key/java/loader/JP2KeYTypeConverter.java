@@ -115,6 +115,12 @@ public class JP2KeYTypeConverter {
         return getKeYJavaType(new ReferenceTypeImpl(resolved));
     }
 
+    public KeYJavaType getKeYJavaType(String typeName, boolean forceInit) {
+        var resolved = typeSolver.solveType(typeName);
+        return jp2KeY.resolvedTypeToKeY(new ReferenceTypeImpl(resolved), forceInit);
+    }
+
+
     /**
      * return the corresponding KeY JavaType for a recoder type.
      * <p>
@@ -129,10 +135,7 @@ public class JP2KeYTypeConverter {
         }
 
         if (type.isReferenceType() && type.asReferenceType().isJavaLangObject()) {
-            if (__objectType == null) {
-                __objectType = new KeYJavaType(services.getNamespaces().sorts().lookup("java.lang.Object"));
-            }
-            return __objectType;
+            return getObjectType();
         }
 
 
@@ -228,8 +231,10 @@ public class JP2KeYTypeConverter {
     }
 
     public KeYJavaType getObjectType() {
-        if (__objectType == null)
-            __objectType = getKeYJavaType("java.lang.Object");
+        if (__objectType == null) {
+            //__objectType = new KeYJavaType(services.getNamespaces().sorts().lookup("java.lang.Object"));
+            __objectType = getKeYJavaType("java.lang.Object", true);
+        }
         return __objectType;
     }
 
@@ -446,4 +451,5 @@ public class JP2KeYTypeConverter {
         arrayMethodBuilder =
                 new CreateArrayMethodBuilder(integerType, getObjectType(), heapSort, heapCount);
     }
+
 }
