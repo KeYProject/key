@@ -35,6 +35,7 @@ import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
+import de.uka.ilkd.key.speclang.jml.JmlAdt;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -195,6 +196,10 @@ public class JMLSpecFactory {
             }
         }
         return symbDatas;
+    }
+
+    public JmlAdt createJMLAdt(TextualJMLDatatype a) {
+        throw new RuntimeException("TODO");
     }
 
     // -------------------------------------------------------------------------

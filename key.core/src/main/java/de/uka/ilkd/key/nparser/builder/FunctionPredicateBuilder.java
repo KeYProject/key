@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.AdtHelper;
 import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -50,6 +52,19 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+        var adtHelper = new AdtHelper(services);
+        var sort = Objects.requireNonNull(sorts().lookup(ctx.name.getText()));
+        for (KeYParser.Datatype_constructorContext constructorContext : ctx
+                .datatype_constructor()) {
+            Name name = new Name(constructorContext.name.getText());
+            List<Sort> args = mapOf(constructorContext.sortId());
+            List<String> argNames = mapOf(constructorContext.argName);
+
+            adtHelper.createConstructor(sort, name, args, argNames);
+        }
+        return null;
+
+        /*
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         var sort = sorts().lookup(ctx.name.getText());
@@ -78,6 +93,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         }
         namespaces().functions().addSafely(dtNamespace.allElements());
         return null;
+        */
     }
 
     @Override

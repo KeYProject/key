@@ -20,6 +20,9 @@ import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.nparser.AdtHelper;
+import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -30,6 +33,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.JmlAdt;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -1637,6 +1641,16 @@ public final class SpecificationRepository {
     }
 
     /**
+     *
+     */
+    public void addAdt(JmlAdt adt) {
+        AdtHelper adtHelper = new AdtHelper(services);
+        adtHelper.createSorts();
+
+
+    }
+
+    /**
      * Adds a new {@code LoopContract} and a new {@link FunctionalLoopContract} to the repository.
      *
      * @param contract the {@code LoopContract} to add.
@@ -1740,11 +1754,14 @@ public final class SpecificationRepository {
                 addLoopContract((LoopContract) spec);
             } else if (spec instanceof MergeContract) {
                 addMergeContract((MergeContract) spec);
+            } else if (spec instanceof JmlAdt adt) {
+                addAdt(adt);
             } else {
                 assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
             }
         }
     }
+
 
     public Pair<IObserverFunction, ImmutableSet<Taclet>> limitObs(IObserverFunction obs) {
         assert limitedToUnlimited.get(obs) == null : " observer is already limited: " + obs;
