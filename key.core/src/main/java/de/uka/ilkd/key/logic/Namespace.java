@@ -184,7 +184,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     /** Convenience method to look up. */
-    public E lookup(String name) {
+    public @Nullable E lookup(String name) {
         return lookup(new Name(name));
     }
 
