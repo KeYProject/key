@@ -57,25 +57,25 @@ public class TestJMLPreTranslator {
     @Test
     public void testLexer2() {
         lex("ensures //-key@ this should be ignored\n" + "true;", ENSURES, WS, COMMENT, WS, TRUE,
-            SEMI_TOPLEVEL, EOF);
+            SEMI, EOF);
     }
 
     @Test
     public void testLexer3() {
         lex("ensures      /*-key@ this should be ignored */ true;", ENSURES, WS, COMMENT, WS, TRUE,
-            SEMI_TOPLEVEL, EOF);
+            SEMI, EOF);
     }
 
     @Test
     public void testLexer4() {
-        lex("/*-openjml@ ensures true; */", JML_ML_START, WS, ENSURES, WS, TRUE, SEMI_TOPLEVEL, WS,
+        lex("/*-openjml@ ensures true; */", JML_ML_START, WS, ENSURES, WS, TRUE, SEMI, WS,
             JML_ML_END, EOF);
     }
 
     @Test
     public void testLexer5() {
         lex("/*@ pure */ /*@ ensures true;", JML_ML_START, WS, PURE, WS, JML_ML_END, WS,
-            JML_ML_START, WS, ENSURES, WS, TRUE, SEMI_TOPLEVEL, EOF);
+            JML_ML_START, WS, ENSURES, WS, TRUE, SEMI, EOF);
     }
 
     @Test
@@ -143,7 +143,7 @@ public class TestJMLPreTranslator {
 
         Assertions.assertNotNull(constructs);
         Assertions.assertEquals(1, constructs.size());
-        assertTrue(constructs.head() instanceof TextualJMLSpecCase);
+        assertInstanceOf(TextualJMLSpecCase.class, constructs.head());
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
 
         Assertions.assertSame(Behavior.NORMAL_BEHAVIOR, specCase.getBehavior());
@@ -172,7 +172,7 @@ public class TestJMLPreTranslator {
 
         Assertions.assertNotNull(constructs);
         Assertions.assertEquals(1, constructs.size());
-        assertTrue(constructs.head() instanceof TextualJMLSpecCase);
+        assertInstanceOf(TextualJMLSpecCase.class, constructs.head());
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
 
         Assertions.assertSame(Behavior.BEHAVIOR, specCase.getBehavior());
@@ -212,8 +212,8 @@ public class TestJMLPreTranslator {
 
         Assertions.assertNotNull(constructs);
         Assertions.assertEquals(2, constructs.size());
-        assertTrue(constructs.head() instanceof TextualJMLSpecCase);
-        assertTrue(constructs.tail().head() instanceof TextualJMLSpecCase);
+        assertInstanceOf(TextualJMLSpecCase.class, constructs.head());
+        assertInstanceOf(TextualJMLSpecCase.class, constructs.tail().head());
         TextualJMLSpecCase specCase1 = (TextualJMLSpecCase) constructs.head();
         TextualJMLSpecCase specCase2 = (TextualJMLSpecCase) constructs.tail().head();
 
