@@ -16,17 +16,17 @@ classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: classlevel_element | modifiers | set_statement;
 classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
-  : class_invariant /*| depends_clause*/     | method_specification
-  | method_declaration  | field_declaration  | represents_clause
-  | history_constraint  | initially_clause   | class_axiom
-  | monitors_for_clause | readable_if_clause | writable_if_clause
-  | datagroup_clause    | set_statement      | nowarn_pragma
-  | accessible_clause   | assert_statement   | assume_statement
+  : class_invariant      | set_statement       | field_declaration
+  | method_specification | method_declaration  | represents_clause
+  | history_constraint   | initially_clause    | class_axiom
+  | monitors_for_clause  | readable_if_clause  | writable_if_clause
+  | datagroup_clause     | nowarn_pragma       | accessible_clause
+  | assert_statement     | assume_statement
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
 methodlevel_element
-  : field_declaration | set_statement | merge_point_statement
+  : set_statement | field_declaration | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
   | assert_statement | assume_statement
