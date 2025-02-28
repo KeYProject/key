@@ -131,6 +131,9 @@ class FieldPrinter {
     protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT,
             Services services) {
         try {
+            // the called method either returns a ProgramVariable or throws an exception
+            // We are only interested in whether the method throws an exception or not, so we
+            // ignore the return value.
             getJavaFieldConstant(fieldTerm, heapLDT, services);
             return true;
         } catch (RuntimeException e) {

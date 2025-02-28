@@ -57,7 +57,8 @@ public class FinalFieldsPOExtension implements POExtension {
         // We know this holds because of isPOSupported:
         FunctionalOperationContractPO fpo = (FunctionalOperationContractPO) abstractPO;
         IProgramMethod iconstructor = fpo.getProgramMethod();
-        assert iconstructor instanceof ProgramMethod : "Contracts cannot have schema ";
+        assert iconstructor instanceof ProgramMethod
+                : "Expected a ProgramMethod not a schema variable, since we need the actual implementation";
         ProgramMethod constructor = (ProgramMethod) iconstructor;
 
         FinalFieldCodeValidator.validateFinalFields(constructor, proofConfig);

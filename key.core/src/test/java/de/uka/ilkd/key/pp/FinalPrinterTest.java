@@ -6,7 +6,6 @@ package de.uka.ilkd.key.pp;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
-import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
@@ -18,8 +17,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,18 +43,15 @@ public class FinalPrinterTest {
         io = null;
     }
 
-    public static Stream<Arguments> casesWithFinal() {
-        return Stream.of(
-            Arguments.of("int::select(heap, self, C::$f)", "self.f"),
-            Arguments.of("int::select(heap, self, C::$finf)", "int::select(heap, self, C::$finf)"),
-            Arguments.of("int::final(sub, Csub::$finf)", "sub.finf"),
-            Arguments.of("int::final(sub, C::$finf)", "sub.(C::finf)"),
-            Arguments.of("int::final(self, C::$finf)", "self.finf"),
-            Arguments.of("int::final(sub, C::$finf)", "sub.(C::finf)"));
-    }
-
     @ParameterizedTest(name = "{0} => {1}")
-    @MethodSource("casesWithFinal")
+    @CsvSource(delimiter = ';', textBlock = """
+            int::select(heap, self, C::$f); self.f
+            int::select(heap, self, C::$finf); int::select(heap, self, C::$finf)
+            int::final(sub, Csub::$finf); sub.finf
+            int::final(sub, C::$finf); sub.(C::finf)
+            int::final(self, C::$finf); self.finf
+            int::final(sub, C::$finf); sub.(C::finf)
+            """)
     public void testPPWithFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()
                 .updateWith(List.of(PrettyPrinterRoundtripTest.WITH_FINAL));
@@ -68,18 +63,14 @@ public class FinalPrinterTest {
         assertEquals(expected, printed);
     }
 
-    public static Stream<Arguments> casesWithoutFinal() {
-        return Stream.of(
-            Arguments.of("int::final(sub, Csub::$finf)", "sub.finf"),
-            Arguments.of("int::final(sub, C::$finf)", "sub.(C::finf)"),
-            Arguments.of("int::final(self, C::$finf)", "self.finf"),
-            Arguments.of("int::select(heap, self, C::$f)", "self.f"),
-            Arguments.of("int::select(heap, self, C::$finf)", "self.finf"));
-    }
-
-
     @ParameterizedTest(name = "{0} => {1}")
-    @MethodSource("casesWithoutFinal")
+    @CsvSource(delimiter = ';', textBlock = """
+            int::final(sub, Csub::$finf); sub.finf
+            int::final(sub, C::$finf); sub.(C::finf)
+            int::final(self, C::$finf); self.finf
+            int::select(heap, self, C::$f); self.f
+            int::select(heap, self, C::$finf); self.finf
+            """)
     public void testPPWithoutFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()
                 .updateWith(List.of(PrettyPrinterRoundtripTest.WITHOUT_FINAL));
