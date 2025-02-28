@@ -453,7 +453,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
-        assert !mods.isEmpty();
+        if (mods.isEmpty()) {
+            raiseError(ctx, "Modifiers are empty.");
+        }
         TextualJMLFieldDecl inv = new TextualJMLFieldDecl(mods, ctx);
         constructs = constructs.append(inv);
         return null;

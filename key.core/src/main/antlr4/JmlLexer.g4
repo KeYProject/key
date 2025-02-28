@@ -121,9 +121,6 @@ MERGE_PROC: 'merge_proc';
 MERGE_PARAMS: 'merge_params';
 MONITORED: 'monitored';
 MONITORS_FOR: 'monitors_for';
-//OLD: 'old';
-//POST: 'post'Pred;
-//PRE: 'pre' Pred;
 READABLE: 'readable';
 REPRESENTS: 'represents' Pred;
 REQUIRES: ('requires'| 'pre') (Pfree|Pred);
@@ -137,22 +134,14 @@ SIGNALS_ONLY: 'signals_only' Pred;
 WHEN: 'when' Pred;
 WORKING_SPACE: 'working_space' Pred;
 WRITABLE: 'writable';
-
 JML_ML_END: '*/' -> channel(HIDDEN);
 WS: (' ' | '\t' | '\n' | '\r' | '@')+ -> channel(HIDDEN);
 NEST_START: '{|' ;
 NEST_END: '|}' ;
 C_STRING_LITERAL: '"' -> pushMode(string), more;
-C_IDENT: '\\'? LETTER (LETTERORDIGIT)* -> type(IDENT);
 COLON: ':';
 DOT: '.';
 COMMA: ',';
-
-SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
-ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
-
-JML_SL_START: {!jmlMarkerDecision.isComment("//")}? '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
-JML_ML_START: {!jmlMarkerDecision.isComment("/*")}?'/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
 
 /* Java keywords */
 BOOLEAN: 'boolean';
@@ -282,6 +271,12 @@ WORKINGSPACE: '\\working_space';
 // ONLY_ASSIGNED: '\\only_assigned';
 // ONLY_CALLED: '\\only_called';
 // ONLY_CAPTURED: '\\only_captured';
+
+SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
+ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
+
+JML_SL_START: {!jmlMarkerDecision.isComment("//")}? '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
+JML_ML_START: {!jmlMarkerDecision.isComment("/*")}?'/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
 
 E_JML_SL_START: '//@' -> type(JML_SL_START), channel(HIDDEN);
 E_JML_ML_START: '/*@' -> type(JML_ML_START), channel(HIDDEN);
