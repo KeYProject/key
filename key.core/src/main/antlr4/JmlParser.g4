@@ -16,20 +16,25 @@ classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: classlevel_element | modifiers | set_statement;
 classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
-  : class_invariant /*| depends_clause*/     | method_specification
-  | method_declaration  | field_declaration  | represents_clause
-  | history_constraint  | initially_clause   | class_axiom
-  | monitors_for_clause | readable_if_clause | writable_if_clause
-  | datagroup_clause    | set_statement      | nowarn_pragma
-  | accessible_clause   | assert_statement   | assume_statement
+// The order matters! The rules with clear lookahead in front.
+// In the new lexer w/o contract and expr mode. The keyword "ensures" can also be an identifier.
+// This means, that the following text could also be seen as a field declaration:
+//      //@   ensures ensures;
+  : class_invariant       | set_statement      | represents_clause
+  | history_constraint    | initially_clause   | class_axiom
+  | monitors_for_clause   | readable_if_clause | writable_if_clause
+  | datagroup_clause      | nowarn_pragma      | accessible_clause
+  | assert_statement      | assume_statement
+  | field_declaration     | method_specification | method_declaration
+
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
 methodlevel_element
-  : field_declaration | set_statement | merge_point_statement
+  : set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
-  | assert_statement | assume_statement
+  | assert_statement | assume_statement   |  field_declaration
  ;
 
 modifiers: modifier+;
