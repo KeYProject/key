@@ -10,7 +10,9 @@ import java.util.Set;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -139,8 +141,8 @@ class FinalFieldCodeValidator {
     private void validateProgramElement(SyntaxElement element) {
         if (element instanceof MethodReference methodReference) {
             validateMethodReference(methodReference);
-        } else if (element instanceof ConstructorReference constructorReference) {
-            validateConstructorReference(constructorReference);
+        } else if (element instanceof New _new) {
+            validateNew(_new);
         } else if (element instanceof FieldReference fieldReference) {
             validateFieldReference(fieldReference);
         } else if (element instanceof Assignment assignment) {
@@ -165,18 +167,27 @@ class FinalFieldCodeValidator {
     /*
      * Constructor calls must not leak 'this' to the called constructor.
      */
-    private void validateConstructorReference(ConstructorReference methodReference) {
-        // TODO We have to make sure that on non-static subclass is instantiated here
+    private void validateNew(New _new) {
+
+        TypeReference typeRef = _new.getTypeReference();
+        Type type = typeRef.getKeYJavaType().getJavaType();
+        if (type instanceof ClassType classType && !classType.isStatic()) {
+            // This also disallows things like "a.new B()" which would not like this. However,
+            // KeY cannot deal with this anyway, so we can do the easy check here.
+            throw new FinalViolationException(
+                "Call to non-static inner class " + classType + " leaks 'this' to the constructor",
+                _new);
+        }
+
         var hasThisArgument =
-            methodReference.getArguments().stream().anyMatch(ThisReference.class::isInstance);
+            _new.getArguments().stream().anyMatch(ThisReference.class::isInstance);
 
         if (hasThisArgument) {
             throw new FinalViolationException(
-                "Method call " + methodReference + " leaks 'this' to called method.",
-                methodReference);
+                "Method call " + _new + " leaks 'this' to called method.", _new);
         }
 
-        validateChildren(methodReference);
+        validateChildren(_new);
     }
 
     /*
