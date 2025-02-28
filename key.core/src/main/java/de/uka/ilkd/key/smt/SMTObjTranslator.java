@@ -11,10 +11,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
 import de.uka.ilkd.key.smt.lang.*;
@@ -428,11 +428,11 @@ public class SMTObjTranslator implements SMTTranslator {
     }
 
     @Override
-    public StringBuffer translateProblem(Sequent sequent, Services services, SMTSettings settings)
+    public StringBuffer translateProblem(Goal goal, Services services, SMTSettings settings)
             throws IllegalFormulaException {
         this.settings = settings;
         this.services = services;
-        Term problem = sequentToTerm(sequent, services);
+        Term problem = sequentToTerm(goal.sequent(), services);
         SMTFile file = translateProblem(problem);
         String s = file.toString();
         return new StringBuffer(s);
