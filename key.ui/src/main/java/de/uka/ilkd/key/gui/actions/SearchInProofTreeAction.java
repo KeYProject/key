@@ -23,8 +23,8 @@ public class SearchInProofTreeAction extends MainWindowAction {
         setTooltip("Search for rule names or node numbers in the proof tree.");
 
         setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.SEARCH_KEY_STROKE);
-        getMediator().enableWhenProofLoaded(this);
-
+        enabledOnAnActiveProof();
+        enabledWhenNotInAutoMode();
     }
 
     @Override
