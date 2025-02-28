@@ -251,4 +251,21 @@ Treatment of formulas and terms for welldefinedness checks:
 <entry key="wdChecks">
 Welldefinedness checks of JML specifications can be turned on/off. This includes class invariants, operation contracts, model fields as well as JML (annotation) statements as loop invariants and block contracts. The former ones are checked "on-the-fly", i.e., directly when they are applied in the code while proving an operation contract, since the context is needed.
 </entry>
+
+<entry key="finalFields">
+Final fields can only be written to from within the constructor. This is a
+Java language feature. KeY can exploit this restriction by treating final fields
+as immutable. This can simplify the reasoning about the program significantly.
+But it is still possible to tread final fields as normal mutable fields to
+ensure backward compatibility. If constructor code is to be inlined, there
+can be cases where the immutable treatment is incomplete.
+
+immutable:
+    Final fields are treated as immutable entities.
+    This is the default option.
+
+onHeap:
+    Final fields are treated like all Java fields.
+    This is the original behaviour of KeY.
+</entry>
 </properties>
