@@ -2392,6 +2392,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             String name = varCtx.IDENT().getText();
             SLExpression expr = accept(varCtx.expression());
             Term term = expr.getTerm();
+            verifyLegalVariable(varCtx, name, term, substList);
             LogicVariable logVar = new LogicVariable(new Name(name), term.sort());
             substList.add(new Pair<>(logVar, term));
             resolverManager.putIntoTopLocalVariablesNamespace(ImmutableList.of(logVar),
@@ -2404,6 +2405,31 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         resolverManager.popLocalVariablesNamespace();
         return new SLExpression(term);
+    }
+
+    /*
+     * Checks if the assigned variable is legal in the current context.
+     * if "var" is present, the name must be new.
+     * if "var" is not present, the name must be already declared with the same/compatible type.
+     */
+    private void verifyLegalVariable(JmlParser.Mbody_varContext ctx, String name, Term term,
+            List<Pair<LogicVariable, Term>> substList) {
+        Optional<LogicVariable> existingVar =
+            substList.stream().map(p -> p.first).filter(p -> p.name().toString().equals(name))
+                    .findAny();
+        if (ctx.VAR() != null) {
+            existingVar.ifPresent(p -> {
+                raiseError("Variable " + name + " already declared in this block.", ctx);
+            });
+        } else {
+            LogicVariable lvar = existingVar.orElseThrow(() -> {
+                raiseError("Assigned variable " + name + " unknown in this block.", ctx);
+                return new Error("Unreachable");
+            });
+            if (!term.sort().extendsTrans(lvar.sort())) {
+                raiseError("Assignment to variable " + name + " with incompatible type.", ctx);
+            }
+        }
     }
 
     @Override
