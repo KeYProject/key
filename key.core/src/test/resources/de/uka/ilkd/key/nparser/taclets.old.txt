@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Fri Dec 13 23:01:56 CET 2024
+# Date: Mon Mar 03 18:42:58 CET 2025
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1906,7 +1906,7 @@ assignment_read_static_attribute {
 \sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G),  \not \final(#sv (program StaticVariable)))
 \replacewith(update-application(elem-update(#v0 (program Variable))(G::select(heap,null,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & finalFields:immutable)}
 -----------------------------------------------------
 == assignment_read_static_attribute_final (assignment_read_static_attribute_final) =========================================
 assignment_read_static_attribute_final {
@@ -1916,7 +1916,7 @@ assignment_read_static_attribute_final {
 \sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G), \final(#sv (program StaticVariable)))
 \replacewith(update-application(elem-update(#v0 (program Variable))(G::final(null,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & finalFields:immutable)}
 -----------------------------------------------------
 == assignment_read_static_attribute_with_variable_prefix (assignment) =========================================
 assignment_read_static_attribute_with_variable_prefix {
@@ -7277,6 +7277,13 @@ equal_literals {
 \replacewith(#eq(Z(iz),Z(jz))) 
 \heuristics(simplify_literals)
 Choices: true}
+-----------------------------------------------------
+== equalityOfSingleton (equalityOfSingleton) =========================================
+equalityOfSingleton {
+\find(equals(singleton(o1,f1),singleton(o2,f2)))
+\replacewith(and(equals(o1,o2),equals(f1,f2))) 
+\heuristics(simplify)
+Choices: programRules:Java}
 -----------------------------------------------------
 == equalityToElementOf (equalityToElementOf) =========================================
 equalityToElementOf {
@@ -15150,6 +15157,14 @@ reference_type_cast {
 \heuristics(simplify_prog)
 Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
+== referencedObjectIsCreatedRighFinalEQ (referencedObjectIsCreatedRighFinalEQ) =========================================
+referencedObjectIsCreatedRighFinalEQ {
+\assumes ([equals(deltaObject::final(o,f),EQ)]==>[equals(EQ,null)]) 
+\find(==>equals(boolean::select(h,EQ,java.lang.Object::<created>),TRUE))
+\add []==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))] 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == referencedObjectIsCreatedRight (referencedObjectIsCreatedRight) =========================================
 referencedObjectIsCreatedRight {
 \assumes ([]==>[equals(deltaObject::select(h,o,f),null)]) 
@@ -15164,6 +15179,14 @@ referencedObjectIsCreatedRightEQ {
 \find(==>equals(boolean::select(h,EQ,java.lang.Object::<created>),TRUE))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== referencedObjectIsCreatedRightFinal (referencedObjectIsCreatedRightFinal) =========================================
+referencedObjectIsCreatedRightFinal {
+\assumes ([]==>[equals(deltaObject::final(o,f),null)]) 
+\find(==>equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::<created>),TRUE))
+\replacewith([]==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))]) 
+\heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
 == regExAxiom (regExAxiom) =========================================
