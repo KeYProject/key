@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.*;
@@ -171,7 +172,8 @@ class FinalFieldCodeValidator {
 
         TypeReference typeRef = _new.getTypeReference();
         Type type = typeRef.getKeYJavaType().getJavaType();
-        if (type instanceof ClassType classType && !classType.isStatic()) {
+        if (type instanceof ClassDeclaration classType && classType.isInnerClass()
+                && !classType.isStatic()) {
             // This also disallows things like "a.new B()" which would not like this. However,
             // KeY cannot deal with this anyway, so we can do the easy check here.
             throw new FinalViolationException(
