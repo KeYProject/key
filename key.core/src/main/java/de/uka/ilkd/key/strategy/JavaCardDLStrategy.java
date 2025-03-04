@@ -348,6 +348,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "try_apply_subst",
             add(EqNonDuplicateAppFeature.INSTANCE, longConst(-10000)));
 
+        bindRuleSet(d, "out_of_bounds",
+                add(applyTF("left", tf.polynomial),
+                        applyTF("right", tf.polynomial),
+                        PolynomialValuesCmpFeature.lt(instOf("right"), instOf("left"))));
+
         final TermBuffer superFor = new TermBuffer();
         bindRuleSet(d, "split_if",
             add(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),

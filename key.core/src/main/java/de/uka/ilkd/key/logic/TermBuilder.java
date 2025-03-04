@@ -2169,7 +2169,7 @@ public class TermBuilder {
     }
 
     public Term mset(QuantifiableVariable qv, Term a, Term b, Term t) {
-        return func(services.getTypeConverter().getMSetLDT().getMset(), new Term[] { a, b, t },
+        return func(services.getTypeConverter().getMSetLDT().getMsetRange(), new Term[] { a, b, t },
                 new ImmutableArray<>(qv));
     }
 

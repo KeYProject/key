@@ -21,7 +21,7 @@ public class MSetLDT extends LDT {
 
     public static final Name NAME = new Name("Mset");
 
-    private final JFunction mset;
+    private final JFunction msetRange;
     private final JFunction msetMul;
     private final JFunction msetEmpty;
     private final JFunction msetSingle;
@@ -41,11 +41,11 @@ public class MSetLDT extends LDT {
         msetSum = addFunction(services, "msetSum");
         msetDiff = addFunction(services, "msetDiff");
         msetCard = addFunction(services, "msetCard");
-        mset = addFunction(services , "mset");
+        msetRange = addFunction(services , "msetRange");
     }
 
 
-    public JFunction getMset(){ return mset;}
+    public JFunction getMsetRange(){ return msetRange;}
     public JFunction getMsetMul() {
         return msetMul;
     }
