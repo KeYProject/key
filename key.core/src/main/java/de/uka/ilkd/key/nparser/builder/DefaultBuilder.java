@@ -19,11 +19,9 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration.Variance;
-import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
+import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration.SortParameter;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
 
@@ -353,9 +351,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             primitiveName = PrimitiveType.JAVA_BIGINT.getName();
         }
 
-        if (t != null
-                && ctx.formal_sort_parameters() != null
-                && !ctx.formal_sort_parameters().formal_sort_parameter().isEmpty()) {
+        if (t != null && ctx.formal_sort_parameters() != null) {
             semanticError(ctx, "Combination of primitive type and type parameters.");
         }
 
@@ -381,47 +377,17 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return s;
     }
 
-    public record FormalSortParameter(Variance first, Sort second) {}
-
-
     private ImmutableList<Sort> getSorts(KeYParser.Formal_sort_parametersContext ctx) {
-        List<FormalSortParameter> seq = accept(ctx);
+        List<Sort> seq = accept(ctx);
         assert seq != null;
-        for (var p : seq) {
-            if (p.first() != Variance.INVARIANT) {
-                addWarning(ctx, "Variance is ignored");
-            }
-        }
-        return seq.stream().map(FormalSortParameter::second)
-                .collect(ImmutableSLList.toImmutableList());
+        return ImmutableList.fromList(seq);
     }
 
     @Override
-    public List<FormalSortParameter> visitFormal_sort_parameters(
+    public List<Sort> visitFormal_sort_parameters(
             KeYParser.Formal_sort_parametersContext ctx) {
-        return mapOf(ctx.formal_sort_parameter());
+        return mapOf(ctx.sortId());
     }
-
-    @Override
-    public FormalSortParameter visitFormal_sort_parameter(
-            KeYParser.Formal_sort_parameterContext ctx) {
-        Sort sort = sorts().lookup(ctx.id.getText());
-        if (sort == null) {
-            semanticError(ctx.id, "Could not find sort '%s'. It was not previously defined.",
-                ctx.id.getText());
-        }
-        return new FormalSortParameter(accept(ctx.formal_sort_variance()), sort);
-    }
-
-    @Override
-    public Object visitFormal_sort_variance(KeYParser.Formal_sort_varianceContext ctx) {
-        if (ctx.PLUS() != null)
-            return Variance.COVARIANT;
-        if (ctx.MINUS() != null)
-            return Variance.CONTRAVARIANT;
-        return Variance.INVARIANT;
-    }
-
 
     @Override
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {

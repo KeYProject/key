@@ -16,6 +16,7 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -26,7 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static de.uka.ilkd.key.logic.sort.ParametricSort.Variance.*;
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -203,6 +205,53 @@ public class TestDeclParser {
             System.out.println(e);
             assertTrue(e.getMessage().contains("generic"), "Expected a GenericSortException");
         }
+    }
+
+
+    @Test
+    public void testParametrisedSortDecls() {
+        evaluateDeclarations("\\sorts { \\generic G, H; ADT<[+G]>; Fun<[-G,-H]>; Invar<[G]>; }");
+        var adt = serv.getNamespaces().parametricSorts().lookup("ADT");
+        assertNotNull(adt);
+        assertEquals("ADT", adt.name().toString());
+        assertEquals("[SortParameter[genericSort=G, variance=COVARIANT]]", adt.getParameters().toString());
+
+        var fun = serv.getNamespaces().parametricSorts().lookup("Fun");
+        assertNotNull(fun);
+        assertEquals("Fun", fun.name().toString());
+        assertEquals("[SortParameter[genericSort=G, variance=CONTRAVARIANT]," +
+                "SortParameter[genericSort=H, variance=CONTRAVARIANT]]", fun.getParameters().toString());
+
+        var invar = serv.getNamespaces().parametricSorts().lookup("Invar");
+        assertNotNull(invar);
+        assertEquals("Invar", invar.name().toString());
+        assertEquals("[SortParameter[genericSort=G, variance=INVARIANT]]", invar.getParameters().toString());
+
+        var exc = assertThrowsExactly(BuildingException.class, () -> {
+            KeyIO.Loader l = io.load("\\sorts { \\generic G; ADT<[+G,G]>; }");
+            l.parseFile().loadDeclarations().loadSndDegreeDeclarations().loadTaclets();
+        });
+        assertTrue(exc.getMessage().contains("Type parameters must be unique within a declaration"));
+
+        exc = assertThrowsExactly(BuildingException.class, () -> {
+            KeyIO.Loader l = io.load("\\sorts { X; ADT<[X]>; }");
+            l.parseFile().loadDeclarations().loadSndDegreeDeclarations().loadTaclets();
+        });
+
+        assertTrue(exc.getMessage().contains("Sort 'X' is not a generic sort"));
+
+        exc = assertThrowsExactly(BuildingException.class, () -> {
+            KeyIO.Loader l = io.load("\\sorts { ADT<[Y]>; }");
+            l.parseFile().loadDeclarations().loadSndDegreeDeclarations().loadTaclets();
+        });
+        assertTrue(exc.getMessage().contains("Could not find sort 'Y'."));
+    }
+
+    @Test
+    public void testParametrisedFunDecls() throws IOException {
+        KeyIO.Loader l = io.load("\\sorts { \\generic A; \\generic G; ADT<[+G]>; } " +
+                "\\functions { int f(ADT<[int]>); A A::g(ADT<[A]>); }");
+        l.parseFile().loadDeclarations().loadSndDegreeDeclarations().loadTaclets();
     }
 
     /**

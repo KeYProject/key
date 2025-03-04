@@ -71,10 +71,12 @@ public class ParametricSortInstance extends AbstractSort {
             switch(parameter.variance()) {
                 case COVARIANT -> {
                     // take all bases of that arg and add the modified sort as ext class
-                    for (Sort s : parameter.genericSort().extendsSorts()) {
+                    /* for (Sort s : parameter.genericSort().extendsSorts()) {
                         ImmutableList<Sort> newArgs = parameters.replace(number, s);
                         result = result.add(ParametricSortInstance.get(base, newArgs));
-                    }
+                    } */
+//                    throw new UnsupportedOperationException(
+//                            "Covariance currently not supported");
                 }
 
                 case CONTRAVARIANT -> throw new UnsupportedOperationException(
@@ -88,7 +90,8 @@ public class ParametricSortInstance extends AbstractSort {
     }
 
     private static Name makeName(ParametricSortDeclaration base, ImmutableList<Sort> parameters) {
-        return new Name(base.name() + "<[" + parameters + "]>");
+        // The [ ] are produced by the list's toString method.
+        return new Name(base.name() + "<" + parameters + ">");
     }
 
     public ParametricSortDeclaration getBase() {
@@ -128,6 +131,22 @@ public class ParametricSortInstance extends AbstractSort {
 
     @Override
     public boolean extendsTrans(Sort sort) {
-        return false;
+        return sort == this || extendsSorts()
+                .exists((Sort superSort) -> superSort == sort || superSort.extendsTrans(sort));
+    }
+
+    public static Sort instantiate(GenericSort genericSort, Sort instantiation, Sort toInstantiate) {
+        if(genericSort == toInstantiate) {
+            return instantiation;
+        } else if(toInstantiate instanceof ParametricSortInstance psort) {
+            return psort.instantiate(genericSort, instantiation);
+        } else {
+            return toInstantiate;
+        }
+    }
+
+    public Sort instantiate(GenericSort template, Sort instantiation) {
+        ImmutableList<Sort> newParameters = parameters.map(s -> instantiate(template, instantiation, s));
+        return get(base, newParameters);
     }
 }

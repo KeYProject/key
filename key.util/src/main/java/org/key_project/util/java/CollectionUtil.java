@@ -305,4 +305,25 @@ public class CollectionUtil {
             list.add(index, toInsert);
         }
     }
+
+    /**
+     * Finds all duplicated elements in the given collection.
+     *
+     * The order of reported elements is in order of appearance in the collection.
+     * They are reported on the second and subsequent occurrences.
+     *
+     * @param collection The collection to search for duplicates.
+     * @return A list of all duplicated elements.
+     */
+    public static <T extends @Nullable Object> List<T> findDuplicates(Iterable<T> collection) {
+        List<T> result = new ArrayList<>();
+        Set<T> alreadySeen = new HashSet<>();
+        for (T element : collection) {
+            if (!alreadySeen.add(element)) {
+                result.add(element);
+            }
+        }
+        return result;
+    }
+
 }

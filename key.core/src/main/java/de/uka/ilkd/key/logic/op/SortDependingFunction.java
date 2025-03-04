@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
@@ -39,7 +40,7 @@ public final class SortDependingFunction extends JFunction {
 
     private SortDependingFunction(SortDependingFunctionTemplate template, Sort sortDependingOn) {
         super(instantiateName(template.kind, sortDependingOn),
-            instantiateResultSort(template, sortDependingOn),
+            instantiateSort(template.sortDependingOn, sortDependingOn, template.sort),
             instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
         this.template = template;
         this.sortDependingOn = Qualifier.create(sortDependingOn);
@@ -55,9 +56,10 @@ public final class SortDependingFunction extends JFunction {
     }
 
 
-    private static Sort instantiateResultSort(SortDependingFunctionTemplate template,
-            Sort sortDependingOn) {
-        return template.sort == template.sortDependingOn ? sortDependingOn : template.sort;
+    private static Sort instantiateSort(GenericSort genericSort, Sort instanatiation,
+                                        Sort toInstantiate) {
+        // Replaces the generic sort and all occurrences in parametric sorts
+        return ParametricSortInstance.instantiate(genericSort, instanatiation, toInstantiate);
     }
 
 
@@ -65,12 +67,10 @@ public final class SortDependingFunction extends JFunction {
             Sort sortDependingOn) {
         Sort[] result = new Sort[template.argSorts.size()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = (template.argSorts.get(i) == template.sortDependingOn ? sortDependingOn
-                    : template.argSorts.get(i));
+            result[i] = ParametricSortInstance.instantiate(template.sortDependingOn, sortDependingOn, template.argSorts.get(i));
         }
         return new ImmutableArray<>(result);
     }
-
 
     // -------------------------------------------------------------------------
     // public interface

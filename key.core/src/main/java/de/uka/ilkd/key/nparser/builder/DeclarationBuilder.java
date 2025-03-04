@@ -20,12 +20,10 @@ import de.uka.ilkd.key.rule.RuleSet;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Immutables;
+import org.key_project.util.collection.*;
 
 import org.antlr.v4.runtime.Token;
+import org.key_project.util.java.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +62,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
         var name = ctx.name.getText();
-        List<FormalSortParameter> typeParameters = accept(ctx.formal_sort_parameters());
+        List<SortParameter> typeParameters = accept(ctx.formal_sort_parameters());
         var doc = ctx.DOC_COMMENT() != null
                 ? ctx.DOC_COMMENT().getText()
                 : null;
@@ -73,10 +71,15 @@ public class DeclarationBuilder extends DefaultBuilder {
             var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
             sorts().addSafely(s);
         } else {
-            var tp = typeParameters.stream().map(it -> (GenericSort) it.second())
+            var tp = typeParameters.stream().map(SortParameter::genericSort)
                     .collect(ImmutableList.collector());
+            var doubled = CollectionUtil.findDuplicates(tp);
+            if (!doubled.isEmpty()) {
+                semanticError(ctx.formal_sort_parameters(),
+                    "Type parameters must be unique within a declaration. Found duplicate: %s", doubled.getFirst());
+            }
             var variance =
-                typeParameters.stream().map(FormalSortParameter::first)
+                typeParameters.stream().map(SortParameter::variance)
                         .collect(ImmutableList.collector());
             var s = new ParametricSortDeclaration(
                 new Name(name), ImmutableSet.empty(), false, tp, variance,
@@ -146,20 +149,20 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
-    public record NamedFormalSortParameter(String name, List<FormalSortParameter> parameters) {}
+    public record NamedFormalSortParameter(String name, List<SortParameter> parameters) {}
 
-    @Override
-    public List<NamedFormalSortParameter> visitSortList(KeYParser.SortListContext ctx) {
-        List<NamedFormalSortParameter> seq = new ArrayList<>();
-        for (KeYParser.SortIdContext context : ctx.sortId()) {
-            String sortName = context.simple_ident_dots().getText();
-            // String brackets = StringUtil.repeat("[]", context.EMPTYBRACKETS().size());
-            List<FormalSortParameter> typeParams = accept(context.formal_sort_parameters());
-            seq.add(new NamedFormalSortParameter(sortName,
-                typeParams != null ? typeParams : Collections.emptyList()));
-        }
-        return seq;
-    }
+//    @Override
+//    public List<NamedFormalSortParameter> visitSortList(KeYParser.SortListContext ctx) {
+//        List<NamedFormalSortParameter> seq = new ArrayList<>();
+//        for (KeYParser.SortIdContext context : ctx.sortId()) {
+//            String sortName = context.simple_ident_dots().getText();
+//            // String brackets = StringUtil.repeat("[]", context.EMPTYBRACKETS().size());
+//            List<SortParameter> typeParams = accept(context.formal_sort_parameters());
+//            seq.add(new NamedFormalSortParameter(sortName,
+//                typeParams != null ? typeParams : Collections.emptyList()));
+//        }
+//        return seq;
+//    }
 
 
     @Override
@@ -174,78 +177,93 @@ public class DeclarationBuilder extends DefaultBuilder {
         List<Sort> createdSorts = new LinkedList<>();
         // assert sortIds != null;
 
+        ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
+                : Immutables.setOf(sortExt);
+        ImmutableSet<Sort> oneOf = sortOneOf == null ? ImmutableSet.empty()
+                : Immutables.setOf(sortOneOf);
+
         var documentation = ParsingFacade.getValueDocumentation(ctx.DOC_COMMENT());
-        for (var idCtx : ctx.sortIds.sortId()) {
-            // for (Pair<String, List<Pair<ParametricSort.Variance, Sort>>> sortId : sortIds) {
-            var name = idCtx.simple_ident_dots().getText();
-            // var brackets = StringUtil.repeat("[]", idCtx.EMPTYBRACKETS().size());
-            List<FormalSortParameter> typeParams = accept(idCtx.formal_sort_parameters());
+
+        if(ctx.sortIds == null) {
+            // parametrised sorts
+            var declCtx = ctx.parametric_sort_decl();
+            assert declCtx != null : "One of the two must be present";
+            List<SortParameter> typeParams = mapOf(declCtx.formal_sort_param_decl());
+            ImmutableList<SortParameter> params = Immutables.listOf(typeParams);
+            var doubled = CollectionUtil.findDuplicates(params.map(SortParameter::genericSort));
+            if (!doubled.isEmpty()) {
+                semanticError(declCtx,
+                        "Type parameters must be unique within a declaration. Found duplicate: %s", doubled.getFirst());
+            }
+            String name = declCtx.simple_ident_dots().getText();
             Name sortName = new Name(name);
-            boolean isParametricSort = typeParams != null && !typeParams.isEmpty();
+            var sortDecl = new ParametricSortDeclaration(sortName, ext, isAbstractSort, params, documentation, BuilderHelpers.getPosition(declCtx));
+            namespaces().parametricSorts().add(sortDecl);
 
-            ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
-                    : Immutables.createSetFrom(sortExt);
-            ImmutableSet<Sort> oneOf = sortOneOf == null ? ImmutableSet.empty()
-                    : Immutables.createSetFrom(sortOneOf);
+        } else {
+            for (var idCtx : ctx.sortIds.simple_ident_dots()) {
+                var name = idCtx.getText();
+                Name sortName = new Name(name);
 
-            // attention: no expand to java.lang here!
-            Sort existingSort = sorts().lookup(sortName);
-            if (existingSort == null) {
-                Sort s = null;
-                if (isParametricSort) {
+                // attention: no expand to java.lang here!
+                Sort existingSort = sorts().lookup(sortName);
+                if (existingSort == null) {
+                    Sort s = null;
                     if (isGenericSort) {
-                        semanticError(ctx,
-                            "Generic sorts are not allowed to have type parameters.");
-                    }
-
-                    for (FormalSortParameter param : typeParams) {
-                        if (!(param.second() instanceof GenericSort)) {
-                            semanticError(ctx,
-                                "Type parameters must be generic sorts. Given type '%s' is %s",
-                                param.second().name(), param.second().getClass().getName());
+                        try {
+                            s = new GenericSort(sortName, ext, oneOf, documentation,
+                                    BuilderHelpers.getPosition(ctx));
+                        } catch (GenericSupersortException e) {
+                            semanticError(ctx, "Illegal sort given");
+                        }
+                    } else if (new Name("any").equals(sortName)) {
+                        s = JavaDLTheory.ANY;
+                    } else {
+                        if (isProxySort) {
+                            s = new ProxySort(sortName, ext, documentation,
+                                    BuilderHelpers.getPosition(idCtx));
+                        } else {
+                            s = new SortImpl(sortName, ext, isAbstractSort,
+                                    documentation, BuilderHelpers.getPosition(idCtx));
                         }
                     }
-
-                    ImmutableList<SortParameter> params =
-                        typeParams.stream()
-                                .map(it -> new SortParameter((GenericSort) it.second(), it.first()))
-                                .collect(ImmutableSLList.toImmutableList());
-                    var sortDecl = new ParametricSortDeclaration(sortName, ext, isAbstractSort, params, documentation, BuilderHelpers.getPosition(idCtx));
-                    namespaces().parametricSorts().add(sortDecl);
-                } else if (isGenericSort) {
-                    try {
-                        s = new GenericSort(sortName, ext, oneOf, documentation,
-                            BuilderHelpers.getPosition(ctx));
-                    } catch (GenericSupersortException e) {
-                        semanticError(ctx, "Illegal sort given");
-                    }
-                } else if (new Name("any").equals(sortName)) {
-                    s = JavaDLTheory.ANY;
-                } else {
-                    if (isProxySort) {
-                        s = new ProxySort(sortName, ext, documentation,
-                            BuilderHelpers.getPosition(idCtx));
-                    } else {
-                        s = new SortImpl(sortName, ext, isAbstractSort,
-                            documentation, BuilderHelpers.getPosition(idCtx));
-                    }
-                }
-                if(!isParametricSort) {
                     // parametric sort declarations are not sorts themselves.
                     assert s != null;
                     sorts().add(s);
                     createdSorts.add(s);
+                } else {
+                    // weigl: agreement on KaKeY meeting: this should be ignored until we finally have
+                    // local namespaces for generic sorts
+                    // addWarning(ctx, "Sort declaration is ignored, due to collision.");
+                    LOGGER.debug("Sort declaration of {} in {} is ignored due to collision (already "
+                                    + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
+                            existingSort.getOrigin());
                 }
-            } else {
-                // weigl: agreement on KaKeY meeting: this should be ignored until we finally have
-                // local namespaces for generic sorts
-                // addWarning(ctx, "Sort declaration is ignored, due to collision.");
-                LOGGER.debug("Sort declaration of {} in {} is ignored due to collision (already "
-                    + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
-                    existingSort.getOrigin());
             }
         }
         return createdSorts;
+    }
+
+    @Override
+    public SortParameter visitFormal_sort_param_decl(KeYParser.Formal_sort_param_declContext ctx) {
+        ParametricSortDeclaration.Variance variance;
+        if (ctx.PLUS() != null)
+            variance = ParametricSortDeclaration.Variance.COVARIANT;
+        else if (ctx.MINUS() != null)
+            variance = ParametricSortDeclaration.Variance.CONTRAVARIANT;
+        else
+            variance = ParametricSortDeclaration.Variance.INVARIANT;
+
+        var name = ctx.simple_ident().getText();
+        Sort paramSort = sorts().lookup(name);
+        if(paramSort == null) {
+            semanticError(ctx, "Parameter sort %s not found", name);
+        }
+        if(!(paramSort instanceof GenericSort)) {
+            semanticError(ctx, "Parameter sort %s is not a generic sort", name);
+        }
+
+        return new SortParameter((GenericSort) paramSort, variance);
     }
 
     @Override

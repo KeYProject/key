@@ -332,8 +332,8 @@ public class KeYFile implements EnvInput {
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
-        specRepos.addContracts(Immutables.createSetFrom(cinvs.getContracts()));
-        specRepos.addClassInvariants(Immutables.createSetFrom(cinvs.getInvariants()));
+        specRepos.addContracts(Immutables.setOf(cinvs.getContracts()));
+        specRepos.addClassInvariants(Immutables.setOf(cinvs.getInvariants()));
 
         return DefaultImmutableSet.nil();
     }

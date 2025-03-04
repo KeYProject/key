@@ -90,17 +90,28 @@ one_sort_decl
 :
   doc=DOC_COMMENT?
   (
-     GENERIC  sortIds=sortList
+     GENERIC  sortIds=simple_ident_dots_comma_list
         (ONEOF sortOneOf = oneof_sorts)?
         (EXTENDS sortExt = extends_sorts)? SEMI
-    | PROXY  sortIds=sortList (EXTENDS sortExt=extends_sorts)? SEMI
-    | ABSTRACT? sortIds=sortList (EXTENDS sortExt=extends_sorts)?  SEMI
+    | PROXY  sortIds=simple_ident_dots_comma_list (EXTENDS sortExt=extends_sorts)? SEMI
+    | ABSTRACT? (sortIds=simple_ident_dots_comma_list |
+                 parametric_sort_decl) (EXTENDS sortExt=extends_sorts)?  SEMI
   )
 ;
 
-sortList
+// TODO currently you are not allowed to commatise parametric_sort_decl. Is this severe?
+
+parametric_sort_decl
 :
-    sortId (COMMA sortId)*
+    simple_ident_dots
+    OPENTYPEPARAMS
+    formal_sort_param_decl (COMMA formal_sort_param_decl)*
+    CLOSETYPEPARAMS
+;
+
+formal_sort_param_decl
+:
+    (PLUS | MINUS)? simple_ident
 ;
 
 simple_ident_dots
@@ -112,7 +123,6 @@ simple_ident_dots_comma_list
 :
   simple_ident_dots (COMMA simple_ident_dots)*
 ;
-
 
 extends_sorts
 :
@@ -334,17 +344,10 @@ sortId
     id=simple_ident_dots (EMPTYBRACKETS)* formal_sort_parameters?
 ;
 
-formal_sort_variance
-:
-    (PLUS | MINUS)?
-;
-
-formal_sort_parameter: formal_sort_variance id=sortId;
-
 formal_sort_parameters
 :
     OPENTYPEPARAMS
-    formal_sort_parameter (COMMA formal_sort_parameter)*
+    sortId (COMMA sortId)*
     CLOSETYPEPARAMS
 ;
 

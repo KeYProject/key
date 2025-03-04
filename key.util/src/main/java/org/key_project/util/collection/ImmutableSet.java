@@ -29,7 +29,7 @@ public interface ImmutableSet<T extends @Nullable Object>
         return Collector.of(HashSet::new, Set::add, (set1, set2) -> {
             set1.addAll(set2);
             return set1;
-        }, Immutables::createSetFrom, Characteristics.UNORDERED);
+        }, Immutables::setOf, Characteristics.UNORDERED);
     }
 
     /**
