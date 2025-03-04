@@ -939,7 +939,7 @@ public class IntermediateProofReplayer {
             Namespace<IProgramVariable> progVarNS, Namespace<JFunction> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
-                varNS, functNS, proof.getNamespaces().sorts(),
+                varNS, functNS, proof.getNamespaces().sorts(), proof.getNamespaces().parametricSorts(),
                 progVarNS, new AbbrevMap());
         } catch (ParserException e) {
             throw new RuntimeException(

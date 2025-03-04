@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
@@ -43,11 +44,13 @@ public final class DefaultTermParser {
      *         correctly or the term has an invalid sort.
      */
     public Term parse(Reader in, Sort sort, Services services,
-            Namespace<QuantifiableVariable> var_ns,
-            Namespace<JFunction> func_ns,
-            Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
+                      Namespace<QuantifiableVariable> var_ns,
+                      Namespace<JFunction> func_ns,
+                      Namespace<Sort> sort_ns,
+                      Namespace<ParametricSortDeclaration> paramSort_ns,
+                      Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
-        return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,
+        return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns, paramSort_ns,
             new Namespace<>(), new Namespace<>(), progVar_ns), scm);
     }
 

@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.logic.sort.ParametricSort.SortParameter;
+import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration.SortParameter;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -78,10 +78,10 @@ public class DeclarationBuilder extends DefaultBuilder {
             var variance =
                 typeParameters.stream().map(FormalSortParameter::first)
                         .collect(ImmutableList.collector());
-            var s = new ParametricSort(
+            var s = new ParametricSortDeclaration(
                 new Name(name), ImmutableSet.empty(), false, tp, variance,
                 doc, origin);
-            sorts().add(s);
+            namespaces().parametricSorts().add(s);
         }
         return null;
     }
@@ -210,7 +210,8 @@ public class DeclarationBuilder extends DefaultBuilder {
                         typeParams.stream()
                                 .map(it -> new SortParameter((GenericSort) it.second(), it.first()))
                                 .collect(ImmutableSLList.toImmutableList());
-                    s = new ParametricSort(sortName, ext, isAbstractSort, params);
+                    var sortDecl = new ParametricSortDeclaration(sortName, ext, isAbstractSort, params, documentation, BuilderHelpers.getPosition(idCtx));
+                    namespaces().parametricSorts().add(sortDecl);
                 } else if (isGenericSort) {
                     try {
                         s = new GenericSort(sortName, ext, oneOf, documentation,
@@ -229,9 +230,12 @@ public class DeclarationBuilder extends DefaultBuilder {
                             documentation, BuilderHelpers.getPosition(idCtx));
                     }
                 }
-                assert s != null;
-                sorts().add(s);
-                createdSorts.add(s);
+                if(!isParametricSort) {
+                    // parametric sort declarations are not sorts themselves.
+                    assert s != null;
+                    sorts().add(s);
+                    createdSorts.add(s);
+                }
             } else {
                 // weigl: agreement on KaKeY meeting: this should be ignored until we finally have
                 // local namespaces for generic sorts

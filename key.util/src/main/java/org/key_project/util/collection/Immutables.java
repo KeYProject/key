@@ -4,6 +4,7 @@
 package org.key_project.util.collection;
 
 import java.util.HashSet;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -239,4 +240,18 @@ public final class Immutables {
         return DefaultImmutableSet.fromImmutableList(listOf(element));
     }
 
+    public static <A,B,C> ImmutableList<C> zip(ImmutableList<A> list1, ImmutableList<B> list2, BiFunction<A,B,C> zipper) {
+        ImmutableList<C> result = ImmutableSLList.nil();
+        while (!list1.isEmpty() && !list2.isEmpty()) {
+            result = result.prepend(zipper.apply(list1.head(), list2.head()));
+            list1 = list1.tail();
+            list2 = list2.tail();
+        }
+        return result.reverse();
+    }
+
+    @Deprecated
+    public static <A,B> ImmutableList<Pair<A,B>> zip(ImmutableList<A> list1, ImmutableList<B> list2) {
+        return zip(list1, list2, Pair::new);
+    }
 }

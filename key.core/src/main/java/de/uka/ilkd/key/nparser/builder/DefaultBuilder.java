@@ -21,8 +21,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.ParametricSort;
-import de.uka.ilkd.key.logic.sort.ParametricSort.Variance;
+import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration;
+import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration.Variance;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -359,18 +359,19 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             semanticError(ctx, "Combination of primitive type and type parameters.");
         }
 
-        Sort s = lookupSort(primitiveName);
-        if (s == null) {
-            semanticError(ctx, "Could not find sort: %s", ctx.getText());
-        }
-
-        // parametric sorts should be instantiated
+        Sort s;
         if (ctx.formal_sort_parameters() != null) {
-            if (s instanceof ParametricSort ps) {
-                ImmutableList<Sort> parameters = getSorts(ctx.formal_sort_parameters());
-                s = ParametricSortInstance.get(ps, parameters, null, null);
-            } else {
-                semanticError(ctx, "Not a polymorphic sort: %s", s);
+            // parametric sorts should be instantiated
+            ParametricSortDeclaration sortDecl = services.getNamespaces().parametricSorts().lookup(primitiveName);
+            if (sortDecl == null) {
+                semanticError(ctx, "Could not find polymorphic sort: %s", primitiveName);
+            }
+            ImmutableList<Sort> parameters = getSorts(ctx.formal_sort_parameters());
+            s = ParametricSortInstance.get(sortDecl, parameters);
+        } else {
+            s = lookupSort(primitiveName);
+            if (s == null) {
+                semanticError(ctx, "Could not find sort: %s", ctx.getText());
             }
         }
 

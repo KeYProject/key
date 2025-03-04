@@ -7,6 +7,8 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.rule.RuleSet;
 
 import org.key_project.logic.Name;
@@ -21,6 +23,7 @@ public class NamespaceSet {
     private Namespace<JFunction> funcNS = new Namespace<>();
     private Namespace<RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<Sort> sortNS = new Namespace<>();
+    private Namespace<ParametricSortDeclaration> parametricSortNS = new Namespace<>();
     private Namespace<Choice> choiceNS = new Namespace<>();
 
     public NamespaceSet() {
@@ -28,32 +31,35 @@ public class NamespaceSet {
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
             Namespace<JFunction> funcNS,
-            Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
+            Namespace<Sort> sortNS,
+                        Namespace<ParametricSortDeclaration> parametricSortNS,
+                        Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS) {
         this.varNS = varNS;
         this.progVarNS = programVarNS;
         this.funcNS = funcNS;
         this.sortNS = sortNS;
+        this.parametricSortNS = parametricSortNS;
         this.ruleSetNS = ruleSetNS;
         this.choiceNS = choiceNS;
     }
 
     public NamespaceSet copy() {
         return new NamespaceSet(variables().copy(), functions().copy(),
-            sorts().copy(),
+            sorts().copy(), parametricSorts().copy(),
             ruleSets().copy(), choices().copy(), programVariables().copy());
     }
 
     public NamespaceSet shallowCopy() {
-        return new NamespaceSet(variables(), functions(), sorts(), ruleSets(),
-            choices(),
-            programVariables());
+        return new NamespaceSet(variables(), functions(), sorts(), parametricSorts(), ruleSets(),
+            choices(), programVariables());
     }
 
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
         return new NamespaceSet(new Namespace<>(variables()),
             new Namespace<>(functions()), new Namespace<>(sorts()),
+            new Namespace<>(parametricSorts()),
             new Namespace<>(ruleSets()), new Namespace<>(choices()),
             new Namespace<>(programVariables()));
     }
@@ -98,6 +104,14 @@ public class NamespaceSet {
         this.sortNS = sortNS;
     }
 
+    public Namespace<ParametricSortDeclaration> parametricSorts() {
+        return parametricSortNS;
+    }
+
+    public void setParametricSorts(Namespace<ParametricSortDeclaration> parametricSortNS) {
+        this.parametricSortNS = parametricSortNS;
+    }
+
     public Namespace<Choice> choices() {
         return choiceNS;
     }
@@ -110,6 +124,7 @@ public class NamespaceSet {
         variables().add(ns.variables());
         programVariables().add(ns.programVariables());
         sorts().add(ns.sorts());
+        parametricSorts().add(ns.parametricSorts());
         ruleSets().add(ns.ruleSets());
         functions().add(ns.functions());
         choices().add(ns.choices());
@@ -119,7 +134,7 @@ public class NamespaceSet {
      * returns all namespaces in an array
      */
     private Namespace<?>[] asArray() {
-        return new Namespace[] { variables(), programVariables(), sorts(), ruleSets(), functions(),
+        return new Namespace[] { variables(), programVariables(), sorts(), parametricSorts(), ruleSets(), functions(),
             choices() };
     }
 
@@ -190,23 +205,26 @@ public class NamespaceSet {
         funcNS.seal();
         ruleSetNS.seal();
         sortNS.seal();
+        parametricSortNS.seal();
         choiceNS.seal();
     }
 
     public boolean isEmpty() {
         return varNS.isEmpty() && programVariables().isEmpty() && funcNS.isEmpty()
-                && ruleSetNS.isEmpty() && sortNS.isEmpty() && choiceNS.isEmpty();
+                && ruleSetNS.isEmpty() && sortNS.isEmpty() && parametricSortNS.isEmpty() && choiceNS.isEmpty();
     }
 
 
     // create a namespace
     public NamespaceSet simplify() {
         return new NamespaceSet(varNS.simplify(), funcNS.simplify(), sortNS.simplify(),
+            parametricSortNS.simplify(),
             ruleSetNS.simplify(), choiceNS.simplify(), progVarNS.simplify());
     }
 
     public NamespaceSet getCompression() {
         return new NamespaceSet(varNS.compress(), funcNS.compress(), sortNS.compress(),
+            parametricSortNS.compress(),
             ruleSetNS.compress(), choiceNS.compress(), progVarNS.compress());
     }
 
@@ -218,6 +236,7 @@ public class NamespaceSet {
 
     public NamespaceSet getParent() {
         return new NamespaceSet(varNS.parent(), funcNS.parent(), sortNS.parent(),
+            parametricSortNS.parent(),
             ruleSetNS.parent(), choiceNS.parent(), progVarNS.parent());
     }
 

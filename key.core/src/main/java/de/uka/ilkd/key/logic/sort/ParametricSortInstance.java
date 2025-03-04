@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NullMarked;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
@@ -17,20 +18,21 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class ParametricSortInstance extends AbstractSort {
     private static final Map<ParametricSortInstance, ParametricSortInstance> CACHE =
         new WeakHashMap<>();
 
     private final ImmutableList<Sort> parameters;
 
-    private final ParametricSort base;
+    private final ParametricSortDeclaration base;
 
     private final ImmutableSet<Sort> extendsSorts;
 
-    public static ParametricSortInstance get(ParametricSort base, ImmutableList<Sort> parameters,
-            @Nullable String documentation, @Nullable String origin) {
+    public static ParametricSortInstance get(ParametricSortDeclaration base,
+            ImmutableList<Sort> parameters) {
         ParametricSortInstance sort =
-            new ParametricSortInstance(base, parameters, documentation, origin);
+            new ParametricSortInstance(base, parameters);
         ParametricSortInstance cached = CACHE.get(sort);
         if (cached != null) {
             return cached;
@@ -40,55 +42,56 @@ public class ParametricSortInstance extends AbstractSort {
         }
     }
 
-    private ParametricSortInstance(ParametricSort base, ImmutableList<Sort> parameters,
-            String documentation, String origin) {
-        super(makeName(base, parameters), base.isAbstract(), documentation, origin);
+    // This must only be called in #get, which ensures that the cache is used.
+    private ParametricSortInstance(ParametricSortDeclaration base, ImmutableList<Sort> parameters) {
+        super(makeName(base, parameters), base.isAbstract(), base.getDocumentation(), base.getOrigin());
 
         this.extendsSorts = computeExt(base, parameters);
         this.base = base;
         this.parameters = parameters;
     }
 
-    private static ImmutableSet<Sort> computeExt(ParametricSort base,
+    private static ImmutableSet<Sort> computeExt(ParametricSortDeclaration base,
             ImmutableList<Sort> parameters) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
 
         // 1. extensions by base sort
-        ImmutableSet<Sort> baseExt = base.extendsSorts();
+        ImmutableSet<Sort> baseExt = base.getExtendedSorts();
         if (!baseExt.isEmpty()) {
-            Function<Sort, Sort> inster = base.getInstantiation(parameters);
+            Function<Sort, Sort> inster = base.getInstantiator(parameters);
             for (Sort s : baseExt) {
                 result = result.add(inster.apply(s));
             }
         }
 
         // 2. extensions by variances
-        ImmutableList<ParametricSort.Variance> cov = base.getCovariances();
-        for (int i = 0; !cov.isEmpty(); i++, cov = cov.tail()) {
-            switch (cov.head()) {
-            case COVARIANT -> {
-                // take all bases of that arg and add the modified sort as ext class
-                for (Sort s : parameters.get(i).extendsSorts()) {
-                    ImmutableList<Sort> newArgs = parameters.replace(i, s);
-                    result = result.add(ParametricSortInstance.get(base, newArgs, null, null));
+        ImmutableList<ParametricSortDeclaration.SortParameter> cov = base.getParameters();
+        int number = 0;
+        for (ParametricSortDeclaration.SortParameter parameter : base.getParameters()) {
+            switch(parameter.variance()) {
+                case COVARIANT -> {
+                    // take all bases of that arg and add the modified sort as ext class
+                    for (Sort s : parameter.genericSort().extendsSorts()) {
+                        ImmutableList<Sort> newArgs = parameters.replace(number, s);
+                        result = result.add(ParametricSortInstance.get(base, newArgs));
+                    }
                 }
-            }
 
-            case CONTRAVARIANT -> throw new UnsupportedOperationException(
-                "Contravariance can currently not be supported");
+                case CONTRAVARIANT -> throw new UnsupportedOperationException(
+                        "Contravariance currently not supported");
 
-            case INVARIANT -> {
-                /* Nothing to be done */}
+                case INVARIANT -> {
+                    /* Nothing to be done */}
             }
         }
         return result;
     }
 
-    private static Name makeName(Sort base, ImmutableList<Sort> parameters) {
-        return new Name(base + "<" + parameters + ">");
+    private static Name makeName(ParametricSortDeclaration base, ImmutableList<Sort> parameters) {
+        return new Name(base.name() + "<[" + parameters + "]>");
     }
 
-    public Sort getBase() {
+    public ParametricSortDeclaration getBase() {
         return base;
     }
 
@@ -99,7 +102,7 @@ public class ParametricSortInstance extends AbstractSort {
     public ParametricSortInstance map(Function<Sort, Sort> f) {
         ImmutableList<Sort> newParameters = parameters.map(f);
         // The cache ensures that no unnecessary duplicates are kept.
-        return get(base, newParameters, null, null);
+        return get(base, newParameters);
     }
 
     @Override
