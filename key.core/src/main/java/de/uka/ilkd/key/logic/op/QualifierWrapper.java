@@ -8,7 +8,8 @@ import java.util.WeakHashMap;
 import org.key_project.logic.TerminalSyntaxElement;
 
 /**
- * This class is primarily used in logic operations where qualifiers (e.g., types or sorts)
+ * This class is a wrapper primarily used in logic operations where qualifiers (e.g., types or
+ * sorts)
  * are referenced multiple times, such as in {@link ObserverFunction} and
  * {@link SortDependingFunction}.
  * It helps to ensure that qualifiers maintain identity-based equality when reused.
@@ -21,12 +22,12 @@ import org.key_project.logic.TerminalSyntaxElement;
  *
  * @param <T> The type of the qualifier object being wrapped.
  */
-public class Qualifier<T> implements TerminalSyntaxElement {
+public class QualifierWrapper<T> implements TerminalSyntaxElement {
     private final T qualifier;
 
-    private static final WeakHashMap<Object, Qualifier<?>> INSTANCES = new WeakHashMap<>();
+    private static final WeakHashMap<Object, QualifierWrapper<?>> INSTANCES = new WeakHashMap<>();
 
-    private Qualifier(T qualifier) {
+    private QualifierWrapper(T qualifier) {
         this.qualifier = qualifier;
     }
 
@@ -37,11 +38,11 @@ public class Qualifier<T> implements TerminalSyntaxElement {
      * @return new instance
      * @param <T> The type of the qualifier object being wrapped.
      */
-    synchronized static <T> Qualifier<T> create(T qualifier) {
+    synchronized static <T> QualifierWrapper<T> create(T qualifier) {
         if (INSTANCES.containsKey(qualifier)) {
-            return (Qualifier<T>) INSTANCES.get(qualifier);
+            return (QualifierWrapper<T>) INSTANCES.get(qualifier);
         }
-        var q = new Qualifier<>(qualifier);
+        var q = new QualifierWrapper<>(qualifier);
         INSTANCES.put(qualifier, q);
         return q;
     }
