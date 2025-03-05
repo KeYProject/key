@@ -84,9 +84,11 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    protected List<ResultsAndCondition> computeResultsAndConditions(Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
+    protected List<ResultsAndCondition> computeResultsAndConditions(Goal goal,
+            ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             JFunction newPredicate) throws ProofInputException {
-        return SymbolicExecutionSideProofUtil.computeResultsAndConditions(goal.getOverlayServices(), goal.proof(),
+        return SymbolicExecutionSideProofUtil.computeResultsAndConditions(goal.getOverlayServices(),
+            goal.proof(),
             sideProofEnvironment, sequentToProve, newPredicate,
             "Side proof rule on node " + goal.node().serialNr() + ".",
             StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,

@@ -91,14 +91,15 @@ public abstract class TacletIndex {
         if (indexTerm.javaBlock().isEmpty()) {
             indexObj = indexTerm.op();
             switch (indexObj) {
-                case SortDependingFunction sortDependingFunction ->
-                    // indexed independently of sort
-                        indexObj = sortDependingFunction.getKind();
-                case ElementaryUpdate ignored ->
-                        indexObj = ElementaryUpdate.class;
-                case Modality ignored ->
-                        indexObj = Modality.class;
-                default -> {}
+            case SortDependingFunction sortDependingFunction ->
+                // indexed independently of sort
+                indexObj = sortDependingFunction.getKind();
+            case ElementaryUpdate ignored ->
+                indexObj = ElementaryUpdate.class;
+            case Modality ignored ->
+                indexObj = Modality.class;
+            default -> {
+            }
             }
         } else {
             final JavaProgramElement prg = indexTerm.javaBlock().program();
@@ -187,13 +188,13 @@ public abstract class TacletIndex {
     public void add(NoPosTacletApp tacletApp) {
         Taclet taclet = tacletApp.taclet();
         switch (taclet) {
-            case RewriteTaclet ignored -> insertToMap(tacletApp, rwList);
-            case AntecTaclet ignored   -> insertToMap(tacletApp, antecList);
-            case SuccTaclet ignored    -> insertToMap(tacletApp, succList);
-            case NoFindTaclet ignored  -> noFindList = noFindList.prepend(tacletApp);
-            case null, default ->
-                // should never be reached
-                    Debug.fail("Tried to add an unknown type of Taclet");
+        case RewriteTaclet ignored -> insertToMap(tacletApp, rwList);
+        case AntecTaclet ignored -> insertToMap(tacletApp, antecList);
+        case SuccTaclet ignored -> insertToMap(tacletApp, succList);
+        case NoFindTaclet ignored -> noFindList = noFindList.prepend(tacletApp);
+        case null, default ->
+            // should never be reached
+            Debug.fail("Tried to add an unknown type of Taclet");
         }
 
         if (tacletApp.instantiations() != SVInstantiations.EMPTY_SVINSTANTIATIONS) {
@@ -209,13 +210,13 @@ public abstract class TacletIndex {
     public void remove(NoPosTacletApp tacletApp) {
         Taclet rule = tacletApp.taclet();
         switch (rule) {
-            case RewriteTaclet ignored -> removeFromMap(tacletApp, rwList);
-            case AntecTaclet ignored   -> removeFromMap(tacletApp, antecList);
-            case SuccTaclet ignored    -> removeFromMap(tacletApp, succList);
-            case NoFindTaclet ignored  -> noFindList = noFindList.removeAll(tacletApp);
-            case null, default ->
-                // should never be reached
-                    Debug.fail("Tried to remove an unknown type of Taclet");
+        case RewriteTaclet ignored -> removeFromMap(tacletApp, rwList);
+        case AntecTaclet ignored -> removeFromMap(tacletApp, antecList);
+        case SuccTaclet ignored -> removeFromMap(tacletApp, succList);
+        case NoFindTaclet ignored -> noFindList = noFindList.removeAll(tacletApp);
+        case null, default ->
+            // should never be reached
+            Debug.fail("Tried to remove an unknown type of Taclet");
         }
 
         if (tacletApp.instantiations() != SVInstantiations.EMPTY_SVINSTANTIATIONS) {
@@ -331,10 +332,11 @@ public abstract class TacletIndex {
         }
 
         final ImmutableList<NoPosTacletApp> inMap = switch (op) {
-            case SortDependingFunction sortDependingFunction -> map.get(sortDependingFunction.getKind());
-            case ElementaryUpdate ignored -> map.get(ElementaryUpdate.class);
-            case Modality ignored -> map.get(Modality.class);
-            default -> map.get(op);
+        case SortDependingFunction sortDependingFunction ->
+            map.get(sortDependingFunction.getKind());
+        case ElementaryUpdate ignored -> map.get(ElementaryUpdate.class);
+        case Modality ignored -> map.get(Modality.class);
+        default -> map.get(op);
         };
 
         res = merge(res, inMap);

@@ -21,79 +21,54 @@ import recoder.io.DataLocation;
  * @author mulbrich
  * @since 2006-11-02
  */
-public record URLDataLocation(URL url) implements DataLocation {
+public record URLDataLocation(URL url)implements DataLocation{
 
-    public static final String LOCATION_TYPE_FILE = "URL";
+public static final String LOCATION_TYPE_FILE="URL";
 
-    /**
-     * return the URL's input stream
-     *
-     * @see DataLocation#getInputStream()
-     */
-    public InputStream getInputStream() throws IOException {
-        return url.openStream();
-    }
+/**
+ * return the URL's input stream
+ *
+ * @see DataLocation#getInputStream()
+ */
+public InputStream getInputStream()throws IOException{return url.openStream();}
 
-    /**
-     * @throws UnsupportedOperationException always
-     * @see DataLocation#getOutputStream()
-     */
-    public OutputStream getOutputStream() throws IOException {
-        throw new UnsupportedOperationException("Output is not supported for URLDataLocation");
-    }
+/**
+ * @throws UnsupportedOperationException always
+ * @see DataLocation#getOutputStream()
+ */
+public OutputStream getOutputStream()throws IOException{throw new UnsupportedOperationException("Output is not supported for URLDataLocation");}
 
-    /**
-     * @throws UnsupportedOperationException always
-     * @see DataLocation#getWriter()
-     */
-    public Writer getWriter() throws IOException {
-        throw new UnsupportedOperationException("Output is not supported for URLDataLocation");
-    }
+/**
+ * @throws UnsupportedOperationException always
+ * @see DataLocation#getWriter()
+ */
+public Writer getWriter()throws IOException{throw new UnsupportedOperationException("Output is not supported for URLDataLocation");}
 
-    public Reader getReader() throws IOException {
-        return new InputStreamReader(getInputStream(), StandardCharsets.UTF_8);
-    }
+public Reader getReader()throws IOException{return new InputStreamReader(getInputStream(),StandardCharsets.UTF_8);}
 
-    public String getType() {
-        return LOCATION_TYPE_FILE;
-    }
+public String getType(){return LOCATION_TYPE_FILE;}
 
-    /**
-     * Getter for url.
-     *
-     * @return the url of this data location
-     */
-    @Override
-    public URL url() {
-        return url;
-    }
+/**
+ * Getter for url.
+ *
+ * @return the url of this data location
+ */
+@Override public URL url(){return url;}
 
-    public String toString() {
-        return getType() + ":" + url;
-    }
+public String toString(){return getType()+":"+url;}
 
-    public boolean hasReaderSupport() {
-        return true;
-    }
+public boolean hasReaderSupport(){return true;}
 
-    public boolean hasWriterSupport() {
-        return false;
-    }
+public boolean hasWriterSupport(){return false;}
 
-    public boolean isWritable() {
-        return false;
-    }
+public boolean isWritable(){return false;}
 
-    public void inputStreamClosed() {
-    }
+public void inputStreamClosed(){}
 
-    public void outputStreamClosed() {
-    }
+public void outputStreamClosed(){}
 
-    public void readerClosed() {
-    }
+public void readerClosed(){}
 
-    public void writerClosed() {
-    }
+public void writerClosed(){}
 
 }

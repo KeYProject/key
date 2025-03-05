@@ -90,8 +90,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             if (name.equals("hide_right")) {
                 return applyTF("b",
                     hasLabel(ParameterlessTermLabel.POST_CONDITION_LABEL))
-                            .computeCost(ruleApp, pio,
-                                goal, mState);
+                        .computeCost(ruleApp, pio,
+                            goal, mState);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
                 RuleAppCost andRightCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
                         .computeCost(ruleApp, pio, goal, mState);

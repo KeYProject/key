@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 
 import org.key_project.prover.proof.ProofGoal;

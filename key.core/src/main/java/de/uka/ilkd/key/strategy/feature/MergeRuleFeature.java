@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
 import org.key_project.prover.proof.ProofGoal;

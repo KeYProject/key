@@ -9,10 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.nparser.ChoiceInformation;
-import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.nparser.ProblemInformation;
-import de.uka.ilkd.key.nparser.ProofReplayer;
+import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;

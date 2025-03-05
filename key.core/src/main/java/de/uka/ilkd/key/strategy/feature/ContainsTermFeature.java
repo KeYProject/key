@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.proof.Goal;
-
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.prover.proof.ProofGoal;

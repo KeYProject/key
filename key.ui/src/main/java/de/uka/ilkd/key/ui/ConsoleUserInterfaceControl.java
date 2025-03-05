@@ -131,6 +131,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         super.taskFinished(info);
         progressMax = 0; // reset progress bar marker
         final Proof proof = (Proof) info.getProof();
+        final Object result = info.getResult();
         if (proof == null) {
             LOGGER.info("Proof loading failed");
             if (result instanceof Throwable thrown) {
