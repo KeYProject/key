@@ -61,10 +61,15 @@ public class FinalFieldsPOExtension implements POExtension {
                 : "Expected a ProgramMethod not a schema variable, since we need the actual implementation";
         ProgramMethod constructor = (ProgramMethod) iconstructor;
 
+        List<JFunction> finalFields = findFinalFields(iconstructor, services);
+        if (finalFields.isEmpty()) {
+            // If there are no final fields, we do not need to do anything
+            return postTerm;
+        }
+
         FinalFieldCodeValidator.validateFinalFields(constructor, proofConfig);
 
         TermBuilder tb = services.getTermBuilder();
-        List<JFunction> finalFields = findFinalFields(iconstructor, services);
         Term self = tb.var(selfVar);
         for (JFunction finalField : finalFields) {
             Term fieldRef = tb.tf().createTerm(finalField);

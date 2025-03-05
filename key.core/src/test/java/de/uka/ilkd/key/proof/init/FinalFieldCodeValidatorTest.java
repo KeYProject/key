@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,13 +71,14 @@ class FinalFieldCodeValidatorTest {
                         () -> testConstructor(c, env)));
     }
 
-    private void testConstructor(Contract c, KeYEnvironment<?> env) throws ProofInputException {
+    private void testConstructor(Contract c, KeYEnvironment<?> env)
+            throws ProofInputException, MalformedURLException {
         try {
             // System.out.println("Contract id: " + c.getName());
             ContractPO po = c.createProofObl(env.getInitConfig());
             env.createProof(po);
         } catch (FinalFieldCodeValidator.FinalViolationException fex) {
-            System.err.println("Position: " + fex.getPositionInfo());
+            System.err.println("Position: " + fex.getLocation());
             fex.printStackTrace();
             throw fex;
         }

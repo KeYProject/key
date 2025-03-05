@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.parsing.LocatableException;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.IdentityHashSet;
@@ -177,7 +179,8 @@ class FinalFieldCodeValidator {
             // This also disallows things like "a.new B()" which would not like this. However,
             // KeY cannot deal with this anyway, so we can do the easy check here.
             throw new FinalViolationException(
-                "Call to non-static inner class " + classType + " leaks 'this' to the constructor",
+                "Constructor call to non-static inner class " + classType.getFullName() +
+                    " leaks 'this' to the constructor",
                 _new);
         }
 
@@ -204,12 +207,14 @@ class FinalFieldCodeValidator {
 
         if (hasThisArgument) {
             throw new FinalViolationException(
-                "Method call " + methodReference + " leaks 'this' to called method.",
+                "Method call to " + methodReference.getName() + " leaks 'this' to called method.",
                 methodReference);
         }
 
         if (calledOnThis) {
             IProgramMethod method = findMethod(methodReference);
+            assert !method.isConstructor()
+                    : "Constructor calls should have been handled by the New handler above.";
             if (method.isStatic() || method.isConstructor()) {
                 // local static methods are acutally fine ...
                 // constructor calls are also fine
@@ -219,7 +224,9 @@ class FinalFieldCodeValidator {
             if (!method.isFinal() && !method.isPrivate()
                     && !((ClassType) enclosingClass.getJavaType()).isFinal()) {
                 throw new FinalViolationException(
-                    "Method called on 'this' that is not effectively final.", methodReference);
+                    "Method to " + method.getFullName() +
+                        " called on 'this' that is not effectively final.",
+                    methodReference);
             }
             validate(method);
         }
@@ -266,25 +273,24 @@ class FinalFieldCodeValidator {
         validateChildren(fieldReference);
     }
 
-    static class FinalViolationException extends RuntimeException {
-
-        private final PositionInfo position;
+    static class FinalViolationException extends LocatableException {
 
         public FinalViolationException(String message) {
             this(message, null);
         }
 
         public FinalViolationException(String message, SyntaxElement syntaxElement) {
-            super(message);
-            if (syntaxElement instanceof SourceElement sourceElement) {
-                this.position = sourceElement.getPositionInfo();
-            } else {
-                this.position = null;
-            }
+            super(message, computeLocation(syntaxElement));
         }
 
-        public PositionInfo getPositionInfo() {
-            return position;
+        private static Location computeLocation(SyntaxElement syntaxElement) {
+            if (syntaxElement instanceof SourceElement sourceElement) {
+                PositionInfo posInfo = sourceElement.getPositionInfo();
+                var uri = posInfo.getURI().orElse(null);
+                var pos = posInfo.getStartPosition();
+                return new Location(uri, pos);
+            }
+            return Location.UNDEFINED;
         }
     }
 }
