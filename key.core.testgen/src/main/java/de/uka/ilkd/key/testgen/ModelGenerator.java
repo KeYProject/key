@@ -79,7 +79,7 @@ public class ModelGenerator implements SolverLauncherListener {
     private SolverLauncher prepareLauncher() {
         final TestGenerationSettings settings = TestGenerationSettings.getInstance();
         final ProofIndependentSMTSettings piSettings =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().copy();
 
 
         piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
