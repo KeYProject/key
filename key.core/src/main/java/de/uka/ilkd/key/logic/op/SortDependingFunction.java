@@ -102,7 +102,7 @@ public final class SortDependingFunction extends JFunction {
      * @return the variant for the given sort
      */
     public synchronized SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
-        if (sort == this.sortDependingOn) {
+        if (sort == this.sortDependingOn.getQualifier()) {
             return this;
         }
 
