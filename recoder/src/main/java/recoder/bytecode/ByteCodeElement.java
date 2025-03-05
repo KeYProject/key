@@ -16,15 +16,15 @@ public abstract class ByteCodeElement implements ProgramModelElement {
 
     protected ProgramModelInfo service;
 
-    public ByteCodeElement() {
+    protected ByteCodeElement() {
         super();
     }
 
-    public ByteCodeElement(int accessFlags) {
+    protected ByteCodeElement(int accessFlags) {
         this.accessFlags = accessFlags;
     }
 
-    public ByteCodeElement(int accessFlags, String name) {
+    protected ByteCodeElement(int accessFlags, String name) {
         setName(name);
         this.accessFlags = accessFlags;
     }

@@ -26,7 +26,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Type operator.
      */
-    public TypeOperator() {
+    protected TypeOperator() {
         // nothing to do
     }
 
@@ -36,7 +36,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * @param unaryChild an expression.
      * @param typeref a type reference.
      */
-    public TypeOperator(Expression unaryChild, TypeReference typeref) {
+    protected TypeOperator(Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
         setTypeReference(typeref);
     }
@@ -48,7 +48,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * @param rhs an expression.
      * @param typeref a type reference.
      */
-    public TypeOperator(Expression lhs, Expression rhs, TypeReference typeref) {
+    protected TypeOperator(Expression lhs, Expression rhs, TypeReference typeref) {
         super(lhs, rhs);
         setTypeReference(typeref);
     }

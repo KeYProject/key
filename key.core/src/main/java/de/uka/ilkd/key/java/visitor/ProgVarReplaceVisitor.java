@@ -173,7 +173,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             if (op instanceof ElementaryUpdate) {
                 ElementaryUpdate uop = (ElementaryUpdate) t.op();
                 if (replaceMap.containsKey(uop.lhs())) {
-                    UpdateableOperator replacedLhs = (UpdateableOperator) replaceMap.get(uop.lhs());
+                    UpdateableOperator replacedLhs = replaceMap.get(uop.lhs());
                     op = ElementaryUpdate.getInstance(replacedLhs);
                     changed = changed || uop != op;
                 }
@@ -310,7 +310,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 }
                 if (replaceMap.containsKey(pv)) {
                     atPres.remove(pv);
-                    pv = (LocationVariable) replaceMap.get(pv);
+                    pv = replaceMap.get(pv);
                 }
                 atPres.put(pv, replaceVariablesInTerm(t));
             }
@@ -512,7 +512,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             // TODO Can we really safely assume that replaceVariable returns a
             // location variable?
             result.put(remembranceHeap.getKey(),
-                (LocationVariable) replaceVariable(remembranceHeap.getValue()));
+                replaceVariable(remembranceHeap.getValue()));
         }
         return result;
     }
@@ -523,8 +523,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             new LinkedHashMap<>();
         for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable : remembranceLocalVariables
                 .entrySet()) {
-            result.put((LocationVariable) replaceVariable(remembranceLocalVariable.getKey()),
-                (LocationVariable) replaceVariable(remembranceLocalVariable.getValue()));
+            result.put(replaceVariable(remembranceLocalVariable.getKey()),
+                replaceVariable(remembranceLocalVariable.getValue()));
         }
         return result;
     }
@@ -583,7 +583,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             }
             if (replaceMap.containsKey(pv)) {
                 atPres.remove(pv);
-                pv = (LocationVariable) replaceMap.get(pv);
+                pv = replaceMap.get(pv);
             }
             atPres.put(pv, replaceVariablesInTerm(t));
         }
@@ -664,7 +664,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
             if (replaceMap.containsKey(pv)) {
                 newAtPres.remove(pv);
-                pv = (LocationVariable) replaceMap.get(pv);
+                pv = replaceMap.get(pv);
                 newAtPreVars.put(pv, atPreVars.get(e.getKey()));
             }
             newAtPres.put(pv, replaceVariablesInTerm(t));

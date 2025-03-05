@@ -6,5 +6,4 @@ package de.uka.ilkd.key.parser;
 import org.key_project.logic.sort.Sort;
 
 
-public record IdDeclaration(String name, Sort sort) {
-}
+public record IdDeclaration(String name,Sort sort){}

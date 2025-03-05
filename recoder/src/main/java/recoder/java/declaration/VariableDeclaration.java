@@ -30,7 +30,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      * Variable declaration.
      */
 
-    public VariableDeclaration() {
+    protected VariableDeclaration() {
         // nothing to do here
     }
 
@@ -41,7 +41,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      * @param typeRef a type reference.
      */
 
-    public VariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef) {
+    protected VariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
         // makeParentRoleValid() called by subclasses' constructors

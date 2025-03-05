@@ -19,7 +19,7 @@ import recoder.java.expression.Operator;
  * @author bruns
  *
  */
-public class RangeExpression extends Operator implements Expression {
+public class RangeExpression extends Operator {
 
 
     /**

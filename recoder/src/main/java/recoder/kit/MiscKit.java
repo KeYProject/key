@@ -54,7 +54,7 @@ public class MiscKit {
         int i, j = -1;
         do {
             i = j + 1;
-            j = name.indexOf(".", i);
+            j = name.indexOf('.', i);
             String token = (j > i) ? name.substring(i, j) : name.substring(i);
             result =
                 factory.createUncollatedReferenceQualifier(result, factory.createIdentifier(token));

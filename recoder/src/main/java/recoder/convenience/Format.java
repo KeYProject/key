@@ -200,8 +200,7 @@ public class Format {
                     }
                     break;
                 case 'p':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
+                    if (e instanceof SourceElement se) {
                         se = se.getFirstElement();
                         if (se != null) {
                             append(se.getStartPosition(), columns, res);
@@ -209,8 +208,7 @@ public class Format {
                     }
                     break;
                 case 'P':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
+                    if (e instanceof SourceElement se) {
                         SourceElement se2 = se.getFirstElement();
                         if (se2 != null) {
                             append(se2.getStartPosition(), columns, res);
@@ -221,8 +219,7 @@ public class Format {
                     }
                     break;
                 case 'r':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
+                    if (e instanceof SourceElement se) {
                         se = se.getFirstElement();
                         if (se != null) {
                             append(se.getRelativePosition(), columns, res);

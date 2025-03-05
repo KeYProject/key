@@ -23,7 +23,7 @@ public abstract class ExplorationAction extends MainWindowAction {
 
     private static final long serialVersionUID = -1662459714803539089L;
 
-    public ExplorationAction(MainWindow mw) {
+    protected ExplorationAction(MainWindow mw) {
         super(mw);
     }
 

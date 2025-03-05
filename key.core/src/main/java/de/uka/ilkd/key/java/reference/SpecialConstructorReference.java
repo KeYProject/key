@@ -25,7 +25,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
 
 
 
-    public SpecialConstructorReference() {
+    protected SpecialConstructorReference() {
         this.arguments = null;
     }
 
@@ -34,7 +34,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      *
      * @param arguments an expression mutable list.
      */
-    public SpecialConstructorReference(Expression[] arguments) {
+    protected SpecialConstructorReference(Expression[] arguments) {
         this.arguments = new ImmutableArray<>(arguments);
     }
 
@@ -44,7 +44,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      *
      * @param arguments an expression mutable list.
      */
-    public SpecialConstructorReference(ImmutableArray<Expression> arguments) {
+    protected SpecialConstructorReference(ImmutableArray<Expression> arguments) {
         this.arguments = arguments;
     }
 
@@ -55,7 +55,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @param children the children of this AST element as KeY classes. May contain: several of
      *        Expression (as initializers of the array), Comments
      */
-    public SpecialConstructorReference(ExtList children) {
+    protected SpecialConstructorReference(ExtList children) {
         super(children);
         this.arguments = new ImmutableArray<>(children.collect(Expression.class));
     }
@@ -66,7 +66,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @param children the children of this AST element as KeY classes. May contain: several of
      *        Expression (as initializers of the array), Comments
      */
-    public SpecialConstructorReference(ExtList children, PositionInfo pi) {
+    protected SpecialConstructorReference(ExtList children, PositionInfo pi) {
         super(children, pi);
         this.arguments = new ImmutableArray<>(children.collect(Expression.class));
     }

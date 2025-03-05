@@ -26,7 +26,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      * Expression jump statement.
      */
 
-    public ExpressionJumpStatement() {
+    protected ExpressionJumpStatement() {
         // nothing to do
     }
 
@@ -36,7 +36,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      * @param expr an expression.
      */
 
-    public ExpressionJumpStatement(Expression expr) {
+    protected ExpressionJumpStatement(Expression expr) {
         if (expr != null) {
             setExpression(expr);
         }

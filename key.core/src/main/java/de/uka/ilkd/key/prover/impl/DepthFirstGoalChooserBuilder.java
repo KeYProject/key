@@ -3,20 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
-import de.uka.ilkd.key.prover.GoalChooser;
-import de.uka.ilkd.key.prover.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 
-public class DepthFirstGoalChooserBuilder implements GoalChooserBuilder {
+import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.engine.GoalChooserBuilder;
+
+public class DepthFirstGoalChooserBuilder implements GoalChooserBuilder<Proof, Goal> {
 
     public static final String NAME = "Depth First Goal Chooser";
 
     public DepthFirstGoalChooserBuilder() {}
 
-    public GoalChooser create() {
+    public GoalChooser<Proof, Goal> create() {
         return new DepthFirstGoalChooser();
     }
 
-    public GoalChooserBuilder copy() {
+    public GoalChooserBuilder<Proof, Goal> copy() {
         return new DepthFirstGoalChooserBuilder();
     }
 

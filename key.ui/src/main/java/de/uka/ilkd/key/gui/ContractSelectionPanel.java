@@ -143,7 +143,7 @@ public class ContractSelectionPanel extends JPanel {
                 lay.setAlignment(FlowLayout.LEFT);
                 JPanel result = new JPanel(lay);
                 result.add(label);
-                label.setVerticalAlignment(SwingConstants.TOP);
+                label.setVerticalAlignment(TOP);
 
                 result.setBackground(supComp.getBackground());
 

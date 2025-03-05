@@ -15,7 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
 public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         implements NonTerminalProgramElement {
 
-    public JavaNonTerminalProgramElement() {
+    protected JavaNonTerminalProgramElement() {
     }
 
 
@@ -24,17 +24,17 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      *
      * @param list as ExtList with children of the node
      */
-    public JavaNonTerminalProgramElement(ExtList list) {
+    protected JavaNonTerminalProgramElement(ExtList list) {
         super(list);
     }
 
 
-    public JavaNonTerminalProgramElement(PositionInfo pos) {
+    protected JavaNonTerminalProgramElement(PositionInfo pos) {
         super(pos);
     }
 
 
-    public JavaNonTerminalProgramElement(ExtList children, PositionInfo pos) {
+    protected JavaNonTerminalProgramElement(ExtList children, PositionInfo pos) {
         super(children, pos);
     }
 
@@ -110,7 +110,6 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
         source.next();
         return matchCond;
-
     }
 
 

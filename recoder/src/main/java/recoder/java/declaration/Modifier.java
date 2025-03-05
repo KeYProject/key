@@ -28,7 +28,7 @@ public abstract class Modifier extends JavaProgramElement
      * Modifier.
      */
 
-    public Modifier() {
+    protected Modifier() {
         // nothing to do here
     }
 

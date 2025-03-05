@@ -20,11 +20,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This variable condition checks if the instantiation of a schemavariable (of
@@ -53,10 +53,10 @@ public class ModelFieldCondition extends VariableConditionAdapter {
 
         if (var == field) {
             ProgramVariable attribute;
-            if (subst instanceof FieldReference) {
-                attribute = ((FieldReference) subst).getProgramVariable();
-            } else if (subst instanceof ProgramVariable) {
-                attribute = (ProgramVariable) subst;
+            if (subst instanceof FieldReference fieldReference) {
+                attribute = fieldReference.getProgramVariable();
+            } else if (subst instanceof ProgramVariable pv) {
+                attribute = pv;
             } else {
                 return !negated;
             }

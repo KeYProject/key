@@ -11475,9 +11475,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             jj_lasttokens[jj_endpos++] = kind;
         } else if (jj_endpos != 0) {
             jj_expentry = new int[jj_endpos];
-            for (int i = 0; i < jj_endpos; i++) {
-                jj_expentry[i] = jj_lasttokens[i];
-            }
+            System.arraycopy(jj_lasttokens, 0, jj_expentry, 0, jj_endpos);
             boolean exists = false;
             for (java.util.Enumeration e = jj_expentries.elements(); e.hasMoreElements();) {
                 int[] oldentry = (int[]) (e.nextElement());

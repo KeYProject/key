@@ -42,7 +42,7 @@ public class FloatHandler extends LDTHandler {
     @Override
     protected @Nullable TypedOperator getOperator(Type promotedType, JMLOperator op) {
         if (promotedType.equals(PrimitiveType.JAVA_FLOAT)) {
-            return LDTHandler.getOperatorFromMap(this.opMap, op);
+            return getOperatorFromMap(this.opMap, op);
         } else {
             return null;
         }

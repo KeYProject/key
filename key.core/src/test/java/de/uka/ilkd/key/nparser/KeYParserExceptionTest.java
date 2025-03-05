@@ -42,7 +42,7 @@ public class KeYParserExceptionTest extends ParserExceptionTest {
 
     public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
         URL fileURL = KeYParserExceptionTest.class.getResource("exceptional");
-        return ParserExceptionTest.getFiles(FIX_FILE, fileURL, ".key");
+        return getFiles(FIX_FILE, fileURL, ".key");
     }
 
 

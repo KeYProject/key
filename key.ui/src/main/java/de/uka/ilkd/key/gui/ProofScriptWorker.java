@@ -130,8 +130,8 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         Document doc = logArea.getDocument();
         for (ProofScriptEngine.Message info : chunks) {
             var message = new StringBuilder("\n---\n");
-            if (info instanceof ProofScriptEngine.EchoMessage echo) {
-                message.append(echo.message());
+            if (info instanceof ProofScriptEngine.EchoMessage(String message1)) {
+                message.append(message1);
             } else {
                 var exec = (ProofScriptEngine.ExecuteInfo) info;
                 if (exec.command().startsWith("'echo ")) {

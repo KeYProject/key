@@ -42,7 +42,7 @@ public class DoubleHandler extends LDTHandler {
     @Override
     protected @Nullable TypedOperator getOperator(Type promotedType, JMLOperator op) {
         if (promotedType.equals(PrimitiveType.JAVA_DOUBLE)) {
-            return LDTHandler.getOperatorFromMap(this.opMap, op);
+            return getOperatorFromMap(this.opMap, op);
         } else {
             return null;
         }

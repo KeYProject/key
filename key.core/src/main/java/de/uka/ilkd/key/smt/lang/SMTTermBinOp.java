@@ -429,7 +429,7 @@ public class SMTTermBinOp extends SMTTerm {
         for (; i < args.size(); ++i) {
             SMTTerm arg = args.get(i);
             if (arg instanceof SMTTermBinOp binarg
-                    && ((SMTTermBinOp) arg).getOperator().equals(op)) {
+                    && binarg.getOperator().equals(op)) {
                 if (binarg.getLeft().equals(chain.get(chain.size() - 1))) {
                     chain.add(binarg.getRight());
                     chainables.add(arg);

@@ -55,8 +55,8 @@ public class InterfaceDeclaration extends TypeDeclaration {
     }
 
     public InterfaceDeclaration(ProgramElementName name) {
-        this(new de.uka.ilkd.key.java.declaration.Modifier[] {}, name, null,
-            new de.uka.ilkd.key.java.declaration.MemberDeclaration[] {}, true);
+        this(new Modifier[] {}, name, null,
+            new MemberDeclaration[] {}, true);
     }
 
 

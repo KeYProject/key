@@ -98,7 +98,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
     private static class ColorSettingsTableModel extends AbstractTableModel {
         private static final long serialVersionUID = 4722928883386296559L;
-        private static final String[] COLUMNS = new String[] { "Key", "Description", "Color" };
+        private static final String[] COLUMNS = { "Key", "Description", "Color" };
         private final List<ColorPropertyData> colorData;
 
         public ColorSettingsTableModel(List<ColorPropertyData> properties) {
