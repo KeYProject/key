@@ -94,7 +94,7 @@ SKOLEMFORMULA : '\\skolemFormula';
 TERMLABEL : '\\termlabel';
 
 // used in contracts
-MODIFIES : '\\modifies';
+MODIFIABLE : '\\modifiable';
 
 // Keywords used in program variable declarations
 PROGRAMVARIABLES : '\\programVariables';
@@ -145,6 +145,7 @@ EQUAL_UNIQUE : '\\equalUnique';
 NEW : '\\new';
 NEW_TYPE_OF: '\\newTypeOf';
 NEW_DEPENDING_ON: '\\newDependingOn';
+NEW_LOCAL_VARS: '\\newLocalVars';
 HAS_ELEMENTARY_SORT:'\\hasElementarySort';
 NEWLABEL : '\\newLabel';
 CONTAINS_ASSIGNMENT : '\\containsAssignment';
@@ -226,9 +227,10 @@ INVARIANTS : '\\invariants';
 // Taclet annotations (see TacletAnnotations.java for more details)
 LEMMA : '\\lemma';
 
-// The first two guys are not really meta operators, treated separately
+// The first three guys are not really meta operators, treated separately
 IN_TYPE : '\\inType';
 IS_ABSTRACT_OR_INTERFACE : '\\isAbstractOrInterface';
+IS_FINAL : '\\isFinal';
 CONTAINERTYPE : '\\containerType';
 
 // types that need to be declared as keywords

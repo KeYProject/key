@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+
+import org.key_project.logic.Name;
 
 /**
  * The Zero element of the sign lattice, representing only the number 0.

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -47,15 +47,18 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -109,9 +112,18 @@ public class IntermediateProofReplayer {
     private final LinkedList<Pair<Node, NodeIntermediate>> queue =
         new LinkedList<>();
 
+    /**
+     * Used by the node merging during the proof replay.
+     *
+     * @param node the other node to be merged with
+     * @param pio pio of ??? (ask Dominic Steinhöfel)
+     * @param intermediate representation of the node during the replay
+     * @see MergePartnerAppIntermediate
+     */
+    private record PartnerNode(Node node, PosInOccurrence pio, NodeIntermediate intermediate) {}
+
     /** Maps join node IDs to previously seen join partners */
-    private final HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
-        new HashMap<>();
+    private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -261,7 +273,7 @@ public class IntermediateProofReplayer {
                             (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
 
                         if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
-                            HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
+                            HashSet<PartnerNode> partnerNodesInfo =
                                 joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
 
                             if (partnerNodesInfo == null
@@ -306,11 +318,11 @@ public class IntermediateProofReplayer {
                                     }
 
                                     // Now add children of partner nodes
-                                    for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
                                         Iterator<Node> children =
-                                            partnerNodeInfo.first.childrenIterator();
+                                            partnerNodeInfo.node.childrenIterator();
                                         LinkedList<NodeIntermediate> intermChildren =
-                                            partnerNodeInfo.third.getChildren();
+                                            partnerNodeInfo.intermediate.getChildren();
 
                                         addChildren(children, intermChildren);
                                     }
@@ -324,11 +336,11 @@ public class IntermediateProofReplayer {
                             }
                         } else if (appInterm instanceof MergePartnerAppIntermediate joinPartnerApp) {
                             // Register this partner node
-                            HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
+                            HashSet<PartnerNode> partnerNodeInfo =
                                 joinPartnerNodes.computeIfAbsent(joinPartnerApp.getMergeNodeId(),
                                     k -> new HashSet<>());
 
-                            partnerNodeInfo.add(new Triple<>(
+                            partnerNodeInfo.add(new PartnerNode(
                                 currNode,
                                 PosInOccurrence.findInSequent(currGoal.sequent(),
                                     appInterm.getPosInfo().first, appInterm.getPosInfo().second),
@@ -710,7 +722,7 @@ public class IntermediateProofReplayer {
      */
     private MergeRuleBuiltInRuleApp instantiateJoinApp(final MergeAppIntermediate joinAppInterm,
             final Node currNode,
-            final Set<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo,
+            final HashSet<PartnerNode> partnerNodesInfo,
             final Services services) throws SkipSMTRuleException, BuiltInConstructionException {
         final MergeRuleBuiltInRuleApp joinApp =
             (MergeRuleBuiltInRuleApp) constructBuiltinApp(joinAppInterm, currGoal);
@@ -799,18 +811,18 @@ public class IntermediateProofReplayer {
         }
 
         ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
-        for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+        for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
 
-            final Triple<Term, Term, Term> ownSEState =
+            SymbolicExecutionStateWithProgCnt ownSEState =
                 sequentToSETriple(currNode, joinApp.posInOccurrence(), services);
-            final Triple<Term, Term, Term> partnerSEState =
-                sequentToSETriple(partnerNodeInfo.first, partnerNodeInfo.second, services);
+            var partnerSEState =
+                sequentToSETriple(partnerNodeInfo.node, partnerNodeInfo.pio, services);
 
-            assert ownSEState.third.equals(partnerSEState.third)
+            assert ownSEState.programCounter().equals(partnerSEState.programCounter())
                     : "Cannot merge incompatible program counters";
 
             joinPartners = joinPartners.append(
-                new MergePartner(proof.getOpenGoal(partnerNodeInfo.first), partnerNodeInfo.second));
+                new MergePartner(proof.getOpenGoal(partnerNodeInfo.node), partnerNodeInfo.pio));
         }
 
         joinApp.setMergeNode(currNode);
@@ -884,8 +896,8 @@ public class IntermediateProofReplayer {
                 continue;
             }
             final String value = s.substring(eq + 1);
-            if (sv instanceof VariableSV) {
-                app = parseSV1(app, sv, value, services);
+            if (sv instanceof VariableSV vsv) {
+                app = parseSV1(app, vsv, value, services);
             }
         }
 
@@ -933,10 +945,11 @@ public class IntermediateProofReplayer {
      * @throws ParserException In case of an error.
      */
     public static Term parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
-            Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
+            Namespace<IProgramVariable> progVarNS, Namespace<JFunction> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
-                varNS, functNS, proof.getNamespaces().sorts(), progVarNS, new AbbrevMap());
+                varNS, functNS, proof.getNamespaces().sorts(),
+                progVarNS, new AbbrevMap());
         } catch (ParserException e) {
             throw new RuntimeException(
                 "Error while parsing value " + value + "\nVar namespace is: " + varNS + "\n", e);
@@ -959,13 +972,13 @@ public class IntermediateProofReplayer {
      * Instantiates a schema variable in the given taclet application. 1st pass: only VariableSV.
      *
      * @param app Application to instantiate.
-     * @param sv Schema variable (VariableSV) to instantiate.
+     * @param sv VariableSV to instantiate.
      * @param value Name for the instantiated logic variable.
      * @param services The services object.
      * @return An instantiated taclet application, where the schema variable has been instantiated
      *         by a logic variable of the given name.
      */
-    public static TacletApp parseSV1(TacletApp app, SchemaVariable sv, String value,
+    public static TacletApp parseSV1(TacletApp app, VariableSV sv, String value,
             Services services) {
         LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(sv, services));
         Term instance = services.getTermFactory().createTerm(lv);
@@ -983,7 +996,7 @@ public class IntermediateProofReplayer {
      * @return An instantiated taclet application, where the schema variable has been instantiated,
      *         depending on its type, by a Skolem constant, program element, or term of the given
      *         name.
-     * @see #parseSV1(TacletApp, SchemaVariable, String, Services)
+     * @see #parseSV1(TacletApp, VariableSV, String, Services)
      */
     public static TacletApp parseSV2(TacletApp app, SchemaVariable sv, String value,
             Goal targetGoal) {
@@ -993,16 +1006,20 @@ public class IntermediateProofReplayer {
         if (sv instanceof VariableSV) {
             // ignore -- already done
             result = app;
-        } else if (sv instanceof ProgramSV) {
-            final ProgramElement pe = app.getProgramElement(value, sv, services);
+        } else if (sv instanceof ProgramSV psv) {
+            final ProgramElement pe = app.getProgramElement(value, psv, services);
             result = app.addCheckedInstantiation(sv, pe, services, true);
-        } else if (sv instanceof SkolemTermSV) {
-            result = app.createSkolemConstant(value, sv, true, services);
+        } else if (sv instanceof SkolemTermSV skolemSv) {
+            result = app.createSkolemConstant(value, skolemSv, true, services);
+        } else if (sv instanceof ModalOperatorSV msv) {
+            result = app.addInstantiation(
+                app.instantiations().add(msv, Modality.JavaModalityKind.getKind(value), services),
+                services);
         } else {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS =
                 targetGoal.getLocalNamespaces().programVariables();
-            Namespace<Function> funcNS = targetGoal.getLocalNamespaces().functions();
+            Namespace<JFunction> funcNS = targetGoal.getLocalNamespaces().functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);

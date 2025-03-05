@@ -13,11 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -100,7 +96,7 @@ public class ProofObligationVars {
     }
 
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
-        if (pre.heap.op() instanceof Function
+        if (pre.heap.op() instanceof JFunction
                 && !pre.heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {
             ImmutableArray<TermLabel> labels = pre.heap.getLabels();
             TermLabel[] newLabels = new TermLabel[labels.size() + 1];

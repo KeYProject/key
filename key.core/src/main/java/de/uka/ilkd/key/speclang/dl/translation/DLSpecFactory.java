@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -21,10 +22,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -71,7 +70,7 @@ public final class DLSpecFactory {
     private LocationVariable extractHeapAtPre(Term fma) throws ProofInputException {
         if (fma.sub(1).op() instanceof UpdateApplication) {
             final Term update = fma.sub(1).sub(0);
-            assert update.sort() == Sort.UPDATE;
+            assert update.sort() == JavaDLTheory.UPDATE;
             if (!(update.op() instanceof ElementaryUpdate eu)) {
                 throw new ProofInputException(
                     "Elementary update expected, " + "but found: " + update);
@@ -90,7 +89,7 @@ public final class DLSpecFactory {
     }
 
 
-    private ProgramVariable extractExcVar(Term fma) {
+    private LocationVariable extractExcVar(Term fma) {
         final Term modFma =
             fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
 
@@ -121,19 +120,20 @@ public final class DLSpecFactory {
     }
 
 
-    private Modality extractModality(UseOperationContractRule.Instantiation inst)
+    private Modality.JavaModalityKind extractModalityKind(
+            UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
-        return inst.mod;
+        return inst.modality.kind();
     }
 
 
-    private ProgramVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
+    private LocationVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
         if (inst.actualSelf == null) {
             assert inst.pm.isStatic();
             return null;
-        } else if (inst.actualSelf.op() instanceof ProgramVariable) {
-            return (ProgramVariable) inst.actualSelf.op();
+        } else if (inst.actualSelf.op() instanceof LocationVariable lv) {
+            return lv;
         } else {
             throw new ProofInputException(
                 "Program variable expected, " + "but found: " + inst.actualSelf);
@@ -141,12 +141,12 @@ public final class DLSpecFactory {
     }
 
 
-    private ImmutableList<ProgramVariable> extractParamVars(
+    private ImmutableList<LocationVariable> extractParamVars(
             UseOperationContractRule.Instantiation inst) throws ProofInputException {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         for (Term param : inst.actualParams) {
-            if (param.op() instanceof ProgramVariable) {
-                result = result.append((ProgramVariable) param.op());
+            if (param.op() instanceof LocationVariable lv) {
+                result = result.append(lv);
             } else {
                 throw new ProofInputException(
                     "Program variable expected, " + "but found: " + param);
@@ -156,12 +156,12 @@ public final class DLSpecFactory {
     }
 
 
-    private ProgramVariable extractResultVar(UseOperationContractRule.Instantiation inst)
+    private LocationVariable extractResultVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
         if (inst.actualResult == null) {
             return null;
-        } else if (inst.actualResult instanceof ProgramVariable) {
-            return (ProgramVariable) inst.actualResult;
+        } else if (inst.actualResult instanceof LocationVariable lv) {
+            return lv;
         } else {
             throw new ProofInputException(
                 "Program variable expected, " + "but found: " + inst.actualResult);
@@ -185,7 +185,7 @@ public final class DLSpecFactory {
      * Creates a class invariant from a formula and a designated "self".
      */
     public ClassInvariant createDLClassInvariant(String name, String displayName,
-            ParsableVariable selfVar, Term inv) throws ProofInputException {
+            LocationVariable selfVar, Term inv) throws ProofInputException {
         assert name != null;
         if (displayName == null) {
             displayName = name;
@@ -203,40 +203,40 @@ public final class DLSpecFactory {
     /**
      * Creates an operation contract from an implication formula of the form "pre -> {heapAtPre :=
      * heap} [#catchAll(java.lang.Throwable exc){m();}]post", (where the update and/or the #catchAll
-     * may be omitted) and a modifies clause.
+     * may be omitted) and a modifiable clause.
      */
     public FunctionalOperationContract createDLOperationContract(String name, Term fma,
-            Term modifies) throws ProofInputException {
+            Term modifiable) throws ProofInputException {
         assert name != null;
         assert fma != null;
-        assert modifies != null;
+        assert modifiable != null;
 
         final ContractFactory cf = new ContractFactory(services);
 
         // extract parts of fma
         final Term pre = extractPre(fma);
         LocationVariable heapAtPreVar = extractHeapAtPre(fma);
-        ProgramVariable excVar = extractExcVar(fma);
+        LocationVariable excVar = extractExcVar(fma);
         final UseOperationContractRule.Instantiation inst = extractInst(fma);
         final IProgramMethod pm = extractProgramMethod(inst);
-        final Modality modality = extractModality(inst);
-        final ProgramVariable selfVar =
+        final Modality.JavaModalityKind modalityKind = extractModalityKind(inst);
+        final LocationVariable selfVar =
             pm.isConstructor() ? extractResultVar(inst) : extractSelfVar(inst);
-        final ImmutableList<ProgramVariable> paramVars = extractParamVars(inst);
-        ProgramVariable resultVar = pm.isConstructor() ? null : extractResultVar(inst);
+        final ImmutableList<LocationVariable> paramVars = extractParamVars(inst);
+        LocationVariable resultVar = pm.isConstructor() ? null : extractResultVar(inst);
         Term post = extractPost(fma);
 
-        // heapAtPre must not occur in precondition or in modifies clause
+        // heapAtPre must not occur in precondition or in modifiables clause
         if (heapAtPreVar != null) {
             final OpCollector oc = new OpCollector();
             pre.execPostOrder(oc);
 
-            modifies.execPostOrder(oc);
+            modifiable.execPostOrder(oc);
 
             if (oc.contains(heapAtPreVar)) {
                 throw new ProofInputException(
                     "variable \"" + heapAtPreVar + "\" used for pre-state heap"
-                        + " must not occur in precondition or in modifies clause");
+                        + " must not occur in precondition or in modifiable clause");
             }
         }
 
@@ -250,8 +250,8 @@ public final class DLSpecFactory {
         Map<LocationVariable, LocationVariable> atPreVars =
             new LinkedHashMap<>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
-        Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        mods.put(heapLDT.getHeap(), modifies);
+        Map<LocationVariable, Term> modifiables = new LinkedHashMap<>();
+        modifiables.put(heapLDT.getHeap(), modifiable);
 
         // result variable may be omitted
         if (resultVar == null && !pm.isVoid()) {
@@ -262,13 +262,13 @@ public final class DLSpecFactory {
         if (excVar == null) {
             excVar = tb.excVar(pm, false);
             Term excNullTerm = tb.equals(tb.var(excVar), tb.NULL());
-            if (modality == Modality.DIA) {
+            if (modalityKind == Modality.JavaModalityKind.DIA) {
                 post = tb.and(post, excNullTerm);
-            } else if (modality == Modality.BOX) {
+            } else if (modalityKind == Modality.JavaModalityKind.BOX) {
                 post = tb.or(post, tb.not(excNullTerm));
             } else {
                 throw new ProofInputException("unknown semantics for exceptional termination: "
-                    + modality + "; please use #catchAll block");
+                    + modalityKind.name() + "; please use #catchAll block");
             }
         }
 
@@ -278,26 +278,26 @@ public final class DLSpecFactory {
         Map<LocationVariable, Term> posts = new LinkedHashMap<>();
         posts.put(heapLDT.getHeap(), post);
 
-        Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
-        hasMod.put(heapLDT.getHeap(), modifies.op() != tb.ff().op());
+        Map<LocationVariable, Boolean> hasModifiable = new LinkedHashMap<>();
+        hasModifiable.put(heapLDT.getHeap(), modifiable.op() != tb.ff().op());
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (h != heapLDT.getHeap()) {
-                hasMod.put(heapLDT.getSavedHeap(), true); // different heaps not supported yet in DL
-                                                          // contracts
+                hasModifiable.put(heapLDT.getSavedHeap(), true); // different heaps not supported
+                                                                 // yet in DL contracts
             }
         }
 
         final boolean isLibraryClass =
             ((TypeDeclaration) pm.getContainerType().getJavaType()).isLibraryClass();
-        return cf.func(name, pm.getContainerType(), pm, modality, pres,
+        return cf.func(name, pm.getContainerType(), pm, modalityKind, pres,
             new LinkedHashMap<>(), null, // TODO measured_by in DL contracts
                                          // not supported yet
             posts, new LinkedHashMap<>(), null, // TODO no model methods in DL
                                                 // contracts
-            mods, new LinkedHashMap<>(),
+            modifiables, new LinkedHashMap<>(),
             new LinkedHashMap<>(),
-            hasMod, new LinkedHashMap<>(), // TODO strictly pure in DL
-                                           // contracts not supported yet
+            hasModifiable, new LinkedHashMap<>(), // TODO strictly pure in DL
+            // contracts not supported yet
             selfVar, paramVars, resultVar, excVar, atPreVars, !isLibraryClass);
     }
 }

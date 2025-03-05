@@ -66,8 +66,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a contract without modality.");
         }
-        assert Modality.class.equals(BasicSnippetData.Key.MODALITY.getType());
-        Modality modality = (Modality) d.get(BasicSnippetData.Key.MODALITY);
+        assert Modality.JavaModalityKind.class.equals(BasicSnippetData.Key.MODALITY.getType());
+        Modality.JavaModalityKind kind =
+            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
 
 
         // create java block
@@ -78,11 +79,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             vs.exceptionParameter.op(LocationVariable.class));
 
         // create program term
-        final Modality symbExecMod;
-        if (modality == Modality.BOX) {
-            symbExecMod = Modality.DIA;
+        final Modality.JavaModalityKind symbExecMod;
+        if (kind == Modality.JavaModalityKind.BOX) {
+            symbExecMod = Modality.JavaModalityKind.DIA;
         } else {
-            symbExecMod = Modality.BOX;
+            symbExecMod = Modality.JavaModalityKind.BOX;
         }
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
         // final Term programTerm = tb.not(tb.prog(modality, jb, tb.not(postTerm)));

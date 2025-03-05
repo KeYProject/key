@@ -61,7 +61,7 @@ public class TacletAppIndex {
     /**
      * The sequent with the formulas for which taclet indices are hold by this object. Invariant:
      * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
-     * <code>succIndex</code> are up to date for the sequent <code>seq</code>
+     * <code>succIndex</code> are up-to-date for the sequent <code>seq</code>
      */
     private Sequent seq;
 

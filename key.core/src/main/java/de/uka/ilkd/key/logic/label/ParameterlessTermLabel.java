@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
+
+import org.key_project.logic.Name;
 
 /**
  * The Class {@link ParameterlessTermLabel} can be used to define labels without parameters.
@@ -138,7 +139,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * {@link IndexOutOfBoundsException}.
      */
     @Override
-    public Object getChild(int i) {
+    public Object getTLChild(int i) {
         throw new IndexOutOfBoundsException();
     }
 
@@ -149,7 +150,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * Simple term labels have no parameters. This always returns 0.
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         return 0;
     }
 

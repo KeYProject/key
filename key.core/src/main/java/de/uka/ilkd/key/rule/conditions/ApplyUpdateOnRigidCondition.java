@@ -12,8 +12,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 /**
@@ -80,7 +84,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
             }
 
             return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(),
-                phi.javaBlock());
+                null);
         }
 
         // Here we have to check for name collisions as there are free variables in u
@@ -138,7 +142,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         }
 
         return services.getTermFactory().createTerm(phi.op(), updatedSubs,
-            new ImmutableArray<>(boundVarsInPhi), phi.javaBlock());
+            new ImmutableArray<>(boundVarsInPhi), null);
     }
 
     /**
@@ -195,7 +199,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);
@@ -212,7 +217,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
-        } else if (resultInst.equalsModRenaming(properResultInst)) {
+        } else if (resultInst.equalsModProperty(properResultInst, RENAMING_TERM_PROPERTY)) {
             return mc;
         } else {
             return null;

@@ -6,8 +6,9 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -20,9 +21,9 @@ import org.key_project.util.collection.ImmutableArray;
  * Observer symbols serve as the targets of contracts (i.e., as the subjects that the contracts are
  * about).
  */
-public class ObserverFunction extends Function implements IObserverFunction {
+public class ObserverFunction extends JFunction implements IObserverFunction {
 
-    private final KeYJavaType container;
+    private final Qualifier<KeYJavaType> container;
     private final boolean isStatic;
     private final ImmutableArray<KeYJavaType> paramTypes;
     private final KeYJavaType type;
@@ -42,7 +43,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
         assert type == null || type.getSort() == sort;
         assert container != null;
         this.type = type;
-        this.container = container;
+        this.container = Qualifier.create(container);
         this.isStatic = isStatic;
         this.paramTypes = paramTypes;
         this.heapCount = heapCount;
@@ -107,7 +108,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
      */
     @Override
     public final KeYJavaType getContainerType() {
-        return container;
+        return container.getQualifier();
     }
 
 
@@ -169,4 +170,15 @@ public class ObserverFunction extends Function implements IObserverFunction {
         return paramTypes;
     }
 
+    @Override
+    public int getChildCount() {
+        return 1;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        if (n == 0)
+            return container;
+        throw new IndexOutOfBoundsException("ObserverFunction " + name() + " has only one child");
+    }
 }

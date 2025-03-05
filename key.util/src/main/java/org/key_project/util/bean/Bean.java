@@ -9,6 +9,8 @@ import java.beans.PropertyChangeSupport;
 
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Implements the basic methods that a Java bean should have and is the default implementation of
  * {@link IBean}.
@@ -20,6 +22,7 @@ public class Bean implements IBean {
     /**
      * The used {@link PropertyChangeSupport}.
      */
+    @SuppressWarnings("nullness") // TODO Check with Werner Dietl why this is so.
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     /**
@@ -129,8 +132,8 @@ public class Bean implements IBean {
      * @param oldValue The old value.
      * @param newValue The new value.
      */
-    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue,
-            Object newValue) {
+    protected void fireIndexedPropertyChange(String propertyName, int index,
+            @Nullable Object oldValue, @Nullable Object newValue) {
         pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 

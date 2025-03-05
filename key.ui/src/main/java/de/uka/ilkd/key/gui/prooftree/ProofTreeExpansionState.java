@@ -18,7 +18,6 @@ import javax.swing.tree.TreePath;
 
 import org.jspecify.annotations.NonNull;
 
-
 /**
  * Cache/Access JTree's expansion state. The interface of JTree to access the expanded paths is
  * rather incomplete, since expanded paths under collapsed ancestors cannot be accessed at all

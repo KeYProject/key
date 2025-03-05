@@ -191,7 +191,8 @@ public class SemisequentTacletAppIndex {
      * @return all taclet apps for the given position
      */
     public ImmutableList<NoPosTacletApp> getTacletAppAt(PosInOccurrence pos, RuleFilter filter) {
-        return getTermIndex(pos).getTacletAppAt(pos, filter);
+        TermTacletAppIndex termIndex = getTermIndex(pos);
+        return termIndex.getTacletAppAt(pos, filter);
     }
 
     /**

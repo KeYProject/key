@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.logic.Name;
 
 /**
  * {@link Strategy} used to simplify {@link Term}s in side proofs.

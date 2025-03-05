@@ -9,7 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 /**
  * This class realizes a 1:1 map for term abbreviations.

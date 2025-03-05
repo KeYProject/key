@@ -6,7 +6,8 @@ package de.uka.ilkd.key.pp;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+
+import org.key_project.logic.op.Function;
 
 /**
  * This class is used by LogicPrinter.java to print out store-terms, i.e. terms of the following

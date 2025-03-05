@@ -16,10 +16,20 @@ import org.key_project.util.java.IOUtil;
 import org.junit.jupiter.api.Assertions;
 
 /**
+ * This class configuress the "runAllProofs" test runs.
+ *
+ * The ProofCollection objects are created and configured in the two methods
+ * #automaticJavaDL() and #automaticInfFlow(). You can add new files
+ * to existing groups to be run by CI or you can add new groups. Follow the
+ * example set by the other test cases.
+ *
  * @author Alexander Weigl
  * @version 1 (08.02.23)
  */
 public class ProofCollections {
+
+    public static final String ENV_KEY_RAP_FUN_KEEP = "KEY_RAP_FUN_KEEP";
+
     public static ProofCollection automaticJavaDL() throws IOException {
         var settings = new ProofCollectionSettings(new Date());
         /*
@@ -236,11 +246,14 @@ public class ProofCollections {
         g.provable("heap/javacard/arrayFillNonAtomic.key");
 
 
+        g = c.group("other");
         // Other tests:
         g.provable("heap/coincidence_count/project.key");
         g.provable("heap/verifyThis11_1_Maximum/project.key");
         g.provable("heap/fm12_01_LRS/lcp.key");
         g.provable("heap/SemanticSlicing/project.key");
+
+        g = c.group("funOfIF");
         g.provable("heap/information_flow/ArrayList_contains.key");
         g.provable("heap/information_flow/ArrayList_get.key");
         g.provable("heap/information_flow/ArrayList_size.key");
@@ -313,9 +326,11 @@ public class ProofCollections {
         g.provable("heap/list_seq/ArrayList.contains.key");
         g.provable("heap/list_seq/ArrayList.enlarge.key");
         g.provable("heap/list_seq/ArrayList.get.key");
+        g.provable("heap/list_seq/ArrayList.set.key");
         g.provable("heap/list_seq/ArrayList.newArray.key");
         g.provable("heap/list_seq/ArrayList.remove.0.key");
         g.provable("heap/list_seq/ArrayList.remove.1.key");
+        g.provable("heap/list_seq/LinkedList.set.key");
 
 
         g = c.group("observer");
@@ -335,13 +350,20 @@ public class ProofCollections {
         g.provable("heap/observer/ExampleSubject_value.key");
 
 
-        g = c.group("removeDups");
+        g = c.group("example-algos");
         g.provable("heap/removeDups/arrayPart.key");
         g.provable("heap/removeDups/contains.key");
         g.provable("heap/removeDups/removeDup.key");
-
-
         g.provable("heap/saddleback_search/Saddleback_search.key");
+        // TODO: Make BoyerMoore run automatically, not only loading proofs. Need proofs scripts for
+        // that.
+        g.loadable("heap/BoyerMoore/BM(BM__bm((I)).JML normal_behavior operation contract.0.proof");
+        g.loadable(
+            "heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML accessible clause.0.proof");
+        g.loadable(
+            "heap/BoyerMoore/BM(BM__count((I,_bigint,_bigint)).JML model_behavior operation contract.0.proof");
+        g.loadable(
+            "heap/BoyerMoore/BM(BM__monoLemma((I,int,int)).JML normal_behavior operation contract.0.proof");
 
         g = c.group("quicksort");
         g.setLocalSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on");
@@ -368,8 +390,8 @@ public class ProofCollections {
         g.provable("heap/simple/locsets.key");
         g.provable("heap/simple/loop1.key");
         g.provable("heap/simple/loop2.key");
-        g.provable("heap/simple/modifies_datagroup.key");
-        g.provable("heap/simple/modifies.key");
+        g.provable("heap/simple/modifiable_datagroup.key");
+        g.provable("heap/simple/modifiable.key");
         g.provable("heap/simple/object_creation.key");
         g.provable("heap/simple/operation_contracts.key");
         g.provable("heap/simple/select_store.key");
@@ -628,6 +650,8 @@ public class ProofCollections {
         g.provable("standard_key/staticInitialisation/objectOfErroneousClass.key");
         g.provable("standard_key/staticInitialisation/staticInitialisersAreNonSimple.key");
         g.provable("standard_key/types/disjoint.key");
+        g.provable("standard_key/types/finalTypes.key");
+        g.notprovable("standard_key/types/finalTypes_unprovable.key");
         g.provable("../../key.core/src/test/resources/testcase/classpath/classpath.key");
         g.notprovable("heap/inconsistent_represents/MyClass_m.key");
         g.notprovable("heap/inconsistent_represents/MyClass_n.key");
@@ -970,7 +994,14 @@ public class ProofCollections {
         g.loadable("standard_key/adt/dt_list_revrev.proof");
         g.loadable("standard_key/adt/dt_list_appnil.proof");
         g.loadable("standard_key/adt/dt_color.proof");
+        g.loadable("standard_key/adt/dt_list_deconstruct.key");
 
+        // use for debugging purposes.
+        // c.keep("VSTTE10");
+        String s = System.getenv(ENV_KEY_RAP_FUN_KEEP);
+        if (s != null) {
+            c.keep(s.split(","));
+        }
         return c;
     }
 

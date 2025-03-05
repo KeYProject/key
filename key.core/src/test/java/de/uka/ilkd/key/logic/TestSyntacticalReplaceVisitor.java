@@ -4,17 +4,21 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +44,7 @@ public class TestSyntacticalReplaceVisitor {
         RewriteTaclet taclet =
             (RewriteTaclet) index.lookup("testSyntacticalReplaceVisitor_0").taclet();
         rw = ((RewriteTacletGoalTemplate) taclet.goalTemplates().head()).replaceWith();
-        SchemaVariable u = (SchemaVariable) rw.varsBoundHere(0).get(0);
+        var u = (OperatorSV) rw.varsBoundHere(0).get(0);
 
         SchemaVariable b = (SchemaVariable) rw.sub(0).sub(0).op();
 
@@ -52,7 +56,7 @@ public class TestSyntacticalReplaceVisitor {
 
         LogicVariable x = new LogicVariable(new Name("x"), s);
         LogicVariable y = new LogicVariable(new Name("y"), s);
-        Function p = new Function(new Name("p"), Sort.FORMULA, s);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
 
         Term t_x = TB.tf().createTerm(x);
         Term t_px = TB.tf().createTerm(p, new Term[] { t_x }, null, null);

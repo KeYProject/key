@@ -5,9 +5,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
@@ -16,6 +14,7 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -257,18 +257,32 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
     }
 
-    private void transformJmlAsserts(final IProgramMethod pm) {
+    private void transformProgramElements(final IProgramMethod pm) throws ProofInputException {
         Services services = initConfig.getServices();
         JMLSpecFactory jsf = new JMLSpecFactory(services);
-        JavaASTWalker walker = new JavaASTWalker(pm.getBody()) {
+        var walker = new JavaASTWalker(pm.getBody()) {
+            public ProofInputException exception = null;
+
             @Override
             protected void doAction(final ProgramElement node) {
-                if (node instanceof JmlAssert) {
-                    jsf.translateJmlAssertCondition((JmlAssert) node, pm);
+                try {
+                    if (node instanceof JmlAssert) {
+                        jsf.translateJmlAssertCondition((JmlAssert) node, pm);
+                    } else if (node instanceof SetStatement) {
+                        jsf.translateSetStatement((SetStatement) node, pm);
+                    }
+                } catch (ProofInputException e) {
+                    // Store the first exception that occurred
+                    if (this.exception == null) {
+                        this.exception = e;
+                    }
                 }
             }
         };
         walker.start();
+        if (walker.exception != null) {
+            throw walker.exception;
+        }
     }
 
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
@@ -317,13 +331,28 @@ public final class SLEnvInput extends AbstractEnvInput {
                     specExtractor.extractMethodSpecs(pm, staticInvPresent);
                 specRepos.addSpecs(methodSpecs);
 
+                Type declaringType = pm.getContainerType().getJavaType();
+
+                // Create default contracts for all methods except KeY default methods (like <init>)
+                // and Object methods.
+                if (methodSpecs.isEmpty()
+                        && (declaringType instanceof TypeDeclaration decl && decl.isLibraryClass())
+                        && !declaringType.getFullName().equals("java.lang.Object")
+                        && !pm.isImplicit()) {
+                    specRepos.addContract(specExtractor.createDefaultContract(pm,
+                        initConfig.getActivatedChoices().exists(
+                            choice -> choice.category().equals("soundDefaultContracts")
+                                    && choice.name().toString()
+                                            .equals("soundDefaultContracts:on"))));
+                }
+
                 addLoopInvariants(specExtractor, specRepos, kjt, pm);
                 addLoopContracts(specExtractor, specRepos, kjt, pm);
                 addBlockAndLoopContracts(specExtractor, specRepos, pm);
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
-                transformJmlAsserts(pm);
+                transformProgramElements(pm);
             }
 
             // constructor contracts

@@ -8,14 +8,12 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
@@ -29,6 +27,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -88,19 +87,19 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      * @param heaps the heaps.
      * @param anonymisationHeaps the anonymization heaps.
      * @param variables the variables.
-     * @param modifiesClauses the modifies clauses.
+     * @param modifiableClauses the modifiable clauses.
      * @param services services.
      * @return the updates for the usage branch.
      */
     private static Term[] createUpdates(final Term contextUpdate,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, Function> anonymisationHeaps,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final LoopContract.Variables variables,
-            final Map<LocationVariable, Term> modifiesClauses, final Services services) {
+            final Map<LocationVariable, Term> modifiableClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
-            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+            updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
@@ -116,7 +115,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      */
     private static Term[] createPreconditions(final Term selfTerm, final LoopContract contract,
             final List<LocationVariable> heaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
@@ -138,8 +137,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      * @return preconditions for the usage branch.
      */
     private static Term[] createUsageAssumptions(
-            final ImmutableSet<ProgramVariable> localOutVariables,
-            final Map<LocationVariable, Function> anonymisationHeaps,
+            final ImmutableSet<LocationVariable> localOutVariables,
+            final Map<LocationVariable, JFunction> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
@@ -210,9 +209,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         }
     }
 
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractExternalBuiltInRuleApp;
         LoopContractExternalBuiltInRuleApp application =
@@ -227,11 +225,11 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
                 || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
 
         final List<LocationVariable> heaps = application.getHeapContext();
-        final ImmutableSet<ProgramVariable> localInVariables =
+        final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
-        final ImmutableSet<ProgramVariable> localOutVariables =
+        final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, Function> anonymisationHeaps =
+        final Map<LocationVariable, JFunction> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
@@ -240,8 +238,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
             new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self(),
                 services);
-        final Map<LocationVariable, Term> modifiesClauses =
-            conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> modifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
 
         final Term[] preconditions = createPreconditions(instantiation.self(), contract, heaps,
             localInVariables, conditionsAndClausesBuilder, services);
@@ -249,7 +247,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] updates = createUpdates(instantiation.update(), heaps, anonymisationHeaps,
-            variables, modifiesClauses, services);
+            variables, modifiableClauses, services);
 
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator =

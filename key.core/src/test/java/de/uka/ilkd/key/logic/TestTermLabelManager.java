@@ -28,10 +28,12 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -555,18 +557,18 @@ public class TestTermLabelManager {
         TermLabel label = manager.parseLabel("ONE", null, services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("ONE", label.name().toString());
-        assertEquals(0, label.getChildCount());
+        assertEquals(0, label.getTLChildCount());
         // Test empty parameter
         label = manager.parseLabel("TWO", null, services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("TWO", label.name().toString());
-        assertEquals(0, label.getChildCount());
+        assertEquals(0, label.getTLChildCount());
         // Test with parameter
         label = manager.parseLabel("THREE", Collections.singletonList("Param"), services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("THREE", label.name().toString());
-        assertEquals(1, label.getChildCount());
-        assertEquals("Param", label.getChild(0));
+        assertEquals(1, label.getTLChildCount());
+        assertEquals("Param", label.getTLChild(0));
         // Test unsupported
         try {
             manager.parseLabel("UNKNOWN", null, services);
@@ -848,12 +850,12 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public Object getChild(int i) {
+        public Object getTLChild(int i) {
             return arguments.get(i);
         }
 
         @Override
-        public int getChildCount() {
+        public int getTLChildCount() {
             return arguments != null ? arguments.size() : 0;
         }
     }
@@ -866,9 +868,9 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+        public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
                 throws RuleAbortException {
-            return null;
+            throw new RuleAbortException("no implementation");
         }
 
         @Override

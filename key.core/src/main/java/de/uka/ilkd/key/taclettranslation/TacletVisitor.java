@@ -14,7 +14,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 
-public abstract class TacletVisitor extends DefaultVisitor {
+
+public abstract class TacletVisitor implements DefaultVisitor {
     private String failureDescription = null;
 
     private void visit(Semisequent semiseq) {

@@ -5,20 +5,20 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -104,7 +104,7 @@ public class TestDeclParser {
         assertNotNull(P);
         assertTrue(P instanceof ProxySort);
         assertEquals("P", P.name().toString());
-        assertEquals(DefaultImmutableSet.nil().add(Sort.ANY), P.extendsSorts());
+        assertEquals(DefaultImmutableSet.nil().add(JavaDLTheory.ANY), P.extendsSorts());
 
         Sort A = nss.sorts().lookup(new Name("A"));
         Sort B = nss.sorts().lookup(new Name("B"));
@@ -127,7 +127,7 @@ public class TestDeclParser {
         evaluateDeclarations("\\sorts { \\generic G; \\generic H \\extends G; }");
 
         G = checkGenericSort(nss.sorts().lookup(new Name("G")),
-            DefaultImmutableSet.<Sort>nil().add(Sort.ANY), DefaultImmutableSet.nil());
+            DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY), DefaultImmutableSet.nil());
         H = checkGenericSort(nss.sorts().lookup(new Name("H")),
             DefaultImmutableSet.<Sort>nil().add(G), DefaultImmutableSet.nil());
     }
@@ -138,7 +138,7 @@ public class TestDeclParser {
 
         Sort S = checkSort(nss.sorts().lookup(new Name("S")));
         GenericSort G = checkGenericSort(nss.sorts().lookup(new Name("G")),
-            DefaultImmutableSet.<Sort>nil().add(Sort.ANY), DefaultImmutableSet.nil());
+            DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY), DefaultImmutableSet.nil());
         GenericSort H = checkGenericSort(nss.sorts().lookup(new Name("H")),
             DefaultImmutableSet.<Sort>nil().add(S).add(G), DefaultImmutableSet.nil());
     }
@@ -150,7 +150,7 @@ public class TestDeclParser {
         Sort S = checkSort(nss.sorts().lookup(new Name("S")));
         Sort T = checkSort(nss.sorts().lookup(new Name("T")));
         GenericSort H = checkGenericSort(nss.sorts().lookup(new Name("H")),
-            DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+            DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY),
             DefaultImmutableSet.<Sort>nil().add(S).add(T));
     }
 
@@ -162,7 +162,7 @@ public class TestDeclParser {
         Sort S = checkSort(nss.sorts().lookup(new Name("S")));
         Sort T = checkSort(nss.sorts().lookup(new Name("T")));
         GenericSort G = checkGenericSort(nss.sorts().lookup(new Name("G")),
-            DefaultImmutableSet.<Sort>nil().add(Sort.ANY), DefaultImmutableSet.nil());
+            DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY), DefaultImmutableSet.nil());
         GenericSort H = checkGenericSort(nss.sorts().lookup(new Name("H")),
             DefaultImmutableSet.<Sort>nil().add(T).add(G), DefaultImmutableSet.<Sort>nil().add(S));
 
@@ -176,9 +176,9 @@ public class TestDeclParser {
         Sort S = checkSort(nss.sorts().lookup(new Name("S")));
         Sort T = checkSort(nss.sorts().lookup(new Name("T")));
         GenericSort G = checkGenericSort(nss.sorts().lookup(new Name("G")),
-            DefaultImmutableSet.<Sort>nil().add(Sort.ANY), DefaultImmutableSet.nil());
+            DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY), DefaultImmutableSet.nil());
         checkGenericSort(nss.sorts().lookup(new Name("G2")),
-            DefaultImmutableSet.<Sort>nil().add(Sort.ANY), DefaultImmutableSet.nil());
+            DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY), DefaultImmutableSet.nil());
         GenericSort H = checkGenericSort(nss.sorts().lookup(new Name("H")),
             DefaultImmutableSet.<Sort>nil().add(T).add(G), DefaultImmutableSet.<Sort>nil().add(S));
         checkGenericSort(nss.sorts().lookup(new Name("H2")),
@@ -217,10 +217,9 @@ public class TestDeclParser {
      * asserts that the SchemaVariable matches to term but not to a formula
      */
     private void assertTermSV(String msg, Object o) {
-
-        assertTrue(o instanceof SchemaVariable, "The named object: " + o + " is of type "
+        assertTrue(o instanceof TermSV, "The named object: " + o + " is of type "
             + o.getClass() + ", but the type SchemaVariable was expected");
-        assertNotSame(((SchemaVariable) o).sort(), Sort.FORMULA,
+        assertNotSame(((TermSV) o).sort(), JavaDLTheory.FORMULA,
             "Schemavariable is not allowed to match a term of sort FORMULA.");
     }
 
@@ -229,11 +228,11 @@ public class TestDeclParser {
      * Sort.FORMULA)
      */
     private void assertFormulaSV(String msg, Object o) {
-        assertTrue(o instanceof SchemaVariable, "The named object: " + o + " is of type "
+        assertTrue(o instanceof FormulaSV, "The named object: " + o + " is of type "
             + o.getClass() + ", but the type SchemaVariable was expected");
-        assertSame(((SchemaVariable) o).sort(), Sort.FORMULA,
+        assertSame(((FormulaSV) o).sort(), JavaDLTheory.FORMULA,
             "Only matches to terms of sort FORMULA allowed. " + "But term has sort "
-                + ((SchemaVariable) o).sort());
+                + ((FormulaSV) o).sort());
 
 
     }
@@ -338,7 +337,7 @@ public class TestDeclParser {
         assertEquals(1, nss.functions().lookup(new Name("isEmpty")).arity(), "isEmpty arity");
         assertEquals(list, nss.functions().lookup(new Name("isEmpty")).argSort(0),
             "isEmpty arg sort 0");
-        assertEquals(Sort.FORMULA, nss.functions().lookup(new Name("isEmpty")).sort(),
+        assertEquals(JavaDLTheory.FORMULA, nss.functions().lookup(new Name("isEmpty")).sort(),
             "isEmpty return sort");
 
         assertEquals(new Name("contains"), nss.functions().lookup(new Name("contains")).name(),
@@ -348,13 +347,13 @@ public class TestDeclParser {
             "contains arg sort 0");
         assertEquals(elem, nss.functions().lookup(new Name("contains")).argSort(1),
             "contains arg sort 1");
-        assertEquals(Sort.FORMULA, nss.functions().lookup(new Name("contains")).sort(),
+        assertEquals(JavaDLTheory.FORMULA, nss.functions().lookup(new Name("contains")).sort(),
             "contains return sort");
 
         assertEquals(new Name("maybe"), nss.functions().lookup(new Name("maybe")).name(),
             "find maybe predicate");
         assertEquals(0, nss.functions().lookup(new Name("maybe")).arity(), "maybe arity");
-        assertEquals(Sort.FORMULA, nss.functions().lookup(new Name("maybe")).sort(),
+        assertEquals(JavaDLTheory.FORMULA, nss.functions().lookup(new Name("maybe")).sort(),
             "maybe return sort");
     }
 
@@ -372,19 +371,20 @@ public class TestDeclParser {
 
         assertEquals(new Name("x"), variables.lookup(new Name("x")).name(), "find SV x");
         assertTermSV("SV x type", variables.lookup(new Name("x")));
-        assertEquals(elem, variables.lookup(new Name("x")).sort(), "SV x sort");
+        assertEquals(elem, ((TermSV) variables.lookup(new Name("x"))).sort(), "SV x sort");
 
         assertEquals(new Name("y"), variables.lookup(new Name("y")).name(), "find SV ");
         assertTermSV("SV y type", variables.lookup(new Name("y")));
-        assertEquals(elem, variables.lookup(new Name("y")).sort(), "SV y sort");
+        assertEquals(elem, ((TermSV) variables.lookup(new Name("y"))).sort(), "SV y sort");
 
         assertEquals(new Name("lv"), variables.lookup(new Name("lv")).name(), "find SV ");
         assertVariableSV("SV lv type", variables.lookup(new Name("lv")));
-        assertEquals(list, variables.lookup(new Name("lv")).sort(), "SV lv sort");
+        assertEquals(list, ((VariableSV) variables.lookup(new Name("lv"))).sort(), "SV lv sort");
 
         assertEquals(new Name("b"), variables.lookup(new Name("b")).name(), "find SV ");
         assertFormulaSV("SV b type", variables.lookup(new Name("b")));
-        assertEquals(Sort.FORMULA, variables.lookup(new Name("b")).sort(), "SV b sort");
+        assertEquals(JavaDLTheory.FORMULA, ((FormulaSV) variables.lookup(new Name("b"))).sort(),
+            "SV b sort");
     }
 
 

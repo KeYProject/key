@@ -5,17 +5,17 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
+
+
 /**
- * Initializes the "before loop" update needed for the assignable clause.
+ * Initializes the "before loop" update needed for the modifiable clause.
  *
  * Only remembers the heaps of the context, not the changed local variables, although this is done
  * for the built-in loop invariant rules, where they however are never used.
@@ -44,7 +44,7 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         final Term anonSavedHeapTerm = term.sub(2);
         final Term anonPermissionsHeapTerm = term.sub(3);
 
-        return createBeforeLoopUpdate(MiscTools.isTransaction((Modality) loopTerm.op()),
+        return createBeforeLoopUpdate(MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
             MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
             anonPermissionsHeapTerm, services);
     }
@@ -63,7 +63,8 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
      * @return The anonymizing update.
      */
     private static Term createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
-            Term anonHeapTerm, Term anonSavedHeapTerm, Term anonPermissionsHeapTerm,
+            Term anonHeapTerm, Term anonSavedHeapTerm,
+            Term anonPermissionsHeapTerm,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();

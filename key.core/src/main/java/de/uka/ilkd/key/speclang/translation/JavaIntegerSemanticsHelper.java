@@ -10,7 +10,7 @@
 // import de.uka.ilkd.key.ldt.IntegerLDT;
 // import de.uka.ilkd.key.logic.Term;
 // import de.uka.ilkd.key.logic.TermBuilder;
-// import de.uka.ilkd.key.logic.op.Function;
+// import org.key_project.logic.op.Function;
 // import org.jspecify.annotations.NonNull;
 //
 //

@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (19.08.19)
  */
+@NullMarked
 public final class ParsingFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParsingFacade.class);
 
@@ -52,8 +54,8 @@ public final class ParsingFacade {
      * @param <T> parse tree type
      * @return the {@link ParserRuleContext} inside the given ast object.
      */
-    @NonNull
-    public static <T extends ParserRuleContext> T getParseRuleContext(@NonNull KeyAst<T> ast) {
+    public static <T extends ParserRuleContext> @NonNull T getParseRuleContext(
+            @NonNull KeyAst<T> ast) {
         return ast.ctx;
     }
 
@@ -130,7 +132,6 @@ public final class ParsingFacade {
         KeYParser p = createParser(stream);
 
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
-        // we don't want error messages or recovery during first try
         p.removeErrorListeners();
         p.setErrorHandler(new BailErrorStrategy());
         KeYParser.FileContext ctx;
@@ -138,8 +139,13 @@ public final class ParsingFacade {
             ctx = p.file();
         } catch (ParseCancellationException ex) {
             LOGGER.warn("SLL was not enough");
+            stream.seek(0);
             p = createParser(stream);
+            p.setErrorHandler(new BailErrorStrategy());
             ctx = p.file();
+            if (p.getErrorReporter().hasErrors()) {
+                throw ex;
+            }
         }
 
         p.getErrorReporter().throwException();
@@ -186,8 +192,7 @@ public final class ParsingFacade {
         return p.id_declaration();
     }
 
-    @Nullable
-    public static String getValueDocumentation(@Nullable TerminalNode docComment) {
+    public static @Nullable String getValueDocumentation(@Nullable TerminalNode docComment) {
         if (docComment == null) {
             return null;
         }
@@ -208,7 +213,7 @@ public final class ParsingFacade {
 
     // region configuration
     /**
-     * Parses a the configuration determined by the given {@code file}.
+     * Parses the configuration determined by the given {@code file}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
      *
      * @param file non-null {@link Path} object
@@ -221,19 +226,20 @@ public final class ParsingFacade {
     }
 
     /**
+     * @param file non-null file to read as configuration
      * @see #parseConfigurationFile(Path)
+     * @throws IOException if the file is not found or not readable.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(File file) throws IOException {
         return parseConfigurationFile(file.toPath());
     }
 
     /**
-     * Parses a the configuration determined by the given {@code stream}.
+     * Parses the configuration determined by the given {@code stream}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
      *
-     * @param file non-null {@link CharStream} object
+     * @param stream non-null {@link CharStream} object
      * @return monad that encapsluate the ParserRuleContext
-     * @throws IOException if the file is not found or not readable.
      * @throws BuildingException if the file is syntactical broken.
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(CharStream stream) {
@@ -244,20 +250,20 @@ public final class ParsingFacade {
     }
 
     /**
-     * Parses a the configuration determined by the given {@code stream}.
+     * Parses the configuration determined by the given {@code stream}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
      *
-     * @param file non-null {@link CharStream} object
-     * @return a configration object with the data deserialize from the given file
-     * @throws IOException if the file is not found or not readable.
+     * @param input non-null {@link CharStream} object
+     * @return a configuration object with the data deserialize from the given file
      * @throws BuildingException if the file is syntactical broken.
      */
-    public static Configuration readConfigurationFile(CharStream input) throws IOException {
+    public static Configuration readConfigurationFile(CharStream input) {
         return parseConfigurationFile(input).asConfiguration();
     }
 
     /**
      * @see #readConfigurationFile(CharStream)
+     * @throws IOException if the file is not found or not readable.
      */
     public static Configuration readConfigurationFile(Path file) throws IOException {
         return readConfigurationFile(CharStreams.fromPath(file));
@@ -265,9 +271,15 @@ public final class ParsingFacade {
 
     /**
      * @see #readConfigurationFile(CharStream)
+     * @throws IOException if the file is not found or not readable.
      */
     public static Configuration readConfigurationFile(File file) throws IOException {
         return readConfigurationFile(file.toPath());
+    }
+
+    public static Configuration getConfiguration(KeYParser.TableContext ctx) {
+        final var cfg = new ConfigurationBuilder();
+        return cfg.visitTable(ctx);
     }
     // endregion
 }

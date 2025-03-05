@@ -21,8 +21,11 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * instantiate var=a occ=2 with="a_8" hide
@@ -107,7 +110,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if (p.formula != null
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -115,7 +119,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if (p.formula != null
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -131,7 +136,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
-                if (pta.posInOccurrence().subTerm().equalsModRenaming(p.formula)) {
+                if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,
+                    RENAMING_TERM_PROPERTY)) {
                     return pta;
                 }
             }

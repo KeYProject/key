@@ -8,8 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
+
+import org.key_project.logic.Name;
 
 /**
  * Label attached to a predicates for instance in postconditions, loop invariants or precondition
@@ -133,7 +134,7 @@ public class FormulaTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public Object getChild(int i) {
+    public Object getTLChild(int i) {
         return switch (i) {
         case 0 -> getId();
         case 1 -> beforeIds;
@@ -145,7 +146,7 @@ public class FormulaTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         if (beforeIds != null) {
             return 2;
         } else {

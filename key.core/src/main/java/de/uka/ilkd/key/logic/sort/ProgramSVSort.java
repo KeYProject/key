@@ -39,16 +39,14 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Switch;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
@@ -59,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * Special "sorts" used for schema variables matching program constructs (class ProgramSV). Not
  * really sorts in the theoretical meaning of the word.
  */
-public abstract class ProgramSVSort extends AbstractSort {
+public abstract class ProgramSVSort extends SortImpl {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgramSVSort.class);
 
     // Keeps the mapping of ProgramSVSort names to
@@ -482,7 +480,7 @@ public abstract class ProgramSVSort extends AbstractSort {
                     || pe instanceof SetMinus || pe instanceof AllFields || pe instanceof AllObjects
                     || pe instanceof SeqSingleton || pe instanceof SeqConcat
                     || pe instanceof SeqLength || pe instanceof SeqGet || pe instanceof SeqIndexOf
-                    || pe instanceof SeqSub || pe instanceof SeqReverse) {
+                    || pe instanceof SeqSub || pe instanceof SeqReverse || pe instanceof SeqPut) {
                 if (pe instanceof NonTerminalProgramElement npe) {
                     for (int i = 0, childCount = npe.getChildCount(); i < childCount; i++) {
                         if (!canStandFor(npe.getChildAt(i), services)) {
@@ -1322,7 +1320,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public ProgramElement getSVWithSort(ExtList l, Class<?> alternative) {
         for (final Object o : l) {
-            if (o instanceof SchemaVariable && (((SchemaVariable) o).sort() == this)) {
+            if (o instanceof ProgramSV psv && (psv.sort() == this)) {
                 return (ProgramElement) o;
             } else if ((alternative.isInstance(o)) && (!(o instanceof SchemaVariable))) {
                 return (ProgramElement) o;

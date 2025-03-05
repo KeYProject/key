@@ -5,13 +5,14 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.pp.AbbrevMap;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 /**
  *
@@ -44,7 +45,7 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
         Name schemaVar = new Name("_SCHEMA_" + args.var.substring(1));
 
         try {
-            SchemaVariable sv;
+            OperatorSV sv;
             if ("Formula".equals(args.type)) {
                 sv = SchemaVariableFactory.createFormulaSV(schemaVar);
             } else {
