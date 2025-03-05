@@ -1,0 +1,16 @@
+---
+contains:
+  - (declare-fun unknown_0 (U) U)
+expected: FAIL
+keySrc: |-
+  \functions {
+    Seq s1;
+    int maxx;
+  }
+
+  \problem {
+    \forall Seq s; (s = (seqDef{int u;}(0, s.length, any::seqGet(s, u))))
+    & seqLen(seqSub(s1, 0, maxx - 1)) = maxx - 1
+   ->
+    s1.length = maxx - 1
+  }
