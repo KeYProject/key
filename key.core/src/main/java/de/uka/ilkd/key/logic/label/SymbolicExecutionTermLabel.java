@@ -13,73 +13,52 @@ import org.key_project.prover.sequent.Sequent;
  *
  * @param id The unique ID of this term label in the {@link Sequent}.
  */
-public record SymbolicExecutionTermLabel(int id) implements TermLabel {
-    /**
-     * The unique name of this label.
-     */
-    public static final Name NAME = new Name("SE");
+public record SymbolicExecutionTermLabel(int id)implements TermLabel{
+/**
+ * The unique name of this label.
+ */
+public static final Name NAME=new Name("SE");
 
-    /**
-     * The name used in {@link Services#getCounter(String)} to keep track of the already used IDs.
-     */
-    public static final String PROOF_COUNTER_NAME = "SE_LABEL_COUNTER";
+/**
+ * The name used in {@link Services#getCounter(String)} to keep track of the already used IDs.
+ */
+public static final String PROOF_COUNTER_NAME="SE_LABEL_COUNTER";
 
-    /**
-     * Constructor.
-     *
-     * @param id The unique ID of this term label in the {@link Sequent}.
-     */
-    public SymbolicExecutionTermLabel {
-    }
+/**
+ * Constructor.
+ *
+ * @param id The unique ID of this term label in the {@link Sequent}.
+ */
+public SymbolicExecutionTermLabel{}
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean equals(Object o) {
-        return this == o;
-    }
+/**
+ * {@inheritDoc}
+ */
+public boolean equals(Object o){return this==o;}
 
-    /**
-     * {@inheritDoc}
-     */
-    public String toString() {
-        return NAME + "(" + id() + ")";
-    }
+/**
+ * {@inheritDoc}
+ */
+public String toString(){return NAME+"("+id()+")";}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object getTLChild(int i) {
-        if (i == 0) {
-            return id();
-        }
-        return null;
-    }
+/**
+ * {@inheritDoc}
+ */
+@Override public Object getTLChild(int i){if(i==0){return id();}return null;}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getTLChildCount() {
-        return 1;
-    }
+/**
+ * {@inheritDoc}
+ */
+@Override public int getTLChildCount(){return 1;}
 
-    /**
-     * Returns the unique ID of this label in the {@link Sequent}.
-     *
-     * @return The unique ID of this label in the {@link Sequent}.
-     */
-    @Override
-    public int id() {
-        return id;
-    }
+/**
+ * Returns the unique ID of this label in the {@link Sequent}.
+ *
+ * @return The unique ID of this label in the {@link Sequent}.
+ */
+@Override public int id(){return id;}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Name name() {
-        return NAME;
-    }
-}
+/**
+ * {@inheritDoc}
+ */
+@Override public Name name(){return NAME;}}

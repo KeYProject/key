@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;

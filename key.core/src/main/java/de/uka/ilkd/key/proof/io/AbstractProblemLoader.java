@@ -39,10 +39,10 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
 import org.antlr.runtime.MismatchedTokenException;
-import org.jspecify.annotations.Nullable;
 import org.antlr.runtime.MissingTokenException;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

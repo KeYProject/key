@@ -134,7 +134,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         for (int i = 1; i < sequent.size() + 1; i++) {
             final boolean matchesRegex = formatTermString(
                 LogicPrinter.quickPrintTerm((Term) sequent.getFormulaByNr(i).formula(), services))
-                        .matches(".*" + matchRegEx + ".*");
+                    .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
                 if (matched) {
                     throw new ScriptException("More than one occurrence of a matching term.");

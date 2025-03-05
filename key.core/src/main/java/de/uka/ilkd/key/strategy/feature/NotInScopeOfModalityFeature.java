@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;

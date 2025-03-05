@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;

@@ -9,10 +9,6 @@ package de.uka.ilkd.key.smt.newsmt2;
  * <p>
  * Writing them is obvious.
  */
-record VerbatimSMT(String string) implements Writable {
+record VerbatimSMT(String string)implements Writable{
 
-    @Override
-    public void appendTo(StringBuilder sb) {
-        sb.append(string);
-    }
-}
+@Override public void appendTo(StringBuilder sb){sb.append(string);}}

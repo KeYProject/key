@@ -12,52 +12,38 @@ import org.jspecify.annotations.NonNull;
  * This class represents a heuristic. Taclets can belong to different rulesets and are executed
  * automatic if these are selected. A ruleset is just a name.
  * <p>
- *     Rulesets had been originally called heuristics.
+ * Rulesets had been originally called heuristics.
  * </p>
  */
-public record RuleSet(Name name) implements Named {
-    /**
-     * creates a ruleset
-     *
-     * @param name the {@link Name} of the ruleset
-     */
-    public RuleSet {
-    }
+public record RuleSet(Name name)implements Named{
+/**
+ * creates a ruleset
+ *
+ * @param name the {@link Name} of the ruleset
+ */
+public RuleSet{}
 
-    /**
-     * retrieves name of the ruleset
-     *
-     * @return the {@link Name} of the ruleset
-     */
-    @Override
-    public @NonNull Name name() {
-        return name;
-    }
+/**
+ * retrieves name of the ruleset
+ *
+ * @return the {@link Name} of the ruleset
+ */
+@Override public @NonNull Name name(){return name;}
 
-    public int hashCode() {
-        return 3 * name().hashCode();
-    }
+public int hashCode(){return 3*name().hashCode();}
 
-    /**
-     *
-     * Checks whether the given object is equal to this instance.
-     * Two rulesets are equal if and only if their names are equal.
-     *
-     * @param other the Object with which this instance is compared
-     * @return true it the {@code other} is a ruleset of the same name
-     * as this ruleset
-     */
-    public boolean equals(Object other) {
-        if (other instanceof RuleSet(Name otherName)) {
-            return this.name().equals(otherName);
-        }
-        return false;
-    }
+/**
+ *
+ * Checks whether the given object is equal to this instance.
+ * Two rulesets are equal if and only if their names are equal.
+ *
+ * @param other the Object with which this instance is compared
+ * @return true it the {@code other} is a ruleset of the same name
+ *         as this ruleset
+ */
+public boolean equals(Object other){if(other instanceof RuleSet(Name otherName)){return this.name().equals(otherName);}return false;}
 
-    /**
-     * toString
-     */
-    public String toString() {
-        return name.toString();
-    }
-}
+/**
+ * toString
+ */
+public String toString(){return name.toString();}}

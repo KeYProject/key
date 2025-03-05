@@ -256,7 +256,7 @@ public class SVInstantiations
             LogicServices services) {
         return new SVInstantiations(map.put(sv, entry), interesting().put(sv, entry),
             getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions())
-                    .checkSorts(sv, entry, false, services);
+                .checkSorts(sv, entry, false, services);
     }
 
     public SVInstantiations addInteresting(SchemaVariable sv, Name name, LogicServices services) {
@@ -642,7 +642,7 @@ public class SVInstantiations
             throws SortException {
         return new SVInstantiations(map, interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
-                    .checkCondition(p_c, false, services);
+                .checkCondition(p_c, false, services);
     }
 
     public ExecutionContext getExecutionContext() {

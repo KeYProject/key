@@ -8,7 +8,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.logic.Name;

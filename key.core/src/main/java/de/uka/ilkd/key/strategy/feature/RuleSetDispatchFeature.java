@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.proof.ProofGoal;

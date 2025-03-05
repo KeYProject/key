@@ -240,7 +240,7 @@ public class TestSemisequent {
         Semisequent origin = extract(
             extract(
                 extract(JavaDLSequentKit.emptySemisequent().insertLast(con[0])).insertLast(con[1]))
-                        .insertLast(con[2]));
+                    .insertLast(con[2]));
 
         Semisequent expected = extract(
             extract(extract(origin.insertLast(con[4])).insertLast(con[5])).insertLast(con[6]));
@@ -257,7 +257,7 @@ public class TestSemisequent {
         Semisequent origin = extract(
             extract(
                 extract(JavaDLSequentKit.emptySemisequent().insertLast(con[0])).insertLast(con[1]))
-                        .insertLast(con[2]));
+                    .insertLast(con[2]));
         Semisequent expected =
             extract(extract(extract(origin.insert(2, con[4])).insert(3, con[5])).insert(4, con[6]));
         ImmutableList<SequentFormula> insertionList = ImmutableSLList

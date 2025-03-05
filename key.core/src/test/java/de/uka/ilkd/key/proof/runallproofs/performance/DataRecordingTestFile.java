@@ -9,7 +9,6 @@ import java.io.IOException;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
@@ -19,7 +18,6 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
-import org.key_project.util.collection.Pair;
 
 class DataRecordingTestFile extends TestFile {
     public final ProfilingDirectories directories;
@@ -55,7 +53,7 @@ class DataRecordingTestFile extends TestFile {
         return new ApplyStrategy(
             proof.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder()
                     .create())
-                            .start(proof, proof.openGoals().head());
+                .start(proof, proof.openGoals().head());
     }
 
     public final ProfilingDirectories getProfileDirectories() {

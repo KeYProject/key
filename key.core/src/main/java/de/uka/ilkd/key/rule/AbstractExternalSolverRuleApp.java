@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
