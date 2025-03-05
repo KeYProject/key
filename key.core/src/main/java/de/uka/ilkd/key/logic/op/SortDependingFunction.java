@@ -42,7 +42,7 @@ public final class SortDependingFunction extends JFunction {
             instantiateResultSort(template, sortDependingOn),
             instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
         this.template = template;
-        this.sortDependingOn = QualifierWrapper.create(sortDependingOn);
+        this.sortDependingOn = QualifierWrapper.get(sortDependingOn);
     }
 
 

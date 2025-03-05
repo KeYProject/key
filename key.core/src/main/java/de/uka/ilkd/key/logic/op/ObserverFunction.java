@@ -43,7 +43,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
         assert type == null || type.getSort() == sort;
         assert container != null;
         this.type = type;
-        this.container = QualifierWrapper.create(container);
+        this.container = QualifierWrapper.get(container);
         this.isStatic = isStatic;
         this.paramTypes = paramTypes;
         this.heapCount = heapCount;

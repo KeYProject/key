@@ -8,17 +8,14 @@ import java.util.WeakHashMap;
 import org.key_project.logic.TerminalSyntaxElement;
 
 /**
- * This class is a wrapper primarily used in logic operations where qualifiers (e.g., types or
- * sorts)
+ * This class is a wrapper primarily used in logic operations where qualifiers, i.e., objects that
+ * partly define a function but are not part of the syntax tree,
  * are referenced multiple times, such as in {@link ObserverFunction} and
- * {@link SortDependingFunction}.
- * It helps to ensure that qualifiers maintain identity-based equality when reused.
- * <p>
- * As a qualifier is part of the structure of a symbol, e.g., function symbols, it has to be its own
- * AST node. Hence, it is part of the structure reached by navigating through
- * {@link org.key_project.logic.SyntaxElement} and
- * {@link org.key_project.logic.SyntaxElementCursor}.
- * </p>
+ * {@link SortDependingFunction}. For example, for a function like {@code int::cast}, the
+ * {@code int} sort is part of the function and should be considered when comparing it or traversing
+ * the function.
+ * But because sorts are not terms or operators, they are not part of a term's syntax tree.
+ * This wrapper allows objects like sorts to appear in the syntax tree.
  *
  * @param <T> The type of the qualifier object being wrapped.
  */
@@ -38,7 +35,7 @@ public class QualifierWrapper<T> implements TerminalSyntaxElement {
      * @return new instance
      * @param <T> The type of the qualifier object being wrapped.
      */
-    synchronized static <T> QualifierWrapper<T> create(T qualifier) {
+    synchronized static <T> QualifierWrapper<T> get(T qualifier) {
         if (INSTANCES.containsKey(qualifier)) {
             return (QualifierWrapper<T>) INSTANCES.get(qualifier);
         }
