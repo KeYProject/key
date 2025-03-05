@@ -8,14 +8,22 @@ import java.util.WeakHashMap;
 import org.key_project.logic.TerminalSyntaxElement;
 
 /**
+ * <p>
  * This class is a wrapper primarily used in logic operations where qualifiers, i.e., objects that
  * partly define a function but are not part of the syntax tree,
  * are referenced multiple times, such as in {@link ObserverFunction} and
  * {@link SortDependingFunction}. For example, for a function like {@code int::cast}, the
  * {@code int} sort is part of the function and should be considered when comparing it or traversing
  * the function.
+ * </p>
+ * <p>
  * But because sorts are not terms or operators, they are not part of a term's syntax tree.
  * This wrapper allows objects like sorts to appear in the syntax tree.
+ * </p>
+ * <p>
+ * The class further ensures that two wrappers are referentially equal iff the wrapped objects are
+ * equal.
+ * </p>
  *
  * @param <T> The type of the qualifier object being wrapped.
  */

@@ -4,8 +4,8 @@
 package org.key_project.logic;
 
 /**
- * This interface declares the methods common to all logic related (terms, formulas, and programs)
- * AST nodes. All tree-like structures should implement this interface.
+ * This interface defines the base class for abstract syntax tree structures regardless of the
+ * underlying language. All tree-like structures should implement this interface.
  * <p>
  * For navigating the syntax elements, see {@link SyntaxElementCursor}.
  * </p>
