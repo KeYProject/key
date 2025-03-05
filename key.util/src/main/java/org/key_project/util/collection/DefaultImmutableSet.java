@@ -4,6 +4,7 @@
 package org.key_project.util.collection;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -211,6 +212,11 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     @Override
     public boolean exists(Predicate<T> predicate) {
         return elementList.exists(predicate);
+    }
+
+    @Override
+    public <U> ImmutableSet<U> map(Function<T, U> f) {
+        return new DefaultImmutableSet<>(elementList.map(f));
     }
 
     /** @return int the cardinality of the set */
