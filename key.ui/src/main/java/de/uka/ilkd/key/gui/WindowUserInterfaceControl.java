@@ -134,7 +134,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportException(Object sender, ProofOblInput input, Exception e) {
-        reportStatus(sender, input.name() + " failed");
+        IssueDialog.showExceptionDialog(mainWindow, e);
     }
 
     @Override
