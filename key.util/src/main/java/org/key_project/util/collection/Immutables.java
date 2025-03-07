@@ -4,6 +4,7 @@
 package org.key_project.util.collection;
 
 import java.util.HashSet;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -12,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * This class is a collection of methods that operate on immutable collections, in particular
  * {@link ImmutableSet}s and {@link ImmutableList}s.
- *
+ * <p>
  * This class cannot be instantiated.
  *
  * @author Mattias Ulbrich
@@ -25,11 +26,11 @@ public final class Immutables {
 
     /**
      * Checks whether an immutable list is free of duplicates.
-     *
+     * <p>
      * A list has a duplicate if it during iteration it visits two objects o1 and o2 such that
      * <code>o1==null ? o2 == null : o1.equals(o2)</code> is true. <code>null</code> may appear in
      * the list.
-     *
+     * <p>
      * The implementation uses a hash set internally and thus runs in O(n).
      *
      * @param list any list, must not be <code>null</code>
@@ -49,27 +50,26 @@ public final class Immutables {
 
     /**
      * Removes duplicate entries from an immutable list.
-     *
+     * <p>
      * A list has a duplicate if it during iteration it visits two objects o1 and o2 such that
      * <code>o1==null ? o2 == null : o1.equals(o2)</code> is true. <code>null</code> may appear in
      * the list.
-     *
+     * <p>
      * If an element occurs duplicated, its first (in order of iteration) occurrence is kept, while
      * later occurrences are removeed.
-     *
+     * <p>
      * If a list iterates "a", "b", "a" in this order, removeDuplicates returns a list iterating
      * "a", "b".
-     *
+     * <p>
      * The implementation uses a hash set internally and thus runs in O(n).
-     *
+     * <p>
      * It reuses as much created datastructure as possible. In particular, if the list is already
      * duplicate-free, it does not allocate new memory (well, only temporarily) and returns the
      * argument.
-     *
+     * <p>
      * Sidenote: Would that not make a nice KeY-Verification condition? Eat your own dogfood.
      *
      * @param list any list, must not be <code>null</code>
-     *
      * @return a duplicate-free version of the argument, never <code>null</code>
      */
     public static <T extends @Nullable Object> ImmutableList<T> removeDuplicates(
@@ -147,15 +147,15 @@ public final class Immutables {
      *
      * @return the view onto the iterable as an immutable set
      */
-    public static <T extends @Nullable Object> ImmutableSet<T> createSetFrom(
+    public static <T extends @Nullable Object> ImmutableSet<T> setOf(
             Iterable<? extends T> iterable) {
-        return DefaultImmutableSet.fromImmutableList(createListFrom(iterable));
+        return DefaultImmutableSet.fromImmutableList(listOf(iterable));
     }
 
     /**
      * Returns an immutable list consisting of the elements of the
      * given iterable collection.
-     *
+     * <p>
      * The iteration order of the result is identical to that of the argument.
      *
      * @param iterable the collection to iterate through to obtain the elements
@@ -163,7 +163,7 @@ public final class Immutables {
      *
      * @return the view onto the iterable as an immutable list
      */
-    public static <T> ImmutableList<T> createListFrom(Iterable<? extends T> iterable) {
+    public static <T> ImmutableList<T> listOf(Iterable<? extends T> iterable) {
         ImmutableList<T> result = ImmutableSLList.nil();
         for (T t : iterable) {
             result = result.prepend(t);
@@ -176,11 +176,9 @@ public final class Immutables {
      * the given predicate.
      *
      * @param ts non-null immutable list.
-     *
      * @param predicate a non-interfering, stateless
      *        predicate to apply to each element to determine if it
      *        should be included
-     *
      * @returns the filtered list
      */
     public static <T extends @Nullable Object> ImmutableList<T> filter(ImmutableList<T> ts,
@@ -219,4 +217,42 @@ public final class Immutables {
         }
         return acc.reverse();
     }
+
+    public static <T> ImmutableList<T> listOf(T... elements) {
+        ImmutableList<T> result = ImmutableSLList.<T>nil();
+        for (T t : elements) {
+            result = result.prepend(t);
+        }
+        return result.reverse();
+    }
+
+    public static <T> ImmutableList<T> listOf(T element) {
+        ImmutableList<T> result = ImmutableSLList.<T>nil();
+        result = result.prepend(element);
+        return result.reverse();
+    }
+
+    public static <T> ImmutableSet<T> setOf(T... elements) {
+        return DefaultImmutableSet.fromImmutableList(listOf(elements));
+    }
+
+    public static <T> ImmutableSet<T> setOf(T element) {
+        return DefaultImmutableSet.fromImmutableList(listOf(element));
+    }
+
+    public static <A,B,C> ImmutableList<C> zip(ImmutableList<A> list1, ImmutableList<B> list2, BiFunction<A,B,C> zipper) {
+        ImmutableList<C> result = ImmutableSLList.nil();
+        while (!list1.isEmpty() && !list2.isEmpty()) {
+            result = result.prepend(zipper.apply(list1.head(), list2.head()));
+            list1 = list1.tail();
+            list2 = list2.tail();
+        }
+        return result.reverse();
+    }
+
+    @Deprecated
+    public static <A,B> ImmutableList<Pair<A,B>> zip(ImmutableList<A> list1, ImmutableList<B> list2) {
+        return zip(list1, list2, Pair::new);
+    }
+
 }
