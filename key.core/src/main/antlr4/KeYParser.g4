@@ -670,6 +670,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISARRAY
   | ISARRAYLENGTH
   | IS_ABSTRACT_OR_INTERFACE
+  | IS_FINAL
   | ENUM_CONST
   | FINAL
   | STATIC
