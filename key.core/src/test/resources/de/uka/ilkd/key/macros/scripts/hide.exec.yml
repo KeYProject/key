@@ -4,7 +4,7 @@ key: |
 script: |
   macro split-prop;
   hide "b ==>";
-exception: |2
+exception: |-
 
   Error while executing script: This formula is not on the sequent: b
 
