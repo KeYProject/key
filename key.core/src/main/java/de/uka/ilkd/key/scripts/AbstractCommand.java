@@ -60,15 +60,6 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     }
 
 
-    public @Nullable Object evaluateArguments(EngineState state, ScriptCommandAst arguments)
-            throws Exception {
-        if (parameterClazz != null) {
-            Object obj = parameterClazz.getDeclaredConstructor().newInstance();
-            return state.getValueInjector().inject(this, obj, arguments);
-        }
-        return null;
-    }
-
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState stateMap)
@@ -98,6 +89,10 @@ public abstract class AbstractCommand implements ProofScriptCommand {
 
     @Override
     public String getDocumentation() {
-        return "";
+        if (documentation == null) {
+            documentation = ArgumentsLifter.extractDocumentation(parameterClazz);
+        }
+        return documentation;
     }
+
 }

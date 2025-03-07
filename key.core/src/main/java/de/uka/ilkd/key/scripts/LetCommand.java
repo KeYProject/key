@@ -17,14 +17,20 @@ import org.jspecify.annotations.NullMarked;
 
 /// The *let* command lets you introduce entries to the abbreviation table.
 /// ```
-/// let @abbrev1=term1 ... @abbrev2=term2 force=true;
+/// let @abbrev1=term1 ... @abbrev2=term2;
+/// ```
+/// of
+/// ```
+/// letf @abbrev1=term1 ... @abbrev2=term2;
 /// ```
 /// **Arguments:**
 /// - varargs any key-value where *value* is a term and key is prefixed with `@`
-/// - `force` : `boolean` if set the bindings are overridden otherwise conflicts results into an
-/// exception.
+///
+/// **Aliases**
+/// - `letf` if used, the let bindings are overridden otherwise conflicts results into an exception.
 ///
 /// **Changes:**
+/// * Apr,2025 (weigl): remove {@code force} in favor of {@code letf}.
 /// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
 @NullMarked
 public class LetCommand implements ProofScriptCommand {
@@ -40,14 +46,7 @@ public class LetCommand implements ProofScriptCommand {
 
         AbbrevMap abbrMap = stateMap.getAbbreviations();
 
-        boolean force = false;
-
-        try {
-            force = "force".equals(
-                stateMap.getValueInjector().convert(String.class,
-                    args.positionalArgs().getFirst()));
-        } catch (NoSuchElementException ignore) {
-        }
+        boolean force = "letf".equals(args.commandName());
 
         for (Map.Entry<String, Object> entry : args.namedArgs().entrySet()) {
             String key = entry.getKey();
@@ -85,5 +84,10 @@ public class LetCommand implements ProofScriptCommand {
     @Override
     public String getDocumentation() {
         return "";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of(getName(), "letf");
     }
 }
