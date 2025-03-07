@@ -18,40 +18,14 @@ import org.key_project.logic.Name;
  * The axiom command takes one argument: a formula to which the command is applied.
  *
  * @see AssumeCommand The assume command is a synonym for the axiom command.
+ *
+ * @Deprecated This command is deprecated and should not be used in new scripts. It is kept for compatibility reasons.
+ * Use the {@link AssumeCommand} "assume" instead.
  */
-public class AxiomCommand extends AbstractCommand<AxiomCommand.FormulaParameter> {
-    private static final Name TACLET_NAME = new Name("introduceAxiom");
-
-    public AxiomCommand() {
-        super(FormulaParameter.class);
-    }
-
-    @Override
-    public FormulaParameter evaluateArguments(EngineState state,
-            Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
-    }
+public class AxiomCommand extends AssumeCommand {
 
     @Override
     public String getName() {
         return "axiom";
-    }
-
-    @Override
-    public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
-        Taclet cut =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
-        TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
-        SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-
-        app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
-            true);
-        state.getFirstOpenAutomaticGoal().apply(app);
-    }
-
-    public static class FormulaParameter {
-        @Option("#2")
-        public Term formula;
     }
 }

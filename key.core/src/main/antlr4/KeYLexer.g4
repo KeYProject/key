@@ -481,7 +481,9 @@ MODAILITYGENERIC:
       -> more, pushMode(modGeneric);
 */
 //BACKSLASH:  '\\';
-ERROR_UKNOWN_ESCAPE: '\\' IDENT;
+
+// Re-add this as soon as the .key files that use \ifEx are fixed.
+// ERROR_UKNOWN_ESCAPE: '\\' IDENT;
 ERROR_CHAR: .;
 
 mode modDiamond;

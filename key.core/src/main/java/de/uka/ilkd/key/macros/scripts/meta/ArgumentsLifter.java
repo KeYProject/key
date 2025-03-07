@@ -70,4 +70,33 @@ public final class ArgumentsLifter {
     private static <T> ProofScriptArgument<T> lift(Flag flag, Field field) {
         throw new IllegalStateException("not implemented");
     }
+
+    public static String extractDocumentation(Class<?> parameterClazz) {
+        assert parameterClazz != null;
+
+        Documentation docAn = parameterClazz.getAnnotation(Documentation.class);
+        if (docAn == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(docAn.value());
+
+        for (Field field : parameterClazz.getDeclaredFields()) {
+            Option optionAn = field.getAnnotation(Option.class);
+            if (optionAn != null && !optionAn.help().isBlank()) {
+                sb.append("\n\n");
+                sb.append("* Option %s (%s): %s".formatted(field.getName(), field.getType().getName(), optionAn.help()));
+            }
+
+            Flag flagAn = field.getAnnotation(Flag.class);
+            if (flagAn != null && !flagAn.help().isBlank()) {
+                sb.append("\n\n");
+                sb.append("* Flag %s: %s".formatted(field.getName(), flagAn.help()));
+            }
+        }
+
+        return sb.toString();
+    }
+
 }

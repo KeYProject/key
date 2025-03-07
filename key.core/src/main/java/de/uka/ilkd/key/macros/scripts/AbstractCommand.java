@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.macros.scripts.meta.ArgumentsLifter;
-import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
+import de.uka.ilkd.key.macros.scripts.meta.*;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.jspecify.annotations.NullMarked;
@@ -94,6 +95,10 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
 
     @Override
     public String getDocumentation() {
-        return "";
+        if (documentation == null) {
+            documentation = ArgumentsLifter.extractDocumentation(parameterClazz);
+        }
+        return documentation;
     }
+
 }

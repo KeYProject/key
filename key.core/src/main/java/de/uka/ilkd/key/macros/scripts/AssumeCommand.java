@@ -5,20 +5,52 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.macros.scripts.meta.Documentation;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
- * The assume command takes one argument: * a formula to which the command is applied
+ * The assume statement for proof debugging purposes
+ *
+ *  See exported documentation at @{@link FormulaParameter} at the end of this file.
  */
+@NullMarked
 public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParameter> {
     private static final Name TACLET_NAME = new Name("UNSOUND_ASSUME");
+
+    /**
+     * The taclet that is used to implement the assume command.
+     *
+     * The taclet UNSOUND_ASSUME { \add( b ==> ) } is obviously unsound, but it is used for debugging
+     * purposes. It is constructed programmatically here, because it should not show up in the sources
+     * of the key repository.
+     *
+     * (Earlier versions had the unsound axion taclet amongst the axioms in KeY and special-cased around it.)
+     */
+    private static final Taclet ASSUME_TACLET;
+
+    static {
+        TacletApplPart applPart = new TacletApplPart(Sequent.EMPTY_SEQUENT, ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
+        FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
+        Term b = new TermFactory().createTerm(sv);
+        TacletGoalTemplate goal = new TacletGoalTemplate(
+                Sequent.createAnteSequent(new Semisequent(ImmutableList.of(new SequentFormula(b)))),
+                            ImmutableList.of());
+        ASSUME_TACLET = new NoFindTaclet(TACLET_NAME, applPart, ImmutableList.of(goal), ImmutableList.of(), new TacletAttributes(),
+                DefaultImmutableMap.nilMap(), ChoiceExpr.TRUE, ImmutableSet.empty());
+    }
 
     public AssumeCommand() {
         super(FormulaParameter.class);
@@ -37,19 +69,8 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
     }
 
     @Override
-    public String getDocumentation() {
-        return """
-                The assume command is an unsound taclet rule and takes one argument:
-
-                The command adds the formula passed as argument to the antecedent
-                a formula #2 to which the command is applied""";
-    }
-
-    @Override
     public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
-        Taclet cut =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
-        TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
+        TacletApp app = NoPosTacletApp.createNoPosTacletApp(ASSUME_TACLET);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
         app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
@@ -57,8 +78,13 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @Documentation("""
+                   The assume command is an unsound debug command. It takes one argument, a formula,
+                   that is added to the antecedent of the current goal. The command is implemented
+                   using a local unsound taclet, UNSOUND_ASSUME.""")
+
     public static class FormulaParameter {
-        @Option("#2")
+        @Option(value = "#2", help = "The formula to be assumed.")
         public Term formula;
     }
 }
