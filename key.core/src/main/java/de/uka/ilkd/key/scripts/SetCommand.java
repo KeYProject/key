@@ -41,8 +41,11 @@ public class SetCommand extends AbstractCommand {
         } else if (args.proofSteps != null) {
             state.setMaxAutomaticSteps(args.proofSteps);
         } else if (args.key != null) {
+            if (!newProps.containsKey(args.key)) {
+                throw new ScriptException("Unknown setting key: " + args.key);
+            }
             newProps.setProperty(args.key, args.value);
-            updateStrategySettings(newProps);
+            updateStrategySettings(state, newProps);
         } else {
             throw new IllegalArgumentException("You have to set oss, steps, or key and value.");
         }
@@ -55,9 +58,9 @@ public class SetCommand extends AbstractCommand {
      * quite complicated implementation, which is inspired by StrategySelectionView.
      */
 
-    private void updateStrategySettings(StrategyProperties p) {
+    public static void updateStrategySettings(EngineState state, StrategyProperties p) {
         final Proof proof = state.getProof();
-        final Strategy strategy = getStrategy(p);
+        final Strategy strategy = getStrategy(state, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
@@ -68,8 +71,9 @@ public class SetCommand extends AbstractCommand {
         proof.setActiveStrategy(strategy);
     }
 
-    private Strategy getStrategy(StrategyProperties properties) {
+    private static Strategy getStrategy(EngineState state, StrategyProperties properties) {
         final Profile profile = state.getProof().getServices().getProfile();
+        final Proof proof = state.getProof();
 
         //
         for (StrategyFactory s : profile.supportedStrategies()) {

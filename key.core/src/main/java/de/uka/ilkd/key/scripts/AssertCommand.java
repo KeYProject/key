@@ -4,10 +4,13 @@
 package de.uka.ilkd.key.scripts;
 
 
+import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 /**
  * Halts the script if some condition is not met.
+ * <p>
+ * See exported documentation at {@link Parameters} at the end of this file.
  *
  * @author lanzinger
  */
@@ -30,7 +33,7 @@ public class AssertCommand extends AbstractCommand {
 
         if (state().getProof().openEnabledGoals().size() != args.goals) {
             throw new ScriptException("Assertion failed: number of open goals is "
-                + state.getProof().openGoals().size() + ", but should be " + args.goals);
+                + state().getProof().openGoals().size() + ", but should be " + args.goals);
         }
     }
 
@@ -42,6 +45,15 @@ public class AssertCommand extends AbstractCommand {
     /**
      * The Assigned parameters (currently only the passed goals).
      */
+    @Documentation("""
+            The assert command checks if the number of open and enabled goals is equal to the given number.
+            If not, the script is halted with an error message.
+
+            Deprecated: This command is deprecated and should not be used in new scripts.
+            The name of this command is likely to change since "assert" will
+            be used for a more general purpose. You may find that this is called
+            "failUnless".
+            """)
     public static class Parameters {
         /**
          * The number of open and enabled goals.
