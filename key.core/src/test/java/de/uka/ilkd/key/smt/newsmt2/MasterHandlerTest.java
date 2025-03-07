@@ -152,7 +152,7 @@ public class MasterHandlerTest {
 
                 ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
                 var translation =
-                        translator.translateProblem(sequent, env.getServices(), settings).toString();
+                        translator.translateProblem(proof.getOpenGoal(proof.root()), env.getServices(), settings).toString();
                 return new TestData(name, path, props, translation);
             }
 
