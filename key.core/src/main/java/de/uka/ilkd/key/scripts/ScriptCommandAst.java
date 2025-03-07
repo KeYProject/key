@@ -17,18 +17,19 @@ import org.jspecify.annotations.Nullable;
 ///
 /// ```
 /// <commandName> key_1=value_1 ... key_m=value_m positionalArgs_1 ... positionalArgs_n {
-///    commands_0; ...; commands_k;
+/// commands_0; ...; commands_k;
 /// }
 /// ```
 ///
 ///
 /// @param commandName the name of the command, e.g., "macro" for `macro auto;`
 /// @param namedArgs a map of the given named arguments and values.
-///        If a named argument is not given, the entry should be missing in the map. Null-values are not allowed.
+/// If a named argument is not given, the entry should be missing in the map. Null-values are not
+/// allowed.
 /// @param positionalArgs the list of given positional arguments
 /// @param commands a nullable block of proof script arguments (represents "higher-order proof
-///        scripts").
-///        If null, the block was omitted syntactically in contrast to an empty list.
+/// scripts").
+/// If null, the block was omitted syntactically in contrast to an empty list.
 /// @param location the location of this command for error reporting.
 /// @author Alexander Weigl
 /// @version 1 (14.03.25)
