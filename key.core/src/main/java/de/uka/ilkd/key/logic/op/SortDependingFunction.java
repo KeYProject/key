@@ -30,7 +30,7 @@ public final class SortDependingFunction extends JFunction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SortDependingFunction.class);
 
     private final SortDependingFunctionTemplate template;
-    private final Qualifier<Sort> sortDependingOn;
+    private final QualifierWrapper<Sort> sortDependingOn;
 
 
     // -------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public final class SortDependingFunction extends JFunction {
             instantiateResultSort(template, sortDependingOn),
             instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
         this.template = template;
-        this.sortDependingOn = Qualifier.create(sortDependingOn);
+        this.sortDependingOn = QualifierWrapper.get(sortDependingOn);
     }
 
 
@@ -102,7 +102,7 @@ public final class SortDependingFunction extends JFunction {
      * @return the variant for the given sort
      */
     public synchronized SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
-        if (sort == this.sortDependingOn) {
+        if (sort == this.sortDependingOn.getQualifier()) {
             return this;
         }
 
