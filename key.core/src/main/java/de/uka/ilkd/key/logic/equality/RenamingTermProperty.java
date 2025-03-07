@@ -19,6 +19,8 @@ import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAM
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * Renaming of variables is ignored in this equality check.
  * <p>
+ * This is also named "equality modulo bound renaming" or "equality modulo alpha-equivalence".
+ * <p>
  * The single instance of this property can be accessed through
  * {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}.
  *

@@ -24,8 +24,11 @@ import org.key_project.logic.sort.Sort;
  */
 class SelectPrinter extends FieldPrinter {
 
-    SelectPrinter(Services services) {
+    private final NotationInfo ni;
+
+    SelectPrinter(NotationInfo ni, Services services) {
         super(services);
+        this.ni = ni;
     }
 
     /*
@@ -71,7 +74,11 @@ class SelectPrinter extends FieldPrinter {
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 // object properties denoted like o.<created>
                 printBuiltinObjectProperty(lp, t, heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (isStaticFieldConstant(objectTerm, fieldTerm)
+
+            } else if (ni.isFinalImmutable() && isFinalFieldConstant(fieldTerm)) {
+                // final field access: do not pretty print the sect term but only the final term.
+                lp.printFunctionTerm(t);
+            } else if (isStaticFieldConstant(fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
                 // static field access
                 printStaticJavaFieldConstant(lp, fieldTerm, heapTerm, tacitHeap);
@@ -129,11 +136,15 @@ class SelectPrinter extends FieldPrinter {
      * Print a static field constant.
      */
     private void printStaticJavaFieldConstant(LogicPrinter lp, final Term fieldTerm,
+
             final Term heapTerm,
             Term tacitHeap) {
         lp.layouter.startTerm(3);
         /*
          * Is consideration for static arrays missing in this? (Kai Wallisch 08/2014)
+         *
+         * No, array accesses are not static selects.
+         * This only handles the access to the static array reference.
          */
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());

@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.POExtension;
@@ -35,7 +36,9 @@ public class TruthValuePOExtension implements POExtension {
      * {@inheritDoc}
      */
     @Override
-    public Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm) {
+    public Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
+            Services services, ProgramVariable selfTerm,
+            Term postTerm) {
         if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
             return labelPostTerm(services, postTerm);
         } else {

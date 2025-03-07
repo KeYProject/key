@@ -368,6 +368,20 @@ public abstract class Notation {
     }
 
     /**
+     * The standard concrete syntax for select.
+     */
+    public static final class FinalNotation extends Notation {
+        public FinalNotation() {
+            super(140);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) {
+            sp.printFinal(t);
+        }
+    }
+
+    /**
      * The standard concrete syntax for heap constructors.
      */
     public static class HeapConstructorNotation extends Notation {

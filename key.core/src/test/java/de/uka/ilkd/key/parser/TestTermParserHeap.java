@@ -214,8 +214,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     // @Ignore(value="weigl: This test is not comprehensible anymore.")
     public void testUnknownConstant() throws Exception {
-        parseDecls("\\functions { \\unique Field unkonwn.Clazz::$unknownField; }");
-        String string = "int::select(heap,a,unkonwn.Clazz::$unknownField)";
+        parseDecls("\\functions { \\unique Field unknown.Clazz::$unknownField; }");
+        String string = "int::select(heap,a,unknown.Clazz::$unknownField)";
         comparePrettyPrintAgainstToString(string, string);
     }
 

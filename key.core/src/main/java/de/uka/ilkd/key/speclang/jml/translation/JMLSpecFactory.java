@@ -1550,6 +1550,7 @@ public class JMLSpecFactory {
                 .resultVariable(pv.resultVar).exceptionVariable(pv.excVar).atPres(pv.atPres)
                 .atBefore(pv.atBefores);
         Term assignee = io.translateTerm(setStatementContext.getAssignee());
+        assignee = resolveFinalAssignee(assignee);
         Term value = io.translateTerm(setStatementContext.getValue());
         if (value.sort() == JavaDLTheory.FORMULA) {
             value = tb.convertToBoolean(value);
@@ -1564,6 +1565,26 @@ public class JMLSpecFactory {
         services.getSpecificationRepository().addStatementSpec(
             statement,
             new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value)));
+    }
+
+    /**
+     * If the LHS of a set statement has been translated into a final term, this method undoes this
+     * encoding since LHS need to be encoded as select terms for KeY's mechanisms to works.
+     *
+     * @param assignee the LHS term of an assignment
+     * @return the term that should be used as the LHS of the assignment
+     */
+    private Term resolveFinalAssignee(Term assignee) {
+        if (services.getTypeConverter().getHeapLDT().isFinalOp(assignee.op())) {
+            SortDependingFunction finalOp = assignee.op(SortDependingFunction.class);
+            return tb.select(
+                finalOp.sort(),
+                tb.getBaseHeap(),
+                assignee.sub(0),
+                assignee.sub(1));
+        } else {
+            return assignee;
+        }
     }
 
     /**
