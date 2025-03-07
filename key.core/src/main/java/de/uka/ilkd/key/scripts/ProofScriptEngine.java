@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +43,14 @@ public class ProofScriptEngine {
     /**
      * The initially selected goal.
      */
-    private final Goal initiallySelectedGoal;
+    private final @Nullable Goal initiallySelectedGoal;
 
     /**
      * The engine state map.
      */
     private EngineState stateMap;
 
-    private Consumer<Message> commandMonitor;
+    private @Nullable Consumer<Message> commandMonitor;
 
     public ProofScriptEngine(Path file) throws IOException {
         this(ParsingFacade.parseScript(file), null);
@@ -79,7 +80,9 @@ public class ProofScriptEngine {
         var loader = ServiceLoader.load(ProofScriptCommand.class);
 
         for (ProofScriptCommand cmd : loader) {
-            result.put(cmd.getName(), cmd);
+            for (var alias : cmd.getAliases()) {
+                result.put(alias, cmd);
+            }
         }
 
         return result;
