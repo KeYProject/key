@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.scripts.meta;
+package de.uka.ilkd.key.macros.scripts.meta;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,7 +12,9 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.AbstractCommand;
 import de.uka.ilkd.key.scripts.EngineState;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
+import de.uka.ilkd.key.scripts.meta.*;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,6 +94,7 @@ public class ValueInjectorTest {
         String s;
     }
 
+    @NullMarked
     private static class PPCommand extends AbstractCommand {
         public PPCommand() {
             super(null);
