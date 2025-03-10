@@ -30,6 +30,18 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0
+        # with:
+        #  z3Version: 4.13.0
+
+      - name: z3 version
+        run: z3 --version
+
+      - name: cvc5 version
+        run: cvc5 --version
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -39,6 +51,7 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
       - name: Test with Gradle
         run: ./gradlew --continue -DjacocoEnabled=true -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
 
@@ -75,16 +88,8 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
 
-      - name: Cache SMT-Solvers
-        id: smt-solvers
-        uses: actions/cache@v4
-        with:
-          path: smt-solvers
-          key: ${{ runner.os }}-smt-solvers
-
-      - name: Install SMT-Solvers
-        run: .github/dlsmt.sh
-        shell: bash
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
