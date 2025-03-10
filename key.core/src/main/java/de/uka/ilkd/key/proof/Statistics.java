@@ -12,7 +12,6 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
@@ -252,6 +251,10 @@ public class Statistics {
         summaryList.add(new Pair<>("Merge Rule apps", String.valueOf(stat.mergeRuleApps)));
         summaryList.add(new Pair<>("Total rule apps",
             EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
+        if (stat.totalRuleApps > 0) {
+            String avgTime = String.valueOf((time * 1000) / stat.totalRuleApps);
+            summaryList.add(new Pair<>("Avg. time per app", avgTime + "μs"));
+        }
     }
 
 
@@ -397,10 +400,10 @@ public class Statistics {
          */
         private int tmpOssCaptured(final RuleApp ruleApp) {
             int tmpOssCaptured = 0;
-            final Protocol protocol =
-                ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
-            if (protocol != null) {
-                tmpOssCaptured = protocol.size() - 1;
+            int protocol =
+                ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocolLength();
+            if (protocol != 0) {
+                tmpOssCaptured = protocol - 1;
             }
             return tmpOssCaptured;
         }
