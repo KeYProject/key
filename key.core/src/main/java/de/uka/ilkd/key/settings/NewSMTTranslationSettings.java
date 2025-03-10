@@ -7,6 +7,11 @@ package de.uka.ilkd.key.settings;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A collection of settings for the new (= 2021) SMT translation.
  * <p>
@@ -21,8 +26,10 @@ import java.util.Map.Entry;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class NewSMTTranslationSettings extends AbstractSettings {
-    private static final String PREFIX = "[NewSMT]";
+    private static final String CATEGORY = "NewSMT";
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewSMTTranslationSettings.class);
 
     // Using a linked hash map to make the order deterministic in writing to
     // file
@@ -45,45 +52,29 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     }
 
     /**
-     * Create a clone of this object. <code>s.clone()</code> is equivalent to
-     *
-     * <pre>
-     *     new new NewSMTTranslationSettings(s);
-     * </pre>
-     *
-     * @return
+     * Create a deep copy of this object.
      */
-    @Override
-    public NewSMTTranslationSettings clone() {
+    public NewSMTTranslationSettings copy() {
         return new NewSMTTranslationSettings(this);
     }
 
     @Override
-    public void readSettings(Properties props) {
-        for (Object k : props.keySet()) {
-            String key = k.toString();
-            if (key.startsWith(PREFIX)) {
-                map.put(key.substring(PREFIX.length()), props.getProperty(key));
-            }
-        }
-    }
-
-    @Override
-    public void writeSettings(Properties props) {
-        for (Entry<String, String> en : map.entrySet()) {
-            props.put(PREFIX + en.getKey(), en.getValue());
-        }
-    }
-
-    @Override
     public void readSettings(Configuration props) {
-        var newSmt = props.getSection("NewSMT");
-        if (newSmt == null)
+        var newSmt = props.getSection(CATEGORY);
+
+        if (newSmt == null) {
             return;
+        }
+
         for (var entry : newSmt.getEntries()) {
             final var value = entry.getValue();
-            assert value instanceof String;
-            map.put(entry.getKey(), value.toString());
+            if (value instanceof String s) {
+                map.put(entry.getKey(), s);
+            } else {
+                LOGGER.warn("Settings {} with value {} ignored. Value of type string expected.",
+                    entry.getKey(),
+                    entry.getValue());
+            }
         }
     }
 
@@ -111,7 +102,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
      * @param key the key to look up
      * @return the value for the key, null if not present
      */
-    public String get(String key) {
+    public @Nullable String get(String key) {
         return map.get(key);
     }
 
@@ -122,7 +113,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
      * @param value the non-null value to set
      * @return the value that was in the map prior to the call (see {@link Map#put(Object, Object)}.
      */
-    public String put(String key, String value) {
+    public @Nullable String put(String key, String value) {
         var old = map.get(key);
         String result = map.put(Objects.requireNonNull(key), Objects.requireNonNull(value));
         firePropertyChange(key, old, value);
