@@ -1,0 +1,11 @@
+contains:
+  - |-
+    (declare-fun u_p () Bool)
+    (declare-fun u_b () U)
+  - (assert (not (=> (= u_p (= u_b (b2u true))) (= (not u_p) (= u_b (b2u false))))))
+expected: VALID
+keySrc: |-
+  \predicates { p; }
+  \functions { boolean b; }
+
+  \problem { (p <-> b=TRUE) -> (!p <-> b=FALSE) }

@@ -89,8 +89,6 @@ subprojects {
         implementation("org.slf4j:slf4j-api:2.0.17")
         testImplementation("ch.qos.logback:logback-classic:1.5.17")
 
-        //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
-        //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
         compileOnly("org.jspecify:jspecify:1.0.0")
         testCompileOnly("org.jspecify:jspecify:1.0.0")
@@ -101,6 +99,7 @@ subprojects {
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
+        testImplementation("org.assertj:assertj-core:3.27.3")
         testImplementation("ch.qos.logback:logback-classic:1.5.17")
 
         testImplementation(platform("org.junit:junit-bom:5.11.4"))
@@ -110,6 +109,11 @@ subprojects {
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
         testImplementation project(':key.util')
 
+        // test fixtures
+        testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
+        testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2")
+
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
     }
 
     tasks.withType(JavaCompile) {
@@ -143,7 +147,6 @@ subprojects {
 
     tasks.withType(Test) {
         useJUnitPlatform {
-            includeEngines 'junit-vintage'
             includeEngines 'junit-jupiter'
         }
     }
