@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
@@ -13,7 +16,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -25,12 +28,14 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStreams;
 
@@ -172,7 +177,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace
      */
     private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS,
-            Namespace<Function> functNS) throws ParserException {
+            Namespace<JFunction> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -228,12 +233,12 @@ public class TacletFindModel extends AbstractTableModel {
      * @return the parsed term
      */
     private Term parseRow(int irow, Namespace<QuantifiableVariable> varNS,
-            Namespace<Function> functNS)
+            Namespace<JFunction> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);
 
-        if (instantiation == null || "".equals(instantiation)) {
+        if (instantiation == null || instantiation.isEmpty()) {
             throw new MissingInstantiationException("", createPosition(irow), false);
         }
 
@@ -263,7 +268,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         String instantiation = (String) getValueAt(irow, 1);
 
-        if (instantiation == null || "".equals(instantiation)) {
+        if (instantiation == null || instantiation.isEmpty()) {
             throw new MissingInstantiationException("", createPosition(irow), false);
         }
 
@@ -282,14 +287,10 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     private Term addOrigin(Term term) {
-        if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
-            return services.getTermBuilder().addLabelToAllSubs(
-                OriginTermLabel.removeOriginLabels(term, services),
-                new OriginTermLabel(new NodeOrigin(SpecType.USER_INTERACTION,
-                    originalApp.rule().displayName(), goal.node().serialNr())));
-        } else {
-            return term;
-        }
+        return services.getTermBuilder().addLabelToAllSubs(
+            OriginTermLabel.removeOriginLabels(term, services),
+            new NodeOrigin(SpecType.USER_INTERACTION,
+                originalApp.rule().displayName(), goal.node().serialNr()));
     }
 
     /**
@@ -301,7 +302,7 @@ public class TacletFindModel extends AbstractTableModel {
     private ProgramElement parseRow(int irow) throws SVInstantiationParserException {
 
         String instantiation = (String) getValueAt(irow, 1);
-        SchemaVariable sv = (SchemaVariable) getValueAt(irow, 0);
+        ProgramSV sv = (ProgramSV) getValueAt(irow, 0);
 
         ContextInstantiationEntry contextInstantiation =
             originalApp.instantiations().getContextInstantiation();
@@ -349,10 +350,10 @@ public class TacletFindModel extends AbstractTableModel {
                 sort = null;
                 if (sv instanceof VariableSV || sv instanceof SkolemTermSV) {
                     IdDeclaration idd = parseIdDeclaration(irow);
-                    sort = idd.getSort();
+                    sort = idd.sort();
                     if (sort == null) {
                         try {
-                            sort = result.getRealSort(sv, services);
+                            sort = result.getRealSort((OperatorSV) sv, services);
                         } catch (SortException e) {
                             throw new MissingSortException(String.valueOf(sv),
                                 createPosition(irow));
@@ -360,17 +361,17 @@ public class TacletFindModel extends AbstractTableModel {
                     }
 
                     if (sv instanceof VariableSV) {
-                        LogicVariable lv = new LogicVariable(new Name(idd.getName()), sort);
+                        LogicVariable lv = new LogicVariable(new Name(idd.name()), sort);
                         result = result.addCheckedInstantiation(sv, addOrigin(tb.var(lv)), services,
                             true);
                     } else {
                         // sv instanceof SkolemTermSV
-                        final Named n = namespaces().lookupLogicSymbol(new Name(idd.getName()));
+                        final Named n = namespaces().lookupLogicSymbol(new Name(idd.name()));
                         if (n == null) {
-                            result = result.createSkolemConstant(idd.getName(), sv, sort, true,
+                            result = result.createSkolemConstant(idd.name(), sv, sort, true,
                                 services);
                         } else {
-                            throw new SVInstantiationParserException(idd.getName(),
+                            throw new SVInstantiationParserException(idd.name(),
                                 createPosition(irow),
                                 "Name already in use.", false);
                         }
@@ -410,7 +411,7 @@ public class TacletFindModel extends AbstractTableModel {
                         final Namespace<QuantifiableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
 
-                        Namespace<Function> functNS =
+                        Namespace<JFunction> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
 
                         final Term instance = parseRow(irow, extVarNS, functNS);

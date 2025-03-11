@@ -1,12 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 /**
@@ -50,23 +52,11 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
         v.performActionOnLocationVariable(this);
     }
 
-
-    @Override
-    public UpdateableOperator rename(Name name) {
-        if (getKeYJavaType() != null) {
-            return new LocationVariable(new ProgramElementName(name.toString()), getKeYJavaType(),
-                getContainerType(), isStatic(), isModel());
-        } else {
-            return new LocationVariable(new ProgramElementName(name.toString()), sort());
-        }
-    }
-
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof LocationVariable)) {
+        if (!(obj instanceof LocationVariable that)) {
             return false;
         }
-        LocationVariable that = (LocationVariable) obj;
         return Objects.equals(getKeYJavaType(), that.getKeYJavaType())
                 && isStatic() == that.isStatic()
                 && isModel() == that.isModel()
@@ -85,5 +75,19 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
         return Objects.hash(getKeYJavaType(), isStatic(), isModel(), isGhost(), isFinal(), sort(),
             argSorts(), name().toString(), arity(),
             whereToBind(), isRigid());
+    }
+
+    /**
+     * Constructs a location variable from a program variable.
+     * This should not be done manually since it is important to keep *all* modifiers.
+     *
+     * @param variable the variable
+     * @param name the name of the variable
+     * @return a new location variable
+     */
+    public static LocationVariable fromProgramVariable(ProgramVariable variable,
+            ProgramElementName name) {
+        return new LocationVariable(name, variable.getKeYJavaType(), variable.getContainerType(),
+            variable.isStatic(), variable.isModel(), variable.isGhost(), variable.isFinal());
     }
 }

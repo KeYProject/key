@@ -33,12 +33,11 @@ import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdContext;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 public class ApplyScriptsMacro extends AbstractProofMacro {
     public static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);

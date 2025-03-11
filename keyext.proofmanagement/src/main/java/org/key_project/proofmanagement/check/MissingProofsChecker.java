@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
 import java.net.URI;
@@ -98,8 +101,7 @@ public class MissingProofsChecker implements Checker {
             // considered. For other contracts (e.g. from bootclasspath) a message is
             // printed if loglevel is low enough.
             Type type = c.getKJT().getJavaType();
-            if (type instanceof TypeDeclaration) {
-                TypeDeclaration td = (TypeDeclaration) type;
+            if (type instanceof TypeDeclaration td) {
                 PositionInfo positionInfo = td.getPositionInfo();
                 URI uri = positionInfo.getURI().orElseThrow().normalize();
                 URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();

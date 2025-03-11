@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.ui;
 
 import java.awt.*;
@@ -12,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
@@ -26,6 +28,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
@@ -41,6 +44,7 @@ import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 
 import bibliothek.gui.dock.common.action.CAction;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +53,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@HelpInfo(path = "/user/ProofSlicing/")
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener,
         ProofTreeListener {
     /**
@@ -64,11 +69,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * Logger of this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SlicingLeftPanel.class);
-    /**
-     * If set to true, the panel will include information on the current usage of the Java Heap
-     * and a button that calls {@link System#gc()}.
-     */
-    private static final boolean ENABLE_DEBUGGING_UI = false;
 
     /**
      * KeY mediator instance.
@@ -91,10 +91,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      */
     private JButton showGraphRendering = null;
     /**
-     * If {@link #ENABLE_DEBUGGING_UI} is true: a button that will call the garbage collector
-     */
-    private JButton buttonSystemGC = null;
-    /**
      * "Slice proof" button.
      */
     private JButton sliceProof = null;
@@ -110,10 +106,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * "Show rule statistics" button.
      */
     private JButton showRuleStatistics = null;
-    /**
-     * Label showing current usage of the Java heap.
-     */
-    private JLabel memoryStats = null;
     /**
      * Label indicating the number of dependency graph nodes.
      *
@@ -146,6 +138,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * Checkbox to abbreviate formulas in DOT output.
      */
     private JCheckBox abbreviateFormulas = null;
+    /**
+     * Checkbox to shorten chains in DOT output.
+     */
+    private JCheckBox abbreviateChains = null;
     /**
      * Checkbox to enable the dependency analysis algorithm.
      */
@@ -203,16 +199,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
                 updateGraphLabelsTimer.stop();
             }
         });
-        if (ENABLE_DEBUGGING_UI) {
-            Timer updateHeapMemoryTimer = new Timer(100, e -> {
-                Runtime runtime = Runtime.getRuntime();
-                long total = runtime.totalMemory();
-                long used = total - runtime.freeMemory();
-                memoryStats.setText(String.format(
-                    "Java Heap Usage: %d MB / %d MB", used / 1024 / 1024, total / 1024 / 1024));
-            });
-            updateHeapMemoryTimer.start();
-        }
     }
 
     private void buildUI() {
@@ -239,11 +225,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
                 dialog.start(currentProof);
             }
         });
-        buttonSystemGC = new JButton("call System.gc()");
-        buttonSystemGC.addActionListener(e -> {
-            System.gc();
-            Runtime.getRuntime().gc();
-        });
 
         sliceProof.setAlignmentX(Component.LEFT_ALIGNMENT);
         sliceProofFixedPoint.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -255,22 +236,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         timings.setBorder(new TitledBorder("Execution timings"));
         timings.setVisible(false);
 
-        memoryStats = new JLabel("Java Heap Usage: ?");
-
         panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel3.setAlignmentX(Component.LEFT_ALIGNMENT);
-        buttonSystemGC.setAlignmentX(Component.LEFT_ALIGNMENT);
-        memoryStats.setAlignmentX(Component.LEFT_ALIGNMENT);
         timings.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(panel1, gridBagConstraints(0));
         mainPanel.add(panel2, gridBagConstraints(1));
         mainPanel.add(panel3, gridBagConstraints(2));
         mainPanel.add(timings, gridBagConstraints(3));
-        if (ENABLE_DEBUGGING_UI) {
-            mainPanel.add(buttonSystemGC, gridBagConstraints(4));
-            mainPanel.add(memoryStats, gridBagConstraints(5));
-        }
 
         mainPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         JScrollPane scrollPane = new JScrollPane(mainPanel);
@@ -317,7 +290,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
         panel1.setBorder(new TitledBorder("Dependency graph"));
 
-        abbreviateFormulas = new JCheckBox("Abbreviate formulas");
+        abbreviateFormulas = new JCheckBox("Abbreviate node labels");
+        abbreviateFormulas.setToolTipText("Replace node labels with their hash value.");
+        abbreviateChains = new JCheckBox("Shorten long chains");
+        abbreviateChains.setToolTipText("""
+                Collapse long chains when rendering the graph.
+                 When enabled: dependency graph nodes with both input and output degree equal to one
+                 will be collapsed.
+                 These shortened edges are labeled by: initial step ... last step""");
         dotExport = new JButton("Export as DOT");
         dotExport.addActionListener(this::exportDot);
         showGraphRendering = new JButton("Show rendering of graph");
@@ -334,12 +314,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         resetGraphLabels();
 
         abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
+        abbreviateChains.setAlignmentX(Component.LEFT_ALIGNMENT);
         dotExport.setAlignmentX(Component.LEFT_ALIGNMENT);
         showGraphRendering.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panel1.add(graphNodes);
         panel1.add(graphEdges);
         panel1.add(abbreviateFormulas);
+        panel1.add(abbreviateChains);
         panel1.add(dotExport);
         panel1.add(showGraphRendering);
 
@@ -359,9 +341,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return c;
     }
 
-    @Nonnull
     @Override
-    public Collection<CAction> getTitleCActions() {
+    public @NonNull Collection<CAction> getTitleCActions() {
         return List.of(HelpFacade.createHelpButton("user/ProofSlicing/"));
     }
 
@@ -379,7 +360,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 String text = extension.trackers.get(currentProof)
-                        .exportDot(abbreviateFormulas.isSelected());
+                        .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
                 writer.write(text);
             } catch (IOException e) {
                 LOGGER.error("failed to export DOT file", e);
@@ -405,7 +386,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             return;
         }
         String text = extension.trackers.get(currentProof)
-                .exportDot(abbreviateFormulas.isSelected());
+                .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
         new PreviewDialog(MainWindow.getInstance(), text);
     }
 
@@ -532,9 +513,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         graphEdges.setText("Graph edges: " + graphEdgesNr);
     }
 
-    @Nonnull
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Proof Slicing";
     }
 
@@ -543,9 +523,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return INFO_ICON;
     }
 
-    @Nonnull
     @Override
-    public JComponent getComponent() {
+    public @NonNull JComponent getComponent() {
         return this;
     }
 

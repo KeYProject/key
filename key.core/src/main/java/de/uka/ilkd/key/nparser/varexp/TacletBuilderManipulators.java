@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
 
 import java.util.ArrayList;
@@ -5,17 +8,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+
+import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.TYPE_RESOLVER;
@@ -49,6 +55,9 @@ public class TacletBuilderManipulators {
      */
     public static final AbstractConditionBuilder ABSTRACT_OR_INTERFACE =
         new ConstructorBasedBuilder("isAbstractOrInterface", AbstractOrInterfaceType.class, TR);
+
+    public static final AbstractConditionBuilder FINAL_TYPE =
+        new ConstructorBasedBuilder("isFinal", FinalTypeVarCond.class, TR);
 
     /**
      *
@@ -84,7 +93,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder STRICT =
         new AbstractConditionBuilder("scrictSub", TR, TR) {
             @Override
-            public boolean isSuitableFor(@Nonnull String name) {
+            public boolean isSuitableFor(@NonNull String name) {
                 if (super.isSuitableFor(name)) {
                     return true;
                 }
@@ -155,9 +164,11 @@ public class TacletBuilderManipulators {
             }
         };
 
+    public static final TacletBuilderCommand NEW_LOCAL_VARS = new ConstructorBasedBuilder(
+        "newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
-        public NotFreeInTacletBuilderCommand(@Nonnull ArgumentType... argumentsTypes) {
+        public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
             super("notFreeIn", argumentsTypes);
         }
 
@@ -291,7 +302,7 @@ public class TacletBuilderManipulators {
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
 
-        public JavaTypeToSortConditionBuilder(@Nonnull String triggerName, boolean forceElmentary) {
+        public JavaTypeToSortConditionBuilder(@NonNull String triggerName, boolean forceElmentary) {
             super(triggerName, SV, SORT);
             this.elmen = forceElmentary;
         }
@@ -299,7 +310,7 @@ public class TacletBuilderManipulators {
         @Override
         public VariableCondition build(Object[] arguments, List<String> parameters,
                 boolean negated) {
-            SchemaVariable v = (SchemaVariable) arguments[0];
+            var v = (OperatorSV) arguments[0];
             Sort s = (Sort) arguments[1];
             if (!(s instanceof GenericSort)) {
                 throw new IllegalArgumentException("Generic sort is expected. Got: " + s);
@@ -361,7 +372,8 @@ public class TacletBuilderManipulators {
     // region Registry
     static {
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE, ABSTRACT_OR_INTERFACE, SAME, IS_SUBTYPE,
-            STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR, FREE_1, FREE_2, FREE_3, FREE_4,
+            STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR, NEW_LOCAL_VARS, FREE_1, FREE_2,
+            FREE_3, FREE_4, FINAL_TYPE,
             FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON, FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL,
             ENUM_CONST, LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
             MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE, ENUM_TYPE,

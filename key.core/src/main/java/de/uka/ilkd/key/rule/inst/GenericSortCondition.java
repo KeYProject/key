@@ -1,11 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.sort.Sort;
 
 
 /**
@@ -27,13 +33,12 @@ public abstract class GenericSortCondition {
     public static GenericSortCondition createCondition(SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
-        if (!(p_entry instanceof TermInstantiation)) {
+        if (!(p_entry instanceof TermInstantiation ti)) {
             return null;
         }
 
-        final TermInstantiation ti = (TermInstantiation) p_entry;
-
-        return createCondition(sv.sort(), ti.getInstantiation().sort(), !subSortsAllowed(sv));
+        return createCondition(((OperatorSV) sv).sort(), ti.getInstantiation().sort(),
+            !subSortsAllowed(sv));
     }
 
     /**
@@ -85,11 +90,10 @@ public abstract class GenericSortCondition {
             s1 = ((ArraySort) s1).elementSort();
         }
 
-        if (!(s0 instanceof GenericSort) || s1 == Sort.FORMULA || s1 == Sort.UPDATE) {
+        if (!(s0 instanceof GenericSort gs) || s1 == JavaDLTheory.FORMULA
+                || s1 == JavaDLTheory.UPDATE) {
             return null;
         }
-
-        final GenericSort gs = (GenericSort) s0;
 
         if (p_identity) {
             return createIdentityCondition(gs, s1);

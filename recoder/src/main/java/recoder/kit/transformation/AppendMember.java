@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
 
 import java.util.List;
@@ -39,10 +41,9 @@ public class AppendMember extends TwoPassTransformation {
      *
      * @param sc the service configuration to use.
      * @param isVisible flag indicating if this transformation shall be visible.
-     * @param decl the declaration to modify. may not be <CODE>null</CODE> and must denote a valid
+     * @param child the declaration to append. may not be <CODE>null</CODE> and must denote a valid
      *        identifier name.
-     * @param code the modifier to create, encoded using the codes from
-     *        {@link recoder.kit.ModifierKit}.
+     * @param parent the TypeDeclaration where to append the member
      */
     public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible,
             MemberDeclaration child, TypeDeclaration parent) {

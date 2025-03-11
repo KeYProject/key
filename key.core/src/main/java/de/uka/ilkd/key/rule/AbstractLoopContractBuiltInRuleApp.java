@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -60,7 +63,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
             rule.instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts =
             AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
-        setStatement(instantiation.statement);
+        setStatement(instantiation.statement());
         ImmutableSet<LoopContract> cons = DefaultImmutableSet.nil();
         for (LoopContract cont : contracts) {
             if (cont.isOnBlock() && cont.getBlock().getStartPosition().line() == getStatement()
@@ -72,7 +75,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
             }
         }
         contract = LoopContractImpl.combine(cons, services);
-        heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
+        heaps = HeapContext.getModifiableHeaps(services, instantiation.isTransactional());
         return this;
     }
 

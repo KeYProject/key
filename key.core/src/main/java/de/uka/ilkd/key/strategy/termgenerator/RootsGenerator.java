@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.math.BigInteger;
@@ -15,16 +18,19 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+
 
 /**
  * Term generator for inferring the range of values that a variable can have from a given non-linear
- * (in)equation. The generator may only be called on formulas of the form <tt>v^n = l</tt>,
- * <tt>v^n <= l</tt>, <tt>v^n >= l</tt>, where <tt>v</tt> is an atomic term (does not start with
- * addition or multiplication) and <tt>l</tt> is a literal. The generator will then produce at most
+ * (in)equation. The generator may only be called on formulas of the form {@code v^n = l},
+ * {@code v^n <= l}, {@code v^n >= l}, where {@code v} is an atomic term (does not start with
+ * addition or multiplication) and {@code l} is a literal. The generator will then produce at most
  * one formula that describes the solutions of the formula using linear (in)equations.
  */
 public class RootsGenerator implements TermGenerator {
@@ -45,11 +51,12 @@ public class RootsGenerator implements TermGenerator {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
-        final Term powerRel = powerRelation.toTerm(app, pos, goal);
+        final Term powerRel = powerRelation.toTerm(app, pos, goal, mState);
 
         final Operator op = powerRel.op();
 
@@ -85,7 +92,7 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Iterator<Term> toIterator(Term res) {
-        if (res.equalsModIrrelevantTermLabels(tb.ff())) {
+        if (res.equalsModProperty(tb.ff(), IRRELEVANT_TERM_LABELS_PROPERTY)) {
             return emptyIterator();
         }
         return ImmutableSLList.<Term>nil().prepend(res).iterator();
@@ -96,30 +103,28 @@ public class RootsGenerator implements TermGenerator {
 
         if ((pow % 2 == 0)) {
             // the even case
-
-            switch (lit.signum()) {
-            case -1:
-                // no solutions
-                return tb.ff();
-            case 0:
-                // exactly one solution
-                return tb.equals(var, zero);
-            case 1:
-                final BigInteger r = root(lit, pow);
-                if (power(r, pow).equals(lit)) {
-                    // two solutions
-                    final Term rTerm = tb.zTerm(r.toString());
-                    final Term rNegTerm = tb.zTerm(r.negate().toString());
-                    return tb.or(tb.or(tb.lt(var, rNegTerm), tb.gt(var, rTerm)),
-                        tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
-                } else {
-                    // no solution
-                    return tb.ff();
+            return switch (lit.signum()) {
+                case -1 -> // no solutions
+                        tb.ff();
+                case 0 -> // exactly one solution
+                        tb.equals(var, zero);
+                case 1 -> {
+                    final BigInteger r = root(lit, pow);
+                    if (power(r, pow).equals(lit)) {
+                        // two solutions
+                        final Term rTerm = tb.zTerm(r.toString());
+                        final Term rNegTerm = tb.zTerm(r.negate().toString());
+                        yield tb.or(tb.or(tb.lt(var, rNegTerm), tb.gt(var, rTerm)),
+                                tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
+                    } else {
+                        // no solution
+                        yield tb.ff();
+                    }
                 }
-            }
+                default -> null;
+            };
         } else {
             // the odd case
-
             final BigInteger r = root(lit, pow);
             if (power(r, pow).equals(lit)) {
                 // one solution
@@ -130,60 +135,49 @@ public class RootsGenerator implements TermGenerator {
                 return tb.ff();
             }
         }
-
-        assert false; // unreachable
-        return null;
     }
 
     private Term breakDownGeq(Term var, BigInteger lit, int pow, TermServices services) {
         if ((pow % 2 == 0)) {
             // the even case
 
-            switch (lit.signum()) {
-            case -1:
-            case 0:
-                // the inequation is no restriction
-                return tb.ff();
-            case 1:
-                final BigInteger r = rootRoundingUpwards(lit, pow);
-                final Term rTerm = tb.zTerm(r.toString());
-                final Term rNegTerm = tb.zTerm(r.negate().toString());
-                return tb.or(tb.leq(var, rNegTerm), tb.geq(var, rTerm));
-            }
+            return switch (lit.signum()) {
+                case -1, 0 -> // the inequation is no restriction
+                        tb.ff();
+                case 1 -> {
+                    final BigInteger r = rootRoundingUpwards(lit, pow);
+                    final Term rTerm = tb.zTerm(r.toString());
+                    final Term rNegTerm = tb.zTerm(r.negate().toString());
+                    yield tb.or(tb.leq(var, rNegTerm), tb.geq(var, rTerm));
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
+            };
         } else {
             // the odd case
-
             return tb.geq(var, tb.zTerm(rootRoundingUpwards(lit, pow).toString()));
         }
-
-        assert false; // unreachable
-        return null;
     }
 
     private Term breakDownLeq(Term var, BigInteger lit, int pow, TermServices services) {
         if ((pow % 2 == 0)) {
             // the even case
 
-            switch (lit.signum()) {
-            case -1:
-                // no solutions
-                return tb.ff();
-            case 0:
-                return tb.equals(var, tb.zero());
-            case 1:
-                final BigInteger r = root(lit, pow);
-                final Term rTerm = tb.zTerm(r.toString());
-                final Term rNegTerm = tb.zTerm(r.negate().toString());
-                return tb.and(tb.geq(var, rNegTerm), tb.leq(var, rTerm));
-            }
+            return switch (lit.signum()) {
+                case -1 -> // no solutions
+                        tb.ff();
+                case 0 -> tb.equals(var, tb.zero());
+                case 1 -> {
+                    final BigInteger r = root(lit, pow);
+                    final Term rTerm = tb.zTerm(r.toString());
+                    final Term rNegTerm = tb.zTerm(r.negate().toString());
+                    yield tb.and(tb.geq(var, rNegTerm), tb.leq(var, rTerm));
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
+            };
         } else {
             // the odd case
-
             return tb.leq(var, tb.zTerm(root(lit, pow).toString()));
         }
-
-        assert false; // unreachable
-        return null;
     }
 
     /**

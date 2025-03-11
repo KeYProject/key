@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -12,7 +14,10 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
+
+import org.key_project.logic.Name;
 
 /**
  * <p>
@@ -32,9 +37,10 @@ public class CutHeapObjectsFeature extends BinaryFeature {
      * {@inheritDoc}
      */
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         Term cutFormula =
-            SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal);
+            SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal,
+                mState);
         if (cutFormula != null) {
             if (cutFormula.op() == Junctor.NOT) {
                 cutFormula = cutFormula.sub(0);

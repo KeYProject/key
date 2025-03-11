@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import de.uka.ilkd.key.java.Services;
@@ -62,7 +65,7 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate)
      *        result of applying the taclet
-     * @param whereToAdd the {@link PosInOccurrence} where to add the sequent or {@link null} if it
+     * @param whereToAdd the {@link PosInOccurrence} where to add the sequent or {@code null} if it
      *        should just be added to the head of the sequent (otherwise it will be tried to add the
      *        new formulas close to that position)
      * @param posOfFind the {@link PosInOccurrence} providing the position information where the

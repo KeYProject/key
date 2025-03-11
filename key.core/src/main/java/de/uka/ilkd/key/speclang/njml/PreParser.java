@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
@@ -14,25 +17,32 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class PreParser {
     /** warnings */
     private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
+    private boolean attachOrigin;
+
     /** constructor */
-    public PreParser() {}
+    public PreParser(boolean attachOrigin) {
+        this.attachOrigin = attachOrigin;
+    }
 
     /**
      * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a
      * parse tree.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(JmlLexer lexer) {
-        @Nonnull
+        @NonNull
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         p.getErrorReporter().throwException();
         jmlCheck(ctx);
-        TextualTranslator translator = new TextualTranslator();
+        TextualTranslator translator = new TextualTranslator(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ctx.accept(translator);
         return translator.constructs;
     }
@@ -68,12 +78,13 @@ public class PreParser {
      * parse tree.
      */
     private ImmutableList<TextualJMLConstruct> parseMethodLevel(JmlLexer lexer) {
-        @Nonnull
+        @NonNull
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
         p.getErrorReporter().throwException();
         jmlCheck(ctx);
-        TextualTranslator translator = new TextualTranslator();
+        TextualTranslator translator = new TextualTranslator(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ctx.accept(translator);
         return translator.constructs;
     }
@@ -82,7 +93,7 @@ public class PreParser {
      * Parse and interpret class level comments.
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment,
-            URI fileName, Position pos) {
+            @Nullable URI fileName, Position pos) {
         return parseClassLevel(
             new PositionedString(concatenatedComment, new Location(fileName, pos)));
     }
@@ -99,7 +110,7 @@ public class PreParser {
      * Parse and interpret the given string as a method level construct.
      */
     public ImmutableList<TextualJMLConstruct> parseMethodLevel(String concatenatedComment,
-            URI fileName, Position position) {
+            @Nullable URI fileName, Position position) {
         return parseMethodLevel(
             new PositionedString(concatenatedComment, new Location(fileName, position)));
     }

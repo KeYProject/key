@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
 import java.util.HashSet;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.java.StringUtil;
 
 import org.slf4j.Logger;
@@ -427,24 +430,12 @@ public class ReflectionClassCreator {
         int edged = 0;
         for (int i = 0; i < buf.length(); i++) {
             switch (buf.charAt(i)) {
-            case '{':
-                curly++;
-                break;
-            case '}':
-                curly--;
-                break;
-            case '(':
-                round++;
-                break;
-            case ')':
-                round--;
-                break;
-            case '[':
-                edged++;
-                break;
-            case ']':
-                edged--;
-                break;
+            case '{' -> curly++;
+            case '}' -> curly--;
+            case '(' -> round++;
+            case ')' -> round--;
+            case '[' -> edged++;
+            case ']' -> edged--;
             }
         }
         if (curly == 0 && round == 0 && edged == 0) {

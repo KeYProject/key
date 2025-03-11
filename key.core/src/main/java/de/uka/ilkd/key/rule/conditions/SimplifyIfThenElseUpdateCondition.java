@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Comparator;
@@ -6,13 +9,15 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.Named;
+import org.key_project.logic.SyntaxElement;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
@@ -110,8 +115,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
                 updates.add(next.sub(1));
             } else if (next.op() == UpdateJunctor.SKIP) {
                 return true;
-            } else if (next.op() instanceof ElementaryUpdate) {
-                ElementaryUpdate eu = (ElementaryUpdate) next.op();
+            } else if (next.op() instanceof ElementaryUpdate eu) {
                 if (collected.contains(eu.lhs())) {
                     return false;
                 }
@@ -148,7 +152,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
 

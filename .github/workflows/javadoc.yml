@@ -6,29 +6,28 @@ on:
 
 jobs:
   doc:
-    # later limit to master only!
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: ls -ld
       - run: ls -lh 'gradle'
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          java-version: '11'
-          distribution: 'temurin'
-
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: alldoc
+          java-version: '21'
+          distribution: 'corretto'
+          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build Documentation with Gradle
+        run: ./gradlew alldoc
 
       - name: Package
         run: tar cvfj javadoc.tar.bz2 build/docs/javadoc
 
       - name: Upload Javadoc
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: javadoc
           path: "javadoc.tar.bz2"

@@ -1,19 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
 public class UserDefinedSymbols {
@@ -27,8 +31,8 @@ public class UserDefinedSymbols {
     }
 
     final UserDefinedSymbols parent;
-    final Set<Function> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
-    final Set<Function> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<JFunction> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
+    final Set<JFunction> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Sort> usedExtraSorts = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<QuantifiableVariable> usedExtraVariables =
         new TreeSet<>(NamedComparator.INSTANCE);
@@ -51,7 +55,7 @@ public class UserDefinedSymbols {
         this.referenceNamespaces = parent.referenceNamespaces;
     }
 
-    private <T extends Named> void addUserDefiniedSymbol(T symbol, Set<T> set,
+    private <T extends Named> void addUserDefinedSymbol(T symbol, Set<T> set,
             Namespace<T> excludeNamespace) {
         if (!contains(symbol, set)) {
             if (symbol instanceof SchemaVariable
@@ -70,33 +74,34 @@ public class UserDefinedSymbols {
         return set.contains(symbol);
     }
 
-    public void addFunction(Function symbol) {
-        addUserDefiniedSymbol(symbol, usedExtraFunctions, referenceNamespaces.functions());
+    public void addFunction(JFunction symbol) {
+        addUserDefinedSymbol(symbol, usedExtraFunctions, referenceNamespaces.functions());
     }
 
-    public void addPredicate(Function symbol) {
-        addUserDefiniedSymbol(symbol, usedExtraPredicates, referenceNamespaces.functions());
+    public void addPredicate(JFunction symbol) {
+        addUserDefinedSymbol(symbol, usedExtraPredicates, referenceNamespaces.functions());
     }
 
     public void addSort(Named symbol) {
-        if (symbol != Sort.FORMULA) {
+        if (symbol != JavaDLTheory.FORMULA) {
             Sort sort = (Sort) symbol;
             if (!(sort instanceof NullSort)) {
                 for (Sort parentSort : sort.extendsSorts()) {
                     addSort(parentSort);
                 }
             }
-            addUserDefiniedSymbol(sort, usedExtraSorts, referenceNamespaces.sorts());
+            addUserDefinedSymbol(sort, usedExtraSorts, referenceNamespaces.sorts());
         }
     }
 
     public void addVariable(QuantifiableVariable symbol) {
-        addUserDefiniedSymbol(symbol, usedExtraVariables, referenceNamespaces.variables());
+        addUserDefinedSymbol(symbol, usedExtraVariables, referenceNamespaces.variables());
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void addSchemaVariable(SchemaVariable symbol) {
         // FIXME: This breaks the generics of namespace
-        addUserDefiniedSymbol(symbol, usedSchemaVariables,
+        addUserDefinedSymbol(symbol, usedSchemaVariables,
             (Namespace) referenceNamespaces.variables());
     }
 
@@ -117,9 +122,9 @@ public class UserDefinedSymbols {
     public void replaceGenericByProxySorts() {
         Set<Sort> result = new HashSet<>();
         for (Sort sort : usedExtraSorts) {
-            if (sort instanceof GenericSort) {
-                GenericSort genSort = (GenericSort) sort;
-                ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
+            if (sort instanceof GenericSort genSort) {
+                ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts(),
+                    "", "");
                 result.add(proxySort);
             } else {
                 result.add(sort);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
@@ -9,14 +12,10 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
-import org.key_project.util.collection.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -32,7 +31,7 @@ public final class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    private final Map<ProgramVariable, ProgramVariable> map;
+    private final Map<LocationVariable, LocationVariable> map;
 
 
     /**
@@ -44,7 +43,7 @@ public final class ProgVarReplacer {
     /**
      * creates a ProgVarReplacer that replaces program variables as specified by the map parameter
      */
-    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplacer(Map<LocationVariable, LocationVariable> map, Services services) {
         this.map = map;
         this.services = services;
     }
@@ -56,7 +55,7 @@ public final class ProgVarReplacer {
         ImmutableSet<IProgramVariable> result = vars;
 
         for (final IProgramVariable var : vars) {
-            IProgramVariable newVar = map.get(var);
+            final IProgramVariable newVar = map.get(var);
             if (newVar != null) {
                 result = result.remove(var);
                 result = result.add(newVar);
@@ -217,10 +216,8 @@ public final class ProgVarReplacer {
     private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         ProgramVariable o = map.get(pv);
-        if (o instanceof ProgramVariable) {
+        if (o != null) {
             return services.getTermFactory().createTerm(o, t.getLabels());
-        } else if (o instanceof Term) {
-            return (Term) o;
         }
         return t;
     }
@@ -241,18 +238,22 @@ public final class ProgVarReplacer {
             }
         }
 
+        Operator op = t.op();
+
+        // TODO (DD): Clean up
         final JavaBlock jb = t.javaBlock();
         JavaBlock newJb = jb;
-        if (!jb.isEmpty()) {
+        if (op instanceof Modality mod) {
             Statement s = (Statement) jb.program();
             Statement newS = (Statement) replace(s);
             if (newS != s) {
                 newJb = JavaBlock.createJavaBlock((StatementBlock) newS);
+                op = Modality.getModality(mod.kind(), newJb);
             }
         }
 
         if (changedSubTerm || newJb != jb) {
-            result = services.getTermFactory().createTerm(t.op(), newSubTerms, t.boundVars(), newJb,
+            result = services.getTermFactory().createTerm(op, newSubTerms, t.boundVars(),
                 t.getLabels());
         }
         return result;
@@ -266,9 +267,26 @@ public final class ProgVarReplacer {
         final Operator op = t.op();
         if (op instanceof ProgramVariable) {
             return replaceProgramVariable(t);
+        } else if (op instanceof ElementaryUpdate
+                && map.containsKey(((ElementaryUpdate) op).lhs())) {
+            return replaceProgramVariableInLHSOfElementaryUpdate(t);
         } else {
             return standardReplace(t);
         }
+    }
+
+    /**
+     * replaces a program variable on the lefthandside of an elementary update
+     * requires the given term to have an elementary update operator as top level operator
+     *
+     * @param t the Term where to replace renamed variables
+     * @return the term with all replacements done
+     */
+    private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
+        final Term newTerm = services.getTermBuilder().elementary(
+            (UpdateableOperator) map.get(((ElementaryUpdate) t.op()).lhs()),
+            standardReplace(t.sub(0)));
+        return newTerm;
     }
 
 

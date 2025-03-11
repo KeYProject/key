@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project;
 
 import java.io.File;
@@ -35,6 +38,7 @@ public class Main {
      * @param args The start parameters.
      */
     public static void main(String[] args) {
+        LOGGER.info("Starting KeY example application.");
         File location = args.length == 1 ? new File(args[0]) : new File("example");
         // Path to the source code folder/file or to a *.proof file
         try {
@@ -87,6 +91,7 @@ public class Main {
             final List<Contract> proofContracts = getContracts(env);
 
             for (Contract contract : proofContracts) {
+                LOGGER.info("Found contract '" + contract.getDisplayName());
                 proveContract(env, contract);
             }
         } finally {

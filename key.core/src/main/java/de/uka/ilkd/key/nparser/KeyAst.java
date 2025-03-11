@@ -1,16 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.net.URI;
 import java.net.URL;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.java.StringUtil;
 
@@ -19,6 +25,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is a monad around the parse tree. We use this class to hide the
@@ -32,10 +40,10 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  * @version 1 (5.12.19)
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
-    @Nonnull
-    final T ctx;
 
-    protected KeyAst(@Nonnull T ctx) {
+    final @NonNull T ctx;
+
+    protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;
     }
 
@@ -48,6 +56,15 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         return getClass().getName() + ": " + BuilderHelpers.getPosition(ctx);
     }
 
+    public Location getStartLocation() {
+        return Location.fromToken(ctx.start);
+    }
+
+    public String getText() {
+        var interval = new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1);
+        return ctx.start.getInputStream().getText(interval);
+    }
+
     public static class File extends KeyAst<KeYParser.FileContext> {
         File(KeYParser.FileContext ctx) {
             super(ctx);
@@ -55,20 +72,37 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-            if (ctx.preferences() != null) {
-                String text =
-                    StringUtil.trim(ctx.preferences().s.getText(), '"').replace("\\\\:", ":");
-                settings.loadSettingsFromString(text);
+
+            if (ctx.preferences() != null && ctx.preferences().s != null) {
+                String text = StringUtil.trim(ctx.preferences().s.getText(), '"')
+                        .replace("\\\\:", ":");
+                settings.loadSettingsFromPropertyString(text);
+            } else if (ctx.preferences() != null && ctx.preferences().c != null) {
+                var cb = new ConfigurationBuilder();
+                var c = (Configuration) ctx.preferences().c.accept(cb);
+                settings.readSettings(c);
             }
             return settings;
         }
 
-        public @Nullable Triple<String, Integer, Integer> findProofScript() {
+        /**
+         * Returns the a {@link ProofScriptEntry} from the underlying AST if an {@code \proofscript}
+         * entry is present.
+         * The {@code url} is used as the source of input and might be later used for error message,
+         * or including
+         * other files.
+         *
+         * @param url location pointing to the source of the AST
+         * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
+         */
+        public @Nullable ProofScriptEntry findProofScript(URI url) {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
+                Location location = new Location(url,
+                    Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
+
                 String text = pctx.ps.getText();
-                return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
-                    pctx.ps.getCharPositionInLine());
+                return new ProofScriptEntry(StringUtil.trim(text, '"'), location);
             }
             return null;
         }
@@ -124,6 +158,43 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
     }
 
+    public static class ConfigurationFile extends KeyAst<KeYParser.CfileContext> {
+        ConfigurationFile(KeYParser.CfileContext ctx) {
+            super(ctx);
+        }
+
+        public Configuration asConfiguration() {
+            final var cfg = new ConfigurationBuilder();
+            List<Object> res = cfg.visitCfile(ctx);
+            if (!res.isEmpty())
+                return (Configuration) res.get(0);
+            else
+                throw new RuntimeException("Error in configuration. Source: "
+                    + ctx.start.getTokenSource().getSourceName());
+        }
+    }
+
+    public static class SetStatementContext extends KeyAst<JmlParser.Set_statementContext> {
+        public SetStatementContext(JmlParser.@NonNull Set_statementContext ctx) {
+            super(ctx);
+        }
+
+        public Expression getAssignee() {
+            return new Expression(ctx.assignee);
+        }
+
+        public Expression getValue() {
+            return new Expression(ctx.value);
+        }
+    }
+
+    public static class Expression extends KeyAst<JmlParser.ExpressionContext> {
+        public Expression(JmlParser.@NonNull ExpressionContext ctx) {
+            super(ctx);
+        }
+    }
+
+
     public static class Term extends KeyAst<KeYParser.TermContext> {
         Term(KeYParser.TermContext ctx) {
             super(ctx);
@@ -133,6 +204,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Seq extends KeyAst<KeYParser.SeqContext> {
         Seq(KeYParser.SeqContext ctx) {
             super(ctx);
+        }
+    }
+
+    public static class Taclet extends KeyAst<KeYParser.TacletContext> {
+        public Taclet(KeYParser.TacletContext taclet) {
+            super(taclet);
         }
     }
 }

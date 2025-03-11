@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A base class for own settings based on properties.
@@ -13,6 +17,7 @@ import javax.annotation.Nullable;
  * @author weigl
  */
 public abstract class AbstractPropertiesSettings extends AbstractSettings {
+
     private static final String SET_DELIMITER = ",";
     private static final Function<String, Integer> parseInt = Integer::parseInt;
     private static final Function<String, Float> parseFloat = Float::parseFloat;
@@ -23,12 +28,23 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * Properties stored in this settings object.
      * Updated by each {@link PropertyEntry} when a new non-null value is set.
      */
-    protected final Properties properties = new Properties();
+    protected Map<String, Object> properties = new TreeMap<>();
 
     /**
-     *
+     * category of this settings w/o brackets, e.g, "View" for "[View]".
+     * This will prefix to every property entry.
+     */
+    protected final String category;
+
+
+    /**
+     * Collection of listeners to notify when a setting changes its value.
      */
     protected final List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
+
+    public AbstractPropertiesSettings(String category) {
+        this.category = category;
+    }
 
     private static Set<String> parseStringSet(String o) {
         Set<String> set = new TreeSet<>();
@@ -51,7 +67,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @return a possible empty, list of strings
      * @see #stringListToString(List)
      */
-    private static @Nonnull List<String> parseStringList(@Nonnull String str) {
+    private static @NonNull List<String> parseStringList(@NonNull String str) {
         // escape special chars (in particular the comma)
         return Arrays.stream(str.split(SET_DELIMITER)).map(SettingsConverter::decodeString)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -61,7 +77,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @param seq a string list
      * @return the strings concatenated with {@link #SET_DELIMITER}
      */
-    private static @Nonnull String stringListToString(@Nonnull List<String> seq) {
+    private static @NonNull String stringListToString(@NonNull List<String> seq) {
         // escape special chars (in particular the comma)
         return seq.stream().map(SettingsConverter::encodeString)
                 .collect(Collectors.joining(SET_DELIMITER));
@@ -76,43 +92,71 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         propertyEntries.forEach(it -> {
             String value = props.getProperty(it.getKey());
             if (value != null) {
-                properties.setProperty(it.getKey(), value);
+                it.parseFrom(value);
             }
         });
     }
 
     @Override
     public void writeSettings(Properties props) {
-        propertyEntries.forEach(PropertyEntry::update);
-        props.putAll(properties);
+        for (PropertyEntry<?> entry : propertyEntries) {
+            props.setProperty("[" + category + "]" + entry.getKey(), entry.value());
+        }
+    }
+
+
+    @Override
+    public void readSettings(Configuration props) {
+        var cat = props.getSection(category);
+        if (cat == null)
+            return;
+        propertyEntries.forEach(it -> {
+            final var value = it.fromObject(cat.get(it.getKey()));
+            if (value != null) {
+                properties.put(it.getKey(), value);
+            }
+        });
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        var cat = props.getOrCreateSection(category);
+        propertyEntries.forEach(it -> {
+            cat.set(it.getKey(), it.get());
+        });
     }
 
     protected PropertyEntry<Double> createDoubleProperty(String key, double defValue) {
-        PropertyEntry<Double> pe = new DefaultPropertyEntry<>(key, defValue, parseDouble);
+        PropertyEntry<Double> pe =
+            new DefaultPropertyEntry<>(key, defValue, parseDouble, (it) -> (double) it);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Integer> createIntegerProperty(String key, int defValue) {
-        PropertyEntry<Integer> pe = new DefaultPropertyEntry<>(key, defValue, parseInt);
+        PropertyEntry<Integer> pe = new DefaultPropertyEntry<>(key, defValue, parseInt,
+            (it) -> Math.toIntExact((Long) it));
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Float> createFloatProperty(String key, float defValue) {
-        PropertyEntry<Float> pe = new DefaultPropertyEntry<>(key, defValue, parseFloat);
+        PropertyEntry<Float> pe =
+            new DefaultPropertyEntry<>(key, defValue, parseFloat, (it) -> (float) (double) it);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<String> createStringProperty(String key, String defValue) {
-        PropertyEntry<String> pe = new DefaultPropertyEntry<>(key, defValue, id -> id);
+        PropertyEntry<String> pe =
+            new DefaultPropertyEntry<>(key, defValue, id -> id, Object::toString);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean defValue) {
-        PropertyEntry<Boolean> pe = new DefaultPropertyEntry<>(key, defValue, parseBoolean);
+        PropertyEntry<Boolean> pe =
+            new DefaultPropertyEntry<>(key, defValue, parseBoolean, (it) -> (Boolean) it);
         propertyEntries.add(pe);
         return pe;
     }
@@ -120,7 +164,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
         PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
             AbstractPropertiesSettings::parseStringSet,
-            AbstractPropertiesSettings::stringSetToString);
+            AbstractPropertiesSettings::stringSetToString,
+            (it) -> new LinkedHashSet<>((Collection<String>) it));
         propertyEntries.add(pe);
         return pe;
     }
@@ -132,11 +177,11 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
-    protected PropertyEntry<List<String>> createStringListProperty(@Nonnull String key,
+    protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
             @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
             AbstractPropertiesSettings::parseStringList,
-            AbstractPropertiesSettings::stringListToString);
+            AbstractPropertiesSettings::stringListToString, it -> (List<String>) it);
         propertyEntries.add(pe);
         return pe;
     }
@@ -156,6 +201,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         }
 
         String value();
+
+        T fromObject(@Nullable Object o);
     }
 
 
@@ -165,16 +212,20 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         private final Function<String, T> convert;
         private final Function<T, String> toString;
 
-        private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert) {
-            this(key, defaultValue, convert, Objects::toString);
+        private final Function<Object, T> fromObject;
+
+        private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert,
+                Function<Object, T> fromObject) {
+            this(key, defaultValue, convert, Objects::toString, fromObject);
         }
 
         private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert,
-                Function<T, String> toString) {
+                Function<T, String> toString, Function<Object, T> fromObject) {
             this.key = key;
             this.defaultValue = defaultValue;
             this.convert = convert;
             this.toString = toString;
+            this.fromObject = fromObject;
         }
 
         @Override
@@ -192,29 +243,34 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
             T old = get();
             // only store non-null values
             if (value != null) {
-                properties.setProperty(key, toString.apply(value));
+                properties.put(key, value);
                 firePropertyChange(key, old, value);
             }
         }
 
         @Override
         public T get() {
-            String v = properties.getProperty(key);
+            var v = properties.getOrDefault(key, defaultValue);
             if (v == null) {
                 return defaultValue;
             } else {
-                return convert.apply(v);
+                return (T) v;
             }
         }
 
         @Override
         public String value() {
-            String v = properties.getProperty(key);
+            var v = get();
             if (v == null) {
                 return toString.apply(defaultValue);
             } else {
-                return v;
+                return toString.apply(v);
             }
+        }
+
+        @Override
+        public T fromObject(@Nullable Object o) {
+            return fromObject.apply(o);
         }
     }
 }

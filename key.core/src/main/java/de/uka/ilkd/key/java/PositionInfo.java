@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.net.MalformedURLException;
@@ -5,8 +8,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
+import org.jspecify.annotations.Nullable;
 import recoder.java.SourceElement;
 
 /**
@@ -32,15 +35,13 @@ public class PositionInfo {
     /**
      * The URI of the resource this location refers to. Either a meaningful value or null.
      */
-    @Nullable
-    private final URI fileURI;
+    private final @Nullable URI fileURI;
 
     /**
      * The URI of the parent class of this location (the class the statement originates from). May
      * be null.
      */
-    @Nullable
-    private URI parentClassURI;
+    private @Nullable URI parentClassURI;
 
     private PositionInfo() {
         this.relPos = SourceElement.Position.UNDEFINED;
@@ -108,8 +109,7 @@ public class PositionInfo {
         return null;
     }
 
-    @Nullable
-    public URI getParentClassURI() {
+    public @Nullable URI getParentClassURI() {
         return parentClassURI;
     }
 

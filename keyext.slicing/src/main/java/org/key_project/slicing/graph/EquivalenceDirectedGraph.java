@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.graph;
 
 import java.util.ArrayList;
@@ -63,5 +66,16 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
         } else {
             return List.of(v);
         }
+    }
+
+    public EquivalenceDirectedGraph copy() {
+        var g = new EquivalenceDirectedGraph();
+        for (var vertex : vertexSet()) {
+            g.addVertex(vertex);
+        }
+        for (var edge : edgeSet()) {
+            g.addEdge((GraphNode) edge.getSource(), (GraphNode) edge.getTarget(), edge);
+        }
+        return g;
     }
 }

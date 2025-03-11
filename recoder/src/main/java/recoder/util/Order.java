@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 /**
@@ -20,22 +22,28 @@ package recoder.util;
  * <CODE>isComparable(x,&nbsp;y)</CODE> implies <CODE>
  * less(x,&nbsp;y)&nbsp;||&nbsp;less(y,&nbsp;x)</CODE></LI>
  * </UL>
- * As both relations are related by <BLOCKQUOTE><CODE>
- * lessOrEquals(x,&nbsp;y)&nbsp;==&nbsp;(less(x,&nbsp;y)&nbsp;||&nbsp;equals(x,&nbsp;y))
- * </CODE>, </BLOCKQUOTE> this interface extends an equality relation.
+ * As both relations are related by
+ *
+ * <pre>
+ * {@code
+ * lessOrEquals(x,y)==(less(x,y) || equals(x,y))}
+ * ,
+ * </pre>
+ *
+ * this interface extends an equality relation.
  * <p>
  * <SMALL>The usual way is to calculate all relations at once and returning a status code such as
  * <CODE>int compareTo(x, y)</CODE>. However, this function alone can not capture partial orders and
  * is not efficient if the single comparisons become costly - see for instance the subset relation.
- * The prize to pay for the more explicite interface is a slight code overhead, but this should not
- * lead to a noticeable loss of performance. And of course, <CODE>lessOrEquals(x,&nbsp;y)</CODE>
- * should be a bit more comprehensible than <CODE>compareTo(x,&nbsp;y)&nbsp; <=&nbsp;0</CODE>.
+ * The prize to pay for the more explicit interface is a slight code overhead, but this should not
+ * lead to a noticeable loss of performance. And of course, {@code lessOrEquals(x,y)}
+ * should be a bit more comprehensible than {@code compareTo(x,y) <= 0}.
  * </SMALL>
  * <p>
- * Whether or not objects of different type or <CODE>null</CODE> objects are allowed is up to the
- * specific implementation. This <CODE>isComparable
- * </CODE> predicate should be defined for all objects. The orders are total, if the predicate
- * yields true for any input - with the possible exception of <CODE>null</CODE> objects. If two
+ * Whether objects of different type or {@code null} objects are allowed is up to the
+ * specific implementation. This {@code isComparable}
+ * predicate should be defined for all objects. The orders are total, if the predicate
+ * yields true for any input - with the possible exception of {@code null} objects. If two
  * objects are not comparable, the result of the other predicates is not defined unless stated
  * explicitely.
  *

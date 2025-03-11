@@ -1,6 +1,6 @@
-/**
- * Created on: Mar 17, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
 
@@ -211,10 +211,9 @@ public class SMTSort {
             return true;
         }
 
-        if (!(that instanceof SMTSort)) {
+        if (!(that instanceof SMTSort sort)) {
             return false;
         }
-        SMTSort sort = (SMTSort) that;
 
         if (this.isBV() && sort.isBV()) {
             return this.bitSize == sort.bitSize;

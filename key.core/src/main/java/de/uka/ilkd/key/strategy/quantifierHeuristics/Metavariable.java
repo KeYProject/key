@@ -1,13 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.TerminalSyntaxElement;
+import org.key_project.logic.sort.Sort;
 
 @Deprecated
 public final class Metavariable extends AbstractSortedOperator
-        implements ParsableVariable, Comparable<Metavariable> {
+        implements ParsableVariable, Comparable<Metavariable>, TerminalSyntaxElement {
 
     // Used to define an alternative order of all existing
     // metavariables
@@ -22,7 +28,7 @@ public final class Metavariable extends AbstractSortedOperator
 
     private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
         super(name, sort, true);
-        if (sort == Sort.FORMULA) {
+        if (sort == JavaDLTheory.FORMULA) {
             throw new RuntimeException("Attempt to create metavariable of type formula");
         }
         this.isTemporaryVariable = isTemporaryVariable;
@@ -38,7 +44,6 @@ public final class Metavariable extends AbstractSortedOperator
     public String toString() {
         return name() + ":" + sort();
     }
-
 
     @Override
     public int compareTo(Metavariable p_mr) {

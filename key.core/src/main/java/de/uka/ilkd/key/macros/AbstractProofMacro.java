@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -16,8 +19,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * to most general application methods for a given list of goals and translating the less general
  * versions (firstly for a given node and secondly having neither any goals nor a node). Although
  * all these methods can be redefined by inheritance, this is usually not necessary, unless you know
- * <tt>exactly</tt> what you are doing. The exception is {@link #finishAfterMacro()} for compound
- * macros (see description in {@link ProofMacro#finishAfterMacro()}).
+ * <tt>exactly</tt> what you are doing.
  *
  * @author Michael Kirsten
  */

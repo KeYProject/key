@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -25,7 +27,6 @@ public final class ProofManagementAction extends MainWindowAction {
         setName("Proof Management");
         setTooltip("Browse contracts and possible proof targets");
         setIcon(IconFactory.proofMgt(16));
-        setAcceleratorLetter(KeyEvent.VK_M);
 
         setEnabled(enabled());
 

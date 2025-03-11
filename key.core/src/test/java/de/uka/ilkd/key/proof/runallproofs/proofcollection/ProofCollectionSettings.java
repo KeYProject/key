@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.File;
@@ -269,7 +272,7 @@ public class ProofCollectionSettings implements Serializable {
      */
     public boolean reloadEnabled() {
         String reloadEnabled = get(RELOAD_ENABLED);
-        if (reloadEnabled == null || reloadEnabled.equals("true") || reloadEnabled.equals("")) {
+        if (reloadEnabled == null || reloadEnabled.equals("true") || reloadEnabled.isEmpty()) {
             return true;
         } else if (reloadEnabled.equals("false")) {
             return false;
@@ -366,6 +369,10 @@ public class ProofCollectionSettings implements Serializable {
 
     public ProofCollectionSettings setLocalKeYSettings(String settings) {
         return set(LOCAL_SETTINGS_KEY, settings);
+    }
+
+    public ProofCollectionSettings setRunOnlyOn(String settings) {
+        return set(RUN_ONLY_ON, settings);
     }
 
     public boolean getVerboseOutput() {

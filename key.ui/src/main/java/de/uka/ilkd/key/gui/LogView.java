@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -116,6 +119,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             });
             dialog.setContentPane(ui);
             dialog.setSize(800, 600);
+            dialog.setLocationRelativeTo(MainWindow.getInstance());
             dialog.setVisible(true);
         }
     }

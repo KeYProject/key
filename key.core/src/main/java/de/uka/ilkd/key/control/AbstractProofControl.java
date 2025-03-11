@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
 import java.util.Iterator;
@@ -160,8 +163,8 @@ public abstract class AbstractProofControl implements ProofControl {
                 if (ifCandidates.size() == 1 && pos != null) {
                     TacletApp a = ifCandidates.head();
                     ImmutableList<IfFormulaInstantiation> ifs = a.ifFormulaInstantiations();
-                    if (ifs != null && ifs.size() == 1 && ifs.head() instanceof IfFormulaInstSeq) {
-                        IfFormulaInstSeq ifis = (IfFormulaInstSeq) ifs.head();
+                    if (ifs != null && ifs.size() == 1
+                            && ifs.head() instanceof IfFormulaInstSeq ifis) {
                         if (ifis.toPosInOccurrence().equals(pos.topLevel())) {
                             continue; // skip app if find and if same formula
                         }
@@ -461,19 +464,12 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
 
-
-    /**
-     * {@inheritDoc}
-     */
     protected void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
         if (ruleCompletionHandler != null) {
             ruleCompletionHandler.completeAndApplyTacletMatch(models, goal);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
             boolean forced) {
         if (ruleCompletionHandler == null) {
@@ -593,7 +589,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
+    public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
         startAutoMode(proof, goals, null);
     }
 
@@ -606,7 +602,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * that goal
      */
     @Override
-    public void startFocussedAutoMode(PosInOccurrence focus, Goal goal) {
+    public synchronized void startFocussedAutoMode(PosInOccurrence focus, Goal goal) {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 

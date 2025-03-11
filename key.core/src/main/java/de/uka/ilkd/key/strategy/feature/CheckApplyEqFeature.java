@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -21,7 +24,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     private CheckApplyEqFeature() {}
 
-    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertTrue(pos != null,
             "Need to know the position of " + "the application of the taclet");
 

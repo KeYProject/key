@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -19,7 +22,7 @@ public class SearchInProofTreeAction extends MainWindowAction {
         setIcon(IconFactory.search2(16));
         setTooltip("Search for rule names or node numbers in the proof tree.");
 
-        this.setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
+        setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.SEARCH_KEY_STROKE);
         getMediator().enableWhenProofLoaded(this);
 
     }

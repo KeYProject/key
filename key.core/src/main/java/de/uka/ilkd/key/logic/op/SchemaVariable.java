@@ -1,7 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 
 import de.uka.ilkd.key.util.pp.Layouter;
+
+import org.key_project.logic.Named;
+import org.key_project.logic.ParsableVariable;
 
 /**
  * This interface represents the root of a schema variable hierarchy to be express termstructures
@@ -9,7 +15,7 @@ import de.uka.ilkd.key.util.pp.Layouter;
  * for other TermSymbols. The TermSymbols a SchemaVariable is allowed to match is specified by their
  * type and sort.
  */
-public interface SchemaVariable extends ParsableVariable {
+public interface SchemaVariable extends ParsableVariable, Named {
 
     /**
      * @return true if the schemavariable has the strict modifier which forces the instantiation to

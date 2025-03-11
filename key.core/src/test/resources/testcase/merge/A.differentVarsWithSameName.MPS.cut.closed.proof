@@ -41,12 +41,11 @@
 
 \javaSource ".";
 
-\proofObligation "#Proof Obligation Settings
-#Tue May 02 14:36:15 CEST 2017
-name=A[A\\:\\:m(boolean)].JML operation contract.0
-contract=A[A\\:\\:m(boolean)].JML operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "A[A::m(boolean)].JML operation contract.0",
+	"contract": "A[A::m(boolean)].JML operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "dscheurer" ) (keyVersion "327015b4b7182a877de25e71099a53d78919e1bb"))

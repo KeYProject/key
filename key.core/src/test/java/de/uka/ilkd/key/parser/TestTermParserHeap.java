@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -198,7 +201,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            @Nonnull
+            @NonNull
             Term t = io.parseExpression("(a.f + a.f)@h2");
             LOGGER.info("Out: {}", t);
             fail();
@@ -211,8 +214,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     // @Ignore(value="weigl: This test is not comprehensible anymore.")
     public void testUnknownConstant() throws Exception {
-        parseDecls("\\functions { \\unique Field unkonwn.Clazz::$unknownField; }");
-        String string = "int::select(heap,a,unkonwn.Clazz::$unknownField)";
+        parseDecls("\\functions { \\unique Field unknown.Clazz::$unknownField; }");
+        String string = "int::select(heap,a,unknown.Clazz::$unknownField)";
         comparePrettyPrintAgainstToString(string, string);
     }
 

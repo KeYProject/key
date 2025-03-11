@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashSet;
@@ -8,7 +11,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 
 /**
  * Utilities for working with rule applications.
@@ -31,8 +34,7 @@ public final class RuleAppUtil {
         // replayer requires that ifInsts are provided in order (!)
         Set<PosInOccurrence> inputs = new LinkedHashSet<>();
         // taclets with \find or similar
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp posTacletApp = (PosTacletApp) ruleApp;
+        if (ruleApp instanceof PosTacletApp posTacletApp) {
 
             if (posTacletApp.ifFormulaInstantiations() != null) {
                 for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
@@ -47,8 +49,7 @@ public final class RuleAppUtil {
         }
         // built-ins need special treatment:
         // record if instantiations
-        if (ruleApp instanceof AbstractBuiltInRuleApp) {
-            AbstractBuiltInRuleApp builtIn = (AbstractBuiltInRuleApp) ruleApp;
+        if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) {
             builtIn.ifInsts().forEach(inputs::add);
         }
 
@@ -59,7 +60,7 @@ public final class RuleAppUtil {
         // SMT application: add all formulas as inputs
         if (ruleApp instanceof MergeRuleBuiltInRuleApp
                 || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp
-                || ruleApp instanceof RuleAppSMT) {
+                || ruleApp instanceof SMTRuleApp) {
             node.sequent().antecedent().iterator().forEachRemaining(
                 it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true)));
             node.sequent().succedent().iterator().forEachRemaining(

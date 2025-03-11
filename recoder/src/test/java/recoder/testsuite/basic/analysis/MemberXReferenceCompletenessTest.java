@@ -1,9 +1,13 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic.analysis;
 
 import java.util.List;
 
-import junit.framework.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Field;
@@ -32,7 +36,7 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
                     MethodReference r = (MethodReference) memberReference;
                     Method y = xrsi.getMethod(r);
                     if (x != y) {
-                        Assert.fail(makeResolutionError(r, x, y));
+                        Assertions.fail(makeResolutionError(r, x, y));
                     }
                 }
             }
@@ -43,7 +47,7 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
                 for (ConstructorReference r : list) {
                     Constructor y = xrsi.getConstructor(r);
                     if (x != y) {
-                        Assert.fail(makeResolutionError(r, x, y));
+                        Assertions.fail(makeResolutionError(r, x, y));
                     }
                 }
             }
@@ -54,7 +58,7 @@ public class MemberXReferenceCompletenessTest extends XReferenceCompletenessTest
                 for (FieldReference r : list) {
                     Field y = xrsi.getField(r);
                     if (x != y) {
-                        Assert.fail(makeResolutionError(r, x, y));
+                        Assertions.fail(makeResolutionError(r, x, y));
                     }
                 }
             }

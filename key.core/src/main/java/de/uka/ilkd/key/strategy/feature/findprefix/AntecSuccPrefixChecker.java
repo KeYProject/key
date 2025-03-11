@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -41,13 +44,11 @@ class AntecSuccPrefixChecker implements Checker {
                 (op == Junctor.IMP && child == 0)) { // left hand side of implication
             pol = pol * -1;
             // do not change polarity if find term is subterm of
-        } else if ((op == Junctor.AND) || // and
+        } else if (!((op == Junctor.AND) || // and
                 (op == Junctor.OR) || // or
                 (op == Junctor.IMP && child != 0) || // right hand side of implication
-                (op == IfThenElse.IF_THEN_ELSE && child != 0)) { // then or else part of
-                                                                 // if-then-else
-            // do nothing
-        } else { // find term has no polarity in any other case
+                (op == IfThenElse.IF_THEN_ELSE && child != 0))) { // then or else part of
+            // if-then-else
             pol = 0;
         }
         return pol;
@@ -60,9 +61,6 @@ class AntecSuccPrefixChecker implements Checker {
             final PIOPathIterator it = pio.iterator();
             while (pol != 0 && it.next() != -1) {
                 pol = checkOperator(pio.subTerm().op(), it.getChild(), pol);
-                if (pol == 0) {
-                    break;
-                }
             }
         }
 

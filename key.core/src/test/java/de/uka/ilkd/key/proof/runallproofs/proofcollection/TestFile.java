@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.*;
@@ -6,19 +9,20 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,9 +144,9 @@ public class TestFile implements Serializable {
 
             // Initialize KeY settings.
             String gks = settings.getGlobalKeYSettings();
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(gks);
             String lks = settings.getLocalKeYSettings();
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(lks);
 
             // Name resolution for the available KeY file.
             File keyFile = getKeYFile();
@@ -157,10 +161,9 @@ public class TestFile implements Serializable {
             boolean success;
             try {
                 // Initialize KeY environment and load proof.
-                Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
-                    load(keyFile);
+                var pair = load(keyFile);
                 env = pair.first;
-                Pair<String, Location> script = pair.second;
+                ProofScriptEntry script = pair.second;
                 loadedProof = env.getLoadedProof();
                 ReplayResult replayResult;
 
@@ -201,7 +204,8 @@ public class TestFile implements Serializable {
 
                 if (testProperty == TestProperty.PROVABLE
                         || testProperty == TestProperty.NOTPROVABLE) {
-                    loadedProof.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"));
+                    ProofSaver.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"),
+                        loadedProof);
                 }
                 boolean closed = loadedProof.closed();
                 success = (testProperty == TestProperty.PROVABLE) == closed;
@@ -245,7 +249,7 @@ public class TestFile implements Serializable {
             throws Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
-            loadedProof.saveToFile(proofFile);
+            ProofSaver.saveToFile(proofFile, loadedProof);
             reloadProof(proofFile);
             if (verbose) {
                 LOGGER.debug("... success: reloaded.");
@@ -258,14 +262,14 @@ public class TestFile implements Serializable {
      * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            Pair<String, Location> script) throws Exception {
+            ProofScriptEntry script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
             pse.execute(env.getUi(), env.getLoadedProof());
         }
     }
@@ -273,7 +277,7 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> load(
             File keyFile) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
@@ -312,7 +316,7 @@ public class TestFile implements Serializable {
                     .stream()
                     .map(s -> s.node().serialNr())
                     .limit(10)
-                    .collect(Collectors.toList());
+                    .toList();
             assertTrue(reloadedProof.closed(),
                 "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials
                     + ", replay status: " + result.getStatus());

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
@@ -84,7 +87,7 @@ public final class RunAllProofsTest {
         try (JunitXmlWriter xml =
             new JunitXmlWriter(new FileWriter(xmlFile), "runallproofs." + unit.getTestName())) {
             TestResult report = unit.runTest(xml);
-            Assertions.assertTrue(report.success, report.message);
+            Assertions.assertTrue(report.success(), report.message());
         }
     }
 }

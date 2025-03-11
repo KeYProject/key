@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -9,12 +12,12 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.JmlAssertRule;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
@@ -120,7 +123,9 @@ public class JavaProfile extends AbstractProfile {
             new TermLabelConfiguration(ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
                 new SingletonLabelFactory<>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
-            new OriginTermLabelFactory(), originTermLabelPolicyList, null, null, null, null,
+            new OriginTermLabelFactory(), originTermLabelPolicyList,
+            null, null,
+            null, null,
             originTermLabelRefactorings, null));
 
         result =
@@ -152,6 +157,7 @@ public class JavaProfile extends AbstractProfile {
                 .prepend(QueryExpand.INSTANCE).prepend(MergeRule.INSTANCE)
                 .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
                 .prepend(JmlAssertRule.ASSUME_INSTANCE)
+                .prepend(SetStatementRule.INSTANCE)
                 .prepend(ObserverToUpdateRule.INSTANCE);
 
         // contract insertion rule, ATTENTION: ProofMgt relies on the fact

@@ -1,6 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -36,7 +40,8 @@ public class LDTInput implements EnvInput {
      * creates a representation of the LDT files to be used as input to the KeY prover.
      *
      * @param keyFiles an array containing the LDT .key files
-     * @param main the main class used to report the progress of reading
+     * @param listener an LDTInputListener for stsus reports while loading
+     * @param profile the Profile for which the LDTs are load
      */
     public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
         assert profile != null;
@@ -82,15 +87,15 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public String readJavaPath() throws ProofInputException {
+    public String readJavaPath() {
         return "";
     }
 
 
     // no class path elements here
     @Override
-    public List<File> readClassPath() throws ProofInputException {
-        return null;
+    public List<File> readClassPath() {
+        return new ArrayList<>();
     }
 
 
@@ -105,19 +110,25 @@ public class LDTInput implements EnvInput {
      * reads all LDTs, i.e., all associated .key files with respect to the given modification
      * strategy. Reading is done in a special order: first all sort declarations then all function
      * and predicate declarations and third the rules. This procedure makes it possible to use all
-     * declared sorts in all rules, e.g.
+     * declared sorts in all rules.
+     *
+     * @return a list of warnings during the parsing the process
      */
     @Override
-    public ImmutableSet<PositionedString> read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() {
+        var warnings = new ArrayList<PositionedString>();
+
         if (initConfig == null) {
             throw new IllegalStateException("LDTInput: InitConfig not set.");
         }
 
         for (KeYFile keYFile : keyFiles) {
-            keYFile.readSorts();
+            var w = keYFile.readSorts();
+            warnings.addAll(w);
         }
         for (KeYFile file : keyFiles) {
-            file.readFuncAndPred();
+            var w = file.readFuncAndPred();
+            warnings.addAll(w);
         }
         // create LDT objects to have them available for parsing
         initConfig.getServices().getTypeConverter().init();
@@ -130,16 +141,15 @@ public class LDTInput implements EnvInput {
         }
 
 
-        return DefaultImmutableSet.nil();
+        return DefaultImmutableSet.fromCollection(warnings);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LDTInput)) {
+        if (!(o instanceof LDTInput li)) {
             return false;
         }
 
-        LDTInput li = (LDTInput) o;
         if (keyFiles.length != li.keyFiles.length) {
             return false;
         }
@@ -159,7 +169,6 @@ public class LDTInput implements EnvInput {
 
         return true;
     }
-
 
     @Override
     public int hashCode() {

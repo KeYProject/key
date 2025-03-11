@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.List;
@@ -10,7 +13,7 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -18,10 +21,11 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.*;
 
@@ -116,12 +120,12 @@ public class Recoder2KeYTypeConverter {
      * Return the cached value if present - otherwise create a new type. Store this in the cache.
      * <p>
      * This method retrieves the recoder nameinfo and queries it for the type for typeName and
-     * passes this result to {@link #getKeYJavaType(Type)}
+     * passes this result to {@link #getKeYJavaType(recoder.abstraction.Type)}}
      *
      * @param typeName name of a type to be converted
      * @return the KJT for the string representation.
      * @author mu
-     * @see #getKeYJavaType(Type)
+     * @see #getKeYJavaType(recoder.abstraction.Type)
      */
 
     public KeYJavaType getKeYJavaType(String typeName) {
@@ -168,8 +172,7 @@ public class Recoder2KeYTypeConverter {
                 s = new NullSort(objectSort);
             }
             addKeYJavaType(t, s);
-        } else if (t instanceof recoder.abstraction.ParameterizedType) {
-            recoder.abstraction.ParameterizedType pt = (recoder.abstraction.ParameterizedType) t;
+        } else if (t instanceof recoder.abstraction.ParameterizedType pt) {
             return getKeYJavaType(pt.getGenericType());
         } else if (t instanceof recoder.abstraction.ClassType) {
             s = namespaces.sorts().lookup(new Name(t.getFullName()));
@@ -325,8 +328,7 @@ public class Recoder2KeYTypeConverter {
      * @return a freshly created Sort object
      */
     private Sort createObjectSort(recoder.abstraction.ClassType ct, ImmutableSet<Sort> supers) {
-        if (ct instanceof recoder.abstraction.ArrayType) {
-            var at = (recoder.abstraction.ArrayType) ct;
+        if (ct instanceof recoder.abstraction.ArrayType at) {
             Sort objectSort = javaInfo.objectSort();
             Sort cloneableSort = javaInfo.cloneableSort();
             Sort serializableSort = javaInfo.serializableSort();
@@ -477,7 +479,7 @@ public class Recoder2KeYTypeConverter {
             getKeYJavaType(getServiceConfiguration().getNameInfo().getIntType());
         final KeYJavaType objectType = javaInfo.getJavaLangObject();
         final HeapLDT heapLDT = typeConverter.getHeapLDT();
-        Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
         arrayMethodBuilder =
             new CreateArrayMethodBuilder(integerType, objectType, heapSort, heapCount);

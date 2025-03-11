@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
@@ -66,8 +69,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
             Object underlyingObject) {
         if (kind == DefaultContextMenuKind.SEQUENT_VIEW) {
             return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
-        } else if (kind == DefaultContextMenuKind.PROOF_TREE && underlyingObject instanceof Node) {
-            Node node = (Node) underlyingObject;
+        } else if (kind == DefaultContextMenuKind.PROOF_TREE
+                && underlyingObject instanceof Node node) {
             return NodeInfoVisualizer.getInstances(node).stream().map(OpenVisualizerAction::new)
                     .collect(Collectors.toList());
         } else {

@@ -1,8 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -11,19 +12,22 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Stateful service for translating JML into KeY entities.
@@ -40,25 +44,21 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * @version 1 (7/1/20)
  * @see Translator
  */
+@NullMarked
 public class JmlIO {
+
     private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
-    private Services services;
-    private KeYJavaType specInClass;
-    private ProgramVariable selfVar;
-    private SpecMathMode specMathMode;
-    private ImmutableList<ProgramVariable> paramVars;
-    private ProgramVariable resultVar;
-    private ProgramVariable excVar;
-    private Map<LocationVariable, Term> atPres;
-    private Map<LocationVariable, Term> atBefores;
+    private final Services services;
 
-    /**
-     * Generate an empty jml i/o instance. No very useful until a {@link #services(Services)} is
-     * provided.
-     */
-    public JmlIO() {
-    }
+    private @Nullable KeYJavaType specInClass;
+    private @Nullable LocationVariable selfVar;
+    private @Nullable SpecMathMode specMathMode;
+    private @Nullable ImmutableList<LocationVariable> paramVars;
+    private @Nullable LocationVariable resultVar;
+    private @Nullable LocationVariable excVar;
+    private @Nullable Map<LocationVariable, Term> atPres;
+    private @Nullable Map<LocationVariable, Term> atBefores;
 
     /**
      * Generate an empty jml i/o instance.
@@ -81,9 +81,9 @@ public class JmlIO {
      * @param atPres i do not know
      * @param atBefores i do not know
      */
-    public JmlIO(@Nonnull Services services, @Nullable KeYJavaType specInClass,
-            @Nullable ProgramVariable selfVar, @Nullable ImmutableList<ProgramVariable> paramVars,
-            @Nullable ProgramVariable resultVar, @Nullable ProgramVariable excVar,
+    public JmlIO(Services services, @Nullable KeYJavaType specInClass,
+            @Nullable LocationVariable selfVar, @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable LocationVariable resultVar, @Nullable LocationVariable excVar,
             @Nullable Map<LocationVariable, Term> atPres,
             @Nullable Map<LocationVariable, Term> atBefores) {
         this.services = services;
@@ -117,8 +117,8 @@ public class JmlIO {
      *
      * @throws ClassCastException if unsuitable parser rule context is given@param clause
      */
-    public @Nonnull Pair<IObserverFunction, Term> translateRepresents(
-            @Nonnull LabeledParserRuleContext clause) {
+    public @NonNull Pair<IObserverFunction, Term> translateRepresents(
+            @NonNull LabeledParserRuleContext clause) {
         Pair<IObserverFunction, Term> p = translateRepresents(clause.first);
         return new Pair<>(p.first, p.second);
     }
@@ -135,8 +135,7 @@ public class JmlIO {
     }
 
     private Term attachTermLabel(Term term, OriginTermLabel.SpecType type) {
-        return services.getTermBuilder().addLabel(term,
-            new OriginTermLabel(new OriginTermLabel.Origin(type)));
+        return services.getTermBuilder().addLabel(term, new OriginTermLabel.Origin(type));
     }
 
 
@@ -184,7 +183,14 @@ public class JmlIO {
     /**
      * Interpret the given parse tree as an JML expression in the current context.
      */
-    public @Nonnull Term translateTerm(@Nonnull ParserRuleContext expr) {
+    public Term translateTerm(KeyAst.Expression expr) {
+        return translateTerm(ParsingFacade.getParseRuleContext(expr));
+    }
+
+    /**
+     * Interpret the given parse tree as an JML expression in the current context.
+     */
+    public Term translateTerm(ParserRuleContext expr) {
         Object interpret = interpret(expr);
         if (interpret instanceof SLExpression) {
             return ((SLExpression) interpret).getTerm();
@@ -212,7 +218,7 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
-        OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
+        OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
         if (expr.second != null) {
             return services.getTermBuilder().addLabel(term, expr.second);
         } else {
@@ -266,7 +272,7 @@ public class JmlIO {
      * @return a information flow specification from the given context.
      * @throws ClassCastException if the {@code expr} is not suitable
      */
-    public @Nonnull InfFlowSpec translateInfFlow(@Nonnull ParserRuleContext expr) {
+    public @NonNull InfFlowSpec translateInfFlow(@NonNull ParserRuleContext expr) {
         return (InfFlowSpec) this.interpret(expr);
     }
 
@@ -288,9 +294,8 @@ public class JmlIO {
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
     @SuppressWarnings("unchecked")
-    public Triple<IObserverFunction, Term, Term> translateDependencyContract(
-            ParserRuleContext ctx) {
-        return (Triple<IObserverFunction, Term, Term>) interpret(ctx);
+    public TranslatedDependencyContract translateDependencyContract(ParserRuleContext ctx) {
+        return (TranslatedDependencyContract) interpret(ctx);
     }
 
     /**
@@ -298,10 +303,11 @@ public class JmlIO {
      * <p>
      * Note (weigl): No label is currently attached.
      *
+     * @param ctx a context
+     * @return {@link #translateDependencyContract(ParserRuleContext)}
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
-    public Triple<IObserverFunction, Term, Term> translateDependencyContract(
-            LabeledParserRuleContext ctx) {
+    public TranslatedDependencyContract translateDependencyContract(LabeledParserRuleContext ctx) {
         return translateDependencyContract(ctx.first);
     }
     // endregion
@@ -311,7 +317,7 @@ public class JmlIO {
     /**
      * Sets the variable representing the {@code this} reference.
      */
-    public JmlIO selfVar(ProgramVariable selfVar) {
+    public JmlIO selfVar(@Nullable LocationVariable selfVar) {
         this.selfVar = selfVar;
         return this;
     }
@@ -319,7 +325,7 @@ public class JmlIO {
     /**
      * Sets the spec math mode.
      */
-    public JmlIO specMathMode(@Nonnull SpecMathMode specMathMode) {
+    public JmlIO specMathMode(@NonNull SpecMathMode specMathMode) {
         this.specMathMode = specMathMode;
         return this;
     }
@@ -327,7 +333,7 @@ public class JmlIO {
     /**
      * Sets the current list of known parameter. Can also be used to give additionally variables.
      */
-    public JmlIO parameters(ImmutableList<ProgramVariable> params) {
+    public JmlIO parameters(ImmutableList<LocationVariable> params) {
         this.paramVars = params;
         return this;
     }
@@ -335,12 +341,12 @@ public class JmlIO {
     /**
      * Sets the variable that is used to store exceptions.
      */
-    public JmlIO exceptionVariable(ProgramVariable excVar) {
+    public JmlIO exceptionVariable(@Nullable LocationVariable excVar) {
         this.excVar = excVar;
         return this;
     }
 
-    public JmlIO atPres(Map<LocationVariable, Term> atPres) {
+    public JmlIO atPres(@Nullable Map<LocationVariable, Term> atPres) {
         this.atPres = atPres;
         return this;
     }
@@ -348,39 +354,31 @@ public class JmlIO {
     /**
      * Sets the variable representing {@code \result}.
      */
-    public JmlIO resultVariable(ProgramVariable resultVar) {
+    public JmlIO resultVariable(@Nullable LocationVariable resultVar) {
         this.resultVar = resultVar;
-        return this;
-    }
-
-    /**
-     * Sets the current services
-     */
-    public JmlIO services(Services services) {
-        this.services = services;
         return this;
     }
 
     /**
      * Sets the sort/type of the class containing the interpreted JML.
      */
-    public JmlIO classType(KeYJavaType classType) {
+    public JmlIO classType(@Nullable KeYJavaType classType) {
         this.specInClass = classType;
         return this;
     }
 
-    public JmlIO atBefore(Map<LocationVariable, Term> atBefores) {
+    public JmlIO atBefore(@Nullable Map<LocationVariable, Term> atBefores) {
         this.atBefores = atBefores;
         return this;
     }
 
     /**
-     * Sets class type, spec math mode and self var.
+     * Sets class type, spec math mode and selfVar.
      */
     public JmlIO context(Context context) {
-        this.classType(context.classType);
-        this.specMathMode(context.specMathMode);
-        this.selfVar(context.selfVar);
+        this.classType(context.classType());
+        this.specMathMode(context.specMathMode());
+        this.selfVar(context.selfVar());
         return this;
     }
 

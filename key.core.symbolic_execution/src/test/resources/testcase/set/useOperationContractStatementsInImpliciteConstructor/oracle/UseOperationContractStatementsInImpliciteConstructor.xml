@@ -360,62 +360,13 @@ new IllegalArgumentException(&quot;Array can&apos;t be null.&quot;);" pathCondit
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <exceptionalMethodReturn name="&lt;throw java.lang.IllegalArgumentException&gt;" signature="&lt;exceptional return of &lt;call self.average(array)&gt;&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" methodReturnCondition="equals(array,null)">
-                  <variable name="self" isArrayIndex="false">
-                     <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
-                  <variable name="array" isArrayIndex="false">
-                     <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
-                  <variable name="exc" isArrayIndex="false">
-                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
-                  <variable name="i" isArrayIndex="false">
-                     <value name="i {true}" typeString="java.lang.IllegalArgumentException" valueString="i_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </variable>
-                  <callStackEntry path="/0"/>
-                  <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                     <variable name="exc" isArrayIndex="false">
-                        <value name="exc {true}" typeString="java.lang.IllegalArgumentException" valueString="i_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                        </value>
-                     </variable>
-                  </termination>
-                  <completedBlockEntry path="/0/0" conditionString="equals(array,null)"/>
-                  <callStateVariable name="self" isArrayIndex="false">
-                     <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </callStateVariable>
-                  <callStateVariable name="array" isArrayIndex="false">
-                     <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </callStateVariable>
-                  <callStateVariable name="exc" isArrayIndex="false">
-                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </callStateVariable>
-                  <callStateVariable name="heapBefore_average" isArrayIndex="false">
-                     <value name="heapBefore_average {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </callStateVariable>
-                  <callStateVariable name="savedHeapBefore_average" isArrayIndex="false">
-                     <value name="savedHeapBefore_average {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                     </value>
-                  </callStateVariable>
-               </exceptionalMethodReturn>
             </statement>
          </branchCondition>
          <blockCompletionEntry path="/0/0/0/0"/>
-         <blockCompletionEntry path="/0/0/1/0/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0/1/0"/>
-      <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/0/1/0/0"/>
-   <terminationEntry path="/0/0/1/0/0/0"/>
 </start>

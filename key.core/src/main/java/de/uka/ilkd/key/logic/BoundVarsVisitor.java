@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -9,10 +12,9 @@ import org.key_project.util.collection.ImmutableSet;
  * Visitor traversing a term and collecting all variables that occur bound. The visitor implements
  * also a continuation on sequents, traversing all of the formulas occuring in the sequent.
  */
-public class BoundVarsVisitor extends DefaultVisitor {
+public class BoundVarsVisitor implements DefaultVisitor {
 
-    private ImmutableSet<QuantifiableVariable> bdVars =
-        DefaultImmutableSet.nil();
+    private ImmutableSet<QuantifiableVariable> bdVars = DefaultImmutableSet.nil();
 
 
     /**

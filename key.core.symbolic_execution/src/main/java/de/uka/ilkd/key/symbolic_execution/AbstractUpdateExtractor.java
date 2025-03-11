@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.*;
@@ -5,10 +8,10 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -22,9 +25,11 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -158,7 +163,7 @@ public abstract class AbstractUpdateExtractor {
     }
 
     /**
-     * Utility method of {@link #computeInitialObjectsToIgnore()} which computes the objects to
+     * Utility method of {@link #computeInitialObjectsToIgnore} which computes the objects to
      * ignore recursively.
      *
      * @param term The current {@link Term}.
@@ -172,8 +177,7 @@ public abstract class AbstractUpdateExtractor {
             for (int i = 0; i < term.arity(); i++) {
                 fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill);
             }
-        } else if (term.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) term.op();
+        } else if (term.op() instanceof ElementaryUpdate eu) {
             if (eu.lhs() instanceof ProgramVariable) {
                 toFill.add(term.sub(0));
             }
@@ -252,14 +256,12 @@ public abstract class AbstractUpdateExtractor {
                 collectLocationsFromTerm(sub, locationsToFill, updateCreatedObjectsToFill,
                     updateValueObjectsToFill, objectsToIgnore);
             }
-        } else if (updateTerm.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) updateTerm.op();
+        } else if (updateTerm.op() instanceof ElementaryUpdate eu) {
             if (SymbolicExecutionUtil.isHeapUpdate(getServices(), updateTerm)) {
                 collectLocationsFromHeapUpdate(updateTerm.sub(0), locationsToFill,
                     updateCreatedObjectsToFill, updateValueObjectsToFill);
-            } else if (eu.lhs() instanceof ProgramVariable) {
+            } else if (eu.lhs() instanceof ProgramVariable var) {
                 final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
-                ProgramVariable var = (ProgramVariable) eu.lhs();
                 if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
                     if (!isImplicitProgramVariable(var)
                             && !objectsToIgnore.contains(getServices().getTermBuilder().var(var))
@@ -567,9 +569,9 @@ public abstract class AbstractUpdateExtractor {
             sorts[i] = arguments[i].sort();
         }
         // Create predicate which will be used in formulas to store the value interested in.
-        Function newPredicate =
-            new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
-                Sort.FORMULA, sorts);
+        JFunction newPredicate =
+            new JFunction(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
+                JavaDLTheory.FORMULA, sorts);
         // Create formula which contains the value interested in.
         Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
         return newTerm;
@@ -788,12 +790,13 @@ public abstract class AbstractUpdateExtractor {
                 OriginTermLabel.removeOriginLabels(arrayStartIndex, getServices());
             this.arrayEndIndex = OriginTermLabel.removeOriginLabels(arrayEndIndex, getServices());
             TermBuilder tb = getServices().getTermBuilder();
-            Function constantFunction = new Function(
+            JFunction constantFunction = new JFunction(
                 new Name(tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)),
                 getServices().getTypeConverter().getIntegerLDT().targetSort());
             this.arrayRangeConstant = tb.func(constantFunction);
-            Function notAValueFunction = new Function(
-                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)), Sort.ANY);
+            JFunction notAValueFunction = new JFunction(
+                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)),
+                JavaDLTheory.ANY);
             this.notAValue = tb.func(notAValueFunction);
         }
 
@@ -939,11 +942,11 @@ public abstract class AbstractUpdateExtractor {
                 } else {
                     if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                         // Special handling for length attribute of arrays
-                        Function function =
+                        JFunction function =
                             getServices().getTypeConverter().getHeapLDT().getLength();
                         return tb.func(function, createPreParentTerm());
                     } else {
-                        Function function =
+                        JFunction function =
                             getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                                 (LocationVariable) programVariable, getServices());
                         return tb.dot(programVariable.sort(), createPreParentTerm(), function);
@@ -951,7 +954,7 @@ public abstract class AbstractUpdateExtractor {
                 }
             } else {
                 if (programVariable.isStatic()) {
-                    Function function = getServices().getTypeConverter().getHeapLDT()
+                    JFunction function = getServices().getTypeConverter().getHeapLDT()
                             .getFieldSymbolForPV((LocationVariable) programVariable, getServices());
                     return tb.staticDot(programVariable.sort(), function);
                 } else {
@@ -1044,8 +1047,7 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ExtractLocationParameter) {
-                ExtractLocationParameter other = (ExtractLocationParameter) obj;
+            if (obj instanceof ExtractLocationParameter other) {
                 return Objects.equals(arrayIndex, other.arrayIndex)
                         && stateMember == other.stateMember
                         && Objects.equals(parentTerm, other.parentTerm)
@@ -1423,7 +1425,7 @@ public abstract class AbstractUpdateExtractor {
     }
 
     /**
-     * Utility class used by {@link AbstractUpdateExtractor#computeValueConditions(Set, Map)}.
+     * Utility class used by {@link AbstractUpdateExtractor#computeValueConditions}.
      * Instances of this class store the current {@link Node} and the {@link Goal}s at which
      * backward iteration on parents has started.
      *
@@ -1501,18 +1503,11 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             sb.append(currentNode.serialNr());
             sb.append(" starting from goals ");
-            boolean afterFirst = false;
-            for (Goal goal : startingGoals) {
-                if (afterFirst) {
-                    sb.append(", ");
-                } else {
-                    afterFirst = true;
-                }
-                sb.append(goal.node().serialNr());
-            }
+            sb.append(Strings.formatAsList(startingGoals, "", ", ", "",
+                ((java.util.function.Function<Goal, Node>) Goal::node).andThen(Node::serialNr)));
             return sb.toString();
         }
     }
@@ -1546,7 +1541,7 @@ public abstract class AbstractUpdateExtractor {
      * <p>
      * They are instantiated lazily when a concrete memory layout is requested the first during
      * lazily computation
-     * {@link SymbolicLayoutExtractor#lazyComputeLayout(Node, ImmutableSet, Term, Set, ImmutableList, Term, String)}.
+     * {@link SymbolicLayoutExtractor#lazyComputeLayout}.
      * The instances exists only temporary until the concrete {@link ISymbolicLayout} was created
      * from them.
      * </p>
@@ -1781,8 +1776,7 @@ public abstract class AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ExecutionVariableValuePair) {
-                ExecutionVariableValuePair other = (ExecutionVariableValuePair) obj;
+            if (obj instanceof ExecutionVariableValuePair other) {
                 return isArrayRange()
                         ? (getArrayStartIndex().equals(other.getArrayStartIndex())
                                 && getArrayEndIndex().equals(other.getArrayEndIndex()))

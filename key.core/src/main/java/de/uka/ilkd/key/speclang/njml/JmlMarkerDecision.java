@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.Collection;
@@ -5,7 +8,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.
@@ -25,7 +31,8 @@ public class JmlMarkerDecision {
      */
     public JmlMarkerDecision(JmlLexer lexer) {
         this.lexer = lexer;
-        enabledKeys.add("key");
+        setEnabledKeys(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getJmlEnabledKeys());
     }
 
     /**
@@ -34,7 +41,7 @@ public class JmlMarkerDecision {
      *
      * @param markers a collection of keys without prefix ([+-])
      */
-    public void setEnabledKeys(@Nonnull Collection<String> markers) {
+    public void setEnabledKeys(@NonNull Collection<String> markers) {
         this.enabledKeys = markers.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 
@@ -122,6 +129,15 @@ public class JmlMarkerDecision {
         return false;
     }
 
+    /**
+     * Given a string of conditions of a JML comment, that method decides whether the conditions are
+     * met.
+     *
+     * @param foundKeys a string of conditions, e.g., {@code "+key+esc-float"}. Should not contain
+     *        whitespaces.
+     * @return true whether the given conditions are met and the comment should be considered as
+     *         active.
+     */
     public boolean isActiveJmlSpec(String foundKeys) {
         if (foundKeys.isEmpty()) {
             // a JML annotation with no keys is always included,

@@ -13,4 +13,4 @@ This is the PayCard example from the KeY-quicktour.
 
 The source code for this quicktour, along with a tutorial
 on how to run it in KeY can be found in the KeY online
-documentation at https://www.key-project.org/docs/
+documentation at https://keyproject.github.io/key-docs/

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import java.util.Iterator;
@@ -10,15 +13,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.AbstractSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
 import de.uka.ilkd.key.rule.*;
@@ -29,6 +27,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -44,7 +44,7 @@ import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
  * PositionTable, which is needed for highlighting.
  *
  * <p>
- * The actual layouting/formatting is done using the {@link de.uka.ilkd.key.util.pp.Layouter} class.
+ * The actual layout/formatting is done using the {@link de.uka.ilkd.key.util.pp.Layouter} class.
  * The concrete syntax for operators is given by an instance of {@link NotationInfo}. The
  * LogicPrinter is responsible for the concrete <em>layout</em>, e.g. how terms with infix operators
  * are indented, and it binds the various needed components together.
@@ -74,6 +74,7 @@ public class LogicPrinter {
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     private final SelectPrinter selectPrinter;
+    private final FinalPrinter finalPrinter;
     private final StorePrinter storePrinter;
 
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
@@ -98,7 +99,8 @@ public class LogicPrinter {
             notationInfo.refresh(services);
         }
         storePrinter = new StorePrinter(this.services);
-        selectPrinter = new SelectPrinter(this.services);
+        finalPrinter = new FinalPrinter(this.services);
+        selectPrinter = new SelectPrinter(notationInfo, this.services);
         this.layouter = layouter;
     }
 
@@ -119,7 +121,7 @@ public class LogicPrinter {
         return layouter;
     }
 
-    private static SequentViewLogicPrinter quickPrinter(Services services,
+    public static SequentViewLogicPrinter quickPrinter(Services services,
             boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
@@ -402,8 +404,8 @@ public class LogicPrinter {
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
         if (sv.isDefinedByType()) {
-            if (sv.getType() instanceof ArrayType) {
-                layouter.print(((ArrayType) sv.getType()).getAlternativeNameRepresentation());
+            if (sv.getType().getJavaType() instanceof ArrayType at) {
+                layouter.print(at.getAlternativeNameRepresentation());
             } else {
                 layouter.print(sv.getType().getFullName());
             }
@@ -452,11 +454,11 @@ public class LogicPrinter {
         }
         layouter.nl().beginC().print("\\trigger {");
         Trigger trigger = taclet.getTrigger();
-        printSchemaVariable(trigger.getTriggerVar());
+        printSchemaVariable(trigger.triggerVar());
         layouter.print("} ");
         printTerm(trigger.getTerm());
         if (trigger.hasAvoidConditions()) {
-            Iterator<Term> itTerms = trigger.getAvoidConditions().iterator();
+            Iterator<Term> itTerms = trigger.avoidConditions().iterator();
             layouter.brk(1, 2);
             layouter.print(" \\avoid ");
             while (itTerms.hasNext()) {
@@ -516,7 +518,7 @@ public class LogicPrinter {
     protected void printGoalTemplate(TacletGoalTemplate tgt) {
         // layouter.beginC(0);
         if (tgt.name() != null) {
-            if (tgt.name().length() > 0) {
+            if (!tgt.name().isEmpty()) {
                 layouter.nl().beginC().print("\"" + tgt.name() + "\"").print(":");
             }
 
@@ -534,13 +536,13 @@ public class LogicPrinter {
         if (!tgt.rules().isEmpty()) {
             printRules(tgt.rules());
         }
-        if (tgt.addedProgVars().size() > 0) {
+        if (!tgt.addedProgVars().isEmpty()) {
             layouter.nl();
             printAddProgVars(tgt.addedProgVars());
         }
 
         if (tgt.name() != null) {
-            if (tgt.name().length() > 0) {
+            if (!tgt.name().isEmpty()) {
                 layouter.end();
             }
         }
@@ -596,7 +598,9 @@ public class LogicPrinter {
     }
 
     private void printSourceElement(SourceElement element) {
-        new PrettyPrinter(layouter, instantiations).print(element);
+        new PrettyPrinter(layouter, instantiations, services,
+            notationInfo.isPrettySyntax(),
+            notationInfo.isUnicodeEnabled()).print(element);
     }
 
     /**
@@ -782,7 +786,7 @@ public class LogicPrinter {
     /**
      * Determine the Set of labels that will be printed out for a specific {@link Term}. The class
      * {@link SequentViewLogicPrinter} overrides this method. {@link TermLabel} visibility can be
-     * configured via GUI, see {@link de.uka.ilkd.key.gui.actions.TermLabelMenu}. Default is to
+     * configured via GUI, see de.uka.ilkd.key.gui.actions.TermLabelMenu. Default is to
      * print all TermLabels.
      *
      * @param t {@link Term} whose visible {@link TermLabel}s will be determined.
@@ -814,11 +818,11 @@ public class LogicPrinter {
                 afterFirst = true;
             }
             layouter.print(l.name().toString());
-            if (l.getChildCount() > 0) {
+            if (l.getTLChildCount() > 0) {
                 layouter.print("(").beginC();
-                for (int i = 0; i < l.getChildCount(); i++) {
-                    layouter.print("\"" + l.getChild(i).toString() + "\"");
-                    if (i < l.getChildCount() - 1) {
+                for (int i = 0; i < l.getTLChildCount(); i++) {
+                    layouter.print("\"" + l.getTLChild(i).toString() + "\"");
+                    if (i < l.getTLChildCount() - 1) {
                         layouter.print(",").ind(1, 2);
                     }
                 }
@@ -917,9 +921,8 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
             boolean alreadyPrinted = false;
-            if (t.op() instanceof SortDependingFunction) {
-                SortDependingFunction op = (SortDependingFunction) t.op();
-                if (op.getKind().compareTo(AbstractSort.EXACT_INSTANCE_NAME) == 0) {
+            if (t.op() instanceof SortDependingFunction op) {
+                if (op.getKind().compareTo(JavaDLTheory.EXACT_INSTANCE_NAME) == 0) {
                     layouter.print(op.getSortDependingOn().declarationString());
                     layouter.print("::");
                     layouter.keyWord(op.getKind().toString());
@@ -969,8 +972,7 @@ public class LogicPrinter {
     protected boolean printEmbeddedHeapConstructorTerm(Term t) {
 
         Notation notation = notationInfo.getNotation(t.op());
-        if (notation instanceof HeapConstructorNotation) {
-            HeapConstructorNotation heapNotation = (HeapConstructorNotation) notation;
+        if (notation instanceof HeapConstructorNotation heapNotation) {
             heapNotation.printEmbeddedHeap(t, this);
             return true;
         } else {
@@ -1038,8 +1040,7 @@ public class LogicPrinter {
 
     protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm) {
         Notation notation = notationInfo.getNotation(objectTerm.op());
-        if (notation instanceof ObserverNotation) {
-            ObserverNotation obsNotation = (ObserverNotation) notation;
+        if (notation instanceof ObserverNotation obsNotation) {
             Term innerheap = objectTerm.sub(0);
             boolean paren = !heapTerm.equals(innerheap);
             if (paren) {
@@ -1062,6 +1063,13 @@ public class LogicPrinter {
     }
 
     /*
+     * Print a term of the form: T::final(object, field).
+     */
+    public void printFinal(Term t) {
+        finalPrinter.printFinal(this, t);
+    }
+
+    /*
      * Print a term of the form: store(heap, object, field, value).
      */
     public void printStore(Term t, boolean closingBrace) {
@@ -1074,7 +1082,7 @@ public class LogicPrinter {
     public void printSeqGet(Term t) {
         if (notationInfo.isPrettySyntax()) {
             layouter.startTerm(2);
-            if (!t.sort().equals(Sort.ANY)) {
+            if (!t.sort().equals(JavaDLTheory.ANY)) {
                 layouter.print("(" + t.sort().toString() + ")");
             }
             layouter.markStartSub();
@@ -1345,7 +1353,7 @@ public class LogicPrinter {
      * the format is like
      *
      * <pre>
-     * p & q
+     * {@code p & q}
      * </pre>
      * <p>
      * The subterms are printed using {@link #printTermContinuingBlock(Term)}.
@@ -1517,7 +1525,7 @@ public class LogicPrinter {
 
         layouter.beginC(0);
         layouter.keyWord(keyword);
-        if (t.varsBoundHere(0).size() > 0) {
+        if (!t.varsBoundHere(0).isEmpty()) {
             layouter.print(" ");
             printVariables(t.varsBoundHere(0), quantifiableVariablePrintMode);
         }
@@ -1659,9 +1667,9 @@ public class LogicPrinter {
     public void printModalityTerm(String left, JavaBlock jb, String right, Term phi, int ass) {
         assert jb != null;
         assert jb.program() != null;
-        if (phi.op() instanceof ModalOperatorSV) {
-            Object o = getInstantiations().getInstantiation((ModalOperatorSV) phi.op());
-            if (o != null) {
+        if (phi.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV) {
+            Object o = getInstantiations().getInstantiation(mod.kind());
+            if (o instanceof Modality.JavaModalityKind kind) {
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
                     layouter.startTerm(0);
                     layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));
@@ -1670,12 +1678,13 @@ public class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    Term term = services.getTermFactory().createTerm((Modality) o, ta,
-                        phi.boundVars(), phi.javaBlock());
-                    notationInfo.getNotation((Modality) o).print(term, this);
+                    final Modality m =
+                        Modality.getModality((Modality.JavaModalityKind) o, mod.program());
+                    final Term term = services.getTermFactory().createTerm(m, ta,
+                        phi.boundVars(), null);
+                    notationInfo.getNotation(m).print(term, this);
                     return;
                 }
-
             }
         }
 
@@ -1801,50 +1810,21 @@ public class LogicPrinter {
         for (int i = 0, sz = text.length(); i < sz; i++) {
             char c = text.charAt(i);
             switch (c) {
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '\"':
-                sb.append("&quot;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '(':
-                sb.append("&#040;");
-                break;
-            case ')':
-                sb.append("&#041;");
-                break;
-            case '#':
-                sb.append("&#035;");
-                break;
-            case '+':
-                sb.append("&#043;");
-                break;
-            case '-':
-                sb.append("&#045;");
-                break;
-            case '%':
-                sb.append("&#037;");
-                break;
-            case ';':
-                sb.append("&#059;");
-                break;
-            case '\n':
-                sb.append(escapeWhitespace ? "<br>" : c);
-                break;
-            case ' ':
-                sb.append(escapeWhitespace ? "&nbsp;" : c);
-                break;
-            default:
-                sb.append(c);
+            case '<' -> sb.append("&lt;");
+            case '>' -> sb.append("&gt;");
+            case '&' -> sb.append("&amp;");
+            case '\"' -> sb.append("&quot;");
+            case '\'' -> sb.append("&#039;");
+            case '(' -> sb.append("&#040;");
+            case ')' -> sb.append("&#041;");
+            case '#' -> sb.append("&#035;");
+            case '+' -> sb.append("&#043;");
+            case '-' -> sb.append("&#045;");
+            case '%' -> sb.append("&#037;");
+            case ';' -> sb.append("&#059;");
+            case '\n' -> sb.append(escapeWhitespace ? "<br>" : c);
+            case ' ' -> sb.append(escapeWhitespace ? "&nbsp;" : c);
+            default -> sb.append(c);
             }
 
         }

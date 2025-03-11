@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.Arrays;
@@ -5,13 +8,15 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Name;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
@@ -93,12 +98,13 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (ruleApp instanceof OneStepSimplifierRuleApp && allowOSS) {
-                return delegate.computeCost(ruleApp, pio, goal);
+                return delegate.computeCost(ruleApp, pio, goal, mState);
             } else if (admittedRuleNames.contains(name)) {
-                final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal);
+                final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal, mState);
                 // pass through negative costs
                 if (origCost instanceof NumberRuleAppCost
                         && ((NumberRuleAppCost) origCost).getValue() < 0) {

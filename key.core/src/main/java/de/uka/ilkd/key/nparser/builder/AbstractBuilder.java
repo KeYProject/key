@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.util.parsing.BuildingException;
@@ -11,6 +12,8 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class brings some nice features to the visitors of key's ast.
@@ -26,10 +29,9 @@ import org.antlr.v4.runtime.RuleContext;
  */
 @SuppressWarnings("unchecked")
 abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
-    @Nullable
-    private List<BuildingIssue> buildingIssues = null;
-    @Nullable
-    private Stack<Object> parameters = null;
+
+    private @Nullable List<BuildingIssue> buildingIssues = null;
+    private @Nullable Stack<Object> parameters = null;
 
     /**
      * Helper function for avoiding cast.
@@ -137,7 +139,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
                 .collect(Collectors.toList());
     }
 
-    public @Nonnull List<BuildingIssue> getBuildingIssues() {
+    public @NonNull List<BuildingIssue> getBuildingIssues() {
         if (buildingIssues == null) {
             buildingIssues = new LinkedList<>();
         }

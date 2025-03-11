@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.ArrayList;
@@ -24,7 +27,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
@@ -69,7 +71,6 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * Constructor for a "normal" child value.
      *
-     * @param settings The {@link ITreeSettings} to use.
      * @param parentNode The parent {@link IExecutionNode} which provides this
      *        {@link ExecutionVariable}.
      * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
@@ -302,11 +303,11 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             Proof proof = null;
             for (Goal valueGoal : valueGoals) {
                 pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(),
-                    getSettings().isSimplifyConditions(), false));
+                    getSettings().simplifyConditions(), false));
                 proof = valueGoal.node().proof();
             }
             Term comboundPathCondition = tb.or(pathConditions);
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 comboundPathCondition =
                     SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
             }

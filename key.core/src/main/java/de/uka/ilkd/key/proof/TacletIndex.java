@@ -1,11 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.*;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
@@ -16,10 +17,13 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * manages all applicable Taclets (more precisely: Taclets with instantiations but without position
@@ -94,6 +98,8 @@ public abstract class TacletIndex {
                 indexObj = ((SortDependingFunction) indexObj).getKind();
             } else if (indexObj instanceof ElementaryUpdate) {
                 indexObj = ElementaryUpdate.class;
+            } else if (indexObj instanceof Modality) {
+                indexObj = Modality.class;
             }
         }
 
@@ -101,7 +107,7 @@ public abstract class TacletIndex {
             if ((indexObj instanceof TermSV && ((TermSV) indexObj).isStrict())
                     || indexObj instanceof FormulaSV || indexObj instanceof UpdateSV) {
 
-                indexObj = ((SchemaVariable) indexObj).sort();
+                indexObj = ((OperatorSV) indexObj).sort();
 
                 if (indexObj instanceof GenericSort) {
                     indexObj = GenericSort.class;
@@ -298,8 +304,8 @@ public abstract class TacletIndex {
      *
      * @param map the map to select the NoPosTacletApps from
      * @param pe the program element that is used to retrieve the taclets
-     * @param prefixOcc the PrefixOccurrence object used to keep track of the occuring prefix
-     *        elements
+     * @param prefixOccurrences the PrefixOccurrence object used to keep track of the occurring
+     *        prefix elements
      */
     private ImmutableList<NoPosTacletApp> getJavaTacletList(
             HashMap<Object, ImmutableList<NoPosTacletApp>> map, ProgramElement pe,
@@ -347,6 +353,8 @@ public abstract class TacletIndex {
             inMap = map.get(((SortDependingFunction) op).getKind());
         } else if (op instanceof ElementaryUpdate) {
             inMap = map.get(ElementaryUpdate.class);
+        } else if (op instanceof Modality) {
+            inMap = map.get(Modality.class);
         } else {
             inMap = map.get(op);
         }
@@ -376,7 +384,7 @@ public abstract class TacletIndex {
      * @param second the second list
      * @return the merged list
      */
-    private final ImmutableList<NoPosTacletApp> merge(ImmutableList<NoPosTacletApp> first,
+    private ImmutableList<NoPosTacletApp> merge(ImmutableList<NoPosTacletApp> first,
             final ImmutableList<NoPosTacletApp> second) {
         if (second == null) {
             return first;
@@ -576,9 +584,7 @@ public abstract class TacletIndex {
          * resets the occurred field to 'nothing has occurred'
          */
         public void reset() {
-            for (int i = 0; i < PREFIXTYPES; i++) {
-                occurred[i] = false;
-            }
+            Arrays.fill(occurred, 0, PREFIXTYPES, false);
         }
 
         /**

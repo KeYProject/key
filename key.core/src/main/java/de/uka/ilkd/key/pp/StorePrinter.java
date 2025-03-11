@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+
+import org.key_project.logic.op.Function;
 
 /**
  * This class is used by LogicPrinter.java to print out store-terms, i.e. terms of the following
@@ -67,7 +71,7 @@ class StorePrinter extends FieldPrinter {
             final Term fieldTerm = t.sub(2);
             final Term valueTerm = t.sub(3);
 
-            if (isStaticFieldConstant(objectTerm, fieldTerm)) {
+            if (isStaticFieldConstant(fieldTerm)) {
                 printStoreOnStaticField(lp, heapTerm, fieldTerm, valueTerm, closingBrace);
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 printStoreOnGenericFieldConstant(lp, heapTerm, objectTerm, fieldTerm, valueTerm,

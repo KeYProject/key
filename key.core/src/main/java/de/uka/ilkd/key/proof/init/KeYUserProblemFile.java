@@ -1,32 +1,34 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.nparser.ChoiceInformation;
-import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.nparser.ProblemInformation;
-import de.uka.ilkd.key.nparser.ProofReplayer;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -34,7 +36,7 @@ import org.antlr.v4.runtime.Token;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-    private Term problemTerm = null;
+    private Sequent problem = null;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -102,7 +104,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
         // read key file itself (except contracts)
-        super.readExtendedSignature();
+        warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
@@ -125,13 +127,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
 
-        readSorts();
-        readFuncAndPred();
-        readRules();
-
         try {
-            problemTerm = getProblemFinder().getProblemTerm();
-            if (problemTerm == null) {
+            problem = getProblemFinder().getProblem();
+            if (problem == null) {
                 boolean chooseDLContract = chooseContract() != null;
                 boolean proofObligation = getProofObligation() != null;
                 if (!chooseDLContract && !proofObligation) {
@@ -151,18 +149,19 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
     @Override
-    public String getProofObligation() {
+    public Configuration getProofObligation() {
         return getProblemFinder().getProofObligation();
     }
 
     @Override
-    public ProofAggregate getPO() throws ProofInputException {
-        assert problemTerm != null;
+    public ProofAggregate getPO() {
+        assert problem != null;
         String name = name();
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problemTerm, getParseContext().getProblemHeader() + "\n", initConfig),
+            new Proof(name, problem, getParseContext().getProblemHeader() + "\n", initConfig,
+                file.file()),
             name);
     }
 
@@ -173,12 +172,24 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
 
+    /**
+     * True iff a {@link ProofScriptEntry} is present
+     *
+     * @see #readProofScript()
+     */
     public boolean hasProofScript() {
-        return getParseContext().findProofScript() != null;
+        return readProofScript() != null;
     }
 
-    public Triple<String, Integer, Integer> readProofScript() throws ProofInputException {
-        return getParseContext().findProofScript();
+    /**
+     * Returns the {@link ProofScriptEntry} in this resource
+     *
+     * @return {@link ProofScriptEntry} if present otherwise null
+     * @see KeyAst.File#findProofScript(URI)
+     */
+    public @Nullable ProofScriptEntry readProofScript() {
+        URI url = getInitialFile().toURI();
+        return getParseContext().findProofScript(url);
     }
 
     /**
@@ -236,10 +247,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *
      * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile}
      *         is defined by the file.
-     * @throws Exception Occurred Exception.
      */
-    private Profile readProfileFromFile() throws Exception {
-        @Nonnull
+    private Profile readProfileFromFile() {
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {

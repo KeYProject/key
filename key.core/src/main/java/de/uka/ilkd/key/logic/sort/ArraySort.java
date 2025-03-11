@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
 import java.lang.ref.WeakReference;
@@ -5,8 +8,10 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -20,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * the mathematical integers), but we have different array sorts int[], byte[], char[], short[] and
  * long[], all storing mathematical integers.
  */
-public final class ArraySort extends AbstractSort {
+public final class ArraySort extends SortImpl {
 
     private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH =
         new WeakHashMap<>();
@@ -37,7 +42,7 @@ public final class ArraySort extends AbstractSort {
 
     private ArraySort(ImmutableSet<Sort> extendsSorts, SortKey sk) {
         super(new Name((sk.elemType != null ? sk.elemType.getName() : sk.elemSort.name()) + "[]"),
-            extendsSorts, false);
+            extendsSorts, false, "", "");
 
         if (extendsSorts.isEmpty()) {
             throw new IllegalArgumentException("An ArraySort extends typically three sorts"
@@ -63,7 +68,7 @@ public final class ArraySort extends AbstractSort {
         ImmutableSet<Sort> elemDirectSuperSorts = elemSort.extendsSorts();
 
         if (elemDirectSuperSorts.size() == 1
-                && elemDirectSuperSorts.iterator().next().equals(Sort.ANY)) {
+                && elemDirectSuperSorts.iterator().next().equals(JavaDLTheory.ANY)) {
             if (objectSort != null) {
                 result = result.add(objectSort);
             }
@@ -145,40 +150,16 @@ public final class ArraySort extends AbstractSort {
     }
 
 
-    private static final class SortKey {
-        final Sort elemSort;
-        final Type elemType;
-        final Sort javaLangObjectSort;
-        final Sort javaLangSerializable;
-        final Sort javaLangCloneable;
-
-        public SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
-                Sort javaLangCloneable, Sort javaLangSerializable) {
-            this.elemSort = elemSort;
-            this.elemType = elemType;
-            this.javaLangObjectSort = javaLangObjectSort;
-            this.javaLangCloneable = javaLangCloneable;
-            this.javaLangSerializable = javaLangSerializable;
-        }
-
-
+    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
+                           Sort javaLangSerializable) {
         public boolean equals(Object o) {
-            if (!(o instanceof SortKey)) {
+            if (!(o instanceof SortKey sk)) {
                 return false;
             }
-            final SortKey sk = (SortKey) o;
             return elemSort == sk.elemSort && elemType == sk.elemType
                     && javaLangObjectSort == sk.javaLangObjectSort
                     && javaLangSerializable == sk.javaLangSerializable
                     && javaLangCloneable == sk.javaLangCloneable;
-        }
-
-
-        public int hashCode() {
-            return elemSort.hashCode() + (elemType == null ? 0 : 31 * elemType.hashCode())
-                    + (javaLangCloneable == null ? 0 : 31 * javaLangCloneable.hashCode())
-                    + (javaLangObjectSort == null ? 0 : 17 * javaLangObjectSort.hashCode())
-                    + (javaLangSerializable == null ? 0 : 3 * javaLangSerializable.hashCode());
         }
     }
 }

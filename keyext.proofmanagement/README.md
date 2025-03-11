@@ -59,7 +59,7 @@ The available options correspond to the features described in the section above.
 `<bundle_path>` is the path of the proof bundle to check and can either denote a directory or a zip file.
 
 The directory structure of the bundle has to conform that described in
-[classpath documentation](https://key-project.org/docs/user/Classpath/).
+[classpath documentation](https://keyproject.github.io/key-docs/user/Classpath/).
 An example of a (zipped) proof bundle would be:
 ```
 bundle.zproof

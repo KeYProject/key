@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
 import javax.swing.*;
@@ -155,7 +158,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         settings = new TestGenerationSettings(TestGenerationSettings.getInstance());
         includePostCondition.setSelected(settings.includePostCondition());
         invariantForAll.setSelected(settings.invariantForAll());

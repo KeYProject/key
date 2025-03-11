@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.ArrayList;
@@ -5,10 +8,10 @@ import java.util.ArrayList;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
@@ -185,7 +188,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         // null is OK: In this case, we generate the distinguishing
         // formula automatically. Otherwise, the term must indeed be
         // a formula.
-        assert distForm == null || distForm.sort() == Sort.FORMULA;
+        assert distForm == null || distForm.sort() == JavaDLTheory.FORMULA;
 
         this.distForm = distForm;
     }

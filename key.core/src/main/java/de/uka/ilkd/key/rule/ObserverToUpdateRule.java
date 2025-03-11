@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
-
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -35,8 +35,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Implements the rule which translates the toplevel formula
@@ -147,9 +150,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         return true;
     }
 
-    @Nonnull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate(ruleApp.posInOccurrence().subTerm(), services);
         assert inst != null : "If isApplicable has been checked, this must not be null";
@@ -201,17 +203,19 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         final JavaBlock jb = inst.modality.javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        Term modTerm =
-            tb.prog((Modality) inst.modality.op(), postJavaBlock, inst.modality.sub(0),
+        Modality modality =
+            Modality.getModality(((Modality) inst.modality.op()).kind(), postJavaBlock);
+        Term modalityTerm =
+            tb.prog(modality.kind(), postJavaBlock, inst.modality.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    inst.modality.op(), inst.modality.subs(), null, postJavaBlock,
-                    inst.modality.getLabels()));
+                    tb.tf().createTerm(modality, inst.modality.subs(), null,
+                        inst.modality.getLabels())));
         Term lhs = tb.var(inst.assignmentTarget);
 
         Term update = tb.elementary(lhs,
             makeCall(services, inst.observerSymbol, inst.receiver, ImmutableList.of()));
-        Term normalPost = tb.apply(update, modTerm);
+        Term normalPost = tb.apply(update, modalityTerm);
         contGoal.changeFormula(new SequentFormula(tb.apply(inst.update, normalPost, null)),
             ruleApp.posInOccurrence());
 
@@ -259,16 +263,17 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // ---- create "Assignment" cont branch
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        Term modTerm =
-            tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
+        Modality modality = Modality.getModality(inst.modality.kind(), postJavaBlock);
+        Term modalityTerm =
+            tb.prog(inst.modality.kind(), postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
-                    inst.progPost.getLabels()));
+                    tb.tf().createTerm(modality, new ImmutableArray<>(inst.progPost.sub(0)), null,
+                        inst.progPost.getLabels())));
         Term lhs = tb.var((ProgramVariable) inst.actualResult);
         Term update =
             tb.elementary(lhs, makeCall(services, inst.pm, inst.actualSelf, inst.actualParams));
-        Term normalPost = tb.apply(update, modTerm);
+        Term normalPost = tb.apply(update, modalityTerm);
         contGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
             ruleApp.posInOccurrence());
 
@@ -338,20 +343,17 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (mainFml.op() != Modality.BOX && mainFml.op() != Modality.DIA
-                && mainFml.op() != Modality.BOX_TRANSACTION
-                && mainFml.op() != Modality.DIA_TRANSACTION) {
+        if (!(mainFml.op() instanceof Modality)) {
             return null;
         }
         result.modality = mainFml;
 
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
-        if (!(activeStatement instanceof CopyAssignment)) {
+        if (!(activeStatement instanceof CopyAssignment ca)) {
             return null;
         }
 
-        final CopyAssignment ca = (CopyAssignment) activeStatement;
         final Expression lhs = ca.getExpressionAt(0);
         final Expression rhs = ca.getExpressionAt(1);
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -46,12 +49,6 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
         return new FunctionalBlockContractPO(initConfig, this);
-    }
-
-    @Override
-    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-        assert contract instanceof FunctionalBlockContract;
-        return new FunctionalBlockContractPO(initConfig, (FunctionalBlockContract) contract);
     }
 
     @Override

@@ -66,9 +66,11 @@ public class LogFile {
         int i=1;
         /*@ loop_invariant
           @   0<=i && i <= logArray.length
-          @   && max!=null &&
-          @   (\forall int j; 0 <= j && j<i;
-          @     max.balance >= logArray[j].balance);
+          @   && max!=null
+          @   && (\forall int j; 0 <= j && j<i;
+          @     max.balance >= logArray[j].balance)
+          @   && (\exists int j; 0 <= j && j<i;
+          @     max == logArray[j]);
           @ assignable \nothing;
           @ decreases logArray.length - i;
           @*/

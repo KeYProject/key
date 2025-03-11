@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -122,7 +125,7 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param the ProofEnvironment in which the proof shall be performed
+     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(boolean useAutoSaver) {
         this(null, useAutoSaver);
@@ -131,7 +134,8 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param the ProofEnvironment in which the proof shall be performed
+     * @param ptl the ProverTaskListener to be informed about certain events
+     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
         this.ptl = ptl;

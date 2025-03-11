@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -93,10 +96,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     static RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
             Goal goal) {
         final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
-
-        final BuiltInRuleAppContainer container = new BuiltInRuleAppContainer(bir, pio, cost, goal);
-
-        return container;
+        return new BuiltInRuleAppContainer(bir, pio, cost, goal);
     }
 
     /**

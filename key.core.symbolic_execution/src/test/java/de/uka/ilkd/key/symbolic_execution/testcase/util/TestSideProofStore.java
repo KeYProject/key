@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
 import java.beans.PropertyChangeEvent;
@@ -17,9 +20,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofUserManager;
 
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ArrayUtil;
 
 import org.junit.jupiter.api.Assertions;

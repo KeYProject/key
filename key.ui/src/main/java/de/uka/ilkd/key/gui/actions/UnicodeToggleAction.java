@@ -1,14 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EventObject;
-import javax.swing.*;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 public class UnicodeToggleAction extends MainWindowAction {
@@ -36,7 +39,7 @@ public class UnicodeToggleAction extends MainWindowAction {
         // Attention: The listener is never// removed, because there is only one
         // MainWindow!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addPropertyChangeListener(viewSettingsListener);
+                .addPropertyChangeListener(ViewSettings.USE_UNICODE, viewSettingsListener);
         updateSelectedState();
     }
 
@@ -62,14 +65,13 @@ public class UnicodeToggleAction extends MainWindowAction {
                                                                         // UI will react on the
                                                                         // settings change event!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUseUnicode(useUnicode);
-        updateMainWindow();
     }
 
     protected void updateMainWindow() {
         mainWindow.makePrettyView();
     }
 
-    protected void handleViewSettingsChanged(EventObject e) {
+    protected void handleViewSettingsChanged(PropertyChangeEvent e) {
         updateSelectedState();
         updateMainWindow();
     }

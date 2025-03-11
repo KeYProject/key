@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 
 import java.awt.*;
 import java.text.Format;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -17,6 +19,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,6 +187,28 @@ public class SimpleSettingsPanel extends JPanel {
         JLabel infoButton =
             new JLabel(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
         infoButton.setToolTipText(s);
+        return infoButton;
+    }
+
+    public static JLabel createHelpTextLabel(String s) {
+        if (s == null || s.isEmpty()) {
+            s = "";
+        }
+        if (s.contains("\n")) {
+            s = s.substring(0, s.indexOf('\n'));
+        }
+
+        JLabel infoButton = new JLabel(s);
+        infoButton.setFont(infoButton.getFont().deriveFont(10f));
+        infoButton.setBackground(Color.orange);
+        return infoButton;
+    }
+
+    public static JButton createHelpButton(Runnable callback) {
+        var infoButton =
+            new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+        infoButton.setToolTipText("Open online help...");
+        infoButton.addActionListener(e -> callback.run());
         return infoButton;
     }
 

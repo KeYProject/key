@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import java.util.Iterator;
@@ -6,11 +9,13 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -212,7 +217,7 @@ public abstract class Notation {
             assert t.op() == UpdateApplication.UPDATE_APPLICATION;
             final Operator targetOp = UpdateApplication.getTarget(t).op();
             final int assTarget =
-                (t.sort() == Sort.FORMULA ? (targetOp.arity() == 1 ? 60 : 85) : 110);
+                (t.sort() == JavaDLTheory.FORMULA ? (targetOp.arity() == 1 ? 60 : 85) : 110);
 
             sp.printUpdateApplicationTerm("{", "}", t, assTarget);
         }
@@ -262,7 +267,8 @@ public abstract class Notation {
         public void print(Term t, LogicPrinter sp) {
             QuantifiableVariable v = instQV(t, sp, 1);
             final int assTarget =
-                (t.sort() == Sort.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60) : 110);
+                (t.sort() == JavaDLTheory.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60)
+                        : 110);
             sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1), assTarget);
         }
 
@@ -358,6 +364,20 @@ public abstract class Notation {
         @Override
         public void printWithHeap(Term t, LogicPrinter sp, Term heapTerm) {
             sp.printSelect(t, heapTerm);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for select.
+     */
+    public static final class FinalNotation extends Notation {
+        public FinalNotation() {
+            super(140);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) {
+            sp.printFinal(t);
         }
     }
 

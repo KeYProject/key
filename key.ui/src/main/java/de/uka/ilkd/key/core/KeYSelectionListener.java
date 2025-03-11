@@ -1,5 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
+
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * The KeYSelectionListener is notified if the proof or the node the user works with has changed.
@@ -14,7 +20,7 @@ public interface KeYSelectionListener {
      *
      * @param e event with details about the new selection
      */
-    default void selectedNodeChanged(KeYSelectionEvent e) {
+    default void selectedNodeChanged(KeYSelectionEvent<Node> e) {
 
     }
 
@@ -26,7 +32,7 @@ public interface KeYSelectionListener {
      *
      * @param e event with details about the new selection
      */
-    default void selectedProofChanged(KeYSelectionEvent e) {
+    default void selectedProofChanged(KeYSelectionEvent<Proof> e) {
 
     }
 

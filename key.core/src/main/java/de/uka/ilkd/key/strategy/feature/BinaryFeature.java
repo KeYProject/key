@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -19,8 +22,9 @@ public abstract class BinaryFeature implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return filter(app, pos, goal) ? ZERO_COST : TOP_COST;
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        return filter(app, pos, goal, mState) ? ZERO_COST : TOP_COST;
     }
 
     /**
@@ -30,8 +34,10 @@ public abstract class BinaryFeature implements Feature {
      * @param app the RuleApp
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
-     * @return true iff the the result of the feature is supposed to be zero.
+     * @param mState mutable state needed for feature computation
+     * @return true iff the result of the feature is supposed to be zero.
      */
-    protected abstract boolean filter(RuleApp app, PosInOccurrence pos, Goal goal);
+    protected abstract boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState);
 
 }

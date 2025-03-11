@@ -1,6 +1,6 @@
-/**
- * Created on: Aug 15, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
 
@@ -165,10 +165,9 @@ public class SMTTermNumber extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermNumber)) {
+        if (!(term instanceof SMTTermNumber tn)) {
             return false;
         }
-        SMTTermNumber tn = (SMTTermNumber) term;
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
     }
@@ -183,10 +182,9 @@ public class SMTTermNumber extends SMTTerm {
             return true;
         }
 
-        if (!(term instanceof SMTTermNumber)) {
+        if (!(term instanceof SMTTermNumber tn)) {
             return false;
         }
-        SMTTermNumber tn = (SMTTermNumber) term;
 
         return this.intValue == tn.intValue && this.bitSize == tn.bitSize;
     }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -9,25 +12,26 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -49,7 +53,7 @@ public class Node implements Iterable<Node> {
     private final Proof proof;
 
     /** The parent node. **/
-    private Node parent = null;
+    private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
      */
@@ -73,7 +77,7 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
+    private ImmutableList<JFunction> localFunctions = ImmutableSLList.nil();
 
     private boolean closed = false;
 
@@ -106,8 +110,7 @@ public class Node implements Iterable<Node> {
 
     private String cachedName = null;
 
-    @Nullable
-    private Lookup userData = null;
+    private @Nullable Lookup userData = null;
 
 
     /**
@@ -118,7 +121,7 @@ public class Node implements Iterable<Node> {
         DefaultImmutableSet.nil();
 
     /**
-     * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
+     * Holds the undo methods for the information added by rules to the {@code Goal.strategyInfos}.
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
@@ -228,10 +231,10 @@ public class Node implements Iterable<Node> {
 
     /**
      * Returns the set of created program variables known in this node.
-     *
+     * <p>
      * In the resulting list, the newest additions come first.
      *
-     * @returns a non-null immutable list of program variables.
+     * @return a non-null immutable list of program variables.
      */
     public ImmutableList<IProgramVariable> getLocalProgVars() {
         return localProgVars;
@@ -250,12 +253,12 @@ public class Node implements Iterable<Node> {
      *
      * @return a non-null immutable list of function symbols.
      */
-    public Iterable<Function> getLocalFunctions() {
+    public Iterable<JFunction> getLocalFunctions() {
         return localFunctions;
     }
 
-    public void addLocalFunctions(Collection<? extends Function> elements) {
-        for (Function op : elements) {
+    public void addLocalFunctions(Collection<? extends JFunction> elements) {
+        for (JFunction op : elements) {
             localFunctions = localFunctions.prepend(op);
         }
     }
@@ -272,7 +275,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
-    public Node parent() {
+    public @Nullable Node parent() {
         return parent;
     }
 
@@ -454,7 +457,14 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @return an iterator for all nodes in the subtree.
+     * @return the direct children of this node.
+     */
+    public Collection<Node> children() {
+        return Collections.unmodifiableList(children);
+    }
+
+    /**
+     * @return an iterator for all nodes in the subtree (including this node).
      */
     public Iterator<Node> subtreeIterator() {
         return new SubtreeIterator(this);
@@ -801,7 +811,7 @@ public class Node implements Iterable<Node> {
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
+    public @NonNull Lookup getUserData() {
         if (userData == null) {
             userData = new Lookup();
         }

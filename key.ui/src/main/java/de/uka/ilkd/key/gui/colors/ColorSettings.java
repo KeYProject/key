@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.colors;
 
 import java.awt.*;
@@ -5,16 +8,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,20 +30,30 @@ import org.slf4j.LoggerFactory;
  * @version 1 (10.05.19)
  */
 public class ColorSettings extends AbstractPropertiesSettings {
-    public static final String SETTINGS_FILENAME = "colors.properties";
-    public static final File SETTINGS_FILE =
-        new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
+    public static final File SETTINGS_FILE_NEW =
+        new File(PathConfig.getKeyConfigDir(), "colors.json");
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
-    private ColorSettings(Properties settings) {
-        readSettings(settings);
+    public ColorSettings(Configuration load) {
+        super("");
+        readSettings(load);
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
     public static ColorSettings getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new ColorSettings(SettingsManager.loadProperties(SETTINGS_FILE));
+            if (SETTINGS_FILE_NEW.exists()) {
+                try {
+                    LOGGER.info("Load color settings from file {}", SETTINGS_FILE_NEW);
+                    INSTANCE = new ColorSettings(Configuration.load(SETTINGS_FILE_NEW));
+                    return INSTANCE;
+                } catch (IOException e) {
+                    LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
+                }
+            }
+            INSTANCE = new ColorSettings(new Configuration());
+            return INSTANCE;
         }
         return INSTANCE;
     }
@@ -70,12 +83,13 @@ public class ColorSettings extends AbstractPropertiesSettings {
     /**
      * Writes the current settings to default location.
      *
-     * @see #SETTINGS_FILE
+     * @see #SETTINGS_FILE_NEW
      */
     public void save() {
-        LOGGER.info("Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
-            properties.store(writer, "KeY's Colors");
+        LOGGER.info("Save color settings to: {}", SETTINGS_FILE_NEW.getAbsolutePath());
+        try (Writer writer = new FileWriter(SETTINGS_FILE_NEW)) {
+            var config = new Configuration(properties);
+            config.save(writer, "KeY's Colors");
             writer.flush();
         } catch (IOException ex) {
             LOGGER.error("Failed to save color settings", ex);
@@ -120,7 +134,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
                 return toHex(currentValue);
             }
 
-            String v = properties.getProperty(key);
+            String v = properties.get(key).toString();
 
             try {
                 return v;
@@ -130,11 +144,16 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
 
         @Override
+        public Color fromObject(@Nullable Object o) {
+            return fromHex(o.toString());
+        }
+
+        @Override
         public void parseFrom(String v) {
             final var old = value();
             if (!Objects.equals(old, v)) {
                 currentValue = fromHex(v);
-                properties.setProperty(getKey(), v);
+                properties.put(getKey(), v);
                 firePropertyChange(getKey(), old, currentValue);
             }
         }
@@ -149,7 +168,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             if (currentValue != value) {
                 var old = currentValue;
                 currentValue = value;
-                properties.setProperty(getKey(), toHex(value));
+                properties.put(getKey(), toHex(value));
                 firePropertyChange(getKey(), old, value);
             }
         }
@@ -160,7 +179,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
                 return currentValue;
             }
 
-            String v = properties.getProperty(key);
+            String v = (String) properties.get(key);
 
             try {
                 return currentValue = fromHex(v);
@@ -177,6 +196,6 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
     @Override
     public void readSettings(Properties props) {
-        this.properties.putAll(props);
+        props.forEach((k, v) -> this.properties.put(k.toString(), v));
     }
 }

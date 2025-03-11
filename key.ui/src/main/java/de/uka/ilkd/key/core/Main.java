@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -206,9 +210,10 @@ public final class Main {
         LOGGER.debug("OS: {}", System.getProperty("java.os"));
         LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
         Runtime rt = Runtime.getRuntime();
-        LOGGER.debug("Total memory: {} MB", (rt.totalMemory() / 1048576.0));
-        LOGGER.debug("Maximum memory:  {} MB", (rt.maxMemory() / 1048576.0));
-        LOGGER.debug("Free memory: {} MB", (rt.freeMemory() / 1048576.0));
+        LOGGER.info("Memory: total {} MB, max {} MB, free {} MB",
+            rt.totalMemory() / 1048576.0,
+            rt.maxMemory() / 1048576.0,
+            rt.freeMemory() / 1048576.0);
         LOGGER.debug("Available processors: {}", rt.availableProcessors());
     }
 
@@ -441,7 +446,7 @@ public final class Main {
                     break;
                 }
             }
-            if (macro.equals("") || autoMacro instanceof SkipMacro) {
+            if (macro.isEmpty() || autoMacro instanceof SkipMacro) {
                 LOGGER.warn("No automatic proof macro specified.");
             }
         }
@@ -470,8 +475,10 @@ public final class Main {
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
         LOGGER.debug("Experimental Features: {}", state);
+        ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings().setActivateAll(state);
     }
 
+    @Deprecated
     public static boolean isExperimentalMode() {
         return experimentalMode;
     }
@@ -542,7 +549,40 @@ public final class Main {
     public static void ensureExamplesAvailable() {
         File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
                 : new File(getExamplesDir());
+        if (!examplesDir.exists()) {
+            examplesDir = setupExamples();
+        }
         setExamplesDir(examplesDir.getAbsolutePath());
+    }
+
+    private static File setupExamples() {
+        try {
+            URL examplesURL = Main.class.getResource("/examples.zip");
+            if (examplesURL == null) {
+                throw new IOException("Missing examples.zip in resources");
+            }
+
+            File tempDir = createTempDirectory();
+
+            if (tempDir != null) {
+                IOUtil.extractZip(examplesURL.openStream(), tempDir.toPath());
+            }
+            return tempDir;
+        } catch (IOException e) {
+            LOGGER.warn("Error setting up examples", e);
+            return null;
+        }
+    }
+
+
+    private static File createTempDirectory() throws IOException {
+        final File tempDir = File.createTempFile("keyheap-examples-", null);
+        tempDir.delete();
+        if (!tempDir.mkdir()) {
+            return null;
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> IOUtil.delete(tempDir)));
+        return tempDir;
     }
 
     private static void evaluateLemmataOptions(CommandLine options) {

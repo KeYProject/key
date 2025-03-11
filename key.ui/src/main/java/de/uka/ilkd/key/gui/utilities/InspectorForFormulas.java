@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 
 /**
@@ -33,7 +36,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
             return NO_USER_INPUT;
         }
 
-        if (term.sort() != Sort.FORMULA) {
+        if (term.sort() != JavaDLTheory.FORMULA) {
             return "Not a formula.";
         }
         return null;

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import java.util.LinkedList;
@@ -9,6 +12,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 
 import org.key_project.util.collection.ImmutableArray;
+
 
 /**
  * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for pretty-printing should be

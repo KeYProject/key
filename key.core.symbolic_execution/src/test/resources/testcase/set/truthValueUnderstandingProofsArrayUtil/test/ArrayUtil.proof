@@ -43,13 +43,12 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Fri Mar 23 14:47:12 CET 2018
-name=ArrayUtil[ArrayUtil\\:\\:minIndex([I)].JML normal_behavior operation contract.0
-addSymbolicExecutionLabel=true
-contract=ArrayUtil[ArrayUtil\\:\\:minIndex([I)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "ArrayUtil[ArrayUtil::minIndex([I)].JML normal_behavior operation contract.0",
+	"addSymbolicExecutionLabel": true,
+	"contract": "ArrayUtil[ArrayUtil::minIndex([I)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "bubel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))

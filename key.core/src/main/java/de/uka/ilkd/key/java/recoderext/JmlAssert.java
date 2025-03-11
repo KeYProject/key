@@ -1,5 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
@@ -18,33 +22,29 @@ import recoder.java.statement.JavaStatement;
 public class JmlAssert extends JavaStatement {
 
     /**
-     * The kind of this statment either ASSERT or ASSUME
+     * The kind of this statement either ASSERT or ASSUME
      */
     private final TextualJMLAssertStatement.Kind kind;
     private final AssertionProofContext assertionProof;
 
-    /*
-     * condition should be an Expression, but as KeY doesn't support some jml Expressions as
-     * Expression Objects e.g. \forall keep this as the parse tree for now (blockcontracts seem to
-     * handle this similar)
-     */
+
     /**
      * The condition of this statement in parse tree form
      */
     // this isn't serializable, but that shouldn't be a problem for KeY
-    private final LabeledParserRuleContext condition;
+    private final KeyAst.Expression condition;
     private final String optLabel;
 
     /**
-     * @param kind      the kind of this statment
+     * @param kind the kind of this statement
      * @param condition the condition for this statement
      * @param optLabel
      */
-    public JmlAssert(Kind kind, LabeledParserRuleContext condition, String optLabel) {
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, KeyAst.Expression condition, String optLabel) {
         this(kind, condition, null, optLabel);
     }
 
-    public JmlAssert(Kind kind, LabeledParserRuleContext condition,
+    public JmlAssert(Kind kind,  KeyAst.Expression condition,
                      AssertionProofContext assertionProof, String optLabel) {
         this.kind = kind;
         this.assertionProof = assertionProof;
@@ -55,7 +55,7 @@ public class JmlAssert extends JavaStatement {
     /**
      * copy constructor
      *
-     * @param proto the orginal JML assert statement to copy
+     * @param proto the original JML assert statement to copy
      */
     public JmlAssert(JmlAssert proto) {
         super(proto);
@@ -69,7 +69,7 @@ public class JmlAssert extends JavaStatement {
         return kind;
     }
 
-    public LabeledParserRuleContext getCondition() {
+    public KeyAst.Expression getCondition() {
         return condition;
     }
 

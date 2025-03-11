@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -6,10 +9,12 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 
 /**
  * This class is used by LogicPrinter.java to print out select-terms, i.e. terms of the following
@@ -19,8 +24,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class SelectPrinter extends FieldPrinter {
 
-    SelectPrinter(Services services) {
+    private final NotationInfo ni;
+
+    SelectPrinter(NotationInfo ni, Services services) {
         super(services);
+        this.ni = ni;
     }
 
     /*
@@ -53,7 +61,7 @@ class SelectPrinter extends FieldPrinter {
                 } else {
                     lp.printFunctionTerm(t);
                 }
-            } else if (t.sort().equals(Sort.ANY)) {
+            } else if (t.sort().equals(JavaDLTheory.ANY)) {
                 /*
                  * This section deals with PP of frame conditions (and similar). Select-type is any.
                  */
@@ -66,7 +74,11 @@ class SelectPrinter extends FieldPrinter {
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 // object properties denoted like o.<created>
                 printBuiltinObjectProperty(lp, t, heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (isStaticFieldConstant(objectTerm, fieldTerm)
+
+            } else if (ni.isFinalImmutable() && isFinalFieldConstant(fieldTerm)) {
+                // final field access: do not pretty print the sect term but only the final term.
+                lp.printFunctionTerm(t);
+            } else if (isStaticFieldConstant(fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
                 // static field access
                 printStaticJavaFieldConstant(lp, fieldTerm, heapTerm, tacitHeap);
@@ -124,11 +136,15 @@ class SelectPrinter extends FieldPrinter {
      * Print a static field constant.
      */
     private void printStaticJavaFieldConstant(LogicPrinter lp, final Term fieldTerm,
+
             final Term heapTerm,
             Term tacitHeap) {
         lp.layouter.startTerm(3);
         /*
          * Is consideration for static arrays missing in this? (Kai Wallisch 08/2014)
+         *
+         * No, array accesses are not static selects.
+         * This only handles the access to the static array reference.
          */
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check.dependency;
 
 import java.util.ArrayList;
@@ -5,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -79,8 +81,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
 
     @Override
     protected void doAction(NodeIntermediate node) {
-        if (node instanceof AppNodeIntermediate) {
-            AppNodeIntermediate appNode = (AppNodeIntermediate) node;
+        if (node instanceof AppNodeIntermediate appNode) {
             AppIntermediate appIntermediate = appNode.getIntermediateRuleApp();
             String ruleName = appIntermediate.getRuleName();
 
@@ -147,7 +148,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         Set<ClassAxiom> axioms = specRepo.getClassAxioms(classType).toSet();
         List<ClassAxiom> axiomList = axioms.stream()
                 .filter(a -> a.getName().equals(axiomName))
-                .collect(Collectors.toList());
+                .toList();
         /*
          * the assertions below always hold for current KeY implementation, where
          * only one model method with same name is allowed (no overloading)
@@ -190,15 +191,16 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         ImmutableSet<Contract> contracts = specRepo.splitContract(c);
 
         // load information about the modality under which the contract was applied
-        Modality modality = Modality.getModality(biApp.getModality());
+        Modality.JavaModalityKind modalityKind =
+            Modality.JavaModalityKind.getKind(biApp.getModality());
         DependencyGraph.EdgeType edgeType;
-        if (modality == null) {
+        if (modalityKind == null) {
             // in default case (e.g. legacy proofs without saved modality information)
             // we assume diamond modality but print a warning
             logger.print(LogLevel.WARNING, "No saved modality information was found!" +
                 " Assuming \"diamond\" (incomplete for box contracts)!");
             edgeType = TERMINATION_SENSITIVE;
-        } else if (modality.terminationSensitive()) {
+        } else if (modalityKind.terminationSensitive()) {
             edgeType = TERMINATION_SENSITIVE;
         } else {
             edgeType = TERMINATION_INSENSITIVE;

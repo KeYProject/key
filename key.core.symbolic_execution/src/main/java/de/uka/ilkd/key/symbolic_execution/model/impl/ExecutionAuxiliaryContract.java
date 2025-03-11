@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.LinkedHashMap;
@@ -11,7 +14,6 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -28,6 +30,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.logic.Named;
 
 /**
  * The default implementation of {@link IExecutionAuxiliaryContract}.
@@ -167,15 +171,14 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             for (Term sub : term.subs()) {
                 collectRemembranceVariables(sub, remembranceHeaps, remembranceLocalVariables);
             }
-        } else if (term.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) term.op();
+        } else if (term.op() instanceof ElementaryUpdate eu) {
             if (SymbolicExecutionUtil.isHeap(eu.lhs(),
                 getServices().getTypeConverter().getHeapLDT())) {
                 remembranceHeaps.put((LocationVariable) term.sub(0).op(),
-                    getServices().getTermBuilder().var(eu.lhs()));
+                    getServices().getTermBuilder().varOfUpdateableOp(eu.lhs()));
             } else {
                 remembranceLocalVariables.put((LocationVariable) term.sub(0).op(),
-                    getServices().getTermBuilder().var(eu.lhs()));
+                    getServices().getTermBuilder().varOfUpdateableOp(eu.lhs()));
             }
         } else {
             assert false : "Unsupported update term with operator '" + term.op() + "'.";

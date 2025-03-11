@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.StatementBlock;
@@ -6,7 +9,7 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 import org.key_project.util.collection.ImmutableList;
@@ -76,7 +79,7 @@ public interface SpecExtractor {
      * @param methodParams TODO
      */
     ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<ProgramVariable> methodParams)
+            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException;
 
     /**
@@ -106,4 +109,6 @@ public interface SpecExtractor {
      * unsupported features which have been ignored by the translation)
      */
     ImmutableList<PositionedString> getWarnings();
+
+    Contract createDefaultContract(IProgramMethod pm, boolean useSoundDefault);
 }

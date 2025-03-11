@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
@@ -26,15 +29,15 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
          * changed if needed.
          */
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        ProgramVariable self =
-            services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        JmlIO io = new JmlIO().services(getServices()).classType(containerType)
+        var self = (LocationVariable) services.getJavaInfo()
+                .getCanonicalFieldProgramVariable("next", containerType);
+        JmlIO io = new JmlIO(getServices()).classType(containerType)
                 .specMathMode(SpecMathMode.BIGINT).selfVar(self);
         return io.parseExpression(p);
     }
 
     /*
-     * Test whether {@link KeYJMLParser} parses left-associatively for operators that have same
+     * Test whether {@link KeYJMLParser} parses left-associatively for operators that have the same
      * precedence.
      *
      * Example 1 + 2 - 3 + 4 = ??? Left-associative parsing: (((1 + 2) - 3) + 4) = 4

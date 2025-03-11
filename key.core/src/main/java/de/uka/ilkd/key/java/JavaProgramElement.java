@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -75,16 +78,6 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         return comments;
     }
 
-
-    /**
-     * commented in interface SourceElement. The default equals method compares two elements by
-     * testing if they have the same type and calling the default equals method.
-     */
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return (this.getClass() == se.getClass());
-    }
-
     protected int computeHashCode() {
         int result = 17 * this.getClass().hashCode();
         return result;
@@ -111,11 +104,10 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         if (o == this) {
             return true;
         }
-        if (o == null || o.getClass() != this.getClass()) {
+        if (o == null) {
             return false;
         }
-
-        return equalsModRenaming((JavaProgramElement) o, NameAbstractionTableDisabled.INSTANCE);
+        return (this.getClass() == o.getClass());
     }
 
 

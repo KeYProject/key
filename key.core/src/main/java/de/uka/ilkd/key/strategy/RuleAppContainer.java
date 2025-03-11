@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -115,11 +118,4 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         return result;
     }
 
-    @Override
-    public String toString() {
-        return "RuleAppContainer{" +
-            "ruleApp=" + ruleApp.rule().name() +
-            ", cost=" + cost +
-            '}';
-    }
 }

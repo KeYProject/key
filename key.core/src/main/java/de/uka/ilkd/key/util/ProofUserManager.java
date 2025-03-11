@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.util.HashSet;
@@ -76,7 +79,7 @@ public final class ProofUserManager {
      * automatically disposed via {@link Proof#dispose()}.
      *
      * @param proof The {@link Proof}.
-     * @param userThe user.
+     * @param user The user.
      */
     public void removeUserAndDispose(Proof proof, Object user) {
         if (proof == null) {

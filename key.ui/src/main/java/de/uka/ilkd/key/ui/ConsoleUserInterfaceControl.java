@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
 import java.io.*;
@@ -17,7 +20,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -28,6 +31,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
@@ -36,7 +40,6 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -128,48 +131,56 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         super.taskFinished(info);
         progressMax = 0; // reset progress bar marker
         final Proof proof = info.getProof();
+        final Object result = info.getResult();
         if (proof == null) {
-            final Object error = info.getResult();
             LOGGER.info("Proof loading failed");
-            if (error instanceof Throwable) {
-                LOGGER.info("Proof loading failed", (Throwable) error);
+            if (result instanceof Throwable thrown) {
+                LOGGER.info("Proof loading failed", thrown);
             } else {
                 LOGGER.info("Proof loading failed");
             }
             System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
-        final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
-                printResults(openGoals, info, result2);
+                printResults(openGoals, info, result);
             }
         } else if (info.getSource() instanceof ProblemLoader) {
-            LOGGER.debug("{}", result2);
-            System.exit(-1);
-        }
-        if (loadOnly || openGoals == 0) {
-            LOGGER.info("Number of open goals after loading: {}", openGoals);
-            System.exit(0);
-        }
-        ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-        if (problemLoader.hasProofScript()) {
-            try {
-                Pair<String, Location> script = problemLoader.readProofScript();
-                ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-                this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                pse.execute(this, proof);
-                // The start and end messages are fake to persuade the system ...
-                // All this here should refactored anyway ...
-                this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
-            } catch (Exception e) {
-                LOGGER.debug("", e);
+            if (result != null) {
+                LOGGER.debug("{}", result);
+                if (result instanceof Throwable thrown) {
+                    LOGGER.debug("Exception: ", thrown);
+                }
                 System.exit(-1);
             }
-        } else if (macroChosen()) {
-            applyMacro();
-        } else {
-            finish(proof);
+            if (loadOnly || openGoals == 0) {
+                LOGGER.info("Number of open goals after loading: {}", openGoals);
+                System.exit(0);
+            }
+            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+            if (problemLoader.hasProofScript()) {
+                try {
+                    ProofScriptEntry script = problemLoader.getProofScript();
+                    if (script != null) {
+                        ProofScriptEngine pse =
+                            new ProofScriptEngine(script.script(), script.location());
+                        this.taskStarted(
+                            new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                        pse.execute(this, proof);
+                        // The start and end messages are fake to persuade the system ...
+                        // All this here should refactored anyway ...
+                        this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug("", e);
+                    System.exit(-1);
+                }
+            } else if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
+            }
         }
     }
 
@@ -177,11 +188,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        progressMax = info.getSize();
-        if (TaskKind.Strategy.equals(info.getKind())) {
-            System.out.println(info.getMessage() + " ["); // start progress bar
+        progressMax = info.size();
+        if (TaskKind.Strategy.equals(info.kind())) {
+            System.out.println(info.message() + " ["); // start progress bar
         } else {
-            System.out.println(info.getMessage());
+            System.out.println(info.message());
         }
     }
 
@@ -221,7 +232,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
-        mediator.setProof(pa.getFirstProof());
+        mediator.getSelectionModel().setSelectedProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
 
@@ -309,7 +320,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             Proof p = proofStack.head();
             proofStack = proofStack.removeAll(p);
             assert p.name().equals(e.getSource().name());
-            mediator.setProof(proofStack.head());
+            mediator.getSelectionModel().setSelectedProof(proofStack.head());
         } else {
             // proofStack might be empty, though proof != null. This can
             // happen for symbolic execution tests, if proofCreated was not
@@ -379,9 +390,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
         try {
             // a copy with running number to compare different runs
-            proof.saveToFile(new File(f.getAbsolutePath()));
+            ProofSaver.saveToFile(new File(f.getAbsolutePath()), proof);
             // save current proof under common name as well
-            proof.saveToFile(new File(baseName + ".auto.proof"));
+            ProofSaver.saveToFile(new File(baseName + ".auto.proof"), proof);
 
             // save proof statistics
             ShowProofStatistics.getCSVStatisticsMessage(proof);

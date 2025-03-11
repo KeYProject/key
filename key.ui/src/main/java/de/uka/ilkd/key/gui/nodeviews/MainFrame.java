@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -23,16 +26,15 @@ public final class MainFrame extends JPanel {
     private static final long serialVersionUID = -2412537422601138379L;
 
     private final JScrollPane scrollPane = new JScrollPane();
-    private Component content;
+    private SequentView sequentView;
     private boolean showTacletInfo = false;
 
-    public Component setContent(Component component) {
-        Component oldContent = content;
-        content = component;
-        if (component instanceof SequentView) {
-            SequentView sequentView = (SequentView) component;
+    public void setSequentView(SequentView component) {
+        SequentView oldSequentView = sequentView;
+        sequentView = component;
+        if (component != null) {
             Point oldSequentViewPosition = scrollPane.getViewport().getViewPosition();
-            scrollPane.setViewportView(new SequentViewPanel(sequentView));
+            scrollPane.setViewportView(new SequentViewPanel(component));
             scrollPane.getViewport().setViewPosition(oldSequentViewPosition);
 
             setShowTacletInfo(showTacletInfo);
@@ -40,11 +42,10 @@ public final class MainFrame extends JPanel {
             scrollPane.setViewportView(component);
         }
 
-        if (oldContent instanceof SequentView) {
-            ((SequentView) oldContent).removeUserSelectionHighlight();
+        if (oldSequentView != null) {
+            oldSequentView.removeUserSelectionHighlight();
         }
 
-        return oldContent;
     }
 
     public MainFrame(final MainWindow mainWindow, EmptySequent emptySequent) {
@@ -56,8 +57,8 @@ public final class MainFrame extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (content != null) {
-                    for (MouseListener listener : content.getMouseListeners()) {
+                if (sequentView != null) {
+                    for (MouseListener listener : sequentView.getMouseListeners()) {
                         if (listener instanceof SequentViewInputListener) {
                             listener.mouseClicked(e);
                         }
@@ -70,8 +71,8 @@ public final class MainFrame extends JPanel {
 
             @Override
             public void ancestorRemoved(AncestorEvent event) {
-                if (content instanceof SequentView) {
-                    ((SequentView) content).removeUserSelectionHighlight();
+                if (sequentView != null) {
+                    sequentView.removeUserSelectionHighlight();
                 }
             }
 
@@ -84,18 +85,17 @@ public final class MainFrame extends JPanel {
 
         // FIXME put this somewhere descent
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "copy");
+            Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
         setLayout(new BorderLayout());
         add(scrollPane);
-        setContent(emptySequent);
+        setSequentView(emptySequent);
     }
 
     public void setShowTacletInfo(boolean showTacletInfo) {
         this.showTacletInfo = showTacletInfo;
 
-        if (content instanceof InnerNodeView) {
-            InnerNodeView view = (InnerNodeView) content;
+        if (sequentView instanceof InnerNodeView view) {
             view.tacletInfo.setVisible(this.showTacletInfo);
         }
     }
@@ -111,5 +111,9 @@ public final class MainFrame extends JPanel {
      */
     public void scrollTo(int y) {
         scrollPane.getVerticalScrollBar().setValue(y);
+    }
+
+    public SequentView getSequentView() {
+        return sequentView;
     }
 }

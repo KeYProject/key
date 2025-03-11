@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
@@ -10,12 +13,13 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -67,26 +71,7 @@ public class LexPathOrdering implements TermOrdering {
     };
 
 
-    private final static class CacheKey {
-        public final Term left;
-        public final Term right;
-
-        public CacheKey(final Term left, final Term right) {
-            this.left = left;
-            this.right = right;
-        }
-
-        public boolean equals(Object arg0) {
-            if (!(arg0 instanceof CacheKey)) {
-                return false;
-            }
-            final CacheKey key0 = (CacheKey) arg0;
-            return left.equals(key0.left) && right.equals(key0.right);
-        }
-
-        public int hashCode() {
-            return left.hashCode() + 2 * right.hashCode();
-        }
+    private record CacheKey(Term left, Term right) {
     }
 
 
@@ -393,10 +378,10 @@ public class LexPathOrdering implements TermOrdering {
             if (p_op.name().equals(IntegerLDT.CHAR_ID_NAME)) {
                 return 1;
             }
-            if (p_op instanceof Function && ((Function) p_op).sort() instanceof NullSort) {
+            if (p_op instanceof JFunction && ((Function) p_op).sort() instanceof NullSort) {
                 return 2;
             }
-            if (p_op instanceof Function && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
+            if (p_op instanceof JFunction && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
                 return 3;
             }
 
@@ -450,7 +435,7 @@ public class LexPathOrdering implements TermOrdering {
             if (opStr.equals("heap")) {
                 return 0;
             }
-            if (p_op instanceof Function && ((Function) p_op).isUnique()) {
+            if (p_op instanceof JFunction && ((Function) p_op).isUnique()) {
                 return 5;
             }
             if (opStr.equals("pair")) {

@@ -1,15 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
@@ -32,6 +37,9 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
     public void searchNext() {
         fillCache();
+        if (cache.isEmpty()) {
+            return; // no results to switch to
+        }
         startRow = currentRow + 1;
         startRow %= cache.size();
         search(searchField.getText(), Position.Bias.Forward);
@@ -39,18 +47,21 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
     public void searchPrevious() {
         fillCache();
+        if (cache.isEmpty()) {
+            return; // no results to switch to
+        }
         startRow = currentRow - 1;
         startRow %= cache.size();
         search(searchField.getText(), Position.Bias.Backward);
     }
 
-    public boolean search(@Nonnull String searchString) {
+    public boolean search(@NonNull String searchString) {
         fillCache();
         return search(searchString, Position.Bias.Forward);
     }
 
     private synchronized boolean search(String searchString, Position.Bias direction) {
-        if (searchString.equals("")) {
+        if (searchString.isEmpty()) {
             startRow = 0;
         }
         currentRow = getNextMatch(searchString, startRow, direction);
@@ -61,11 +72,12 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
             tp = new TreePath(node.getPath());
         }
         if (node instanceof GUIBranchNode) {
-            this.proofTreeView.selectBranchNode((GUIBranchNode) node);
-        } else {
-            this.proofTreeView.delegateView.scrollPathToVisible(tp);
-            this.proofTreeView.delegateView.setSelectionPath(tp);
+            tp = this.proofTreeView.selectBranchNode((GUIBranchNode) node);
         }
+
+        this.proofTreeView.delegateView.scrollPathToVisible(tp);
+        this.proofTreeView.delegateView.setSelectionPath(tp);
+
         return currentRow != -1;
     }
 
@@ -98,9 +110,11 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     private void fillCache() {
         if (cache == null) {
             cache = new ArrayList<>();
-            if (this.proofTreeView.delegateModel.getRoot() != null) {
-                addNodeToCache((GUIAbstractTreeNode) this.proofTreeView.delegateModel.getRoot());
-                fillCacheHelp((GUIBranchNode) this.proofTreeView.delegateModel.getRoot());
+            final GUIProofTreeModel delegateModel = this.proofTreeView.getDelegateModel();
+            if (delegateModel != null
+                    && delegateModel.getRoot() != null) {
+                addNodeToCache((GUIAbstractTreeNode) delegateModel.getRoot());
+                fillCacheHelp((GUIBranchNode) delegateModel.getRoot());
             }
         }
     }
@@ -109,17 +123,17 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         if (branch == null) {
             return;
         }
-        GUIAbstractTreeNode n;
-        for (int i = 0; i < this.proofTreeView.delegateModel.getChildCount(branch); i++) {
-            n = (GUIAbstractTreeNode) this.proofTreeView.delegateModel.getChild(branch, i);
+        final GUIProofTreeModel delegateModel = this.proofTreeView.getDelegateModel();
+        for (int i = 0; i < delegateModel.getChildCount(branch); i++) {
+            final GUIAbstractTreeNode n = (GUIAbstractTreeNode) delegateModel.getChild(branch, i);
             addNodeToCache(n);
-            if (n instanceof GUIBranchNode) {
-                fillCacheHelp((GUIBranchNode) n);
+            if (n instanceof GUIBranchNode branchNode) {
+                fillCacheHelp(branchNode);
             }
         }
     }
 
-    private int getNextMatch(@Nonnull String searchString, int startingRow, Position.Bias bias) {
+    private int getNextMatch(@NonNull String searchString, int startingRow, Position.Bias bias) {
         String s = searchString.toLowerCase();
 
         if (bias == Position.Bias.Forward) {
@@ -161,7 +175,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
      * @param searchString the String to be looked for
      * @return true if a match has been found
      */
-    private boolean nodeContainsString(int node, @Nonnull String searchString) {
+    private boolean nodeContainsString(int node, @NonNull String searchString) {
         return cache.get(node).second.contains(searchString);
     }
 }

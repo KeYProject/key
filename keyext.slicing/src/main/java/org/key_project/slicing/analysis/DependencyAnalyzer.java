@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.analysis;
 
 import java.util.ArrayDeque;
@@ -32,8 +35,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.RuleStatistics;
@@ -42,9 +44,11 @@ import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
+import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,6 +189,8 @@ public final class DependencyAnalyzer {
             throw new IllegalStateException("cannot analyze proof with cached references");
         }
 
+        graph.ensureProofIsTracked(proof);
+
         executionTime.start(TOTAL_WORK);
         proof.setStepIndices();
 
@@ -228,7 +234,7 @@ public final class DependencyAnalyzer {
         executionTime.start(STATISTICS);
         int steps = proof.countNodes() - proof.closedGoals().size()
                 + (int) proof.closedGoals()
-                        .stream().filter(it -> it.node().getAppliedRuleApp() instanceof RuleAppSMT)
+                        .stream().filter(it -> it.node().getAppliedRuleApp() instanceof SMTRuleApp)
                         .count();
         // gather statistics on useful/useless rules
         RuleStatistics rules = getRuleStatistics();
@@ -236,7 +242,7 @@ public final class DependencyAnalyzer {
         executionTime.stop(TOTAL_WORK);
 
         return new AnalysisResults(
-            proof, steps, rules, usefulSteps, usefulFormulas, uselessBranches,
+            proof, graph, steps, rules, usefulSteps, usefulFormulas, uselessBranches,
             branchStacks, doDependencyAnalysis, doDeduplicateRuleApps, executionTime);
     }
 
@@ -382,7 +388,14 @@ public final class DependencyAnalyzer {
             Map<BranchLocation, Collection<GraphNode>> groupedOutputs = new HashMap<>();
             node.childrenIterator().forEachRemaining(
                 x -> groupedOutputs.put(x.getBranchLocation(), new ArrayList<>()));
-            data.outputs.forEach(n -> groupedOutputs.get(n.getBranchLocation()).add(n));
+            data.outputs.forEach(n -> {
+                if (n instanceof PseudoOutput) {
+                    // cut did not any new formulas
+                    // (always leads to cutWasUseful = false)
+                    return;
+                }
+                groupedOutputs.get(n.getBranchLocation()).add(n);
+            });
             boolean cutWasUseful = groupedOutputs.values().stream()
                     .allMatch(l -> l.stream().anyMatch(usefulFormulas::contains));
             if (cutWasUseful) {
@@ -431,7 +444,7 @@ public final class DependencyAnalyzer {
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
             Map<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> foundDupes = new HashMap<>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
-                Node proofNode = t.first;
+                Node proofNode = t.fromNode();
 
                 // this analysis algorithm does not support proofs with State Merging
                 if (proofNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
@@ -452,7 +465,7 @@ public final class DependencyAnalyzer {
                 }
                 // Only try to deduplicate the addition of new formulas.
                 // It is unlikely that two closed goals are derived using the same formula.
-                GraphNode produced = t.second;
+                GraphNode produced = t.toNode();
                 if (!(produced instanceof TrackedFormula)) {
                     return;
                 }
@@ -460,7 +473,7 @@ public final class DependencyAnalyzer {
                         .computeIfAbsent(
                             new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp()),
                             _a -> new LinkedHashSet<>())
-                        .add(t.third.getProofStep());
+                        .add(t.annotation().getProofStep());
             });
 
             // scan dupes, try to find a set of mergable rule applications

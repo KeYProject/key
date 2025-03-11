@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Deque;
@@ -16,6 +19,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.util.collection.ImmutableList;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -101,15 +106,9 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             }
 
             switch (childCount) {
-            case 0:
-                node = choices.pollLast();
-                break;
-
-            case 1:
-                node = node.child(0);
-                break;
-
-            default:
+            case 0 -> node = choices.pollLast();
+            case 1 -> node = node.child(0);
+            default -> {
                 Node next = null;
                 for (int i = 0; i < childCount; i++) {
                     Node child = node.child(i);
@@ -123,7 +122,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
                 }
                 assert next != null;
                 node = next;
-                break;
+            }
             }
         }
 
@@ -136,7 +135,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private boolean contains(Semisequent semiseq, Term formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            if (sf.formula().equalsModRenaming(formula)) {
+            if (sf.formula().equalsModProperty(formula, RENAMING_TERM_PROPERTY)) {
                 return true;
             }
         }

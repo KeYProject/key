@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.util.*;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
@@ -12,15 +14,18 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.settings.FeatureSettings;
 
 import org.key_project.util.reflection.ClassLoaderUtil;
+
+import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 /**
  * This class provides the user interface to the macro extensions.
  *
  * <p>
  * It provides a menu with all macros which are applicable in a given context. The check of of
- * applicability is done using {@link ProofMacro#canApplyTo(KeYMediator, PosInOccurrence)}.
+ * applicability is done using {@link ProofMacro#canApplyTo}.
  *
  * <p>
  * The menu items bear the name returned by {@link ProofMacro#getName()} and the tooltip is set to
@@ -52,6 +57,9 @@ public class ProofMacroMenu extends JMenu {
     public static final Iterable<ProofMacro> REGISTERED_MACROS =
         ClassLoaderUtil.loadServices(ProofMacro.class);
 
+    private static final FeatureSettings.Feature FEATURE_PROOF_SCRIPTS =
+        createFeature("PROOF_SCRIPTS");
+
     /**
      * The number of defined macros.
      */
@@ -59,7 +67,7 @@ public class ProofMacroMenu extends JMenu {
 
     /**
      * Instantiates a new proof macro menu.
-     *
+     * <p>
      * Only applicable macros are added as menu items.
      *
      * @param mediator the mediator of the current proof.
@@ -98,10 +106,25 @@ public class ProofMacroMenu extends JMenu {
             }
         }
 
-        if (Main.isExperimentalMode()) {
-            addSeparator();
-            add(new JMenuItem(new ProofScriptFromFileAction(mediator)));
-            add(new JMenuItem(new ProofScriptInputAction(mediator)));
+        {
+            final var menuItemPSFile = new JMenuItem(new ProofScriptFromFileAction(mediator));
+            final var menuItemPSString = new JMenuItem(new ProofScriptInputAction(mediator));
+
+            if (FeatureSettings.isFeatureActivated(FEATURE_PROOF_SCRIPTS)) {
+                addSeparator();
+                add(menuItemPSFile);
+                add(menuItemPSString);
+            }
+
+            FeatureSettings.on(FEATURE_PROOF_SCRIPTS, (newValue) -> {
+                if (newValue) {
+                    add(menuItemPSFile);
+                    add(menuItemPSString);
+                } else {
+                    remove(menuItemPSFile);
+                    remove(menuItemPSString);
+                }
+            });
         }
 
         mediator.enableWhenProofLoaded(this);

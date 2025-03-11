@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -14,12 +18,12 @@ import java.util.Set;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.useractions.FocussedAutoModeUserAction;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
+import de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -40,6 +44,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
@@ -52,10 +57,11 @@ import org.key_project.util.collection.ImmutableSLList;
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
  * {@link CurrentGoalView}, i.e. when the user clicks on the sequent.
- *
+ * <p>
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
 public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
+    @Serial
     private static final long serialVersionUID = 8151230546928796116L;
 
     private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
@@ -193,8 +199,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 Term t = occ.subTerm();
                 createAbbrevSection(t, control);
 
-                if (t.op() instanceof ProgramVariable) {
-                    ProgramVariable var = (ProgramVariable) t.op();
+                if (t.op() instanceof ProgramVariable var) {
                     if (var.getProgramElementName().getCreationInfo() != null) {
                         createNameCreationInfoSection(control);
                     }
@@ -223,7 +228,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
     private void createSMTMenu(MenuControl control) {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getSMTSettings().getSolverUnions(Main.isExperimentalMode());
+                .getSMTSettings().getSolverUnions();
         if (!solverUnions.isEmpty()) {
             addSeparator();
         }
@@ -238,7 +243,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private void createDelayedCutJoinMenu(MenuControl control) {
-        if (Main.isExperimentalMode()) {
+        if (FeatureSettings.isFeatureActivated(ProofTreePopupFactory.FEATURE_DELAY_CUT)) {
             List<ProspectivePartner> partner = JoinIsApplicable.INSTANCE
                     .isApplicable(mediator.getSelectedGoal(), getPos().getPosInOccurrence());
             if (!partner.isEmpty()) {
@@ -502,8 +507,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             if (e.getSource() instanceof TacletMenuItem) {
                 ((CurrentGoalView) (getPopupMenu().getInvoker()))
                         .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), getPos());
-            } else if (e.getSource() instanceof SMTMenuItem) {
-                final SMTMenuItem item = (SMTMenuItem) e.getSource();
+            } else if (e.getSource() instanceof SMTMenuItem item) {
                 final SolverTypeCollection solverUnion = item.getSolverUnion();
                 final Goal goal = mediator.getSelectedGoal();
                 assert goal != null;
@@ -520,9 +524,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                     launcher.launch(solverUnion.getTypes(), list, goal.proof().getServices());
                 }, "SMTRunner");
                 thread.start();
-            } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
+            } else if (e.getSource() instanceof BuiltInRuleMenuItem birmi) {
 
-                final BuiltInRuleMenuItem birmi = (BuiltInRuleMenuItem) e.getSource();
                 // This method delegates the request only to the UserInterfaceControl which
                 // implements the functionality.
                 // No functionality is allowed in this method body!
@@ -537,23 +540,19 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 PosInOccurrence occ = getPos().getPosInOccurrence();
 
                 switch (((JMenuItem) e.getSource()).getText()) {
-                case DISABLE_ABBREVIATION:
+                case DISABLE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
                         mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
                         getSequentView().printSequent();
                     }
-
-                    break;
-
-                case ENABLE_ABBREVIATION:
+                }
+                case ENABLE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
                         mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), true);
                         getSequentView().printSequent();
                     }
-
-                    break;
-
-                case CREATE_ABBREVIATION:
+                }
+                case CREATE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
                         // trim string, otherwise window gets too large (bug #1430)
                         final String oldTerm = occ.subTerm().toString();
@@ -580,10 +579,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                 JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
-
-                    break;
-
-                case CHANGE_ABBREVIATION:
+                }
+                case CHANGE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
                         String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
                             "Enter abbreviation for term: \n" + occ.subTerm().toString(),
@@ -608,11 +605,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                 JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
-
-                    break;
-
-                default:
-                    super.actionPerformed(e);
+                }
+                default -> super.actionPerformed(e);
                 }
             }
         }
@@ -621,9 +615,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     static class FocussedRuleApplicationMenuItem extends JMenuItem {
         private static final String APPLY_RULES_AUTOMATICALLY_HERE =
             "Apply rules automatically here";
-        /**
-         *
-         */
+
+        @Serial
         private static final long serialVersionUID = -6486650015103963268L;
 
         public FocussedRuleApplicationMenuItem() {
@@ -732,7 +725,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
             final Taclet taclet1 = o1.taclet();
 
-            map.put("closing", taclet1.goalTemplates().size() == 0 ? -1 : 1);
+            map.put("closing", taclet1.goalTemplates().isEmpty() ? -1 : 1);
 
             boolean calc = false;
             for (RuleSet rs : taclet1.getRuleSets()) {

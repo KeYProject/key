@@ -1,6 +1,7 @@
-/**
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -24,7 +25,7 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 /**
- * converts an enhanced for loop to an "old style" for loop. This follows JLS 3rd edition, �14.14.2.
+ * converts an enhanced for loop to an "old style" for loop. This follows JLS 3rd edition, §14.14.2.
  * <p>
  * Currently, if given enhanced for iterates over an array, this will replace the enhanced for with
  * a statement block and not inline it into a possibly given statement block, yielding possibly not
@@ -163,8 +164,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         if (enhancedFor.getStatementCount() > 0) {
             // if statement block, go into it
             Statement s = enhancedFor.getStatementAt(0);
-            if (s instanceof StatementBlock) {
-                StatementBlock sb = (StatementBlock) s;
+            if (s instanceof StatementBlock sb) {
                 for (int i = 0; i < sb.getStatementCount(); i++) {
                     statements.add(sb.getStatementAt(i).deepClone());
                 }

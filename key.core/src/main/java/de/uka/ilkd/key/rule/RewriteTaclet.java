@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
@@ -5,7 +8,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -16,6 +18,7 @@ import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -43,18 +46,23 @@ public class RewriteTaclet extends FindTaclet {
 
     /**
      * If the surrounding formula has been decomposed completely, the find-term will NOT appear on
-     * the SUCcedent. The formula "wellformed(h)" in "wellformed(h) ==>" or in "==> wellformed(h) ->
-     * (inv(h) = inv(h2))" or in "==> \if(b) \then(!wellformed(h)) \else(!wellformed(h2))" has
-     * antecedent polarity. The formula "wellformed(h)" in "wellformed(h) <-> wellformed(h2) ==>"
+     * the SUCcedent. The formula {@code wellformed(h)} in {@code wellformed(h) ==>} or in
+     * {@code ==> wellformed(h) ->
+     * (inv(h) = inv(h2))} or in {@code ==> \if(b) \then(!wellformed(h)) \else(!wellformed(h2))} has
+     * antecedent polarity. The formula {@code wellformed(h)} in
+     * {@code wellformed(h) <-> wellformed(h2) ==>}
      * has NO antecedent polarity.
      */
     public static final int ANTECEDENT_POLARITY = 4;
 
     /**
      * If the surrounding formula has been decomposed completely, the find-term will NOT appear on
-     * the ANTEcedent. The formula "wellformed(h)" in "==> wellformed(h)" or in "wellformed(h) ->
-     * (inv(h) = inv(h2)) ==>" or in "\if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>" has
-     * succedent polarity. The formula "wellformed(h)" in "wellformed(h) <-> wellformed(h2) ==>" has
+     * the ANTEcedent. The formula {@code wellformed(h)} in {@code==> wellformed(h)} or in
+     * {@code wellformed(h) ->
+     * (inv(h) = inv(h2)) ==>} or in {@code \if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>}
+     * has
+     * succedent polarity. The formula {@code wellformed(h)} in
+     * {@code wellformed(h) <-> wellformed(h2) ==>} has
      * NO succedent polarity.
      */
     public static final int SUCCEDENT_POLARITY = 8;
@@ -86,7 +94,7 @@ public class RewriteTaclet extends FindTaclet {
      * @param attrs the TacletAttributes; these are boolean values indicating a noninteractive or
      *        recursive use of the Taclet.
      * @param find the find term of the Taclet
-     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the prefix for each
+     * @param prefixMap an ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
      * @param p_applicationRestriction an int defining state restrictions of the taclet (required
      *        for location check)
@@ -180,7 +188,7 @@ public class RewriteTaclet extends FindTaclet {
                     svi = svi.addUpdate(update, t.getLabels());
                 }
             } else if (getApplicationRestriction() != NONE
-                    && (op instanceof Modality || op instanceof ModalOperatorSV)) {
+                    && (op instanceof Modality)) {
                 return null;
             }
 
@@ -202,7 +210,7 @@ public class RewriteTaclet extends FindTaclet {
     /**
      * Compute polarity
      *
-     * @see AntecSuccPrefixChecker seems to reimplement this.
+     * (the {@code AntecSuccPrefixChecker} seems to reimplement this.
      */
     private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
         // toggle polarity if find term is

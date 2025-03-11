@@ -1,9 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -13,7 +18,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Within an SVInstantiations-object a generic sort is instantiated by a concrete sort, which has to
  * be a subsort of the instantiations of the supersorts of this sort
  */
-public final class GenericSort extends AbstractSort {
+public final class GenericSort extends SortImpl {
 
 
     /**
@@ -41,16 +46,22 @@ public final class GenericSort extends AbstractSort {
      * @param ext supersorts of this sort, which have to be either concrete sorts or plain generic
      *        sorts (i.e. not collection sorts of generic sorts)
      */
-    public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf)
+    public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf,
+            String documentation, String origin)
             throws GenericSupersortException {
-        super(name, ext, false);
+        super(name, ext, false, documentation, origin);
         this.oneOf = oneOf;
         checkSupersorts();
     }
 
+    public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf)
+            throws GenericSupersortException {
+        this(name, ext, oneOf, "", "");
+    }
+
 
     public GenericSort(Name name) {
-        super(name, DefaultImmutableSet.nil(), false);
+        super(name, DefaultImmutableSet.nil(), false, "", "");
         this.oneOf = DefaultImmutableSet.nil();
     }
 
@@ -88,7 +99,7 @@ public final class GenericSort extends AbstractSort {
      *         Use "GenericSortInstantiations" instead
      */
     public boolean isPossibleInstantiation(Sort p_s) {
-        return p_s != Sort.FORMULA && (oneOf.isEmpty() || oneOf.contains(p_s))
+        return p_s != JavaDLTheory.FORMULA && (oneOf.isEmpty() || oneOf.contains(p_s))
                 && checkNonGenericSupersorts(p_s);
     }
 

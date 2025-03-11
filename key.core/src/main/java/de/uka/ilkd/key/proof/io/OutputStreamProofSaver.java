@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
@@ -15,7 +18,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -28,6 +30,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -39,11 +42,13 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -145,11 +150,11 @@ public class OutputStreamProofSaver {
     }
 
     public String writeSettings(ProofSettings ps) {
-        return "\\settings {\n\"" + escapeCharacters(ps.settingsToString()) + "\"\n}\n";
+        return String.format("\\settings %s \n", ps.settingsToString());
     }
 
     public void save(OutputStream out) throws IOException {
-        proof.copyCachedGoals(null, null, null);
+        CopyReferenceResolver.copyCachedGoals(proof, null, null, null);
         try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -190,26 +195,27 @@ public class OutputStreamProofSaver {
             ps.print(header);
 
             // \problem or \proofObligation
-            if (po instanceof IPersistablePO
+            if (po instanceof IPersistablePO ppo
                     && (!(po instanceof AbstractInfFlowPO) || (!(po instanceof InfFlowCompositePO)
                             && ((InfFlowProof) proof).getIFSymbols().isFreshContract()))) {
-                final Properties properties = new Properties();
-                ((IPersistablePO) po).fillSaveProperties(properties);
-                try (StringWriter writer = new StringWriter()) {
-                    properties.store(writer, "Proof Obligation Settings");
-                    ps.println(
-                        "\\proofObligation \"" + escapeCharacters(writer.toString()) + "\";\n");
-                }
+                var loadingConfig = ppo.createLoaderConfig();
+                ps.println("\\proofObligation ");
+                loadingConfig.save(ps, "Proof-Obligation settings");
+                ps.println("\n");
             } else {
                 if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
                         || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
-                    final Properties properties = new Properties();
-                    ((IPersistablePO) po).fillSaveProperties(properties);
                     ps.print(((InfFlowProof) proof).printIFSymbols());
                 }
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
-                printer.printSemisequent(problemSeq.succedent());
+                if (problemSeq.antecedent().isEmpty() && problemSeq.succedent().size() == 1) {
+                    // Problem statement is a single formula ...
+                    printer.printSemisequent(problemSeq.succedent());
+                } else {
+                    // Problem statement is a proper sequent ...
+                    printer.printSequent(problemSeq);
+                }
                 ps.println(printer.result());
                 ps.println("}\n");
             }
@@ -277,7 +283,7 @@ public class OutputStreamProofSaver {
                     // add new relative path
                     final String absPath = tmp.substring(k, j);
                     final String relPath = tryToMakeFilenameRelative(absPath, basePath);
-                    final String correctedRelPath = relPath.equals("") ? "." : relPath;
+                    final String correctedRelPath = relPath.isEmpty() ? "." : relPath;
                     relPathString.append(" \"").append(escapeCharacters(correctedRelPath))
                             .append("\"");
                     i = j + 1;
@@ -490,7 +496,7 @@ public class OutputStreamProofSaver {
         output.append("\")");
     }
 
-    private void printSingleSMTRuleApp(RuleAppSMT smtApp, Node node, String prefix,
+    private void printSingleSMTRuleApp(SMTRuleApp smtApp, Node node, String prefix,
             Appendable output) throws IOException {
         output.append(" (").append(ProofElementID.SOLVERTYPE.getRawName())
                 .append(" \"").append(smtApp.getSuccessfulSolverName()).append("\")");
@@ -508,18 +514,12 @@ public class OutputStreamProofSaver {
         final RuleJustification ruleJusti = proof.getInitConfig().getJustifInfo()
                 .getJustification(appliedRuleApp, proof.getServices());
 
-        String name;
-        if(ruleJusti instanceof RuleJustificationBySpec) {
-            final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
-            name = ruleJustiBySpec.getSpec().getName();
-        } else {
-            LOGGER.error("Unexpexted rule justification type " + ruleJusti.getClass() +
-                    ". Please consult bug MT-1111 #806 if this fails.");
-            name = ">> this proof cannot be loaded. see issue #806 <<";
-        }
+        assert ruleJusti instanceof RuleJustificationBySpec
+                : "Please consult bug #1111 if this fails.";
 
+        final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
-        output.append(name);
+        output.append(ruleJustiBySpec.spec().getName());
         output.append("\")");
     }
 
@@ -549,8 +549,7 @@ public class OutputStreamProofSaver {
             // for operation contract rules we add the modality under which the rule was applied
             // -> needed for proof management tool
             if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
-                if (appliedRuleApp instanceof ContractRuleApp) {
-                    ContractRuleApp app = (ContractRuleApp) appliedRuleApp;
+                if (appliedRuleApp instanceof ContractRuleApp app) {
                     Modality modality = (Modality) app.programTerm().op();
                     output.append(" (modality \"");
                     output.append(modality.toString());
@@ -565,8 +564,8 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
             printSingleCloseAfterMergeRuleApp((CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp,
                 node, prefix, output);
-        } else if (appliedRuleApp instanceof RuleAppSMT) {
-            printSingleSMTRuleApp((RuleAppSMT) appliedRuleApp, node, prefix, output);
+        } else if (appliedRuleApp instanceof SMTRuleApp) {
+            printSingleSMTRuleApp((SMTRuleApp) appliedRuleApp, node, prefix, output);
         }
 
         output.append("");
@@ -720,7 +719,7 @@ public class OutputStreamProofSaver {
     /**
      * Get the "interesting" instantiations of the provided object.
      *
-     * @see SVInstantiations#interesting
+     * @see SVInstantiations#interesting()
      * @param inst instantiations
      * @return the "interesting" instantiations (serialized)
      */

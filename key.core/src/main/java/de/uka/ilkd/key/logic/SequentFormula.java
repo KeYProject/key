@@ -1,9 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
+
+import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 
 
 /**
@@ -30,15 +35,16 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
     /**
      * creates a new SequentFormula
      *
-     * @param term a Term of sort {@link Sort#FORMULA}
+     * @param term a Term of sort {@link JavaDLTheory#FORMULA}
      */
     public SequentFormula(Term term) {
-        if (term.sort() != Sort.FORMULA && term.sort() != AbstractTermTransformer.METASORT) {
+        if (term.sort() != JavaDLTheory.FORMULA
+                && term.sort() != AbstractTermTransformer.METASORT) {
             throw new RuntimeException("A Term instead of a formula: " + term);
         }
         this.term = term;
         this.hashCode = term.hashCode() * 13;
-        this.hashCode2 = term.hashCodeModProofIrrelevancy();
+        this.hashCode2 = term.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY);
     }
 
     /** @return the stored Term */
@@ -51,8 +57,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof SequentFormula) {
-            SequentFormula cmp = (SequentFormula) obj;
+        if (obj instanceof SequentFormula cmp) {
             return term.equals(cmp.formula());
         }
         return false;
@@ -72,11 +77,8 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof SequentFormula) {
-            SequentFormula cmp = (SequentFormula) obj;
-            if (term.equalsModProofIrrelevancy(cmp.formula())) {
-                return true;
-            }
+        if (obj instanceof SequentFormula cmp) {
+            return term.equalsModProperty(cmp.formula(), PROOF_IRRELEVANCY_PROPERTY);
         }
         return false;
     }

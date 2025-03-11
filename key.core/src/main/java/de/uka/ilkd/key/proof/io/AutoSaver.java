@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.beans.PropertyChangeListener;
@@ -19,7 +22,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Saves intermediate proof artifacts during strategy execution. An {@link AutoSaver} instance saves
  * periodically and the final proof state if it is closed. The default save interval can be set
- * using the static {@link #init(int, boolean)} method. Before the saver is registered as a
+ * using the static {@link #setDefaultValues(int, boolean)} method. Before the saver is registered
+ * as a
  * listener, <b>a proof must be set</b> with <code>setProof()</code>. AutoSaver writes .key files to
  * a temporary location (i.e., "/tmp" on most Linux machines). These are possibly overwritten on
  * each strategy run. Write errors (e.g., missing permissions) are silently ignored.

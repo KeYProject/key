@@ -1,6 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.replay;
 
 import java.io.File;
+import java.util.HashSet;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -42,11 +46,14 @@ class TestCopyingReplayer {
         proof2.pruneProof(proof2.root());
         proof2.getServices().resetCounters();
         new CopyingProofReplayer(proof1, proof2).copy(proof1.root(),
-            proof2.getOpenGoal(proof2.root()));
+            proof2.getOpenGoal(proof2.root()), new HashSet<>());
 
         Assertions.assertTrue(proof2.closed());
         Assertions.assertEquals(proof1.countNodes(), proof2.countNodes());
 
         GeneralSettings.noPruningClosed = true;
+
+        env.dispose();
+        env2.dispose();
     }
 }

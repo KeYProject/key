@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
 import java.io.IOException;
@@ -8,7 +11,6 @@ import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.ui.Verbosity;
@@ -17,6 +19,7 @@ import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,24 +59,12 @@ public class Log {
             var filter = new ThresholdFilter();
             consoleAppender.addFilter(filter);
             switch (verbosity.byteValue()) {
-            case Verbosity.TRACE:
-                filter.setLevel("TRACE");
-                break;
-            case Verbosity.DEBUG:
-                filter.setLevel("DEBUG");
-                break;
-            case Verbosity.INFO:
-                filter.setLevel("INFO");
-                break;
-            case Verbosity.NORMAL:
-                filter.setLevel("ERROR");
-                break;
-            case Verbosity.SILENT:
-                filter.setLevel("OFF");
-                break;
-            default:
-                filter.setLevel("WARN");
-                break;
+            case Verbosity.TRACE -> filter.setLevel("TRACE");
+            case Verbosity.DEBUG -> filter.setLevel("DEBUG");
+            case Verbosity.INFO -> filter.setLevel("INFO");
+            case Verbosity.NORMAL -> filter.setLevel("ERROR");
+            case Verbosity.SILENT -> filter.setLevel("OFF");
+            default -> filter.setLevel("WARN");
             }
             filter.start();
         }

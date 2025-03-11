@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayDeque;
@@ -374,7 +377,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
-    /**
+    /*
      *
      * public void performActionOnFor(For x) { ExtList changeList = stack.peek(); if
      * (replaceBreakWithNoLabel==0) { //most outer for loop if (changeList.getFirst() == CHANGED)

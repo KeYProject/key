@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
@@ -13,6 +16,7 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
@@ -96,7 +100,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
             }
         } catch (final InterruptedException exception) {
             LOGGER.debug("Proof macro has been interrupted:", exception);
-            info = new ProofMacroFinishedInfo(macro, selectedProof, true);
+            info = new ProofMacroFinishedInfo(macro, selectedProof);
             this.exception = exception;
         } catch (final Exception exception) {
             // This should actually never happen.
@@ -118,18 +122,17 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
             if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not
                                                        // report this
                 // This should actually never happen.
+                LOGGER.error("", exception);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
             }
-
             mediator.getUI().taskFinished(info);
-
-            if (SELECT_GOAL_AFTER_MACRO) {
-                selectOpenGoalBelow();
-            }
 
             mediator.setInteractive(true);
             mediator.startInterface(true);
-
+            mediator.getUI().getProofControl().fireAutoModeStopped(new ProofEvent(node.proof()));
+            if (SELECT_GOAL_AFTER_MACRO) {
+                selectOpenGoalBelow();
+            }
             emitProofMacroFinished(node, macro, posInOcc, info);
         }
     }

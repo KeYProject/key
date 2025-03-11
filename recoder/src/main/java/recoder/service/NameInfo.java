@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import java.util.List;
@@ -287,7 +289,7 @@ public interface NameInfo extends Service {
     /**
      * Returns a field belonging to the given fully qualified name.
      *
-     * @param a fully qualified field name, e.g. "System.out".
+     * @param name fully qualified field name, e.g. "System.out".
      * @return the field with that name, or <tt>null</tt> if no such field is known.
      */
     Field getField(String name);

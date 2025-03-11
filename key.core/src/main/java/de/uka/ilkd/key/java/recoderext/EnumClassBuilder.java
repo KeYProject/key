@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.LinkedHashMap;
@@ -72,8 +75,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
             TreeWalker tw = new TreeWalker(unit);
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                if (pe instanceof EnumDeclaration) {
-                    EnumDeclaration ed = (EnumDeclaration) pe;
+                if (pe instanceof EnumDeclaration ed) {
                     addCases(ed);
                     EnumClassDeclaration ecd = new EnumClassDeclaration(ed);
                     substitutes.put(ed, ecd);

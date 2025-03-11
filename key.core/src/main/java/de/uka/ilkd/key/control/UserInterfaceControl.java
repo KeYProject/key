@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
 import java.io.File;
@@ -19,8 +22,8 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 /**
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
- * <li>Functionality to load files via {@link #load(Profile, File, List<File>, File, List<File>,
- * Properties, boolean, Consumer<Proof>)}.</li>
+ * <li>Functionality to load files via
+ * {@link #load(Profile, File, List, File, List, Properties, boolean, Consumer)}.</li>
  * <li>Functionality to instantiate new {@link Proof}s via
  * {@link #createProof(InitConfig, ProofOblInput)}.</li>
  * <li>Functionality to register existing {@link Proof}s in the user interface via
@@ -63,7 +66,7 @@ public interface UserInterfaceControl {
      * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or
      *        overwrite saved PO {@link Properties}.
      * @param forceNewProfileOfNewProofs {@code} true
-     *        {@link AbstractProblemLoader#profileOfNewProofs} will be used as {@link Profile} of
+     *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
      *        new proofs.
      * @param callbackProofLoaded receives the proof after it is loaded, but before it is replayed

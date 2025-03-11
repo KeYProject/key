@@ -1,14 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,8 +21,8 @@ import org.key_project.util.collection.ImmutableList;
 
 /**
  * This action is one part of the previous UndoLastStepAction: It undoes the last rule application
- * on the currently selected branch. It now also works on closed branches if not the flag
- * "--no-pruning-closed" is set (to save memory).
+ * on the currently selected branch. It now also works on closed branches if the flag
+ * "--no-pruning-closed" is not set (to save memory).
  *
  * The action is enabled if: 1. the proof is not empty (just the root node exists) and 2. either
  * pruning of closed branches is enabled or the selected node is open
@@ -54,8 +55,6 @@ public final class GoalBackAction extends MainWindowAction {
         putValue(SHORT_DESCRIPTION, "Undo the last rule application.");
         initListeners();
         updateName();
-        setAcceleratorLetter(KeyEvent.VK_Z);
-        KeyStrokeManager.lookupAndOverride(this);
     }
 
     /**

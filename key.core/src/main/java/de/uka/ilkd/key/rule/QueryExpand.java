@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -11,19 +13,23 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +59,8 @@ public class QueryExpand implements BuiltInRule {
      */
     private final WeakHashMap<Term, Long> timeOfTerm = new WeakHashMap<>(DEFAULT_MAP_SIZE);
 
-
-    @Nonnull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
 
         final PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term query = pio.subTerm();
@@ -96,11 +100,13 @@ public class QueryExpand implements BuiltInRule {
      * @param services
      * @param query The query on which the query expand rule is applied
      * @param instVars If null, then the result of the query can be stored in a constant (e.g.
-     *        res=query(a)). Otherwise it is a list of logical variables that can be instantiated
+     *        {@code res=query(a)}). Otherwise, it is a list of logical variables that can be
+     *        instantiated
      *        (using the rules allLeft, exRight) and therefore the result of the query must be
-     *        stored by function that depends on instVars (e.g. forall i; res(i)=query(i)). The list
-     *        may be empty even if it not null.
-     * @return The formula (!{U}<result=query();>result=res_query) & query()=res_query
+     *        stored by function that depends on instVars (e.g. {@code \forall i; res(i)=query(i)}).
+     *        The list
+     *        may be empty even if it is not null.
+     * @return The formula {@code (!{U}<result=query();>result=res_query) & query()=res_query}
      * @author Richard Bubel
      * @author gladisch
      */
@@ -147,11 +153,11 @@ public class QueryExpand implements BuiltInRule {
         final MethodReference mr =
             new MethodReference(args, method.getProgramElementName(), callee);
 
-        final Function placeHolderResult;
+        final JFunction placeHolderResult;
         final Term placeHolderResultTrm;
 
         if (instVars == null || instVars.length == 0) {
-            placeHolderResult = new Function(new Name(logicResultName), query.sort());
+            placeHolderResult = new JFunction(new Name(logicResultName), query.sort());
             placeHolderResultTrm = tb.func(placeHolderResult);
         } else {
             // If the query expansion depends on logical variables, then store the result in a
@@ -164,7 +170,8 @@ public class QueryExpand implements BuiltInRule {
                 lvSorts[i] = instVars[i].sort();
             }
             ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<>(lvSorts);
-            placeHolderResult = new Function(new Name(logicResultName), query.sort(), imArrlvSorts);
+            placeHolderResult =
+                new JFunction(new Name(logicResultName), query.sort(), imArrlvSorts);
             placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); // I'm not sure about
                                                                              // the third parameter!
         }
@@ -381,7 +388,7 @@ public class QueryExpand implements BuiltInRule {
                 findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
                     curPosIsPositive, nextLevel, curPosIsPositive, qeps);
             }
-        } else if (t.sort() == Sort.FORMULA) {
+        } else if (t.sort() == JavaDLTheory.FORMULA) {
             ArrayList<Term> queries = collectQueries(t);
             for (Term query : queries) {
                 QueryEvalPos qep = new QueryEvalPos(query, Arrays.copyOf(pathInTerm, qepLevel + 1),
@@ -560,8 +567,8 @@ public class QueryExpand implements BuiltInRule {
 
         final Term result;
         if (changedSubTerm) {
-            result = services.getTermFactory().createTerm(term.op(), newSubTerms, newBoundVars,
-                term.javaBlock());
+            result =
+                services.getTermFactory().createTerm(term.op(), newSubTerms, newBoundVars, null);
         } else {
             result = term;
         }

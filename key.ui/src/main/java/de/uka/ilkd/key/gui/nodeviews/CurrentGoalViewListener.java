@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -117,7 +120,9 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     @Override
     public void dragGestureRecognized(DragGestureEvent dgEvent) {
         final Object oldHighlight = getSequentView().getCurrentHighlight();
-        getSequentView().setCurrentHighlight(getSequentView().dndHighlight);
+        Object dndHighlight =
+            getSequentView().createColorHighlight(SequentView.DND_HIGHLIGHT_COLOR.get());
+        getSequentView().setCurrentHighlight(dndHighlight);
         hideMenu(menu);
         Point dragOrigin = dgEvent.getDragOrigin();
         PosInSequent localMousePos = getSequentView().getPosInSequent(dragOrigin);
@@ -131,7 +136,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                         public void dragDropEnd(DragSourceDropEvent event) {
                             // Enable updating the subterm
                             // highlightning ...
-                            getSequentView().disableHighlight(getSequentView().dndHighlight);
+                            getSequentView().disableHighlight(dndHighlight);
                             getSequentView().setCurrentHighlight(oldHighlight);
                         }
                     });
@@ -139,7 +144,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                 // system not in proper dnd state
                 // Enable updating the subterm
                 // highlightning ...
-                getSequentView().disableHighlight(getSequentView().dndHighlight);
+                getSequentView().disableHighlight(dndHighlight);
                 getSequentView().setCurrentHighlight(oldHighlight);
             }
         }

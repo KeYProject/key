@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.LinkedHashMap;
@@ -5,10 +8,10 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.RuleApp;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 
 
 public class ComplexRuleJustificationBySpec implements ComplexRuleJustification {
@@ -25,7 +28,7 @@ public class ComplexRuleJustificationBySpec implements ComplexRuleJustification 
     }
 
 
-    public @Nonnull RuleJustification getSpecificJustification(RuleApp app, TermServices services) {
+    public @NonNull RuleJustification getSpecificJustification(RuleApp app, TermServices services) {
         RuleJustification result = app2Just.get(app);
         if (result == null) {
             LOGGER.error("Rule app without stored justification: " + app +

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -5,6 +8,7 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Projection for computing a subterm of a given term. The position of the subterm within the
@@ -24,7 +28,7 @@ public class SubtermProjection implements ProjectionToTerm {
         this.pit = pit;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return pit.getSubTerm(completeTerm.toTerm(app, pos, goal));
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
     }
 }

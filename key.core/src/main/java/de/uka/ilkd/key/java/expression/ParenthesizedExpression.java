@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression;
 
 import de.uka.ilkd.key.java.*;
@@ -28,29 +31,6 @@ public class ParenthesizedExpression extends Operator
 
     public ParenthesizedExpression(Expression child) {
         super(child);
-    }
-
-    /**
-     * Returns the number of children of this node.
-     *
-     * @return an int giving the number of children of this node
-     */
-    public int getChildCount() {
-        return (children != null) ? children.size() : 0;
-    }
-
-    /**
-     * Returns the child at the specified index in this node's "virtual" child array
-     *
-     * @param index an index into this node's "virtual" child array
-     * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
-     */
-    public ProgramElement getChildAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
-        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**

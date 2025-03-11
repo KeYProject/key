@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.ArrayList;
@@ -6,16 +9,17 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
+import org.key_project.logic.TermCreationException;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -111,9 +115,8 @@ class GenericTranslator {
 
         }
 
-        if (term.op() instanceof SortDependingFunction) {
+        if (term.op() instanceof SortDependingFunction func) {
 
-            SortDependingFunction func = (SortDependingFunction) term.op();
             try { // Try block is necessary because there are some
                   // taclets
                   // that should have isReference-Condition, but
@@ -126,7 +129,7 @@ class GenericTranslator {
                     }
                     func = func.getInstanceFor(instantiation, services);
 
-                    if (func.getKind().equals(Sort.CAST_NAME)) {
+                    if (func.getKind().equals(JavaDLTheory.CAST_NAME)) {
                         for (int i = 0; i < term.arity(); i++) {
 
                             if (!sameHierachyBranch(func.getSortDependingOn(),
@@ -155,7 +158,6 @@ class GenericTranslator {
         }
 
         if (term.op() instanceof Quantifier) {
-
             QuantifiableVariable[] copy = new QuantifiableVariable[term.boundVars().size()];
             assert copy.length == 1;
             int i = 0;
@@ -176,12 +178,9 @@ class GenericTranslator {
             if ((term.op()).equals(Quantifier.EX)) {
                 term = services.getTermBuilder().ex(copy[0], subTerms[0]);
             }
-
         } else {
-
             term = services.getTermFactory().createTerm(term.op(), subTerms, variables,
-                JavaBlock.EMPTY_JAVABLOCK);
-
+                null);
         }
 
         return term;
@@ -196,7 +195,7 @@ class GenericTranslator {
      */
     private boolean doInstantiation(GenericSort generic, Sort inst, TacletConditions conditions) {
 
-        return !((inst instanceof GenericSort) || (inst.equals(Sort.ANY))
+        return !((inst instanceof GenericSort) || (inst.equals(JavaDLTheory.ANY))
                 || (conditions.containsIsReferenceCondition(generic) > 0
                         && !AssumptionGenerator.isReferenceSort(inst, services))
                 || (conditions.containsNotAbstractInterfaceCondition(generic)

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.merge;
 
 import java.io.FileInputStream;
@@ -8,10 +11,10 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 import org.key_project.proofmanagement.io.ProofBundleHandler;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class tests if all given proof is consistent w.r.t. the files contained.
@@ -24,7 +27,7 @@ public class FilesChecker {
         R apply(T t) throws IOException;
     }
 
-    static boolean listOfPathsConsistent(@Nonnull List<Path> paths) {
+    static boolean listOfPathsConsistent(@NonNull List<Path> paths) {
         boolean res = true;
         Path reference = paths.get(0);
         for (int i = 1; i < paths.size(); i++) {
@@ -59,7 +62,7 @@ public class FilesChecker {
             return Collections.emptyList();
         }
         try (var files = Files.walk(pbh.getBootclasspath())) {
-            return files.collect(Collectors.toUnmodifiableList());
+            return files.toList();
         }
     }
 

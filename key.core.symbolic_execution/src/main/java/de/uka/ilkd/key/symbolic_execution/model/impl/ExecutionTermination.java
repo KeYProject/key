@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * The default implementation of {@link IExecutionTermination}.
@@ -57,19 +61,17 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
      */
     @Override
     protected String lazyComputeName() {
-        switch (getTerminationKind()) {
-        case EXCEPTIONAL:
-            return INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort + INTERNAL_NODE_NAME_END;
-        case LOOP_BODY:
-            return LOOP_BODY_TERMINATION_NODE_NAME;
-        case BLOCK_CONTRACT_NORMAL:
-            return INTERNAL_NODE_NAME_START + "block contract end" + INTERNAL_NODE_NAME_END;
-        case BLOCK_CONTRACT_EXCEPTIONAL:
-            return INTERNAL_NODE_NAME_START + "block contract uncaught " + exceptionSort
-                + INTERNAL_NODE_NAME_END;
-        default:
-            return NORMAL_TERMINATION_NODE_NAME;
-        }
+        return switch (getTerminationKind()) {
+        case EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort
+            + INTERNAL_NODE_NAME_END;
+        case LOOP_BODY -> LOOP_BODY_TERMINATION_NODE_NAME;
+        case BLOCK_CONTRACT_NORMAL -> INTERNAL_NODE_NAME_START + "block contract end"
+            + INTERNAL_NODE_NAME_END;
+        case BLOCK_CONTRACT_EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "block contract uncaught "
+            + exceptionSort
+            + INTERNAL_NODE_NAME_END;
+        default -> NORMAL_TERMINATION_NODE_NAME;
+        };
     }
 
     /**
@@ -142,18 +144,13 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
      */
     @Override
     public String getElementType() {
-        switch (getTerminationKind()) {
-        case EXCEPTIONAL:
-            return "Exceptional Termination";
-        case LOOP_BODY:
-            return "Loop Body Termination";
-        case BLOCK_CONTRACT_NORMAL:
-            return "Block Contract Termination";
-        case BLOCK_CONTRACT_EXCEPTIONAL:
-            return "Block Contract Exceptional Termination";
-        default:
-            return "Termination";
-        }
+        return switch (getTerminationKind()) {
+        case EXCEPTIONAL -> "Exceptional Termination";
+        case LOOP_BODY -> "Loop Body Termination";
+        case BLOCK_CONTRACT_NORMAL -> "Block Contract Termination";
+        case BLOCK_CONTRACT_EXCEPTIONAL -> "Block Contract Exceptional Termination";
+        default -> "Termination";
+        };
     }
 
     /**

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -14,6 +17,9 @@ import java.util.zip.ZipFile;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This dialog allows the user to select the proof to load from a proof bundle.
  *
@@ -22,6 +28,7 @@ import javax.swing.border.TitledBorder;
 public final class ProofSelectionDialog extends JDialog {
 
     private static final long serialVersionUID = -586107341789859969L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofSelectionDialog.class);
 
     /**
      * Regex for identifiers (class, method), which catches for example "java.lang.Object",
@@ -203,6 +210,7 @@ public final class ProofSelectionDialog extends JDialog {
             dialog.setVisible(true);
             proofPath = dialog.proofToLoad;
         } catch (IOException exc) {
+            LOGGER.error("", exc);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
         }
         return proofPath;

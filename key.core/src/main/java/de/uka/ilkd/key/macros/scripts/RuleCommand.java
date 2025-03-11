@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -17,8 +19,12 @@ import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * Command that applies a calculus rule All parameters are passed as strings and converted by the
@@ -75,8 +81,20 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         RuleApp theApp = makeRuleApp(args, state);
         Goal g = state.getFirstOpenAutomaticGoal();
 
-        if (theApp instanceof TacletApp) {
-            RuleApp completeApp = ((TacletApp) theApp).tryToInstantiate(g.proof().getServices());
+        if (theApp instanceof TacletApp tacletApp) {
+
+            if (!tacletApp.ifInstsComplete()) {
+                ImmutableList<TacletApp> ifSeqCandidates =
+                    tacletApp.findIfFormulaInstantiations(g.sequent(), g.proof().getServices());
+
+                if (ifSeqCandidates.size() == 1) {
+                    theApp = ifSeqCandidates.head();
+                    assert theApp != null;
+                    tacletApp = (TacletApp) theApp;
+                }
+            }
+
+            RuleApp completeApp = tacletApp.tryToInstantiate(g.proof().getServices());
             theApp = completeApp == null ? theApp : completeApp;
         }
         assert theApp != null;
@@ -88,7 +106,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         final Proof proof = state.getProof();
         final Optional<BuiltInRule> maybeBuiltInRule =
-            proof.getInitConfig().getProfile().getStandardRules().getStandardBuiltInRules().stream()
+            proof.getInitConfig().getProfile().getStandardRules().standardBuiltInRules().stream()
                     .filter(r -> r.name().toString().equals(p.rulename)).findAny();
 
         final Optional<Taclet> maybeTaclet = Optional.ofNullable(
@@ -216,7 +234,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             throws ScriptException {
         final List<IBuiltInRuleApp> matchingApps = //
             findBuiltInRuleApps(p, state).stream().filter(r -> r.rule().name().equals(rule.name()))
-                    .collect(Collectors.toList());
+                    .toList();
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -334,7 +352,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private boolean isSequentFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
             throws ScriptException {
         final boolean satisfiesFormulaParameter =
-            p.formula != null && sf.formula().equalsModRenaming(p.formula);
+            p.formula != null && sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY);
 
         final boolean satisfiesMatchesParameter = p.matches != null
                 && formatTermString(LogicPrinter.quickPrintTerm(sf.formula(), services))
@@ -362,10 +380,10 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private List<TacletApp> filterList(Services services, Parameters p, ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
-            if (tacletApp instanceof PosTacletApp) {
-                PosTacletApp pta = (PosTacletApp) tacletApp;
+            if (tacletApp instanceof PosTacletApp pta) {
                 boolean add =
-                    p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
+                    p.on == null || pta.posInOccurrence().subTerm()
+                            .equalsModProperty(p.on, RENAMING_TERM_PROPERTY);
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
@@ -374,7 +392,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
-                    add &= userInst == null || userInst.equalsModIrrelevantTermLabels(ptaInst);
+                    add &= userInst == null
+                            || userInst.equalsModProperty(ptaInst, IRRELEVANT_TERM_LABELS_PROPERTY);
                 }
 
                 if (add) {

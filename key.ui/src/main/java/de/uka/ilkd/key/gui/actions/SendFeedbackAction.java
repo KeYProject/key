@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
@@ -10,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.*;
@@ -116,7 +118,7 @@ public class SendFeedbackAction extends AbstractAction {
                 zipEntryFileName += ".exception";
                 data = (e.getClass().getSimpleName() + " occured while trying to read data.\n"
                     + e.getMessage() + "\n" + serializeStackTrace(e))
-                            .getBytes(StandardCharsets.UTF_8);
+                        .getBytes(StandardCharsets.UTF_8);
             }
             stream.putNextEntry(new ZipEntry(zipEntryFileName));
             stream.write(data);
@@ -264,7 +266,7 @@ public class SendFeedbackAction extends AbstractAction {
             if (throwable != null) {
                 try {
                     var location = ExceptionTools.getLocation(throwable);
-                    return location.isPresent() && location.get().getFileURI().isPresent();
+                    return location != null && location.getFileURI().isPresent();
                 } catch (MalformedURLException e) {
                     // no valid location could be extracted
                     LOGGER.warn("Failed to extract location", e);
@@ -281,12 +283,12 @@ public class SendFeedbackAction extends AbstractAction {
              * default charset) and then writing back to byte[] (using default charset again).
              * However, this way it is a very concise and easy to read.
              */
-            URI url = ExceptionTools.getLocation(throwable)
-                    .flatMap(Location::getFileURI)
-                    .orElse(null);
-            Optional<String> content = IOUtil.readFrom(url);
-            return content.map(s -> s.getBytes(Charset.defaultCharset()))
-                    .orElse(new byte[0]);
+            Location url = ExceptionTools.getLocation(throwable);
+            if (url != null) {
+                String content = IOUtil.readFrom(url.fileUri());
+                return content.getBytes(Charset.defaultCharset());
+            }
+            return new byte[0];
         }
     }
 
@@ -356,6 +358,7 @@ public class SendFeedbackAction extends AbstractAction {
                         + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
             }
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }
@@ -399,6 +402,7 @@ public class SendFeedbackAction extends AbstractAction {
             }
 
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }

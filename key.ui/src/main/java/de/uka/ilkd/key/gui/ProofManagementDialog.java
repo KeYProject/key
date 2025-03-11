@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -10,10 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -39,21 +38,27 @@ import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ProofManagementDialog extends JDialog {
 
     private static final long serialVersionUID = 3543411893273433386L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofManagementDialog.class);
 
     /**
      * The contracts are stored by name of the {@link KeYJavaType}, method name, and contract name
      * to avoid keeping environments in the memory.
      */
-    @Nullable
-    private static ContractId previouslySelectedContracts;
+    private static @Nullable ContractId previouslySelectedContracts;
 
     private static final ImageIcon KEY_OPEN = IconFactory.keyHole(20, 20);
     private static final ImageIcon KEY_ALMOST_CLOSED = IconFactory.keyHoleAlmostClosed(20, 20);
@@ -119,9 +124,8 @@ public final class ProofManagementDialog extends JDialog {
                 Component result = super.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
 
-                if (result instanceof JLabel) {
+                if (result instanceof JLabel label) {
                     ProofStatus ps = ((ProofWrapper) value).proof.mgt().getStatus();
-                    JLabel label = (JLabel) result;
                     if (ps.getProofClosed()) {
                         label.setIcon(KEY_CLOSED);
                     } else if (ps.getProofClosedButLemmasLeft()) {
@@ -260,7 +264,7 @@ public final class ProofManagementDialog extends JDialog {
                 // filter out library classes
                 .filter(kjtTmp -> !(kjtTmp.getJavaType() instanceof TypeDeclaration
                         && ((TypeDeclaration) kjtTmp.getJavaType()).isLibraryClass()))
-                .collect(Collectors.toList());
+                .toList();
 
         // compare: IProgramMethods by program name, otherwise prefer NOT IProgramMethod
         final Comparator<IObserverFunction> compareFunction = (o1, o2) -> {
@@ -367,7 +371,7 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Selects the contract by the given {@link ContractId}
      */
-    private void select(@Nonnull ContractId cid) {
+    private void select(@NonNull ContractId cid) {
         Services servicesLocal = initConfig.getServices();
         String keyJavaTypeName = cid.keyJavaTypeName;
         Optional<KeYJavaType> allJavaTypes =
@@ -434,8 +438,7 @@ public final class ProofManagementDialog extends JDialog {
      * @return a proof for the contract, preferring closed proofs then closed proofs needing some
      *         lemmas and then just any proof or {@code null} if there is no proof for the contract
      */
-    @Nullable
-    private Proof findPreferablyClosedProof(@Nonnull Contract contract) {
+    private @Nullable Proof findPreferablyClosedProof(@NonNull Contract contract) {
         // will the contracts here always be atomic?
         // it seems that way, but not completely sure
         ImmutableSet<Proof> proofs =
@@ -457,7 +460,7 @@ public final class ProofManagementDialog extends JDialog {
         return fallback;
     }
 
-    private void findOrStartProof(@Nonnull Contract contract) {
+    private void findOrStartProof(@NonNull Contract contract) {
         Proof proof = findPreferablyClosedProof(contract);
         if (proof == null) {
             AbstractMediatorUserInterfaceControl ui = mediator.getUI();
@@ -476,15 +479,21 @@ public final class ProofManagementDialog extends JDialog {
                     env = ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
                 } else {
                     env.registerProof(po, pl);
-
                 }
+                mediator.getSelectionModel().setSelectedProof(pl.getFirstProof());
             } catch (ProofInputException exc) {
+                LOGGER.error("", exc);
                 IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {
-            mediator.setProof(proof);
+            mediator.getSelectionModel().setSelectedProof(proof);
         }
         startedProof = true;
+        // starting another proof will not execute the ProblemLoader again,
+        // so we have to activate the UI here
+        if (initConfig.getServices().getSpecificationRepository().getAllProofs().size() > 1) {
+            mediator.startInterface(true);
+        }
     }
 
     private void updateStartButton() {
@@ -634,50 +643,33 @@ public final class ProofManagementDialog extends JDialog {
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
-    private static final class ProofWrapper {
-
-        public final Proof proof;
-
-        public ProofWrapper(Proof proof) {
-            this.proof = proof;
-        }
-
+    private record ProofWrapper(Proof proof) {
         @Override
-        public String toString() {
-            return proof.name().toString();
-        }
+            public String toString() {
+                return proof.name().toString();
+            }
 
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof ProofWrapper && proof.equals(((ProofWrapper) o).proof);
-        }
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof final ProofWrapper pw && proof.equals(pw.proof);
+            }
 
-        @Override
-        public int hashCode() {
-            return proof.hashCode();
-        }
+            @Override
+            public int hashCode() {
+                return 3*proof.hashCode();
+            }
+
     }
 
 
     /**
      * Stores the identification of a {@link Contract}, i.e. type, method, contract name.
+     *
+     * @param keyJavaTypeName The key java type name.
+     * @param methodName The method name.
+     * @param contractName The contract name.
      */
-    private static final class ContractId {
-        /** The key java type name. */
-        @Nullable
-        public final String keyJavaTypeName;
-        /** The method name. */
-        @Nullable
-        public final String methodName;
-        /** The contract name. */
-        @Nullable
-        public final String contractName;
-
-        private ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
-                @Nullable String contractName) {
-            this.keyJavaTypeName = keyJavaTypeName;
-            this.methodName = methodName;
-            this.contractName = contractName;
-        }
+    private record ContractId(@Nullable String keyJavaTypeName, @Nullable String methodName,
+            @Nullable String contractName) {
     }
 }

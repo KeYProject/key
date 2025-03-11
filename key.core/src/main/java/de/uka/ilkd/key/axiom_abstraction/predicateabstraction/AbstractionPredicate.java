@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -11,12 +14,15 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.Pair;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping
@@ -51,7 +57,9 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
 
     /**
      * Creates a new {@link AbstractionPredicate}. Constructor is hidden since elements fo this
-     * class should be created by the factory method {@link #create(String, Function)}.
+     * class should be created by the factory methods
+     * {@link #create(Term, LocationVariable, Services)} or
+     * {@link #create(Sort, Function, Services)}}.
      *
      * @param argSort The expected sort for the arguments of the predicate.
      */
@@ -196,7 +204,6 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      * @return The parsed {@link String}.
      * @throws ParserException If there is a syntax error.
      * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
-     * @throws SortNotKnownException If the given sort is not known to the system.
      */
     public static List<AbstractionPredicate> fromString(final String s, final Services services,
             NamespaceSet localNamespaces) throws ParserException {
@@ -241,11 +248,9 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof AbstractionPredicate)) {
+        if (!(obj instanceof AbstractionPredicate otherPred)) {
             return false;
         }
-
-        final AbstractionPredicate otherPred = (AbstractionPredicate) obj;
 
         return otherPred.placeholderVariable.equals(placeholderVariable)
                 && otherPred.predicateFormWithPlaceholder.equals(predicateFormWithPlaceholder);

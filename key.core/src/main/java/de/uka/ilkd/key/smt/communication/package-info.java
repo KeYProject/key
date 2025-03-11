@@ -8,7 +8,7 @@
  * input/output strings to/from the external process. It uses
  * {@link de.uka.ilkd.key.smt.communication.BufferedMessageReader} to split the received strings
  * into separate messages.</li>
- * <li>{@link de.uka.ilkd.key.smt.communication.SolverSocket} defines the (solver specific)
+ * <li>{@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket} defines the (solver specific)
  * behaviour for handling solver results.</li>
  * <li>{@link de.uka.ilkd.key.smt.communication.SolverCommunication} stores the messages sent to and
  * from the external solver.</li>

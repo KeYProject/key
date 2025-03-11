@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
@@ -23,19 +26,19 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.gui.plugins.caching.DefaultReferenceSearchDialogListener;
-import de.uka.ilkd.key.gui.plugins.caching.ReferenceSearchDialog;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ShowProofStatistics extends MainWindowAction {
+    private static final String CSV_SEPERATOR = ";";
     private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);
 
     private static final long serialVersionUID = -8814798230037775905L;
@@ -56,7 +59,6 @@ public class ShowProofStatistics extends MainWindowAction {
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
         getMediator().enableWhenProofLoaded(this);
-        lookupAcceleratorKey();
 
         this.proof = proof;
     }
@@ -82,7 +84,7 @@ public class ShowProofStatistics extends MainWindowAction {
     public static String getCSVStatisticsMessage(Proof proof) {
         final int openGoals = proof.openGoals().size();
         StringBuilder stats = new StringBuilder();
-        stats.append("open goals,").append(openGoals).append("\n");
+        stats.append("open goals" + CSV_SEPERATOR).append(openGoals).append("\n");
 
         final Statistics s = proof.getStatistics();
 
@@ -90,7 +92,7 @@ public class ShowProofStatistics extends MainWindowAction {
             if ("".equals(x.second)) {
                 stats.append(x.first).append("\n");
             } else {
-                stats.append(x.first).append(",").append(x.second).append("\n");
+                stats.append(x.first).append(CSV_SEPERATOR).append(x.second).append("\n");
             }
         }
 
@@ -107,7 +109,8 @@ public class ShowProofStatistics extends MainWindowAction {
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
             for (Map.Entry<String, Integer> entry : sortedEntries) {
-                stats.append("interactive,").append(entry.getKey()).append(",")
+                stats.append("interactive" + CSV_SEPERATOR).append(entry.getKey())
+                        .append(CSV_SEPERATOR)
                         .append(entry.getValue()).append("\n");
             }
         }
@@ -271,9 +274,6 @@ public class ShowProofStatistics extends MainWindowAction {
             statisticsPane.setBorder(BorderFactory.createEmptyBorder());
             statisticsPane.setCaretPosition(0);
             statisticsPane.setBackground(MainWindow.getInstance().getBackground());
-            statisticsPane.setSize(new Dimension(10, 420));
-            statisticsPane.setPreferredSize(
-                new Dimension(statisticsPane.getPreferredSize().width + 15, 420));
 
             JScrollPane scrollPane = new JScrollPane(statisticsPane);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -316,9 +316,13 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonPane2.add(saveButton);
             buttonPane2.add(saveBundleButton);
 
+            // spotless:off
+            /*
             if (proof.closedGoals().stream()
                     .anyMatch(g -> g.node().lookup(ClosedBy.class) != null)) {
-                JButton copyReferences = new JButton("Copy referenced proof");
+                JButton copyReferences = new JButton("Realize cached branches");
+                copyReferences.setToolTipText("For each goal closed using the proof cache, copy " +
+                    "the referenced proof steps into this proof.");
                 copyReferences.addActionListener(e -> {
                     dispose();
                     ReferenceSearchDialog dialog =
@@ -331,6 +335,8 @@ public class ShowProofStatistics extends MainWindowAction {
                 });
                 buttonPane2.add(copyReferences);
             }
+             */
+            // spotless:on
 
             getRootPane().setDefaultButton(okButton);
             getRootPane().addKeyListener(new KeyAdapter() {
@@ -353,10 +359,12 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonsPane.add(buttonPane2);
             add(buttonsPane, BorderLayout.PAGE_END);
 
-            int w = 50 + Math.max(scrollPane.getPreferredSize().width,
-                buttonsPane.getPreferredSize().width);
-            int h =
-                scrollPane.getPreferredSize().height + buttonsPane.getPreferredSize().height + 100;
+            pack();
+            int w = Math.min(600, 50 + Math.max(scrollPane.getPreferredSize().width,
+                buttonsPane.getPreferredSize().width));
+            int h = Math.min(850,
+                50 + scrollPane.getPreferredSize().height + buttonsPane.getPreferredSize().height);
+
             setSize(w, h);
             setLocationRelativeTo(mainWindow);
         }

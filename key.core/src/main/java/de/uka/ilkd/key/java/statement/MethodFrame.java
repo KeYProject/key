@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.*;
@@ -50,7 +53,8 @@ public class MethodFrame extends JavaStatement
         this.execContext = execContext;
 
         firstActiveChildPos =
-            body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(getChildCount() - 1).down(0);
+            body.isEmpty() ? PosInProgram.TOP
+                    : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");
         Debug.assertTrue(body != null, "methodframe: body missing");
@@ -75,7 +79,8 @@ public class MethodFrame extends JavaStatement
         this.execContext = execContext;
 
         firstActiveChildPos =
-            body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(getChildCount() - 1).down(0);
+            body.isEmpty() ? PosInProgram.TOP
+                    : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
 
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");

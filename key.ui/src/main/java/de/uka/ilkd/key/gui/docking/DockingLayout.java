@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.docking;
 
 import java.awt.*;
@@ -8,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -26,6 +28,7 @@ import de.uka.ilkd.key.settings.PathConfig;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,9 +130,8 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         DockingHelper.restoreMissingPanels(window);
     }
 
-    @Nonnull
     @Override
-    public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         List<Action> actions = new ArrayList<>();
         int keypos = 0;
         for (String layout : LAYOUT_NAMES) {
@@ -161,7 +163,7 @@ final class SaveLayoutAction extends MainWindowAction {
         setMenuPath("View.Layout");
         if (key != null) {
             setAcceleratorKey(KeyStroke.getKeyStroke(key,
-                InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+                KeyStrokeManager.SHORTCUT_KEY_MASK | InputEvent.SHIFT_DOWN_MASK));
         }
         KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
     }

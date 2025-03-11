@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import org.key_project.logic.SyntaxElement;
 
 
 /**
@@ -27,7 +31,8 @@ public interface VariableCondition {
      * @return modified match results if the condition can be satisfied, or <code>null</code>
      *         otherwise
      */
-    MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions matchCond,
+    MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions matchCond,
             Services services);
 
 }

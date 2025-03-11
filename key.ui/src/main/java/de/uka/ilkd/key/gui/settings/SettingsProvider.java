@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.util.Collections;
@@ -37,7 +40,7 @@ public interface SettingsProvider {
      * @param window non-null reference
      * @return
      */
-    JComponent getPanel(MainWindow window);
+    JPanel getPanel(MainWindow window);
 
     /**
      * Tree children of your settings dialog.

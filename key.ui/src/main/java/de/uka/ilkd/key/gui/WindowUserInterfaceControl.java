@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +23,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -35,17 +37,21 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
+import org.key_project.util.java.SwingUtil;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +134,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportException(Object sender, ProofOblInput input, Exception e) {
-        reportStatus(sender, input.name() + " failed");
+        IssueDialog.showExceptionDialog(mainWindow, e);
     }
 
     @Override
@@ -149,6 +155,11 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         super.taskFinished(info);
+        // ensure all UI modifying operations are done on the UI thread
+        SwingUtilities.invokeLater(() -> taskFinishedInternal(info));
+    }
+
+    private void taskFinishedInternal(TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
@@ -156,7 +167,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (proof != null && !proof.closed()
+            if (proof != null && !proof.isDisposed() && !proof.closed()
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
@@ -170,11 +181,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
                     dialog.show();
                 }
+                if (!isAtLeastOneMacroRunning()) {
+                    showNotification("Automated proof search", info.toString());
+                }
             }
             mainWindow.displayResults(info.toString());
-        } else if (info != null && info.getSource() instanceof ProofMacro) {
+        } else if (info != null && info.getSource() instanceof ProofMacro macro) {
             if (!isAtLeastOneMacroRunning()) {
-                resetStatus(this);
+                mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
                 if (proof != null && !proof.closed()
@@ -188,30 +202,31 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                             "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
                         dialog.show();
                     }
+                    if (!isAtLeastOneMacroRunning()) {
+                        showNotification(macro.getName(), info.toString());
+                    }
                 }
             }
-        } else if (info != null && info.getSource() instanceof ProblemLoader) {
+        } else if (info != null && info.getSource() instanceof ProblemLoader problemLoader) {
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
+                LOGGER.error("", result);
+                if (result instanceof ParseCancellationException) {
+                    result = result.getCause();
+                }
                 IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-                if (problemLoader.hasProofScript()) {
-                    Pair<String, Location> scriptAndLoc;
-                    try {
-                        scriptAndLoc = problemLoader.readProofScript();
-                        ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                            scriptAndLoc.first, scriptAndLoc.second);
-                        psw.init();
-                        psw.execute();
-                    } catch (ProofInputException e) {
-                        LOGGER.warn("Failed to load proof", e);
-                    }
+                ProofScriptEntry scriptAndLoc = problemLoader.getProofScript();
+                if (scriptAndLoc != null) {
+                    ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
+                        scriptAndLoc.script(), scriptAndLoc.location());
+                    psw.init();
+                    psw.execute();
                 } else if (macroChosen()) {
                     applyMacro();
                 }
@@ -224,6 +239,24 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         }
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
+    }
+
+    /**
+     * Show a notification, if enabled by the settings.
+     *
+     * @param title header
+     * @param text body
+     */
+    private void showNotification(String title, String text) {
+        var mode =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().notificationAfterMacro();
+        if (mode.equals(ViewSettings.NOTIFICATION_ALWAYS)) {
+            SwingUtil.showNotification(title, text);
+        } else if (mode.equals(ViewSettings.NOTIFICATION_UNFOCUSED)) {
+            if (!MainWindow.getInstance().isActive()) {
+                SwingUtil.showNotification(title, text);
+            }
+        }
     }
 
     protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
@@ -242,7 +275,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        mainWindow.setStatusLine(info.getMessage(), info.getSize());
+        mainWindow.setStatusLine(info.message(), info.size());
     }
 
     @Override
@@ -359,8 +392,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             try {
                 getMediator().stopInterface(true);
                 errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
             } finally {
                 getMediator().startInterface(true);
             }
@@ -390,15 +421,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         Pair<File, String> f = fileName(proof, ".zproof");
         final int result = fileChooser.showSaveDialog(mainWindow, f.first, f.second);
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            ProofSaver saver = new ProofBundleSaver(proof, file);
+            final File file = fileChooser.getSelectedFile();
+            final ProofSaver saver = new ProofBundleSaver(proof, file);
+            final String errorMsg = saver.save();
 
-            String errorMsg;
-            try {
-                errorMsg = saver.save();
-            } catch (IOException e) {
-                errorMsg = e.toString();
-            }
             if (errorMsg != null) {
                 mainWindow.notify(
                     new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
@@ -460,6 +486,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
+        getMediator().fireProofLoaded(pa.getFirstProof());
         mainWindow.addProblem(pa);
         mainWindow.setStandardStatusLine();
     }
@@ -481,7 +508,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 } else {
                     this.reportStatus(this, result.getStatus());
                 }
-                getMediator().getSelectionModel().setSelectedNode(result.getNode());
                 if (result.hasErrors()) {
                     throw new ProblemLoaderException(loader,
                         "Proof could only be loaded partially.\n" + "In summary "
@@ -490,11 +516,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                             + "The first one:\n" + result.getErrorList().get(0).getMessage(),
                         result.getErrorList().get(0));
                 }
-            } else {
-                // should never happen as replay always returns a result object
-                // TODO (DS): Why is it then there? If this happens, we will get\\
-                // a NullPointerException just a line below...
-                getMediator().getSelectionModel().setSelectedNode(loader.getProof().root());
             }
         }
         getMediator().resetNrGoalsClosedByHeuristics();
@@ -538,7 +559,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param includes Optional includes to consider.
      * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
      *        visible?
-     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as
+     * @param forceNewProfileOfNewProofs {@code} true {@code AbstractProfile.profileOfNewProofs}
+     *        will be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.

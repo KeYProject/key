@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
+
+import org.key_project.logic.Name;
 
 /**
  * Feature that returns zero iff a certain schema variable is instantiated. If the schemavariable is
@@ -23,8 +27,8 @@ public class InstantiatedSVFeature extends BinaryTacletAppFeature {
         instProj = SVInstantiationProjection.create(svName, false);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        return instProj.toTerm(app, pos, goal) != null;
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return instProj.toTerm(app, pos, goal, mState) != null;
     }
 
 }

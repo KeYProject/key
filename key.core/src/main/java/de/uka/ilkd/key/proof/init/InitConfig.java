@@ -1,17 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -24,10 +24,14 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,
@@ -50,7 +54,7 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings), which is used if no
      * other choice is specified in the problemfile
      */
-    private Map<String, String> category2DefaultChoice;
+    private Map<String, String> category2DefaultChoice = new LinkedHashMap<>();
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when a taclet contains
@@ -121,7 +125,7 @@ public class InitConfig {
      *
      * @return true if the default was successfully set
      */
-    public boolean addCategoryDefaultChoice(@Nonnull String category, @Nonnull String choice) {
+    public boolean addCategoryDefaultChoice(@NonNull String category, @NonNull String choice) {
         if (!category2DefaultChoice.containsKey(category)) {
             category2DefaultChoice.put(category, choice);
             return true;
@@ -132,7 +136,7 @@ public class InitConfig {
     /**
      * Adds default choices given in {@code init}. Not overriding previous default choices.
      */
-    public void addCategory2DefaultChoices(@Nonnull Map<String, String> init) {
+    public void addCategory2DefaultChoices(@NonNull Map<String, String> init) {
         boolean changed = false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
             changed = addCategoryDefaultChoice(entry.getKey(), entry.getValue()) || changed;
@@ -277,7 +281,7 @@ public class InitConfig {
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
         return (profile == null ? ImmutableSLList.nil()
-                : profile.getStandardRules().getStandardBuiltInRules());
+                : profile.getStandardRules().standardBuiltInRules());
     }
 
 
@@ -342,7 +346,7 @@ public class InitConfig {
      *
      * @return a non-null namespace
      */
-    public Namespace<Function> funcNS() {
+    public Namespace<JFunction> funcNS() {
         return namespaces().functions();
     }
 

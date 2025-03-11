@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import java.io.File;
@@ -183,37 +186,37 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     }
 
     /**
-     * Tests example: /set/blockContractAssignableEverything
+     * Tests example: /set/blockContractModifiableEverything
      */
     @Test
-    public void testBlockContractAssignableEverything() throws Exception {
+    public void testBlockContractModifiableEverything() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableEverything/test/BlockContractAssignableEverything.proof",
-            "/set/blockContractAssignableEverything/oracle/BlockContractAssignableEverything.xml",
+            "/set/blockContractModifiableEverything/test/BlockContractModifiableEverything.proof",
+            "/set/blockContractModifiableEverything/oracle/BlockContractModifiableEverything.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
 
     /**
-     * Tests example: /set/blockContractAssignableLocationNotRequested
+     * Tests example: /set/blockContractModifiableLocationNotRequested
      */
     @Test
-    public void testBlockContractAssignableLocationNotRequested() throws Exception {
+    public void testBlockContractModifiableLocationNotRequested() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableLocationNotRequested/test/BlockContractAssignableLocationNotRequested.proof",
-            "/set/blockContractAssignableLocationNotRequested/oracle/BlockContractAssignableLocationNotRequested.xml",
+            "/set/blockContractModifiableLocationNotRequested/test/BlockContractModifiableLocationNotRequested.proof",
+            "/set/blockContractModifiableLocationNotRequested/oracle/BlockContractModifiableLocationNotRequested.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
 
     /**
-     * Tests example: /set/blockContractAssignableRequestedLocation
+     * Tests example: /set/blockContractModifiableRequestedLocation
      */
     @Test
-    public void testBlockContractAssignableRequestedLocation() throws Exception {
+    public void testBlockContractModifiableRequestedLocation() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableRequestedLocation/test/BlockContractAssignableRequestedLocation.proof",
-            "/set/blockContractAssignableRequestedLocation/oracle/BlockContractAssignableRequestedLocation.xml",
+            "/set/blockContractModifiableRequestedLocation/test/BlockContractModifiableRequestedLocation.proof",
+            "/set/blockContractModifiableRequestedLocation/oracle/BlockContractModifiableRequestedLocation.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }

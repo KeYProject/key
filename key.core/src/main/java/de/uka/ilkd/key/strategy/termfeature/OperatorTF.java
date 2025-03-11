@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Term feature for checking whether the top operator of a term is identical to a given one
@@ -19,7 +23,7 @@ public class OperatorTF extends BinaryTermFeature {
         return new OperatorTF(op);
     }
 
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(Term term, MutableState mState, Services services) {
         return op == term.op();
     }
 }

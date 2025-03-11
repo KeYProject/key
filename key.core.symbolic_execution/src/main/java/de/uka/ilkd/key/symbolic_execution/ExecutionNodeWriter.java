@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -73,12 +76,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
     public static final String ATTRIBUTE_TERMINATION_KIND = "terminationKind";
 
     /**
-     * Attribute name to store {@link IExecutionVariable#getTypeString()}.
+     * Attribute name to store {@link IExecutionValue#getTypeString()}.
      */
     public static final String ATTRIBUTE_TYPE_STRING = "typeString";
 
     /**
-     * Attribute name to store {@link IExecutionVariable#getValueString()}.
+     * Attribute name to store {@link IExecutionValue#getValueString()}.
      */
     public static final String ATTRIBUTE_VALUE_STRING = "valueString";
 
@@ -138,12 +141,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
     public static final String ATTRIBUTE_MERGED_BRANCH_CONDITION = "mergedBranchCondition";
 
     /**
-     * Attribute name to store {@link IExecutionVariable#isValueAnObject()}.
+     * Attribute name to store {@link IExecutionValue#isValueAnObject()}.
      */
     public static final String ATTRIBUTE_IS_VALUE_AN_OBJECT = "isValueAnObject";
 
     /**
-     * Attribute name to store {@link IExecutionVariable#isValueUnknown()}.
+     * Attribute name to store {@link IExecutionValue#isValueUnknown()}.
      */
     public static final String ATTRIBUTE_IS_VALUE_UNKNOWN = "isValueUnknown";
 
@@ -324,7 +327,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
 
     /**
      * Tag name to store on entry of {@link IExecutionNode#getCompletedBlocks()} together with its
-     * condition {@link IExecutionNode#getFormatedBlockCompletionCondition(IExecutionNode)}.
+     * condition {@link IExecutionNode#getFormatedBlockCompletionCondition}.
      */
     public static final String TAG_COMPLETED_BLOCK_ENTRY = "completedBlockEntry";
 
@@ -727,7 +730,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
         }
         attributeValues.put(ATTRIBUTE_RETURN_VALUE_COMPUTED, node.isReturnValuesComputed() + "");
         attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION,
-            node.getFormatedMethodReturnCondition());
+            node.getFormattedMethodReturnCondition());
         appendStartTag(level, TAG_METHOD_RETURN, attributeValues, sb);
         if (saveReturnValues) {
             IExecutionMethodReturnValue[] returnValues = node.getReturnValues();
@@ -769,7 +772,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
         attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION,
-            node.getFormatedMethodReturnCondition());
+            node.getFormattedMethodReturnCondition());
         appendStartTag(level, TAG_EXCEPTIONAL_METHOD_RETURN, attributeValues, sb);
         appendConstraints(level + 1, node, saveConstraints, sb);
         appendVariables(level + 1, node, saveVariables, saveConstraints, sb);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.*;
@@ -19,35 +22,47 @@ import org.key_project.util.collection.ImmutableArray;
 public class MethodDeclaration extends JavaDeclaration implements MemberDeclaration,
         TypeReferenceContainer, NamedProgramElement, ParameterContainer, Method, VariableScope {
 
+    /**
+     * The return type of the method.
+     */
     protected final TypeReference returnType;
+    /**
+     * In case of void return type: comments associated with the method.
+     */
     protected final Comment[] voidComments;
+    /**
+     * The name of the method.
+     */
     protected final ProgramElementName name;
+    /**
+     * Parameters of the method.
+     */
     protected final ImmutableArray<ParameterDeclaration> parameters;
+    /**
+     * 'throws' part of the method. Indicates which exceptions the method may throw.
+     * May be null.
+     */
     protected final Throws exceptions;
+    /**
+     * Body of the method.
+     * May be null, in which case the body is referenced in a file using {@link #posInfo}.
+     */
     protected final StatementBlock body;
+    /**
+     * JML modifiers of the referenced method. Includes e.g. {@code pure}.
+     */
     protected final JMLModifiers jmlModifiers;
 
     /**
      * JML modifiers of a method
+     *
+     * @param pure pure
+     * @param strictlyPure strictly pure
+     * @param helper helper
+     * @param specMathMode spec math mode
      */
-    public static final class JMLModifiers {
-        /** pure */
-        public final boolean pure;
-        /** strictly pure */
-        public final boolean strictlyPure;
-        /** helper */
-        public final boolean helper;
-        /** spec math mode */
-        public final SpecMathMode specMathMode;
-
-        /** constructor */
-        public JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
-                SpecMathMode specMathMode) {
-            this.pure = pure;
-            this.strictlyPure = strictlyPure;
-            this.helper = helper;
-            this.specMathMode = specMathMode;
-        }
+    public record JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
+            SpecMathMode specMathMode) {
     }
 
 
@@ -61,12 +76,14 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     /**
      * Method declaration.
      *
-     * @param children an ExtList of children. May include: a TypeReference (as a reference to the
-     *        return type), a de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
-     *        several ParameterDeclaration (as parameters of the declared method), a StatementBlock
-     *        (as body of the declared method), several Modifier (taken as modifiers of the
-     *        declaration), a Comment
+     * @param children an ExtList of children. Must include: a TypeReference (as a reference to the
+     *        return type),
+     *        a {@link ProgramElementName} (as Name of the method),
+     *        one or more {@link ParameterDeclaration} (as parameters of the declared method),
+     *        optionally a {@link StatementBlock} (as body of the declared method),
+     *        optionally a {@link Throws} to indicate exceptional behaviour
      * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param voidComments in case of void return type: comments associated with the method
      */
     public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
             Comment[] voidComments) {
@@ -146,7 +163,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
 
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
 
@@ -274,6 +291,12 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
 
+    /**
+     * Get the "void comments" of this method declaration.
+     * Only non-null if the method has void return type.
+     *
+     * @return the "void comments"
+     */
     public Comment[] getVoidComments() {
         return voidComments;
     }

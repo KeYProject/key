@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.LinkedHashMap;
@@ -246,8 +249,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
             initializerExecutionBody = new ASTArrayList<>(20);
         }
 
-        if (td instanceof ClassDeclaration && td != javaLangObject) {
-            ClassDeclaration cd = (ClassDeclaration) td;
+        if (td instanceof ClassDeclaration cd && td != javaLangObject) {
             initializerExecutionBody.add(0, new PassiveExpression(new MethodReference(
                 class2super.get(cd).deepClone(),
                 new ImplicitIdentifier(ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));

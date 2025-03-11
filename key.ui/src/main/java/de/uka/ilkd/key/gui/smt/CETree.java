@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.event.MouseAdapter;
@@ -10,7 +13,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.smt.model.*;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 public class CETree {
     /**
@@ -303,8 +307,7 @@ public class CETree {
             if (selRow != -1) {
                 if (e.getClickCount() == 2) {
                     Object oNode = selPath.getLastPathComponent();
-                    if (oNode instanceof DefaultMutableTreeNode) {
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) oNode;
+                    if (oNode instanceof DefaultMutableTreeNode node) {
 
                         if (node.getChildCount() > 0) {
                             return;

@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.logic.sort.Sort;
 
 class ArithTermFeatures extends StaticFeatureCollection {
 
@@ -86,18 +90,18 @@ class ArithTermFeatures extends StaticFeatureCollection {
 
     final Sort intS;
 
-    final Function Z;
-    final Function C;
-    final Function add;
-    final Function mul;
-    final Function mod;
-    final Function div;
-    final Function jmod;
-    final Function jdiv;
+    final JFunction Z;
+    final JFunction C;
+    final JFunction add;
+    final JFunction mul;
+    final JFunction mod;
+    final JFunction div;
+    final JFunction jmod;
+    final JFunction jdiv;
 
     final Operator eq;
-    final Function leq;
-    final Function geq;
+    final JFunction leq;
+    final JFunction geq;
 
     final TermFeature intF;
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
@@ -64,7 +67,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     /**
      * Adds a new {@link Term}.
      *
-     * @param value The new {@link Term} to add.
+     * @param term The new {@link Term} to add.
      */
     public void addTerm(Term term) {
         terms = terms.append(OriginTermLabel.removeOriginLabels(term, services));

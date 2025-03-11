@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.abstraction;
 
 /**
@@ -14,6 +17,13 @@ public interface Variable extends ProgramModelElement {
      * @return <CODE>true</CODE> if this variable is final, <CODE>false</CODE> otherwise.
      */
     boolean isFinal();
+
+    /**
+     * Checks if this variable is a model entity.
+     *
+     * @return <CODE>true</CODE> if this variable is a model entity, <CODE>false</CODE> otherwise.
+     */
+    public boolean isModel();
 
     /**
      * Returns the type of this variable.

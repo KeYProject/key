@@ -94,7 +94,7 @@ SKOLEMFORMULA : '\\skolemFormula';
 TERMLABEL : '\\termlabel';
 
 // used in contracts
-MODIFIES : '\\modifies';
+MODIFIABLE : '\\modifiable';
 
 // Keywords used in program variable declarations
 PROGRAMVARIABLES : '\\programVariables';
@@ -145,6 +145,7 @@ EQUAL_UNIQUE : '\\equalUnique';
 NEW : '\\new';
 NEW_TYPE_OF: '\\newTypeOf';
 NEW_DEPENDING_ON: '\\newDependingOn';
+NEW_LOCAL_VARS: '\\newLocalVars';
 HAS_ELEMENTARY_SORT:'\\hasElementarySort';
 NEWLABEL : '\\newLabel';
 CONTAINS_ASSIGNMENT : '\\containsAssignment';
@@ -185,6 +186,7 @@ PROFILE : '\\profile';
 TRUE : 'true';
 FALSE : 'false';
 
+
 // Keywords related to taclets
 SAMEUPDATELEVEL : '\\sameUpdateLevel';
 INSEQUENTSTATE : '\\inSequentState';
@@ -207,8 +209,10 @@ AVOID : '\\avoid';
 
 PREDICATES : '\\predicates';
 FUNCTIONS : '\\functions';
+DATATYPES : '\\datatypes';
 TRANSFORMERS : '\\transformers';
 UNIQUE : '\\unique';
+FREE : '\\free';
 
 RULES : '\\rules';
 AXIOMS : '\\axioms';
@@ -223,9 +227,10 @@ INVARIANTS : '\\invariants';
 // Taclet annotations (see TacletAnnotations.java for more details)
 LEMMA : '\\lemma';
 
-// The first two guys are not really meta operators, treated separately
+// The first three guys are not really meta operators, treated separately
 IN_TYPE : '\\inType';
 IS_ABSTRACT_OR_INTERFACE : '\\isAbstractOrInterface';
+IS_FINAL : '\\isFinal';
 CONTAINERTYPE : '\\containerType';
 
 // types that need to be declared as keywords
@@ -408,8 +413,6 @@ SL_COMMENT
 
 DOC_COMMENT: '/*!' -> more, pushMode(docComment);
 ML_COMMENT: '/*' -> more, pushMode(COMMENT);
-
-
 BIN_LITERAL: '0' 'b' ('0' | '1' | '_')+ ('l'|'L')?;
 
 HEX_LITERAL: '0' 'x' (DIGIT | 'a'..'f' | 'A'..'F' | '_')+ ('l'|'L')?;
@@ -450,7 +453,7 @@ DOUBLE_LITERAL:
     ;
 
 REAL_LITERAL:
-    RATIONAL_LITERAL ('r' | 'R')
+    RATIONAL_LITERAL ('r' | 'R')?
     ;
 
 

@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,22 +23,22 @@ public class SimplePipe implements Pipe {
     /**
      * The Reader that splits incoming messages at the given delimiters.
      */
-    private final @Nonnull BufferedMessageReader reader;
+    private final @NonNull BufferedMessageReader reader;
 
     /**
      *
      */
-    private final @Nonnull SolverCommunication session;
+    private final @NonNull SolverCommunication session;
 
     /**
      * The process this pipe is attached to.
      */
-    private final @Nonnull Process process;
+    private final @NonNull Process process;
 
     /**
      * The Writer connected to stdin of the external process.
      */
-    private final @Nonnull Writer smtIn;
+    private final @NonNull Writer smtIn;
 
     /**
      * Input of the SMT stdin
@@ -69,9 +72,9 @@ public class SimplePipe implements Pipe {
      * @param session the message list where to log the messages to
      * @param process the external process this pipe is connected to
      */
-    public SimplePipe(@Nonnull InputStream input, @Nonnull String[] messageDelimiters,
-            @Nonnull OutputStream output, @Nonnull SolverCommunication session,
-            @Nonnull Process process) {
+    public SimplePipe(@NonNull InputStream input, @NonNull String[] messageDelimiters,
+            @NonNull OutputStream output, @NonNull SolverCommunication session,
+            @NonNull Process process) {
         processWriter =
             new TeeWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), stdin);
         processReader = new TeeReader(new InputStreamReader(input, StandardCharsets.UTF_8), stdout);
@@ -91,7 +94,7 @@ public class SimplePipe implements Pipe {
     }
 
     @Override
-    public void sendMessage(@Nonnull String message) throws IOException {
+    public void sendMessage(@NonNull String message) throws IOException {
         try {
             session.addMessage(message, SolverCommunication.MessageType.INPUT);
             smtIn.write(message + System.lineSeparator());
@@ -124,7 +127,7 @@ public class SimplePipe implements Pipe {
     }
 
     @Override
-    public @Nonnull SolverCommunication getSolverCommunication() {
+    public @NonNull SolverCommunication getSolverCommunication() {
         return session;
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
 
 
@@ -25,7 +28,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply
- * the macro given by {@link getProofMacro()} directly, or --if not directly applicable-- search on
+ * the macro given by {@link #getProofMacro()} directly, or --if not directly applicable-- search on
  * the sequent for any applicable posInOcc and apply it on the first applicable one or --if not
  * applicable anywhere on the sequent-- do not apply it.
  *

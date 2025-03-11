@@ -5,7 +5,7 @@
 # Jenkins runs are triggered from somewhere else.
 #
 
-image: wadoon/key-test-docker:jdk11
+image: wadoon/key-test-docker:jdk17
 
 cache:
   policy: pull-push
@@ -47,7 +47,7 @@ compile:classes:
 compile:testClasses:
   dependencies:  ["compile:classes"]
   stage: secondary
-  image: wadoon/key-test-docker:jdk11
+  image: wadoon/key-test-docker:jdk17
   script:
     - javac -version
     - gradle --build-cache --parallel testClasses
@@ -61,7 +61,7 @@ compile:testClasses:
 sonarqube:
   dependencies:  ["compile:testClasses"]
   stage: ternary
-  image: wadoon/key-test-docker:jdk11
+  image: wadoon/key-test-docker:jdk17
   allow_failure: true
   script:
     - ./scripts/tools/sonarqube_hint.py
@@ -82,7 +82,7 @@ sonarqube:
 
 format:
   stage: primary
-  image: wadoon/key-test-docker:jdk11
+  image: wadoon/key-test-docker:jdk17
   allow_failure: true
   script:
     - gradle spotlessCheck

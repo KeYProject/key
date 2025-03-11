@@ -44,12 +44,11 @@
 
 \javaSource ".";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Dec 08 18:06:08 CET 2022
-contract=Gcd[Gcd\\:\\:gcd(int,int)].JML normal_behavior operation contract.0
-name=Gcd[Gcd\\:\\:gcd(int,int)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"contract": "Gcd[Gcd::gcd(int,int)].JML normal_behavior operation contract.0",
+	"name": "Gcd[Gcd::gcd(int,int)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Julian" ) (keyVersion "008f011f15"))

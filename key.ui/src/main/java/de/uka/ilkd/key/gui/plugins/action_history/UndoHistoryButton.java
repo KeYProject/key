@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.plugins.action_history;
 
 import java.awt.event.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -252,7 +256,7 @@ public class UndoHistoryButton {
     /**
      * The main purpose of this GUI component: the undo button / action.
      */
-    private final class UndoAction extends MainWindowAction {
+    public final class UndoAction extends MainWindowAction {
 
         /**
          * Calling this function should perform the undo operation.
@@ -269,7 +273,6 @@ public class UndoHistoryButton {
             super(mainWindow);
             setIcon(actionIcon.get(iconSize));
             setTooltip("Undo the last action performed on the proof");
-            setAcceleratorLetter(KeyEvent.VK_U);
             this.callback = callback;
         }
 

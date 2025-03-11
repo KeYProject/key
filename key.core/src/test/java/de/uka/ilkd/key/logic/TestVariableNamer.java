@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.Collections;
@@ -20,6 +23,7 @@ import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -34,13 +38,13 @@ public class TestVariableNamer {
     private final Proof proof = new Proof("TestVariableNamer",
         new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
     private final Services services = proof.getServices();
-    private final ProgramVariable x = constructProgramVariable("x");
-    private final ProgramVariable xx = constructProgramVariable("x");
-    private final ProgramVariable y = constructProgramVariable("y");
-    private final ProgramVariable x_1 = constructProgramVariable("x_1");
-    private final ProgramVariable x_2 = constructProgramVariable("x_2");
-    private final ProgramVariable var_1 = constructProgramVariable("var_1");
-    private final ProgramVariable var_2 = constructProgramVariable("var_2");
+    private final LocationVariable x = constructProgramVariable("x");
+    private final LocationVariable xx = constructProgramVariable("x");
+    private final LocationVariable y = constructProgramVariable("y");
+    private final LocationVariable x_1 = constructProgramVariable("x_1");
+    private final LocationVariable x_2 = constructProgramVariable("x_2");
+    private final LocationVariable var_1 = constructProgramVariable("var_1");
+    private final LocationVariable var_2 = constructProgramVariable("var_2");
     private final SequentFormula formulaWithX = constructFormula(x);
     private final SequentFormula formulaWithX_1 = constructFormula(x_1);
     private final SequentFormula formulaWithVar_1 = constructFormula(var_1);
@@ -48,12 +52,12 @@ public class TestVariableNamer {
             .createProgramSV(new ProgramElementName("sv"), ProgramSVSort.VARIABLE, false);
 
 
-    private ProgramVariable constructProgramVariable(ProgramElementName name) {
+    private LocationVariable constructProgramVariable(ProgramElementName name) {
         KeYJavaType myKeyJavaType = new KeYJavaType(new SortImpl(new Name("mysort")));
         return new LocationVariable(name, myKeyJavaType);
     }
 
-    private ProgramVariable constructProgramVariable(String name) {
+    private LocationVariable constructProgramVariable(String name) {
         ProgramElementName pen = VariableNamer.parseName(name);
         assertEquals(pen.toString(), name);
         return constructProgramVariable(pen);
@@ -143,7 +147,7 @@ public class TestVariableNamer {
         ProgramElementName name = vn.getTemporaryNameProposal("x");
         assertNotEquals("x", name.getProgramName());
 
-        ProgramVariable v = constructProgramVariable(name);
+        LocationVariable v = constructProgramVariable(name);
         SequentFormula formula = constructFormula(v);
         Goal goal = constructGoal(formula);
         PosInOccurrence pio = constructPIO(formula);
@@ -202,14 +206,15 @@ public class TestVariableNamer {
         PosInOccurrence pio = constructPIO(formulaWithVar_1);
         Goal goal = constructGoal(formulaWithVar_1);
 
-        proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null);
+        proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null, services);
         assertEquals("var_2", proposal.toString());
 
         proof.getNamespaces().programVariables().addSafely(var_2);
         addGlobal(goal, var_2);
 
-        proposal = vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null);
-        assertEquals("var_2", proposal.toString());
+        proposal =
+            vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null, services);
+        assertEquals("var_3", proposal.toString());
     }
 
 

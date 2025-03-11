@@ -1,13 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement;
 
 import java.awt.event.*;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.help.HelpInfo;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Wolfram Pfeifer
@@ -17,14 +22,14 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
     optional = true,
     description = "Allows to run soundness checks on proof bundles.",
     experimental = false)
+@HelpInfo(path = "https://github.com/KeYProject/key/blob/main/keyext.proofmanagement/README.md")
 public class ProofManagementExt implements
         KeYGuiExtension, KeYGuiExtension.MainMenu {
 
     private static final String MENU_PM = "Proof Management";
 
-    @Nonnull
     @Override
-    public List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
 
         return List.of(new CheckAction());
     }

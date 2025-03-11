@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.io.File;
 
-import de.uka.ilkd.key.api.KeYApi;
-import de.uka.ilkd.key.api.ProofManagementApi;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -22,7 +25,7 @@ public class ContractLoadingTests {
     public void sumAndMax() throws ProblemLoaderException {
         final File javaFile =
             new File(EXAMPLES_DIR, "heap/vstte10_01_SumAndMax/src/SumAndMax.java");
-        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
         Services services = file.getServices();
         Logger LOGGER = LoggerFactory.getLogger(ContractLoadingTests.class);
         for (Contract proofContract : file.getProofContracts()) {
@@ -35,8 +38,20 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
         Assertions.assertTrue(file.getProofContracts().size() > 0);
+    }
+
+    @Test
+    void issues1717() throws ProblemLoaderException, ProofInputException {
+        File javaFile =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1717/UnderscoreZero.java");
+        Assumptions.assumeTrue(javaFile.exists());
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
+        final var contract = file.getProofContracts().get(0);
+        var proof = file.createProof(contract.createProofObl(file.getInitConfig()));
+        Assertions.assertNotNull(proof);
     }
 
     @Test
@@ -44,8 +59,8 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/java/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        ProofManagementApi file = KeYApi.loadProof(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
     @Test
@@ -53,7 +68,7 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/bigint/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        ProofManagementApi file = KeYApi.loadProof(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 }

@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -23,6 +27,7 @@ public class Config {
 
     /** The index of the current size */
     private int sizeIndex = readSizeIndex();
+    private double sizeFactor = readSizeFactor();
 
     /** cached ConfigChange event */
     private final ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(this);
@@ -70,12 +75,21 @@ public class Config {
         return s;
     }
 
+    private double readSizeFactor() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getUIFontSizeFactor();
+    }
+
     public void setDefaultFonts() {
+        sizeFactor = readSizeFactor();
         int idx = readSizeIndex();
-        UIManager.put(KEY_FONT_PROOF_TREE, new Font("Default", Font.PLAIN, SIZES[idx]));
-        UIManager.put(KEY_FONT_SEQUENT_VIEW, new Font("Monospaced", Font.PLAIN, SIZES[idx]));
-        UIManager.put(KEY_FONT_GOAL_LIST_VIEW, new Font("Default", Font.PLAIN, SIZES[2]));
-        UIManager.put(KEY_FONT_PROOF_LIST_VIEW, new Font("Default", Font.PLAIN, SIZES[2]));
+        UIManager.put(KEY_FONT_PROOF_TREE,
+            new FontUIResource("Default", Font.PLAIN, (int) (sizeFactor * SIZES[idx])));
+        UIManager.put(KEY_FONT_SEQUENT_VIEW,
+            new FontUIResource("Monospaced", Font.PLAIN, (int) (sizeFactor * SIZES[idx])));
+        UIManager.put(KEY_FONT_GOAL_LIST_VIEW,
+            new FontUIResource("Default", Font.PLAIN, (int) (sizeFactor * SIZES[2])));
+        UIManager.put(KEY_FONT_PROOF_LIST_VIEW,
+            new FontUIResource("Default", Font.PLAIN, (int) (sizeFactor * SIZES[2])));
     }
 
 

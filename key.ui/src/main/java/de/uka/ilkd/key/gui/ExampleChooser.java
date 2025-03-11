@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -18,6 +21,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.util.java.IOUtil;
 
@@ -274,6 +279,15 @@ public final class ExampleChooser extends JDialog {
                 .setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) buttonDim.getHeight() + 10));
         getContentPane().add(buttonPanel);
 
+        // create the checkbox to hide example load on next startup
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        JCheckBox showAgainCheckbox =
+            new JCheckBox("Show this dialog on startup", vs.getShowLoadExamplesDialog());
+        buttonPanel.add(showAgainCheckbox);
+        showAgainCheckbox.addActionListener(e -> {
+            vs.setShowLoadExamplesDialog(showAgainCheckbox.isSelected());
+        });
+
         // create "load" button
         loadButton = new JButton("Load Example");
         loadButton.addActionListener(e -> {
@@ -308,6 +322,7 @@ public final class ExampleChooser extends JDialog {
         });
         buttonPanel.add(cancelButton);
         GuiUtilities.attachClickOnEscListener(cancelButton);
+
 
         // select first example
         DefaultMutableTreeNode firstLeaf =
@@ -390,8 +405,7 @@ public final class ExampleChooser extends JDialog {
         Object nodeObj = node.getUserObject();
         tabPane.removeAll();
 
-        if (nodeObj instanceof Example) {
-            Example example = (Example) nodeObj;
+        if (nodeObj instanceof Example example) {
 
             if (example != selectedExample) {
                 addTab(example.getDescription(), "Description", true);

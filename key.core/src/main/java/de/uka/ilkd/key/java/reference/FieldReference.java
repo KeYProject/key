@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.reference;
 
 
@@ -14,19 +17,24 @@ public class FieldReference extends VariableReference
     /**
      * Reference prefix.
      */
-    protected ReferencePrefix prefix;
+    protected final ReferencePrefix prefix;
 
 
     protected FieldReference() {
         prefix = null;
     }
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
-        super(pv);
-        initPrefix(pv, prefix);
+    protected FieldReference(ReferencePrefix prefix) {
+        this.prefix = prefix;
     }
 
-    private void initPrefix(ProgramVariable pv, ReferencePrefix prefix) {
+    public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
+        this(pv, prefix, PositionInfo.UNDEFINED);
+    }
+
+    public FieldReference(ExtList children, ReferencePrefix prefix) {
+        super(children);
+        final ProgramVariable pv = getProgramVariable();
         if (prefix == null && !pv.isStatic() && pv.isMember()) {
             this.prefix = new ThisReference();
         } else {
@@ -34,16 +42,13 @@ public class FieldReference extends VariableReference
         }
     }
 
-    public FieldReference(ExtList children, ReferencePrefix prefix) {
-        super(children);
-        initPrefix(getProgramVariable(), prefix);
-    }
-
-
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
         super(pv, pi);
-        initPrefix(pv, prefix);
-
+        if (prefix == null && !pv.isStatic() && pv.isMember()) {
+            this.prefix = new ThisReference();
+        } else {
+            this.prefix = prefix;
+        }
     }
 
     /**

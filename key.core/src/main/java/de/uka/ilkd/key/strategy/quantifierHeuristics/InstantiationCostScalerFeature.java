@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -7,6 +10,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class InstantiationCostScalerFeature implements Feature {
 
@@ -25,9 +29,10 @@ public class InstantiationCostScalerFeature implements Feature {
         return new InstantiationCostScalerFeature(costFeature, allowSplitting);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
 
-        final RuleAppCost cost = costFeature.computeCost(app, pos, goal);
+        final RuleAppCost cost = costFeature.computeCost(app, pos, goal, mState);
 
         if (cost.equals(NumberRuleAppCost.getZeroCost())) {
             return MINUS_3000_COST;
@@ -36,7 +41,7 @@ public class InstantiationCostScalerFeature implements Feature {
             return NumberRuleAppCost.getZeroCost();
         }
 
-        final RuleAppCost as = allowSplitting.computeCost(app, pos, goal);
+        final RuleAppCost as = allowSplitting.computeCost(app, pos, goal, mState);
         if (!as.equals(NumberRuleAppCost.getZeroCost())) {
             return TopRuleAppCost.INSTANCE;
         }

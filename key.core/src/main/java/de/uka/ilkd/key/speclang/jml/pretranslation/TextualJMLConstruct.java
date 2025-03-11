@@ -1,21 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
@@ -23,7 +26,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public abstract class TextualJMLConstruct {
 
-    protected final ImmutableList<JMLModifier> mods;
+    protected final ImmutableList<JMLModifier> modifiers;
     private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
@@ -32,13 +35,13 @@ public abstract class TextualJMLConstruct {
      */
     protected String name;
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> mods) {
-        assert mods != null;
-        this.mods = mods;
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
+        assert specModifiers != null;
+        this.modifiers = specModifiers;
     }
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> mods, String name) {
-        this(mods);
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+        this(specModifiers);
         this.name = name;
     }
 
@@ -58,8 +61,8 @@ public abstract class TextualJMLConstruct {
         this.loopContract = loopContract;
     }
 
-    public final ImmutableList<JMLModifier> getMods() {
-        return mods;
+    public final ImmutableList<JMLModifier> getModifiers() {
+        return modifiers;
     }
 
     /**
@@ -99,7 +102,7 @@ public abstract class TextualJMLConstruct {
      */
     @Deprecated
     protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
-            @Nonnull LabeledParserRuleContext ps) {
+            @NonNull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
         if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());

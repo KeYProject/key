@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Encapsulates intermediate information for constructing a {@link MergeRule} application.
@@ -39,7 +42,9 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
      *        determines how abstract domain elements are generated from predicates.
      * @param abstractionPredicates The abstraction predicates, if predicate abstraction is used as
      *        a join technique.
-     * @param currAbstractionPredicates
+     * @param userChoices abstraction predicates for program variables involved in a join that are
+     *        manually
+     *        chosen by the user
      */
     public MergeAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, int id,
             String joinProc, int nrPartners, ImmutableList<Name> newNames,

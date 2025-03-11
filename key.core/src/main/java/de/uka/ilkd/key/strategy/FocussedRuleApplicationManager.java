@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -6,6 +9,7 @@ import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
 import org.key_project.util.collection.ImmutableList;
@@ -112,7 +116,8 @@ public class FocussedRuleApplicationManager
                  * rule app within the focussed formula, but not within the focussed subterm
                  */
                 return isBelow(focFormula, pos) && !NonDuplicateAppModPositionFeature.INSTANCE
-                        .computeCost(rule, pos, goal).equals(BinaryFeature.TOP_COST);
+                        .computeCost(rule, pos, goal, new MutableState())
+                        .equals(BinaryFeature.TOP_COST);
             } else {
                 return !onlyModifyFocussedFormula;
             }

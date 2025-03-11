@@ -10,7 +10,7 @@ class StrictlyPure {
       @ ensures \result == field;
       @*/
     int strictlyPureMethod() {
-        // assignable means modifies in KeY!
+        // assignable means modifiable in KeY!
         // intermediate states may change the values of locations.
 
         field ++;

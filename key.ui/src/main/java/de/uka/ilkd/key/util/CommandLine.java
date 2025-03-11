@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.File;
@@ -609,11 +612,10 @@ public final class CommandLine {
 
     /**
      * Sets the line length used for the usage page.
-     *
+     * <p>
      * This is the number of characters printed in one line when printing the usage page. Longer
      * lines are broken at spaces (if possible).
-     *
-     * @return the line length
+     * </p>
      */
     public void setLineLength(int lineLength) {
         this.lineLength = lineLength;

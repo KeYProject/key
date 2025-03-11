@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.net.URI;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -10,20 +12,21 @@ import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A string with associated position information (file and line number). The position information is
  * used for error reporting.
  */
 public class PositionedString {
-    @Nonnull
-    public final String text;
 
-    @Nonnull
-    public final Location location;
+    public final @NonNull String text;
+
+    public final @NonNull Location location;
 
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
-    public PositionedString(@Nonnull String text, @Nonnull Location location) {
+    public PositionedString(@NonNull String text, @NonNull Location location) {
         if (text == null || location == null) {
             throw new IllegalArgumentException();
         }
@@ -32,7 +35,7 @@ public class PositionedString {
         this.location = location;
     }
 
-    public PositionedString(@Nonnull String text, URI fileName) {
+    public PositionedString(@NonNull String text, URI fileName) {
         this(text, new Location(fileName, Position.UNDEFINED));
     }
 
@@ -59,13 +62,11 @@ public class PositionedString {
             + location.getPosition() + ")";
     }
 
-    @Nonnull
-    public String getText() {
+    public @NonNull String getText() {
         return text;
     }
 
-    @Nonnull
-    public Location getLocation() {
+    public @NonNull Location getLocation() {
         return location;
     }
 
@@ -74,10 +75,9 @@ public class PositionedString {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PositionedString)) {
+        if (!(o instanceof PositionedString that)) {
             return false;
         }
-        PositionedString that = (PositionedString) o;
         return text.equals(that.text) && Objects.equals(location, that.location);
     }
 

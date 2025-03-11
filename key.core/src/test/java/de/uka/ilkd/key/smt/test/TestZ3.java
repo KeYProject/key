@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +77,13 @@ public class TestZ3 extends TestSMTSolver {
     }
 
     @Test
+    @Disabled("weigl: due to performance issues")
     public void testDiv5() throws Exception {
         assertTrue(correctResult(testFile + "div5.key", false));
     }
 
     @Test
+    @Disabled("weigl: due to performance issues")
     public void testDiv6() throws Exception {
         assertTrue(correctResult(testFile + "div6.key", false));
     }

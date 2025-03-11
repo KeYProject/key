@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.EventObject;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
@@ -33,7 +37,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         // removed, because there is only one
         // MainWindow!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addPropertyChangeListener(viewSettingsListener);
+                .addPropertyChangeListener(ViewSettings.HIDE_PACKAGE_PREFIX, viewSettingsListener);
         updateSelectedState();
     }
 
@@ -52,16 +56,11 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
                                                              // the UI will react on the settings
                                                              // change event!
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHidePackagePrefix(selected);
-        updateMainWindow();
     }
 
-    private void updateMainWindow() {
-        mainWindow.makePrettyView();
-    }
-
-    private void handleViewSettingsChanged(EventObject e) {
+    protected void handleViewSettingsChanged(PropertyChangeEvent e) {
         updateSelectedState();
-        updateMainWindow();
+        mainWindow.makePrettyView();
     }
 
 }

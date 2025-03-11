@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.Property;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -76,11 +78,11 @@ public class ExpandDefCommand extends AbstractCommand<ExpandDefCommand.Parameter
         if (p.on != null) {
             apps = apps.filter(
                     it -> it instanceof PosTacletApp &&
-                          it.posInOccurrence().subTerm().equalsModTermLabels(p.on));
+                          it.posInOccurrence().subTerm().equalsModProperty(p.on, RenamingTermProperty.RENAMING_TERM_PROPERTY));
         } else if (p.formula != null) {
             apps = apps.filter(
                     it -> it instanceof PosTacletApp &&
-                          it.posInOccurrence().sequentFormula().formula().equalsModTermLabels(p.formula));
+                          it.posInOccurrence().sequentFormula().formula().equalsModProperty(p.formula, RenamingTermProperty.RENAMING_TERM_PROPERTY));
         } else {
             throw new ScriptException("Either 'formula' or 'on' must be specified");
         }

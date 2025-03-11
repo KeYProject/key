@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
 import java.util.ArrayList;
@@ -61,8 +64,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
     private IProgramVariable findAttr(String fieldName) {
         String completeName = getFullName() + "::" + fieldName;
         for (int i = 0; i < members.size(); i++) {
-            if (members.get(i) instanceof FieldDeclaration) {
-                FieldDeclaration fd = (FieldDeclaration) members.get(i);
+            if (members.get(i) instanceof FieldDeclaration fd) {
                 FieldSpecification fs = fd.getFieldSpecifications().get(0);
                 if (fs.getName().equals(completeName)) {
                     return fs.getProgramVariable();

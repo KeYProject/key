@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.helper;
 
 import java.io.File;
@@ -5,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+@SuppressWarnings("nullness")
 public class HelperClassForUtilityTests {
     public static final File RESOURCE_DIRECTORY = FindResources.getTestResourcesDirectory();
 

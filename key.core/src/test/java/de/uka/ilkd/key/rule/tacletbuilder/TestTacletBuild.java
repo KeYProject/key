@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.io.File;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -12,6 +16,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +50,8 @@ public class TestTacletBuild {
     public void test0() {
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup("u");
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup("v");
-        Term b = tf.createTerm(TacletForTests.getSchemaVariables().lookup("b"), NO_SUBTERMS);
+        Term b = tf.createTerm((OperatorSV) TacletForTests.getSchemaVariables().lookup("b"),
+            NO_SUBTERMS);
         Term t1 = tb.ex((QuantifiableVariable) u, b);
         Term t2 = tb.ex((QuantifiableVariable) v, b);
         RewriteTacletBuilder<RewriteTaclet> sb = new RewriteTacletBuilder<>();

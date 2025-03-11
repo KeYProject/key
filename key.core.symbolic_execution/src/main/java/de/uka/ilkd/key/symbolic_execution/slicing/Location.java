@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -76,8 +79,7 @@ public class Location {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Location) {
-            Location other = (Location) obj;
+        if (obj instanceof Location other) {
             return Objects.equals(accesses, other.getAccesses());
         } else {
             return false;
@@ -140,8 +142,9 @@ public class Location {
             } else if (SymbolicExecutionUtil.isStaticVariable(access.getProgramVariable())) {
                 // Static field access
                 assert parent == null;
-                Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                    (LocationVariable) access.getProgramVariable(), services);
+                JFunction function =
+                    services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                        (LocationVariable) access.getProgramVariable(), services);
                 parent = services.getTermBuilder().staticDot(access.getProgramVariable().sort(),
                     function);
             } else if (parent == null) {
@@ -151,13 +154,14 @@ public class Location {
             } else if (services.getJavaInfo().getArrayLength() == access.getProgramVariable()) {
                 // Special handling for length attribute of arrays
                 assert parent != null;
-                Function function = services.getTypeConverter().getHeapLDT().getLength();
+                JFunction function = services.getTypeConverter().getHeapLDT().getLength();
                 parent = services.getTermBuilder().func(function, parent);
             } else {
                 // Field access on the parent variable
                 assert parent != null;
-                Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                    (LocationVariable) access.getProgramVariable(), services);
+                JFunction function =
+                    services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                        (LocationVariable) access.getProgramVariable(), services);
                 parent = services.getTermBuilder().dot(access.getProgramVariable().sort(), parent,
                     function);
             }

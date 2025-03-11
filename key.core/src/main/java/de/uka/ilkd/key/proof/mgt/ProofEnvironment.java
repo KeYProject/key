@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.LinkedHashSet;
@@ -133,10 +136,9 @@ public class ProofEnvironment {
      * to available rules and specs.
      */
     public boolean equals(Object cmp) {
-        if (!(cmp instanceof ProofEnvironment)) {
+        if (!(cmp instanceof ProofEnvironment pe)) {
             return false;
         }
-        ProofEnvironment pe = (ProofEnvironment) cmp;
         return pe.getJavaModel().equals(getJavaModel())
                 && pe.initConfig.getActivatedChoices().equals(initConfig.getActivatedChoices());
     }

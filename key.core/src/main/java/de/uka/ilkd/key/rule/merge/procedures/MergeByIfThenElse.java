@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashSet;
@@ -9,11 +12,10 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
@@ -105,12 +107,12 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         Term cond, ifForm, elseForm;
 
         if (distinguishingFormula == null) {
-            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+            DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
-            cond = distFormAndRightSidesForITEUpd.first;
-            ifForm = distFormAndRightSidesForITEUpd.second;
-            elseForm = distFormAndRightSidesForITEUpd.third;
+            cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            elseForm = distFormAndRightSidesForITEUpd.elseTerm();
         } else {
             cond = distinguishingFormula;
             ifForm = ifTerm;
@@ -144,7 +146,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
+    static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
             LocationVariable v, SymbolicExecutionState state1, SymbolicExecutionState state2,
             Services services) {
 
@@ -166,7 +168,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     /**
-     * Creates the input for an if-then-else update. The elements of the resulting quadruple can be
+     * Creates the input for an if-then-else update. The elements of the resulting
+     * {@link DistanceFormRightSide} can be
      * used to construct an elementary update corresponding to
      * <code>{ v := \if (c1) \then (ifTerm) \else (elseTerm) }</code>, where c1 is the path
      * condition of state1. However, the method also tries an optimization: The path condition c2 of
@@ -187,7 +190,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
+    static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
             SymbolicExecutionState state1, SymbolicExecutionState state2, Term ifTerm,
             Term elseTerm, Services services) {
 
@@ -214,9 +217,18 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         // left); this
         // should be allowed (although they are of course indistinguishable).
         assert distinguishingFormula != null || distinguishingFormula2 != null
-                : String.format("\nA computed distinguishing formula is trivial (\"true\"); "
-                    + "please verify that everything is OK. Symbolic execution states were:\n\n"
-                    + "--- State 1 ---\n%s\n\n---State 2---\n%s\n", state1, state2);
+                : String.format(
+                    """
+
+                            A computed distinguishing formula is trivial ("true"); please verify that everything is OK. Symbolic execution states were:
+
+                            --- State 1 ---
+                            %s
+
+                            ---State 2---
+                            %s
+                            """,
+                    state1, state2);
 
         boolean commuteSides = false;
         if (distinguishingFormula == null) {
@@ -234,7 +246,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula, true,
             SIMPLIFICATION_TIMEOUT_MS);
 
-        return new Quadruple<>(distinguishingFormula,
+        return new DistanceFormRightSide(distinguishingFormula,
             commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm : elseTerm, commuteSides);
 
     }
@@ -242,5 +254,28 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     @Override
     public String toString() {
         return DISPLAY_NAME;
+    }
+
+    /**
+     * Represents the distance between formulas for an if-then-else update.
+     * Input to construct an elementary update like
+     * <code>{ v := \if (distinguishingFormula) \then (ifTerm) \else (elseTerm) }</code>, where
+     * distinguishingFormula, ifTerm
+     * and elseTerm are the respective components of the returned triple. The sideCommuted component
+     * indicates whether the path condition of the distinguishingFormula (sideCommuted component =
+     * false) or the
+     * ifTerm (sideCommuted component = true) state was used as a basis for the condition
+     * (distinguishingFormula
+     * component).
+     *
+     * @param distinguishingFormula a formula
+     * @param ifTerm a term
+     * @param elseTerm a term
+     * @param sideCommuted true if ifTerm and elseTerm have been swapped.
+     * @see #createDistFormAndRightSidesForITEUpd(SymbolicExecutionState, SymbolicExecutionState,
+     *      Term, Term, Services)
+     */
+    public record DistanceFormRightSide(Term distinguishingFormula, Term ifTerm, Term elseTerm,
+            boolean sideCommuted) {
     }
 }

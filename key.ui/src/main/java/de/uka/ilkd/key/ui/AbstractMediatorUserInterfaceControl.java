@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
@@ -9,7 +12,6 @@ import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -127,8 +129,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
             ProverTaskListener ptl = this;
             try {
-                getMediator().stopInterface(true);
-                getMediator().setInteractive(false);
+                getMediator().initiateAutoMode(proof, true, false);
                 ptl.taskStarted(
                     new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
                 synchronized (macro) {
@@ -141,8 +142,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
                 LOGGER.debug("Exception occurred during macro application:", e);
             } finally {
                 ptl.taskFinished(info);
-                getMediator().setInteractive(true);
-                getMediator().startInterface(true);
+                getMediator().finishAutoMode(proof, true, true, null);
             }
             return true;
         } else {
@@ -173,8 +173,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time
             ThreadUtilities.invokeAndWait(() -> {
-                getMediator().stopInterface(true);
-                getMediator().setInteractive(false);
+                getMediator().initiateAutoMode(info.getProof(), true, false);
             });
         }
     }
@@ -215,10 +214,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final File toSave = new File(proofFolder, filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
         final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
-        try {
-            ps.save();
-        } catch (IOException e) {
-            reportException(this, null, e);
+        final String errorMsg = ps.save();
+        if (errorMsg != null) {
+            reportException(this, null, new IOException(errorMsg));
         }
     }
 
@@ -231,9 +229,6 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final ProofEnvironment env = new ProofEnvironment(initConfig);
         env.addProofEnvironmentListener(this);
         env.registerProof(proofOblInput, proofList);
-        for (Proof proof : proofList.getProofs()) {
-            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
-        }
         return env;
     }
 
@@ -264,10 +259,10 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * asks if removal of a task is completed. This is useful to display a dialog to the user and
      * asking her or if on command line to allow it always.
      *
-     * @param message
+     * @param message to be displayed asking for confirmation
      * @return true if removal has been granted
      */
-    public boolean confirmTaskRemoval(String string) {
+    public boolean confirmTaskRemoval(String message) {
         return true;
     }
 

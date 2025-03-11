@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.help;
 
 import java.awt.*;
@@ -10,6 +13,8 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
@@ -43,7 +48,7 @@ public class HelpFacade {
      *
      * @see #KEY_HELP_URL
      */
-    public static String HELP_BASE_URL = "https://key-project.org/docs/";
+    public static String HELP_BASE_URL = "https://keyproject.github.io/key-docs/";
 
     static {
         if (System.getProperty("KEY_HELP_URL") != null) {
@@ -53,8 +58,8 @@ public class HelpFacade {
 
     private static void openHelpInBrowser(String url) {
         try {
-            Desktop.getDesktop().browse(new URI(url));
-        } catch (IOException | URISyntaxException e) {
+            SwingUtil.browse(new URI(url));
+        } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
             LOGGER.warn("Failed to open help in browser", e);
         }
     }
@@ -67,11 +72,18 @@ public class HelpFacade {
     }
 
     /**
-     * Opens the specified sub page of the key documentation website in the default system browser.
+     * Opens the specified subpage of the KeY documentation website in the default system browser.
      *
      * @param path a valid suffix to the current URI
      */
     public static void openHelp(String path) {
+        if (path.startsWith("https://")) {
+            openHelpInBrowser(path);
+            return;
+        }
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
         openHelpInBrowser(HELP_BASE_URL + path);
     }
 
@@ -138,12 +150,17 @@ public class HelpFacade {
         return new HelpAction();
     }
 
+    /*
+     * TODO: While a good idea in principle, this only works partially at the moment: The source
+     * component of the ActionEvent is always the root pane, which means that always the main docs
+     * page is opened.
+     */
     private static class OpenHelpAction extends KeyAction {
         private static final long serialVersionUID = 85722762932429493L;
 
         public OpenHelpAction() {
             setName("Open help");
-            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, KeyEvent.CTRL_DOWN_MASK));
+            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
             lookupAcceleratorKey();
         }
 

@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -9,7 +13,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author lanzinger
  */
-public class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
+public class VariableReplacementMap extends ReplacementMap<LocationVariable> {
 
     /**
      * constructs a replacement map with the given term factory
@@ -21,8 +25,8 @@ public class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
     }
 
     @Override
-    protected ProgramVariable convert(ProgramVariable variable, TermServices services) {
-        return variable;
+    protected LocationVariable convert(ProgramVariable variable, TermServices services) {
+        return (LocationVariable) variable;
     }
 
 }

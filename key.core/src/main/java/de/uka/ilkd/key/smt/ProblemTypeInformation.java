@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.util.HashMap;
@@ -11,10 +14,11 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
 import de.uka.ilkd.key.smt.lang.Util;
+
+import org.key_project.logic.sort.Sort;
 
 public class ProblemTypeInformation {
 
@@ -118,8 +122,7 @@ public class ProblemTypeInformation {
 
         KeYJavaType kjt = info.getKeYJavaType(s);
 
-        if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration) {
-            ClassDeclaration c = (ClassDeclaration) kjt.getJavaType();
+        if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration c) {
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
                 if (!sp.equals(kjt)) {

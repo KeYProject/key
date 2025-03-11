@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // package de.uka.ilkd.key.speclang.translation;
 //
 // import de.uka.ilkd.key.java.Services;
@@ -7,8 +10,8 @@
 // import de.uka.ilkd.key.ldt.IntegerLDT;
 // import de.uka.ilkd.key.logic.Term;
 // import de.uka.ilkd.key.logic.TermBuilder;
-// import de.uka.ilkd.key.logic.op.Function;
-// import javax.annotation.Nonnull;
+// import org.key_project.logic.op.Function;
+// import org.jspecify.annotations.NonNull;
 //
 //
 /// **
@@ -82,13 +85,13 @@
 // //public interface
 // //-------------------------------------------------------------------------
 //
-// public boolean isIntegerTerm(@Nonnull SLExpression a) {
+// public boolean isIntegerTerm(@NonNull SLExpression a) {
 // assert a.isTerm();
 // return a.getTerm().sort() == integerLDT.targetSort();
 // }
 //
 //
-// public SLExpression buildPromotedOrExpression(@Nonnull SLExpression a, @Nonnull SLExpression b)
+// public SLExpression buildPromotedOrExpression(@NonNull SLExpression a, @NonNull SLExpression b)
 // throws SLTranslationException {
 // assert a != null;
 // assert b != null;

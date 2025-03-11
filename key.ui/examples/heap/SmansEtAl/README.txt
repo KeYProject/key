@@ -1,4 +1,4 @@
-example.name = Smans et al.
+example.name = Smans et al. / Cell
 example.path = Dynamic Frames
 example.additionalFile.1 = src/Cell.java
 example.additionalFile.2 = src/CellClient.java

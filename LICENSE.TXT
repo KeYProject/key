@@ -27,16 +27,14 @@
        Sweden
 
 
-       WWW: http://key-project.org
-       e-mail: key@ira.uka.de	
+       WWW: https://www.key-project.org/
+       e-mail: support@key-project.org
      
        The KeY system is protected by the GNU General Public License.
     
        The KeY system is free software; you can redistribute it 
-       and/or modify it under the terms of the GNU General 
-       Public License as published by the Free Software 
-       Foundation; either version 2 of the License, or (at your 
-       option) any later version. 
+       and/or modify it under the terms of the GNU General Public
+       License as published by the Free Software Foundation; version 2.
     
        This program is distributed in the hope that it will be 
        useful, but WITHOUT ANY WARRANTY; without 

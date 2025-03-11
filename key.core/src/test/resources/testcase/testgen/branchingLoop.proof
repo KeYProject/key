@@ -98,7 +98,7 @@ int _n;
                                                           _n)),
                                         oldN))))
   = (jint)(4)
-& inReachableState") (inst "#v1=b") (inst "#modifies={i,_n}"))
+& inReachableState") (inst "#v1=b") (inst "#modifiable={i,_n}"))
 (branch " Invariant Initially Valid"
    (builtin "Update Simplification" (formula "4"))
    (rule "castDelInt" (formula "4") (term "0,0"))

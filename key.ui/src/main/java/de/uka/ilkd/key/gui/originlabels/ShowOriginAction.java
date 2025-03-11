@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
@@ -5,8 +8,8 @@ import javax.swing.AbstractAction;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
@@ -47,7 +50,7 @@ public class ShowOriginAction extends MainWindowAction {
 
         // OriginTermLabelVisualizer.TermView can only print sequents or formulas, not terms.
         if (pio != null) {
-            while (!pio.subTerm().sort().equals(Sort.FORMULA)) {
+            while (!pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) {
                 pio = pio.up();
             }
         }

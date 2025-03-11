@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -5,12 +8,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -29,6 +31,8 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -251,7 +255,7 @@ public final class Goal {
     private void setNode(Node p_node) {
         if (node().sequent() != p_node.sequent()) {
             node = p_node;
-            resetTagManager();
+            tagManager = new FormulaTagManager(this);
         } else {
             node = p_node;
         }
@@ -362,12 +366,6 @@ public final class Goal {
             assert sci.sequent().equals(sci.getOriginalSequent());
             return;
         }
-        // sci.hasChanged() can be true for added: f, removed: f
-        // This afaik only ever happens in TestApplyTaclet.testBugBrokenApply
-        // Since SequentChangeInfo does not filter this we have to
-        // work with maybe sci.original.equals(sci.sequent)
-        // Checking this is probably too expensive for what it's worth
-        assert sci.sequent() != sci.getOriginalSequent();
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
         var time = System.nanoTime();
@@ -460,18 +458,6 @@ public final class Goal {
         ruleAppIndex.clearAndDetachCache();
     }
 
-    // @Deprecated
-    // public void setProgramVariables(Namespace ns) {
-    // // final Iterator<Named> it=ns.elements().iterator();
-    // // ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
-    // // while (it.hasNext()) {
-    // // s = s.add((ProgramVariable)it.next());
-    // // }
-    // // node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-    // // proof().getNamespaces().programVariables().set(s);
-    // // setGlobalProgVars(s);
-    // }
-
     public void addProgramVariable(ProgramVariable pv) {
         localNamespaces.programVariables().addSafely(pv);
     }
@@ -534,10 +520,10 @@ public final class Goal {
      * creates n new nodes as children of the referenced node and new n goals that have references
      * to these new nodes.
      *
+     * @param n number of goals to create
      * @return the list of new created goals.
      */
-    @Nonnull
-    public ImmutableList<Goal> split(int n) {
+    public @NonNull ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node
@@ -573,10 +559,6 @@ public final class Goal {
         return goalList;
     }
 
-    private void resetTagManager() {
-        tagManager = new FormulaTagManager(this);
-    }
-
     public void setBranchLabel(String s) {
         node.getNodeInfo().setBranchLabel(s);
     }
@@ -595,20 +577,27 @@ public final class Goal {
         for (IProgramVariable pv : node.getLocalProgVars()) {
             newNS.programVariables().add(pv);
         }
-        for (Function op : node.getLocalFunctions()) {
+        for (JFunction op : node.getLocalFunctions()) {
             newNS.functions().add(op);
         }
 
         localNamespaces = newNS.copyWithParent();
     }
 
+    /**
+     * Perform the provided rule application on this goal.
+     * Returns the new goal(s), if any.
+     * This will also populate a {@link RuleAppInfo} object and fire the corresponding event.
+     * The state of the proof is also updated.
+     *
+     * @param ruleApp the rule app
+     * @return new goal(s)
+     */
     public ImmutableList<Goal> apply(final RuleApp ruleApp) {
-
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
-
 
         final Node n = node;
 
@@ -636,7 +625,8 @@ public final class Goal {
             proof.closeGoal(this);
         } else {
             proof.replace(this, goalList);
-            if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
+            if (ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
+                    || ruleApp instanceof AbstractExternalSolverRuleApp) {
                 // the first new goal is the one to be closed
                 proof.closeGoal(goalList.head());
             }
@@ -658,7 +648,7 @@ public final class Goal {
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
-        Collection<Function> newFunctions = localNamespaces.functions().elements();
+        Collection<JFunction> newFunctions = localNamespaces.functions().elements();
 
         localNamespaces.flushToParent();
 
@@ -676,6 +666,7 @@ public final class Goal {
         }
     }
 
+    @Override
     public String toString() {
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), proof().getServices());
         lp.printSequent(node.sequent());
@@ -707,9 +698,6 @@ public final class Goal {
         this.localNamespaces = ns.copyWithParent().copyWithParent();
     }
 
-    /**
-     *
-     */
     public List<RuleApp> getAllBuiltInRuleApps() {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
         LinkedList<RuleApp> ruleApps = new LinkedList<>();

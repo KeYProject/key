@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.Node;
@@ -31,7 +34,7 @@ public class AnnotatedEdge extends DefaultEdge {
     }
 
     /**
-     * @return tte node that added this edge to the dependency graph
+     * @return the node that added this edge to the dependency graph
      */
     public Node getProofStep() {
         return proofStep;

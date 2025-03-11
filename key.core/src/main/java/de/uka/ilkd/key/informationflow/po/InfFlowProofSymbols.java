@@ -1,25 +1,31 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.util.LinkedList;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Named;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 public class InfFlowProofSymbols {
 
@@ -250,7 +256,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    private void addFunc(Function f, boolean labeled) {
+    private void addFunc(JFunction f, boolean labeled) {
         if (isPredicate(f)) {
             addPredicate(f, labeled);
         } else {
@@ -302,20 +308,16 @@ public class InfFlowProofSymbols {
             final SortedOperator s = (SortedOperator) symb;
             addSort(s.sort(), l);
         }
-        if (symb instanceof Function) {
-            final Function f = (Function) symb;
+        if (symb instanceof JFunction f) {
             addFunc(f, l);
         }
-        if (symb instanceof ProgramVariable) {
-            final ProgramVariable pv = (ProgramVariable) symb;
+        if (symb instanceof ProgramVariable pv) {
             addProgramVariable(pv, l);
         }
-        if (symb instanceof SchemaVariable) {
-            final SchemaVariable sv = (SchemaVariable) symb;
+        if (symb instanceof SchemaVariable sv) {
             addSchemaVariable(sv, l);
         }
-        if (symb instanceof Taclet) {
-            final Taclet t = (Taclet) symb;
+        if (symb instanceof Taclet t) {
             addTaclet(t, l);
         }
     }
@@ -324,28 +326,22 @@ public class InfFlowProofSymbols {
         assert symb != null;
         boolean l = true;
 
-        if (symb instanceof Sort) {
-            final Sort s = (Sort) symb;
-            addSort(s, l);
+        if (symb instanceof Sort sort) {
+            addSort(sort, l);
         }
-        if (symb instanceof SortedOperator) {
-            final SortedOperator s = (SortedOperator) symb;
-            addSort(s.sort(), l);
+        if (symb instanceof SortedOperator op) {
+            addSort(op.sort(), l);
         }
-        if (symb instanceof Function) {
-            final Function f = (Function) symb;
+        if (symb instanceof JFunction f) {
             addFunc(f, l);
         }
-        if (symb instanceof ProgramVariable) {
-            final ProgramVariable pv = (ProgramVariable) symb;
+        if (symb instanceof ProgramVariable pv) {
             addProgramVariable(pv, l);
         }
-        if (symb instanceof SchemaVariable) {
-            final SchemaVariable sv = (SchemaVariable) symb;
+        if (symb instanceof SchemaVariable sv) {
             addSchemaVariable(sv, l);
         }
-        if (symb instanceof Taclet) {
-            final Taclet t = (Taclet) symb;
+        if (symb instanceof Taclet t) {
             addTaclet(t, l);
         }
     }
@@ -544,7 +540,7 @@ public class InfFlowProofSymbols {
                 StringBuilder res = new StringBuilder("\\extends ");
                 boolean extendsAtLeastOneSort = false;
                 for (final Sort sortParent : sort.extendsSorts()) {
-                    if (sortParent != Sort.ANY) {
+                    if (sortParent != JavaDLTheory.ANY) {
                         res.append(sortParent.name()).append(", ");
                         extendsAtLeastOneSort = true;
                     }
@@ -617,11 +613,13 @@ public class InfFlowProofSymbols {
 
         result.append("\\schemaVariables{\n");
         for (final SchemaVariable sv : getSchemaVariables()) {
-            final String prefix = sv instanceof FormulaSV ? "\\formula "
-                    : sv instanceof TermSV ? "\\term " : "\\variables ";
+            if (!(sv instanceof OperatorSV asv))
+                continue;
+            final String prefix = asv instanceof FormulaSV ? "\\formula "
+                    : asv instanceof TermSV ? "\\term " : "\\variables ";
             result.append(prefix);
-            result.append(sv.sort().name()).append(" ");
-            result.append(sv.name());
+            result.append(asv.sort().name()).append(" ");
+            result.append(asv.name());
             result.append(";\n");
         }
         result.append("}\n\n");

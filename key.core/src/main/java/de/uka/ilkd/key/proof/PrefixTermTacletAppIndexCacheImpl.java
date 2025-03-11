@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.Map;
@@ -90,11 +93,10 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
 
         public boolean equals(Object obj) {
-            if (!(obj instanceof CacheKey)) {
+            if (!(obj instanceof CacheKey objKey)) {
                 return false;
             }
 
-            final CacheKey objKey = (CacheKey) obj;
             return parent == objKey.parent && analysedTerm.equals(objKey.analysedTerm);
         }
 

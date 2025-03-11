@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -19,6 +22,32 @@ import org.slf4j.LoggerFactory;
  */
 public class ProofSaver extends OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSaver.class);
+
+    /**
+     * Save this proof to a file
+     *
+     * @param file file to save proof in
+     * @param proof the {@link Proof} to be saved
+     * @throws IOException on any I/O error
+     */
+    public static void saveToFile(File file, Proof proof) throws IOException {
+        ProofSaver saver = new ProofSaver(proof, file);
+        saver.save();
+    }
+
+    /**
+     * Save this proof to a file whilst omitting all proof steps.
+     * In effect, this only saves the proof obligation.
+     *
+     * @param file file to save proof in
+     * @param proof the {@link Proof} to be saved
+     * @throws IOException on any I/O error
+     */
+    public static void saveProofObligationToFile(File file, Proof proof) throws IOException {
+        ProofSaver saver = new ProofSaver(proof, file, false);
+        saver.save();
+    }
+
 
     private final File file;
 
@@ -84,7 +113,7 @@ public class ProofSaver extends OutputStreamProofSaver {
         save(new FileOutputStream(file));
     }
 
-    public String save() throws IOException {
+    public String save() {
         String errorMsg = null;
         try {
             save(file);
@@ -159,4 +188,5 @@ public class ProofSaver extends OutputStreamProofSaver {
     private String filename() {
         return file.getAbsolutePath();
     }
+
 }

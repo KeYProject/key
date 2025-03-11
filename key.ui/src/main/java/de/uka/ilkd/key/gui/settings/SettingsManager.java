@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.awt.event.ActionEvent;
@@ -12,7 +15,7 @@ import java.util.Properties;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.colors.ColorSettingsProvider;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -38,6 +41,7 @@ public class SettingsManager {
     public static final ShortcutSettings SHORTCUT_SETTINGS = new ShortcutSettings();
     public static final StandardUISettings STANDARD_UI_SETTINGS = new StandardUISettings();
     public static final ColorSettingsProvider COLOR_SETTINGS = new ColorSettingsProvider();
+    public static final FeatureSettingsPanel FEATURE_SETTINGS_PANEL = new FeatureSettingsPanel();
 
     private static SettingsManager INSTANCE;
     private final List<SettingsProvider> settingsProviders = new LinkedList<>();
@@ -58,6 +62,7 @@ public class SettingsManager {
             INSTANCE.add(EXTENSION_MANAGER);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             // INSTANCE.add(COLOR_SETTINGS);
+            INSTANCE.add(FEATURE_SETTINGS_PANEL);
         }
         return INSTANCE;
     }
@@ -150,21 +155,20 @@ public class SettingsManager {
         return settingsProviders.remove(o);
     }
 
-    public Action getActionShowSettings(MainWindow window) {
-        class ShowSettingsAction extends KeyAction {
-            private static final long serialVersionUID = 153753479823919818L;
-
-            public ShowSettingsAction() {
-                setName("Show Settings");
-                setIcon(IconFactory.editFile(16));
-                lookupAcceleratorKey();
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSettingsDialog(window);
-            }
+    public static class ShowSettingsAction extends MainWindowAction {
+        public ShowSettingsAction(MainWindow mainWindow) {
+            super(mainWindow);
+            setName("Settings");
+            setIcon(IconFactory.editFile(16));
         }
-        return new ShowSettingsAction();
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            getInstance().showSettingsDialog(mainWindow);
+        }
+    }
+
+    public static Action getActionShowSettings(MainWindow window) {
+        return new ShowSettingsAction(window);
     }
 }

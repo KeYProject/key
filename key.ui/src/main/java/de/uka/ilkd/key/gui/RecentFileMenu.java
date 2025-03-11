@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionListener;
@@ -5,11 +8,13 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Properties;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
 import org.slf4j.Logger;
@@ -50,7 +55,7 @@ public class RecentFileMenu {
     /**
      * recent files, unique by path
      */
-    private final HashMap<String, RecentFileEntry> pathToRecentFile = new HashMap<>();
+    private final Map<String, RecentFileEntry> pathToRecentFile = new LinkedHashMap<>();
     /**
      * Mapping from menu item to entry
      */
@@ -192,39 +197,12 @@ public class RecentFileMenu {
     }
 
     /**
-     * read the recent file names from the properties object. the property names are expected to be
-     * "RecentFile0" "RecentFile1" ...
-     */
-    private void load(Properties p) {
-        int i = maxNumberOfEntries;
-        do {
-            String s = p.getProperty("RecentFile" + i);
-            if (s != null) {
-                addRecentFileNoSave(s);
-            }
-            i--;
-        } while (i >= 0);
-    }
-
-    /**
-     * Put the names of the recent Files into the properties object. The property names are
-     * "RecentFile0" "RecentFile1" ... The values are fully qualified path names.
-     */
-    public void store(Properties p) {
-        // if there's nothing to store:
-        for (int i = 0; i < menu.getItemCount(); i++) {
-            p.setProperty("RecentFile" + i, getAbsolutePath(menu.getItem(i)));
-        }
-    }
-
-    /**
      * read the recent files from the given properties file
      */
     public final void loadFrom(String filename) {
-        try (FileInputStream propStream = new FileInputStream(filename)) {
-            Properties p = new Properties();
-            p.load(propStream);
-            load(p);
+        try {
+            var c = Configuration.load(new File(filename));
+            c.getStringList("recentFiles").forEach(this::addRecentFileNoSave);
         } catch (FileNotFoundException ex) {
             LOGGER.debug("Could not read RecentFileList. Did not find file {}", filename);
         } catch (IOException ioe) {
@@ -232,8 +210,11 @@ public class RecentFileMenu {
         }
     }
 
+    /**
+     * @return the absolute path to the most recently opened file (maybe null)
+     */
     public String getMostRecent() {
-        return mostRecentFile.getAbsolutePath();
+        return mostRecentFile != null ? mostRecentFile.getAbsolutePath() : null;
     }
 
     /**
@@ -242,17 +223,16 @@ public class RecentFileMenu {
      */
     public void store(String filename) {
         File localRecentFiles = new File(filename);
+        Configuration c = new Configuration();
+        var seq = menuItemToRecentFile.values().stream()
+                .map(RecentFileEntry::getAbsolutePath)
+                .collect(Collectors.toList());
+        c.set("recentFiles", seq);
 
-        Properties p = new Properties();
-        try (FileInputStream fin = new FileInputStream(localRecentFiles);
-                FileOutputStream fout = new FileOutputStream(localRecentFiles)) {
-            // creates a new file if it does not exist yet
-            localRecentFiles.createNewFile();
-            p.load(fin);
-            store(p);
-            p.store(fout, "recent files");
+        try (var fin = new BufferedWriter(new FileWriter(localRecentFiles))) {
+            c.save(fin, "");
         } catch (IOException ex) {
-            LOGGER.info("Could not write recent files list", ex);
+            LOGGER.info("Could not write recent files list ", ex);
         }
     }
 

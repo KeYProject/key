@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
@@ -17,7 +20,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
  */
 public class HeapContext {
 
-    public static List<LocationVariable> getModHeaps(Services services, boolean transaction) {
+    public static List<LocationVariable> getModifiableHeaps(Services services,
+            boolean transaction) {
         List<LocationVariable> result = new ArrayList<>();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
