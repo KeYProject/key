@@ -410,7 +410,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         var argSort =
             context.argSort.stream()
-                    .map(it -> sorts().lookup(it.getText()))
+                    .map(it -> (Sort) accept(it))
                     .toList();
         var argNames =
             context.argName.stream()
@@ -602,7 +602,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         if (text.contains("[")) {
             var num = text.indexOf('[') - text.lastIndexOf(']') / 2 + 1;
-            return toArraySort(new Pair<>(s, t), num);
+            return toArraySort(s, t, num);
         }
         return s;
     }
@@ -746,7 +746,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public ImmutableSet<SchemaVariable> visitAddprogvar(KeYParser.AddprogvarContext ctx) {
         final Collection<? extends SchemaVariable> accept = accept(ctx.pvs);
-        return Immutables.<SchemaVariable>createSetFrom(Objects.requireNonNull(accept));
+        return Immutables.<SchemaVariable>setOf(Objects.requireNonNull(accept));
     }
 
     @Override
