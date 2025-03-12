@@ -17,4 +17,8 @@ public class SkipCommand extends NoArgumentCommand {
         return "skip";
     }
 
+    @Override
+    public String getDocumentation() {
+        return "Does exactly nothing. Really nothing.";
+    }
 }
