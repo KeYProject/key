@@ -24,7 +24,7 @@ public class ValueInjectorTest {
     @Test
     public void testInjectionSimple() throws Exception {
         PP pp = new PP();
-        Map<String, String> args = new HashMap<>();
+        Map<String, Object> args = new HashMap<>();
         args.put("b", "true");
         args.put("i", "42");
         args.put("s", "blubb");
@@ -40,7 +40,7 @@ public class ValueInjectorTest {
     @Test
     public void testRequired() {
         PP pp = new PP();
-        Map<String, String> args = new HashMap<>();
+        Map<String, Object> args = new HashMap<>();
         args.put("b", "true");
         args.put("s", "blubb");
         assertThrows(ArgumentRequiredException.class,
@@ -81,7 +81,7 @@ public class ValueInjectorTest {
     public static class PP {
         @Option("b")
         boolean b;
-        @Option(value = "i", required = true)
+        @Option(value = "i")
         int i;
         @Option(value = "s", required = false)
         String s;
