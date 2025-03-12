@@ -25,11 +25,11 @@ public class ValueInjectorTest {
     public void testInjectionSimple() throws Exception {
         PP pp = new PP();
         Map<String, Object> args = new HashMap<>();
-        args.put("b", "true");
-        args.put("i", "42");
+        args.put("b", true);
+        args.put("i", 42);
         args.put("s", "blubb");
 
-        ValueInjector.injection(new LetCommand(), pp, args);
+        ValueInjector.injection(new PPCommand(), pp, args);
 
         assertTrue(pp.b);
         assertEquals(42, pp.i);
@@ -93,7 +93,7 @@ public class ValueInjectorTest {
         }
 
         @Override
-        public PP evaluateArguments(EngineState state, Map<String, String> arguments) {
+        public PP evaluateArguments(EngineState state, Map<String, Object> arguments) {
             return null;
         }
 

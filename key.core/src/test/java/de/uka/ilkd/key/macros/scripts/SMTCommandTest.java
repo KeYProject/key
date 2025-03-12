@@ -19,7 +19,7 @@ public class SMTCommandTest {
         args.put("solver", "z3");
 
         SMTCommand cmd = new SMTCommand();
-        SMTCommand.SMTCommandArguments o = cmd.evaluateArguments(new EngineState(null), args);
+        SMTCommand.SMTCommandArguments o = cmd.evaluateArguments(new EngineState(null, null), args);
         Assertions.assertEquals("z3", o.solver);
     }
 }
