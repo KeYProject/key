@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
@@ -95,10 +96,10 @@ public class ValueInjector {
     /**
      * Injects the converted version of the given {@code arguments} in the given {@code obj}.
      *
+     * @param <T>       type safety
      * @param command a proof script command
      * @param obj a non-null instance of a parameter class (with annotation)
      * @param arguments a non-null string map
-     * @param <T> type safety
      * @return the same object as {@code obj}
      * @throws ArgumentRequiredException a required argument was not given in {@code arguments}
      * @throws InjectionReflectionException an access on some reflection methods occurred
@@ -198,8 +199,8 @@ public class ValueInjector {
         try {
             return converter.convert(val);
         } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert value %s to type %s",
-                val, meta.getField().getType().getName()), e, meta);
+            throw new ConversionException(String.format("Could not convert value %s (%s) to type %s",
+                val, val.getClass(), meta.getField().getType().getName()), e, meta);
         }
     }
 
@@ -230,5 +231,11 @@ public class ValueInjector {
     @SuppressWarnings("unchecked")
     public <R, T> Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
         return (Converter<R, T>) converters.get(new Pair<>(ret, arg));
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "(" + converters.keySet().stream()
+                .map(it -> it.toString()).collect(Collectors.joining(",\n")) + ")";
     }
 }
