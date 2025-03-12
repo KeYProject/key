@@ -118,6 +118,10 @@ public class KeyIO {
         return seq;
     }
 
+    public Sequent parseSequence(String sequent) {
+        return parseSequence(CharStreams.fromString(sequent));
+    }
+
     public Services getServices() {
         return services;
     }

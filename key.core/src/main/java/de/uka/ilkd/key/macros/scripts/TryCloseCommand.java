@@ -28,7 +28,7 @@ public class TryCloseCommand extends AbstractCommand<TryCloseCommand.TryCloseArg
     }
 
     @Override
-    public TryCloseArguments evaluateArguments(EngineState state, Map<String, String> arguments)
+    public TryCloseArguments evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
         return ValueInjector.injection(this, new TryCloseArguments(), arguments);
     }

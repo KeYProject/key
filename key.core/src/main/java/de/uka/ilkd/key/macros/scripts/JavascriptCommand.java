@@ -45,7 +45,7 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
         return ValueInjector.injection(this, new Parameters(), arguments);
     }
