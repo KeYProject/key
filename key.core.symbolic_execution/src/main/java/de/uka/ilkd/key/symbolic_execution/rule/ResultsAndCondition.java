@@ -11,9 +11,9 @@ import de.uka.ilkd.key.proof.Node;
 /**
  * The return value of a side proof.
  *
- * @param result     a term representing the result (first formula of succedent)
+ * @param result a term representing the result (first formula of succedent)
  * @param conditions formulas of the antecedent
- * @param node       the final node of the side proof
+ * @param node the final node of the side proof
  */
 public record ResultsAndCondition(Term result, Set<Term> conditions, Node node) {
 }

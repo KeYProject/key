@@ -645,19 +645,19 @@ public final class ProofManagementDialog extends JDialog {
     // -------------------------------------------------------------------------
     private record ProofWrapper(Proof proof) {
         @Override
-            public String toString() {
-                return proof.name().toString();
-            }
+        public String toString() {
+            return proof.name().toString();
+        }
 
-            @Override
-            public boolean equals(Object o) {
-                return o instanceof final ProofWrapper pw && proof.equals(pw.proof);
-            }
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof final ProofWrapper pw && proof.equals(pw.proof);
+        }
 
-            @Override
-            public int hashCode() {
-                return 3*proof.hashCode();
-            }
+        @Override
+        public int hashCode() {
+            return 3 * proof.hashCode();
+        }
 
     }
 
