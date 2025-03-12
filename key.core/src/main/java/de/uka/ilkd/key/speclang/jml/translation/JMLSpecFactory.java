@@ -1073,7 +1073,8 @@ public class JMLSpecFactory {
                 }
             }
             final Contract depContract = cf.dep(pm.getContainerType(), pm, pm.getContainerType(),
-                pres, clauses.measuredBy, clauses.accessibles, progVars.selfVar, progVars.paramVars,
+                pres, clauses.measuredBy, clauses.accessibles, clauses.assignables,
+                progVars.selfVar, progVars.paramVars,
                 progVars.atPreVars, abbrvLhs);
             result = result.add(depContract);
         }
