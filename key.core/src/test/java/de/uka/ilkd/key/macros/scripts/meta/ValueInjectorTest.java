@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.AbstractCommand;
 import de.uka.ilkd.key.macros.scripts.EngineState;
+import de.uka.ilkd.key.macros.scripts.LetCommand;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
-
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +29,7 @@ public class ValueInjectorTest {
         args.put("i", "42");
         args.put("s", "blubb");
 
-        ValueInjector.injection(null, pp, args);
+        ValueInjector.injection(null, null, args);
 
         assertTrue(pp.b);
         assertEquals(42, pp.i);
@@ -44,7 +44,7 @@ public class ValueInjectorTest {
         args.put("b", "true");
         args.put("s", "blubb");
         assertThrows(ArgumentRequiredException.class,
-            () -> ValueInjector.injection(new PPCommand(), pp, args));
+            () -> ValueInjector.injection(new PPCommand(), null, args));
     }
 
     @Test

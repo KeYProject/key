@@ -88,6 +88,10 @@ public class KeyIO {
      */
     public @NonNull Term parseExpression(@NonNull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
+        return interpretExpression(ctx);
+    }
+
+    private Term interpretExpression(KeyAst.Term ctx) {
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
         if (schemaNamespace != null) {

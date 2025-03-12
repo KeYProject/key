@@ -46,7 +46,7 @@ public class LetCommand extends AbstractCommand<Map<String, Object>> {
             try {
                 // TODO weigl
                 var v = entry.getValue().toString();
-                abbrMap.put(stateMap.toTerm(v, null), key, true);
+                abbrMap.put(stateMap.toTerm(v), key, true);
             } catch (Exception e) {
                 throw new ScriptException(e);
             }

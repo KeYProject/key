@@ -3,14 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.function.Consumer;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -19,12 +11,21 @@ import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -114,6 +115,7 @@ public class ProofScriptEngine {
             stateMap.setObserver(commandMonitor);
         }
 
+
         int cnt = 0;
         for (KeYParser.ProofScriptCommandContext commandContext : ctx.proofScriptCommand()) {
             if (Thread.interrupted()) {
@@ -174,11 +176,13 @@ public class ProofScriptEngine {
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
                         String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
-                                e.getMessage(), prettyPrintCommand(commandContext), BuilderHelpers.getPosition(commandContext)),
+                                e.getMessage(), prettyPrintCommand(commandContext),
+                                BuilderHelpers.getPosition(commandContext)),
                         url, commandContext.start.getLine(), commandContext.start.getCharPositionInLine(), e);
             }
         }
     }
+
 
     public static String prettyPrintCommand(KeYParser.ProofScriptCommandContext ctx) {
         return (ctx.AT() != null ? "@ " : "") +
