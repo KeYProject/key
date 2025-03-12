@@ -19,19 +19,19 @@ public class SMTTermQuant extends SMTTerm {
 
         public Quant sign(boolean pol) {
             return switch (this) {
-                case FORALL -> {
-                    if (pol) {
-                        yield this;
-                    }
-                    yield EXISTS;
+            case FORALL -> {
+                if (pol) {
+                    yield this;
                 }
-                case EXISTS -> {
-                    if (pol) {
-                        yield this;
-                    }
-                    yield FORALL;
+                yield EXISTS;
+            }
+            case EXISTS -> {
+                if (pol) {
+                    yield this;
                 }
-                default -> throw new RuntimeException("Unexpected: Quant in neg() : " + this);
+                yield FORALL;
+            }
+            default -> throw new RuntimeException("Unexpected: Quant in neg() : " + this);
             };
         }
     }

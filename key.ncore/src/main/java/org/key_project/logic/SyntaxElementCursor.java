@@ -10,7 +10,8 @@ import java.util.Deque;
  * A cursor (or walker) for navigating {@link SyntaxElement}s in pre-order. *
  */
 public class SyntaxElementCursor {
-    private record ParentAndPosition(SyntaxElement parent, int index) {}
+    private record ParentAndPosition(SyntaxElement parent, int index) {
+    }
 
     private final Deque<ParentAndPosition> path = new ArrayDeque<>();
 

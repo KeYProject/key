@@ -238,7 +238,7 @@ public class TestEqualsHashCodeResetter {
      * @param value A value.
      * @author Martin Hentschel
      */
-        private record MyBean(String value) {
+    private record MyBean(String value) {
         /**
          * Constructor.
          *
@@ -248,17 +248,17 @@ public class TestEqualsHashCodeResetter {
             assertNotNull(value);
         }
 
-            /**
-             * Overwritten to make {@link MyBean}s equal if they have the same value.
-             */
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof MyBean) {
-                    return value.equals(((MyBean) obj).value);
-                } else {
-                    return false;
-                }
+        /**
+         * Overwritten to make {@link MyBean}s equal if they have the same value.
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof MyBean) {
+                return value.equals(((MyBean) obj).value);
+            } else {
+                return false;
             }
+        }
 
     }
 }

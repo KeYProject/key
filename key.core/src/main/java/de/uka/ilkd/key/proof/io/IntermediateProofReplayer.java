@@ -120,7 +120,8 @@ public class IntermediateProofReplayer {
      * @param intermediate representation of the node during the replay
      * @see MergePartnerAppIntermediate
      */
-    private record PartnerNode(Node node, PosInOccurrence pio, NodeIntermediate intermediate) {}
+    private record PartnerNode(Node node, PosInOccurrence pio, NodeIntermediate intermediate) {
+    }
 
     /** Maps join node IDs to previously seen join partners */
     private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();

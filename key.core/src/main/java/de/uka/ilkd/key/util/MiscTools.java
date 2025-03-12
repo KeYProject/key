@@ -731,31 +731,31 @@ public final class MiscTools {
 
         try {
             return switch (loc.getType()) {
-                case "URL" -> // URLDataLocation
-                        Optional.of(((URLDataLocation) loc).url().toURI());
-                case "ARCHIVE" -> { // ArchiveDataLocation
-                    // format: "ARCHIVE:<filename>?<itemname>"
-                    ArchiveDataLocation adl = (ArchiveDataLocation) loc;
+            case "URL" -> // URLDataLocation
+                Optional.of(((URLDataLocation) loc).url().toURI());
+            case "ARCHIVE" -> { // ArchiveDataLocation
+                // format: "ARCHIVE:<filename>?<itemname>"
+                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
 
-                    // extract item name and zip file
-                    int qmindex = adl.toString().lastIndexOf('?');
-                    String itemName = adl.toString().substring(qmindex + 1);
-                    ZipFile zip = adl.getFile();
+                // extract item name and zip file
+                int qmindex = adl.toString().lastIndexOf('?');
+                String itemName = adl.toString().substring(qmindex + 1);
+                ZipFile zip = adl.getFile();
 
-                    // use special method to ensure that path separators are correct
-                    yield Optional.of(getZipEntryURI(zip, itemName));
-                }
-                case "FILE" -> // DataFileLocation
-                    // format: "FILE:<path>"
-                        Optional.of(((DataFileLocation) loc).getFile().toURI());
-                default -> // SpecDataLocation
-                    // format "<type>://<location>"
-                    // wrap into URN to ensure URI encoding is correct (no spaces!)
-                        Optional.empty();
+                // use special method to ensure that path separators are correct
+                yield Optional.of(getZipEntryURI(zip, itemName));
+            }
+            case "FILE" -> // DataFileLocation
+                // format: "FILE:<path>"
+                Optional.of(((DataFileLocation) loc).getFile().toURI());
+            default -> // SpecDataLocation
+                // format "<type>://<location>"
+                // wrap into URN to ensure URI encoding is correct (no spaces!)
+                Optional.empty();
             };
         } catch (URISyntaxException | IOException e) {
             throw new IllegalArgumentException(
-                    "The given DataLocation can not be converted into a valid URI: " + loc, e);
+                "The given DataLocation can not be converted into a valid URI: " + loc, e);
         }
     }
 
