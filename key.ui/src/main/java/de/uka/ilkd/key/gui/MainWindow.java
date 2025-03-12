@@ -6,11 +6,10 @@ package de.uka.ilkd.key.gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -24,7 +23,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -57,6 +55,7 @@ import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
@@ -105,6 +104,8 @@ public final class MainWindow extends JFrame {
         "BULK_UI_TEST",
         "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.",
         false);
+
+    public static final String PROPERTY_IN_AUTO_MODE = "inAutoMode";
 
     private static MainWindow instance = null;
     /**
@@ -167,23 +168,27 @@ public final class MainWindow extends JFrame {
     private final ToggleProofTreeTooltipAction toogleProofTreeTooltipAction =
         new ToggleProofTreeTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
-    private boolean frozen = false;
+
     /**
      *
      */
     private final CControl dockControl = new CControl(this);
+
     /**
      * the first toolbar
      */
     private JToolBar controlToolBar;
+
     /**
      * the second toolbar
      */
     private JToolBar fileOpToolBar;
+
     /**
      * the status line
      */
     private MainStatusLine statusLine;
+
     /**
      * action for opening a KeY file
      */
@@ -278,6 +283,7 @@ public final class MainWindow extends JFrame {
 
     private final LruCached<HTMLSyntaxHighlighter.Args, String> highlightCache =
         new LruCached<>(HTMLSyntaxHighlighter.Args::run);
+    private boolean inAutoMode;
 
     /*
      * This class should only be instantiated once!
@@ -442,7 +448,7 @@ public final class MainWindow extends JFrame {
      */
     private void applyGnomeWorkaround() {
         Toolkit xToolkit = Toolkit.getDefaultToolkit();
-        java.lang.reflect.Field awtAppClassNameField;
+        Field awtAppClassNameField;
         try {
             awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
             awtAppClassNameField.setAccessible(true);
@@ -573,7 +579,7 @@ public final class MainWindow extends JFrame {
 
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
 
-        proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
+        proofListView.setPreferredSize(new Dimension(350, 100));
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
 
         // JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView,
@@ -816,27 +822,6 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * Freeze the main window by blocking all input events, except those for the toolbar (i.e.
-     * the abort button within the toolbar)
-     */
-    public void freezeExceptAutoModeButton() {
-        if (!frozen) {
-            frozen = true;
-
-            Component glassPane = new BlockingGlassPane(getContentPane());
-            setGlassPane(glassPane);
-            glassPane.setVisible(true);
-        }
-    }
-
-    public void unfreezeExceptAutoModeButton() {
-        if (frozen) {
-            getGlassPane().setVisible(false);
-            frozen = false;
-        }
-    }
-
-    /**
      * Update the sequent view.
      */
     public void makePrettyView() {
@@ -846,7 +831,7 @@ public final class MainWindow extends JFrame {
         SwingUtilities.invokeLater(this::updateSequentView);
     }
 
-    private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
+    private void addToProofList(ProofAggregate plist) {
         proofList.addProof(plist);
         // TODO/Check: the code below emulates phantom actions. Check if this can be solved
         // differently
@@ -1183,7 +1168,7 @@ public final class MainWindow extends JFrame {
         return currentGoalView;
     }
 
-    public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
+    public void addProblem(final ProofAggregate plist) {
         Runnable guiUpdater = () -> {
             disableCurrentGoalView = true;
             addToProofList(plist);
@@ -1489,146 +1474,14 @@ public final class MainWindow extends JFrame {
         return currentGoalView;
     }
 
-    /**
-     * Glass pane that only delivers events for the status line (i.e. the abort button)
-     * <p>
-     * This has been partly taken from the GlassPaneDemo of the Java Tutorial
-     */
-    private static class BlockingGlassPane extends JComponent {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1218022319090988424L;
-        private final GlassPaneListener listener;
-
-        public BlockingGlassPane(Container contentPane) {
-            setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-            listener = new GlassPaneListener(this, contentPane);
-            addMouseListener(listener);
-            addMouseMotionListener(listener);
-            addKeyListener(new KeyListener() {
-
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    e.consume();
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    e.consume();
-
-                }
-
-                @Override
-                public void keyTyped(KeyEvent e) {
-                    e.consume();
-                }
-
-            });
-        }
+    public void setInAutoMode(boolean inAutoMode) {
+        var oldValue = this.inAutoMode;
+        this.inAutoMode = inAutoMode;
+        firePropertyChange(PROPERTY_IN_AUTO_MODE, oldValue, inAutoMode);
     }
 
-    /**
-     * Mouse listener for the glass pane that only delivers events for the status line (i.e. the
-     * abort button)
-     * <p>
-     * This has been partly taken from the GlassPaneDemo of the Java Tutorial
-     */
-    private static class GlassPaneListener extends MouseInputAdapter {
-        Component currentComponent = null;
-        final Component glassPane;
-        final Container contentPane;
-
-        public GlassPaneListener(Component glassPane, Container contentPane) {
-            this.glassPane = glassPane;
-            this.contentPane = contentPane;
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {
-            redispatchMouseEvent(e);
-        }
-
-        /*
-         * We must forward at least the mouse drags that started with mouse presses over the check
-         * box. Otherwise, when the user presses the check box then drags off, the check box isn't
-         * disarmed -- it keeps its dark gray background or whatever its L&F uses to indicate that
-         * the button is currently being pressed.
-         */
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            redispatchMouseEvent(e);
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            redispatchMouseEvent(e);
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            redispatchMouseEvent(e);
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            redispatchMouseEvent(e);
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            redispatchMouseEvent(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            redispatchMouseEvent(e);
-            currentComponent = null;
-        }
-
-        private void redispatchMouseEvent(MouseEvent e) {
-            if (currentComponent != null) {
-                dispatchForCurrentComponent(e);
-            } else {
-                int eventID = e.getID();
-                Point glassPanePoint = e.getPoint();
-
-                Point containerPoint =
-                    SwingUtilities.convertPoint(glassPane, glassPanePoint, contentPane);
-                Component component = SwingUtilities.getDeepestComponentAt(contentPane,
-                    containerPoint.x, containerPoint.y);
-
-                if (eventID == MouseEvent.MOUSE_PRESSED && isLiveComponent(component)) {
-                    currentComponent = component;
-                    dispatchForCurrentComponent(e);
-                }
-            }
-        }
-
-        // FIXME This is not really good.
-        private boolean isLiveComponent(Component c) {
-            // this is not the most elegant way to identify the right
-            // components, but it scales well ;-)
-            while (c != null) {
-                if ((c instanceof JComponent)
-                        && AUTO_MODE_TEXT.equals(((JComponent) c).getToolTipText())) {
-                    return true;
-                }
-                c = c.getParent();
-            }
-            return false;
-        }
-
-        private void dispatchForCurrentComponent(MouseEvent e) {
-            Point glassPanePoint = e.getPoint();
-            Point componentPoint =
-                SwingUtilities.convertPoint(glassPane, glassPanePoint, currentComponent);
-            currentComponent.dispatchEvent(new MouseEvent(currentComponent, e.getID(), e.getWhen(),
-                // do not use as it freezes the stop button: e.getModifiersEx(),
-                e.getModifiers(), componentPoint.x, componentPoint.y, e.getClickCount(),
-                e.isPopupTrigger()));
-        }
+    public boolean isInAutoMode() {
+        return inAutoMode;
     }
 
     /**
@@ -1776,7 +1629,7 @@ public final class MainWindow extends JFrame {
             LOGGER.debug("Automode started");
             disableCurrentGoalView = true;
             getMediator().removeKeYSelectionListener(proofListener);
-            freezeExceptAutoModeButton();
+            setInAutoMode(true);
         }
 
         /**
@@ -1785,9 +1638,9 @@ public final class MainWindow extends JFrame {
         @Override
         public synchronized void autoModeStopped(ProofEvent e) {
             LOGGER.debug("Automode stopped");
-            unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             getMediator().addKeYSelectionListenerChecked(proofListener);
+            setInAutoMode(false);
         }
 
         @Override
