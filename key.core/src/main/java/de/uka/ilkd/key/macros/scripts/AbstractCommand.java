@@ -51,7 +51,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
 
 
     @Override
-    public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
+    public T evaluateArguments(EngineState state, Map<String, Object> arguments) throws Exception {
         if (parameterClazz != null) {
             T obj = parameterClazz.getDeclaredConstructor().newInstance();
             return state.getValueInjector().inject(this, obj, arguments);

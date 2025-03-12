@@ -11,4 +11,4 @@ rule andLeft;
 
 Error while executing script: No matching applications.
 
-Command: rule andLeft
+Command: rule andLeft;

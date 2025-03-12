@@ -22,7 +22,7 @@ public class SetEchoCommand extends AbstractCommand<SetEchoCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }

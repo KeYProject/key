@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-
-import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.nparser.KeYParser.ProofScriptContext;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -16,10 +12,8 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
-
-import org.key_project.util.java.StringUtil;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -27,6 +21,11 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.java.StringUtil;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
 /**
  * This is a monad around the parse tree. We use this class to hide the
@@ -70,7 +69,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public @Nullable ProofSettings findProofSettings() {
+        @Nullable
+        public ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
 
             if (ctx.preferences() != null && ctx.preferences().s != null) {
@@ -92,17 +92,18 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          * or including
          * other files.
          *
-         * @param url location pointing to the source of the AST
          * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
          */
-        public @Nullable ProofScriptEntry findProofScript(URI url) {
-            if (ctx.problem() != null && ctx.problem().proofScript() != null) {
-                KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
-                Location location = new Location(url,
-                    Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
-
-                String text = pctx.ps.getText();
-                return new ProofScriptEntry(StringUtil.trim(text, '"'), location);
+        public ProofScript findProofScript() {
+            if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
+                var pctx = ctx.problem().proofScriptEntry();
+                if (pctx.STRING_LITERAL() != null) {
+                    var ps = new PositionedString(pctx.STRING_LITERAL().getText(),
+                        pctx.STRING_LITERAL().getSymbol());
+                    return ParsingFacade.parseScript(ps);
+                } else {
+                    return new KeyAst.ProofScript(pctx.proofScript());
+                }
             }
             return null;
         }
@@ -210,6 +211,25 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Taclet extends KeyAst<KeYParser.TacletContext> {
         public Taclet(KeYParser.TacletContext taclet) {
             super(taclet);
+        }
+    }
+
+    public static class ProofScript extends KeyAst<ProofScriptContext> {
+        ProofScript(@Nullable ProofScriptContext ctx) {
+            super(ctx);
+        }
+
+        public URL getUrl() {
+            try {
+                final var sourceName = ctx.start.getTokenSource().getSourceName();
+                if(sourceName.startsWith("file:") || sourceName.startsWith("http:") || sourceName.startsWith("jar:"))
+                    return new URL(sourceName);
+                else
+                    return new java.io.File(sourceName).toURI().toURL();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 }

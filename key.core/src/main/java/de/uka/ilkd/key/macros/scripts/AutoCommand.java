@@ -6,21 +6,20 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 import java.util.Optional;
 
+import de.uka.ilkd.key.macros.scripts.meta.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
@@ -40,10 +39,11 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
-            throws Exception {
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+            throws ConversionException, ArgumentRequiredException, InjectionReflectionException,
+            NoSpecifiedConverterException {
         Parameters args = new Parameters();
-        ValueInjector.getInstance().inject(this, args, arguments);
+        state.getValueInjector().inject(this, args, arguments);
         return args;
     }
 
@@ -137,11 +137,15 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         @Option(value = "steps", required = false)
         public int maxSteps = -1;
 
-        /** Run on formula matching the given regex */
+        /**
+         * Run on formula matching the given regex
+         */
         @Option(value = "matches", required = false)
         public String matches = null;
 
-        /** Run on formula matching the given regex */
+        /**
+         * Run on formula matching the given regex
+         */
         @Option(value = "breakpoint", required = false)
         public String breakpoint = null;
 

@@ -13,4 +13,4 @@ hide "b ==>";
 
 Error while executing script: This formula is not on the sequent: b
 
-Command: hide "b ==>"
+Command: hide "b ==>";

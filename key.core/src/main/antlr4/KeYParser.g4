@@ -41,7 +41,7 @@ problem
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
   | PROOFOBLIGATION  (proofObligation=cvalue)? SEMI?
   )
-  proofScript?
+  proofScriptEntry?
 ;
 
 
@@ -852,10 +852,31 @@ preferences
 	            |  c=cvalue ) // LBRACE, RBRACE included in cvalue#table
 ;
 
-proofScript
+proofScriptEntry
 :
-  PROOFSCRIPT ps = STRING_LITERAL
+  PROOFSCRIPT
+    ( STRING_LITERAL
+    | LBRACE proofScript RBRACE
+    )
 ;
+proofScript: proofScriptCommand+;
+proofScriptCommand
+:
+  AT? cmd=IDENT proofScriptParameters? SEMI
+;
+
+proofScriptParameters: proofScriptParameter+;
+proofScriptParameter :  ((pname=IDENT EQUALS)? expr=proofScriptExpression);
+proofScriptExpression:
+    boolean_literal
+  | char_literal
+  | integer
+  | floatnum
+  | string_literal
+  | BACKTICK (term | seq) BACKTICK
+  | term
+  | seq;
+
 
 // PROOF
 proof: PROOF EOF;
