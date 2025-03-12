@@ -47,6 +47,7 @@ public class RewriteTest {
         String firstOpenGoal = p.openGoals().head().sequent().toString();
         String expectedSequent = "[equals(x,f),equals(x,z)]==>[equals(z,f)]";
 
+        System.out.println(p);
         assertEquals(expectedSequent, firstOpenGoal);
     }
 

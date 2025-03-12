@@ -22,9 +22,10 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
+    public Parameters evaluateArguments(EngineState state,
+            Map<String, Object> arguments) throws Exception {
+        return state.getValueInjector().inject(this, new Parameters(),
+            arguments);
     }
 
     @Override

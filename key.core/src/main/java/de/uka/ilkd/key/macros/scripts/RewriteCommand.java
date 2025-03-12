@@ -68,7 +68,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
@@ -85,7 +85,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         List<PosInOccurrence> failposInOccs = findAndExecReplacement(args, allApps, state);
 
         // if not all find terms successfully replaced, apply cut
-        if (failposInOccs.size() >= 1) {
+        if (!failposInOccs.isEmpty()) {
 
             CutCommand cut = new CutCommand();
             CutCommand.Parameters param = new CutCommand.Parameters();
