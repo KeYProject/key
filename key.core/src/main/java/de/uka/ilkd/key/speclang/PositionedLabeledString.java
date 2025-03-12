@@ -8,6 +8,8 @@ import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A positionedString with labels, which can then be passed over to the translated term. For the
  * moment, this is used to distinguish implicit specifications from explicit ones and {@code &} from
@@ -16,6 +18,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class PositionedLabeledString extends PositionedString {
 
     public final ImmutableArray<TermLabel> labels;

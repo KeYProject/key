@@ -122,8 +122,8 @@ public class KeyIO {
         return seq;
     }
 
-    public Sequent parseSequence(String sequent) {
-        return parseSequence(CharStreams.fromString(sequent));
+    public Sequent parseSequent(String sequent) {
+        return parseSequent(CharStreams.fromString(sequent));
     }
 
     public Services getServices() {
