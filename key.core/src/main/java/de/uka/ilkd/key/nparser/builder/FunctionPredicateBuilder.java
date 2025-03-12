@@ -8,13 +8,11 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.AdtHelper;
 import de.uka.ilkd.key.nparser.KeYParser;
 
@@ -58,44 +56,44 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         var sort = Objects.requireNonNull(sorts().lookup(ctx.name.getText()));
         for (KeYParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
-            Name name = new Name(constructorContext.name.getText());
+            var name = constructorContext.name.getText();
             List<Sort> args = mapOf(constructorContext.sortId());
             List<String> argNames = mapOf(constructorContext.argName);
 
-            adtHelper.createConstructor(sort, name, args, argNames);
+            adtHelper.createConstructor(sort, new AdtHelper.AdtConstructor(name));
         }
         return null;
 
         /*
-        // weigl: all datatypes are free ==> functions are unique!
-        // boolean freeAdt = ctx.FREE() != null;
-        var sort = sorts().lookup(ctx.name.getText());
-        var dtNamespace = new Namespace<JFunction>();
-        for (KeYParser.Datatype_constructorContext constructorContext : ctx
-                .datatype_constructor()) {
-            Name name = new Name(constructorContext.name.getText());
-            Sort[] args = new Sort[constructorContext.sortId().size()];
-            var argNames = constructorContext.argName;
-            for (int i = 0; i < args.length; i++) {
-                Sort argSort = accept(constructorContext.sortId(i));
-                args[i] = argSort;
-                var argName = argNames.get(i).getText();
-                var alreadyDefinedFn = dtNamespace.lookup(argName);
-                if (alreadyDefinedFn != null
-                        && (!alreadyDefinedFn.sort().equals(argSort)
-                                || !alreadyDefinedFn.argSort(0).equals(sort))) {
-                    throw new RuntimeException("Name already in namespace: " + argName);
-                }
-                JFunction fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
-                    false, false);
-                dtNamespace.add(fn);
-            }
-            JFunction function = new JFunction(name, sort, args, null, true, false);
-            namespaces().functions().addSafely(function);
-        }
-        namespaces().functions().addSafely(dtNamespace.allElements());
-        return null;
-        */
+         * // weigl: all datatypes are free ==> functions are unique!
+         * // boolean freeAdt = ctx.FREE() != null;
+         * var sort = sorts().lookup(ctx.name.getText());
+         * var dtNamespace = new Namespace<JFunction>();
+         * for (KeYParser.Datatype_constructorContext constructorContext : ctx
+         * .datatype_constructor()) {
+         * Name name = new Name(constructorContext.name.getText());
+         * Sort[] args = new Sort[constructorContext.sortId().size()];
+         * var argNames = constructorContext.argName;
+         * for (int i = 0; i < args.length; i++) {
+         * Sort argSort = accept(constructorContext.sortId(i));
+         * args[i] = argSort;
+         * var argName = argNames.get(i).getText();
+         * var alreadyDefinedFn = dtNamespace.lookup(argName);
+         * if (alreadyDefinedFn != null
+         * && (!alreadyDefinedFn.sort().equals(argSort)
+         * || !alreadyDefinedFn.argSort(0).equals(sort))) {
+         * throw new RuntimeException("Name already in namespace: " + argName);
+         * }
+         * JFunction fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
+         * false, false);
+         * dtNamespace.add(fn);
+         * }
+         * JFunction function = new JFunction(name, sort, args, null, true, false);
+         * namespaces().functions().addSafely(function);
+         * }
+         * namespaces().functions().addSafely(dtNamespace.allElements());
+         * return null;
+         */
     }
 
     @Override

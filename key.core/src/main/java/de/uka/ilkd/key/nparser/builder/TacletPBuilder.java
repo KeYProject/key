@@ -377,11 +377,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         tacletBuilder.setName(new Name(String.format("%s_Axiom", ctx.name.getText())));
         final var sort = sorts().lookup(ctx.name.getText());
         var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
-                false, false, new SchemaVariableModifierSet.FormulaSV());
+            false, false, new SchemaVariableModifierSet.FormulaSV());
         var tb = services.getTermBuilder();
         var qvar = (VariableSV) declareSchemaVariable(ctx, "x", sort,
-                true, false, false,
-                new SchemaVariableModifierSet.VariableSV());
+            true, false, false,
+            new SchemaVariableModifierSet.VariableSV());
         var find = tb.all(qvar, tb.var(phi)); // \forall #x #phi
 
         var cases = ctx.datatype_constructor().stream()
@@ -391,8 +391,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         var axiom = tb.equals(find, tb.and(cases));
 
         var goal = new TacletGoalTemplate(
-                Sequent.createAnteSequent(new Semisequent(new SequentFormula(axiom))),
-                ImmutableSLList.nil());
+            Sequent.createAnteSequent(new Semisequent(new SequentFormula(axiom))),
+            ImmutableSLList.nil());
         tacletBuilder.addTacletGoalTemplate(goal);
 
         tacletBuilder.setDisplayName("Axiom_for_" + sort.name());
@@ -400,7 +400,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private Term createQuantifiedFormula(KeYParser.Datatype_constructorContext context,
-                                         QuantifiableVariable qvX, Term phi, Sort dt) {
+            QuantifiableVariable qvX, Term phi, Sort dt) {
         var tb = services.getTermBuilder();
         var fn = functions().lookup(context.name.getText());
         if (context.argName.isEmpty())
@@ -409,13 +409,13 @@ public class TacletPBuilder extends ExpressionBuilder {
         var args = new Term[context.argName.size()];
 
         var argSort =
-                context.argSort.stream()
-                        .map(it -> sorts().lookup(it.getText()))
-                        .toList();
+            context.argSort.stream()
+                    .map(it -> sorts().lookup(it.getText()))
+                    .toList();
         var argNames =
-                context.argName.stream()
-                        .map(RuleContext::getText)
-                        .toList();
+            context.argName.stream()
+                    .map(RuleContext::getText)
+                    .toList();
         var qvs = new ArrayList<QuantifiableVariable>(args.length);
         var ind = new ArrayList<Term>(args.length);
 
@@ -449,8 +449,8 @@ public class TacletPBuilder extends ExpressionBuilder {
                 var name = context.argName.get(i).getText();
                 var sort = sorts().lookup(context.argSort.get(i).getText());
                 var sv = declareSchemaVariable(ctx, prefix + name, sort,
-                        false, true, false,
-                        new SchemaVariableModifierSet.TermSV());
+                    false, true, false,
+                    new SchemaVariableModifierSet.TermSV());
                 variables.put(name, tb.var(sv));
             }
         }
@@ -463,8 +463,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         b.setDisplayName("case distinction of " + sort.name());
 
         var phi = declareSchemaVariable(ctx, "var", sort,
-                false, false, false,
-                new SchemaVariableModifierSet.TermSV());
+            false, false, false,
+            new SchemaVariableModifierSet.TermSV());
         b.setFind(tb.var(phi));
         for (KeYParser.Datatype_constructorContext context : ctx.datatype_constructor()) {
             var func = functions().lookup(context.name.getText());
@@ -473,7 +473,7 @@ public class TacletPBuilder extends ExpressionBuilder {
                 args[i] = variables.get(context.argName.get(i).getText());
             }
             Semisequent antec =
-                    new Semisequent(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args))));
+                new Semisequent(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args))));
             Sequent addedSeq = Sequent.createAnteSequent(antec);
             TacletGoalTemplate goal = new TacletGoalTemplate(addedSeq, ImmutableSLList.nil());
             goal.setName("#var = " + context.name.getText());

@@ -1,10 +1,14 @@
-package de.uka.ilkd.key.nparser;
+@org.jetbrains.annotations.NotNull
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+        package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -12,14 +16,15 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static de.uka.ilkd.key.ldt.JavaDLTheory.UPDATE;
 
 /**
  * @author Alexander Weigl
@@ -31,22 +36,109 @@ public record AdtHelper(Services services, Namespace<SchemaVariable> schemaVaria
         this(services, new Namespace<>());
     }
 
-    public record Adt(String name, Sort sort, List<AdtConstructor> constructors) {
+    public static final class Adt {
+        private final String package_;
+        private final String name;
+        private @Nullable Sort sort;
+        private final List<AdtConstructor> constructors = new ArrayList<>();
+
+        public Adt(String package_, String name) {
+            this.name = name;
+            this.package_ = package_;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public @Nullable Sort sort() {
+            return sort;
+        }
+
+        public List<AdtConstructor> constructors() {
+            return constructors;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (Adt) obj;
+            return Objects.equals(this.name, that.name) &&
+                    Objects.equals(this.sort, that.sort) &&
+                    Objects.equals(this.constructors, that.constructors);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, sort, constructors);
+        }
+
+        @Override
+        public String toString() {
+            return "Adt[" +
+                    "name=" + name + ", " +
+                    "sort=" + sort + ", " +
+                    "constructors=" + constructors + ']';
+        }
+
     }
 
-    public record AdtConstructor(String name, List<Sort> args, List<String> argNames) {
+    public static final class AdtConstructor {
+        private final String name;
+        private final List<String> sortNames = new ArrayList<>();
+        private final List<String> argNames = new ArrayList<>();
+
+        private final List<Sort> sorts = new ArrayList<>();
+
+        public AdtConstructor(String name) {
+            this.name = name;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public List<String> argNames() {
+            return argNames;
+        }
+
+        public List<String> sortNames() {
+            return sortNames;
+        }
+
+        public List<Sort> sorts() {
+            return sorts;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+
+            AdtConstructor that = (AdtConstructor) o;
+            return name.equals(that.name) && sortNames.equals(that.sortNames) && argNames.equals(that.argNames) && sorts.equals(that.sorts);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name.hashCode();
+            result = 31 * result + sortNames.hashCode();
+            result = 31 * result + argNames.hashCode();
+            result = 31 * result + sorts.hashCode();
+            return result;
+        }
     }
 
-    public Sort createSorts(String name, @Nullable String comment, @Nullable String origin) {
+    public Sort createSort(String name, @Nullable String comment, @Nullable String origin) {
         var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, comment, origin);
         sorts().addSafely(s);
         return s;
     }
 
     public void createConstructor(Sort sort, AdtConstructor c) {
-        var dtNamespace = new Namespace<Function>();
-        for (int i = 0; i < c.args.size(); i++) {
-            var argSort = c.args.get(i);
+        var dtNamespace = new Namespace<JFunction>();
+        for (int i = 0; i < c.argNames.size(); i++) {
+            var argSort = c.sorts.get(i);
             var argName = c.argNames.get(i);
             var alreadyDefinedFn = dtNamespace.lookup(argName);
             if (alreadyDefinedFn != null
@@ -54,12 +146,12 @@ public record AdtHelper(Services services, Namespace<SchemaVariable> schemaVaria
                     || !alreadyDefinedFn.argSort(0).equals(sort))) {
                 throw new RuntimeException("Name already in namespace: " + argName);
             }
-            Function fn = new Function(new Name(argName), argSort, new Sort[]{sort}, null,
+            var fn = new JFunction(new Name(argName), argSort, new Sort[]{sort}, null,
                     false, false);
             dtNamespace.add(fn);
         }
-        final ImmutableArray<Sort> s = new ImmutableArray<>(c.args);
-        Function function = new Function(new Name(c.name), sort, s);
+        final ImmutableArray<Sort> s = new ImmutableArray<>(c.argSort);
+        var function = new JFunction(new Name(c.name), sort, s);
         functions().addSafely(function);
         functions().addSafely(dtNamespace.allElements());
     }
@@ -74,7 +166,7 @@ public record AdtHelper(Services services, Namespace<SchemaVariable> schemaVaria
         var tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setName(new Name(String.format("%s_Axiom", adt.name)));
         var tb = services.getTermBuilder();
-        var phi = declareSchemaVariable("phi", Sort.FORMULA, true,
+        var phi = declareSchemaVariable("phi", JavaDLTheory.FORMULA, true,
                 new SchemaVariableModifierSet.FormulaSV());
         var qvar = (VariableSV) declareSchemaVariable("x", adt.sort,
                 true,
@@ -179,7 +271,7 @@ public record AdtHelper(Services services, Namespace<SchemaVariable> schemaVaria
         return services.getNamespaces().sorts();
     }
 
-    private Namespace<Function> functions() {
+    private Namespace<JFunction> functions() {
         return services.getNamespaces().functions();
     }
 
@@ -188,9 +280,9 @@ public record AdtHelper(Services services, Namespace<SchemaVariable> schemaVaria
                                                  boolean makeSkolemTermSV,
                                                  SchemaVariableModifierSet mods) {
         SchemaVariable v;
-        if (s == Sort.FORMULA && !makeSkolemTermSV) {
+        if (s == JavaDLTheory.FORMULA && !makeSkolemTermSV) {
             v = SchemaVariableFactory.createFormulaSV(new Name(name), mods.rigid());
-        } else if (s == Sort.UPDATE) {
+        } else if (s == UPDATE) {
             v = SchemaVariableFactory.createUpdateSV(new Name(name));
         } else if (s instanceof ProgramSVSort) {
             v = SchemaVariableFactory.createProgramSV(new ProgramElementName(name),

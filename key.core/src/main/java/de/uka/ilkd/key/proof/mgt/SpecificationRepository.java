@@ -20,10 +20,8 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.nparser.AdtHelper;
-import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -34,8 +32,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.jml.JmlAdt;
-import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.jml.JmlAdt;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -1644,14 +1640,24 @@ public final class SpecificationRepository {
         blockContracts.compute(b, (k, set) -> set.remove(contract));
     }
 
+    private boolean isJmlAdtsActivated = false;
+    private List<AdtHelper.Adt> adts = new ArrayList<>(16);
+
     /**
      *
      */
     public void addAdt(JmlAdt adt) {
+        var a = new AdtHelper.Adt(adt.getKJT().createPackagePrefix().toString(),
+                adt.getName());
+        adts.add(a);
+    }
+
+    public void activateAdts() {
+        if(isJmlAdtsActivated) {return;}
+        isJmlAdtsActivated=true;
+
         AdtHelper adtHelper = new AdtHelper(services);
-        adtHelper.createSorts();
-
-
+        adtHelper.process(adts);
     }
 
     /**

@@ -16,12 +16,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.AdtHelper;
-import de.uka.ilkd.key.nparser.AdtHelper;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -66,9 +64,9 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
-        new AdtHelper(services).createSorts(ctx.getText(),
-                ctx.doc != null ? ctx.doc.getText() : null,
-                BuilderHelpers.getPosition(ctx));
+        new AdtHelper(services).createSort(ctx.getText(),
+            ctx.doc != null ? ctx.doc.getText() : null,
+            BuilderHelpers.getPosition(ctx));
         return null;
     }
 
