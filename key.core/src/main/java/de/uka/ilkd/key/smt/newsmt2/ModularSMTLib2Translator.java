@@ -10,13 +10,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -39,6 +44,19 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
+
+    // TODO: check this list ... Represents axioms?
+    private static final String[] AXIOM_TACLET_PREFIXES = {
+        "Class_invariant_axiom_for",
+        "Static_class_invariant_axiom_for",
+        "Definition_axiom_for_",
+        "Free_class_invariant_axiom_for_",
+        "Free_static_class_invariant_axiom_for_",
+        "Partial_inv_axiom_for_JML_class_invariant_",
+            // "Query_axiom_for_" // Do we need those (not translatable at the moment (SkolemSV))?
+    };
+
+    public static final String UNSAT_CORE_PREFIX = "L_";
 
     /**
      * Handler option. If provided, the translator will label translations of sequent formulas such
@@ -108,8 +126,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     }
 
     @Override
-    public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
-
+    public CharSequence translateProblem(Goal goal, Services services, SMTSettings settings) {
         MasterHandler master;
         try {
             master = new MasterHandler(services, settings, handlerNames, handlerOptions);
@@ -117,7 +134,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             throw new RuntimeException(ex);
         }
 
-        List<Term> sequentAsserts = getTermsFromSequent(sequent, services);
+        List<Term> sequentAsserts = getTermsFromSequent(goal.sequent(), services);
         List<SExpr> sequentSMTAsserts = makeSMTAsserts(master, sequentAsserts);
 
         StringBuilder sb = new StringBuilder();
@@ -125,6 +142,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append("; --- Preamble\n");
         sb.append(preamble);
         sb.append(System.lineSeparator());
+
+        // add axioms for invariants, static invariants, represents axioms, ...
+        for (String prefix : AXIOM_TACLET_PREFIXES) {
+            addAxioms(prefix, goal, services, master);
+        }
 
         sb.append("; --- Declarations\n");
         extractSortDeclarations(services, master);
@@ -144,7 +166,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         int i = 1;
         for (SExpr ass : sequentSMTAsserts) {
             if (getUnsatCore) {
-                String label = "L_" + i;
+                String label = UNSAT_CORE_PREFIX + i;
                 i++;
                 ass = SExprs.named(ass, label);
             }
@@ -177,6 +199,27 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         return sb;
+    }
+
+    // Adds all taclets that start with the given prefix as axioms to the MasterHandler.
+    private void addAxioms(String prefix, Goal goal, Services services, MasterHandler master) {
+        Set<NoPosTacletApp> set = goal.ruleAppIndex().tacletIndex().allNoPosTacletApps();
+        List<NoPosTacletApp> filtered = set.stream()
+                .filter(t -> t.taclet().name().toString().startsWith(prefix))
+                .toList();
+        for (NoPosTacletApp npta : filtered) {
+            Taclet taclet = npta.taclet();
+            SMTTacletTranslator tacletTranslator = new SMTTacletTranslator(services);
+            try {
+                Term formula = tacletTranslator.translate(taclet);
+                SExpr smt = master.translate(formula);
+                // we name assertions just for the user, so that it is easier to find them
+                smt = SExprs.named(smt, taclet.name().toString());
+                master.addAxiom(SExprs.assertion(smt));
+            } catch (SMTTranslationException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
