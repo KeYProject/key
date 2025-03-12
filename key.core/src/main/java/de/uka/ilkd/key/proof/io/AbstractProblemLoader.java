@@ -15,6 +15,7 @@ import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
@@ -671,7 +672,6 @@ public abstract class AbstractProblemLoader {
     }
 
     private ReplayResult replayProof(Proof proof) {
-        LOGGER.info("Replaying proof {}", proof.name());
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();

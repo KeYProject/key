@@ -8,8 +8,7 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -26,13 +25,13 @@ public class FocusCommandTest {
     @Test
     public void testSimpleSelection() throws Exception {
         Path temp = Files.createTempFile("key-focus-command", ".key");
-        Files.writeString(temp, "\\functions { int i; } \\problem { i=1&i=2 -> i=3|i=4 }" +
-            "\\proofScript \"prop-simp; \"");
+        Files.writeString(temp, """
+                \\functions { int i; } \\problem { i=1&i=2 -> i=3|i=4 }\
+                \\proofScript "prop-simp;\"""");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
         Proof p = env.getLoadedProof();
-        ProofScriptEngine pse = new ProofScriptEngine(
-            "macro 'nosplit-prop'; focus 'i=1 ==> i = 4';",
-            new Location(null, Position.newOneBased(1, 1)));
+        var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus `i=1 ==> i = 4`;");
+        ProofScriptEngine pse = new ProofScriptEngine(script);
         pse.execute(env.getUi(), p);
 
         assertEquals(1, p.openGoals().size());
@@ -45,15 +44,15 @@ public class FocusCommandTest {
     public void testSelectionWithLabels() throws Exception {
         Path temp = Files.createTempFile("key-focus-command", ".key");
         Files.writeString(temp,
-            "\\functions { int i; } \\problem { i=1<<SC>> -> i=(3<<origin(\"<none> (implicit)\", \"[]\")>>) }"
-                +
-                "\\proofScript \"prop-simp; \"");
+            """
+                        \\functions { int i; } \\problem { i=1<<SC>> -> i=(3<<origin("<none> (implicit)", "[]")>>) }\
+                        \\proofScript "prop-simp; \"
+                    """);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
         Proof p = env.getLoadedProof();
-        ProofScriptEngine pse = new ProofScriptEngine(
-            "macro 'nosplit-prop'; focus 'i=1 ==> i = 3';",
-            new Location(null, Position.newOneBased(1, 1)));
+        var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus `i=1 ==> i = 3`;");
+        ProofScriptEngine pse = new ProofScriptEngine(script);
         pse.execute(env.getUi(), p);
 
         assertEquals(1, p.openGoals().size());

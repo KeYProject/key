@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 
@@ -26,13 +27,13 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
 
     @Override
     public void execute(Parameters args) throws ScriptException, InterruptedException {
-        File root = state.getBaseFileName();
-        if (!root.isDirectory()) {
-            root = root.getParentFile();
+        Path root = state.getBaseFileName();
+        if (!Files.isDirectory(root)) {
+            root = root.getParent();
         }
-        File file = new File(root, args.filename);
+        Path file = root.resolve(args.filename);
 
-        LOGGER.info("Included script " + file);
+        LOGGER.info("Included script {}", file);
 
         try {
             ProofScriptEngine pse = new ProofScriptEngine(file);

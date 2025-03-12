@@ -46,14 +46,14 @@
 
 
 \proofScript {
-macro split-prop;
-rule schiffl_lemma_2 formula=`seqPerm(f_s, f_t)`;
+macro "split-prop";
+rule schiffl_lemma_2 formula=`seqPerm(f_s,f_t)`;
 instantiate hide var=x with=`f_x`;
 instantiate hide var=y with=`f_y`;
 rule impLeft;
 tryclose branch;
 rule exLeft;
-macro split-prop;
+macro "split-prop";
 rule seqPermDef occ=1;
 rule andRight;
 tryclose branch;
