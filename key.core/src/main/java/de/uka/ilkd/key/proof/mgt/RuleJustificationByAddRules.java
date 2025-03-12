@@ -12,12 +12,28 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.prover.rules.RuleApp;
 
 
-public record RuleJustificationByAddRules(Node node,boolean isAxiom)implements RuleJustification{
+public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements RuleJustification {
 
-public RuleJustificationByAddRules{assert node!=null;}
+    public RuleJustificationByAddRules {
+        assert node != null;
+    }
 
-@Override public boolean isAxiomJustification(){return isAxiom;}
+    @Override
+    public boolean isAxiomJustification() { return isAxiom; }
 
-public RuleApp motherTaclet(){return node.getAppliedRuleApp();}
+    public RuleApp motherTaclet() { return node.getAppliedRuleApp(); }
 
-public String toString(){String mother;if(motherTaclet().rule()instanceof Taclet){LogicPrinter tacPrinter=LogicPrinter.purePrinter(new NotationInfo(),node.proof().getServices());tacPrinter.printTaclet((Taclet)(motherTaclet().rule()));mother=tacPrinter.result();}else{mother=motherTaclet().rule().name().toString();}return"added rule justification \nintroduced at node "+node.serialNr()+" by rule \n"+mother;}}
+    public String toString() {
+        String mother;
+        if (motherTaclet().rule() instanceof Taclet) {
+            LogicPrinter tacPrinter =
+                LogicPrinter.purePrinter(new NotationInfo(), node.proof().getServices());
+            tacPrinter.printTaclet((Taclet) (motherTaclet().rule()));
+            mother = tacPrinter.result();
+        } else {
+            mother = motherTaclet().rule().name().toString();
+        }
+        return "added rule justification \nintroduced at node " + node.serialNr() + " by rule \n"
+            + mother;
+    }
+}

@@ -23,8 +23,9 @@ import java.util.Map;
  * different because the default Java implementation with referenced based equality is used.
  * </p>
  *
- * @param wrappedElement The wrapped elements on that {@link #equals(Object)} and {@link #hashCode()} is reset to
- *                       default Java implementation.
+ * @param wrappedElement The wrapped elements on that {@link #equals(Object)} and
+ *        {@link #hashCode()} is reset to
+ *        default Java implementation.
  * @author Martin Hentschel
  */
 public record EqualsHashCodeResetter<T>(T wrappedElement) {
@@ -32,7 +33,7 @@ public record EqualsHashCodeResetter<T>(T wrappedElement) {
      * Constructor
      *
      * @param wrappedElement the wrapped elements on that {@link #equals(Object)} and
-     *                       {@link #hashCode()} is reset to default Java implementation.
+     *        {@link #hashCode()} is reset to default Java implementation.
      */
     public EqualsHashCodeResetter {
     }

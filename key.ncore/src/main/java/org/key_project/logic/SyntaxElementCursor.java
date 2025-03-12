@@ -15,7 +15,8 @@ public class SyntaxElementCursor {
         return !path.isEmpty() || node.getChildCount() > 0;
     }
 
-    private record ParentAndPosition(SyntaxElement parent, int index) {}
+    private record ParentAndPosition(SyntaxElement parent, int index) {
+    }
 
     private final Deque<ParentAndPosition> path = new ArrayDeque<>();
 

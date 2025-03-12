@@ -162,18 +162,18 @@ public class AbbrevMap {
     public record AbbrevWrapper(Term t) {
 
         @Override
-            public boolean equals(Object o) {
-                if (!(o instanceof AbbrevWrapper scw)) {
-                    return false;
-                }
-                if (scw.getTerm() == t) {
-                    return true;
-                }
-                return t.equals(scw.getTerm());
+        public boolean equals(Object o) {
+            if (!(o instanceof AbbrevWrapper scw)) {
+                return false;
             }
-
-            public Term getTerm() {
-                return t;
+            if (scw.getTerm() == t) {
+                return true;
             }
+            return t.equals(scw.getTerm());
         }
+
+        public Term getTerm() {
+            return t;
+        }
+    }
 }

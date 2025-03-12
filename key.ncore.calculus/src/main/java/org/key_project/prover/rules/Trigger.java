@@ -31,22 +31,28 @@ import org.key_project.util.collection.ImmutableList;
  * applicable.
  *
  */
-public record Trigger(OperatorSV triggerVar,Term trigger,ImmutableList<Term>avoidConditions){
-/**
- * Constructs a new {@code Trigger}.
- *
- * @param triggerVar the symbolic variable associated with the trigger. Must not be null.
- * @param trigger the condition that triggers the application of the taclet. Must not be null.
- * @param avoidConditions a list of conditions that must not be met in order to apply the taclet.
- *        If the list is empty, no avoid conditions are present. Must not be null.
- */
-public Trigger{assert triggerVar!=null;assert trigger!=null;assert avoidConditions!=null;}
+public record Trigger(OperatorSV triggerVar, Term trigger, ImmutableList<Term> avoidConditions) {
+    /**
+     * Constructs a new {@code Trigger}.
+     *
+     * @param triggerVar the symbolic variable associated with the trigger. Must not be null.
+     * @param trigger the condition that triggers the application of the taclet. Must not be null.
+     * @param avoidConditions a list of conditions that must not be met in order to apply the
+     *        taclet.
+     *        If the list is empty, no avoid conditions are present. Must not be null.
+     */
+    public Trigger {
+        assert triggerVar != null;
+        assert trigger != null;
+        assert avoidConditions != null;
+    }
 
-/**
- * Checks whether there are any conditions to indicate to strategies that an application of the
- * taclet is not
- * promising in the current proof situation.
- *
- * @return {@code true} if there are avoid conditions, {@code false} otherwise.
- */
-public boolean hasAvoidConditions(){return!avoidConditions.isEmpty();}}
+    /**
+     * Checks whether there are any conditions to indicate to strategies that an application of the
+     * taclet is not
+     * promising in the current proof situation.
+     *
+     * @return {@code true} if there are avoid conditions, {@code false} otherwise.
+     */
+    public boolean hasAvoidConditions() { return !avoidConditions.isEmpty(); }
+}

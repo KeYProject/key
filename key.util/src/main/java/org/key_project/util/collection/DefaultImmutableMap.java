@@ -345,7 +345,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     /**
      * class for the map entries
      *
-     * @param key   the key
+     * @param key the key
      * @param value the value
      */
     // @formatter:off Spotless cannot deal with inner records yet or so it seems :(

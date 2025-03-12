@@ -197,6 +197,7 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     public record Feature(String id, String documentation, boolean restartRequired) {
+
         public static final List<Feature> FEATURES = new ArrayList<>();
 
         public Feature {

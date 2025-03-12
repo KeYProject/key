@@ -250,40 +250,40 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Defines the values of an expected proof reference.
      *
-     * @param kind   The expected kind.
+     * @param kind The expected kind.
      * @param target The expected target.
      * @author Martin Hentschel
      */
-        protected record ExpectedProofReferences(String kind, String target) {
+    protected record ExpectedProofReferences(String kind, String target) {
         /**
          * Constructor.
          *
-         * @param kind   The expected kind.
+         * @param kind The expected kind.
          * @param target The expected target.
          */
         public ExpectedProofReferences {
         }
 
-            /**
-             * Returns the expected kind.
-             *
-             * @return The expected kind.
-             */
-            @Override
-            public String kind() {
-                return kind;
-            }
-
-            /**
-             * Returns the expected target.
-             *
-             * @return The expected target.
-             */
-            @Override
-            public String target() {
-                return target;
-            }
+        /**
+         * Returns the expected kind.
+         *
+         * @return The expected kind.
+         */
+        @Override
+        public String kind() {
+            return kind;
         }
+
+        /**
+         * Returns the expected target.
+         *
+         * @return The expected target.
+         */
+        @Override
+        public String target() {
+            return target;
+        }
+    }
 
     /**
      * Does some test steps with a {@link Proof}.
