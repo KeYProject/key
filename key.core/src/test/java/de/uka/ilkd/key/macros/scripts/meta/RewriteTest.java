@@ -5,6 +5,8 @@ package de.uka.ilkd.key.macros.scripts.meta;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -29,12 +31,12 @@ public class RewriteTest {
     @Test
     public void testTransitive()
             throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
-        File script =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/rewrite.script");
+        Path script = HelperClassForTests.TESTCASE_DIRECTORY.toPath()
+                .resolve("scriptCommands/rewrite.script");
         File keyFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/transitive.key");
 
-        assumeTrue(script.exists(), "Required script file not found: " + script);
+        assumeTrue(Files.exists(script), "Required script file not found: " + script);
         assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
@@ -58,12 +60,12 @@ public class RewriteTest {
     @Test
     public void testLessTransitive()
             throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
-        File script =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/lesstrans.script");
+        Path script = HelperClassForTests.TESTCASE_DIRECTORY.toPath()
+                .resolve("scriptCommands/lesstrans.script");
         File keyFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/less_trans.key");
 
-        assumeTrue(script.exists(), "Required script file not found: " + script);
+        assumeTrue(Files.exists(script), "Required script file not found: " + script);
         assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);

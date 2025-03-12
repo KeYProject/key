@@ -112,12 +112,14 @@ public final class ParsingFacade {
         return new KeYLexer(stream);
     }
 
-    public static KeYLexer createLexer(PositionedString ps) {
-        CharStream result =
-            CharStreams.fromString(ps.text, ps.getLocation().getFileURI().get().toString());
+    public static @NonNull KeYLexer createLexer(@NonNull PositionedString ps) {
+        var position = ps.getLocation().getPosition();
+        var uri = ps.getLocation().fileUri().toString();
+
+        CharStream result = CharStreams.fromString(ps.text, uri);
         var lexer = createLexer(result);
-        lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn());
-        lexer.getInterpreter().setLine(ps.pos.getLine());
+        lexer.getInterpreter().setCharPositionInLine(position.column());
+        lexer.getInterpreter().setLine(position.line());
         return lexer;
     }
 
@@ -187,15 +189,15 @@ public final class ParsingFacade {
         return ast;
     }
 
-    public static KeyAst.ProofScript parseScript(File file) throws IOException {
-        return parseScript(CharStreams.fromFileName(file.getAbsolutePath()));
+    public static KeyAst.ProofScript parseScript(Path file) throws IOException {
+        return parseScript(CharStreams.fromPath(file));
     }
 
     public static KeyAst.ProofScript parseScript(CharStream stream) {
         var rp = createParser(stream);
-        KeyAst.ProofScript ast = new KeyAst.ProofScript(rp.proofScript());
+        final var ctx = rp.proofScriptEOF().proofScript();
         rp.getErrorReporter().throwException();
-        return ast;
+        return new KeyAst.ProofScript(ctx);
     }
 
     public static KeyAst.ProofScript parseScript(String text) {
@@ -249,6 +251,7 @@ public final class ParsingFacade {
     }
 
     // region configuration
+
     /**
      * Parses the configuration determined by the given {@code file}.
      * A configuration corresponds to the grammar rule {@code cfile} in the {@code KeYParser.g4}.
@@ -264,8 +267,8 @@ public final class ParsingFacade {
 
     /**
      * @param file non-null file to read as configuration
-     * @see #parseConfigurationFile(Path)
      * @throws IOException if the file is not found or not readable.
+     * @see #parseConfigurationFile(Path)
      */
     public static KeyAst.ConfigurationFile parseConfigurationFile(File file) throws IOException {
         return parseConfigurationFile(file.toPath());
@@ -299,16 +302,16 @@ public final class ParsingFacade {
     }
 
     /**
-     * @see #readConfigurationFile(CharStream)
      * @throws IOException if the file is not found or not readable.
+     * @see #readConfigurationFile(CharStream)
      */
     public static Configuration readConfigurationFile(Path file) throws IOException {
         return readConfigurationFile(CharStreams.fromPath(file));
     }
 
     /**
-     * @see #readConfigurationFile(CharStream)
      * @throws IOException if the file is not found or not readable.
+     * @see #readConfigurationFile(CharStream)
      */
     public static Configuration readConfigurationFile(File file) throws IOException {
         return readConfigurationFile(file.toPath());

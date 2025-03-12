@@ -859,11 +859,11 @@ proofScriptEntry
     | LBRACE proofScript RBRACE
     )
 ;
+proofScriptEOF: proofScript EOF;
 proofScript: proofScriptCommand+;
-proofScriptCommand
-:
-  AT? cmd=IDENT proofScriptParameters? SEMI
-;
+proofScriptCommand: AT? cmd=IDENT proofScriptParameters?
+	( LBRACE sub=proofScript RBRACE SEMI?
+	| SEMI);
 
 proofScriptParameters: proofScriptParameter+;
 proofScriptParameter :  ((pname=IDENT EQUALS)? expr=proofScriptExpression);
