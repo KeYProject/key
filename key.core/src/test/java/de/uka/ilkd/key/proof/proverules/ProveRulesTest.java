@@ -11,6 +11,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -142,8 +143,10 @@ public class ProveRulesTest {
          * means there will be one test case for each taclet)
          */
         return tacletNames.stream().map(
-            tacletName -> DynamicTest.dynamicTest(tacletName, () -> loadTacletProof(tacletName,
-                tacletObjectByTacletName.get(tacletName), proofFileByTacletName.get(tacletName))));
+                    tacletName -> DynamicTest.dynamicTest(tacletName,
+                        () -> loadTacletProof(tacletName,
+                            tacletObjectByTacletName.get(tacletName),
+                            proofFileByTacletName.get(tacletName))));
     }
 
 }

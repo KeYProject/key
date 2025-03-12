@@ -3,30 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dialog.ModalityType;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.net.URI;
-import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionModel;
@@ -35,27 +11,44 @@ import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import java.awt.*;
+import java.awt.Dialog.ModalityType;
+import java.net.URI;
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.function.Consumer;
 
 /**
  * Executes s given script.
  */
-public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Message>
+@NullMarked
+public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScriptEngine.Message>
         implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
-
-    /** The initially selected goal. */
-    private final Goal initiallySelectedGoal;
     private final KeyAst.ProofScript script;
 
-    /** The proof script engine. */
-    private ProofScriptEngine engine;
-    private JDialog monitor;
-    private JTextArea logArea;
+    /**
+     * The initially selected goal.
+     */
+    private final @Nullable Goal initiallySelectedGoal;
+
+    /**
+     * The proof script engine.
+     */
+    private final ProofScriptEngine engine;
+    private final JDialog monitor = new JDialog(MainWindow.getInstance(),
+        "Running Script ...", ModalityType.MODELESS);
+    private final JTextArea logArea = new JTextArea();
 
     private final Consumer<ProofScriptEngine.Message> observer = this::publish;
 
@@ -77,16 +70,16 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
      * @param initiallySelectedGoal the initially selected goal
      */
     public ProofScriptWorker(KeYMediator mediator, KeyAst.ProofScript script,
-            Goal initiallySelectedGoal) {
+            @Nullable Goal initiallySelectedGoal) {
         this.mediator = mediator;
         this.script = script;
         this.initiallySelectedGoal = initiallySelectedGoal;
+        engine = new ProofScriptEngine(script, initiallySelectedGoal);
     }
 
     @Override
-    protected Object doInBackground() throws Exception {
+    protected @Nullable Object doInBackground() throws Exception {
         try {
-            engine = new ProofScriptEngine(script);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
@@ -96,17 +89,8 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
     }
 
     private void makeDialog() {
-        URI uri = script.getFileURI().orElse(null);
-
-        if (monitor != null) {
-            logArea.setText("Running script from URL '" + uri + "':\n");
-            return;
-        }
-
-        JDialog dlg =
-            new JDialog(MainWindow.getInstance(), "Running Script ...", ModalityType.MODELESS);
-        Container cp = dlg.getContentPane();
-        logArea = new JTextArea();
+        URI uri = script.getStartLocation().getFileURI().orElse(null);
+        Container cp = monitor.getContentPane();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         logArea.setEditable(false);
         logArea.setText("Running script from URL '" + uri + "':\n");
@@ -118,10 +102,8 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         panel.add(cancelButton);
         cp.add(panel, BorderLayout.SOUTH);
 
-        dlg.setSize(750, 400);
-        dlg.setLocationRelativeTo(MainWindow.getInstance());
-
-        this.monitor = dlg;
+        monitor.setSize(750, 400);
+        monitor.setLocationRelativeTo(MainWindow.getInstance());
     }
 
     @Override
@@ -129,8 +111,8 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
         Document doc = logArea.getDocument();
         for (ProofScriptEngine.Message info : chunks) {
             var message = new StringBuilder("\n---\n");
-            if (info instanceof ProofScriptEngine.EchoMessage echo) {
-                message.append(echo.message());
+            if (info instanceof ProofScriptEngine.EchoMessage(String msg)) {
+                message.append(msg);
             } else {
                 var exec = (ProofScriptEngine.ExecuteInfo) info;
                 if (exec.command().startsWith("'echo ")) {
@@ -168,9 +150,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
      */
     @Override
     public void done() {
-        if (monitor != null) {
-            monitor.setVisible(false);
-        }
+        monitor.setVisible(false);
 
         try {
             get();
@@ -185,10 +165,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
 
         final Proof proof = initiallySelectedGoal != null ? initiallySelectedGoal.proof()
                 : mediator.getSelectedProof();
-        mediator.finishAutoMode(proof, true, true,
-            () -> {
-                selectGoalOrNode();
-            });
+        mediator.finishAutoMode(proof, true, true, this::selectGoalOrNode);
     }
 
     private void selectGoalOrNode() {
@@ -205,21 +182,6 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
             }
         }
         selectionModel.defaultSelection();
-    }
-
-    private static void runWithDeadline(Runnable runnable, int milliseconds) {
-        final ExecutorService executor = Executors.newFixedThreadPool(1);
-        final Future<?> future = executor.submit(runnable);
-        executor.shutdown();
-        try {
-            future.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            /*
-             * NOTE (DS, 2019-02-08): There are some problems in starting the automode... We will
-             * just don't do anything here and hope that everything works fine (which it did for my
-             * tests). Any Java-multithreading experts around? ;)
-             */
-        }
     }
 
     @Override

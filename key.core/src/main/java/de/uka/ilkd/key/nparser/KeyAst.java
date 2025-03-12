@@ -4,6 +4,11 @@
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.nparser.KeYParser.ProofScriptContext;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -23,7 +28,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.StringUtil;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -94,13 +98,19 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          *
          * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
          */
-        public ProofScript findProofScript() {
+        public @Nullable ProofScript findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
-                var pctx = ctx.problem().proofScriptEntry();
+                KeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
+
+                KeYParser.ProofScriptContext ps;
                 if (pctx.STRING_LITERAL() != null) {
-                    var ps = new PositionedString(pctx.STRING_LITERAL().getText(),
-                        pctx.STRING_LITERAL().getSymbol());
-                    return ParsingFacade.parseScript(ps);
+                    var ctx = pctx.STRING_LITERAL().getSymbol();
+                    String text = pctx.STRING_LITERAL().getText();
+
+                    // +1 for the removal of the quote.
+                    text = StringUtil.move(StringUtil.trim(text, '"'), ctx.getLine(),
+                        ctx.getCharPositionInLine() + 1);
+                    return ParsingFacade.parseScript(text);
                 } else {
                     return new KeyAst.ProofScript(pctx.proofScript());
                 }
@@ -214,22 +224,26 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
     }
 
-    public static class ProofScript extends KeyAst<ProofScriptContext> {
-        ProofScript(@Nullable ProofScriptContext ctx) {
+    /**
+     * This struct encapsulate the information of a proof script found in key files.
+     *
+     * @author Alexander Weigl
+     * @version 1 (23.04.24)
+     */
+    public static class ProofScript extends KeyAst<KeYParser.ProofScriptContext> {
+        ProofScript(KeYParser.@NonNull ProofScriptContext ctx) {
             super(ctx);
         }
 
-        public URL getUrl() {
+        public URI getUrl() {
+            final var sourceName = ctx.start.getTokenSource().getSourceName();
             try {
-                final var sourceName = ctx.start.getTokenSource().getSourceName();
-                if(sourceName.startsWith("file:") || sourceName.startsWith("http:") || sourceName.startsWith("jar:"))
-                    return new URL(sourceName);
-                else
-                    return new java.io.File(sourceName).toURI().toURL();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
+                if (sourceName.startsWith("file:") || sourceName.startsWith("http:")
+                        || sourceName.startsWith("jar:"))
+                    return new URI(sourceName);
+            } catch (URISyntaxException ignored) {
             }
+            return new java.io.File(sourceName).toURI();
         }
     }
 }

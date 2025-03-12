@@ -482,6 +482,7 @@ MODAILITYGENERIC:
       -> more, pushMode(modGeneric);
 */
 //BACKSLASH:  '\\';
+ERROR_UKNOWN_ESCAPE: '\\' IDENT;
 ERROR_CHAR: .;
 
 mode modDiamond;
