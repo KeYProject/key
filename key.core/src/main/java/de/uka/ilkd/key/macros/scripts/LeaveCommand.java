@@ -18,6 +18,11 @@ public class LeaveCommand extends NoArgumentCommand {
     }
 
     @Override
+    public String getDocumentation() {
+        return "Marks the current goal to be ignored by the macros.";
+    }
+
+    @Override
     public void execute(AbstractUserInterfaceControl uiControl, Void args, EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenAutomaticGoal();

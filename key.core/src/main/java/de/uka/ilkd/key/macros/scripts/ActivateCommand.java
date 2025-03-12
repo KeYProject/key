@@ -20,6 +20,11 @@ public class ActivateCommand extends NoArgumentCommand {
     }
 
     @Override
+    public String getDocumentation() {
+        return "";
+    }
+
+    @Override
     public void execute(AbstractUserInterfaceControl uiControl, Void args, EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenGoal(false);
