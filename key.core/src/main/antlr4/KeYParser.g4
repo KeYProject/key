@@ -856,7 +856,7 @@ proofScriptEntry
 :
   PROOFSCRIPT
     ( STRING_LITERAL
-    | proofScript
+    | LBRACE proofScript RBRACE
     )
 ;
 proofScript: proofScriptCommand+;
@@ -873,6 +873,7 @@ proofScriptExpression:
   | integer
   | floatnum
   | string_literal
+  | BACKTICK (term | seq) BACKTICK
   | term
   | seq;
 
