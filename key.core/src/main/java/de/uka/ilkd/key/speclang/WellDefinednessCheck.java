@@ -1347,30 +1347,31 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     /**
-         * A static data structure for storing and passing two terms, denoting the implicit and the
-         * explicit part of a pre- or post-condition.
-         *
-         * @author Michael Kirsten
-         */
-        public record Condition(Term implicit, Term explicit) {
+     * A static data structure for storing and passing two terms, denoting the implicit and the
+     * explicit part of a pre- or post-condition.
+     *
+     * @author Michael Kirsten
+     */
+    public record Condition(Term implicit, Term explicit) {
 
         /**
-             * Applies a unary operator to every term in this object.
-             *
-             * @param op the operator to apply.
-             * @return this object with the operator applied.
-             */
-            Condition map(UnaryOperator<Term> op) {
-                return new Condition(op.apply(implicit), op.apply(explicit));
-            }
+         * Applies a unary operator to every term in this object.
+         *
+         * @param op the operator to apply.
+         * @return this object with the operator applied.
+         */
+        Condition map(UnaryOperator<Term> op) {
+            return new Condition(op.apply(implicit), op.apply(explicit));
         }
+    }
 
     /**
      * A static data structure for passing a term with a function.
      *
      * @author Michael Kirsten
      */
-    public record TermAndFunc(Term term, JFunction func) {}
+    public record TermAndFunc(Term term, JFunction func) {
+    }
 
     /**
      * A data structure for storing and passing all specifications of a specification element

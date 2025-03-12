@@ -357,49 +357,49 @@ public final class TruthValueTracingUtil {
     /**
      * Utility class which specifies the occurrence of a {@link FormulaTermLabel}.
      *
-     * @param label        The {@link FormulaTermLabel}.
+     * @param label The {@link FormulaTermLabel}.
      * @param inAntecedent {@code true} occurred in antecedent, {@code false} occurred in succedent.
      * @author Martin Hentschel
      */
-        private record LabelOccurrence(FormulaTermLabel label, boolean inAntecedent) {
+    private record LabelOccurrence(FormulaTermLabel label, boolean inAntecedent) {
         /**
          * Constructor.
          *
-         * @param label        The {@link FormulaTermLabel}.
+         * @param label The {@link FormulaTermLabel}.
          * @param inAntecedent {@code true} occurred in antecedent, {@code false} occurred in
-         *                     succedent.
+         *        succedent.
          */
         private LabelOccurrence {
         }
 
-            /**
-             * Returns the {@link FormulaTermLabel}.
-             *
-             * @return The {@link FormulaTermLabel}.
-             */
-            @Override
-            public FormulaTermLabel label() {
-                return label;
-            }
-
-            /**
-             * Checks if the label occurred in antecedent or succedent.
-             *
-             * @return {@code true} occurred in antecedent, {@code false} occurred in succedent.
-             */
-            @Override
-            public boolean inAntecedent() {
-                return inAntecedent;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String toString() {
-                return label + (inAntecedent ? " in antecedent" : " in succedent");
-            }
+        /**
+         * Returns the {@link FormulaTermLabel}.
+         *
+         * @return The {@link FormulaTermLabel}.
+         */
+        @Override
+        public FormulaTermLabel label() {
+            return label;
         }
+
+        /**
+         * Checks if the label occurred in antecedent or succedent.
+         *
+         * @return {@code true} occurred in antecedent, {@code false} occurred in succedent.
+         */
+        @Override
+        public boolean inAntecedent() {
+            return inAntecedent;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return label + (inAntecedent ? " in antecedent" : " in succedent");
+        }
+    }
 
     /**
      * Analyzes the given {@link TacletGoalTemplate}.
@@ -1054,27 +1054,29 @@ public final class TruthValueTracingUtil {
     /**
      * Represents the unmodifiable predicate results of a leaf {@link Node} ({@link Goal}).
      *
-     * @param results         All found results.
-     * @param leafNode        The leaf {@link Node}.
-     * @param condition       The condition under which the leaf {@link Node} is reached from the analyzed
-     *                        {@link Node}.
-     * @param conditionString The human readable condition under which the leaf {@link Node} is reached from the
-     *                        analyzed {@link Node}.
-     * @param termLabelName   The {@link Name} of the {@link TermLabel} to consider.
+     * @param results All found results.
+     * @param leafNode The leaf {@link Node}.
+     * @param condition The condition under which the leaf {@link Node} is reached from the analyzed
+     *        {@link Node}.
+     * @param conditionString The human readable condition under which the leaf {@link Node} is
+     *        reached from the
+     *        analyzed {@link Node}.
+     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
      * @author Martin Hentschel
      */
-        public record BranchResult(Node leafNode, Map<String, MultiEvaluationResult> results, Term condition,
-                                   String conditionString, Name termLabelName) {
+    public record BranchResult(Node leafNode, Map<String, MultiEvaluationResult> results,
+            Term condition,
+            String conditionString, Name termLabelName) {
         /**
          * Constructor.
          *
-         * @param leafNode        The leaf {@link Node}.
-         * @param results         All found results.
-         * @param condition       The condition under which the leaf {@link Node} is reached from the
-         *                        analyzed {@link Node}.
+         * @param leafNode The leaf {@link Node}.
+         * @param results All found results.
+         * @param condition The condition under which the leaf {@link Node} is reached from the
+         *        analyzed {@link Node}.
          * @param conditionString The human readable condition under which the leaf {@link Node} is
-         *                        reached from the analyzed {@link Node}.
-         * @param termLabelName   The {@link Name} of the {@link TermLabel} to consider.
+         *        reached from the analyzed {@link Node}.
+         * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
          */
         public BranchResult {
             assert leafNode != null;
@@ -1082,173 +1084,173 @@ public final class TruthValueTracingUtil {
             assert termLabelName != null;
         }
 
-            /**
-             * Returns all found results.
-             *
-             * @return All found results.
-             */
-            @Override
-            public Map<String, MultiEvaluationResult> results() {
-                return Collections.unmodifiableMap(results);
-            }
+        /**
+         * Returns all found results.
+         *
+         * @return All found results.
+         */
+        @Override
+        public Map<String, MultiEvaluationResult> results() {
+            return Collections.unmodifiableMap(results);
+        }
 
-            /**
-             * Returns the {@link MultiEvaluationResult} for the given {@link FormulaTermLabel}.
-             *
-             * @param termLabel The {@link FormulaTermLabel}.
-             * @return The found {@link MultiEvaluationResult} or {@code null} if not available.
-             */
-            public MultiEvaluationResult getResult(FormulaTermLabel termLabel) {
-                return termLabel != null ? results.get(termLabel.getId()) : null;
-            }
+        /**
+         * Returns the {@link MultiEvaluationResult} for the given {@link FormulaTermLabel}.
+         *
+         * @param termLabel The {@link FormulaTermLabel}.
+         * @return The found {@link MultiEvaluationResult} or {@code null} if not available.
+         */
+        public MultiEvaluationResult getResult(FormulaTermLabel termLabel) {
+            return termLabel != null ? results.get(termLabel.getId()) : null;
+        }
 
-            /**
-             * Updates a result.
-             * <p>
-             * <b>Warning: </b> {@link BranchResult}s are considered to be unmodifiable. This means that
-             * an update of the result needs to be done before results are shown to the user by the UI.
-             *
-             * @param termLabel The {@link FormulaTermLabel} to update.
-             * @param result    The new result of the given {@link FormulaTermLabel}.
-             */
-            public void updateResult(FormulaTermLabel termLabel, MultiEvaluationResult result) {
-                if (termLabel != null) {
-                    results.put(termLabel.getId(), result);
-                }
-            }
-
-            /**
-             * Returns the condition under which the leaf {@link Node} is reached from the analyzed
-             * {@link Node}.
-             *
-             * @return The condition under which the leaf {@link Node} is reached from the analyzed
-             * {@link Node}.
-             */
-            @Override
-            public Term condition() {
-                return condition;
-            }
-
-            /**
-             * Returns the human readable condition under which the leaf {@link Node} is reached from
-             * the analyzed {@link Node}.
-             *
-             * @return The human readable condition under which the leaf {@link Node} is reached from
-             * the analyzed {@link Node}.
-             */
-            @Override
-            public String conditionString() {
-                return conditionString;
-            }
-
-            /**
-             * Returns the {@link Name} of the {@link TermLabel} to consider.
-             *
-             * @return The {@link Name} of the {@link TermLabel} to consider.
-             */
-            @Override
-            public Name termLabelName() {
-                return termLabelName;
-            }
-
-            /**
-             * Checks if the {@link Term} has a {@link TermLabel} with {@link Name}
-             * {@link #termLabelName ()}.
-             *
-             * @param term The {@link Term} to check.
-             * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
-             */
-            public boolean hasPredicateLabel(Term term) {
-                return getPredicateLabel(term) != null;
-            }
-
-            /**
-             * Returns the first {@link FormulaTermLabel} with {@link Name} {@link #termLabelName ()}.
-             *
-             * @param term The {@link Term}.
-             * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
-             */
-            public FormulaTermLabel getPredicateLabel(Term term) {
-                TermLabel label = term.getLabel(termLabelName);
-                return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
-            }
-
-            /**
-             * Returns the leaf {@link Node}.
-             *
-             * @return The leaf {@link Node}.
-             */
-            @Override
-            public Node leafNode() {
-                return leafNode;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String toString() {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Goal ");
-                sb.append(leafNode.serialNr());
-                sb.append("\n");
-                boolean afterFirst = false;
-                for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
-                    if (afterFirst) {
-                        sb.append("\n");
-                    } else {
-                        afterFirst = true;
-                    }
-                    sb.append(entry.getKey());
-                    sb.append(" = ");
-                    sb.append(entry.getValue().evaluate(termLabelName, results));
-                    sb.append(" :: ");
-                    sb.append(entry.getValue());
-                }
-                return sb.toString();
-            }
-
-            /**
-             * Creates a pretty printed {@link String}.
-             *
-             * @return The pretty printed {@link String}.
-             */
-            public String toPrettyString() {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Goal ");
-                sb.append(leafNode.serialNr());
-                sb.append("\n");
-                boolean afterFirst = false;
-                for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
-                    if (afterFirst) {
-                        sb.append("\n");
-                    } else {
-                        afterFirst = true;
-                    }
-                    sb.append(entry.getKey());
-                    sb.append(" = ");
-                    sb.append(entry.getValue().evaluate(termLabelName, results));
-                    sb.append(" :: ");
-                    sb.append(entry.getValue().toPrettyString(leafNode.proof().getServices()));
-                }
-                return sb.toString();
-            }
-
-            /**
-             * Evaluates the given {@link FormulaTermLabel}.
-             *
-             * @param termLabel The {@link FormulaTermLabel} to evaluate.
-             * @return The evaluation result.
-             */
-            public TruthValue evaluate(FormulaTermLabel termLabel) {
-                if (termLabel != null) {
-                    MultiEvaluationResult instruction = getResult(termLabel);
-                    return instruction != null ? instruction.evaluate(termLabelName, results) : null;
-                } else {
-                    return null;
-                }
+        /**
+         * Updates a result.
+         * <p>
+         * <b>Warning: </b> {@link BranchResult}s are considered to be unmodifiable. This means that
+         * an update of the result needs to be done before results are shown to the user by the UI.
+         *
+         * @param termLabel The {@link FormulaTermLabel} to update.
+         * @param result The new result of the given {@link FormulaTermLabel}.
+         */
+        public void updateResult(FormulaTermLabel termLabel, MultiEvaluationResult result) {
+            if (termLabel != null) {
+                results.put(termLabel.getId(), result);
             }
         }
+
+        /**
+         * Returns the condition under which the leaf {@link Node} is reached from the analyzed
+         * {@link Node}.
+         *
+         * @return The condition under which the leaf {@link Node} is reached from the analyzed
+         *         {@link Node}.
+         */
+        @Override
+        public Term condition() {
+            return condition;
+        }
+
+        /**
+         * Returns the human readable condition under which the leaf {@link Node} is reached from
+         * the analyzed {@link Node}.
+         *
+         * @return The human readable condition under which the leaf {@link Node} is reached from
+         *         the analyzed {@link Node}.
+         */
+        @Override
+        public String conditionString() {
+            return conditionString;
+        }
+
+        /**
+         * Returns the {@link Name} of the {@link TermLabel} to consider.
+         *
+         * @return The {@link Name} of the {@link TermLabel} to consider.
+         */
+        @Override
+        public Name termLabelName() {
+            return termLabelName;
+        }
+
+        /**
+         * Checks if the {@link Term} has a {@link TermLabel} with {@link Name}
+         * {@link #termLabelName ()}.
+         *
+         * @param term The {@link Term} to check.
+         * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
+         */
+        public boolean hasPredicateLabel(Term term) {
+            return getPredicateLabel(term) != null;
+        }
+
+        /**
+         * Returns the first {@link FormulaTermLabel} with {@link Name} {@link #termLabelName ()}.
+         *
+         * @param term The {@link Term}.
+         * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
+         */
+        public FormulaTermLabel getPredicateLabel(Term term) {
+            TermLabel label = term.getLabel(termLabelName);
+            return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
+        }
+
+        /**
+         * Returns the leaf {@link Node}.
+         *
+         * @return The leaf {@link Node}.
+         */
+        @Override
+        public Node leafNode() {
+            return leafNode;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Goal ");
+            sb.append(leafNode.serialNr());
+            sb.append("\n");
+            boolean afterFirst = false;
+            for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
+                if (afterFirst) {
+                    sb.append("\n");
+                } else {
+                    afterFirst = true;
+                }
+                sb.append(entry.getKey());
+                sb.append(" = ");
+                sb.append(entry.getValue().evaluate(termLabelName, results));
+                sb.append(" :: ");
+                sb.append(entry.getValue());
+            }
+            return sb.toString();
+        }
+
+        /**
+         * Creates a pretty printed {@link String}.
+         *
+         * @return The pretty printed {@link String}.
+         */
+        public String toPrettyString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Goal ");
+            sb.append(leafNode.serialNr());
+            sb.append("\n");
+            boolean afterFirst = false;
+            for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
+                if (afterFirst) {
+                    sb.append("\n");
+                } else {
+                    afterFirst = true;
+                }
+                sb.append(entry.getKey());
+                sb.append(" = ");
+                sb.append(entry.getValue().evaluate(termLabelName, results));
+                sb.append(" :: ");
+                sb.append(entry.getValue().toPrettyString(leafNode.proof().getServices()));
+            }
+            return sb.toString();
+        }
+
+        /**
+         * Evaluates the given {@link FormulaTermLabel}.
+         *
+         * @param termLabel The {@link FormulaTermLabel} to evaluate.
+         * @return The evaluation result.
+         */
+        public TruthValue evaluate(FormulaTermLabel termLabel) {
+            if (termLabel != null) {
+                MultiEvaluationResult instruction = getResult(termLabel);
+                return instruction != null ? instruction.evaluate(termLabelName, results) : null;
+            } else {
+                return null;
+            }
+        }
+    }
 
     /**
      * Represents the possible truth values.

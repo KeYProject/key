@@ -14,5 +14,6 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Dominic Scheurer
  */
-public record MergeParamsSpec(String latticeType, LocationVariable placeholder, ImmutableList<Term> predicates) {
+public record MergeParamsSpec(String latticeType, LocationVariable placeholder,
+        ImmutableList<Term> predicates) {
 }
