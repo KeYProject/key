@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+
+import org.key_project.util.collection.Pair;
 
 /**
  * @author Alexander Weigl
@@ -23,7 +26,7 @@ public class ValueInjector {
     private static ValueInjector instance;
 
     /**
-     * A mapping between desired types and suitable @{@link StringConverter}.
+     * A mapping between desired types and suitable @{@link Converter}.
      * <p>
      * Should be
      *
@@ -31,7 +34,7 @@ public class ValueInjector {
      * T --> StringConverter<T>
      * </pre>
      */
-    private final Map<Class<?>, StringConverter<?>> converters = new HashMap<>();
+    private final Map<Pair<Class<?>, Class<?>>, Converter<?, ?>> converters = new HashMap<>();
 
     /**
      * Injects the given {@code arguments} in the {@code obj}. For more details see
@@ -48,7 +51,7 @@ public class ValueInjector {
      * @throws ConversionException an converter could not translate the given value in arguments
      */
     public static <T> T injection(ProofScriptCommand<T> command, T obj,
-            Map<String, String> arguments) throws ArgumentRequiredException,
+            Map<String, Object> arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
     }
@@ -74,29 +77,29 @@ public class ValueInjector {
      */
     public static ValueInjector createDefault() {
         ValueInjector vi = new ValueInjector();
-        vi.addConverter(Integer.class, Integer::parseInt);
-        vi.addConverter(Long.class, Long::parseLong);
-        vi.addConverter(Boolean.class, Boolean::parseBoolean);
-        vi.addConverter(Double.class, Double::parseDouble);
-        vi.addConverter(String.class, (String s) -> s);
-        vi.addConverter(Boolean.TYPE, Boolean::parseBoolean);
-        vi.addConverter(Byte.TYPE, Byte::parseByte);
-        vi.addConverter(Character.TYPE, s -> s.charAt(0));
-        vi.addConverter(Short.TYPE, Short::parseShort);
-        vi.addConverter(Integer.TYPE, Integer::parseInt);
-        vi.addConverter(Long.TYPE, Long::parseLong);
-        vi.addConverter(Double.TYPE, Double::parseDouble);
-        vi.addConverter(Float.TYPE, Float::parseFloat);
+        vi.addConverter(Integer.class, String.class, Integer::parseInt);
+        vi.addConverter(Long.class, String.class, Long::parseLong);
+        vi.addConverter(Boolean.class, String.class, Boolean::parseBoolean);
+        vi.addConverter(Double.class, String.class, Double::parseDouble);
+        vi.addConverter(String.class, String.class, (String s) -> s);
+        vi.addConverter(Boolean.TYPE, String.class, Boolean::parseBoolean);
+        vi.addConverter(Byte.TYPE, String.class, Byte::parseByte);
+        vi.addConverter(Character.TYPE, String.class, (String s) -> s.charAt(0));
+        vi.addConverter(Short.TYPE, String.class, Short::parseShort);
+        vi.addConverter(Integer.TYPE, String.class, Integer::parseInt);
+        vi.addConverter(Long.TYPE, String.class, Long::parseLong);
+        vi.addConverter(Double.TYPE, String.class, Double::parseDouble);
+        vi.addConverter(Float.TYPE, String.class, Float::parseFloat);
         return vi;
     }
 
     /**
      * Injects the converted version of the given {@code arguments} in the given {@code obj}.
      *
+     * @param <T>       type safety
      * @param command a proof script command
      * @param obj a non-null instance of a parameter class (with annotation)
      * @param arguments a non-null string map
-     * @param <T> type safety
      * @return the same object as {@code obj}
      * @throws ArgumentRequiredException a required argument was not given in {@code arguments}
      * @throws InjectionReflectionException an access on some reflection methods occurred
@@ -105,7 +108,7 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, String> arguments)
+    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, Object> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
         List<ProofScriptArgument<T>> meta =
@@ -126,9 +129,9 @@ public class ValueInjector {
         for (ProofScriptArgument<T> vararg : varArgs) {
             final Map<String, Object> map = getStringMap(obj, vararg);
             final int prefixLength = vararg.getName().length();
-            for (Map.Entry<String, String> e : arguments.entrySet()) {
-                String k = e.getKey();
-                String v = e.getValue();
+            for (Map.Entry<String, Object> e : arguments.entrySet()) {
+                var k = e.getKey();
+                var v = e.getValue();
                 if (!usedKeys.contains(k) && k.startsWith(vararg.getName())) {
                     map.put(k.substring(prefixLength), convert(vararg, v));
                     usedKeys.add(k);
@@ -155,10 +158,10 @@ public class ValueInjector {
         }
     }
 
-    private void injectIntoField(ProofScriptArgument<?> meta, Map<String, String> args, Object obj)
+    private void injectIntoField(ProofScriptArgument<?> meta, Map<String, Object> args, Object obj)
             throws InjectionReflectionException, ArgumentRequiredException, ConversionException,
             NoSpecifiedConverterException {
-        final String val = args.get(meta.getName());
+        final var val = args.get(meta.getName());
         if (val == null) {
             if (meta.isRequired()) {
                 throw new ArgumentRequiredException(String.format(
@@ -183,41 +186,56 @@ public class ValueInjector {
         }
     }
 
-    private Object convert(ProofScriptArgument<?> meta, String val)
+    @SuppressWarnings("unchecked")
+    private Object convert(ProofScriptArgument<?> meta, Object val)
             throws NoSpecifiedConverterException, ConversionException {
-        StringConverter<?> converter = getConverter(meta.getType());
+        var converter = (Converter<Object, Object>) getConverter(meta.getType(), val.getClass());
         if (converter == null) {
             throw new NoSpecifiedConverterException(
-                "No converter registered for class: " + meta.getField().getType(), meta);
+                "No converter registered for class: " + meta.getField().getType() + " from "
+                    + val.getClass(),
+                meta);
         }
         try {
             return converter.convert(val);
         } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert value %s to type %s",
-                val, meta.getField().getType().getName()), e, meta);
+            throw new ConversionException(String.format("Could not convert value %s (%s) to type %s",
+                val, val.getClass(), meta.getField().getType().getName()), e, meta);
         }
     }
 
     /**
      * Registers the given converter for the specified class.
      *
-     * @param clazz a class
+     * @param ret a class
      * @param conv a converter for the given class
      * @param <T> an arbitrary type
      */
-    public <T> void addConverter(Class<T> clazz, StringConverter<T> conv) {
-        converters.put(clazz, conv);
+    public <R, T> void addConverter(Class<R> ret, Class<T> arg, Converter<R, T> conv) {
+        converters.put(new Pair<>(ret, arg), conv);
+    }
+
+    public <R, T> void addConverter(Converter<R, T> conv) {
+        var m = conv.getClass().getMethods()[0];
+        converters.put(new Pair<>(m.getReturnType(), m.getParameterTypes()[0]), conv);
     }
 
     /**
      * Finds a converter for the given class.
      *
-     * @param clazz a non-null class
      * @param <T> an arbitrary type
+     * @param ret a non-null class
+     * @param arg
      * @return null or a suitable converter (registered) converter for the requested class.
      */
     @SuppressWarnings("unchecked")
-    public <T> StringConverter<T> getConverter(Class<T> clazz) {
-        return (StringConverter<T>) converters.get(clazz);
+    public <R, T> Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
+        return (Converter<R, T>) converters.get(new Pair<>(ret, arg));
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "(" + converters.keySet().stream()
+                .map(it -> it.toString()).collect(Collectors.joining(",\n")) + ")";
     }
 }

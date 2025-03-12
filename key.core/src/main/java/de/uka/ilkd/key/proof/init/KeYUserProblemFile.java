@@ -187,9 +187,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @return {@link ProofScriptEntry} if present otherwise null
      * @see KeyAst.File#findProofScript(URI)
      */
-    public @Nullable ProofScriptEntry readProofScript() {
-        URI url = getInitialFile().toURI();
-        return getParseContext().findProofScript(url);
+    public KeyAst.@Nullable ProofScript readProofScript() {
+        return getParseContext().findProofScript();
     }
 
     /**

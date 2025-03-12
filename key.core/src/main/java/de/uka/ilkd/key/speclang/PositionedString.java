@@ -35,6 +35,11 @@ public class PositionedString {
         this.location = location;
     }
 
+    public PositionedString(@NonNull String text, org.antlr.v4.runtime.Token t) {
+        this(text, t.getTokenSource().getSourceName(), Position.fromToken(t));
+    }
+
+
     public PositionedString(@NonNull String text, URI fileName) {
         this(text, new Location(fileName, Position.UNDEFINED));
     }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -20,7 +21,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -45,6 +46,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +163,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             ProblemLoader problemLoader = (ProblemLoader) info.getSource();
             if (problemLoader.hasProofScript()) {
                 try {
-                    ProofScriptEntry script = problemLoader.getProofScript();
+                    KeyAst.@Nullable ProofScript script = problemLoader.getProofScript();
                     if (script != null) {
                         ProofScriptEngine pse =
                             new ProofScriptEngine(script.script(), script.location());

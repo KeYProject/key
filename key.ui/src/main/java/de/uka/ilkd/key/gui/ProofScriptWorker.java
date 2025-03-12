@@ -3,26 +3,36 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dialog.ModalityType;
-import java.io.File;
-import java.io.IOException;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -37,11 +47,10 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
-    private final String script;
-    private final Location initialLocation;
 
     /** The initially selected goal. */
     private final Goal initiallySelectedGoal;
+    private final KeyAst.ProofScript script;
 
     /** The proof script engine. */
     private ProofScriptEngine engine;
@@ -50,22 +59,14 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
 
     private final Consumer<ProofScriptEngine.Message> observer = this::publish;
 
-    public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
-        this.initialLocation = new Location(file.toURI(), Position.newOneBased(1, 1));
-        this.script = Files.readString(file.toPath());
-        this.mediator = mediator;
-        this.initiallySelectedGoal = null;
-    }
-
     /**
      * Instantiates a new proof script worker.
      *
      * @param mediator the mediator
      * @param script the script
-     * @param location the location
      */
-    public ProofScriptWorker(KeYMediator mediator, String script, Location location) {
-        this(mediator, script, location, null);
+    public ProofScriptWorker(KeYMediator mediator, KeyAst.ProofScript script) {
+        this(mediator, script, null);
     }
 
     /**
@@ -73,21 +74,19 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
      *
      * @param mediator the mediator
      * @param script the script
-     * @param location the location
      * @param initiallySelectedGoal the initially selected goal
      */
-    public ProofScriptWorker(KeYMediator mediator, String script, Location location,
+    public ProofScriptWorker(KeYMediator mediator, KeyAst.ProofScript script,
             Goal initiallySelectedGoal) {
         this.mediator = mediator;
         this.script = script;
-        this.initialLocation = location;
         this.initiallySelectedGoal = initiallySelectedGoal;
     }
 
     @Override
     protected Object doInBackground() throws Exception {
         try {
-            engine = new ProofScriptEngine(script, initialLocation, initiallySelectedGoal);
+            engine = new ProofScriptEngine(script);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
@@ -97,7 +96,7 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
     }
 
     private void makeDialog() {
-        URI uri = initialLocation.getFileURI().orElse(null);
+        URI uri = script.getFileURI().orElse(null);
 
         if (monitor != null) {
             logArea.setText("Running script from URL '" + uri + "':\n");
