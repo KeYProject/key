@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 
 /**
  * This handler treats polymorphic symbols, in particular if-then-else and equals.
@@ -21,11 +22,13 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
  */
 public class PolymorphicHandler implements SMTHandler {
 
+    private IntegerLDT integerLDT;
+
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         // nothing to be done
         // there are also no snippets.
+        this.integerLDT = services.getTypeConverter().getIntegerLDT();
     }
 
     @Override
@@ -37,10 +40,7 @@ public class PolymorphicHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
         if (op == Equality.EQUALS) {
-            List<SExpr> children = trans.translate(term.subs());
-            children.set(0, SExprs.coerce(children.get(0), Type.UNIVERSE));
-            children.set(1, SExprs.coerce(children.get(1), Type.UNIVERSE));
-            return new SExpr("=", Type.BOOL, children);
+            return new SExpr("=", Type.BOOL, trans.translate(term.subs(), Type.UNIVERSE));
         }
 
         if (op == IfThenElse.IF_THEN_ELSE) {

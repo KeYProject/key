@@ -23,6 +23,9 @@ import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
+
 
 /**
  * This interface is used for modeling different solvers. It provides methods that encode
@@ -142,7 +145,7 @@ public interface SolverType {
      *
      * @return the delimiters of the messages that are sent from the solver to KeY.
      */
-    String[] getDelimiters();
+    Collection<String> getDelimiters();
 
     /**
      * Directly before the problem description is sent to the solver one can modify the problem
