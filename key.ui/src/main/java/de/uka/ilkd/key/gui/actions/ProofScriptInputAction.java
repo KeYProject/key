@@ -14,8 +14,7 @@ import javax.swing.JTextArea;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 
 /**
  * The Class ProofScriptInputAction.
@@ -26,7 +25,9 @@ public class ProofScriptInputAction extends AbstractAction {
 
     private static final long serialVersionUID = -1193756128644859298L;
 
-    /** The mediator. */
+    /**
+     * The mediator.
+     */
     private final KeYMediator mediator;
 
     /**
@@ -56,10 +57,9 @@ public class ProofScriptInputAction extends AbstractAction {
             JButton okButton = new JButton("OK");
 
             okButton.addActionListener(event -> {
-                ProofScriptWorker psw = new ProofScriptWorker(mediator, textArea.getText(),
-                    new Location(null, Position.newOneBased(1, 1)),
-                    mediator.getSelectedGoal());
-
+                var script = ParsingFacade.parseScript(textArea.getText());
+                ProofScriptWorker psw = new ProofScriptWorker(
+                    mediator, script, mediator.getSelectedGoal());
                 dispose();
 
                 psw.init();

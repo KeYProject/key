@@ -42,9 +42,9 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     @Override
-    public SMTCommandArguments evaluateArguments(EngineState state, Map<String, String> arguments)
+    public SMTCommandArguments evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
-        return ValueInjector.injection(this, new SMTCommandArguments(), arguments);
+        return state.getValueInjector().inject(this, new SMTCommandArguments(), arguments);
     }
 
     @Override

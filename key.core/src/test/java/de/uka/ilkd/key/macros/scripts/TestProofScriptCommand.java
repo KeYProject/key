@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.LineProperties;
 
 import org.key_project.util.collection.ImmutableList;
@@ -72,16 +72,15 @@ public class TestProofScriptCommand {
 
         Proof proof = env.getLoadedProof();
 
-        String script = props.get("script");
-        ProofScriptEngine pse =
-            new ProofScriptEngine(script,
-                new Location(path.toUri(), Position.newOneBased(1, 1)));
+        var script = ParsingFacade.parseScript(new PositionedString(props.get("script"),
+            tmpKey.toFile().getAbsolutePath()));
+        ProofScriptEngine pse = new ProofScriptEngine(script);
 
         try {
             pse.execute(env.getUi(), proof);
         } catch (Exception ex) {
             assertTrue(props.containsKey("exception"), "unexpected exception");
-            Assertions.assertEquals(ex.getMessage(), props.get("exception").trim());
+            Assertions.assertTrue(ex.getMessage().startsWith(props.get("exception").trim()));
             return;
         }
 

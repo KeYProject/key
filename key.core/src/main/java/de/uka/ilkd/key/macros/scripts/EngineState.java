@@ -3,6 +3,27 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.macros.scripts.meta.Converter;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
+import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
+import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
+import org.jspecify.annotations.NonNull;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -10,29 +31,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
-import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.ProofSettings;
-
-import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableList;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.jspecify.annotations.NonNull;
-
 /**
  * @author Alexander Weigl
  * @version 1 (28.03.17)
  */
 public class EngineState {
+    public static final Logger LOGGER = LoggerFactory.getLogger(EngineState.class);
+
     private final Proof proof;
     private final AbbrevMap abbrevMap = new AbbrevMap();
     /**
@@ -40,7 +45,8 @@ public class EngineState {
      */
     private Consumer<ProofScriptEngine.Message> observer;
     private File baseFileName = new File(".");
-    private final ValueInjector valueInjector = ValueInjector.createDefault();
+    private final ValueInjector valueInjector = createDefaultValueInjector();
+
     private Goal goal;
     private Node lastSetGoalNode;
 
@@ -58,10 +64,116 @@ public class EngineState {
 
     public EngineState(Proof proof) {
         this.proof = proof;
-        valueInjector.addConverter(Term.class, (String s) -> toTerm(s, null));
-        valueInjector.addConverter(Sequent.class, this::toSequent);
-        valueInjector.addConverter(Sort.class, this::toSort);
     }
+
+    private ValueInjector createDefaultValueInjector() {
+        var v = ValueInjector.createDefault();
+        v.addConverter(Term.class, String.class, this::toTerm);
+        v.addConverter(Sequent.class, String.class, this::toSequent);
+        v.addConverter(Sort.class, String.class, this::toSort);
+        addContextTranslator(v, String.class);
+
+        //v.addConverter(String.class, KeYParser.ProofScriptExpressionContext.class, RuleContext::getText);
+
+        addContextTranslator(v, Term.class);
+        addContextTranslator(v, Integer.class);
+        addContextTranslator(v, Byte.class);
+        addContextTranslator(v, Long.class);
+        addContextTranslator(v, Boolean.class);
+        addContextTranslator(v, Character.class);
+        addContextTranslator(v, Sequent.class);
+        addContextTranslator(v, Integer.TYPE);
+        addContextTranslator(v, Byte.TYPE);
+        addContextTranslator(v, Long.TYPE);
+        addContextTranslator(v, Boolean.TYPE);
+        addContextTranslator(v, Character.TYPE);
+
+
+        v.addConverter(Term.class, KeYParser.ProofScriptExpressionContext.class,
+                this::toKeYEntity);
+
+        v.addConverter(Sequent.class, KeYParser.ProofScriptExpressionContext.class,
+                this::toKeYEntity);
+
+        v.addConverter(Semisequent.class, KeYParser.ProofScriptExpressionContext.class,
+                this::toKeYEntity);
+
+
+        return v;
+    }
+
+    private <T> T toKeYEntity(KeYParser.ProofScriptExpressionContext expr) throws ScriptException {
+
+        if (ctx.string_literal() != null) {
+            var v = ctx.string_literal().getText();
+            v = v.substring(1, v.length() - 1);
+            return (R) inj.getConverter(aClass, String.class).convert(v);
+        } else if (ctx.term() != null && aClass == Term.class) {
+            return (R) parseExpr(ctx.term());
+        } else if (ctx.seq() != null && aClass == Sequent.class) {
+            return (R) parseSequent(ctx.seq());
+        }
+        var v = ctx.getText();
+        return (R) inj.getConverter(aClass, String.class).convert(v);
+
+        final var firstNode = getFirstOpenAutomaticGoal();
+        ExpressionBuilder visitor = new ExpressionBuilder(
+                getProof().getServices(),
+                firstNode.getLocalNamespaces());
+        visitor.setAbbrevMap(abbrevMap);
+        //if (schemaNamespace != null)
+        //    visitor.setSchemaVariables(schemaNamespace);
+        T ret = (T) expr.accept(visitor);
+        var warnings = visitor.getBuildingIssues();
+        for (BuildingIssue warning : warnings) {
+            LOGGER.warn(warning.toString());
+        }
+        return ret;
+    }
+
+    private <T> void addContextTranslator(ValueInjector v, Class<T> aClass) {
+        var converter = (Converter<T, KeYParser.ProofScriptExpressionContext>)
+                (KeYParser.ProofScriptExpressionContext a) -> convertToString(v, aClass, a);
+        v.addConverter(aClass, KeYParser.ProofScriptExpressionContext.class, converter);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <R> R convertToString(ValueInjector inj, Class<?> aClass, KeYParser.ProofScriptExpressionContext ctx)
+            throws Exception {
+        if (ctx.string_literal() != null) {
+            var v = ctx.string_literal().getText();
+            v = v.substring(1, v.length() - 1);
+            return (R) inj.getConverter(aClass, String.class).convert(v);
+        } else if (ctx.term() != null && aClass == Term.class) {
+            return (R) parseExpr(ctx.term());
+        } else if (ctx.seq() != null && aClass == Sequent.class) {
+            return (R) parseSequent(ctx.seq());
+        }
+        var v = ctx.getText();
+        return (R) inj.getConverter(aClass, String.class).convert(v);
+
+    }
+
+
+
+    private Sequent parseSequent(KeYParser.SeqContext term) {
+        ExpressionBuilder visitor = new ExpressionBuilder(proof.getServices(), proof.getNamespaces());
+        visitor.setAbbrevMap(abbrevMap);
+        var t = (Sequent) term.accept(visitor);
+        var warnings = visitor.getBuildingIssues();
+        warnings.forEach(System.out::println);//waiting for logging
+        return t;
+    }
+
+    private Term parseExpr(KeYParser.TermContext term) {
+        ExpressionBuilder visitor = new ExpressionBuilder(proof.getServices(), proof.getNamespaces());
+        visitor.setAbbrevMap(abbrevMap);
+        Term t = (Term) term.accept(visitor);
+        var warnings = visitor.getBuildingIssues();
+        warnings.forEach(System.out::println);//waiting for logging
+        return t;
+    }
+
 
     protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
@@ -124,7 +236,6 @@ public class EngineState {
 
     /**
      * @return The first open and automatic {@link Goal}.
-     *
      * @throws ScriptException If there is no such {@link Goal}.
      */
     public Goal getFirstOpenAutomaticGoal() throws ScriptException {
@@ -189,31 +300,24 @@ public class EngineState {
         return result;
     }
 
-
-    public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
-        final var io = getKeyIO();
-        var term = io.parseExpression(string);
-        if (sort == null || term.sort().equals(sort))
-            return term;
-        else
-            throw new IllegalStateException(
-                "Unexpected sort for term: " + term + ". Expected: " + sort);
-    }
-
-    private @NonNull KeyIO getKeyIO() throws ScriptException {
-        Services services = proof.getServices();
-        KeyIO io = new KeyIO(services, getFirstOpenAutomaticGoal().getLocalNamespaces());
+    public Term toTerm(String string)
+            throws ParserException, ScriptException {
+        KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
         io.setAbbrevMap(abbrevMap);
-        return io;
+        Term formula = io.parseExpression(string);
+        return formula;
     }
 
-    public Sort toSort(String sortName) throws ScriptException {
+    public org.key_project.logic.sort.Sort toSort(String sortName) throws ScriptException {
         return (getFirstOpenAutomaticGoal() == null ? getProof().getServices().getNamespaces()
                 : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts().lookup(sortName);
     }
 
-    public Sequent toSequent(String sequent) throws ScriptException {
-        return getKeyIO().parseSequent(CharStreams.fromString(sequent));
+    public Sequent toSequent(String sequent)
+            throws ParserException, ScriptException {
+        KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
+        io.setAbbrevMap(getAbbreviations());
+        return io.parseSequence(sequent);
     }
 
     public int getMaxAutomaticSteps() {
