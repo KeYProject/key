@@ -1862,14 +1862,18 @@ public final class SpecificationRepository {
 
     /**
      * This record represents information which are necessary to evaluate JML statements.
-     * JML statements need to maintain the current variable set as well as the updated information for the KeY terms
-     * they describe. This record represents this information, i.e., the scope of variables, and a list of terms, in
+     * JML statements need to maintain the current variable set as well as the updated information
+     * for the KeY terms
+     * they describe. This record represents this information, i.e., the scope of variables, and a
+     * list of terms, in
      * an immutable fasion. Updates require to create instances.
      * <p>
-     * <b>Note:</b> There is a immutability hole in {@link ProgramVariableCollection} due to mutable {@link Map}
+     * <b>Note:</b> There is a immutability hole in {@link ProgramVariableCollection} due to mutable
+     * {@link Map}
      * <p>
      * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert.
-     * For {@link de.uka.ilkd.key.java.statement.SetStatement} this is the target and the value terms.
+     * For {@link de.uka.ilkd.key.java.statement.SetStatement} this is the target and the value
+     * terms.
      * You may want to use the index constant for accessing them:
      * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_TARGET},
      * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_VALUE},
@@ -1880,13 +1884,14 @@ public final class SpecificationRepository {
      */
     public record JmlStatementSpec(
             ProgramVariableCollection vars,
-            ImmutableList<Term> terms
-    ) {
+            ImmutableList<Term> terms) {
         /**
          * Retrieve a term
+         *
          * @param index a index to the list of {@code terms}.
          * @return the term at {@code index} in the {@code terms} list
-         * @throws IndexOutOfBoundsException if the given {@code index} is negative or {@code >= terms().size()}
+         * @throws IndexOutOfBoundsException if the given {@code index} is negative or
+         *         {@code >= terms().size()}
          */
         public Term term(int index) {
             return terms.get(index);
@@ -1894,8 +1899,10 @@ public final class SpecificationRepository {
 
         /**
          * Retrieve a term with a update to the given {@code self} term.
+         *
          * @param services the corresponding services instance
-         * @param self a term which describes the {@code self} object aka. this on the current sequence
+         * @param self a term which describes the {@code self} object aka. this on the current
+         *        sequence
          * @param index the index of the term in {@code terms()}
          * @return a term updated with {@code self} and the {@code vars()}.
          */
@@ -1907,32 +1914,38 @@ public final class SpecificationRepository {
             if (self != null) {
                 replacementMap.replaceSelf(vars().selfVar, self, services);
             }
-            replacementMap.replaceRemembranceLocalVariables(vars().atPreVars, vars().atPres, services);
-            replacementMap.replaceRemembranceLocalVariables(vars().atBeforeVars, vars().atBefores, services);
-            final OpReplacer replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
+            replacementMap.replaceRemembranceLocalVariables(vars().atPreVars, vars().atPres,
+                services);
+            replacementMap.replaceRemembranceLocalVariables(vars().atBeforeVars, vars().atBefores,
+                services);
+            final OpReplacer replacer =
+                new OpReplacer(replacementMap, termFactory, services.getProof());
             return replacer.replace(term);
         }
 
         /**
-         * Updates the variables given the new {@code atPres} (variable in pre state) map and the services.
+         * Updates the variables given the new {@code atPres} (variable in pre state) map and the
+         * services.
          * The update is applied directly and an updated specification is returned. You need to add
          * the updated spec to the statement in the {@link SpecificationRepository} by yourself.
          *
          * @param atPres a non-null map of a map of program variable to a term which describes
-         *               the value of this variable in the pre-state.
+         *        the value of this variable in the pre-state.
          * @param services the corresponding services object
          * @return a fresh {@link JmlStatementSpec} instance, non-registered.
          */
-        public JmlStatementSpec updateVariables(Map<LocationVariable, Term> atPres, Services services) {
+        public JmlStatementSpec updateVariables(Map<LocationVariable, Term> atPres,
+                Services services) {
             var termFactory = services.getTermFactory();
             var replacementMap = new TermReplacementMap(termFactory);
             replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
             var replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
             var newTerms = terms().map(replacer::replace);
             return new JmlStatementSpec(
-                    new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
-                            vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
-                    newTerms);
+                new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar,
+                    vars.excVar,
+                    vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
+                newTerms);
         }
     }
 

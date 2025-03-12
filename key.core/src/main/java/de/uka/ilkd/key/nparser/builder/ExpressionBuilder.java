@@ -340,12 +340,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < terms.size(); i++) {
             String opname = "";
             switch (ctx.op.get(i).getType()) {
-                case KeYLexer.UTF_INTERSECT -> opname = "intersect";
-                case KeYLexer.UTF_SETMINUS -> opname = "setMinus";
-                case KeYLexer.UTF_UNION -> opname = "union";
-                case KeYLexer.PLUS -> opname = "add";
-                case KeYLexer.MINUS -> opname = "sub";
-                default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
+            case KeYLexer.UTF_INTERSECT -> opname = "intersect";
+            case KeYLexer.UTF_SETMINUS -> opname = "setMinus";
+            case KeYLexer.UTF_UNION -> opname = "union";
+            case KeYLexer.PLUS -> opname = "add";
+            case KeYLexer.MINUS -> opname = "sub";
+            default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
             }
             Term cur = terms.get(i);
             last = binaryLDTSpecificTerm(ctx, opname, last, cur);
@@ -677,11 +677,14 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ProgramVariable pv = (ProgramVariable) attribute;
                 JFunction fieldSymbol = getServices().getTypeConverter().getHeapLDT()
                         .getFieldSymbolForPV((LocationVariable) pv, getServices());
-                if (pv.isFinal() && FinalHeapResolution.isFinalEnabled(getServices().getProof().getSettings())) {
-                    if(pv.isStatic()) {
-                        result = getServices().getTermBuilder().staticFinalDot(pv.sort(), fieldSymbol);
+                if (pv.isFinal() && FinalHeapResolution
+                        .isFinalEnabled(getServices().getProof().getSettings())) {
+                    if (pv.isStatic()) {
+                        result =
+                            getServices().getTermBuilder().staticFinalDot(pv.sort(), fieldSymbol);
                     } else {
-                        result = getServices().getTermBuilder().finalDot(pv.sort(), result, fieldSymbol);
+                        result =
+                            getServices().getTermBuilder().finalDot(pv.sort(), result, fieldSymbol);
                     }
                 } else if (pv.isStatic()) {
                     result = getServices().getTermBuilder().staticDot(pv.sort(), fieldSymbol);
@@ -759,15 +762,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == '\\' && i < chars.length - 1) {
                 switch (chars[++i]) {
-                    case 'n' -> sb.append("\n");
-                    case 'f' -> sb.append("\f");
-                    case 'r' -> sb.append("\r");
-                    case 't' -> sb.append("\t");
-                    case 'b' -> sb.append("\b");
-                    case ':' -> sb.append("\\:");
-                    // this is so in KeY ...
-                    default -> sb.append(chars[i]);
-                    // this more relaxed than before, \a becomes a ...
+                case 'n' -> sb.append("\n");
+                case 'f' -> sb.append("\f");
+                case 'r' -> sb.append("\r");
+                case 't' -> sb.append("\t");
+                case 'b' -> sb.append("\b");
+                case ':' -> sb.append("\\:");
+                // this is so in KeY ...
+                default -> sb.append(chars[i]);
+                // this more relaxed than before, \a becomes a ...
                 }
             } else {
                 sb.append(chars[i]);
@@ -799,7 +802,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 + ". Casts between primitive and reference types are not allowed. ");
         }
         assert s != null;
-        SortDependingFunction castSymbol = getServices().getJavaDLTheory().getCastSymbol(s, services);
+        SortDependingFunction castSymbol =
+            getServices().getJavaDLTheory().getCastSymbol(s, services);
         return getTermFactory().createTerm(castSymbol, result);
     }
 
@@ -1129,7 +1133,8 @@ public class ExpressionBuilder extends DefaultBuilder {
              * if (!inSchemaMode()) { semanticError(ctx,
              * "No schema elements allowed outside taclet declarations (" + sjb.opName + ")"); }
              */
-            Modality.JavaModalityKind kind = (Modality.JavaModalityKind) schemaVariables().lookup(new Name(sjb.opName));
+            Modality.JavaModalityKind kind =
+                (Modality.JavaModalityKind) schemaVariables().lookup(new Name(sjb.opName));
             op = Modality.getModality(kind, sjb.javaBlock);
         } else {
             Modality.JavaModalityKind kind = Modality.JavaModalityKind.getKind(sjb.opName);
@@ -1248,11 +1253,13 @@ public class ExpressionBuilder extends DefaultBuilder {
 
             // region split up package and class name
             while (startWithPackage
-                    && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext a) {
+                    && ctx.attribute(
+                        currentSuffix) instanceof KeYParser.Attribute_simpleContext a) {
                 if (a.heap != null) {
                     break; // No heap on java package allowed
                 }
-                @Nullable Object cur = accept(a.id);
+                @Nullable
+                Object cur = accept(a.id);
                 if (isPackage(javaPackage + "." + cur)) {
                     javaPackage += "." + cur;
                     currentSuffix++;
@@ -1527,7 +1534,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return current;
     }
 
-    private @Nullable Term[] visitArguments(KeYParser. @Nullable Argument_listContext call) {
+    private @Nullable Term[] visitArguments(KeYParser.@Nullable Argument_listContext call) {
         List<Term> arguments = accept(call);
         return arguments == null ? null : arguments.toArray(new Term[0]);
     }
@@ -1548,8 +1555,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitRealLiteral(RealLiteralContext ctx) {
         String txt = ctx.getText(); // full text of node incl. unary minus.
         char lastChar = txt.charAt(txt.length() - 1);
-        if(lastChar == 'R' || lastChar == 'r') {
-            semanticError(ctx, "The given float literal does not have a suffix. This is essential to determine its exact meaning. You probably want to add 'r' as a suffix.");
+        if (lastChar == 'R' || lastChar == 'r') {
+            semanticError(ctx,
+                "The given float literal does not have a suffix. This is essential to determine its exact meaning. You probably want to add 'r' as a suffix.");
         }
         throw new Error("not yet implemented");
     }
@@ -1625,7 +1633,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
         } else if (v instanceof LocationVariable lv) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(lv));
-        }else {
+        } else {
             if (v instanceof OperatorSV sv) {
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(sv));
             } else {
@@ -1646,7 +1654,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
 
-    protected ImmutableSet<Modality.JavaModalityKind> opSVHelper(String opName, ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
+    protected ImmutableSet<Modality.JavaModalityKind> opSVHelper(String opName,
+            ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
         if (opName.charAt(0) == '#') {
             return lookupOperatorSV(opName, modalityKinds);
         } else {
@@ -1706,7 +1715,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private ImmutableSet<Modality.JavaModalityKind> lookupOperatorSV(String opName,
-                                                                     ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
+            ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
         SchemaVariable sv = schemaVariables().lookup(new Name(opName));
         if (sv instanceof ModalOperatorSV osv) {
             modalityKinds = modalityKinds.union(osv.getModalities());
@@ -1848,5 +1857,6 @@ public class ExpressionBuilder extends DefaultBuilder {
 }
 
 
-record JavaQuery(String packageName, String className, List<String> attributeNames, KeYJavaType kjt) {
+record JavaQuery(String packageName, String className, List<String> attributeNames,
+        KeYJavaType kjt) {
 }

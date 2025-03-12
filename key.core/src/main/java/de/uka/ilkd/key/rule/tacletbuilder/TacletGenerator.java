@@ -1022,5 +1022,6 @@ public class TacletGenerator {
     }
 
 
-    private record TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {}
+    private record TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {
+    }
 }

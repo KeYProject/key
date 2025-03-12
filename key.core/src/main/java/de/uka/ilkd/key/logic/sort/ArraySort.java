@@ -150,8 +150,9 @@ public final class ArraySort extends SortImpl {
     }
 
 
-    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
-                           Sort javaLangSerializable) {
+    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
+            Sort javaLangCloneable,
+            Sort javaLangSerializable) {
         public boolean equals(Object o) {
             if (!(o instanceof SortKey sk)) {
                 return false;

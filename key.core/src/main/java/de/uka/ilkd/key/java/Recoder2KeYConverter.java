@@ -399,22 +399,23 @@ public class Recoder2KeYConverter {
      */
     private Literal getLiteralFor(recoder.service.ConstantEvaluator.EvaluationResult p_er) {
         return switch (p_er.getTypeCode()) {
-            case recoder.service.ConstantEvaluator.BOOLEAN_TYPE -> BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
-            case recoder.service.ConstantEvaluator.CHAR_TYPE -> new CharLiteral(p_er.getChar());
-            case recoder.service.ConstantEvaluator.DOUBLE_TYPE -> new DoubleLiteral(p_er.getDouble());
-            case recoder.service.ConstantEvaluator.FLOAT_TYPE -> new FloatLiteral(p_er.getFloat());
-            case recoder.service.ConstantEvaluator.BYTE_TYPE -> new IntLiteral(p_er.getByte());
-            case recoder.service.ConstantEvaluator.SHORT_TYPE -> new IntLiteral(p_er.getShort());
-            case recoder.service.ConstantEvaluator.INT_TYPE -> new IntLiteral(p_er.getInt());
-            case recoder.service.ConstantEvaluator.LONG_TYPE -> new LongLiteral(p_er.getLong());
-            case recoder.service.ConstantEvaluator.STRING_TYPE -> {
-                if (p_er.getString() == null) {
-                    yield NullLiteral.NULL;
-                }
-                yield new StringLiteral("\"" + p_er.getString() + "\"");
+        case recoder.service.ConstantEvaluator.BOOLEAN_TYPE ->
+            BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
+        case recoder.service.ConstantEvaluator.CHAR_TYPE -> new CharLiteral(p_er.getChar());
+        case recoder.service.ConstantEvaluator.DOUBLE_TYPE -> new DoubleLiteral(p_er.getDouble());
+        case recoder.service.ConstantEvaluator.FLOAT_TYPE -> new FloatLiteral(p_er.getFloat());
+        case recoder.service.ConstantEvaluator.BYTE_TYPE -> new IntLiteral(p_er.getByte());
+        case recoder.service.ConstantEvaluator.SHORT_TYPE -> new IntLiteral(p_er.getShort());
+        case recoder.service.ConstantEvaluator.INT_TYPE -> new IntLiteral(p_er.getInt());
+        case recoder.service.ConstantEvaluator.LONG_TYPE -> new LongLiteral(p_er.getLong());
+        case recoder.service.ConstantEvaluator.STRING_TYPE -> {
+            if (p_er.getString() == null) {
+                yield NullLiteral.NULL;
             }
-            default -> throw new ConvertException(
-                    "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
+            yield new StringLiteral("\"" + p_er.getString() + "\"");
+        }
+        default -> throw new ConvertException(
+            "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
         };
     }
 
