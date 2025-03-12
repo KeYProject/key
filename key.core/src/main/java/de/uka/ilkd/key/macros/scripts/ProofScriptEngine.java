@@ -10,18 +10,14 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -174,7 +170,8 @@ public class ProofScriptEngine {
                 throw new ScriptException(
                         String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
                                 e.getMessage(), prettyPrintCommand(commandContext),
-                                BuilderHelpers.getPosition(commandContext)),e);
+                                BuilderHelpers.getPosition(commandContext)),
+                    e);
             }
         }
     }
