@@ -21,7 +21,6 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -46,7 +45,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,16 +161,17 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             ProblemLoader problemLoader = (ProblemLoader) info.getSource();
             if (problemLoader.hasProofScript()) {
                 try {
-                    KeyAst.@Nullable ProofScript script = problemLoader.getProofScript();
+                    var script = problemLoader.getProofScript();
                     if (script != null) {
                         ProofScriptEngine pse =
-                            new ProofScriptEngine(script.script(), script.location());
+                            new ProofScriptEngine(script);
                         this.taskStarted(
                             new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                    pse.execute(this, proof);
-                    // The start and end messages are fake to persuade the system ...
-                    // All this here should refactored anyway ...
-                    this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                        pse.execute(this, proof);
+                        // The start and end messages are fake to persuade the system ...
+                        // All this here should refactored anyway ...
+                        this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                    }
                 } catch (Exception e) {
                     LOGGER.debug("", e);
                     System.exit(-1);
