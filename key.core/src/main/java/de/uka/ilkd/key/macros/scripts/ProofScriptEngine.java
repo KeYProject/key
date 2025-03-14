@@ -132,9 +132,7 @@ public class ProofScriptEngine {
             }
 
             final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
-            if (commandMonitor != null
-                    && stateMap.isEchoOn()
-                    && commandContext.AT() == null) {
+            if (commandMonitor != null && stateMap.isEchoOn()) {
                 commandMonitor
                         .accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
             }
@@ -148,7 +146,7 @@ public class ProofScriptEngine {
                 }
 
                 Object o = command.evaluateArguments(stateMap, argMap);
-                if (commandContext.AT() == null && stateMap.isEchoOn()) {
+                if (stateMap.isEchoOn()) {
                     LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
                         firstNode.serialNr(), commandContext.start.getLine(), cmd);
                 }
@@ -190,8 +188,7 @@ public class ProofScriptEngine {
 
 
     public static String prettyPrintCommand(KeYParser.ProofScriptCommandContext ctx) {
-        return (ctx.AT() != null ? "@ " : "") +
-            ctx.cmd.getText() +
+        return ctx.cmd.getText() +
             (ctx.proofScriptParameters() != null
                     ? " " + ctx.proofScriptParameters().proofScriptParameter().stream()
                             .map(RuleContext::getText)
