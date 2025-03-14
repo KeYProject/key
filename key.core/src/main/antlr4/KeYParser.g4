@@ -861,7 +861,7 @@ proofScriptEntry
 ;
 proofScriptEOF: proofScript EOF;
 proofScript: proofScriptCommand+;
-proofScriptCommand: AT? cmd=IDENT proofScriptParameters?
+proofScriptCommand: cmd=IDENT proofScriptParameters?
 	( LBRACE sub=proofScript RBRACE SEMI?
 	| SEMI);
 
