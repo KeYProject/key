@@ -7,7 +7,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 

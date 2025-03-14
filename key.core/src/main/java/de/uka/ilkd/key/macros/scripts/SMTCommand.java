@@ -6,7 +6,6 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.*;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;

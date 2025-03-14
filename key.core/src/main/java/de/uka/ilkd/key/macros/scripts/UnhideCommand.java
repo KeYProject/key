@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -14,8 +18,6 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.util.collection.ImmutableList;
-
-import java.util.Map;
 
 /**
  * Proof script command to insert a formula hidden earlier in the proof.

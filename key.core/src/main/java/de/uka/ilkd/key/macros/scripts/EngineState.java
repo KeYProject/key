@@ -84,17 +84,6 @@ public class EngineState {
         v.addConverter(Sequent.class, String.class, this::toSequent);
         v.addConverter(Sort.class, String.class, this::toSort);
 
-        v.addConverter(Integer.TYPE, Integer.class, (Integer i) -> (int) i);
-        v.addConverter(Double.TYPE, Double.class, d -> d);
-        v.addConverter(Boolean.TYPE, Boolean.class, b -> b);
-
-        v.addConverter(Integer.TYPE, String.class, Integer::parseInt);
-        v.addConverter(Double.TYPE, String.class, Double::parseDouble);
-        v.addConverter(Boolean.TYPE, String.class, Boolean::parseBoolean);
-        v.addConverter(Integer.class, String.class, Integer::parseInt);
-        v.addConverter(Double.class, String.class, Double::parseDouble);
-        v.addConverter(Boolean.class, String.class, Boolean::parseBoolean);
-
         addContextTranslator(v, String.class);
         addContextTranslator(v, Term.class);
         addContextTranslator(v, Integer.class);
@@ -166,10 +155,11 @@ public class EngineState {
      * Returns the first open goal, which has to be automatic iff checkAutomatic is true.
      *
      * @param checkAutomatic Set to true if the returned {@link Goal} should be automatic.
-     * @return the first open goal, which has to be automatic iff checkAutomatic* is true.
-     *
+     * @return the first open goal, which has to be automatic iff checkAutomatic
+     *         is true.
      * @throws ProofAlreadyClosedException If the proof is already closed when calling this method.
-     * @throws ScriptException If there is no such {@link Goal}, or something else goes*         wrong.
+     * @throws ScriptException If there is no such {@link Goal}, or something else goes
+     *         wrong.
      */
     @SuppressWarnings("unused")
     public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
@@ -284,20 +274,16 @@ public class EngineState {
         Services services = proof.getServices();
         KeyIO io = new KeyIO(services, getFirstOpenAutomaticGoal().getLocalNamespaces());
         io.setAbbrevMap(abbrevMap);
-        Term formula = io.parseExpression(string);
-        return formula;
+        return io;
     }
 
-    public org.key_project.logic.sort.Sort toSort(String sortName) throws ScriptException {
+    public Sort toSort(String sortName) throws ScriptException {
         return (getFirstOpenAutomaticGoal() == null ? getProof().getServices().getNamespaces()
                 : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts().lookup(sortName);
     }
 
-    public Sequent toSequent(String sequent)
-            throws ParserException, ScriptException {
-        KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
-        io.setAbbrevMap(getAbbreviations());
-        return io.parseSequence(sequent);
+    public Sequent toSequent(String sequent) throws ParserException, ScriptException {
+        return getKeyIO().parseSequent(CharStreams.fromString(sequent));
     }
 
     public int getMaxAutomaticSteps() {

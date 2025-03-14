@@ -6,13 +6,11 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 import java.util.Optional;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.macros.scripts.meta.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverCore;
@@ -113,7 +111,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * @param breakpointArg An optional breakpoint argument.
      * @param goal The {@link Goal} to apply the strategy on, needed for the rule* application
      *        manager.
-     * @param proverCore The {@link ProverCore}, needed for resetting the strategy*        afterward.
+     * @param proverCore The {@link ProverCore}, needed for resetting the strategy* afterward.
      * @param services The {@link Services} object.
      * @throws ScriptException
      */
