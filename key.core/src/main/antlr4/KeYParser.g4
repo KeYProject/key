@@ -866,7 +866,7 @@ proofScriptCommand: AT? cmd=IDENT proofScriptParameters?
 	| SEMI);
 
 proofScriptParameters: proofScriptParameter+;
-proofScriptParameter :  ((pname=proofScriptParameterName EQUALS)? expr=proofScriptExpression);
+proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
 proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
 proofScriptExpression:
     boolean_literal
