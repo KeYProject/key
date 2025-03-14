@@ -3,13 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
-import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
-import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +26,7 @@ public class AllCommand implements ProofScriptCommand<Map<String, Object>> {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
-                        EngineState stateMap) throws ScriptException, InterruptedException {
+            EngineState stateMap) throws ScriptException, InterruptedException {
         var block = (KeYParser.ProofScriptContext) args.get(ProofScriptEngine.KEY_SUB_SCRIPT);
 
         if (block == null) {
