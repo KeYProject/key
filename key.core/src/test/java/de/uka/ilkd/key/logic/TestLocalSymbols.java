@@ -9,7 +9,6 @@ import java.util.Set;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.collection.ImmutableList;
