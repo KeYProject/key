@@ -1837,7 +1837,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitProofScript(KeYParser.ProofScriptContext ctx) {
-        return null;//Do not traverse into proof scripts.
+        return null;// Do not traverse into proof scripts.
     }
 
     public void setAbbrevMap(AbbrevMap abbrevMap) {

@@ -16,11 +16,11 @@ import javax.swing.text.Document;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionModel;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.scripts.ScriptException;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
