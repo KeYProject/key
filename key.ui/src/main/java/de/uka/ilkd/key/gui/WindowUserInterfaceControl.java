@@ -222,14 +222,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
                 if (problemLoader.hasProofScript()) {
-                    try {
-                        KeyAst.ProofScript scriptAndLoc = problemLoader.readProofScript();
+                    KeyAst.ProofScript scriptAndLoc = problemLoader.getProofScript();
+                    if (scriptAndLoc != null) {
                         ProofScriptWorker psw =
                             new ProofScriptWorker(mainWindow.getMediator(), scriptAndLoc);
                         psw.init();
                         psw.execute();
-                    } catch (ProofInputException e) {
-                        throw new RuntimeException(e);
                     }
                 } else if (macroChosen()) {
                     applyMacro();
