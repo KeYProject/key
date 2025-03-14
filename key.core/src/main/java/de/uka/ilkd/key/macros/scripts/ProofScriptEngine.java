@@ -3,6 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -10,19 +19,13 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author Mattias Ulbrich
@@ -91,7 +94,13 @@ public class ProofScriptEngine {
 
         // add the filename (if available) to the statemap.
         URI url = script.getUrl();
-        stateMap.setBaseFileName(Paths.get(url));
+        try {
+            stateMap.setBaseFileName(Paths.get(url));
+        } catch (InvalidPathException ignored) {
+            // weigl: occurs on windows platforms, due to the fact
+            // that the URI contains "<unknown>" from ANTLR4 when read by string
+            // "<" is illegal on windows
+        }
 
         // add the observer (if installed) to the state map
         if (commandMonitor != null) {
@@ -122,14 +131,17 @@ public class ProofScriptEngine {
                 cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
+            final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
             if (commandMonitor != null
                     && stateMap.isEchoOn()
                     && commandContext.AT() == null) {
-                commandMonitor.update(null, cmd);
+                commandMonitor
+                        .accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
             }
 
             try {
-                ProofScriptCommand<Object> command = (ProofScriptCommand<Object>) COMMANDS.get(name);
+                ProofScriptCommand<Object> command =
+                    (ProofScriptCommand<Object>) COMMANDS.get(name);
                 if (command == null) {
                     throw new ScriptException("Unknown command " + name + " at "
                         + BuilderHelpers.getPosition(commandContext));
@@ -148,12 +160,12 @@ public class ProofScriptEngine {
                 if (stateMap.isFailOnClosedOn()) {
                     throw new ScriptException(
                         String.format("""
-                                    Proof already closed while trying to fetch next goal.
-                            This error can be suppressed by setting '@failonclosed off'.
+                                        Proof already closed while trying to fetch next goal.
+                                This error can be suppressed by setting '@failonclosed off'.
 
-                            Command: %s
-                                    Position: %s
-                                    """,
+                                Command: %s
+                                        Position: %s
+                                        """,
                             commandContext.getText(),
                             BuilderHelpers.getPosition(commandContext)));
                 } else {
@@ -168,9 +180,9 @@ public class ProofScriptEngine {
                 proof.getSubtreeGoals(stateMap.getProof().root())
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                        String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
-                                e.getMessage(), prettyPrintCommand(commandContext),
-                                BuilderHelpers.getPosition(commandContext)),
+                    String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
+                        e.getMessage(), prettyPrintCommand(commandContext),
+                        BuilderHelpers.getPosition(commandContext)),
                     e);
             }
         }

@@ -8,13 +8,13 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.parser.Location;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A string with associated position information (file and line number). The position information is
