@@ -3,6 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.awt.Dialog.ModalityType;
+import java.net.URI;
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.function.Consumer;
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionModel;
@@ -11,20 +21,11 @@ import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import java.awt.*;
-import java.awt.Dialog.ModalityType;
-import java.net.URI;
-import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.function.Consumer;
 
 /**
  * Executes s given script.

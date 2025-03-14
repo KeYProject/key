@@ -7,16 +7,21 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
-/**
- * The let command lets you introduce abbreviation.
- * <p>
- * weigl: add new parameter {@code force} to override bindings.
- */
+/// The *let* command lets you introduce entries to the abbreviation table.
+/// ```
+/// let @abbrev1=term1 ... @abbrev2=term2 force=true;
+/// ```
+/// **Arguments:**
+/// - varargs any key-value where *value* is a term and key is prefixed with `@`
+/// - `force` : `boolean` if set the bindings are overridden otherwise conflicts results into an
+/// exception.
+///
+/// **Changes:**
+/// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
 public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
 
     @Override
@@ -54,7 +59,9 @@ public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
                 throw new ScriptException(key + " is already fixed in this script");
             }
             try {
-                abbrMap.put((Term) entry.getValue(), key, true);
+                final var termCtx = (KeYParser.ProofScriptExpressionContext) entry.getValue();
+                final var term = stateMap.getEvaluator().visitTerm(termCtx.term());
+                abbrMap.put(term, key, true);
             } catch (Exception e) {
                 throw new ScriptException(e);
             }
@@ -71,5 +78,4 @@ public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
     public String getDocumentation() {
         return "";
     }
-
 }
