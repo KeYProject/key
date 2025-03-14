@@ -5,6 +5,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.io.StringReader;
 
+import de.uka.ilkd.key.scripts.ScriptLineParser;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

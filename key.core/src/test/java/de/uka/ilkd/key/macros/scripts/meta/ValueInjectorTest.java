@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.macros.scripts.AbstractCommand;
-import de.uka.ilkd.key.macros.scripts.EngineState;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
+import de.uka.ilkd.key.scripts.AbstractCommand;
+import de.uka.ilkd.key.scripts.EngineState;
+import de.uka.ilkd.key.scripts.ScriptException;
 
+import de.uka.ilkd.key.scripts.meta.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
