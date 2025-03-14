@@ -10,6 +10,8 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// The *let* command lets you introduce entries to the abbreviation table.
 /// ```
@@ -22,6 +24,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 ///
 /// **Changes:**
 /// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
+@NullMarked
 public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
 
     @Override
