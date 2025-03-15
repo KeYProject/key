@@ -20,9 +20,9 @@ public final class ArgumentsLifter {
     private ArgumentsLifter() {
     }
 
-    public static <T> List<ProofScriptArgument<T>> inferScriptArguments(Class<?> clazz,
-            ProofScriptCommand<T> command) {
-        List<ProofScriptArgument<T>> args = new ArrayList<>();
+    public static <T> List<ProofScriptArgument> inferScriptArguments(Class<?> clazz,
+            ProofScriptCommand command) {
+        List<ProofScriptArgument> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isFinal(field.getModifiers())) {
                 throw new UnsupportedOperationException(
@@ -48,8 +48,8 @@ public final class ArgumentsLifter {
         return args;
     }
 
-    private static <T> ProofScriptArgument<T> lift(Varargs vargs, Field field) {
-        ProofScriptArgument<T> arg = new ProofScriptArgument<>();
+    private static <T> ProofScriptArgument lift(Varargs vargs, Field field) {
+        ProofScriptArgument arg = new ProofScriptArgument();
         arg.setName(vargs.prefix());
         arg.setRequired(false);
         arg.setField(field);
@@ -58,8 +58,8 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static <T> ProofScriptArgument<T> lift(Option option, Field field) {
-        ProofScriptArgument<T> arg = new ProofScriptArgument<>();
+    private static <T> ProofScriptArgument lift(Option option, Field field) {
+        ProofScriptArgument arg = new ProofScriptArgument();
         arg.setName(option.value());
         arg.setRequired(option.required());
         arg.setField(field);
@@ -67,7 +67,7 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static <T> ProofScriptArgument<T> lift(Flag flag, Field field) {
+    private static <T> ProofScriptArgument lift(Flag flag, Field field) {
         throw new IllegalStateException("not implemented");
     }
 }
