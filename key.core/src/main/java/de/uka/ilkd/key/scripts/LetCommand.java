@@ -5,6 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.JTerm;
@@ -26,27 +27,29 @@ import org.jspecify.annotations.NullMarked;
 /// **Changes:**
 /// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
 @NullMarked
-public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
-
+public class LetCommand implements ProofScriptCommand {
     @Override
-    public List<ProofScriptArgument<Map<String, Object>>> getArguments() {
+    public List<ProofScriptArgument> getArguments() {
         return List.of();
     }
 
-    @Override
-    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
-        return arguments;
-    }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState stateMap) throws ScriptException, InterruptedException {
 
         AbbrevMap abbrMap = stateMap.getAbbreviations();
 
-        boolean force = args.containsKey("force");
+        boolean force = false;
 
-        for (Map.Entry<String, Object> entry : args.entrySet()) {
+        try {
+            force = "force".equals(
+                stateMap.getValueInjector().convert(String.class,
+                    args.positionalArgs().getFirst()));
+        } catch (NoSuchElementException ignore) {
+        }
+
+        for (Map.Entry<String, Object> entry : args.namedArgs().entrySet()) {
             String key = entry.getKey();
             if (key.startsWith("#") || key.equals("force")) {
                 continue;
