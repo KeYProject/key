@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -14,20 +13,15 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
-
+public class SetCommand extends AbstractCommand {
     public SetCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state.getValueInjector().inject(this, new Parameters(), arguments);
 
-    @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
         if (args.key == null ^ args.value == null) {
             throw new IllegalArgumentException(
                 "When using key or value in a set command, you have to use both.");

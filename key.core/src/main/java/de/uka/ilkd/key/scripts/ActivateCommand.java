@@ -25,7 +25,8 @@ public class ActivateCommand extends NoArgumentCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Void args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenGoal(false);
         goal.setEnabled(true);

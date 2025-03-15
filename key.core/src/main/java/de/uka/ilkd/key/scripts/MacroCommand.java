@@ -17,13 +17,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.Varargs;
+import org.jspecify.annotations.Nullable;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
-public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
+public class MacroCommand extends AbstractCommand {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();
 
     public MacroCommand() {
@@ -45,19 +46,16 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
     public String getName() {
         return "macro";
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
+            EngineState state)
             throws ScriptException, InterruptedException {
+        var args = state.getValueInjector().inject(this, new Parameters(), arguments);
+
         final Services services = state.getProof().getServices();
         // look up macro name
         ProofMacro macro = macroMap.get(args.macroName);
@@ -174,7 +172,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         public Integer occ = -1;
         /** Run on formula matching the given regex */
         @Option(value = "matches", required = false)
-        public String matches = null;
+        public @Nullable String matches = null;
         /** Variable macro parameters */
         @Varargs(as = String.class, prefix = "arg_")
         public Map<String, String> instantiations = new HashMap<>();

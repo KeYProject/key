@@ -12,8 +12,8 @@ import de.uka.ilkd.key.scripts.ProofScriptCommand;
  * @author Alexander Weigl
  * @version 1 (21.04.17)
  */
-public class ProofScriptArgument<T> {
-    private ProofScriptCommand<T> command;
+public class ProofScriptArgument {
+    private ProofScriptCommand command;
     private String name;
     private Class<?> type;
     private boolean required;
@@ -28,11 +28,11 @@ public class ProofScriptArgument<T> {
      */
     private String documentation;
 
-    public ProofScriptCommand<T> getCommand() {
+    public ProofScriptCommand getCommand() {
         return command;
     }
 
-    public ProofScriptArgument<T> setCommand(ProofScriptCommand<T> command) {
+    public ProofScriptArgument setCommand(ProofScriptCommand command) {
         this.command = command;
         return this;
     }
@@ -41,7 +41,7 @@ public class ProofScriptArgument<T> {
         return name;
     }
 
-    public ProofScriptArgument<T> setName(String name) {
+    public ProofScriptArgument setName(String name) {
         this.name = name;
         return this;
     }
@@ -50,7 +50,7 @@ public class ProofScriptArgument<T> {
         return type;
     }
 
-    public ProofScriptArgument<T> setType(Class<?> type) {
+    public ProofScriptArgument setType(Class<?> type) {
         this.type = type;
         return this;
     }
@@ -59,7 +59,7 @@ public class ProofScriptArgument<T> {
         return required;
     }
 
-    public ProofScriptArgument<T> setRequired(boolean required) {
+    public ProofScriptArgument setRequired(boolean required) {
         this.required = required;
         return this;
     }
@@ -68,7 +68,7 @@ public class ProofScriptArgument<T> {
         return flag;
     }
 
-    public ProofScriptArgument<T> setFlag(boolean flag) {
+    public ProofScriptArgument setFlag(boolean flag) {
         this.flag = flag;
         return this;
     }
@@ -82,7 +82,7 @@ public class ProofScriptArgument<T> {
             return false;
         }
 
-        ProofScriptArgument<?> that = (ProofScriptArgument<?>) o;
+        ProofScriptArgument that = (ProofScriptArgument) o;
 
         if (required != that.required) {
             return false;
@@ -132,12 +132,12 @@ public class ProofScriptArgument<T> {
      * @param documentation a string
      * @return this
      */
-    public ProofScriptArgument<T> setDocumentation(String documentation) {
+    public ProofScriptArgument setDocumentation(String documentation) {
         this.documentation = documentation;
         return this;
     }
 
-    public ProofScriptArgument<T> setVariableArguments(boolean hasVariableArguments) {
+    public ProofScriptArgument setVariableArguments(boolean hasVariableArguments) {
         this.variableArguments = hasVariableArguments;
         return this;
     }

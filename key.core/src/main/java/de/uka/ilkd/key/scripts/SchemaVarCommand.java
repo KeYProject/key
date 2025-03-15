@@ -17,26 +17,23 @@ import org.key_project.logic.sort.Sort;
 /**
  *
  */
-public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameters> {
+public class SchemaVarCommand extends AbstractCommand {
 
     public SchemaVarCommand() {
         super(Parameters.class);
     }
 
-    @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(this, new Parameters(), arguments);
+
 
         if (args.type == null || args.var == null) {
             throw new ScriptException("Missing argument: type var");
         }
 
-        AbbrevMap abbrMap = state.getAbbreviations();
+        AbbrevMap abbrMap = state().getAbbreviations();
 
         if (!args.var.matches("@[a-zA-Z0-9_]")) {
             throw new ScriptException("Illegal variable name: " + args.var);
@@ -49,11 +46,11 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
             if ("Formula".equals(args.type)) {
                 sv = SchemaVariableFactory.createFormulaSV(schemaVar);
             } else {
-                Sort sort = state.toSort(args.type);
+                Sort sort = state().toSort(args.type);
                 sv = SchemaVariableFactory.createTermSV(schemaVar, sort);
             }
 
-            JTerm term = state.getProof().getServices().getTermFactory().createTerm(sv);
+            JTerm term = state().getProof().getServices().getTermFactory().createTerm(sv);
 
             abbrMap.put(term, args.var, true);
         } catch (Exception e) {
