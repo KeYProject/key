@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -32,7 +31,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Mattias Ulbrich
  */
-public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
+public class UnhideCommand extends AbstractCommand {
 
     public static final String INSERT_HIDDEN_PATTERN = "insert_hidden_taclet_[0-9]+";
 
@@ -48,14 +47,9 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
-        Goal goal = state.getFirstOpenAutomaticGoal();
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(this, new Parameters(), arguments);
+        Goal goal = state().getFirstOpenAutomaticGoal();
 
         Set<Term> antes = new HashSet<>();
         args.sequent.antecedent().forEach(sf -> antes.add(sf.formula()));
