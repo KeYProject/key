@@ -56,7 +56,7 @@ public class TestJMLPreTranslator {
 
     @Test
     public void testLexer2() {
-        lex("ensures //-key@ this should be ignored\n" + "true;", ENSURES, WS, COMMENT, WS, TRUE,
+        lex("ensures //-key@ this should be ignored\n" + "true;", ENSURES, WS, SL_COMMENT, WS, TRUE,
             SEMI, EOF);
     }
 
