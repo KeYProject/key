@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import java.util.Optional;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -17,6 +15,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
  * (within a goal). The real work is delegated to a second manager (delegate pattern), this class
@@ -26,20 +26,17 @@ public class FocussedBreakpointRuleApplicationManager
         implements DelegationBasedAutomatedRuleApplicationManager {
 
     private final AutomatedRuleApplicationManager delegate;
-    private final Optional<String> breakpoint;
+    private final @Nullable String breakpoint;
 
     private FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
-            Optional<String> breakpoint) {
+            @Nullable String breakpoint) {
         this.delegate = delegate;
         this.breakpoint = breakpoint;
     }
 
     public FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
-            Goal goal, Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
-        this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
-                .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
-            breakpoint);
-
+            Goal goal, PosInOccurrence focussedSubterm, String breakpoint) {
+        this(new FocussedRuleApplicationManager(delegate, goal, focussedSubterm), breakpoint);
         clearCache();
     }
 
@@ -95,7 +92,7 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     private boolean mayAddRule(RuleApp rule, PosInOccurrence pos) {
-        if (!breakpoint.isPresent()) {
+        if (breakpoint != null) {
             return true;
         }
 
@@ -108,7 +105,7 @@ public class FocussedBreakpointRuleApplicationManager
             return currStmtString == null || //
                     !(currStmtString.contains("{")
                             ? currStmtString.substring(0, currStmtString.indexOf('{'))
-                            : currStmtString).trim().equals(breakpoint.get());
+                            : currStmtString).trim().equals(breakpoint);
         }
 
         return true;
