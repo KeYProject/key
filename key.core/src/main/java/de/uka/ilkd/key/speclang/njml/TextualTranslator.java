@@ -231,7 +231,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
-        assert methodContract != null;
+        if (methodContract == null) {
+            throw new AssertionError("a methodContract is required");
+        }
         boolean depends = ctx.MEASURED_BY() != null || ctx.COLON() != null;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final LabeledParserRuleContext ctx2 =
