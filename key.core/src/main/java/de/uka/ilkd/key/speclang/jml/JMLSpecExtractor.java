@@ -199,6 +199,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             // use special "deep" non null predicate (see bug #1392)
             // ... looks a bit like a hack with those DL escapes ...
+
+            if (!varName.startsWith("\\")) {
+                // weigl: escape all variables, except JML identifiers like \result.
+                // Otherwise their meaning change, e.g., \result is a special token.
+                varName = "`%s`".formatted(varName);
+            }
+
             final String nonNullString =
                 arrayDepth > 0 ? format("\\dl_nonNull(\\dl_heap(),%s,%d)", varName, arrayDepth)
                         : format("%s != null", varName);
