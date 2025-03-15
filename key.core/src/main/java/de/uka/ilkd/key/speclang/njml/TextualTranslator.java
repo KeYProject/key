@@ -231,22 +231,17 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
-        if (methodContract == null) {
-            throw new AssertionError("a methodContract is required");
-        }
-        boolean depends = ctx.MEASURED_BY() != null || ctx.COLON() != null;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.ACCESSIBLE, attachOriginLabel);
         for (Name heap : heaps) {
-            if (depends) {
+            if (methodContract == null) {
+                // weigl: this accessible_clause is for the class-level not for the method.
                 TextualJMLDepends d = new TextualJMLDepends(mods, heaps, ctx2);
                 constructs = constructs.append(d);
-            } else if (methodContract != null) {
-                methodContract.addClause(ACCESSIBLE, heap, ctx2);
             } else {
-                assert false;
+                methodContract.addClause(ACCESSIBLE, heap, ctx2);
             }
         }
         return null;
