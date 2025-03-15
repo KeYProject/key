@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
@@ -27,18 +26,12 @@ import org.jspecify.annotations.NullMarked;
  * @author Alexander Weigl
  */
 @NullMarked
-public interface ProofScriptCommand<T> {
+public interface ProofScriptCommand {
 
     /**
      *
      */
-    List<ProofScriptArgument<T>> getArguments();
-
-    /**
-     * @param arguments
-     * @return
-     */
-    T evaluateArguments(EngineState state, Map<String, Object> arguments) throws Exception;
+    List<ProofScriptArgument> getArguments();
 
     /**
      * @param uiControl the current ui controller
@@ -48,7 +41,8 @@ public interface ProofScriptCommand<T> {
      * @throws InterruptedException if something bad happens
      */
     // TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
-    void execute(AbstractUserInterfaceControl uiControl, T args, EngineState stateMap)
+    void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState stateMap)
             throws ScriptException, InterruptedException;
 
     /**

@@ -12,8 +12,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.scripts.meta.Option;
-import de.uka.ilkd.key.scripts.meta.Varargs;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,6 +19,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.scripts.meta.Option;
+import de.uka.ilkd.key.scripts.meta.Varargs;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
@@ -41,7 +41,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * <li>inst_= instantiation</li>
  * </ol>
  */
-public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
+public class RuleCommand extends AbstractCommand {
 
     public RuleCommand() {
         super(Parameters.class);
@@ -70,14 +70,11 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst params,
+            EngineState state)
             throws ScriptException, InterruptedException {
+        var args = state.getValueInjector().inject(this, new Parameters(), params);
+
         RuleApp theApp = makeRuleApp(args, state);
         Goal g = state.getFirstOpenAutomaticGoal();
 
@@ -112,7 +109,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         final Optional<Taclet> maybeTaclet = Optional.ofNullable(
             proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(p.rulename)));
 
-        if (!maybeBuiltInRule.isPresent() && !maybeTaclet.isPresent()) {
+        if (maybeBuiltInRule.isEmpty() && maybeTaclet.isEmpty()) {
             /*
              * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by hide_left etc.
              */

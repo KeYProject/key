@@ -5,12 +5,10 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -18,6 +16,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -42,7 +41,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author lulong, grebing, weigl
  */
-public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
+public class RewriteCommand extends AbstractCommand {
 
     /**
      * List of PosInOcc that haven't been successfully replaced
@@ -66,16 +65,12 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         return "rewrite";
     }
 
-
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst arguments,
+            EngineState state)
             throws ScriptException, InterruptedException {
+        var args = state.getValueInjector().inject(this, new Parameters(), arguments);
+
         Proof proof = state.getProof();
         assert proof != null;
 
@@ -87,11 +82,9 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // if not all find terms successfully replaced, apply cut
         if (!failposInOccs.isEmpty()) {
 
-            CutCommand cut = new CutCommand();
             CutCommand.Parameters param = new CutCommand.Parameters();
             param.formula = args.replace;
-
-            cut.execute(uiControl, param, state);
+            CutCommand.execute(state, param);
         }
 
     }

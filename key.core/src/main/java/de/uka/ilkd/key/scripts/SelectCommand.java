@@ -5,7 +5,6 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -13,28 +12,27 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
-public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
+public class SelectCommand extends AbstractCommand {
     public SelectCommand() {
         super(Parameters.class);
     }
 
-    @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(this, new Parameters(), params);
+
         Goal g;
         if (args.number != null && args.formula == null && args.branch == null) {
             ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
@@ -150,16 +148,16 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
-        public Term formula;
+        public @Nullable Term formula;
         /**
          * The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is
          * the last goal, -2 the second-to-last, etc.
          */
         @Option(value = "number", required = false)
-        public Integer number;
+        public @Nullable Integer number;
         /** The name of the branch to select */
         @Option(value = "branch", required = false)
-        public String branch;
+        public @Nullable String branch;
     }
 
 }

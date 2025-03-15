@@ -6,14 +6,18 @@ package de.uka.ilkd.key.nparser;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -48,7 +52,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         this.ctx = ctx;
     }
 
-    public <T> T accept(ParseTreeVisitor<T> visitor) {
+    public <R> R accept(ParseTreeVisitor<R> visitor) {
         return ctx.accept(visitor);
     }
 
@@ -100,7 +104,6 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
                 KeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
 
-                KeYParser.ProofScriptContext ps;
                 if (pctx.STRING_LITERAL() != null) {
                     var ctx = pctx.STRING_LITERAL().getSymbol();
                     String text = pctx.STRING_LITERAL().getText();
@@ -177,7 +180,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             final var cfg = new ConfigurationBuilder();
             List<Object> res = cfg.visitCfile(ctx);
             if (!res.isEmpty())
-                return (Configuration) res.get(0);
+                return (Configuration) res.getFirst();
             else
                 throw new RuntimeException("Error in configuration. Source: "
                     + ctx.start.getTokenSource().getSourceName());
@@ -234,7 +237,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public URI getUrl() {
+        public URI getUri() {
             final var sourceName = ctx.start.getTokenSource().getSourceName();
             try {
                 if (sourceName.startsWith("file:") || sourceName.startsWith("http:")
@@ -243,6 +246,41 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             } catch (URISyntaxException ignored) {
             }
             return new java.io.File(sourceName).toURI();
+        }
+
+        /**
+         * Translates this parse tree into an AST usable for the proof script engine.
+         *
+         * @return a non-null list of the parsed commands.
+         */
+        public List<ScriptCommandAst> asAst() {
+            var fileUri = getUri();
+            return asAst(fileUri, ctx.proofScriptCommand());
+        }
+
+        private List<ScriptCommandAst> asAst(URI file,
+                List<KeYParser.ProofScriptCommandContext> cmds) {
+            return cmds.stream().map(it -> {
+                var loc = new Location(file, Position.fromToken(it.start));
+                var sub = it.sub != null
+                        ? asAst(file, it.sub.proofScriptCommand())
+                        : null;
+
+                var nargs = new HashMap<String, Object>();
+                var pargs = new ArrayList<>();
+
+                if(it.proofScriptParameters()!=null) {
+                    for (var param : it.proofScriptParameters().proofScriptParameter()) {
+                        if (param.pname != null) {
+                            nargs.put(param.pname.getText(), param.expr);
+                        } else {
+                            pargs.add(param.expr);
+                        }
+                    }
+                }
+
+                return new ScriptCommandAst(it.cmd.getText(), nargs, pargs, sub, loc);
+            }).toList();
         }
     }
 }

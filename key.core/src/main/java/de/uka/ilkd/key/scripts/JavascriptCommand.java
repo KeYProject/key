@@ -3,19 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.scripts.meta.Option;
 
-public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Parameters> {
+public class JavascriptCommand extends AbstractCommand {
 
     private static final String PREAMBLE = """
             var goal = __state.getSelectedGoal();
@@ -27,12 +26,14 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(this, new Parameters(), params);
+
         ScriptEngineManager factory = new ScriptEngineManager();
         // create JavaScript engine
         ScriptEngine engine = factory.getEngineByName("JavaScript");
         // evaluate JavaScript code from given file - specified by first argument
-        JavascriptInterface jsIntf = new JavascriptInterface(proof, state);
+        JavascriptInterface jsIntf = new JavascriptInterface(proof, state());
 
         engine.getBindings(ScriptContext.GLOBAL_SCOPE).put("__state", jsIntf);
         try {
@@ -41,12 +42,6 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
         } catch (javax.script.ScriptException e) {
             throw new ScriptException(e);
         }
-    }
-
-    @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override

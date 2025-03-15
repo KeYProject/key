@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
 
@@ -19,18 +18,13 @@ import org.key_project.logic.Name;
  *
  * @see AssumeCommand The assume command is a synonym for the axiom command.
  */
-public class AxiomCommand extends AbstractCommand<AxiomCommand.FormulaParameter> {
+public class AxiomCommand extends AbstractCommand {
     private static final Name TACLET_NAME = new Name("introduceAxiom");
 
     public AxiomCommand() {
         super(FormulaParameter.class);
     }
 
-    @Override
-    public FormulaParameter evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
-    }
 
     @Override
     public String getName() {
@@ -38,15 +32,17 @@ public class AxiomCommand extends AbstractCommand<AxiomCommand.FormulaParameter>
     }
 
     @Override
-    public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
-        Taclet cut =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
+        var parameter = state().getValueInjector().inject(this, new FormulaParameter(), args);
+
+        Taclet cut = state().getProof().getEnv()
+                .getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
+        app = app.addCheckedInstantiation(sv, parameter.formula, state().getProof().getServices(),
             true);
-        state.getFirstOpenAutomaticGoal().apply(app);
+        state().getFirstOpenAutomaticGoal().apply(app);
     }
 
     public static class FormulaParameter {

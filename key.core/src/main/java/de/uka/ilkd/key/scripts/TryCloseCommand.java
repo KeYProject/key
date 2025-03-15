@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.macros.TryCloseMacro;
-import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The script command tryclose" has two optional arguments:
@@ -21,19 +21,14 @@ import org.key_project.util.collection.ImmutableList;
  *
  * If #2 is not given or not a number, the TryClose macro is applied to all open goals.
  */
-public class TryCloseCommand extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
+public class TryCloseCommand extends AbstractCommand {
     public TryCloseCommand() {
         super(TryCloseArguments.class);
     }
 
     @Override
-    public TryCloseArguments evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new TryCloseArguments(), arguments);
-    }
-
-    @Override
-    public void execute(TryCloseArguments args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(this, new TryCloseArguments(), params);
 
         TryCloseMacro macro =
             args.steps == null ? new TryCloseMacro() : new TryCloseMacro(args.steps);
@@ -41,18 +36,18 @@ public class TryCloseCommand extends AbstractCommand<TryCloseCommand.TryCloseArg
         boolean branch = "branch".equals(args.branch);
         Node target;
         if (branch) {
-            target = state.getFirstOpenAutomaticGoal().node();
+            target = state().getFirstOpenAutomaticGoal().node();
         } else {
             try {
                 int num = Integer.parseInt(args.branch);
-                ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
+                ImmutableList<Goal> goals = state().getProof().openEnabledGoals();
                 if (num >= 0) {
                     target = goals.take(num).head().node();
                 } else {
                     target = goals.take(goals.size() + num).head().node();
                 }
             } catch (NumberFormatException e) {
-                target = state.getProof().root();
+                target = state().getProof().root();
             }
         }
 
@@ -74,8 +69,10 @@ public class TryCloseCommand extends AbstractCommand<TryCloseCommand.TryCloseArg
 
     public static class TryCloseArguments {
         @Option(value = "steps", required = false)
+        @Nullable
         public Integer steps;
         @Option(value = "#2", required = false)
+        @Nullable
         public String branch;
         @Option(value = "assertClosed", required = false)
         public Boolean assertClosed = false;

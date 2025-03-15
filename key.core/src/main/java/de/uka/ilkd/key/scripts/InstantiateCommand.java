@@ -3,15 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,6 +17,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
@@ -34,21 +32,16 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author mulbrich
  */
-public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Parameters> {
+public class InstantiateCommand extends AbstractCommand {
 
     public InstantiateCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters params,
-            EngineState state) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState stateMap) throws ScriptException, InterruptedException {
+        var params = state.getValueInjector().inject(this, new Parameters(), args);
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
