@@ -17,7 +17,7 @@ classlevel_comment: classlevel_element | modifiers | set_statement;
 classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
 // The order matters! The rules with clear lookahead in front.
-// In the new lexer w/o contract and expr mode. The keyword "ensures" can also be an identifier.
+// In the new lexer w/o contract and expr mode. The keyword "ensures"   can also be an identifier.
 // This means, that the following text could also be seen as a field declaration:
 //      //@   ensures ensures;
   : class_invariant       | set_statement      | represents_clause
