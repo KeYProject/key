@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -38,21 +36,16 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author mulbrich
  */
-public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Parameters> {
+public class InstantiateCommand extends AbstractCommand {
 
     public InstantiateCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(), arguments);
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters params,
-            EngineState state) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState stateMap) throws ScriptException, InterruptedException {
+        var params = state.getValueInjector().inject(this, new Parameters(), args);
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 

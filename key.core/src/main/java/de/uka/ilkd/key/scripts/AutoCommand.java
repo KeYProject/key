@@ -3,17 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
-import java.util.Optional;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.scripts.meta.*;
+import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
@@ -23,13 +22,15 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
  *
  * @author Mattias Ulbrich
  * @author Alexander Weigl
  */
-public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
+public class AutoCommand extends AbstractCommand {
 
     public AutoCommand() {
         super(Parameters.class);
@@ -46,17 +47,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws ConversionException, ArgumentRequiredException, InjectionReflectionException,
-            NoSpecifiedConverterException {
-        Parameters args = new Parameters();
-        state.getValueInjector().inject(this, args, arguments);
-        return args;
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters arguments,
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState state) throws ScriptException, InterruptedException {
+        var arguments = state.getValueInjector().inject(this, new AutoCommand.Parameters(), args);
         final Services services = state.getProof().getServices();
         final Profile profile = services.getProfile();
 
@@ -72,11 +65,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             final Goal goal = state.getFirstOpenAutomaticGoal();
             goals = ImmutableSLList.<Goal>nil().prepend(goal);
 
-            final Optional<String> matchesRegEx = Optional.ofNullable(arguments.matches);
-            final Optional<String> breakpoint = Optional.ofNullable(arguments.breakpoint);
-            if (matchesRegEx.isPresent() || breakpoint.isPresent()) {
+            if (arguments.matches != null || arguments.breakpoint != null) {
                 setupFocussedBreakpointStrategy( //
-                    matchesRegEx, breakpoint, goal, applyStrategy, services);
+                    arguments.matches, arguments.breakpoint, goal, applyStrategy, services);
             }
         }
 
@@ -117,13 +108,11 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * @param services The {@link Services} object.
      * @throws ScriptException
      */
-    private void setupFocussedBreakpointStrategy(final Optional<String> maybeMatchesRegEx,
-            final Optional<String> breakpointArg, final Goal goal, final ProverCore proverCore,
+    private void setupFocussedBreakpointStrategy(final String maybeMatchesRegEx,
+            final String breakpointArg, final Goal goal, final ProverCore proverCore,
             final Services services) throws ScriptException {
-        final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
-                ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
-                    maybeMatchesRegEx.get(), services))
-                : Optional.empty();
+        final PosInOccurrence focus =
+            MacroCommand.extractMatchingPio(goal.node().sequent(), maybeMatchesRegEx, services);
 
         final RuleApplicationManager realManager = //
             goal.getRuleAppManager();
@@ -148,13 +137,13 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
          * Run on formula matching the given regex
          */
         @Option(value = "matches", required = false)
-        public String matches = null;
+        public @Nullable String matches = null;
 
         /**
          * Run on formula matching the given regex
          */
         @Option(value = "breakpoint", required = false)
-        public String breakpoint = null;
+        public @Nullable String breakpoint = null;
 
         public boolean isOnAllOpenGoals() {
             return onAllOpenGoals;

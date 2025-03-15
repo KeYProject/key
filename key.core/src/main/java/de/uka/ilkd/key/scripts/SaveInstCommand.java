@@ -25,22 +25,17 @@ import org.key_project.prover.rules.RuleApp;
  *
  * @author Dominic Steinhoefel
  */
-public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
+public class SaveInstCommand extends AbstractCommand {
     public SaveInstCommand() {
         super(null);
     }
 
     @Override
-    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
-        return arguments;
-    }
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
+    public void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
             EngineState stateMap) throws ScriptException, InterruptedException {
 
         AbbrevMap abbrMap = stateMap.getAbbreviations();
-        for (Map.Entry<String, Object> entry : args.entrySet()) {
+        for (Map.Entry<String, Object> entry : args.namedArgs().entrySet()) {
             String key = entry.getKey();
             final var value = entry.getValue();
             if ("#1".equals(key)) {
