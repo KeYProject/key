@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> {
+public class SMTCommand extends AbstractCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTCommand.class);
 
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
@@ -40,11 +40,6 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         return Collections.unmodifiableMap(result);
     }
 
-    @Override
-    public SMTCommandArguments evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new SMTCommandArguments(), arguments);
-    }
 
     @Override
     public String getName() {
@@ -52,7 +47,9 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     @Override
-    public void execute(SMTCommandArguments args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
+        var args = state.getValueInjector().inject(this, new SMTCommandArguments(), params);
+
         SolverTypeCollection su = computeSolvers(args.solver);
 
         ImmutableList<Goal> goals;

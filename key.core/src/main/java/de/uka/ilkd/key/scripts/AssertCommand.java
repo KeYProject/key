@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import java.util.Map;
 
 import de.uka.ilkd.key.scripts.meta.Option;
 
@@ -12,7 +11,7 @@ import de.uka.ilkd.key.scripts.meta.Option;
  *
  * @author lanzinger
  */
-public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
+public class AssertCommand extends AbstractCommand {
 
     /**
      * Instantiates a new assert command.
@@ -22,19 +21,14 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-            Map<String, Object> arguments) throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(),
-            arguments);
-    }
+    public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
+        var args = state().getValueInjector().inject(this, new Parameters(), arguments);
 
-    @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
         if (args.goals == null) {
             throw new ScriptException("No parameter specified!");
         }
 
-        if (state.getProof().openEnabledGoals().size() != args.goals) {
+        if (state().getProof().openEnabledGoals().size() != args.goals) {
             throw new ScriptException("Assertion failed: number of open goals is "
                 + state.getProof().openGoals().size() + ", but should be " + args.goals);
         }
