@@ -7,6 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.scripts.meta.Flag;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -18,10 +19,11 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> {
+public class SMTCommand extends AbstractCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTCommand.class);
 
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
@@ -40,11 +42,6 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         return Collections.unmodifiableMap(result);
     }
 
-    @Override
-    public SMTCommandArguments evaluateArguments(EngineState state, Map<String, Object> arguments)
-            throws Exception {
-        return state.getValueInjector().inject(this, new SMTCommandArguments(), arguments);
-    }
 
     @Override
     public String getName() {
@@ -52,7 +49,9 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     @Override
-    public void execute(SMTCommandArguments args) throws ScriptException, InterruptedException {
+    public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
+        var args = state.getValueInjector().inject(new SMTCommandArguments(), params);
+
         SolverTypeCollection su = computeSolvers(args.solver);
 
         ImmutableList<Goal> goals;
@@ -113,11 +112,11 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         @Option("solver")
         public String solver = "Z3";
 
-        @Option(value = "all", required = false)
+        @Flag(value = "all")
         public boolean all = false;
 
-        @Option(value = "timeout", required = false)
-        public int timeout = -1;
+        @Option(value = "timeout")
+        public @Nullable int timeout = -1;
     }
 
     private static class TimerListener implements SolverLauncherListener {
