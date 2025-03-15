@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.StringReader;
-
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,7 @@ public class ScriptLineParserTest {
     public void test() throws Exception {
         String arg = """
                 macro key1=value1 key2="value two" defval3 "long defvalue"; command ;\s
-
+                
                 # some comment
                 multiline #comment internal
                  command\s
@@ -30,10 +29,10 @@ public class ScriptLineParserTest {
                 hyphened-command;
                 """;
 
-        ScriptLineParser mlp = new ScriptLineParser(new StringReader(arg), null);
-        ScriptLineParser.ParsedCommand command;
-        while ((command = mlp.parseCommand()) != null) {
-            LOGGER.info(String.valueOf(command.args()));
+        var script = ParsingFacade.parseScript(arg);
+        var ast = script.asAst();
+        for (var scriptCommandAst : ast) {
+            System.out.println(scriptCommandAst);
         }
     }
 }

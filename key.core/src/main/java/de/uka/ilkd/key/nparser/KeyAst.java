@@ -4,7 +4,10 @@
 package de.uka.ilkd.key.nparser;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Position;
@@ -14,6 +17,7 @@ import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -21,6 +25,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
@@ -47,7 +52,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         this.ctx = ctx;
     }
 
-    public <T> T accept(ParseTreeVisitor<T> visitor) {
+    public <R> R accept(ParseTreeVisitor<R> visitor) {
         return ctx.accept(visitor);
     }
 
@@ -70,7 +75,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public @Nullable ProofSettings findProofSettings() {
+        @Nullable
+        public ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
 
             if (ctx.preferences() != null && ctx.preferences().s != null) {
@@ -92,17 +98,24 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          * or including
          * other files.
          *
-         * @param url location pointing to the source of the AST
          * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
          */
-        public @Nullable ProofScriptEntry findProofScript(URI url) {
-            if (ctx.problem() != null && ctx.problem().proofScript() != null) {
-                KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
-                Location location = new Location(url,
-                    Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
+        public @Nullable ProofScript findProofScript() {
+            if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
+                KeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
 
-                String text = pctx.ps.getText();
-                return new ProofScriptEntry(StringUtil.trim(text, '"'), location);
+                if (pctx.STRING_LITERAL() != null) {
+                    var ctx = pctx.STRING_LITERAL().getSymbol();
+                    String text = pctx.STRING_LITERAL().getText();
+
+                    // +1 for the removal of the quote.
+                    text = StringUtil.move(StringUtil.trim(text, '"'), ctx.getLine(),
+                        ctx.getCharPositionInLine() + 1);
+                    return ParsingFacade.parseScript(
+                        CharStreams.fromString(text, ctx.getTokenSource().getSourceName()));
+                } else {
+                    return new KeyAst.ProofScript(pctx.proofScript());
+                }
             }
             return null;
         }
@@ -167,7 +180,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             final var cfg = new ConfigurationBuilder();
             List<Object> res = cfg.visitCfile(ctx);
             if (!res.isEmpty())
-                return (Configuration) res.get(0);
+                return (Configuration) res.getFirst();
             else
                 throw new RuntimeException("Error in configuration. Source: "
                     + ctx.start.getTokenSource().getSourceName());
@@ -210,6 +223,64 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Taclet extends KeyAst<KeYParser.TacletContext> {
         public Taclet(KeYParser.TacletContext taclet) {
             super(taclet);
+        }
+    }
+
+    /**
+     * This struct encapsulate the information of a proof script found in key files.
+     *
+     * @author Alexander Weigl
+     * @version 1 (23.04.24)
+     */
+    public static class ProofScript extends KeyAst<KeYParser.ProofScriptContext> {
+        ProofScript(KeYParser.@NonNull ProofScriptContext ctx) {
+            super(ctx);
+        }
+
+        public URI getUri() {
+            final var sourceName = ctx.start.getTokenSource().getSourceName();
+            try {
+                if (sourceName.startsWith("file:") || sourceName.startsWith("http:")
+                        || sourceName.startsWith("jar:"))
+                    return new URI(sourceName);
+            } catch (URISyntaxException ignored) {
+            }
+            return new java.io.File(sourceName).toURI();
+        }
+
+        /**
+         * Translates this parse tree into an AST usable for the proof script engine.
+         *
+         * @return a non-null list of the parsed commands.
+         */
+        public List<ScriptCommandAst> asAst() {
+            var fileUri = getUri();
+            return asAst(fileUri, ctx.proofScriptCommand());
+        }
+
+        private List<ScriptCommandAst> asAst(URI file,
+                List<KeYParser.ProofScriptCommandContext> cmds) {
+            return cmds.stream().map(it -> {
+                var loc = new Location(file, Position.fromToken(it.start));
+                var sub = it.sub != null
+                        ? asAst(file, it.sub.proofScriptCommand())
+                        : null;
+
+                var nargs = new HashMap<String, Object>();
+                var pargs = new ArrayList<>();
+
+                if(it.proofScriptParameters()!=null) {
+                    for (var param : it.proofScriptParameters().proofScriptParameter()) {
+                        if (param.pname != null) {
+                            nargs.put(param.pname.getText(), param.expr);
+                        } else {
+                            pargs.add(param.expr);
+                        }
+                    }
+                }
+
+                return new ScriptCommandAst(it.cmd.getText(), nargs, pargs, sub, loc);
+            }).toList();
         }
     }
 }
