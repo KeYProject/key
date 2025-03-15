@@ -100,7 +100,7 @@ DEBUG: 'debug'; //?
 DECREASING: ('decreasing' | 'decreases' | 'loop_variant') Pred;
 DETERMINES: 'determines';
 DIVERGES: 'diverges' Pred;
-//DURATION: 'duration' Pred;
+DURATION: 'duration' Pred;
 ENSURES: ('ensures' | 'post') (Pfree|Pred);
 FOR_EXAMPLE: 'for_example';
 //FORALL: 'forall'; //?
@@ -171,7 +171,7 @@ BY: '\\by';  //KeY extension, not official JML
 DECLASSIFIES: '\\declassifies';  //KeY extension, not official JML
 DISJOINT: '\\disjoint';  //KeY extension, not official JML
 DOMAIN_IMPLIES_CREATED: '\\domain_implies_created';  //KeY extension, not official JML
-DURATION: '\\duration';
+ESC_DURATION: '\\duration';
 ELEMTYPE: '\\elemtype';
 EMPTYSET: '\\empty';
 ERASES: '\\erases';  //KeY extension, not official JML
@@ -277,11 +277,6 @@ ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlCommen
 
 JML_SL_START: {!jmlMarkerDecision.isComment("//")}? '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
 JML_ML_START: {!jmlMarkerDecision.isComment("/*")}?'/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
-
-E_JML_SL_START: '//@' -> type(JML_SL_START), channel(HIDDEN);
-E_JML_ML_START: '/*@' -> type(JML_ML_START), channel(HIDDEN);
-E_SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> type(COMMENT), channel(HIDDEN);
-E_ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
 
 AND: '&';
 BITWISENOT: '~';
@@ -399,9 +394,11 @@ DOUBLE_LITERAL
 fragment
 LETTERORDIGIT: LETTER | DIGIT;
 
+ESCAPED_IDENTIFIER: '`' IDENT '`' -> type(IDENT);
 IDENT: LETTER (LETTERORDIGIT)*;
 JML_IDENT: '\\' IDENT ;
 SPECIAL_IDENT: '<'IDENT'>';
+
 
 //DL_ESCAPE: '\\dl_'  LETTER  ( LETTERORDIGIT )*  ;
 
@@ -436,7 +433,6 @@ STRING_LITERAL: '"' -> pushMode(string),more;
 E_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN), type(WS);
 INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';
 
-DOC_COMMENT: '/**' -> pushMode(mlComment);
 fragment PRAGMA: '\\nowarn';
 
 ERROR_CHAR: .;
