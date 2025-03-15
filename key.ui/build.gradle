@@ -90,6 +90,13 @@ tasks.register('runWithProfiler', JavaExec) {
     }
 }
 
+tasks.register('runInExperimentalMode', JavaExec) {
+    group = "application"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set("de.uka.ilkd.key.core.Main")
+    args("--experimental")
+}
+
 /**
  * Go and scan all registered README.txt files for files that need to be
  * included into examples.zip. Thus only those files that can actually be
