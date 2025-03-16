@@ -388,7 +388,7 @@ LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
 LGUILLEMETS: '<' '<' | '«' | '‹';
 RGUILLEMETS: '>''>' | '»' | '›';
-IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
+IMPLICIT_IDENT: '<' '$'? (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
 PRIMES:	('\'')+;

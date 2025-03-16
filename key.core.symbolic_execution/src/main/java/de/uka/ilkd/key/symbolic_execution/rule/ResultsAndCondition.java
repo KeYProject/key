@@ -15,4 +15,5 @@ import de.uka.ilkd.key.proof.Node;
  * @param conditions formulas of the antecedent
  * @param node the final node of the side proof
  */
-public record ResultsAndCondition(Term result,Set<Term>conditions,Node node){}
+public record ResultsAndCondition(Term result, Set<Term> conditions, Node node) {
+}

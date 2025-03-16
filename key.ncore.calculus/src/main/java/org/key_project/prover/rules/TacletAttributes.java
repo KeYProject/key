@@ -3,4 +3,5 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
-public record TacletAttributes(String displayName,Trigger trigger){}
+public record TacletAttributes(String displayName, Trigger trigger) {
+}

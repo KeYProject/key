@@ -15,4 +15,5 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (23.04.24)
  */
-public record ProofScriptEntry(@NonNull String script,@NonNull Location location){}
+public record ProofScriptEntry(@NonNull String script, @NonNull Location location) {
+}
