@@ -194,6 +194,8 @@ public class JmlIO {
         Object interpret = interpret(expr);
         if (interpret instanceof SLExpression) {
             return ((SLExpression) interpret).getTerm();
+        } else if (interpret instanceof TranslatedDependencyContract tdc) {
+            return tdc.rhs(); // weigl is this correct?
         } else {
             return (JTerm) interpret;
         }
