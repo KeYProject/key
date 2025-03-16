@@ -462,7 +462,7 @@ public class SVInstantiations
 
         @Override
         public int hashCode() {
-            return update.hashCode() + 13*updateApplicationlabels.hashCode();
+            return update.hashCode() + 13 * updateApplicationlabels.hashCode();
         }
     }
 

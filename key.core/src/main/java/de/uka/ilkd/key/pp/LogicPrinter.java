@@ -83,6 +83,7 @@ public class LogicPrinter {
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     private final SelectPrinter selectPrinter;
+    private final FinalPrinter finalPrinter;
     private final StorePrinter storePrinter;
 
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
@@ -107,7 +108,8 @@ public class LogicPrinter {
             notationInfo.refresh(services);
         }
         storePrinter = new StorePrinter(this.services);
-        selectPrinter = new SelectPrinter(this.services);
+        finalPrinter = new FinalPrinter(this.services);
+        selectPrinter = new SelectPrinter(notationInfo, this.services);
         this.layouter = layouter;
     }
 
@@ -1083,6 +1085,13 @@ public class LogicPrinter {
      */
     public void printSelect(Term t, Term tacitHeap) {
         selectPrinter.printSelect(this, t, tacitHeap);
+    }
+
+    /*
+     * Print a term of the form: T::final(object, field).
+     */
+    public void printFinal(Term t) {
+        finalPrinter.printFinal(this, t);
     }
 
     /*

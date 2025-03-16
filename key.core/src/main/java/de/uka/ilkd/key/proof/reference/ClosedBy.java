@@ -17,4 +17,5 @@ import de.uka.ilkd.key.proof.Proof;
  * @param nodesToSkip If the referenced proof has dependency graph information: proof steps to skip.
  * @author Arne Keller
  */
-public record ClosedBy(Proof proof,Node node,Set<Node>nodesToSkip){}
+public record ClosedBy(Proof proof, Node node, Set<Node> nodesToSkip) {
+}

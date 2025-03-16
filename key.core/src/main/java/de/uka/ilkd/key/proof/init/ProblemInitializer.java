@@ -598,7 +598,8 @@ public final class ProblemInitializer {
             // done
             proofCreated(pa);
             return pa;
-        } catch (ProofInputException e) {
+        } catch (Exception e) {
+            // This has been generalised from ProofInputException to not miss exceptions
             reportException(po, e);
             throw e;
         } finally {
