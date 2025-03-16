@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -22,91 +19,93 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
-import de.uka.ilkd.key.util.LineProperties;
 
 import org.key_project.util.collection.ImmutableList;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 /**
  * see {@link MasterHandlerTest} from where I copied quite a bit.
  */
 public class TestProofScriptCommand {
+    public record TestInstance(String key, String script, String exception,
+            String[] goals, Integer selectedGoal) {
+    }
+
     public static List<Arguments> data() throws IOException, URISyntaxException {
-        URL url = TestProofScriptCommand.class.getResource("cases");
-        if (url == null) {
-            throw new FileNotFoundException("Cannot find resource 'cases'.");
-        }
+        var folder = Paths.get("src/test/resources/de/uka/ilkd/key/macros/scripts");
+        try (var walker = Files.walk(folder)) {
+            List<Path> files =
+                walker.filter(it -> it.getFileName().toString().endsWith(".yml")).toList();
+            var objectMapper = new ObjectMapper(new YAMLFactory());
+            objectMapper.findAndRegisterModules();
 
-        if (!url.getProtocol().equals("file")) {
-            throw new IOException("Resource should be a file URL not " + url);
-        }
-
-        Path directory = Paths.get(url.toURI());
-        assertTrue(Files.isDirectory(directory));
-        try (var s = Files.list(directory)) {
-            return s.map(f -> Arguments.of(f.getFileName().toString(), f))
-                    .collect(Collectors.toList());
+            List<Arguments> args = new ArrayList(files.size());
+            for (Path path : files) {
+                try {
+                    TestInstance instance =
+                        objectMapper.readValue(path.toFile(), TestInstance.class);
+                    args.add(Arguments.of(path.toFile(), instance));
+                } catch (Exception e) {
+                    System.out.println(path);
+                    e.printStackTrace();
+                    throw e;
+                }
+            }
+            return args;
         }
     }
 
     @ParameterizedTest
     @MethodSource("data")
-    void testProofScript(String name, Path path) throws Exception {
-
-        BufferedReader reader = Files.newBufferedReader(path);
-        LineProperties props = new LineProperties();
-        props.read(reader);
-
-        List<String> lines = new ArrayList<>(props.getLines("KeY"));
+    void testProofScript(File file, TestInstance data) throws Exception {
+        var name = file.getName().replace(".yml", "");
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
-        Files.write(tmpKey, lines);
+        Files.writeString(tmpKey, data.key());
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
 
         Proof proof = env.getLoadedProof();
 
-        String script = props.get("script");
-        ProofScriptEngine pse =
-            new ProofScriptEngine(script,
-                new Location(path.toUri(), Position.newOneBased(1, 1)));
+        ProofScriptEngine pse = new ProofScriptEngine(data.script(),
+            new Location(file.toURI(), Position.newOneBased(1, 1)));
 
+        boolean hasException = data.exception() != null;
         try {
             pse.execute(env.getUi(), proof);
         } catch (Exception ex) {
-            assertTrue(props.containsKey("exception"), "unexpected exception");
-            Assertions.assertEquals(ex.getMessage(), props.get("exception").trim());
+            assertTrue(hasException,
+                "An exception was not expected, but got " + ex.getClass());
+            assertThat(data.exception.trim())
+                    .startsWithIgnoringCase(ex.getMessage().trim().replace("\r\n", "\n"));
             return;
         }
 
-        Assertions.assertFalse(props.containsKey("exception"),
+        Assertions.assertFalse(hasException,
             "exception would have been expected");
 
-        ImmutableList<Goal> goals = proof.openGoals();
-        if (props.containsKey("goals")) {
-            int expected = Integer.parseInt(props.get("goals").trim());
+        if (data.goals() != null) {
+            ImmutableList<Goal> goals = proof.openGoals();
+            int expected = data.goals().length;
             Assertions.assertEquals(expected, goals.size());
-        }
 
+            for (String expectedGoal : data.goals()) {
+                assertThat(goals.head().toString().trim()).isEqualTo(expectedGoal);
+                goals = goals.tail();
+            }
 
-        int no = 1;
-        while (props.containsKey("goal " + no)) {
-            String expected = props.get("goal " + no).trim();
-            Assertions.assertEquals(expected, goals.head().toString().trim(), "goal " + no);
-            goals = goals.tail();
-            no++;
-        }
-
-        if (props.containsKey("selected")) {
-            Goal goal = pse.getStateMap().getFirstOpenAutomaticGoal();
-            String expected = props.get("selected").trim();
-            Assertions.assertEquals(expected, goal.toString().trim());
+            if (data.selectedGoal() != null) {
+                Goal goal = pse.getStateMap().getFirstOpenAutomaticGoal();
+                assertThat(goal.toString().trim()).isEqualTo(data.goals()[data.selectedGoal()]);
+            }
         }
     }
 
