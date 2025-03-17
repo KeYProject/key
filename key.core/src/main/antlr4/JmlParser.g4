@@ -20,21 +20,20 @@ classlevel_element
 // In the new lexer w/o contract and expr mode. The keyword "ensures"   can also be an identifier.
 // This means, that the following text could also be seen as a field declaration:
 //      //@   ensures ensures;
-  : class_invariant       | set_statement      | represents_clause
+  : class_invariant /*| depends_clause*/     | method_specification
+  | method_declaration  | field_declaration  | represents_clause
   | history_constraint    | initially_clause   | class_axiom
   | monitors_for_clause   | readable_if_clause | writable_if_clause
-  | datagroup_clause      | nowarn_pragma      | accessible_clause
-  | assert_statement      | assume_statement
-  | field_declaration     | method_specification | method_declaration
-
+  | datagroup_clause    | set_statement      | nowarn_pragma
+  | accessible_clause   | assert_statement   | assume_statement
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
 methodlevel_element
-  : set_statement | merge_point_statement
+  : field_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
-  | assert_statement | assume_statement   |  field_declaration
+  | assert_statement | assume_statement
  ;
 
 modifiers: modifier+;
