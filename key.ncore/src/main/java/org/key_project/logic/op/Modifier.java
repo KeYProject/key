@@ -10,7 +10,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 
 /**
- * A modifier for a {@link Function} and similar elements. Defines additional properties for
+ * A modifier for an {@link AbstractOperator}. Defines additional properties for
  * operators in a more flexible manner than fields.
  */
 public class Modifier implements Named {
@@ -26,7 +26,13 @@ public class Modifier implements Named {
     public static final Modifier NONE = create("none", 0);
 
     /**
-     * A rigid (non-flexible) function.
+     * A rigid (non-flexible) operator. Example of non-rigid operators in JavaDL (and RustyDL) are:
+     * <ul>
+     *     <li>Updates</li>
+     *     <li>Program variables</li>
+     *     <li>Update applications</li>
+     *     <li>Term transformers</li>
+     * </ul>
      */
     public static final Modifier RIGID = create("rigid", 1);
 
