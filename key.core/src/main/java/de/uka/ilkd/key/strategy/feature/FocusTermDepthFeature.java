@@ -22,7 +22,7 @@ public class FocusTermDepthFeature implements Feature {
 
     private FocusTermDepthFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         // assert pos != null : "Feature is only applicable to rules with find";
 
         return NumberRuleAppCost.create(pos == null ? 0 : pos.posInTerm().depth());

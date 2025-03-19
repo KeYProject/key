@@ -724,9 +724,9 @@ public class InvariantConfigurator {
 
             public void generateActionPerformed(ActionEvent ae) {
                 boolean relaxed = relaxedCheckBox.isSelected();
-                List<Set<ProgramVariable>> possibleIndexes =
+                List<Set<LocationVariable>> possibleIndexes =
                     findPossibleIndexes(PosInSequent.createCfmaPos(posInOccurrence), services);
-                List<ProgramVariable> indexes = findIndexes(possibleIndexes);
+                List<LocationVariable> indexes = findIndexes(possibleIndexes);
                 System.out.println("Calculating number of arrays...");
                 int nrArrays =
                     findNumberOfArrays(PosInSequent.createCfmaPos(posInOccurrence), services);

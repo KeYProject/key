@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -32,7 +33,7 @@ public class StrictEqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeatu
 
     private StrictEqNonDuplicateAppFeature() {}
 
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         if (!app.ifInstsComplete())
@@ -81,8 +82,10 @@ public class StrictEqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeatu
 
             while (it0.hasNext()) {
                 // this test should be improved
-                if (!it0.next().getConstrainedFormula().formula().equalsModIrrelevantTermLabels(
-                    it1.next().getConstrainedFormula().formula()))
+                if (!it0.next().getConstrainedFormula().formula()
+                        .equalsModProperty(
+                    it1.next().getConstrainedFormula().formula(),
+                                ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY))
                     return false;
             }
         }
@@ -101,7 +104,7 @@ public class StrictEqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeatu
             PosInOccurrence newPio, PosInOccurrence oldPio) {
         final Term newFocus = newPio.subTerm();
         final Term oldFocus = oldPio.subTerm();
-        if (!newFocus.equalsModIrrelevantTermLabels(oldFocus)) {
+        if (!newFocus.equalsModProperty(oldFocus, ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY)) {
             return false;
         }
 

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -38,9 +39,9 @@ public class SimilarityCountFeature implements Feature {
         this.second = second;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        Term fst = first.toTerm(app, pos, goal);
-        Term snd = second.toTerm(app, pos, goal);
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        Term fst = first.toTerm(app, pos, goal, mState);
+        Term snd = second.toTerm(app, pos, goal, mState);
 
         LocSetLDT locsetLDT = goal.proof().getServices().getTypeConverter().getLocSetLDT();
 
@@ -69,7 +70,7 @@ public class SimilarityCountFeature implements Feature {
 
             if ((subFst != null || subSnd != null)) {
                 if ((subFst != null && subSnd == null) || (subSnd != null && subFst == null) ||
-                        !subFst.equalsModRenaming(subSnd)) {
+                        !subFst.equalsModProperty(subSnd, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     penalty += 1 + (countSetMinusFst - countSetMinusSnd);
                 }
             }
@@ -87,7 +88,7 @@ public class SimilarityCountFeature implements Feature {
                 toCompute.add(next.sub(0));
                 toCompute.add(next.sub(1));
             } else {
-                count += weightLocSets(next, snd, app, pos, goal);
+                count += weightLocSets(next, snd, app, pos, goal, mState);
             }
         }
 
@@ -95,7 +96,7 @@ public class SimilarityCountFeature implements Feature {
     }
 
     private int weightLocSets(Term fst, Term snd,
-            final RuleApp p_app, final PosInOccurrence p_pos, final Goal p_goal) {
+            final RuleApp p_app, final PosInOccurrence p_pos, final Goal p_goal, final MutableState p_mState) {
         Services services = p_goal.proof().getServices();
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -127,29 +128,29 @@ public class SimilarityCountFeature implements Feature {
         if (fst.op() == snd.op() && fst.op() == locSetLDT.getMatrixRange()) {
             final Term matrixSucc = snd;
 
-            Feature startRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(2),
-                (app, pos, goal) -> matrixSucc.sub(2));
+            Feature startRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> fst.sub(2),
+                (app, pos, goal, mState) -> matrixSucc.sub(2));
             Feature endRowIncl =
-                PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(3),
-                    (app, pos, goal) -> fst.sub(3));
+                PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> matrixSucc.sub(3),
+                    (app, pos, goal, mState) -> fst.sub(3));
 
-            Feature startColIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(4),
-                (app, pos, goal) -> matrixSucc.sub(4));
+            Feature startColIncl = PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> fst.sub(4),
+                (app, pos, goal, mState) -> matrixSucc.sub(4));
             Feature endColIncl =
-                PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(5),
-                    (app, pos, goal) -> fst.sub(5));
+                PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> matrixSucc.sub(5),
+                    (app, pos, goal, mState) -> fst.sub(5));
 
             Feature crossColumns1 =
-                PolynomialValuesCmpFeature.leq((app, pos, goal) -> matrixSucc.sub(4),
-                    (app, pos, goal) -> fst.sub(5));
-            Feature crossColumns2 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(4),
-                (app, pos, goal) -> matrixSucc.sub(5));
+                PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> matrixSucc.sub(4),
+                    (app, pos, goal, mState) -> fst.sub(5));
+            Feature crossColumns2 = PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> fst.sub(4),
+                (app, pos, goal, mState) -> matrixSucc.sub(5));
 
             RuleAppCost costs[] = new RuleAppCost[4];
-            costs[0] = startRowIncl.computeCost(p_app, p_pos, p_goal);
-            costs[1] = endRowIncl.computeCost(p_app, p_pos, p_goal);
-            costs[2] = startColIncl.computeCost(p_app, p_pos, p_goal);
-            costs[3] = endColIncl.computeCost(p_app, p_pos, p_goal);
+            costs[0] = startRowIncl.computeCost(p_app, p_pos, p_goal, p_mState);
+            costs[1] = endRowIncl.computeCost(p_app, p_pos, p_goal, p_mState);
+            costs[2] = startColIncl.computeCost(p_app, p_pos, p_goal, p_mState);
+            costs[3] = endColIncl.computeCost(p_app, p_pos, p_goal, p_mState);
             for (RuleAppCost cost : costs) {
                 if (cost.equals(NumberRuleAppCost.getZeroCost())) {
                     count += 10;
@@ -157,8 +158,8 @@ public class SimilarityCountFeature implements Feature {
             }
 
             RuleAppCost crossCosts[] = new RuleAppCost[2];
-            crossCosts[0] = crossColumns1.computeCost(p_app, p_pos, p_goal);
-            crossCosts[1] = crossColumns2.computeCost(p_app, p_pos, p_goal);
+            crossCosts[0] = crossColumns1.computeCost(p_app, p_pos, p_goal, p_mState);
+            crossCosts[1] = crossColumns2.computeCost(p_app, p_pos, p_goal, p_mState);
             for (RuleAppCost cost : crossCosts) {
                 if (cost.equals(NumberRuleAppCost.getZeroCost())) {
                     count += 5;
@@ -172,27 +173,27 @@ public class SimilarityCountFeature implements Feature {
             }
         } else if (fst.op() == snd.op() && fst.op() == locSetLDT.getArrayRange()) {
             final Term arraySucc = snd;
-            Feature startRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(1),
-                (app, pos, goal) -> arraySucc.sub(1));
+            Feature startRowIncl = PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> fst.sub(1),
+                (app, pos, goal, mState) -> arraySucc.sub(1));
             Feature endRowIncl =
-                PolynomialValuesCmpFeature.leq((app, pos, goal) -> arraySucc.sub(2),
-                    (app, pos, goal) -> fst.sub(2));
-            Feature crossRow1 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> arraySucc.sub(1),
-                (app, pos, goal) -> fst.sub(2));
-            Feature crossRow2 = PolynomialValuesCmpFeature.leq((app, pos, goal) -> fst.sub(1),
-                (app, pos, goal) -> arraySucc.sub(2));
+                PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> arraySucc.sub(2),
+                    (app, pos, goal, mState) -> fst.sub(2));
+            Feature crossRow1 = PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> arraySucc.sub(1),
+                (app, pos, goal, mState) -> fst.sub(2));
+            Feature crossRow2 = PolynomialValuesCmpFeature.leq((app, pos, goal, mState) -> fst.sub(1),
+                (app, pos, goal, mState) -> arraySucc.sub(2));
 
             RuleAppCost costs[] = new RuleAppCost[2];
-            costs[0] = startRowIncl.computeCost(p_app, p_pos, p_goal);
-            costs[1] = endRowIncl.computeCost(p_app, p_pos, p_goal);
+            costs[0] = startRowIncl.computeCost(p_app, p_pos, p_goal, p_mState);
+            costs[1] = endRowIncl.computeCost(p_app, p_pos, p_goal, p_mState);
             for (RuleAppCost cost : costs) {
                 if (cost.equals(NumberRuleAppCost.getZeroCost())) {
                     count += 10;
                 }
             }
             RuleAppCost crossCosts[] = new RuleAppCost[2];
-            crossCosts[0] = crossRow1.computeCost(p_app, p_pos, p_goal);
-            crossCosts[1] = crossRow2.computeCost(p_app, p_pos, p_goal);
+            crossCosts[0] = crossRow1.computeCost(p_app, p_pos, p_goal, p_mState);
+            crossCosts[1] = crossRow2.computeCost(p_app, p_pos, p_goal, p_mState);
             for (RuleAppCost cost : crossCosts) {
                 if (cost.equals(NumberRuleAppCost.getZeroCost())) {
                     count += 5;
@@ -209,7 +210,7 @@ public class SimilarityCountFeature implements Feature {
                 return 0;
             }
             for (int i = 0; i < fst.arity(); i++) {
-                if (fst.sub(i).equalsModRenaming(snd.sub(i))) {
+                if (fst.sub(i).equalsModProperty(snd.sub(i), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     count += 10 * (6 / fst.arity());
                 }
             }

@@ -84,7 +84,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         return equalInterestingInsts(newApp.instantiations(), cmp.instantiations());
     }
 
-    private boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
+    protected boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
         if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
             return false;
         }

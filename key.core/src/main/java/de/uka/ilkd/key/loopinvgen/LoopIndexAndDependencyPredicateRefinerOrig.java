@@ -3,6 +3,7 @@ package de.uka.ilkd.key.loopinvgen;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.JFunction;
 import org.key_project.util.collection.Pair;
@@ -95,7 +96,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR()) ||
 				dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
 
-				if (dp1.sub(0).equalsModRenaming(dp2.sub(0))) {
+				if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 					return true;
 				}
 
@@ -107,7 +108,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 				dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())
 					|| dp1.op().equals(depLDT.getRelaxedNoWaW())) {
 
-				if (dp1.sub(0).equalsModRenaming(dp2.sub(0))) {
+				if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 					return true;
 				}
 
@@ -116,7 +117,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 			}
 		}  else if (dp2.op().equals(depLDT.getRelaxedNoR())) {
 			if (dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
-				if (dp1.sub(0).equalsModRenaming(dp2.sub(0))) {
+				if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 					return true;
 				}
 
@@ -126,7 +127,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 			if (dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())
 					|| dp1.op().equals(depLDT.getRelaxedNoWaW())) {
 
-				if (dp1.sub(0).equalsModRenaming(dp2.sub(0))) {
+				if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 					return true;
 				}
 
@@ -217,7 +218,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 				}
 
 				if (depLDT.isDependencePredicate(unProven.op())) {
-					final Function op = (Function) unProven.op();
+					final JFunction op = (JFunction) unProven.op();
 					if(op==depLDT.getRelaxedNoRaW() || op == depLDT.getRelaxedNoWaR()){
 						result.add(tb.func(op, subLoc, tb.empty(), tb.empty(), tb.empty()));
 						result.add(tb.func(op, lowSingleton, tb.empty(), tb.empty(), tb.empty()));
@@ -274,7 +275,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 				}
 
 				if (depLDT.isDependencePredicate(unProven.op())) {
-					final Function op = (Function) unProven.op();
+					final JFunction op = (JFunction) unProven.op();
 					result.add(tb.func(op, subLoc));
 					result.add(tb.func(op, lowArr));
 					result.add(tb.func(op, highArr));
@@ -300,7 +301,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 				}
 
 				if (depLDT.isDependencePredicate(unProven.op())) {
-					final Function op = (Function) unProven.op();
+					final JFunction op = (JFunction) unProven.op();
 					result.add(tb.func(op, subLoc));
 //					result.add(tb.func(op, lowArr));
 //					result.add(tb.func(op, highArr));
@@ -337,7 +338,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 		Term subLoc = tb.matrixRange(heap, arr, newOutLow, newOutHigh, inLow, inHigh);
 
 		if (depLDT.isDependencePredicate(unProven.op())) {
-			final Function op = (Function) unProven.op();
+			final JFunction op = (JFunction) unProven.op();
 			result.add(tb.func(op, subLoc));
 			result.add(tb.func(op, lowArr));
 			result.add(tb.func(op, highArr));
@@ -347,7 +348,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 		subLoc = tb.matrixRange(heap, arr, inLow, inHigh, newInLow, newInHigh);
 
 		if (depLDT.isDependencePredicate(unProven.op())) {
-			final Function op = (Function) unProven.op();
+			final JFunction op = (JFunction) unProven.op();
 			result.add(tb.func(op, subLoc));
 //					result.add(tb.func(op, lowArr));
 //					result.add(tb.func(op, highArr));
@@ -471,7 +472,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 				}
 				if (lowToI != null && iToHigh != null) {
 					if (depLDT.isDependencePredicate(pred.op())) {
-						final Function dependencyOp = (Function) pred.op();
+						final JFunction dependencyOp = (JFunction) pred.op();
 						if(dependencyOp==depLDT.getRelaxedNoRaW() || dependencyOp == depLDT.getRelaxedNoWaR()){
 							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty(), tb.empty()));
 							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty(), tb.empty()));
@@ -508,16 +509,16 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 		Term lowToOuter, outerToHigh;
 
 
-		if (!inLow.equalsModRenaming(index)) {
+		if (!inLow.equalsModProperty(index, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 			lowToInner = tb.matrixRange(heap, arr, outLow, outHigh, inLow, index);
-			if (!index.equalsModRenaming(inHigh)) {
+			if (!index.equalsModProperty(inHigh, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 				innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh ,index, inHigh);
 			} else {
 				innerToHigh = tb.empty();
 			}
 		} else {
 			lowToInner = tb.empty();
-			if (!index.equalsModRenaming(inHigh)) {
+			if (!index.equalsModProperty(inHigh, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 				innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh,index, inHigh);
 			} else {
 				innerToHigh = tb.empty();
@@ -525,21 +526,21 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 		}
 		if (lowToInner != null && innerToHigh != null) {
 			if (depLDT.isDependencePredicate(pred.op())) {
-				final Function dependencyOp = (Function) pred.op();
+				final JFunction dependencyOp = (JFunction) pred.op();
 				result.add(tb.func(dependencyOp, lowToInner));
 				result.add(tb.func(dependencyOp, innerToHigh));
 			}
 		}
-		if (!outLow.equalsModRenaming(indexOuter)) {
+		if (!outLow.equalsModProperty(indexOuter, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 			lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
-			if (!indexOuter.equalsModRenaming(outHigh)) {
+			if (!indexOuter.equalsModProperty(outHigh, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 				outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
 			} else {
 				outerToHigh = tb.matrixRange(heap,arr,indexOuter, indexOuter,inLow, inHigh);//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
 			}
 		} else {
 			lowToOuter = tb.matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh); //tb.arrayRange(arr, inLow, inHigh);//
-			if (!indexOuter.equalsModRenaming(outHigh)) {
+			if (!indexOuter.equalsModProperty(outHigh, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 				outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
 			} else {
 				outerToHigh = tb.matrixRange(heap,arr,indexOuter, indexOuter,inLow, inHigh);//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
@@ -547,11 +548,11 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 		}
 		if (lowToOuter != null && outerToHigh != null) {
 			if (depLDT.isDependencePredicate(pred.op())) {
-				final Function dependencyOp = (Function) pred.op();
+				final JFunction dependencyOp = (JFunction) pred.op();
 				result.add(tb.func(dependencyOp, lowToOuter));
 				result.add(tb.func(dependencyOp, outerToHigh));
 
-				if (!lowToOuter.sub(2).equalsModRenaming(lowToOuter.sub(3))) {
+				if (!lowToOuter.sub(2).equalsModProperty(lowToOuter.sub(3), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 					result.add(tb.func(dependencyOp, tb.matrixRange(heap, arr,
 							lowToOuter.sub(2),
 							tb.sub(lowToOuter.sub(3), tb.one()),
@@ -562,7 +563,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 
 				result.add(tb.func(dependencyOp, outerToHigh));
 
-				if (!outerToHigh.sub(2).equalsModRenaming(outerToHigh.sub(3))) {
+				if (!outerToHigh.sub(2).equalsModProperty(outerToHigh.sub(3), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
 					result.add(tb.func(dependencyOp, tb.matrixRange(outerToHigh.sub(0), outerToHigh.sub(1),
 							tb.add(outerToHigh.sub(2), tb.one()),
 							outerToHigh.sub(3),
@@ -610,7 +611,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 			}
 			if (lowToInner != null && innerToHigh != null) {
 				if (depLDT.isDependencePredicate(pred.op())) {
-					final Function dependencyOp = (Function) pred.op();
+					final JFunction dependencyOp = (JFunction) pred.op();
 					result.add(tb.func(dependencyOp, lowToInner));
 					result.add(tb.func(dependencyOp, innerToHigh));
 				}
@@ -634,7 +635,7 @@ public class LoopIndexAndDependencyPredicateRefinerOrig extends PredicateRefiner
 			}
 			if (lowToOuter != null && outerToHigh != null) {
 				if (depLDT.isDependencePredicate(pred.op())) {
-					final Function dependencyOp = (Function) pred.op();
+					final JFunction dependencyOp = (JFunction) pred.op();
 					result.add(tb.func(dependencyOp, lowToOuter));
 					result.add(tb.func(dependencyOp, outerToHigh));
 

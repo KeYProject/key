@@ -119,4 +119,5 @@ public class ProblemFinder extends ExpressionBuilder {
     public @Nullable Sequent getProblem() {
         return problem;
     }
+
 }

@@ -84,15 +84,25 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
-        Function func = services.getTypeConverter().getLocSetLDT().getAllLocs();
+    public Term getModifiable(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+        JFunction func = services.getTypeConverter().getLocSetLDT().getAllLocs();
         return services.getTermBuilder().func(func);
     }
 
     @Override
-    public Term getModifies(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
-        Function func = services.getTypeConverter().getLocSetLDT().getAllLocs();
+    public Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+        JFunction func = services.getTypeConverter().getLocSetLDT().getAllLocs();
         return services.getTermBuilder().func(func);
+    }
+
+    @Override
+    public Term getFreeModifiable(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+        return null;
+    }
+
+    @Override
+    public Term getFreeModifiable(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+        return null;
     }
 
     @Override
@@ -126,7 +136,7 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getModifies() {
+    public Term getModifiable() {
         return null;
     }
 
@@ -151,8 +161,13 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public Map<LocationVariable, Term> getInternalModifies() {
+    public Map<LocationVariable, Term> getInternalModifiable() {
         return new HashMap<>();
+    }
+
+    @Override
+    public Map<LocationVariable, Term> getInternalFreeModifiable() {
+        return Map.of();
     }
 
     @Override
@@ -161,14 +176,15 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt, Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifies, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable, Term> atPres) {
+    public LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt, Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable, Term> atPres) {
         return this;
     }
 
     @Override
-    public LoopSpecification create(LoopStatement loop, Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifies, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable, Term> atPres) {
+    public LoopSpecification create(LoopStatement loop, Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable, Term> atPres) {
         return this;
     }
+
 
     @Override
     public LoopSpecification instantiate(Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Term variant) {
@@ -176,7 +192,7 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public LoopSpecification configurate(Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifies, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant) {
+    public LoopSpecification configurate(Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant) {
         return this;
     }
 

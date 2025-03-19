@@ -58,7 +58,7 @@ public abstract class AbstractLoopInvariantGenerator {
         this.arrays = new Term[nrArrays];
     }
 
-    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, List<ProgramVariable> indexes, int nrArrays) {
+    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, List<LocationVariable> indexes, int nrArrays) {
         seq = sequent;
         ruleApp = new RuleApplication(s, seq);
         services = ruleApp.services;

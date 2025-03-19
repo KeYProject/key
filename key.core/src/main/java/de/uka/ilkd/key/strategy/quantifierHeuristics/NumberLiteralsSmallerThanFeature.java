@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
@@ -38,12 +39,12 @@ public class NumberLiteralsSmallerThanFeature extends SmallerThanFeature {
         return new NumberLiteralsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final IntegerLDT intLDT = goal.proof().getServices().getTypeConverter().getIntegerLDT();
         final Operator Z = intLDT.getNumberSymbol();
 
-        final Term leftTerm = left.toTerm(app, pos, goal);
-        final Term rightTerm = right.toTerm(app, pos, goal);
+        final Term leftTerm = left.toTerm(app, pos, goal, mState);
+        final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
         if (leftTerm.op() != Z || rightTerm.op() != Z) {
             return false;

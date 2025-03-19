@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -29,7 +30,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 //		heapLDT = services.getTypeConverter().getHeapLDT();
     }
 
-    public LIGNestedMDarr(Sequent sequent, Services services, List<ProgramVariable> indexes, int nrArrays) {
+    public LIGNestedMDarr(Sequent sequent, Services services, List<LocationVariable> indexes, int nrArrays) {
         super(sequent, services, indexes, nrArrays);
     }
 

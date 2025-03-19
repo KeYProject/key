@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.Name;
@@ -61,7 +62,7 @@ public class WhileStatementAnalyzer {
         return form.op() instanceof Modality && form.javaBlock().program().getFirstElement() instanceof While;
     }
 
-    public static List<Set<ProgramVariable>> findPossibleIndexes(PosInSequent posInSequent, Services services) {
+    public static List<Set<LocationVariable>> findPossibleIndexes(PosInSequent posInSequent, Services services) {
         While whileStatement = posInSequentToWhile(posInSequent);
 
         IndexCollector indexCollector = new IndexCollector(whileStatement, services);
@@ -140,8 +141,8 @@ public class WhileStatementAnalyzer {
         return null;
     }
 
-    public static List<ProgramVariable> findIndexes(List<Set<ProgramVariable>> possibleIndexes) {
-        List<ProgramVariable> result = new LinkedList<ProgramVariable>();
+    public static List<LocationVariable> findIndexes(List<Set<LocationVariable>> possibleIndexes) {
+        List<LocationVariable> result = new LinkedList<>();
         for (int i = 0; i < possibleIndexes.size(); i++) {
             if (possibleIndexes.get(i).isEmpty()) {
                 result.add(null);
@@ -162,7 +163,7 @@ public class WhileStatementAnalyzer {
         return result;
     }
 
-    private static ProgramVariable selectIndex(Set<ProgramVariable> indexes, String loopDefinition) {
+    private static LocationVariable selectIndex(Set<LocationVariable> indexes, String loopDefinition) {
 
         JDialog dialog = new JDialog((Frame) null, "Select the " + loopDefinition + "loop's index", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -170,17 +171,17 @@ public class WhileStatementAnalyzer {
 
         dialog.setPreferredSize(new Dimension(300, 100));
 
-        JComboBox<ProgramVariable> comboBox = new JComboBox<>(indexes.toArray(new ProgramVariable[0]));
+        JComboBox<ProgramVariable> comboBox = new JComboBox<>(indexes.toArray(new LocationVariable[0]));
         dialog.add(comboBox, BorderLayout.CENTER);
 
         JButton okButton = new JButton("OK");
 
-        final ProgramVariable[] selectedIndex = new ProgramVariable[1];
+        final LocationVariable[] selectedIndex = new LocationVariable[1];
 
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectedIndex[0] = (ProgramVariable) comboBox.getSelectedItem();
+                selectedIndex[0] = (LocationVariable) comboBox.getSelectedItem();
                 dialog.dispose();
             }
         });

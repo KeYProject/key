@@ -43,10 +43,23 @@ public class TestPredicateConstruction {
 
     }
 
+    private Term[] toArray(Semisequent semi) {
+        final Term[] result = new Term[semi.size()];
+        int i = 0;
+        for (var sf : semi) {
+            result[i++] = sf.formula();
+        }
+        return result;
+    }
+
     public Term parseProblem(String s) {
         try {
             new Recoder2KeY(services, nss).parseSpecialClasses();
-            return io.load(s).loadProblem().getProblemTerm();
+            final Sequent seq = io.load(s).loadProblem().getProblem();
+            final TermBuilder tb = services.getTermBuilder();
+            return tb.imp(
+                    tb.and(toArray(seq.antecedent())),
+                    tb.or(toArray(seq.succedent())));
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
