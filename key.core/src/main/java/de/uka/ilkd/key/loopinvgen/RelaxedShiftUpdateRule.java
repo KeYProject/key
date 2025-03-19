@@ -1,14 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.logic.op.*;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
 
 public class RelaxedShiftUpdateRule implements BuiltInRule {
 
@@ -18,7 +21,7 @@ public class RelaxedShiftUpdateRule implements BuiltInRule {
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
-                                     RuleApp ruleApp) throws RuleAbortException {
+            RuleApp ruleApp) throws RuleAbortException {
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
 
@@ -40,7 +43,8 @@ public class RelaxedShiftUpdateRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        return pio != null && pio.sequentFormula().formula().op() == UpdateApplication.UPDATE_APPLICATION;
+        return pio != null
+                && pio.sequentFormula().formula().op() == UpdateApplication.UPDATE_APPLICATION;
     }
 
     @Override
@@ -50,7 +54,7 @@ public class RelaxedShiftUpdateRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
-                                     TermServices services) {
+            TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

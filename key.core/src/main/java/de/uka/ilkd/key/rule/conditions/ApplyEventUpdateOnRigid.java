@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.logic.SyntaxElement;
 
 public final class ApplyEventUpdateOnRigid implements VariableCondition {
@@ -38,8 +39,9 @@ public final class ApplyEventUpdateOnRigid implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate, MatchConditions mc,
-                                 Services services) {
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
 
         Term uInst = null;

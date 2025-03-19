@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -7,12 +15,8 @@ import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import org.key_project.util.collection.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import org.key_project.util.collection.Pair;
 
 /**
  * Refinement of the predicates describing the loop index and the dependency predicates
@@ -27,8 +31,9 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
     private Graph<Term> locSetToPredicate;
 
-    public LoopIndexAndDependencyPredicateRefiner(Sequent sequent, Set<Term> depPredList, Set<Term> compPredList, Term outerIndex,
-                                                  Term index, int iteration, Services services) {
+    public LoopIndexAndDependencyPredicateRefiner(Sequent sequent, Set<Term> depPredList,
+            Set<Term> compPredList, Term outerIndex,
+            Term index, int iteration, Services services) {
         super(sequent, services);
         this.depPredicates = depPredList;
         this.compPredicates = compPredList;
@@ -45,9 +50,10 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
         Set<Term> unProvenDepPreds = new HashSet<>();
         for (Term pred : depPredicates) {
             if (depLDT.isDependencePredicate(pred.op())) {
-//				System.out.println("abel + 1 " + pred);
-                if (locSetToPredicate.hasVertex(pred.sub(0)) && locSetToPredicate.hasEdge(pred.sub(0), pred)) {
-//					System.out.println("In lattice " + pred);
+                // System.out.println("abel + 1 " + pred);
+                if (locSetToPredicate.hasVertex(pred.sub(0))
+                        && locSetToPredicate.hasEdge(pred.sub(0), pred)) {
+                    // System.out.println("In lattice " + pred);
                     inlattice++;
                 } else if (sequentImpliesPredicate(pred)) {
                     locSetToPredicate.addEdge(pred.sub(0), pred, false);
@@ -59,16 +65,25 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                         locSetToPredicate.addEdge(pred.sub(0), tb.noWaR(pred.sub(0)), false);
                         locSetToPredicate.addEdge(pred.sub(0), tb.noWaW(pred.sub(0)), false);
                     } else if (pred.op() == depLDT.getRelaxedNoR()) {
-                        locSetToPredicate.addEdge(pred.sub(0), tb.relaxedNoRaW(pred.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
-                        locSetToPredicate.addEdge(pred.sub(0), tb.relaxedNoWaR(pred.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
+                        locSetToPredicate.addEdge(pred.sub(0),
+                            tb.relaxedNoRaW(pred.sub(0), tb.empty(), tb.empty(), tb.empty()),
+                            false);
+                        locSetToPredicate.addEdge(pred.sub(0),
+                            tb.relaxedNoWaR(pred.sub(0), tb.empty(), tb.empty(), tb.empty()),
+                            false);
                     } else if (pred.op() == depLDT.getRelaxedNoW()) {
-                        locSetToPredicate.addEdge(pred.sub(0), tb.relaxedNoRaW(pred.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
-                        locSetToPredicate.addEdge(pred.sub(0), tb.relaxedNoWaR(pred.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
-                        locSetToPredicate.addEdge(pred.sub(0), tb.relaxedNoWaW(pred.sub(0), tb.empty(), tb.empty()), false);
+                        locSetToPredicate.addEdge(pred.sub(0),
+                            tb.relaxedNoRaW(pred.sub(0), tb.empty(), tb.empty(), tb.empty()),
+                            false);
+                        locSetToPredicate.addEdge(pred.sub(0),
+                            tb.relaxedNoWaR(pred.sub(0), tb.empty(), tb.empty(), tb.empty()),
+                            false);
+                        locSetToPredicate.addEdge(pred.sub(0),
+                            tb.relaxedNoWaW(pred.sub(0), tb.empty(), tb.empty()), false);
                     }
                 } else {
                     unProvenDepPreds.add(pred);
-//				System.out.println("Here: 2");
+                    // System.out.println("Here: 2");
                 }
             }
 
@@ -82,10 +97,11 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
         for (Term w : weakenedDepPreds) {
             if (w.arity() > 0) {
-//				System.out.println("Checking lattice for: " + w);
-                if (locSetToPredicate.hasVertex(w.sub(0)) && locSetToPredicate.hasEdge(w.sub(0), w)) {
+                // System.out.println("Checking lattice for: " + w);
+                if (locSetToPredicate.hasVertex(w.sub(0))
+                        && locSetToPredicate.hasEdge(w.sub(0), w)) {
                     depPredicates.add(w);
-//					System.out.println("In lattice: " + w);
+                    // System.out.println("In lattice: " + w);
                     inlattice++;
                 } else {
                     if (sequentImpliesPredicate(w)) {
@@ -99,25 +115,34 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                             locSetToPredicate.addEdge(w.sub(0), tb.noWaR(w.sub(0)), false);
                             locSetToPredicate.addEdge(w.sub(0), tb.noWaW(w.sub(0)), false);
                         } else if (w.op() == depLDT.getRelaxedNoR()) {
-                            locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoRaW(w.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
-                            locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoWaR(w.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
+                            locSetToPredicate.addEdge(w.sub(0),
+                                tb.relaxedNoRaW(w.sub(0), tb.empty(), tb.empty(), tb.empty()),
+                                false);
+                            locSetToPredicate.addEdge(w.sub(0),
+                                tb.relaxedNoWaR(w.sub(0), tb.empty(), tb.empty(), tb.empty()),
+                                false);
                         } else if (w.op() == depLDT.getRelaxedNoW()) {
-                            locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoRaW(w.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
-                            locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoWaR(w.sub(0), tb.empty(), tb.empty(), tb.empty()), false);
-                            locSetToPredicate.addEdge(w.sub(0), tb.relaxedNoWaW(w.sub(0), tb.empty(), tb.empty()), false);
+                            locSetToPredicate.addEdge(w.sub(0),
+                                tb.relaxedNoRaW(w.sub(0), tb.empty(), tb.empty(), tb.empty()),
+                                false);
+                            locSetToPredicate.addEdge(w.sub(0),
+                                tb.relaxedNoWaR(w.sub(0), tb.empty(), tb.empty(), tb.empty()),
+                                false);
+                            locSetToPredicate.addEdge(w.sub(0),
+                                tb.relaxedNoWaW(w.sub(0), tb.empty(), tb.empty()), false);
                         }
                     }
                 }
             }
         }
-//		System.out.println("Lattice was useful " + inlattice + " times");
-//		System.out.println("DEP PREDS: " + depPredicates);
+        // System.out.println("Lattice was useful " + inlattice + " times");
+        // System.out.println("DEP PREDS: " + depPredicates);
         // -------------------------------------
         Set<Term> unProvenCompPreds = new HashSet<>();
         for (Term pred : compPredicates) {
-//			System.out.println("Proving Comp Pred: " + pred);
+            // System.out.println("Proving Comp Pred: " + pred);
             if (!sequentImpliesPredicate(pred)) {
-//				System.out.println("not proved Inner: "+pred);
+                // System.out.println("not proved Inner: "+pred);
                 unProvenCompPreds.add(pred);
             }
         }
@@ -128,12 +153,12 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
         }
 
         for (Term w : weakenedCompPreds) {
-//			System.out.println("Proving Weakened Comp Pred: " + w);
+            // System.out.println("Proving Weakened Comp Pred: " + w);
             if (sequentImpliesPredicate(w)) {
                 compPredicates.add(w);
             }
         }
-//		System.out.println("COMP PREDS: " + compPredicates);
+        // System.out.println("COMP PREDS: " + compPredicates);
         return new Pair<>(depPredicates, compPredicates);
     }
 
@@ -143,9 +168,11 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
             return true;
         } else if (dp2.op().equals(depLDT.getNoR())) {
             if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR()) ||
-                    dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
+                    dp1.op().equals(depLDT.getRelaxedNoRaW())
+                    || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
 
-                if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
+                if (dp1.sub(0).equalsModProperty(dp2.sub(0),
+                    RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     return true;
                 }
 
@@ -154,10 +181,12 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
         } else if (dp2.op().equals(depLDT.getNoW())) {
             if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())
                     || dp1.op().equals(depLDT.getNoWaW()) ||
-                    dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())
+                    dp1.op().equals(depLDT.getRelaxedNoRaW())
+                    || dp1.op().equals(depLDT.getRelaxedNoWaR())
                     || dp1.op().equals(depLDT.getRelaxedNoWaW())) {
 
-                if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
+                if (dp1.sub(0).equalsModProperty(dp2.sub(0),
+                    RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     return true;
                 }
 
@@ -165,18 +194,22 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                 return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
             }
         } else if (dp2.op().equals(depLDT.getRelaxedNoR())) {
-            if (dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
-                if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
+            if (dp1.op().equals(depLDT.getRelaxedNoRaW())
+                    || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
+                if (dp1.sub(0).equalsModProperty(dp2.sub(0),
+                    RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     return true;
                 }
 
                 return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
             }
         } else if (dp2.op().equals(depLDT.getRelaxedNoW())) {
-            if (dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())
+            if (dp1.op().equals(depLDT.getRelaxedNoRaW())
+                    || dp1.op().equals(depLDT.getRelaxedNoWaR())
                     || dp1.op().equals(depLDT.getRelaxedNoWaW())) {
 
-                if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
+                if (dp1.sub(0).equalsModProperty(dp2.sub(0),
+                    RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     return true;
                 }
 
@@ -189,24 +222,24 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
     private Set<Term> weakeningDependencePredicates(Term unProven) {
         Set<Term> result = new HashSet<>();
 
-//		**
+        // **
         if (unProven != null) {
-//		System.out.println("Weaken " + unProven + ": ");
+            // System.out.println("Weaken " + unProven + ": ");
             result.addAll(weakenByPredicateSymbol(unProven));
 
-//		System.out.println("Weaken by Index for "+unProven);
+            // System.out.println("Weaken by Index for "+unProven);
             result.addAll(weakenByDividingOverIndex(unProven));
-//			System.out.println("Weakening for iteration: " + itrNumber);
+            // System.out.println("Weakening for iteration: " + itrNumber);
             if (itrNumber < 1) {
-//			System.out.println("Weaken by Subset for "+unProven);
+                // System.out.println("Weaken by Subset for "+unProven);
                 result.addAll(weakenBySubSet(unProven));
             }
         }
         if (result.isEmpty()) {
-//			System.out.println("Weakening didn't succeed");
+            // System.out.println("Weakening didn't succeed");
             result.add(tb.tt());
         }
-//		System.out.println("WEAKENING RESULT: "+result);
+        // System.out.println("WEAKENING RESULT: "+result);
         return result;
     }
 
@@ -215,15 +248,15 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
         if (unProven.op().equals(depLDT.getNoR())) {
             result.add(tb.noRaW(unProven.sub(0)));
             result.add(tb.noWaR(unProven.sub(0)));
-            //		result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
-            //		result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+            // result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+            // result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
         } else if (unProven.op().equals(depLDT.getNoW())) {
             result.add(tb.noRaW(unProven.sub(0)));
             result.add(tb.noWaR(unProven.sub(0)));
             result.add(tb.noWaW(unProven.sub(0)));
-//			result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
-//			result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
-//			result.add(tb.relaxedNoWaW(unProven.sub(0), tb.empty(), tb.empty()));
+            // result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+            // result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+            // result.add(tb.relaxedNoWaW(unProven.sub(0), tb.empty(), tb.empty()));
         } else if (unProven.op().equals(depLDT.getRelaxedNoR())) {
             result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
             result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
@@ -233,15 +266,15 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
             result.add(tb.relaxedNoWaW(unProven.sub(0), tb.empty(), tb.empty()));
         }
 
-//		System.out.println("weaken by pred symb "+ unProven +" with "+ result);
+        // System.out.println("weaken by pred symb "+ unProven +" with "+ result);
         for (Term r : result) {
             if (locSetToPredicate.hasVertex(r.sub(0))) {
                 locSetToPredicate.addEdge(r.sub(0), r, false);
-//				System.out.println("added 1");
+                // System.out.println("added 1");
             }
         }
-//		System.out.println("weaken by predicate symb for " + unProven + " is "+result);
-//		System.out.println("size: " + result.size());
+        // System.out.println("weaken by predicate symb for " + unProven + " is "+result);
+        // System.out.println("size: " + result.size());
         return result;
     }
 
@@ -303,7 +336,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
             }
         }
 
-//		System.out.println("weaken by subset "+ unProven +" with "+ result);
+        // System.out.println("weaken by subset "+ unProven +" with "+ result);
         return result;
 
     }
@@ -376,8 +409,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                 }
             }
         }
-//		System.out.println("weaken by subset for " + unProven + " is " +result);
-//		System.out.println("size: " + result.size());
+        // System.out.println("weaken by subset for " + unProven + " is " +result);
+        // System.out.println("size: " + result.size());
 
         return resultArr;
     }
@@ -388,7 +421,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
             return weakenByDividingOverIndexForArrayRange(pred);
         else if (pred.sub(0).op() == locsetLDT.getMatrixRange())
             return weakenByDividingOverIndexForMatrixRange(pred);
-        else return new HashSet<>();
+        else
+            return new HashSet<>();
     }
 
     private Set<Term> weakenByDividingOverIndexForArrayRange(Term pred) {
@@ -396,7 +430,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
         Set<Term> resultArr = new HashSet<>();
         Term locSet = pred.sub(0);
         if (locSet != null && locSet.arity() == 3) {
-//			System.out.println("Find Loc Set: "+locSet);
+            // System.out.println("Find Loc Set: "+locSet);
             Term array = locSet.sub(0);
             Term low = locSet.sub(1);
             Term high = locSet.sub(2);
@@ -404,7 +438,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
             Term iToHigh = tb.empty();
             Term lowToIPlusOne = tb.empty();
             Term iPlusOneToHigh = tb.empty();
-//			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
+            // System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
             if (array != null && low != null && high != null && innerIndex != null) {
                 if (!sProof.proofEquality(low, innerIndex)) {
                     if (!sProof.proofEquality(innerIndex, high)) {
@@ -412,7 +446,8 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                         iToHigh = tb.arrayRange(array, innerIndex, high);
                         if (sProof.proofLT(tb.add(innerIndex, tb.one()), high)) {
                             lowToIPlusOne = tb.arrayRange(array, low, tb.add(innerIndex, tb.one()));
-                            iPlusOneToHigh = tb.arrayRange(array, tb.add(innerIndex, tb.one()), high);
+                            iPlusOneToHigh =
+                                tb.arrayRange(array, tb.add(innerIndex, tb.one()), high);
                         }
                     } else {
                         lowToI = tb.arrayRange(array, low, innerIndex);
@@ -425,14 +460,15 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
                         if (sProof.proofLT(tb.add(innerIndex, tb.one()), high)) {
                             lowToIPlusOne = tb.arrayRange(array, low, tb.add(innerIndex, tb.one()));
-                            iPlusOneToHigh = tb.arrayRange(array, tb.add(innerIndex, tb.one()), high);
+                            iPlusOneToHigh =
+                                tb.arrayRange(array, tb.add(innerIndex, tb.one()), high);
                         }
                     } else {
                         lowToI = tb.singleton(array, tb.arr(innerIndex));
                         iToHigh = tb.singleton(array, tb.arr(innerIndex));
                     }
                 }
-//				if (lowToI != null && iToHigh != null) {
+                // if (lowToI != null && iToHigh != null) {
                 if (depLDT.isDependencePredicate(pred.op())) {
                     final JFunction dependencyOp = (JFunction) pred.op();
 
@@ -446,12 +482,12 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                     resultArr = resultArr;
 
                 }
-//				}
+                // }
             }
-//		System.out.println(result);
+            // System.out.println(result);
         }
 
-//		System.out.println("weaken by index & pred symb "+ pred +" with "+ result);
+        // System.out.println("weaken by index & pred symb "+ pred +" with "+ result);
         return resultArr;
 
     }
@@ -517,8 +553,10 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                                 boolean outerCond = cacheProofResult(outers, cacheLEQ, k, l);
                                 boolean innerCond = cacheProofResult(inners, cacheLEQ, i, j);
                                 if (outerCond && innerCond) {
-                                    Term right = tb.matrixRange(heap, arr, outers[k], outers[l], inners[i], inners[j]);
-                                    if (!locSet.equalsModProperty(right, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
+                                    Term right = tb.matrixRange(heap, arr, outers[k], outers[l],
+                                        inners[i], inners[j]);
+                                    if (!locSet.equalsModProperty(right,
+                                        RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                                         matrixes.add(right);
                                     }
                                 }
@@ -528,7 +566,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                 }
             }
 
-//			System.out.println("PRED.OP   " + pred.op());
+            // System.out.println("PRED.OP " + pred.op());
             if (depLDT.isDependencePredicate(pred.op())) {
                 final JFunction dependencyOp = (JFunction) pred.op();
                 for (Term mtr : matrixes) {
@@ -538,11 +576,12 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
         }
 
-//		System.out.println("weakening by dividing over index for: "+ pred + " is:"+ resultArr);
+        // System.out.println("weakening by dividing over index for: "+ pred + " is:"+ resultArr);
         return resultArr;
     }
 
-    private boolean cacheProofResult(Term[] outers, HashMap<Pair<Term, Term>, Boolean> cacheLT, int k, int l) {
+    private boolean cacheProofResult(Term[] outers, HashMap<Pair<Term, Term>, Boolean> cacheLT,
+            int k, int l) {
         boolean cond;
         Pair<Term, Term> pair = new Pair<>(outers[k], outers[l]);
         Boolean result = cacheLT.get(pair);
@@ -560,9 +599,9 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
         Set<Term> result = new HashSet<>();
         if (pred != null) {
             result = compPredWeakeningByPredicates(pred);
-//		result.addAll(compPredWeakenByIndex(pred));
-//		System.out.println("Weakening by Predicate for: " + pred);
-//		System.out.println("Weakening by Heuristics for: " + pred);
+            // result.addAll(compPredWeakenByIndex(pred));
+            // System.out.println("Weakening by Predicate for: " + pred);
+            // System.out.println("Weakening by Heuristics for: " + pred);
             if (itrNumber < 1) {
                 result.addAll(compPredWeakeningByHeuristics(pred));
             }
@@ -585,20 +624,20 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                 } else if (pred.op() == intLDT.getGreaterThan()) {
                     result.add(tb.geq(low, high));
                 }
-//				else if (pred.op() == intLDT.getLessOrEquals()) {// Think again
-//					result.add(tb.gt(low, high));
-//					result.add(tb.equals(low, high));
-//				} else if (pred.op() == intLDT.getGreaterOrEquals()) {// Think again
-//					result.add(tb.lt(low, high));
-//					result.add(tb.equals(low, high));
-//				}
+                // else if (pred.op() == intLDT.getLessOrEquals()) {// Think again
+                // result.add(tb.gt(low, high));
+                // result.add(tb.equals(low, high));
+                // } else if (pred.op() == intLDT.getGreaterOrEquals()) {// Think again
+                // result.add(tb.lt(low, high));
+                // result.add(tb.equals(low, high));
+                // }
                 else if (pred.op() == Equality.EQUALS) {
                     result.add(tb.gt(low, high));
                     result.add(tb.lt(low, high));
                 }
             }
         }
-//		System.out.println(result);
+        // System.out.println(result);
         return result;
     }
 
@@ -624,22 +663,23 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                 }
             }
         }
-//		System.out.println(result);
+        // System.out.println(result);
         return result;
     }
 
     private Term buildPredicate(Term unProven, Term locSet, JFunction op) {
         final Term builtPred;
         assert locSet != null;
-//		if (locSet !=tb.empty()){
+        // if (locSet !=tb.empty()){
         if (unProven.arity() == 1) {
             builtPred = tb.func(op, locSet);
         } else if (unProven.arity() == 4) {
             builtPred = tb.func(op, locSet, tb.empty(), tb.empty(), tb.empty());
         } else if (unProven.arity() == 3) {
             builtPred = tb.func(op, locSet, tb.empty(), tb.empty());
-        } else throw new IllegalArgumentException("Unexpected predicate " + unProven);
-//		}
+        } else
+            throw new IllegalArgumentException("Unexpected predicate " + unProven);
+        // }
         return builtPred;
     }
 

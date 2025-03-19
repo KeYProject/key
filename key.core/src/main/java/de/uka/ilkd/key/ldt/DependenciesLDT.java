@@ -9,12 +9,12 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 public class DependenciesLDT extends LDT {

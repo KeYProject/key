@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -11,10 +18,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public abstract class AbstractLoopInvariantGenerator {
     protected final Sequent seq;
@@ -58,7 +61,8 @@ public abstract class AbstractLoopInvariantGenerator {
         this.arrays = new Term[nrArrays];
     }
 
-    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, List<LocationVariable> indexes, int nrArrays) {
+    public AbstractLoopInvariantGenerator(Sequent sequent, Services s,
+            List<LocationVariable> indexes, int nrArrays) {
         seq = sequent;
         ruleApp = new RuleApplication(s, seq);
         services = ruleApp.services;
@@ -76,11 +80,11 @@ public abstract class AbstractLoopInvariantGenerator {
         tb = services.getTermBuilder();
         intLDT = services.getTypeConverter().getIntegerLDT();
         getIndex(sequent);
-        this.arrays = new Term[2]; //TODO: unhardcode here. Where is this constructor used?
+        this.arrays = new Term[2]; // TODO: unhardcode here. Where is this constructor used?
     }
 
     protected void abstractGoal(Goal currentGoal, Set<Term> compPredsSet, Set<Term> depPredsSet) {
-//		System.out.println("Goal: " + currentGoal);
+        // System.out.println("Goal: " + currentGoal);
         for (SequentFormula cgsf : currentGoal.sequent().antecedent()) {
             PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
             currentGoal.removeFormula(p);
@@ -95,18 +99,18 @@ public abstract class AbstractLoopInvariantGenerator {
 
         for (Term cp : compPredsSet) {
             currentGoal.addFormula(new SequentFormula(cp), true, false);
-//			currentGoal.addFormula(new SequentFormula(cp), false, false);
+            // currentGoal.addFormula(new SequentFormula(cp), false, false);
         }
 
         for (Term cp : depPredsSet) {
             currentGoal.addFormula(new SequentFormula(cp), true, false);
-//			currentGoal.addFormula(new SequentFormula(cp), false, false);
+            // currentGoal.addFormula(new SequentFormula(cp), false, false);
         }
-//		System.out.println("Modified Goal: " + currentGoal);
+        // System.out.println("Modified Goal: " + currentGoal);
     }
 
     protected void abstractSequent(Sequent seq, Set<Term> compPredsSet, Set<Term> depPredsSet) {
-//		System.out.println("Goal: " + currentGoal);
+        // System.out.println("Goal: " + currentGoal);
         for (SequentFormula cgsf : seq.antecedent()) {
             PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
             seq.removeFormula(p);
@@ -121,14 +125,14 @@ public abstract class AbstractLoopInvariantGenerator {
 
         for (Term cp : compPredsSet) {
             seq.addFormula(new SequentFormula(cp), true, false);
-//			currentGoal.addFormula(new SequentFormula(cp), false, false);
+            // currentGoal.addFormula(new SequentFormula(cp), false, false);
         }
 
         for (Term cp : depPredsSet) {
             seq.addFormula(new SequentFormula(cp), true, false);
-//			currentGoal.addFormula(new SequentFormula(cp), false, false);
+            // currentGoal.addFormula(new SequentFormula(cp), false, false);
         }
-//		System.out.println("Modified Goal: " + currentGoal);
+        // System.out.println("Modified Goal: " + currentGoal);
     }
 
     protected void getLow(Sequent seq) {
@@ -154,11 +158,11 @@ public abstract class AbstractLoopInvariantGenerator {
                     Term updateInner = update.sub(1);
                     if (updateOuter.op() instanceof ElementaryUpdate) {
                         this.lowOuter = updateOuter.sub(0);
-//                        System.out.println("Low Outer: " + this.lowOuter);
+                        // System.out.println("Low Outer: " + this.lowOuter);
                     }
                     if (updateInner.op() instanceof ElementaryUpdate) {
                         this.lowInner = updateInner.sub(0);
-//                        System.out.println("Low Inner: " + this.lowInner);
+                        // System.out.println("Low Inner: " + this.lowInner);
                     }
                     break;
                 }
@@ -174,7 +178,8 @@ public abstract class AbstractLoopInvariantGenerator {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
-                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                    activePE =
+                        (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
                 } else {
                     activePE = (Statement) pe.getFirstElement();
                 }
@@ -200,7 +205,8 @@ public abstract class AbstractLoopInvariantGenerator {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
-                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                    activePE =
+                        (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
                 } else {
                     activePE = (Statement) pe.getFirstElement();
                 }
@@ -216,7 +222,7 @@ public abstract class AbstractLoopInvariantGenerator {
             }
         }
         this.high = expr2term(high);
-        //this.index = expr2term(index);
+        // this.index = expr2term(index);
     }
 
     protected void getIndexes(Sequent seq) {
@@ -228,7 +234,8 @@ public abstract class AbstractLoopInvariantGenerator {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
-                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                    activePE =
+                        (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
                 } else {
                     activePE = (Statement) pe.getFirstElement();
                 }
@@ -241,10 +248,13 @@ public abstract class AbstractLoopInvariantGenerator {
                     }
                     final Statement stmtInner = ((While) activePE).getBody();
                     if (stmtInner.getFirstElement() instanceof While) {
-                        final Expression exprInner = ((While) stmtInner.getFirstElement()).getGuardExpression();
-                        if (exprInner instanceof GreaterOrEquals || exprInner instanceof GreaterThan) {
+                        final Expression exprInner =
+                            ((While) stmtInner.getFirstElement()).getGuardExpression();
+                        if (exprInner instanceof GreaterOrEquals
+                                || exprInner instanceof GreaterThan) {
                             indexInner = ((ComparativeOperator) exprInner).getExpressionAt(1);
-                        } else if (exprInner instanceof LessOrEquals || exprInner instanceof LessThan) {
+                        } else if (exprInner instanceof LessOrEquals
+                                || exprInner instanceof LessThan) {
                             indexInner = ((ComparativeOperator) exprInner).getExpressionAt(0);
                         }
                     }
@@ -265,7 +275,8 @@ public abstract class AbstractLoopInvariantGenerator {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
-                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                    activePE =
+                        (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
                 } else {
                     activePE = (Statement) pe.getFirstElement();
                 }
@@ -278,10 +289,13 @@ public abstract class AbstractLoopInvariantGenerator {
                     }
                     final Statement stmtInner = ((While) activePE).getBody();
                     if (stmtInner.getFirstElement() instanceof While) {
-                        final Expression exprInner = ((While) stmtInner.getFirstElement()).getGuardExpression();
-                        if (exprInner instanceof GreaterOrEquals || exprInner instanceof GreaterThan) {
+                        final Expression exprInner =
+                            ((While) stmtInner.getFirstElement()).getGuardExpression();
+                        if (exprInner instanceof GreaterOrEquals
+                                || exprInner instanceof GreaterThan) {
                             highInner = ((ComparativeOperator) exprInner).getExpressionAt(0);
-                        } else if (exprInner instanceof LessOrEquals || exprInner instanceof LessThan) {
+                        } else if (exprInner instanceof LessOrEquals
+                                || exprInner instanceof LessThan) {
                             highInner = ((ComparativeOperator) exprInner).getExpressionAt(1);
                         }
                     }
@@ -302,7 +316,8 @@ public abstract class AbstractLoopInvariantGenerator {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
-                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                    activePE =
+                        (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
                 } else {
                     activePE = (Statement) pe.getFirstElement();
                 }
@@ -317,11 +332,14 @@ public abstract class AbstractLoopInvariantGenerator {
                     }
                     final Statement stmtInner = ((While) activePE).getBody();
                     if (stmtInner.getFirstElement() instanceof While) {
-                        final Expression exprInner = ((While) stmtInner.getFirstElement()).getGuardExpression();
-                        if (exprInner instanceof GreaterOrEquals || exprInner instanceof GreaterThan) {
+                        final Expression exprInner =
+                            ((While) stmtInner.getFirstElement()).getGuardExpression();
+                        if (exprInner instanceof GreaterOrEquals
+                                || exprInner instanceof GreaterThan) {
                             highInner = ((ComparativeOperator) exprInner).getExpressionAt(0);
                             indexInner = ((ComparativeOperator) exprInner).getExpressionAt(1);
-                        } else if (exprInner instanceof LessOrEquals || exprInner instanceof LessThan) {
+                        } else if (exprInner instanceof LessOrEquals
+                                || exprInner instanceof LessThan) {
                             highInner = ((ComparativeOperator) exprInner).getExpressionAt(1);
                             indexInner = ((ComparativeOperator) exprInner).getExpressionAt(0);
                         }
@@ -334,10 +352,10 @@ public abstract class AbstractLoopInvariantGenerator {
         this.indexOuter = expr2term(indexOuter);
         this.highInner = expr2term(highInner);
         this.indexInner = expr2term(indexInner);
-//        System.out.println("High Inner: " + this.highInner);
-//        System.out.println("High Outer: " + this.highOuter);
-//        System.out.println("Index Inner: " + this.indexInner);
-//        System.out.println("index Outer: " + this.indexOuter);
+        // System.out.println("High Inner: " + this.highInner);
+        // System.out.println("High Outer: " + this.highOuter);
+        // System.out.println("Index Inner: " + this.indexInner);
+        // System.out.println("index Outer: " + this.indexOuter);
     }
 
     protected Set<Term> getInnerLocSets() {
@@ -364,7 +382,8 @@ public abstract class AbstractLoopInvariantGenerator {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
-                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                    activePE =
+                        (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
                 } else {
                     activePE = (Statement) pe.getFirstElement();
                 }
@@ -393,16 +412,18 @@ public abstract class AbstractLoopInvariantGenerator {
         return this.services.getTypeConverter().convertToLogicElement(expr);
     }
 
-//    protected Term skipUpdates(Term formula) {
-//        return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula) : formula;
-//    }
+    // protected Term skipUpdates(Term formula) {
+    // return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula) :
+    // formula;
+    // }
 
     protected Set<LocationVariable> extractProgramVariable(Statement s) {
-        ProgramVariableCollectorWithArrayIndices pvc = new ProgramVariableCollectorWithArrayIndices(s, services);
+        ProgramVariableCollectorWithArrayIndices pvc =
+            new ProgramVariableCollectorWithArrayIndices(s, services);
         pvc.start();
-//		System.out.println(pvc.result());
-//		System.out.println("my array: " + pvc.array());
-//		System.out.println(pvc.index());
+        // System.out.println(pvc.result());
+        // System.out.println("my array: " + pvc.array());
+        // System.out.println(pvc.index());
         return pvc.result();
     }
 
@@ -429,7 +450,7 @@ public abstract class AbstractLoopInvariantGenerator {
                 // kjt.getJavaType(); // Java type
                 // System.out.println(v + " is of KeY sort " + kjt.getSort());
                 // System.out.println(v + " is of java type " + kjt.getJavaType());
-//				System.out.println("old array: " + v);
+                // System.out.println("old array: " + v);
                 arrays[arraysIndex] = tb.var(v);
                 arraysIndex++;
             }
@@ -438,11 +459,11 @@ public abstract class AbstractLoopInvariantGenerator {
 
     protected boolean isComparisonOperator(Term pred) {
         final boolean isComparison =
-                pred.op() == intLDT.getLessThan() ||
-                        pred.op() == intLDT.getGreaterThan() ||
-                        pred.op() == intLDT.getLessOrEquals() ||
-                        pred.op() == intLDT.getGreaterOrEquals() ||
-                        pred.op() == Equality.EQUALS;
+            pred.op() == intLDT.getLessThan() ||
+                    pred.op() == intLDT.getGreaterThan() ||
+                    pred.op() == intLDT.getLessOrEquals() ||
+                    pred.op() == intLDT.getGreaterOrEquals() ||
+                    pred.op() == Equality.EQUALS;
         return isComparison;
     }
 

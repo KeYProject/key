@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.logic.SyntaxElement;
 
 public class NoDependenceLDT extends VariableConditionAdapter {
@@ -21,7 +22,7 @@ public class NoDependenceLDT extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-                         Services services) {
+            Services services) {
         if (var != dependenceSV) {
             return true;
         }

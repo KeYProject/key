@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
@@ -14,7 +15,8 @@ public class InverseAnonEventUpdate extends AbstractSortedOperator {
     public static final Operator SINGLETON = new InverseAnonEventUpdate();
 
     private InverseAnonEventUpdate() {
-        super(new Name("\\invAnonEvUp"), new Sort[] { JavaDLTheory.ANY }, JavaDLTheory.UPDATE, false);
+        super(new Name("\\invAnonEvUp"), new Sort[] { JavaDLTheory.ANY }, JavaDLTheory.UPDATE,
+            false);
     }
 
     @Override

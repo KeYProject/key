@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -6,20 +13,18 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import org.jetbrains.annotations.Nullable;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.UnaryOperator;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -59,12 +64,13 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public IProgramMethod getTarget() {//return exception
+    public IProgramMethod getTarget() {// return exception
         return null;
     }
 
     @Override
-    public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getInvariant(LocationVariable heap, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services) {
         return loopInv;
     }
 
@@ -74,7 +80,8 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getFreeInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getFreeInvariant(LocationVariable heap, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services) {
         return null;
     }
 
@@ -84,24 +91,28 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getModifiable(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getModifiable(LocationVariable heap, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services) {
         JFunction func = services.getTypeConverter().getLocSetLDT().getAllLocs();
         return services.getTermBuilder().func(func);
     }
 
     @Override
-    public Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres,
+            Services services) {
         JFunction func = services.getTypeConverter().getLocSetLDT().getAllLocs();
         return services.getTermBuilder().func(func);
     }
 
     @Override
-    public Term getFreeModifiable(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getFreeModifiable(LocationVariable heap, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services) {
         return null;
     }
 
     @Override
-    public Term getFreeModifiable(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getFreeModifiable(Term selfTerm, Map<LocationVariable, Term> atPres,
+            Services services) {
         return null;
     }
 
@@ -116,7 +127,8 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services) {
         return ImmutableSLList.<InfFlowSpec>nil();
     }
 
@@ -176,23 +188,37 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt, Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable, Term> atPres) {
+    public LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
+            Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
+            Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
+            Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
+            Map<LocationVariable, Term> atPres) {
         return this;
     }
 
     @Override
-    public LoopSpecification create(LoopStatement loop, Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant, Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts, Map<LocationVariable, Term> atPres) {
+    public LoopSpecification create(LoopStatement loop, Map<LocationVariable, Term> invariants,
+            Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable,
+            Map<LocationVariable, Term> freeModifiable,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
+            Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
+            Map<LocationVariable, Term> atPres) {
         return this;
     }
 
 
     @Override
-    public LoopSpecification instantiate(Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Term variant) {
+    public LoopSpecification instantiate(Map<LocationVariable, Term> invariants,
+            Map<LocationVariable, Term> freeInvariants, Term variant) {
         return this;
     }
 
     @Override
-    public LoopSpecification configurate(Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable, Map<LocationVariable, Term> freeModifiable, Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant) {
+    public LoopSpecification configurate(Map<LocationVariable, Term> invariants,
+            Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable,
+            Map<LocationVariable, Term> freeModifiable,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant) {
         return this;
     }
 
@@ -207,7 +233,9 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public LoopSpecification setInvariant(Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public LoopSpecification setInvariant(Map<LocationVariable, Term> invariants,
+            Map<LocationVariable, Term> freeInvariants, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services) {
         return this;
     }
 
@@ -217,7 +245,8 @@ public class LoopSpecificationImpl implements LoopSpecification {
     }
 
     @Override
-    public String getPlainText(Services services, Iterable<LocationVariable> heapContext, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+    public String getPlainText(Services services, Iterable<LocationVariable> heapContext,
+            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         return loopInv.toString();
     }
 

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.logic.SyntaxElement;
 
 public final class ApplyInverseAnonEventUpdateOnRigid implements VariableCondition {
@@ -30,13 +31,15 @@ public final class ApplyInverseAnonEventUpdateOnRigid implements VariableConditi
             updatedSubs[i] = services.getTermBuilder().apply(update, target.sub(i), null);
         }
         Term result =
-            services.getTermFactory().createTerm(target.op(), updatedSubs, target.boundVars(), null);
+            services.getTermFactory().createTerm(target.op(), updatedSubs, target.boundVars(),
+                null);
         return result;
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate, MatchConditions mc,
-                                 Services services) {
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
 
         Term uInst = null;

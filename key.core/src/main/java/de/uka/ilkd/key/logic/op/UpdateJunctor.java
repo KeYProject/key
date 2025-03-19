@@ -23,7 +23,7 @@ public final class UpdateJunctor extends AbstractSortedOperator {
         new UpdateJunctor(new Name("parallel-upd"), 2);
 
     public static final UpdateJunctor SEQUENTIAL_UPDATE =
-            new UpdateJunctor(new Name("sequential-upd"), 2);
+        new UpdateJunctor(new Name("sequential-upd"), 2);
 
     private static Sort[] createUpdateSortArray(int arity) {
         Sort[] result = new Sort[arity];

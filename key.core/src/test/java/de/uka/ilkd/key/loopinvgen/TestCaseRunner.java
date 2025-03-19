@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
 
-import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Method;
+import javax.swing.*;
 
 public class TestCaseRunner extends JFrame {
     private final JComboBox<String> testCaseComboBox;
@@ -17,29 +20,29 @@ public class TestCaseRunner extends JFrame {
         setLocationRelativeTo(null);
 
         // Create UI components
-        testCaseComboBox = new JComboBox<>(new String[]{
-                "onlyRead",
-                "withoutFunc",
-                "withFunc",
-                "intaDepOnly",
-                "shiftArrayToLeft",
-                "interAndIntra",
-                "condition",
-                "conditionDifferentNumberOfEvents",
-                "conditionWithDifferentEvents0",
-                "conditionWithDifferentEvents",
-                "shiftArrayToLeftWithBreak",
-                "stencil",
-                "indexToPowerOf2",
-                "basicEx0",
-                "basicMltpArrDiffIndex",
-                "basicMDArray0",
-                "basicMDArray",
-                "basicMDArray42",
-                "correlation_init_array",
-                "correlation_print_array",
-                "gem_ver_scope_1",
-                "three_nested_loops"
+        testCaseComboBox = new JComboBox<>(new String[] {
+            "onlyRead",
+            "withoutFunc",
+            "withFunc",
+            "intaDepOnly",
+            "shiftArrayToLeft",
+            "interAndIntra",
+            "condition",
+            "conditionDifferentNumberOfEvents",
+            "conditionWithDifferentEvents0",
+            "conditionWithDifferentEvents",
+            "shiftArrayToLeftWithBreak",
+            "stencil",
+            "indexToPowerOf2",
+            "basicEx0",
+            "basicMltpArrDiffIndex",
+            "basicMDArray0",
+            "basicMDArray",
+            "basicMDArray42",
+            "correlation_init_array",
+            "correlation_print_array",
+            "gem_ver_scope_1",
+            "three_nested_loops"
         });
         relaxedCheckBox = new JCheckBox("Relaxed");
         JButton runButton = new JButton("Run Test");
@@ -77,7 +80,8 @@ public class TestCaseRunner extends JFrame {
 
     private static String executeTest(String testCase, boolean relaxed) {
         String relaxedText = relaxed ? " (relaxed)" : "";
-        String result = "Output of " + testCase + relaxedText + ": " + System.lineSeparator() + System.lineSeparator();
+        String result = "Output of " + testCase + relaxedText + ": " + System.lineSeparator()
+            + System.lineSeparator();
 
         long timeTaken = -1;
         try {
@@ -91,7 +95,7 @@ public class TestCaseRunner extends JFrame {
             try {
                 Method test = tpc.getClass().getMethod(testCase);
 
-                //don't show relaxed if there is no relaxed version to run
+                // don't show relaxed if there is no relaxed version to run
                 result = result.replace(" (relaxed)", "");
 
                 long start = System.currentTimeMillis();
@@ -108,7 +112,8 @@ public class TestCaseRunner extends JFrame {
         }
 
         if (timeTaken != -1) {
-            result += System.lineSeparator() + System.lineSeparator() + "Loop Invariant Generation took " + timeTaken + " ms";
+            result += System.lineSeparator() + System.lineSeparator()
+                + "Loop Invariant Generation took " + timeTaken + " ms";
         } else {
             result += "Encountered an error while executing this test case";
         }

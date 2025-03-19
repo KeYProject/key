@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
 
-import org.key_project.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
@@ -9,11 +11,13 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
+
+import org.key_project.logic.Name;
 
 public class DepSimplificationStrategy extends JavaCardDLStrategy {
 
-    private static final String DEPENDENCY_SIMPLIFICATION_STRATEGY = "DepenendencySimplificationStrategy";
+    private static final String DEPENDENCY_SIMPLIFICATION_STRATEGY =
+        "DepenendencySimplificationStrategy";
 
     public DepSimplificationStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof, strategyProperties);
@@ -32,16 +36,19 @@ public class DepSimplificationStrategy extends JavaCardDLStrategy {
         bindRuleSet(d, "simplify_ENLARGING", inftyConst());
         bindRuleSet(d, "simplify_enlarging", inftyConst());
 
-        bindRuleSet(d, "dep_replace_known", inftyConst());//EqNonDuplicateAppFeature
+        bindRuleSet(d, "dep_replace_known", inftyConst());// EqNonDuplicateAppFeature
 
-        //Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
+        // Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
 
-        bindRuleSet(d, "dep_pred_unroll_fixed_bounds", inftyConst());//longConst(0));
-        bindRuleSet(d, "dep_pred_known", inftyConst());//+100
-        bindRuleSet(d, "dep_pred_known_2", inftyConst());//+100
+        bindRuleSet(d, "dep_pred_unroll_fixed_bounds", inftyConst());// longConst(0));
+        bindRuleSet(d, "dep_pred_known", inftyConst());// +100
+        bindRuleSet(d, "dep_pred_known_2", inftyConst());// +100
         bindRuleSet(d, "dep_pred_known_2b", inftyConst());
-        bindRuleSet(d, "dep_pred_known_3", inftyConst());//add(noDoubleMinus,longConst(-500)));//-500
-        bindRuleSet(d, "saturate_dep_locset_relations_def", inftyConst());//add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 1000), longConst(300)));
+        bindRuleSet(d, "dep_pred_known_3", inftyConst());// add(noDoubleMinus,longConst(-500)));//-500
+        bindRuleSet(d, "saturate_dep_locset_relations_def", inftyConst());// add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,
+                                                                          // ScaleFeature.createScaled(depth,
+                                                                          // 1000),
+                                                                          // longConst(300)));
 
         bindRuleSet(d, "relaxedAccumulation", inftyConst());
 

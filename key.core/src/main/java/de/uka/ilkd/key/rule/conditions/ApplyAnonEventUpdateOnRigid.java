@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.logic.SyntaxElement;
 
 public final class ApplyAnonEventUpdateOnRigid implements VariableCondition {
@@ -36,8 +37,9 @@ public final class ApplyAnonEventUpdateOnRigid implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate, MatchConditions mc,
-                                 Services services) {
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
 
         Term uInst = null;

@@ -84,8 +84,8 @@ public class StrictEqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeatu
                 // this test should be improved
                 if (!it0.next().getConstrainedFormula().formula()
                         .equalsModProperty(
-                    it1.next().getConstrainedFormula().formula(),
-                                ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY))
+                            it1.next().getConstrainedFormula().formula(),
+                            ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY))
                     return false;
             }
         }
@@ -104,7 +104,8 @@ public class StrictEqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeatu
             PosInOccurrence newPio, PosInOccurrence oldPio) {
         final Term newFocus = newPio.subTerm();
         final Term oldFocus = oldPio.subTerm();
-        if (!newFocus.equalsModProperty(oldFocus, ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY)) {
+        if (!newFocus.equalsModProperty(oldFocus,
+            ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY)) {
             return false;
         }
 

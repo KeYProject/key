@@ -116,7 +116,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * Label attached to location sets if they are non-empty (used by stategies to avoid looping) .
      */
     public static final TermLabel LOCATION_SET_NON_EMPTY =
-            new ParameterlessTermLabel(LOCATION_SET_NON_EMPTY_NAME);
+        new ParameterlessTermLabel(LOCATION_SET_NON_EMPTY_NAME);
 
     /**
      * The unique name of this label. This is the basename and does not include the parameters

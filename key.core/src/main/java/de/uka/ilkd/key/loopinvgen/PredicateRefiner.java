@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
+
+import java.util.HashMap;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -12,10 +18,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import org.key_project.util.collection.Pair;
 
-import java.util.HashMap;
-import java.util.Set;
+import org.key_project.util.collection.Pair;
 
 public abstract class PredicateRefiner {
     protected final Services services;
@@ -42,8 +46,9 @@ public abstract class PredicateRefiner {
     public abstract Pair<Set<Term>, Set<Term>> refine();
 
     public Sequent filter(Sequent sequent) {
-        return filter(sequent,services);
+        return filter(sequent, services);
     }
+
     public static Sequent filter(Sequent originalSequent, Services services) {
         Sequent sequent = Sequent.EMPTY_SEQUENT;
         DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
@@ -51,7 +56,7 @@ public abstract class PredicateRefiner {
         JFunction numberSymbol = integerLDT.getNumberSymbol();
 
         HashMap<Operator, HashMap<Term, Term>> labels = new HashMap<>();
-        for (SequentFormula sf:originalSequent.antecedent()) {
+        for (SequentFormula sf : originalSequent.antecedent()) {
             Operator op = sf.formula().op();
             if (depLDT.isHistoryPredicate(op)) {
                 HashMap<Term, Term> loc2label = labels.get(op);
@@ -69,7 +74,8 @@ public abstract class PredicateRefiner {
                         Term minimalLabel = currentLabel;
                         Integer inMap = Integer.parseInt(integerLDT.toNumberString(label.sub(0)));
                         if (currentLabel.op() == numberSymbol) {
-                            Integer current = Integer.parseInt(integerLDT.toNumberString(currentLabel.sub(0)));
+                            Integer current =
+                                Integer.parseInt(integerLDT.toNumberString(currentLabel.sub(0)));
                             if (inMap.compareTo(current) < 0) {
                                 minimalLabel = label;
                             }
@@ -80,7 +86,8 @@ public abstract class PredicateRefiner {
                     } else {
                         final Term currentLabel = sf.formula().sub(1);
                         if (currentLabel.op() == numberSymbol) {
-                            Integer current = Integer.parseInt(integerLDT.toNumberString(currentLabel.sub(0)));
+                            Integer current =
+                                Integer.parseInt(integerLDT.toNumberString(currentLabel.sub(0)));
                             if (current == 0) {
                                 loc2label.put(loc, currentLabel);
                             }
@@ -95,7 +102,7 @@ public abstract class PredicateRefiner {
             boolean doNotAdd = false;
             Operator sfOp = sequentFormula.formula().op();
             if (depLDT.isHistoryPredicate(sfOp)) {
-                for (Operator op: strongestOp(sfOp,depLDT)) {
+                for (Operator op : strongestOp(sfOp, depLDT)) {
                     if (labels.containsKey(op)) {
                         HashMap<Term, Term> loc2label = labels.get(op);
                         Term minLabel = loc2label.get(sequentFormula.formula().sub(0));
@@ -106,7 +113,7 @@ public abstract class PredicateRefiner {
                             if (minLabel.op() != numberSymbol) {
                                 continue;
                             } else if (!minLabel.equalsModProperty(sequentFormula.formula().sub(1),
-                                    RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
+                                RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                                 doNotAdd = true;
                                 break;
                             } else {
@@ -119,14 +126,15 @@ public abstract class PredicateRefiner {
                         } else {
                             doNotAdd = false;
                         }
-//                    if (minLabel == null ||
-//                            (minLabel.op() != numberSymbol || minLabel.equalsModRenaming(sequentFormula.formula().sub(1)))) {
-//                        //sequent = sequent.addFormula(sequentFormula, true, false).sequent();
-//                        doNotAdd = (sfOp != op);
-//                        break;
-//                    }
-//
-//                    doNotAdd = true;
+                        // if (minLabel == null ||
+                        // (minLabel.op() != numberSymbol ||
+                        // minLabel.equalsModRenaming(sequentFormula.formula().sub(1)))) {
+                        // //sequent = sequent.addFormula(sequentFormula, true, false).sequent();
+                        // doNotAdd = (sfOp != op);
+                        // break;
+                        // }
+                        //
+                        // doNotAdd = true;
                     }
                 }
             }
@@ -134,76 +142,80 @@ public abstract class PredicateRefiner {
                 sequent = sequent.addFormula(sequentFormula, true, false).sequent();
 
             } else {
-//                System.out.println("Discarding " + ProofSaver.printAnything(sequentFormula.formula(), null));
+                // System.out.println("Discarding " +
+                // ProofSaver.printAnything(sequentFormula.formula(), null));
             }
         }
 
         for (SequentFormula sequentFormula : originalSequent.succedent()) {
-//            System.out.println("sequentFormula: " + sequentFormula);
+            // System.out.println("sequentFormula: " + sequentFormula);
             if (!sequentFormula.formula().containsJavaBlockRecursive()) {
                 sequent = sequent.addFormula(sequentFormula, false, false).sequent();
-//                System.out.println("added");
+                // System.out.println("added");
             }
         }
-//        System.out.println("MMMMMM Sequent: " +
-//                ProofSaver.printAnything(sequent, null));
+        // System.out.println("MMMMMM Sequent: " +
+        // ProofSaver.printAnything(sequent, null));
         return sequent;
     }
 
     private static Operator[] strongestOp(Operator op, DependenciesLDT ldt) {
         if (op == ldt.getNoRaWAtHistory() || op == ldt.getNoWaRAtHistory()) {
             return new Operator[] { ldt.getNoRAtHistory(), ldt.getNoWAtHistory(), op };
-        } else if (op == ldt.getNoWaWAtHistory()){
+        } else if (op == ldt.getNoWaWAtHistory()) {
             return new Operator[] { ldt.getNoWAtHistory(), op };
         }
-        return new Operator[] {op};
+        return new Operator[] { op };
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {
-//        System.out.println("sequentImpliesPredicate is called for: "+ ProofSaver.printAnything(pred, null));
+        // System.out.println("sequentImpliesPredicate is called for: "+
+        // ProofSaver.printAnything(pred, null));
 
-//        Sequent sequent = Sequent.EMPTY_SEQUENT;
+        // Sequent sequent = Sequent.EMPTY_SEQUENT;
 
 
 
         Sequent sideSeq =
-                filter(sequent).addFormula(new SequentFormula(pred), false, true).sequent();
+            filter(sequent).addFormula(new SequentFormula(pred), false, true).sequent();
 
 
-//        final TermBuilder tb = services.getTermBuilder();
-//        final Term antecedent =
-//                tb.and(Arrays.stream(sideSeq.antecedent().asList().toArray(new SequentFormula[0])).
-//                        map(SequentFormula::formula).collect(Collectors.toList()));
-//        final Term succedent =
-//                tb.or(Arrays.stream(sideSeq.succedent().asList().toArray(new SequentFormula[0])).
-//                        map(SequentFormula::formula).collect(Collectors.toList()));
-//        sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(tb.imp(antecedent,succedent)),
-//                false, true).sequent();
+        // final TermBuilder tb = services.getTermBuilder();
+        // final Term antecedent =
+        // tb.and(Arrays.stream(sideSeq.antecedent().asList().toArray(new SequentFormula[0])).
+        // map(SequentFormula::formula).collect(Collectors.toList()));
+        // final Term succedent =
+        // tb.or(Arrays.stream(sideSeq.succedent().asList().toArray(new SequentFormula[0])).
+        // map(SequentFormula::formula).collect(Collectors.toList()));
+        // sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new
+        // SequentFormula(tb.imp(antecedent,succedent)),
+        // false, true).sequent();
 
 
         final boolean provable = sProof.isProvable(sideSeq, 60000, services);
-           // SideProof.isProvable(sideSeq, 100000, 60000, true, services);
+        // SideProof.isProvable(sideSeq, 100000, 60000, true, services);
 
 
-//        if(!provable)
-//            System.out.println(pred+ " can't be proven in Seq: "+ sideSeq);
-//        System.out.println(provable);
+        // if(!provable)
+        // System.out.println(pred+ " can't be proven in Seq: "+ sideSeq);
+        // System.out.println(provable);
         return provable;
     }
 
     protected Sequent simplify(Sequent sequent) {
         return sequent;
-//        System.out.println("sequent " + sequent);
-//        try {
-//            ApplyStrategyInfo info =
-//                    SideProof.isProvableHelper(sequent, 1000, true, false, services);
-//            if (info.getProof().openGoals().size() != 1) {
-//                throw new ProofInputException("Illegal number of goals. Open goals: " + info.getProof().openGoals().size());
-//            }
-//            sequent = info.getProof().openGoals().head().sequent();
-//        } catch (ProofInputException e) {
-//            e.printStackTrace();
-//        }
-//        return sequent;
+        // System.out.println("sequent " + sequent);
+        // try {
+        // ApplyStrategyInfo info =
+        // SideProof.isProvableHelper(sequent, 1000, true, false, services);
+        // if (info.getProof().openGoals().size() != 1) {
+        // throw new ProofInputException("Illegal number of goals. Open goals: " +
+        // info.getProof().openGoals().size());
+        // }
+        // sequent = info.getProof().openGoals().head().sequent();
+        // } catch (ProofInputException e) {
+        // e.printStackTrace();
+        // }
+        // return sequent;
     }
 }

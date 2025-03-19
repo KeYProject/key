@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen.analyzer;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -7,9 +13,6 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class ArrayCounter extends JavaASTVisitor {
 
     private final Set<ProgramVariable> arrays = new HashSet<ProgramVariable>();
@@ -17,7 +20,7 @@ public class ArrayCounter extends JavaASTVisitor {
     /**
      * create the JavaASTVisitor
      *
-     * @param root     the ProgramElement where to begin
+     * @param root the ProgramElement where to begin
      * @param services the Services object
      */
     public ArrayCounter(ProgramElement root, Services services) {

@@ -7,10 +7,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
 
 public class OnlyInverseEventUpdates extends VariableConditionAdapter {
 

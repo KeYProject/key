@@ -28,7 +28,7 @@ public class IsInRangeCustom extends IsInRangeProvable {
 
     @Override
     protected Term createConsequence(RuleApp app,
-                                     PosInOccurrence pos, Goal goal, MutableState mState) {
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         final TermBuilder tb = goal.proof().getServices().getTermBuilder();
         Term t_left = left.toTerm(app, pos, goal, mState);
         Term t_right = right.toTerm(app, pos, goal, mState);

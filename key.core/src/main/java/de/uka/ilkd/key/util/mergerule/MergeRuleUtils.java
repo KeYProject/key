@@ -336,7 +336,7 @@ public class MergeRuleUtils {
      * Returns all event updates of a parallel update.
      *
      * @param u
-     *            Parallel update to get elementary updates from.
+     *        Parallel update to get elementary updates from.
      * @return Elementary updates of the supplied parallel update.
      */
     public static LinkedList<Term> getEventUpdates(Term u) {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
 
 import de.uka.ilkd.key.java.*;
@@ -10,9 +13,10 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
 import org.key_project.logic.Name;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 public class NestedLoopUsecaseRule implements BuiltInRule {
 
@@ -21,7 +25,7 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
-                                     RuleApp ruleApp) throws RuleAbortException {
+            RuleApp ruleApp) throws RuleAbortException {
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
 
@@ -30,7 +34,8 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
         LoopSpecification lis = services.getSpecificationRepository().getLoopSpec(innerLoop);
 
         NestedLoopUsecaseRuleImp worker = new NestedLoopUsecaseRuleImp(newGoal);
-        worker.nestedLoopUsecase(newGoal, ruleApp.posInOccurrence(), lis, expr2term(services, innerLoop.getGuardExpression()));
+        worker.nestedLoopUsecase(newGoal, ruleApp.posInOccurrence(), lis,
+            expr2term(services, innerLoop.getGuardExpression()));
 
         return newGoals;
     }
@@ -38,16 +43,20 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
     protected Term expr2term(Services services, Expression expr) {
         return services.getTypeConverter().convertToLogicElement(expr);
     }
+
     protected Term skipUpdates(Term formula) {
-        return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula) : formula;
+        return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula)
+                : formula;
     }
+
     private LoopStatement extractInnerLoop(Term f) {
-        LoopStatement innerLoop =null;
+        LoopStatement innerLoop = null;
         if (f.op() instanceof Modality mod && mod.kind() == Modality.JavaModalityKind.DIA) {
             ProgramElement pe = f.javaBlock().program();
             Statement activePE;
             if (pe instanceof ProgramPrefix) {
-                activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                activePE =
+                    (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
             } else {
                 activePE = (Statement) pe.getFirstElement();
             }
@@ -59,17 +68,19 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
     }
 
     private LoopStatement extractOuterLoop(Term f) {
-        LoopStatement outerLoop =null;
+        LoopStatement outerLoop = null;
         if (f.op() instanceof Modality mod && mod.kind() == Modality.JavaModalityKind.DIA) {
             ProgramElement pe = f.javaBlock().program();
             Statement activePE;
             if (pe instanceof ProgramPrefix) {
-                activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                activePE =
+                    (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
             } else {
                 activePE = (Statement) pe.getFirstElement();
             }
             if (activePE instanceof While) {
-                outerLoop = (LoopStatement)((ProgramPrefix) pe).getLastPrefixElement().getNextPrefixElement();
+                outerLoop = (LoopStatement) ((ProgramPrefix) pe).getLastPrefixElement()
+                        .getNextPrefixElement();
             }
         }
         System.out.println("Outer Loop: " + outerLoop);
@@ -113,7 +124,7 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
     static Pair<Term, Term> applyUpdates(Term focusTerm, TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
             return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
-                    UpdateApplication.getTarget(focusTerm));
+                UpdateApplication.getTarget(focusTerm));
         } else {
             return new Pair<Term, Term>(services.getTermBuilder().skip(), focusTerm);
         }
@@ -124,6 +135,7 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
         // focus (below update) must be modality term
         return progPost.op() instanceof Modality;
     }
+
     @Override
     public boolean isApplicableOnSubTerms() {
         return false;
@@ -131,7 +143,7 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
-                                     TermServices services) {
+            TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

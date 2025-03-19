@@ -59,7 +59,7 @@ public final class LocSetLDT extends LDT {
         allFields = addFunction(services, "allFields");
         allObjects = addFunction(services, "allObjects");
         arrayRange = addFunction(services, "arrayRange");
-        matrixRange      = addFunction(services, "matrixRange");
+        matrixRange = addFunction(services, "matrixRange");
         wellFormedMatrix = addFunction(services, "wellFormedMatrix");
         freshLocs = addFunction(services, "freshLocs");
         elementOf = addFunction(services, "elementOf");

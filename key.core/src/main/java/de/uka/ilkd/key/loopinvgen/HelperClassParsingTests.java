@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -34,7 +37,8 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class HelperClassParsingTests {
-    private static final Profile profile = JavaProfile.getDefaultProfile(); //{
+    private static final Profile profile = JavaProfile.getDefaultProfile(); // {
+
     public HelperClassParsingTests() {
 
     }
@@ -48,28 +52,27 @@ public class HelperClassParsingTests {
         ProofAggregate result = null;
 
         try {
-            KeYUserProblemFile po
-                    = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
+            KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
             pi = new ProblemInitializer(profile);
 
             result = pi.startProver(po, po);
 
         } catch (Exception e) {
-//            System.err.println("Exception occurred while parsing "+file+"\n");
+            // System.err.println("Exception occurred while parsing "+file+"\n");
             e.printStackTrace();
             System.exit(-1);
         }
         return result;
     }
 
-    public ProofAggregate parseThrowException(File file) throws ProofInputException{
+    public ProofAggregate parseThrowException(File file) throws ProofInputException {
         return parseThrowException(file, profile);
     }
 
 
-    public ProofAggregate parseThrowException(File file, Profile profile) throws ProofInputException{
-        KeYUserProblemFile po
-                = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
+    public ProofAggregate parseThrowException(File file, Profile profile)
+            throws ProofInputException {
+        KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
     }
@@ -80,16 +83,18 @@ public class HelperClassParsingTests {
 
     /**
      * Checks if one step simplification is enabled in the given {@link Proof}.
-     * @param proof The {@link Proof} to read from or {@code null} to return the general settings value.
+     *
+     * @param proof The {@link Proof} to read from or {@code null} to return the general settings
+     *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
     public static boolean isOneStepSimplificationEnabled(Proof proof) {
         StrategyProperties props;
         if (proof != null && !proof.isDisposed()) {
             props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-        }
-        else {
-            props = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
+        } else {
+            props =
+                ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
         }
 
         return props.get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
@@ -100,13 +105,13 @@ public class HelperClassParsingTests {
      * {@link Proof}.
      *
      * @param proof
-     *            The optional {@link Proof}.
+     *        The optional {@link Proof}.
      * @param enabled
-     *            {@code true} use one step simplification, {@code false} do not
-     *            use one step simplification.
+     *        {@code true} use one step simplification, {@code false} do not
+     *        use one step simplification.
      */
     public static void setOneStepSimplificationEnabled(Proof proof,
-                                                       boolean enabled) {
+            boolean enabled) {
         final String newVal = enabled ? StrategyProperties.OSS_ON
                 : StrategyProperties.OSS_OFF;
 
