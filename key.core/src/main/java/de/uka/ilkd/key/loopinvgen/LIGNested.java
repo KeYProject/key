@@ -99,7 +99,7 @@ public class LIGNested extends AbstractLoopInvariantGenerator {
             for (Goal g : goalsAfterShiftUpdate) {
                 for (final SequentFormula sf : g.sequent().succedent()) {
                     final Term formula = tb.goBelowUpdates(sf.formula());
-                    if (formula.op() instanceof Modality mod && mod.kind() == JavaModalityKind.DIA) {
+                    if (formula.op() instanceof Modality mod && mod.kind() == Modality.JavaModalityKind.DIA) {
                         ProgramElement pe = formula.javaBlock().program();
                         Statement activePE;
                         if (pe instanceof ProgramPrefix) {

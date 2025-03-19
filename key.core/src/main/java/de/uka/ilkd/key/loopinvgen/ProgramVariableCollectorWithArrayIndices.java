@@ -142,7 +142,7 @@ public class ProgramVariableCollectorWithArrayIndices extends JavaASTVisitor {
 
 		// modifies
 		for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-			Term mod = x.getModifies(heap, selfTerm, atPres, services);
+			Term mod = x.getModifiable(heap, selfTerm, atPres, services);
 			if (mod != null) {
 				mod.execPostOrder(tpvc);
 			}
@@ -191,7 +191,7 @@ public class ProgramVariableCollectorWithArrayIndices extends JavaASTVisitor {
 			}
 		}
 		for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-			Term modifiesClause = x.getModifiesClause(heap, services);
+			Term modifiesClause = x.getModifiableClause(heap, services);
 			if (modifiesClause != null) {
 				modifiesClause.execPostOrder(collector);
 			}
@@ -227,7 +227,7 @@ public class ProgramVariableCollectorWithArrayIndices extends JavaASTVisitor {
 			}
 		}
 		for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-			Term modifiesClause = x.getModifiesClause(heap, services);
+			Term modifiesClause = x.getModifiableClause(heap, services);
 			if (modifiesClause != null) {
 				modifiesClause.execPostOrder(collector);
 			}

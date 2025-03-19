@@ -5,10 +5,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -87,7 +89,7 @@ public class WhileStatementAnalyzer {
 
     public static Term determineInitialIndex(Sequent sequent, Term index, Services services) {
 
-        Function init = getNewInitPredicate(services);
+        JFunction init = getNewInitPredicate(services);
 
         var tb = services.getTermBuilder();
         var initFormula = tb.func(
@@ -113,22 +115,22 @@ public class WhileStatementAnalyzer {
         }
     }
 
-    private static @NotNull Function getNewInitPredicate(Services services) {
+    private static @NotNull JFunction getNewInitPredicate(Services services) {
         boolean unusedFound = false;
         String nameInit = "init";
         for (int i = 0; !unusedFound; i++) {
             try {
-                Function init = new Function(new Name(nameInit), Sort.FORMULA, services.getTypeConverter().getIntegerLDT().targetSort());
+                JFunction init = new JFunction(new Name(nameInit), JavaDLTheory.FORMULA, services.getTypeConverter().getIntegerLDT().targetSort());
                 services.getNamespaces().functions().addSafely(init);
                 unusedFound = true;
             } catch (RuntimeException e) {
                 nameInit += i;
             }
         }
-        return new Function(new Name(nameInit), Sort.FORMULA, services.getTypeConverter().getIntegerLDT().targetSort());
+        return new JFunction(new Name(nameInit), JavaDLTheory.FORMULA, services.getTypeConverter().getIntegerLDT().targetSort());
     }
 
-    private static Term determineLowerBound(Sequent sequent, Function init) {
+    private static Term determineLowerBound(Sequent sequent, JFunction init) {
         for (SequentFormula sF : sequent) {
             Term form = sF.formula();
             if (form.op() == init) {

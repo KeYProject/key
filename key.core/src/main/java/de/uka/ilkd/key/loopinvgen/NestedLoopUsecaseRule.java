@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import org.key_project.logic.Name;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.collection.ImmutableList;
 
@@ -42,7 +43,7 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
     }
     private LoopStatement extractInnerLoop(Term f) {
         LoopStatement innerLoop =null;
-        if (f.op() instanceof Modality mod && mod.kind() == JavaModalityKind.DIA) {
+        if (f.op() instanceof Modality mod && mod.kind() == Modality.JavaModalityKind.DIA) {
             ProgramElement pe = f.javaBlock().program();
             Statement activePE;
             if (pe instanceof ProgramPrefix) {
@@ -59,7 +60,7 @@ public class NestedLoopUsecaseRule implements BuiltInRule {
 
     private LoopStatement extractOuterLoop(Term f) {
         LoopStatement outerLoop =null;
-        if (f.op() instanceof Modality mod && mod.kind() == JavaModalityKind.DIA) {
+        if (f.op() instanceof Modality mod && mod.kind() == Modality.JavaModalityKind.DIA) {
             ProgramElement pe = f.javaBlock().program();
             Statement activePE;
             if (pe instanceof ProgramPrefix) {

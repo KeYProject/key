@@ -71,8 +71,8 @@ public class ShiftUpdateImplNew {
 				shiftElementaryUpdate(update, renameUpdate);
 			} else if (update.op() instanceof EventUpdate) {
 				Operator kind = update.sub(0).op();
-				final Function readMarker = depLDT.getReadMarker();
-				final Function writeMarker = depLDT.getWriteMarker();
+				final JFunction readMarker = depLDT.getReadMarker();
+				final JFunction writeMarker = depLDT.getWriteMarker();
 				counter = kind == readMarker || kind == writeMarker ? tb.add(counter, tb.one())
 						: tb.ife(
 						tb.or(tb.equals(update.sub(0), tb.func(readMarker)),
@@ -179,7 +179,7 @@ public class ShiftUpdateImplNew {
 	 */
 	private void shiftElementaryUpdate(Term update, Term renamingUpdate) {
 		ElementaryUpdate eU = (ElementaryUpdate) update.op();// update: a:=t
-		Term target = tb.var(eU.lhs()); // a
+		Term target = tb.var((ProgramVariable) eU.lhs()); // a
 		// ********** Defining upd which is not an update but an assignment:
 		// a={u'}{u}a
 		Term u_on_a = tb.apply(update, target);

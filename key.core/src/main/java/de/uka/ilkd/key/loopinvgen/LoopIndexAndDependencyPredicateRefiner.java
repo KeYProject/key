@@ -3,6 +3,7 @@ package de.uka.ilkd.key.loopinvgen;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -144,7 +145,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
             if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR()) ||
                     dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
 
-                if (dp1.sub(0).equalsModRenaming(dp2.sub(0))) {
+                if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     return true;
                 }
 
@@ -156,7 +157,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                     dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())
                     || dp1.op().equals(depLDT.getRelaxedNoWaW())) {
 
-                if (dp1.sub(0).equalsModRenaming(dp2.sub(0))) {
+                if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     return true;
                 }
 
@@ -165,7 +166,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
             }
         } else if (dp2.op().equals(depLDT.getRelaxedNoR())) {
             if (dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
-                if (dp1.sub(0).equalsModRenaming(dp2.sub(0))) {
+                if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     return true;
                 }
 
@@ -175,7 +176,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
             if (dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())
                     || dp1.op().equals(depLDT.getRelaxedNoWaW())) {
 
-                if (dp1.sub(0).equalsModRenaming(dp2.sub(0))) {
+                if (dp1.sub(0).equalsModProperty(dp2.sub(0), RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                     return true;
                 }
 
@@ -284,7 +285,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                 }
 
                 if (depLDT.isDependencePredicate(unProven.op())) {
-                    final Function op = (Function) unProven.op();
+                    final JFunction op = (JFunction) unProven.op();
                     if (op == depLDT.getRelaxedNoRaW() || op == depLDT.getRelaxedNoWaR()) {
                         result.add(tb.func(op, subLoc, tb.empty(), tb.empty(), tb.empty()));
                         result.add(tb.func(op, lowSingleton, tb.empty(), tb.empty(), tb.empty()));
@@ -341,7 +342,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
                 if (depLDT.isDependencePredicate(unProven.op())) {
 
-                    final Function op = (Function) unProven.op();
+                    final JFunction op = (JFunction) unProven.op();
 
                     resultArr.add(buildPredicate(unProven, lowArr, op));
                     resultArr.add(buildPredicate(unProven, highArr, op));
@@ -366,7 +367,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
                 if (depLDT.isDependencePredicate(unProven.op())) {
 
-                    final Function op = (Function) unProven.op();
+                    final JFunction op = (JFunction) unProven.op();
 
                     resultArr.add(buildPredicate(unProven, lowArr, op));
                     resultArr.add(buildPredicate(unProven, highArr, op));
@@ -433,7 +434,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                 }
 //				if (lowToI != null && iToHigh != null) {
                 if (depLDT.isDependencePredicate(pred.op())) {
-                    final Function dependencyOp = (Function) pred.op();
+                    final JFunction dependencyOp = (JFunction) pred.op();
 
                     resultArr.add(buildPredicate(pred, lowToI, dependencyOp));
                     resultArr = resultArr;
@@ -517,7 +518,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
                                 boolean innerCond = cacheProofResult(inners, cacheLEQ, i, j);
                                 if (outerCond && innerCond) {
                                     Term right = tb.matrixRange(heap, arr, outers[k], outers[l], inners[i], inners[j]);
-                                    if (!locSet.equalsModRenaming(right)) {
+                                    if (!locSet.equalsModProperty(right, RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                                         matrixes.add(right);
                                     }
                                 }
@@ -529,7 +530,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 //			System.out.println("PRED.OP   " + pred.op());
             if (depLDT.isDependencePredicate(pred.op())) {
-                final Function dependencyOp = (Function) pred.op();
+                final JFunction dependencyOp = (JFunction) pred.op();
                 for (Term mtr : matrixes) {
                     resultArr.add(buildPredicate(pred, mtr, dependencyOp));
                 }
@@ -627,7 +628,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
         return result;
     }
 
-    private Term buildPredicate(Term unProven, Term locSet, Function op) {
+    private Term buildPredicate(Term unProven, Term locSet, JFunction op) {
         final Term builtPred;
         assert locSet != null;
 //		if (locSet !=tb.empty()){

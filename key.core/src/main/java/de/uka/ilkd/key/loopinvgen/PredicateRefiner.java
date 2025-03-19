@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import org.key_project.util.collection.Pair;
@@ -47,7 +48,7 @@ public abstract class PredicateRefiner {
         Sequent sequent = Sequent.EMPTY_SEQUENT;
         DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        Function numberSymbol = integerLDT.getNumberSymbol();
+        JFunction numberSymbol = integerLDT.getNumberSymbol();
 
         HashMap<Operator, HashMap<Term, Term>> labels = new HashMap<>();
         for (SequentFormula sf:originalSequent.antecedent()) {
@@ -104,7 +105,8 @@ public abstract class PredicateRefiner {
                         } else if (minLabel != null) {
                             if (minLabel.op() != numberSymbol) {
                                 continue;
-                            } else if (!minLabel.equalsModRenaming(sequentFormula.formula().sub(1))) {
+                            } else if (!minLabel.equalsModProperty(sequentFormula.formula().sub(1),
+                                    RenamingTermProperty.RENAMING_TERM_PROPERTY)) {
                                 doNotAdd = true;
                                 break;
                             } else {

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.loopinvgen;
 
 import java.util.HashSet;
 
+import de.uka.ilkd.key.logic.op.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -14,13 +15,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.EventUpdate;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 
 public class RelaxedShiftUpdateImpl {
@@ -83,8 +77,8 @@ public class RelaxedShiftUpdateImpl {
 				shiftElementaryUpdate(update, renameUpdate);
 			} else if (update.op() instanceof EventUpdate) {
 				Operator kind = update.sub(0).op();
-//				final Function readMarker = depLDT.getReadMarker();
-//				final Function writeMarker = depLDT.getWriteMarker();
+//				final JFunction readMarker = depLDT.getReadMarker();
+//				final JFunction writeMarker = depLDT.getWriteMarker();
 //				counter = kind == readMarker || kind == writeMarker ? tb.add(counter, tb.one())
 //						: tb.ife(
 //								tb.or(tb.equals(update.sub(0), tb.func(readMarker)),
@@ -136,7 +130,7 @@ public class RelaxedShiftUpdateImpl {
 		for (UpdateableOperator lhs : updatedLocations) {
 			// Defining a fresh constant symbol a'
 			final Name freshConsSymb = new Name(tb.newName("f_" + lhs.name().toString(), services.getNamespaces()));
-			final Function freshConsFunc = new Function(freshConsSymb, lhs.sort(), true);
+			final JFunction freshConsFunc = new JFunction(freshConsSymb, lhs.sort(), true);
 			services.getNamespaces().functions().addSafely(freshConsFunc);
 			final Term freshCons = tb.func(freshConsFunc);
 //			System.out.println("a' is: " + freshCons.toString());
@@ -176,7 +170,7 @@ public class RelaxedShiftUpdateImpl {
 	 */
 	private void shiftElementaryUpdate(Term update, Term renamingUpdate) {
 		ElementaryUpdate eU = (ElementaryUpdate) update.op();// update: a:=t
-		Term target = tb.var(eU.lhs()); // a
+		Term target = tb.var((ProgramVariable) eU.lhs()); // a
 		// ********** Defining upd which is not an update but an assignment:
 		// a={u'}{u}a
 		Term u_on_a = tb.apply(update, target);

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import org.key_project.logic.Name;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.collection.ImmutableList;
 

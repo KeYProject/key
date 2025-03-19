@@ -188,7 +188,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner2 extends PredicateRefi
 					}
 
 					if (depLDT.isDependencePredicate(unProven.op())) {
-						final Function op = (Function) unProven.op();
+						final JFunction op = (JFunction) unProven.op();
 						result.add(tb.func(op, subLoc));
 						result.add(tb.func(op, lowSingleton));
 						result.add(tb.func(op, highSingleton));
@@ -230,7 +230,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner2 extends PredicateRefi
 					}
 
 					if (depLDT.isDependencePredicate(unProven.op())) {
-						final Function op = (Function) unProven.op();
+						final JFunction op = (JFunction) unProven.op();
 						result.add(tb.func(op, subLoc));
 						result.add(tb.func(op, lowSingleton));
 						result.add(tb.func(op, highSingleton));
@@ -288,7 +288,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner2 extends PredicateRefi
 				}
 
 				if (depLDT.isDependencePredicate(unProven.op())) {
-					final Function op = (Function) unProven.op();
+					final JFunction op = (JFunction) unProven.op();
 					result.add(tb.func(op, subLoc));
 					result.add(tb.func(op, lowArr));
 					result.add(tb.func(op, highArr));
@@ -419,7 +419,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner2 extends PredicateRefi
 				}
 				if (lowToInner != null && innerToHigh != null) {
 					if (depLDT.isDependencePredicate(pred.op())) {
-						final Function dependencyOp = (Function) pred.op();
+						final JFunction dependencyOp = (JFunction) pred.op();
 						result.add(tb.func(dependencyOp, lowToInner));
 						result.add(tb.func(dependencyOp, innerToHigh));
 					}
@@ -451,7 +451,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner2 extends PredicateRefi
 				}
 				if (lowToOuter != null && outerToHigh != null) {
 					if (depLDT.isDependencePredicate(pred.op())) {
-						final Function dependencyOp = (Function) pred.op();
+						final JFunction dependencyOp = (JFunction) pred.op();
 						result.add(tb.func(dependencyOp, lowToOuter));
 						result.add(tb.func(dependencyOp, outerToHigh));
 					}
@@ -516,7 +516,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner2 extends PredicateRefi
 			}
 			if (lowToInner != null && innerToHigh != null) {
 				if (depLDT.isDependencePredicate(pred.op())) {
-					final Function dependencyOp = (Function) pred.op();
+					final JFunction dependencyOp = (JFunction) pred.op();
 					result.add(tb.func(dependencyOp, lowToInner));
 					result.add(tb.func(dependencyOp, innerToHigh));
 				}
@@ -539,7 +539,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner2 extends PredicateRefi
 			}
 			if (lowToOuter != null && outerToHigh != null) {
 				if (depLDT.isDependencePredicate(pred.op())) {
-					final Function dependencyOp = (Function) pred.op();
+					final JFunction dependencyOp = (JFunction) pred.op();
 					result.add(tb.func(dependencyOp, lowToOuter));
 					result.add(tb.func(dependencyOp, outerToHigh));
 				}

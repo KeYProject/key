@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -132,7 +133,7 @@ public class NestedLIGNewRelaxed extends AbstractLoopInvariantGenerator {
 //			System.out.println("Before refinement: " + currentGoal.sequent());
 
             LoopStatement ls = ruleApp.getLoopStatementFromGoal(currentGoal);
-            if (!(ls.equalsModRenaming(outerLoop, new NameAbstractionTable()))) {
+            if (!(ls.equalsModProperty(outerLoop, RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY, new NameAbstractionTable()))) {
                 System.out.println("Inner Loop detected");
                 Sequent innerSeq = modifySeq(currentGoal, ls);
 

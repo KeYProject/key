@@ -308,7 +308,7 @@ public class SideProof {
         return this.services.getProof().openGoals();
     }
 
-    private boolean prove(Function pred, Term ts1, Term ts2, Predicate<SequentFormula> filter) {
+    private boolean prove(JFunction pred, Term ts1, Term ts2, Predicate<SequentFormula> filter) {
         Term fml = tb.func(pred, ts1, ts2);
         Sequent sideSeq = prepareSideProof(ts1, ts2, filter);
         sideSeq = sideSeq.addFormula(new SequentFormula(fml), false, true).sequent();
