@@ -6,12 +6,12 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
@@ -30,11 +30,24 @@ public class LoopSpecificationImpl implements LoopSpecification {
 
     private final LoopStatement loop;
     private final Term loopInv;
+    /**
+     * The original invariant terms for each heap.
+     */
+    private final Map<LocationVariable, Term> originalInvariants;
 
-    public LoopSpecificationImpl(LoopStatement loop, Term loopInv){
+    public LoopSpecificationImpl(LoopStatement loop, Term loopInv, LocationVariable heap) {
         this.loop = loop;
         this.loopInv = loopInv;
+        originalInvariants = new HashMap<>();
+        originalInvariants.put(heap, loopInv);
     }
+
+    public LoopSpecificationImpl(LoopStatement loop, Term loopInv) {
+        this.loop = loop;
+        this.loopInv = loopInv;
+        originalInvariants = null;
+    }
+
     @Override
     public LoopSpecification map(UnaryOperator<Term> op, Services services) {
         return null;
@@ -72,12 +85,14 @@ public class LoopSpecificationImpl implements LoopSpecification {
 
     @Override
     public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
-        return null;
+        Function func = services.getTypeConverter().getLocSetLDT().getAllLocs();
+        return services.getTermBuilder().func(func);
     }
 
     @Override
     public Term getModifies(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
-        return null;
+        Function func = services.getTypeConverter().getLocSetLDT().getAllLocs();
+        return services.getTermBuilder().func(func);
     }
 
     @Override
@@ -122,7 +137,7 @@ public class LoopSpecificationImpl implements LoopSpecification {
 
     @Override
     public Map<LocationVariable, Term> getInternalInvariants() {
-        return new HashMap<>();
+        return originalInvariants;
     }
 
     @Override

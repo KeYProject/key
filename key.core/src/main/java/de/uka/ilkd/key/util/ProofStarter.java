@@ -31,11 +31,11 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * This class encapsulates the registration of a proof for a given problem. It then starts a proof
- * attempt.
- *
- * After the proof attempt stops (successfully or not) the side proof is by default unregistered,
- * but can be accessed via this class.
+ * This class encapsulates the registration of a proof for a given problem.
+ * It then starts a proof attempt.
+ * <p>
+ * After the proof attempt stops (successfully or not) the side proof is by default
+ * unregistered, but can be accessed via this class.
  *
  * @author Richard Bubel
  */
@@ -82,8 +82,12 @@ public class ProofStarter {
 
             final InitConfig initConfig = env.getInitConfigForEnvironment().deepCopy();
 
-            return new Proof(proofName, seq, EMPTY_PROOF_HEADER, initConfig.createTacletIndex(),
-                initConfig.createBuiltInRuleIndex(), initConfig);
+            return new Proof(proofName,
+                seq,
+                EMPTY_PROOF_HEADER,
+                initConfig.createTacletIndex(),
+                initConfig.createBuiltInRuleIndex(),
+                initConfig);
         }
 
 

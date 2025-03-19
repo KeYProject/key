@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.Serial;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -56,7 +57,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
- * {@link CurrentGoalView}, i.e. when the user clicks on the sequent.
+ * {@link CurrentGoalView}.
  * <p>
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
@@ -218,6 +219,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             }
         }
     }
+
 
     private void addMacroMenu() {
         ProofMacroMenu menu = new ProofMacroMenu(mediator, getPos().getPosInOccurrence());
