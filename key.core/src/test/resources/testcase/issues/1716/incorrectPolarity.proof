@@ -1,0 +1,12 @@
+\profile "Java Profile";
+
+\problem {
+2 + 2 = 5
+}
+
+\proof {
+(branch "dummy ID"
+(rule "close" (formula "1") (ifseqformula "1"))
+)
+}
+

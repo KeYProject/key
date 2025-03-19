@@ -1,0 +1,551 @@
+import groovy.transform.Memoized
+
+plugins {
+    //Support for IntelliJ IDEA
+    //https://docs.gradle.org/current/userguide/idea_plugin.html
+    id("idea")
+
+    //Support for Eclipse
+    //https://docs.gradle.org/current/userguide/eclipse_plugin.html
+    id("eclipse")  //support for Eclipse
+
+    //Checks and adds the license header of the source files:
+    // Task: `licenseMain' and `licenseFormatMain'
+    //https://github.com/hierynomus/license-gradle-plugin
+    id "com.github.hierynomus.license-base" version "0.16.1"
+    //Generates reports on the license of used packages: Task `downloadLicenses'
+    //Some Licenses requires an entry in the credits (MIT, BSD)
+    id "com.github.hierynomus.license-report" version "0.16.1"
+
+    // Gives `gradle dependencyUpdate` to show which dependency has a newer version
+    // id "com.github.ben-manes.versions" version "0.39.0"
+
+    // Code formatting
+    id "com.diffplug.spotless" version "6.25.0"
+
+    // EISOP Checker Framework
+    id "org.checkerframework" version "0.6.41"
+}
+
+// Configure this project for use inside IntelliJ:
+idea {
+    module {
+        downloadJavadoc = false
+        downloadSources = true
+    }
+}
+
+static def getDate() {
+    return new Date().format('yyyyMMdd')
+}
+
+// The $BUILD_NUMBER is an environment variable set by Jenkins.
+def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
+
+group = "org.key-project"
+version = "2.13.0$build"
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "signing"       // GPG signing of artifacts, required by maven central
+    apply plugin: "idea"
+    apply plugin: "eclipse"
+
+    apply plugin: "com.diffplug.spotless"
+    apply plugin: "checkstyle"
+    apply plugin: "pmd"
+    apply plugin: "org.checkerframework"
+
+    group = rootProject.group
+    version = rootProject.version
+
+    java {
+        sourceCompatibility = 17
+        targetCompatibility = 17
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://git.key-project.org/api/v4/projects/35/packages/maven'
+        }
+    }
+
+    dependencies {
+        implementation("org.slf4j:slf4j-api:2.0.13")
+        implementation("org.slf4j:slf4j-api:2.0.13")
+        testImplementation("ch.qos.logback:logback-classic:1.5.6")
+
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
+        //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
+
+        compileOnly("org.jspecify:jspecify:0.3.0")
+        testCompileOnly("org.jspecify:jspecify:0.3.0")
+        def eisop_version = "3.42.0-eisop3"
+        compileOnly "io.github.eisop:checker-qual:$eisop_version"
+        compileOnly "io.github.eisop:checker-util:$eisop_version"
+        testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
+        checkerFramework "io.github.eisop:checker:$eisop_version"
+
+        testImplementation("ch.qos.logback:logback-classic:1.5.6")
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.3'
+        testImplementation project(':key.util')
+
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
+    }
+
+    tasks.withType(JavaCompile) {
+        // Setting UTF-8 as the java source encoding.
+        options.encoding = "UTF-8"
+        // Setting the release to Java 17
+        options.release = 17
+    }
+
+    tasks.withType(Javadoc) {
+        failOnError = false
+        options.addBooleanOption 'Xdoclint:none', true
+        //options.verbose()
+        options.encoding = 'UTF-8'
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+
+    tasks.withType(Test) {//Configure all tests
+        systemProperty "test-resources", "src/test/resources"
+        systemProperty "testcases", "src/test/resources/testcase"
+        systemProperty "TACLET_PROOFS", "tacletProofs"
+        systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
+        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+
+        systemProperty "key.disregardSettings", "true"
+        maxHeapSize = "4g"
+
+        forkEvery = 0 //default
+        maxParallelForks = 1 // weigl: test on master
+    }
+
+    tasks.withType(Test) {
+        useJUnitPlatform {
+            includeEngines 'junit-vintage'
+            includeEngines 'junit-jupiter'
+        }
+    }
+
+
+    test {
+        // Before we switched to JUnit 5, we used JUnit 4 with a customized discovery of test class.
+        // This discovery called AutoSuite and searched in the compiled classes. AutoSuite was
+        // necessary due to bugs caused in some execution order.
+        // AutoSuites made the test order deterministic. A last known commit to find AutoSuite (for the case),
+        // is 980294d04008f6b3798986bce218bac2753b4783.
+
+        useJUnitPlatform {
+            excludeTags "owntest", "interactive", "performance"
+        }
+
+        afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
+        beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
+
+        testLogging {
+            outputs.upToDateWhen { false }
+            showStandardStreams = true
+        }
+    }
+
+    task testFast(type: Test) {
+        group "verification"
+        useJUnitPlatform {
+            excludeTags "slow", "performance", "interactive"
+        }
+
+        testLogging {
+            // set options for log level LIFECYCLE
+            events "failed"
+            exceptionFormat "short"
+
+            // set options for log level DEBUG
+            debug {
+                events "started", "skipped", "failed"
+                exceptionFormat "full"
+            }
+
+            // remove standard output/error logging from --info builds
+            // by assigning only 'failed' and 'skipped' events
+            info.events = ["failed", "skipped"]
+        }
+    }
+
+    // The following two tasks can be used to execute main methods from the project
+    // The main class is set via "gradle -DmainClass=... execute --args ..."
+    // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
+    task execute(type: JavaExec) {
+        description 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
+        group "application"
+        mainClass.set(System.getProperty('mainClass'))
+        classpath = sourceSets.main.runtimeClasspath
+    }
+
+    task executeInTests(type: JavaExec) {
+        description 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
+        group "application"
+        mainClass.set(System.getProperty('mainClass'))
+        classpath = sourceSets.test.runtimeClasspath
+    }
+
+    // findbugs { findbugsTest.enabled = false; ignoreFailures = true }
+    pmd {
+        pmdTest.enabled = false
+        ignoreFailures = true
+        toolVersion = "6.53.0"
+        consoleOutput = false
+        rulesMinimumPriority = 5
+        ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
+    }
+
+    task pmdMainChanged(type: Pmd) {
+        // Specify all files that should be checked
+        def changedFiles = getChangedFiles()
+        source pmdMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
+        classpath = checkstyleMain.classpath
+        reports {
+            html {
+                enabled true
+                outputLocation = file("build/reports/pmd/main_diff.html")
+            }
+            xml {
+                enabled true
+                outputLocation = file("build/reports/pmd/main_diff.xml")
+            }
+        }
+    }
+
+
+    checkstyle {
+        toolVersion = "10.6.0"
+        ignoreFailures = true
+        configFile file("$rootDir/gradle/key_checks.xml")
+        showViolations = false // disable console output
+    }
+
+
+    task checkstyleMainChanged(type: Checkstyle) {
+        // Specify all files that should be checked
+        def changedFiles = getChangedFiles()
+        source checkstyleMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
+        classpath = checkstyleMain.classpath
+
+        //println(source.getFiles())
+
+        // Define the output folder of the generated reports
+        reports {
+            html {
+                enabled true
+                outputLocation = file("build/reports/checkstyle/main_diff.html")
+            }
+            xml {
+                enabled true
+                outputLocation = file("build/reports/checkstyle/main_diff.xml")
+            }
+        }
+    }
+
+
+    // tasks.withType(FindBugs) {
+    //     reports {
+    //         xml.enabled = false
+    //         html.enabled = true
+    //     }
+    // }
+    tasks.withType(Pmd) {
+        reports {
+            xml.getRequired().set(true)
+            html.getRequired().set(true)
+        }
+    }
+
+    task sourcesJar(type: Jar) {
+        description = 'Create a jar file with the sources from this project'
+        from sourceSets.main.allJava
+        archiveClassifier = 'sources'
+    }
+
+    task javadocJar(type: Jar) {
+        description = 'Create a jar file with the javadocs from this project'
+        from javadoc
+        archiveClassifier = 'javadoc'
+    }
+
+    license {//configures the license file header
+        header = file("$rootDir/gradle/header")
+
+        mapping {
+            //find styles here:
+            // http://code.mycila.com/license-maven-plugin/#supported-comment-types
+            java = "SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
+            javascript = "SLASHSTAR_STYLE"
+        }
+        mapping("key", "SLASHSTAR_STYLE")
+    }
+
+    eclipse { //configures the generated .project and .classpath files.
+        classpath {
+            file {
+                whenMerged { // This adds the exclude entry for every resource and antlr folder.
+                    //As eclipse is so stupid, that it does not distuinguish between resource and java folder correctly.
+                    entries.findAll { it.path.endsWith('src/test/antlr') }.each { it.excludes = ["**/*.java"] }
+                    entries.findAll { it.path.endsWith('/resources') }.each { it.excludes = ["**/*.java"] }
+                }
+            }
+        }
+    }
+
+    spotless {
+        // see https://github.com/diffplug/spotless/tree/main/plugin-gradle
+
+        // optional: limit format enforcement to just the files changed by this feature branch
+        // ratchetFrom 'origin/master'
+
+        format('Key') {
+            // define the files to apply `misc` to
+            //target '*.gradle', '*.md', '.gitignore'
+            target 'src/main/resources/**/*.key'
+            trimTrailingWhitespace()
+            //indentWithSpaces(4)       // this does not really work
+            endWithNewline()
+            // TODO: license headers are problematic at the moment,
+            //  see https://git.key-project.org/key/key/-/wikis/KaKeY%202022-09-30
+            //licenseHeaderFile("$rootDir/gradle/header", '\\s*\\\\\\w+')
+        }
+
+        antlr4 {
+            target 'src/*/antlr4/**/*.g4' // default value, you can change if you want
+            //licenseHeaderFile "$rootDir/gradle/header"
+        }
+
+        java {
+            //target("*.java")
+            // don't need to set target, it is inferred from java
+
+            // We ignore the build folder to avoid double checks and checks of generated code.
+            targetExclude 'build/**'
+
+            // allows us to use spotless:off / spotless:on to keep pre-formatted sections
+            toggleOffOn()
+
+            removeUnusedImports()
+            /* At the moment, we have to ensure that version 4.22 of the eclipse formatter is run, since newer versions
+             * of the formatter crash in SymbolicExecutionTreeBuilder (seems to be a but in the formatter)!
+             */
+            eclipse("4.22").configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
+            trimTrailingWhitespace()        // not sure how to set this in the xml file ...
+            //googleJavaFormat().aosp().reflowLongStrings()
+
+            // note: you can use an empty string for all the imports you didn't specify explicitly,
+            // '|' to join group without blank line, and '\\#` prefix for static imports
+            importOrder('java|javax', 'de.uka', 'org.key_project', '', '\\#')
+
+            // specific delimiter: normally just 'package', but spotless crashes for files in default package
+            // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
+            // with completely commented out code (which would probably better just be removed in future).
+            if(project.name == 'recoder') {
+                licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
+            }else {
+                licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
+            }
+        }
+    }
+
+//    checkerFramework {
+//        checkers = [
+//            "org.checkerframework.checker.nullness.NullnessChecker",
+//        ]
+//        extraJavacArgs = [
+//            "-AonlyDefs=^org\\.key_project\\.util",
+//            "-Xmaxerrs", "10000",
+//            "-Astubs=$projectDir/src/main/checkerframework",
+//            "-Werror",
+//            "-Aversion",
+//        ]
+//    }
+
+    afterEvaluate { // required so project.description is non-null as set by sub build.gradle
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    from components.java
+                    artifact sourcesJar
+                    artifact javadocJar
+                    pom {
+                        name = projects.name
+                        description = project.description
+                        url = 'https://key-project.org/'
+
+                        licenses {
+                            license {
+                                name = "GNU General Public License (GPL), Version 2"
+                                url = "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id = 'key'
+                                name = 'KeY Developers'
+                                email = 'support@key-project.org'
+                                url = "https://www.key-project.org/about/people/"
+                            }
+                        }
+                        scm {
+                            connection = 'scm:git:git://github.com/keyproject/key.git'
+                            developerConnection = 'scm:git:git://github.com/keyproject/key.git'
+                            url = 'https://github.com/keyproject/key/'
+                        }
+                    }
+                }
+            }
+            repositories {
+                maven {
+                    /**
+                     * To be able to publish things on Maven Central, you need two things:
+                     *
+                     * (1) a JIRA account with permission on group-id `org.key-project`
+                     * (2) a keyserver-published GPG (w/o sub-keys)
+                     *
+                     * Your `$HOME/.gradle/gradle.properties` should like this:
+                     * ```
+                     * signing.keyId=YourKeyId
+                     * signing.password=YourPublicKeyPassword
+                     * ossrhUsername=your-jira-id
+                     * ossrhPassword=your-jira-password
+                     * ```
+                     *
+                     * You can test signing with `gradle sign`, and publish with `gradle publish`.
+                     * https://central.sonatype.org/publish/publish-guide/
+                     */
+                    if (project.version.endsWith("-SNAPSHOT")) {
+                        name = "mavenSnapshot"
+                        url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                        credentials(PasswordCredentials) {
+                            username = project.properties.getOrDefault("ossrhUsername", "")
+                            password = project.properties.getOrDefault("ossrhPassword", "")
+                        }
+                    } else {
+                        name = "mavenStaging"
+                        url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                        credentials(PasswordCredentials) {
+                            username = project.properties.getOrDefault("ossrhUsername", "")
+                            password = project.properties.getOrDefault("ossrhPassword", "")
+                        }
+                    }
+                }
+
+                /*
+            maven { // deployment to git.key-project.org
+                name = "GitlabPackages"
+                url "https://git.key-project.org/api/v4/projects/35/packages/maven"
+                credentials(HttpHeaderCredentials) {
+                    if (System.getenv("TOKEN") != null) {
+                        name = 'Private-Token'
+                        value = System.getenv("TOKEN")
+                    } else {
+                        name = 'Job-Token'
+                        value = System.getenv("CI_JOB_TOKEN")
+                    }
+                }
+                authentication {
+                    header(HttpHeaderAuthentication)
+                }
+            }
+            */
+            }
+        }
+
+        signing {
+            useGpgCmd() // works better than the Java implementation, which requires PGP keyrings.
+            sign publishing.publications.mavenJava
+        }
+    }
+}
+
+task start {
+    description "Use :key.ui:run instead"
+    doFirst {
+        println "Use :key.ui:run instead"
+    }
+}
+
+// Generation of a JavaDoc across sub projects.
+task alldoc(type: Javadoc) {
+    group "documentation"
+    description "Generate a JavaDoc across sub projects"
+    def projects = subprojects
+    //key.ui javadoc is broken
+    source projects.collect { it.sourceSets.main.allJava }
+    classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/docs/javadoc")
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        //notworking on jenkins
+        //options.addBooleanOption('html5', true)
+    }
+
+    configure(options) {
+        //showFromPrivate()
+        encoding = 'UTF-8'
+        addBooleanOption 'Xdoclint:none', true
+        // overview = new File( projectDir, 'src/javadoc/package.html' )
+        //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
+        windowTitle = 'KeY API Documentation'
+        docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
+        bottom = "Copyright &copy; 2003-2023 <a href=\"http://key-project.org\">The KeY-Project</a>."
+        use = true
+        links += "https://docs.oracle.com/en/java/javase/17/docs/api/"
+        links += "http://www.antlr2.org/javadoc/"
+        links += "http://www.antlr3.org/api/Java/"
+        links += "https://www.antlr.org/api/Java/"
+    }
+}
+
+// Creates a jar file with the javadoc over all sub projects.
+task alldocJar(type: Zip) {
+    dependsOn alldoc
+    description 'Create a jar file with the javadoc over all sub projects'
+    from alldoc
+    archiveFileName = "key-api-doc-${project.version}.zip"
+    destinationDirectory = file("$buildDir/distribution")
+}
+
+//conditionally enable jacoco coverage when `-DjacocoEnabled=true` is given on CLI.
+def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "false"
+if (jacocoEnabled.toBoolean()) {
+    project.logger.lifecycle("Jacoco enabled. Test performance will be slower.")
+    apply from: rootProject.file("scripts/jacocokey.gradle")
+}
+
+
+@Memoized
+def getChangedFiles() {
+    // Get the target and source branch
+    def anchor = "git merge-base HEAD origin/main".execute().getText()
+
+    // Get list of all changed files including status
+    def allFiles = "git diff --name-status --diff-filter=dr $anchor".execute().getText().split("\n")
+    //println("Found ${allFiles.length} changed files")
+
+    // Remove the status prefix
+    def files = new TreeSet<String>()
+    for (file in allFiles) {
+        if (file.length() > 1) {
+            def a = file.substring(1).trim()
+            if (!a.isBlank()) {
+                files.add(("$rootDir/" + a).toString())
+            }
+        }
+    }
+    // Return the list of touched files
+    files
+}

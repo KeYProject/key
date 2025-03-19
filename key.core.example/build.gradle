@@ -1,0 +1,5 @@
+description "Example project to use KeY's APIs"
+
+dependencies {
+    implementation project(":key.core")
+}

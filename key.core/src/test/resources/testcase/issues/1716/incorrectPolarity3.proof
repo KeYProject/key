@@ -1,0 +1,14 @@
+\profile "Java Profile";
+
+\problem {
+2 + 2 = 5
+}
+
+\proof {
+(branch "dummy ID"
+(rule "add_literals" (formula "1") (term "0") (userinteraction))
+(rule "equal_literals" (formula "1") (userinteraction))
+ (rule "closeFalse" (formula "1"))
+)
+}
+

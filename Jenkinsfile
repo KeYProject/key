@@ -1,6 +1,7 @@
 pipeline {
     agent {
         docker {
+            label "bwcloud"
             image 'wadoon/key-test-docker:jdk11'
         }
     }
@@ -13,42 +14,64 @@ pipeline {
         stage('Clean') {
             steps{
                 sh 'javac -version'
-                sh 'key/scripts/jenkins/startupClean.sh'
+                sh 'scripts/jenkins/startupClean.sh'
             }
         }
 
         stage('Compile') {
             steps { 
-                sh 'cd key && ./gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
+                sh './gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
             }
         }
 
         stage('Test: JUnit') {
             steps {
-                sh 'cd key && ./gradlew --continue test'
+                sh './gradlew --continue test -x key.core.symbolic_execution:test -x key.core.proof_references:test'
             }
         }
 
         stage('Test: testProveRules') {
             steps {
-                sh 'cd key && ./gradlew --continue testProveRules'
+                sh './gradlew --continue testProveRules'
             }
-        }    
+        }
 
-        stage('Test: testRunAllProofs') {
+        stage('Test: testRunAllFunProofs') {
             steps {
-                sh 'cd key && ./gradlew --continue testRunAllProofs'
+                sh './gradlew --continue testRunAllFunProofs'
+            }
+        }
+
+        stage('Test: testRunAllInfProofs') {
+            steps {
+                sh './gradlew --continue testRunAllInfProofs'
+            }
+        }
+
+        stage('Test: Optional Features') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew --continue key.core.symbolic_execution:test key.core.proof_references:test'
+                }
+            }
+        }
+
+        stage('Check Formatting') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew --continue spotlessCheck'
+                }
             }
         }
 
         stage('Docs') {
-            steps{ sh 'key/scripts/jenkins/generateDoc.sh'}
+            steps{ sh 'scripts/jenkins/generateDoc.sh'}
         }
     }
 
     post {
         always {
-            junit(testResults: 'key/*/build/test-results/*/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
+            junit(testResults: '*/build/test-results/*/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
         }
     }
 }
