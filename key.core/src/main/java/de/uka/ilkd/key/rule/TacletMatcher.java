@@ -62,7 +62,7 @@ public interface TacletMatcher {
      * checks if the conditions for a correct instantiation are satisfied
      *
      * @param var the SchemaVariable to be instantiated
-     * @param instantiationCandidate the SVSubstitute, which is a candidate for a possible
+     * @param instantiationCandidate the SyntaxElement, which is a candidate for a possible
      *        instantiation of var
      * @param matchCond the MatchConditions which have to be respected for the new match
      * @param services the Services object encapsulating information about the Java type model

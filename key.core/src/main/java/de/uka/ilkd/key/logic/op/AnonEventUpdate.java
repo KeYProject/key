@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.sort.Sort;
 
 /**
  * This class defines an update that represents a sequence (possibly empty) of events.
@@ -38,8 +40,18 @@ public class AnonEventUpdate extends AbstractSortedOperator {
     public static final Operator SINGLETON = new AnonEventUpdate();
 
     private AnonEventUpdate() {
-        super(new Name("\\anonEvUp"), new Sort[] { /* int, but no order */Sort.ANY }, Sort.UPDATE,
+        super(new Name("\\anonEvUp"), new Sort[] { /* int, but no order */JavaDLTheory.ANY }, JavaDLTheory.UPDATE,
             false);
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("Anon event updates do not have child elements");
     }
 
     public String toString() {

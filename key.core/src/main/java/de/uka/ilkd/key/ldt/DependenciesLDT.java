@@ -9,10 +9,10 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
+import org.key_project.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.ExtList;
@@ -21,54 +21,54 @@ public class DependenciesLDT extends LDT {
 
     public static final Name NAME = new Name("EventMarker");
 
-    private final Function noR;
-    private final Function noW;
-    private final Function noRaW;
-    private final Function noWaR;
-    private final Function noWaW;
+    private final JFunction noR;
+    private final JFunction noW;
+    private final JFunction noRaW;
+    private final JFunction noWaR;
+    private final JFunction noWaW;
 
-    private final Function relaxedNoR;
-    private final Function relaxedNoW;
-    private final Function relaxedNoRaW;
-    private final Function relaxedNoWaR;
-    private final Function relaxedNoWaW;
+    private final JFunction relaxedNoR;
+    private final JFunction relaxedNoW;
+    private final JFunction relaxedNoRaW;
+    private final JFunction relaxedNoWaR;
+    private final JFunction relaxedNoWaW;
 
-    private final Function rPred;
-    private final Function wPred;
-    private final Function relaxedRPred;
-    private final Function relaxedWPred;
+    private final JFunction rPred;
+    private final JFunction wPred;
+    private final JFunction relaxedRPred;
+    private final JFunction relaxedWPred;
 
-    private final Function nothingMarker;
-    private final Function readMarker;
-    private final Function writeMarker;
-    private final Function startMarker;
+    private final JFunction nothingMarker;
+    private final JFunction readMarker;
+    private final JFunction writeMarker;
+    private final JFunction startMarker;
 
-    private final Function endMarker;
+    private final JFunction endMarker;
 
     private final LocationVariable timestamp;
-    private final Function noWaWAtHistory;
-    private final Function noRaWAtHistory;
-    private final Function noWaRAtHistory;
-    private final Function noWAtHistory;
-    private final Function noRAtHistory;
+    private final JFunction noWaWAtHistory;
+    private final JFunction noRaWAtHistory;
+    private final JFunction noWaRAtHistory;
+    private final JFunction noWAtHistory;
+    private final JFunction noRAtHistory;
 
-    public Function getNoWaWAtHistory() {
+    public JFunction getNoWaWAtHistory() {
         return noWaWAtHistory;
     }
 
-    public Function getNoRaWAtHistory() {
+    public JFunction getNoRaWAtHistory() {
         return noRaWAtHistory;
     }
 
-    public Function getNoWaRAtHistory() {
+    public JFunction getNoWaRAtHistory() {
         return noWaRAtHistory;
     }
 
-    public Function getNoWAtHistory() {
+    public JFunction getNoWAtHistory() {
         return noWAtHistory;
     }
 
-    public Function getNoRAtHistory() {
+    public JFunction getNoRAtHistory() {
         return noRAtHistory;
     }
 
@@ -111,85 +111,85 @@ public class DependenciesLDT extends LDT {
 
     }
 
-    public Function getNoR() {
+    public JFunction getNoR() {
         return noR;
     }
 
-    public Function getNoW() {
+    public JFunction getNoW() {
         return noW;
     }
 
-    public Function getNoRaW() {
+    public JFunction getNoRaW() {
         return noRaW;
     }
 
-    public Function getNoWaR() {
+    public JFunction getNoWaR() {
         return noWaR;
     }
 
-    public Function getNoWaW() {
+    public JFunction getNoWaW() {
         return noWaW;
     }
 
-    public Function getRelaxedNoR() {
+    public JFunction getRelaxedNoR() {
         return relaxedNoR;
     }
 
-    public Function getRelaxedNoW() {
+    public JFunction getRelaxedNoW() {
         return relaxedNoW;
     }
 
-    public Function getRelaxedNoRaW() {
+    public JFunction getRelaxedNoRaW() {
         return relaxedNoRaW;
     }
 
-    public Function getRelaxedNoWaR() {
+    public JFunction getRelaxedNoWaR() {
         return relaxedNoWaR;
     }
 
-    public Function getRelaxedNoWaW() {
+    public JFunction getRelaxedNoWaW() {
         return relaxedNoWaW;
     }
 
-    public Function getRPred() {
+    public JFunction getRPred() {
         return rPred;
     }
 
-    public Function getWPred() {
+    public JFunction getWPred() {
         return wPred;
     }
 
-    public Function getRelaxedRPred() {
+    public JFunction getRelaxedRPred() {
         return relaxedRPred;
     }
 
-    public Function getRelaxedWPred() {
+    public JFunction getRelaxedWPred() {
         return relaxedWPred;
     }
 
-    // public Function getEvPred() {
+    // public JFunction getEvPred() {
     // return evPred;
     // }
 
 
-    public Function getNothingMarker() {
+    public JFunction getNothingMarker() {
         return nothingMarker;
     }
 
-    public Function getReadMarker() {
+    public JFunction getReadMarker() {
         return readMarker;
     }
 
-    public Function getWriteMarker() {
+    public JFunction getWriteMarker() {
         return writeMarker;
     }
 
 
-    public Function getUniqueMarker() {
+    public JFunction getUniqueMarker() {
         return startMarker;
     }
 
-    public Function getEndMarker() {
+    public JFunction getEndMarker() {
         return endMarker;
     }
 
@@ -221,13 +221,13 @@ public class DependenciesLDT extends LDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false;
         return null;
     }
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JFunction f) {
         assert false;
         return false;
     }

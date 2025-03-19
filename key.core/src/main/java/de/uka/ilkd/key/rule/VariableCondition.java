@@ -24,7 +24,7 @@ public interface VariableCondition {
      * checks if the condition for a correct instantiation is fulfilled
      *
      * @param var the SchemaVariable to be instantiated
-     * @param instCandidate the SVSubstitute (e.g. Term, ProgramElement) to be mapped to var
+     * @param instCandidate the SyntaxElement (e.g. Term, ProgramElement) to be mapped to var
      * @param matchCond the MatchCondition with the current matching state and in particular the
      *        SVInstantiations that are already known to be needed
      * @param services the program information object

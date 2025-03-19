@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
@@ -30,9 +30,9 @@ public class IncompatibleArrayElementSort extends BinaryFeature {
     }
 
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        Term t_row = row.toTerm(app, pos, goal);
-        Term t_matrix = matrix.toTerm(app, pos, goal);
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        Term t_row = row.toTerm(app, pos, goal, mState);
+        Term t_matrix = matrix.toTerm(app, pos, goal, mState);
 
         if (!(t_matrix.sort() instanceof ArraySort)) {
             return false;

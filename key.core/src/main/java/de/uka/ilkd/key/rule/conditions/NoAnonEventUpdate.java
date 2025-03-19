@@ -4,9 +4,11 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -20,17 +22,16 @@ public class NoAnonEventUpdate extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute instCandidate,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate,
             SVInstantiations instMap, Services services) {
 
         if (var != updateSV) {
             return true;
         }
 
-        final Term inst = (Term) instMap.getInstantiation(var);
+        final Term update = (Term) instMap.getInstantiation(var);
 
-        final Term update = (Term) inst;
-        if (update.sort() == Sort.UPDATE) {
+        if (update.sort() == JavaDLTheory.UPDATE) {
             return !checkForAnonEvent(update);
         }
 

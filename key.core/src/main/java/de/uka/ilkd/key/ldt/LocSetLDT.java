@@ -43,6 +43,8 @@ public final class LocSetLDT extends LDT {
     private final JFunction subset;
     private final JFunction disjoint;
     private final JFunction createdInHeap;
+    private final JFunction wellFormedMatrix;
+    private final JFunction matrixRange;
 
 
     public LocSetLDT(TermServices services) {
@@ -57,6 +59,8 @@ public final class LocSetLDT extends LDT {
         allFields = addFunction(services, "allFields");
         allObjects = addFunction(services, "allObjects");
         arrayRange = addFunction(services, "arrayRange");
+        matrixRange      = addFunction(services, "matrixRange");
+        wellFormedMatrix = addFunction(services, "wellFormedMatrix");
         freshLocs = addFunction(services, "freshLocs");
         elementOf = addFunction(services, "elementOf");
         subset = addFunction(services, "subset");
@@ -119,26 +123,29 @@ public final class LocSetLDT extends LDT {
         return freshLocs;
     }
 
-
     public JFunction getElementOf() {
         return elementOf;
     }
-
 
     public JFunction getSubset() {
         return subset;
     }
 
-
     public JFunction getDisjoint() {
         return disjoint;
     }
-
 
     public JFunction getCreatedInHeap() {
         return createdInHeap;
     }
 
+    public JFunction getWellFormedMatrix() {
+        return wellFormedMatrix;
+    }
+
+    public JFunction getMatrixRange() {
+        return matrixRange;
+    }
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
@@ -220,4 +227,5 @@ public final class LocSetLDT extends LDT {
         default -> null;
         };
     }
+
 }

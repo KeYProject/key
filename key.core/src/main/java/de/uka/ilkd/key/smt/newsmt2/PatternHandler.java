@@ -5,7 +5,7 @@
 //
 // import de.uka.ilkd.key.java.Services;
 // import de.uka.ilkd.key.ldt.LocSetLDT;
-// import de.uka.ilkd.key.logic.Name;
+// import org.key_project.logic.Name;
 // import de.uka.ilkd.key.logic.Term;
 // import org.key_project.logic.op.Function;
 // import de.uka.ilkd.key.logic.op.Operator;
@@ -27,7 +27,7 @@
 // private static final String SMT_PATTERN_NAME = "SMT_PATTERN";
 //
 // private static Function makeSMTPatternFunction() {
-// Sort[] argSorts = { Sort.FORMULA, Sort.ANY };
+// Sort[] argSorts = { Sort.FORMULA, JavaDLTheory.ANY };
 // return new Function(new Name(SMT_PATTERN_NAME), Sort.FORMULA, argSorts);
 // }
 //

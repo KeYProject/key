@@ -110,6 +110,14 @@ public final class ParameterlessTermLabel implements TermLabel {
     public static final TermLabel LOOP_SCOPE_INDEX_LABEL =
         new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
 
+    public static final Name LOCATION_SET_NON_EMPTY_NAME = new Name("nonEmpty");
+
+    /*
+     * Label attached to location sets if they are non-empty (used by stategies to avoid looping) .
+     */
+    public static final TermLabel LOCATION_SET_NON_EMPTY =
+            new ParameterlessTermLabel(LOCATION_SET_NON_EMPTY_NAME);
+
     /**
      * The unique name of this label. This is the basename and does not include the parameters
      */

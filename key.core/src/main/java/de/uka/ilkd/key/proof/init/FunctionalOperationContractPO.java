@@ -178,7 +178,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         if (contract.hasMby()) {
             /*
              * final Function mbyAtPreFunc = new Function(new Name(TB.newName(services,
-             * "mbyAtPre")), Sort.ANY); //
+             * "mbyAtPre")), JavaDLTheory.ANY); //
              * services.getTypeConverter().getIntegerLDT().targetSort()); register(mbyAtPreFunc);
              * mbyAtPre = TB.func(mbyAtPreFunc);
              */

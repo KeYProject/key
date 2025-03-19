@@ -7,12 +7,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.EventUpdate;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.logic.SyntaxElement;
 
 public final class ApplyEventUpdateOnRigid implements VariableCondition {
 
@@ -33,13 +33,13 @@ public final class ApplyEventUpdateOnRigid implements VariableCondition {
         }
         Term result =
             services.getTermFactory().createTerm(target.op(), updatedSubs, target.boundVars(),
-                target.javaBlock());
+                null);
         return result;
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
-            Services services) {
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate, MatchConditions mc,
+                                 Services services) {
         SVInstantiations svInst = mc.getInstantiations();
 
         Term uInst = null;

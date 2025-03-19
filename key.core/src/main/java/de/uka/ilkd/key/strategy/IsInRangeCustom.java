@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 public class IsInRangeCustom extends IsInRangeProvable {
@@ -27,10 +28,10 @@ public class IsInRangeCustom extends IsInRangeProvable {
 
     @Override
     protected Term createConsequence(RuleApp app,
-            PosInOccurrence pos, Goal goal) {
+                                     PosInOccurrence pos, Goal goal, MutableState mState) {
         final TermBuilder tb = goal.proof().getServices().getTermBuilder();
-        Term t_left = left.toTerm(app, pos, goal);
-        Term t_right = right.toTerm(app, pos, goal);
+        Term t_left = left.toTerm(app, pos, goal, mState);
+        Term t_right = right.toTerm(app, pos, goal, mState);
         return tb.gt(t_left, t_right);
     }
 

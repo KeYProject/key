@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
@@ -150,6 +151,8 @@ public final class IntegerLDT extends LDT {
     private final JFunction inRangeLong;
     private final JFunction inRangeChar;
     private final JFunction index;
+    private final JFunction minimum;
+    private final JFunction maximum;
     private final Term one;
     private final Term zero;
 
@@ -271,6 +274,8 @@ public final class IntegerLDT extends LDT {
         inRangeChar = addFunction(services, "inRangeChar");
         index = addFunction(services, "index");
 
+        minimum = addFunction(services, "minimum");
+        maximum = addFunction(services, "maximum");
         // cache often used constants
         zero = makeDigit(0, services.getTermBuilder());
         one = makeDigit(1, services.getTermBuilder());
@@ -1000,4 +1005,14 @@ public final class IntegerLDT extends LDT {
     public Term one() {
         return one;
     }
+
+    public JFunction getMinimum() {
+        return minimum;
+    }
+
+    public JFunction getMaximum() {
+        return maximum;
+    }
+
+
 }

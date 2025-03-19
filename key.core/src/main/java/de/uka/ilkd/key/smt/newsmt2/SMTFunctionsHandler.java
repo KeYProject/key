@@ -4,7 +4,7 @@
 // package de.uka.ilkd.key.smt.newsmt2;
 //
 // import de.uka.ilkd.key.java.Services;
-// import de.uka.ilkd.key.logic.Name;
+// import org.key_project.logic.Name;
 // import de.uka.ilkd.key.logic.Term;
 // import de.uka.ilkd.key.logic.op.Operator;
 // import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -119,7 +119,7 @@
 // trans.addFromSnippets(name);
 // SExpr result = trans.handleAsFunctionCall(name, term);
 // Sort dep = sdf.getSortDependingOn();
-// if (dep == Sort.ANY) {
+// if (dep == JavaDLTheory.ANY) {
 // return result;
 // } else {
 // return SExprs.castExpr(SExprs.sortExpr(dep), result);

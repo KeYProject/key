@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 // package de.uka.ilkd.key.logic.op;
 //
-// import de.uka.ilkd.key.logic.Name;
-// import de.uka.ilkd.key.logic.sort.Sort;
+// import org.key_project.logic.Name;
+// import org.key_project.logic.sort.Sort;
 //
 // public class MarkerEventUpdate extends AbstractSortedOperator {
 //
@@ -12,8 +12,8 @@
 //
 // private MarkerEventUpdate() {
 // super(new Name("\\markerEvent"),
-// new Sort[]{Sort.ANY},
-// Sort.UPDATE,
+// new Sort[]{JavaDLTheory.ANY},
+// JavaDLTheory.UPDATE,
 // false);
 // }
 //

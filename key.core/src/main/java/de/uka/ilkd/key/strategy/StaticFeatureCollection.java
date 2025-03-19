@@ -156,12 +156,11 @@ public abstract class StaticFeatureCollection {
         TermBuffer sf = new TermBuffer();
         TermBuffer sub = new TermBuffer();
 
-        Feature countOccurrencesInSeq = sum(sf, SequentFormulasGenerator.sequent(),
+        return sum(sf, SequentFormulasGenerator.sequent(),
             sum(sub, SubtermGenerator.leftTraverse(sf, any()),
                 // instead of any a condition which stops traversal when
                 // depth(cutF) > depth(sub) would be better
                 ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
-        return countOccurrencesInSeq;
     }
 
     protected static Feature termSmallerThan(String smaller, String bigger) {
@@ -222,7 +221,6 @@ public abstract class StaticFeatureCollection {
         return add(a, add(b, c));
     }
 
-
     protected static TermFeature or(TermFeature... disjuncts) {
         if (disjuncts.length == 0)
             inftyTermConst();
@@ -242,14 +240,6 @@ public abstract class StaticFeatureCollection {
 
     protected static TermFeature or(TermFeature a, TermFeature b, TermFeature c) {
         return or(a, or(b, c));
-    }
-
-    protected static TermFeature or(TermFeature... features) {
-        TermFeature orFeature = inftyTermConst();
-        for (var f : features) {
-            orFeature = or(orFeature, f);
-        }
-        return orFeature;
     }
 
     protected static Feature or(Feature a, Feature b) {

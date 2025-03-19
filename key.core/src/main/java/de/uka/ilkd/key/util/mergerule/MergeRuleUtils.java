@@ -333,6 +333,31 @@ public class MergeRuleUtils {
     }
 
     /**
+     * Returns all event updates of a parallel update.
+     *
+     * @param u
+     *            Parallel update to get elementary updates from.
+     * @return Elementary updates of the supplied parallel update.
+     */
+    public static LinkedList<Term> getEventUpdates(Term u) {
+        LinkedList<Term> result = new LinkedList<Term>();
+
+        if (u.op() instanceof ElementaryUpdate) {
+            // do nothing
+        } else if (u.op() instanceof EventUpdate) {
+            result.add(u);
+        } else if (u.op() instanceof UpdateJunctor) {
+            for (Term sub : u.subs()) {
+                result.addAll(getEventUpdates(sub));
+            }
+        } else {
+            throw new IllegalArgumentException("Expected an update!");
+        }
+
+        return result;
+    }
+
+    /**
      * Counts the atoms in a formula.
      *
      * @param term Formula to count atoms for.

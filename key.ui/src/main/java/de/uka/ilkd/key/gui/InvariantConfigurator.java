@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.loopinvgen.LIGNestedMDarr;
 import de.uka.ilkd.key.loopinvgen.LIGNew;
 import de.uka.ilkd.key.loopinvgen.LoopInvariantGenerationResult;

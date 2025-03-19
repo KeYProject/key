@@ -84,8 +84,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 binFunc = new SuperTermGeneratedOp(numbers);
 
                 // binFunc = new Function
-                // ( new Name ( "SuperTermGenerated" ), Sort.ANY,
-                // new Sort[] { Sort.ANY, numbers.getNumberSymbol ().sort () } );
+                // ( new Name ( "SuperTermGenerated" ), JavaDLTheory.ANY,
+                // new Sort[] { JavaDLTheory.ANY, numbers.getNumberSymbol ().sort () } );
             }
 
             return createIterator(pos, mState);

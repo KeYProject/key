@@ -882,7 +882,7 @@ public class OutputStreamProofSaver {
         }
     }
 
-    private static StringBuffer printSequentAsFormula(Sequent seq, Services services) {
+    private static String printSequentAsFormula(Sequent seq, Services services) {
         final LogicPrinter printer = createLogicPrinter(services,
             services == null);
 
@@ -894,12 +894,7 @@ public class OutputStreamProofSaver {
             tb.or(Arrays.stream(seq.succedent().asList().toArray(new SequentFormula[0]))
                     .map(SequentFormula::formula).collect(Collectors.toList()));
 
-        try {
-            printer.printTerm(tb.imp(antecedent, succedent));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new StringBuffer("ERROR" + seq.toString());
-        }
+        printer.printTerm(tb.imp(antecedent, succedent));
 
         return printer.result();
     }

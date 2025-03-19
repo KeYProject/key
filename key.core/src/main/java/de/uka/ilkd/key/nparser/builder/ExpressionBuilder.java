@@ -180,7 +180,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 1; i < t.size(); i++) {
             a = getTermFactory().createTerm(UpdateJunctor.SEQUENTIAL_UPDATE, a, t.get(i));
         }
-        return updateOrigin(a, ctx);
+        return updateOrigin(a, ctx, services);
     }
 
     @Override
@@ -217,14 +217,14 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term label = accept(ctx.depLabel);
         final TermBuilder tb = getServices().getTermBuilder();
         if (ctx.EVENTUPDATE() != null) {
-            return updateOrigin(tb.eventUpdate(depKind, locset, label), ctx);
+            return updateOrigin(tb.eventUpdate(depKind, locset, label), ctx, services);
         } else if (ctx.INVERSEEVENTUPDATE() != null) {
-            return updateOrigin(tb.invEventUpdate(depKind, locset, label), ctx);
+            return updateOrigin(tb.invEventUpdate(depKind, locset, label), ctx, services);
         } else if (ctx.ANONEVENTUPDATE() != null) {
             // return anon update
-            return updateOrigin(tb.anonEventUpdate(accept(ctx.anonUnique)), ctx);
+            return updateOrigin(tb.anonEventUpdate(accept(ctx.anonUnique)), ctx, services);
         } else if (ctx.INVERSEANONEVENTUPDATE() != null) {
-            return updateOrigin(tb.invAnonEventUpdate(accept(ctx.anonUnique)), ctx);
+            return updateOrigin(tb.invAnonEventUpdate(accept(ctx.anonUnique)), ctx, services);
         }
         throw new RuntimeException("Unknown event update type: " + ctx.getText());
     }
