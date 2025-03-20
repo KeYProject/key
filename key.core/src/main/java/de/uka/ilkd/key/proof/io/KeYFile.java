@@ -246,7 +246,6 @@ public class KeYFile implements EnvInput {
         if (problemInformation == null) {
             KeyAst.File ctx = getParseContext();
             problemInformation = ctx.getProblemInformation();
-            System.out.println(ctx.getProblemInformation());
         }
         return problemInformation;
     }
