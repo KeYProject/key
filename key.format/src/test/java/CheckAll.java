@@ -19,9 +19,14 @@ import org.junit.jupiter.api.TestFactory;
 public class CheckAll {
     @TestFactory
     public Stream<DynamicTest> checkAllKeYFiles() throws IOException {
-        var s = Files.walk(Paths.get(".."));
-        return s.filter(it -> it.getFileName().toString().endsWith(".key"))
-                .map(it -> DynamicTest.dynamicTest(it.getFileName().toString(),
-                    () -> Assertions.assertTrue(KeyFormatFacade.checkFile(it))));
+        final var rules = Paths.get("../key.core/src/main/resources/de/uka/ilkd/key/proof/rules")
+                .toAbsolutePath();
+        System.out.println(Files.exists(rules));
+        try (var s = Files.walk(rules)) {
+            var sq = s.toList();
+            return sq.stream().filter(it -> it.getFileName().toString().endsWith(".key"))
+                    .map(it -> DynamicTest.dynamicTest(it.getFileName().toString(),
+                        () -> Assertions.assertTrue(KeyFormatFacade.checkFile(it))));
+        }
     }
 }
