@@ -135,7 +135,6 @@ public class JavaProfile extends AbstractProfile {
             null, null,
             null, null,
             originTermLabelRefactorings, null));
-        result = ImmutableSLList.nil();
         result =
             result.prepend(new TermLabelConfiguration(DefinedSymbolsHandler.TRIGGER_LABEL.name(),
                 new SingletonLabelFactory<>(DefinedSymbolsHandler.TRIGGER_LABEL)));
