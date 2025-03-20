@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
 
 import java.util.Set;
@@ -125,7 +128,7 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
             output.enterIndent();
         }
 
-        KeYFileFormatter.processHiddenTokensAfterCurrent(node.getSymbol(), ts, output);
+        KeyFileFormatter.processHiddenTokensAfterCurrent(node.getSymbol(), ts, output);
         return super.visitTerminal(node);
     }
 
