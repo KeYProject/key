@@ -20,5 +20,5 @@ shadowJar {
 }
 
 application {
-    mainClassName = "de.uka.ilkd.key.nparser.format.KeYFileFormatter"
+    mainClassName = "de.uka.ilkd.key.nparser.format.KeyFormatFacade"
 }
