@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
 
 /**
@@ -20,10 +23,11 @@ class Output {
 
     /**
      * Generates a string of whitespaces indentation.
+     *
      * @param count indentation level
      * @return string of empty spaces
      */
-    private static String getIndent(int count) {
+    static String getIndent(int count) {
         // Substrings use a shared buffer
         return " ".repeat(INDENT_STEP * count);
     }
@@ -61,6 +65,7 @@ class Output {
 
     /**
      * Add a token to the output. Respects whitespace before token.
+     *
      * @param value a string value
      */
     public void token(String value) {
@@ -70,6 +75,7 @@ class Output {
 
     /**
      * Add a character to the output. Respects whitespace before token.
+     *
      * @param value a char value
      */
     public void token(char value) {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
 
 import java.util.List;
@@ -15,7 +18,7 @@ import org.jspecify.annotations.Nullable;
 
 
 /**
- * {@link KeYFileFormatter} is the entry point for reformatting operation on KeY files.
+ * {@link KeyFileFormatter} is the entry point for reformatting operation on KeY files.
  * <p>
  * It works on the AST and also on the token stream
  * to also capture hidden tokens like comments.
@@ -27,7 +30,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Julian Wiesler
  */
-public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
+public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
     /**
      * Maximum newlines between tokens (2 means one empty line)
      */
@@ -37,11 +40,11 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     private final CommonTokenStream ts;
 
     /**
-     * Create a {@link KeYFileFormatter} with the given stream of tokens.
+     * Create a {@link KeyFileFormatter} with the given stream of tokens.
      *
      * @param ts a token stream created by {@link KeYLexer}
      */
-    public KeYFileFormatter(CommonTokenStream ts) {
+    public KeyFileFormatter(CommonTokenStream ts) {
         this.ts = ts;
     }
 
@@ -232,10 +235,11 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
         return null;
     }
-    
+
 
     private static void processHiddenTokens(@Nullable List<Token> tokens, Output output) {
-        if(tokens == null) return;
+        if (tokens == null)
+            return;
 
         for (Token t : tokens) {
             String text = t.getText();
@@ -416,7 +420,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         parser.addErrorListener(parser.getErrorReporter());
 
         KeYParser.FileContext ctx = parser.file();
-        KeYFileFormatter formatter = new KeYFileFormatter(tokens);
+        KeyFileFormatter formatter = new KeyFileFormatter(tokens);
         formatter.visitFile(ctx);
         return formatter.output.toString().trim() + "\n";
     }
