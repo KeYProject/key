@@ -301,6 +301,7 @@ public final class IssueDialog extends JDialog {
         splitBottom.setResizeWeight(1.0);
         stacktracePanel.setMinimumSize(new Dimension(0, 0));
 
+
         // show the dialog with a size of 900*800 or smaller
         Dimension pref = getPreferredSize();
         Dimension minPref = new Dimension(Math.min(pref.width, 900), Math.min(pref.height, 800));
@@ -583,10 +584,10 @@ public final class IssueDialog extends JDialog {
                             : new PositionedIssueString(o, ""))
                     .collect(Collectors.toSet());
 
-            IssueDialog dialog =
+          /*  IssueDialog dialog =
                 new IssueDialog(parent, SLEnvInput.getLanguage() + " warning(s)", issues, false);
             dialog.setVisible(true);
-            dialog.dispose();
+            dialog.dispose();*/
         }
     }
 
