@@ -13,19 +13,26 @@ options { tokenVocab=JmlLexer; }
 
 
 classlevel_comments: classlevel_comment* EOF;
-classlevel_comment: classlevel_element | modifiers | set_statement;
-classlevel_element0: modifiers? (classlevel_element modifiers?);
+
+/* weigl: Gammar not good here. High ambiguity in the parser.
+   Abstractly speaking:
+   we have:        S ->    A? B | A;
+   but:            S ->    A B? | B;
+      could be better.
+*/
+classlevel_comment: (modifiers classlevel_element | classlevel_element) | modifiers | set_statement;
 classlevel_element
 // The order matters! The rules with clear lookahead in front.
 // In the new lexer w/o contract and expr mode. The keyword "ensures"   can also be an identifier.
 // This means, that the following text could also be seen as a field declaration:
 //      //@   ensures ensures;
-  : class_invariant /*| depends_clause*/     | method_specification
+  : class_invariant /*| depends_clause*/     | accessible_clause
   | method_declaration  | field_declaration  | represents_clause
   | history_constraint    | initially_clause   | class_axiom
   | monitors_for_clause   | readable_if_clause | writable_if_clause
   | datagroup_clause    | set_statement      | nowarn_pragma
-  | accessible_clause   | assert_statement   | assume_statement
+  | assert_statement   | assume_statement
+  | method_specification
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
