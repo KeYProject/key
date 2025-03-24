@@ -230,12 +230,13 @@ public class ExtractMetaData implements Callable<Integer> {
     private Metamodel.Type createType(Class<?> type) {
         final var documentation = findDocumentation(type);
         if (type.isEnum())
-            return new Metamodel.EnumType(type.getSimpleName(),
+            return new Metamodel.EnumType(type.getSimpleName(), type.getName(),
                 Arrays.stream(type.getEnumConstants()).map(Object::toString).toList(),
                 documentation);
 
 
-        var obj = new Metamodel.ObjectType(type.getSimpleName(), new ArrayList<>(), documentation);
+        var obj = new Metamodel.ObjectType(type.getSimpleName(), type.getName(), new ArrayList<>(),
+            documentation);
         final var list = Arrays.stream(type.getDeclaredFields())
                 .map(it -> new Metamodel.Field(it.getName(), getOrFindType(it.getType()).name()))
                 .toList();
