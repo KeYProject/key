@@ -13,14 +13,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.ExampleChooser;
-import de.uka.ilkd.key.macros.ProofMacroFacade;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommandFacade;
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
@@ -44,6 +45,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
+import org.key_project.util.reflection.ClassLoaderUtil;
 import org.keyproject.key.api.data.*;
 import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.internal.NodeText;
@@ -114,14 +116,14 @@ public final class KeyApiImpl implements KeyApi {
     @Override
     public CompletableFuture<List<ProofMacroDesc>> getAvailableMacros() {
         return CompletableFuture.completedFuture(
-            ProofMacroFacade.instance().getMacros().stream()
+                StreamSupport.stream(ClassLoaderUtil.loadServices(ProofMacro.class).spliterator(),false)
                     .map(ProofMacroDesc::from).toList());
     }
 
     @Override
     public CompletableFuture<List<ProofScriptCommandDesc>> getAvailableScriptCommands() {
         return CompletableFuture.completedFuture(
-            ProofScriptCommandFacade.instance().getScriptCommands().stream()
+                StreamSupport.stream(ClassLoaderUtil.loadServices(ProofScriptCommand.class).spliterator(),false)
                     .map(ProofScriptCommandDesc::from).toList());
     }
 
@@ -143,12 +145,13 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     @Override
-    public CompletableFuture<MacroStatistic> macro(ProofId proofId, String macroId,
+    public CompletableFuture<MacroStatistic> macro(ProofId proofId, String macroName,
             StreategyOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
-            var macro = Objects.requireNonNull(ProofMacroFacade.instance().getMacro(macroId));
+            var macro = StreamSupport.stream(ClassLoaderUtil.loadServices(ProofMacro.class).spliterator(),false)
+                    .filter(it -> it.getName().equals(macroName)).findFirst().orElseThrow();
 
             try {
                 var info =
@@ -322,7 +325,7 @@ public final class KeyApiImpl implements KeyApi {
     public CompletableFuture<List<ContractDesc>> contracts(EnvironmentId envId) {
         return CompletableFuture.supplyAsync(() -> {
             var env = data.find(envId);
-            var contracts = env.getAvailableContracts();
+            var contracts = env.getProofContracts();
             return contracts.stream().map(it -> ContractDesc.from(envId, env.getServices(), it))
                     .toList();
         });
@@ -332,7 +335,7 @@ public final class KeyApiImpl implements KeyApi {
     public CompletableFuture<ProofId> openContract(ContractId contractId) {
         return CompletableFuture.supplyAsync(() -> {
             var env = data.find(contractId.envId());
-            var contracts = env.getAvailableContracts();
+            var contracts = env.getProofContracts();
             var contract =
                 contracts.stream()
                         .filter(it -> Objects.equals(it.getName(), contractId.contractId()))
