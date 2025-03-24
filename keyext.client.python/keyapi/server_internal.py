@@ -121,10 +121,10 @@ class KeyServer(ServerBase):
 
        return self._call_sync("proof/goals", [proof , onlyOpened , onlyEnabled])
 
-    def proof_macro(self, proof : ProofId, macroId : str, options : StreategyOptions) -> MacroStatistic:
+    def proof_macro(self, proof : ProofId, macroName : str, options : StreategyOptions) -> MacroStatistic:
        """"""
 
-       return self._call_sync("proof/macro", [proof , macroId , options])
+       return self._call_sync("proof/macro", [proof , macroName , options])
 
     def proof_pruneTo(self, nodeId : NodeId) -> typing.List[NodeDesc]:
        """"""
