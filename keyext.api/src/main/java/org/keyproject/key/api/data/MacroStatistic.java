@@ -10,7 +10,7 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
  * @version 1 (13.10.23)
  */
 public record MacroStatistic(KeyIdentifications.ProofId proofId, String macroId, int appliedRules,
-        int closedGoals) {
+        int closedGoals) implements KeYDataTransferObject {
     public static MacroStatistic from(KeyIdentifications.ProofId proofId,
             ProofMacroFinishedInfo info) {
         return new MacroStatistic(proofId, info.getMacro().getName(), info.getAppliedRules(),

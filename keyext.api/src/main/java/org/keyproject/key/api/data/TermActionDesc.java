@@ -31,5 +31,5 @@ public record TermActionDesc(
         /**
          * Kind of the action
          */
-        TermActionKind kind) {
+        TermActionKind kind) implements KeYDataTransferObject {
 }
