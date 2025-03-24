@@ -66,26 +66,32 @@ public class Metamodel {
     public sealed
 
 
-    interface Type {
-        default String kind() {
-            return getClass().getSimpleName();
+interface Type {
+    default String kind() {
+            return getClass().getName();
         }
 
         String documentation();
 
-        String name();
+    String name();
+
+    String identifier();
+}
+
+
+enum BuiltinType implements Type {
+    INT, LONG, STRING, BOOL, DOUBLE;
+
+    @Override
+    public String documentation() {
+        return "built-in data type";
     }
 
-
-    enum BuiltinType implements Type {
-        INT, LONG, STRING, BOOL, DOUBLE;
-
-        @Override
-        public String documentation() {
-            return "built-in data type";
-        }
-
+    public String identifier() {
+        return name().toLowerCase();
     }
+
+}
 
     record ListType(Type type, String documentation) implements Type {
 
@@ -94,15 +100,22 @@ public class Metamodel {
             return type().name() + "[]";
         }
 
+    public String identifier() {
+        return type().identifier()+"[]";
     }
 
-    record ObjectType(String typeName, List<Field> fields, String documentation) implements Type {
+    }
+
+    record ObjectType(String typeName, String typeFullName, List<Field> fields, String documentation) implements Type {
 
         @Override
         public String name() {
             return typeName;
         }
 
+        public String identifier() {
+            return typeFullName;
+        }
     }
 
     public record EitherType(Type a, Type b, String documentation) implements Type {
@@ -112,14 +125,21 @@ public class Metamodel {
             return "either<a,b>";
         }
 
+    public String identifier() {
+        return name();
     }
 
-    public record EnumType(String typeName, List<String> values, String documentation)
-            implements Type {
+    }
+
+    public record EnumType(String typeName, String typeFullName, List<String> values, String documentation) implements Type {
 
         @Override
         public String name() {
             return typeName;
         }
     }
-}
+
+    public String identifier(){
+        return typeFullName;
+    }
+}}

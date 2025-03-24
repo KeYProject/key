@@ -4,7 +4,7 @@ import threading
 import typing
 from typing import Dict
 
-from keyapi import KEY_DATA_CLASSES
+from keyapi import KEY_DATA_CLASSES, KEY_DATA_CLASSES_REV
 
 JSON_RPC_REQ_FORMAT = "Content-Length: {json_string_len}\r\n\r\n{json_string}"
 LEN_HEADER = "Content-Length: "
@@ -18,7 +18,7 @@ class MyEncoder(json.JSONEncoder):
 
     def default(self, o):  # pylint: disable=E0202
         d = dict(o.__dict__)
-        d['$type'] = type(o).__name__
+        d['$class'] = KEY_DATA_CLASSES_REV[type(o).__name__]
         return d
 
 
@@ -192,6 +192,7 @@ class LspEndpoint(threading.Thread):
             message_dict["id"] = id
         message_dict["method"] = method_name
         message_dict["params"] = params
+        # message_dict["$class"] = "org.eclipse.lsp4j.jsonrpc.messages.Message"
         self.json_rpc_endpoint.send_request(message_dict)
 
     def call_method(self, method_name, args):
