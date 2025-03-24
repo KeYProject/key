@@ -9,7 +9,7 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
  * @author Alexander Weigl
  * @version 1 (29.10.23)
  */
-public record ProofScriptCommandDesc() {
+public record ProofScriptCommandDesc() implements KeYDataTransferObject {
     public static ProofScriptCommandDesc from(ProofScriptCommand<?> proofScriptCommand) {
         return null;
     }

@@ -3,6 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
 
-public enum TraceValue {
+public enum TraceValue implements KeYDataTransferObject {
     Off, Message, All;
 }

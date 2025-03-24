@@ -102,31 +102,32 @@ public class KeyIdentifications {
      * @author Alexander Weigl
      * @version 1 (28.10.23)
      */
-    public record EnvironmentId(String envId) {
+    public record EnvironmentId(String envId) implements KeYDataTransferObject {
     }
 
     /**
      * @author Alexander Weigl
      * @version 1 (28.10.23)
      */
-    public record ContractId(EnvironmentId envId, String contractId) {
+    public record ContractId(EnvironmentId envId, String contractId)
+            implements KeYDataTransferObject {
     }
 
     /**
      * @author Alexander Weigl
      * @version 1 (29.10.23)
      */
-    public record NodeId(ProofId proofId, int nodeId) {
+    public record NodeId(ProofId proofId, int nodeId) implements KeYDataTransferObject {
     }
 
-    public record ProofId(EnvironmentId env, String proofId) {
+    public record ProofId(EnvironmentId env, String proofId) implements KeYDataTransferObject {
     }
 
     /**
      * @author Alexander Weigl
      * @version 1 (29.10.23)
      */
-    public record NodeTextId(NodeId nodeId, int nodeTextId) {
+    public record NodeTextId(NodeId nodeId, int nodeTextId) implements KeYDataTransferObject {
     }
 
 
@@ -134,14 +135,15 @@ public class KeyIdentifications {
      * @author Alexander Weigl
      * @version 1 (13.10.23)
      */
-    public record TermActionId(NodeId nodeId, String pio, String id) {
+    public record TermActionId(NodeId nodeId, String pio, String id)
+            implements KeYDataTransferObject {
     }
 
     /**
      * @author Alexander Weigl
      * @version 1 (13.10.23)
      */
-    public record TreeNodeId(String id) {
+    public record TreeNodeId(String id) implements KeYDataTransferObject {
     }
 
 
