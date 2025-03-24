@@ -129,7 +129,7 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     public CompletableFuture<MacroStatistic> script(ProofId proofId, String scriptLine,
-            StreategyOptions options) {
+            StrategyOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
@@ -146,7 +146,7 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     public CompletableFuture<MacroStatistic> macro(ProofId proofId, String macroName,
-            StreategyOptions options) {
+            StrategyOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
@@ -165,12 +165,13 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     @Override
-    public CompletableFuture<ProofStatus> auto(ProofId proofId, StreategyOptions options) {
+    public CompletableFuture<ProofStatus> auto(ProofId proofId, StrategyOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
-            configureProofMode(proof, options);
+            options.configure(proof);
             try {
+                System.out.println("Starting proof with setting "+proof.getSettings().getStrategySettings().getActiveStrategyProperties().getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY));
                 env.getProofControl().startAndWaitForAutoMode(proof);
                 // clientListener);
                 return ProofStatus.from(proofId, proof);
@@ -179,30 +180,6 @@ public final class KeyApiImpl implements KeyApi {
             }
         });
 
-    }
-
-    private static void configureProofMode(Proof proof, StreategyOptions options) {
-        StrategyProperties sp =
-            proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-            StrategyProperties.METHOD_CONTRACT);
-        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-            StrategyProperties.DEP_ON);
-        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-            StrategyProperties.QUERY_ON);
-        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-            StrategyProperties.STOPMODE_NONCLOSE);
-        proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-        // Make sure that the new options are used
-        int maxSteps = 10000;
-        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxSteps);
-        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
-                .setActiveStrategyProperties(sp);
-        proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
-        proof.setActiveStrategy(proof.getServices().getProfile()
-                .getDefaultStrategyFactory().create(proof, sp));
     }
 
     @Override
