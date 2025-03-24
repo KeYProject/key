@@ -1,5 +1,5 @@
 import socket
-from keyapi import LspEndpoint, LoadParams, StreategyOptions
+from keyapi import LspEndpoint, LoadParams, StrategyOptions
 from keyapi.server_internal import KeyServer
 from keyapi.rpc import JsonRpcEndpoint
 
@@ -56,7 +56,7 @@ class KeYProof(object):
     def root(self):
         return self.key.proofTree_root(self.proofHandle)
 
-    def auto(self, options = StreategyOptions()):
+    def auto(self, options = StrategyOptions(None, None, None, None, None, 10000)):
         return self.key.proof_auto(self.proofHandle, options)
 
     def __exit__(self, exc_type, exc_val, exc_tb):

@@ -101,7 +101,7 @@ class KeyServer(ServerBase):
 
        return self._call_sync("meta/version", [])
 
-    def proof_auto(self, proof : ProofId, options : StreategyOptions) -> ProofStatus:
+    def proof_auto(self, proof : ProofId, options : StrategyOptions) -> ProofStatus:
        """"""
 
        return self._call_sync("proof/auto", [proof , options])
@@ -121,7 +121,7 @@ class KeyServer(ServerBase):
 
        return self._call_sync("proof/goals", [proof , onlyOpened , onlyEnabled])
 
-    def proof_macro(self, proof : ProofId, macroName : str, options : StreategyOptions) -> MacroStatistic:
+    def proof_macro(self, proof : ProofId, macroName : str, options : StrategyOptions) -> MacroStatistic:
        """"""
 
        return self._call_sync("proof/macro", [proof , macroName , options])
@@ -136,7 +136,7 @@ class KeyServer(ServerBase):
 
        return self._call_sync("proof/root", [proof])
 
-    def proof_script(self, proof : ProofId, scriptLine : str, options : StreategyOptions) -> MacroStatistic:
+    def proof_script(self, proof : ProofId, scriptLine : str, options : StrategyOptions) -> MacroStatistic:
        """"""
 
        return self._call_sync("proof/script", [proof , scriptLine , options])

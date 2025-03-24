@@ -12,7 +12,7 @@ import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.data.MacroStatistic;
 import org.keyproject.key.api.data.NodeDesc;
 import org.keyproject.key.api.data.ProofStatus;
-import org.keyproject.key.api.data.StreategyOptions;
+import org.keyproject.key.api.data.StrategyOptions;
 
 /**
  * @author Alexander Weigl
@@ -22,14 +22,14 @@ import org.keyproject.key.api.data.StreategyOptions;
 public interface ProofApi {
     @JsonRequest
     CompletableFuture<MacroStatistic> script(ProofId proof, String scriptLine,
-            StreategyOptions options);
+            StrategyOptions options);
 
     @JsonRequest
     CompletableFuture<MacroStatistic> macro(ProofId proof, String macroName,
-            StreategyOptions options);
+            StrategyOptions options);
 
     @JsonRequest
-    CompletableFuture<ProofStatus> auto(ProofId proof, StreategyOptions options);
+    CompletableFuture<ProofStatus> auto(ProofId proof, StrategyOptions options);
 
     @JsonRequest
     CompletableFuture<Boolean> dispose(ProofId proof);
