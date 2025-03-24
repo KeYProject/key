@@ -15,5 +15,5 @@ import java.util.List;
  * @param includes
  */
 public record LoadParams(File problemFile, List<File> classPath, File bootClassPath,
-        List<File> includes) {
+        List<File> includes) implements KeYDataTransferObject {
 }

@@ -10,7 +10,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
  * @version 1 (29.10.23)
  */
 public record ProofMacroDesc(String name, String category, String description,
-        String scriptCommandName) {
+        String scriptCommandName) implements KeYDataTransferObject {
     public static ProofMacroDesc from(ProofMacro proofMacro) {
         return new ProofMacroDesc(proofMacro.getName(), proofMacro.getCategory(),
             proofMacro.getDescription(), proofMacro.getScriptCommandName());
