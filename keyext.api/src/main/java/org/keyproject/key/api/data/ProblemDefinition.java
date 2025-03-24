@@ -17,5 +17,5 @@ public record ProblemDefinition(
         @Nullable List<FunctionDesc> functions,
         @Nullable List<PredicateDesc> predicates,
         @Nullable List<String> antecTerms,
-        @Nullable List<String> succTerms) {
+        @Nullable List<String> succTerms) implements KeYDataTransferObject {
 }

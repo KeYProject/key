@@ -11,7 +11,8 @@ import de.uka.ilkd.key.macros.ProofMacro;
  * @param description
  * @param category
  */
-public record MacroDescription(String name, String description, String category) {
+public record MacroDescription(String name, String description, String category)
+        implements KeYDataTransferObject {
     public static MacroDescription from(ProofMacro m) {
         return new MacroDescription(m.getName(), m.getDescription(), m.getCategory());
     }

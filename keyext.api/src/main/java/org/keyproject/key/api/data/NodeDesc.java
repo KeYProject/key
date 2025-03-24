@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 public record NodeDesc(KeyIdentifications.NodeId nodeid,
         String branchLabel,
         boolean scriptRuleApplication,
-        @Nullable List<NodeDesc> children) {
+        @Nullable List<NodeDesc> children) implements KeYDataTransferObject {
     public NodeDesc(KeyIdentifications.ProofId proofId, int serialNr, String branchLabel,
             boolean scriptRuleApplication) {
         this(new KeyIdentifications.NodeId(proofId, serialNr), branchLabel, scriptRuleApplication,

@@ -13,7 +13,7 @@ import org.key_project.logic.sort.Sort;
  */
 public record SortDesc(String string, String documentation,
         List<SortDesc> extendsSorts,
-        boolean anAbstract, String s) {
+        boolean anAbstract, String s) implements KeYDataTransferObject {
     public static SortDesc from(Sort sort) {
         return new SortDesc(sort.name().toString(), sort.getDocumentation(),
             sort.extendsSorts().stream().map(SortDesc::from).toList(),

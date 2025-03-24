@@ -14,7 +14,7 @@ import org.key_project.logic.op.Function;
  */
 public record FunctionDesc(String name, String sort, SortDesc retSort, List<SortDesc> argSorts,
         boolean rigid,
-        boolean unique, boolean skolemConstant) {
+        boolean unique, boolean skolemConstant) implements KeYDataTransferObject {
     public static FunctionDesc from(Function fn) {
         return new FunctionDesc(fn.name().toString(), fn.sort().declarationString(),
             SortDesc.from(fn.sort()),
