@@ -124,11 +124,15 @@ class NodeDesc:
     children : List
     """"""
 
-    def __init__(self, nodeid, branchLabel, scriptRuleApplication, children):
+    description : str
+    """"""
+
+    def __init__(self, nodeid, branchLabel, scriptRuleApplication, children, description):
         self.nodeid = nodeid
         self.branchLabel = branchLabel
         self.scriptRuleApplication = scriptRuleApplication
         self.children = children
+        self.description = description
 
 class StrategyOptions:
     """"""
@@ -197,15 +201,6 @@ class ProofStatus:
         self.openGoals = openGoals
         self.closedGoals = closedGoals
 
-class TreeNodeId:
-    """"""
-
-    id : str
-    """"""
-
-    def __init__(self, id):
-        self.id = id
-
 class TreeNodeDesc:
     """"""
 
@@ -218,6 +213,15 @@ class TreeNodeDesc:
     def __init__(self, id, name):
         self.id = id
         self.name = name
+
+class TreeNodeId:
+    """"""
+
+    id : str
+    """"""
+
+    def __init__(self, id):
+        self.id = id
 
 class PrintOptions:
     """"""
@@ -585,7 +589,7 @@ class TaskStartedInfo:
         pass
 
 
-KEY_DATA_CLASSES = { "org.keyproject.key.api.remoteapi.ExampleDesc": ExampleDesc,"org.keyproject.key.api.data.ProofScriptCommandDesc": ProofScriptCommandDesc,"org.keyproject.key.api.data.ProofMacroDesc": ProofMacroDesc,"org.keyproject.key.api.data.TraceValue": TraceValue,"org.keyproject.key.api.remoteapi.ServerManagement$SetTraceParams": SetTraceParams,"org.keyproject.key.api.data.KeyIdentifications$EnvironmentId": EnvironmentId,"org.keyproject.key.api.data.KeyIdentifications$ProofId": ProofId,"org.keyproject.key.api.data.KeyIdentifications$NodeId": NodeId,"java.util.List": List,"org.keyproject.key.api.data.NodeDesc": NodeDesc,"org.keyproject.key.api.data.StrategyOptions": StrategyOptions,"org.keyproject.key.api.data.MacroStatistic": MacroStatistic,"org.keyproject.key.api.data.ProofStatus": ProofStatus,"org.keyproject.key.api.data.KeyIdentifications$TreeNodeId": TreeNodeId,"org.keyproject.key.api.data.TreeNodeDesc": TreeNodeDesc,"org.keyproject.key.api.remoteapi.PrintOptions": PrintOptions,"org.keyproject.key.api.data.KeyIdentifications$NodeTextId": NodeTextId,"org.keyproject.key.api.data.NodeTextDesc": NodeTextDesc,"org.keyproject.key.api.data.KeyIdentifications$TermActionId": TermActionId,"org.keyproject.key.api.data.TermActionKind": TermActionKind,"org.keyproject.key.api.data.TermActionDesc": TermActionDesc,"org.keyproject.key.api.data.SortDesc": SortDesc,"org.keyproject.key.api.data.FunctionDesc": FunctionDesc,"org.keyproject.key.api.data.KeyIdentifications$ContractId": ContractId,"org.keyproject.key.api.data.ContractDesc": ContractDesc,"org.keyproject.key.api.data.LoadParams": LoadParams,"org.keyproject.key.api.data.ProblemDefinition": ProblemDefinition,"org.keyproject.key.api.remoteclient.LogTraceParams": LogTraceParams,"org.keyproject.key.api.remoteclient.MessageType": MessageType,"org.keyproject.key.api.remoteclient.ShowMessageParams": ShowMessageParams,"org.keyproject.key.api.remoteclient.ShowMessageRequestParams": ShowMessageRequestParams,"org.keyproject.key.api.remoteclient.MessageActionItem": MessageActionItem,"de.uka.ilkd.key.pp.Range": Range,"org.keyproject.key.api.remoteclient.ShowDocumentParams": ShowDocumentParams,"org.keyproject.key.api.remoteclient.ShowDocumentResult": ShowDocumentResult,"org.keyproject.key.api.data.TaskFinishedInfo": TaskFinishedInfo,"org.keyproject.key.api.data.TaskStartedInfo": TaskStartedInfo }
+KEY_DATA_CLASSES = { "org.keyproject.key.api.remoteapi.ExampleDesc": ExampleDesc,"org.keyproject.key.api.data.ProofScriptCommandDesc": ProofScriptCommandDesc,"org.keyproject.key.api.data.ProofMacroDesc": ProofMacroDesc,"org.keyproject.key.api.data.TraceValue": TraceValue,"org.keyproject.key.api.remoteapi.ServerManagement$SetTraceParams": SetTraceParams,"org.keyproject.key.api.data.KeyIdentifications$EnvironmentId": EnvironmentId,"org.keyproject.key.api.data.KeyIdentifications$ProofId": ProofId,"org.keyproject.key.api.data.KeyIdentifications$NodeId": NodeId,"java.util.List": List,"org.keyproject.key.api.data.NodeDesc": NodeDesc,"org.keyproject.key.api.data.StrategyOptions": StrategyOptions,"org.keyproject.key.api.data.MacroStatistic": MacroStatistic,"org.keyproject.key.api.data.ProofStatus": ProofStatus,"org.keyproject.key.api.data.TreeNodeDesc": TreeNodeDesc,"org.keyproject.key.api.data.KeyIdentifications$TreeNodeId": TreeNodeId,"org.keyproject.key.api.remoteapi.PrintOptions": PrintOptions,"org.keyproject.key.api.data.KeyIdentifications$NodeTextId": NodeTextId,"org.keyproject.key.api.data.NodeTextDesc": NodeTextDesc,"org.keyproject.key.api.data.KeyIdentifications$TermActionId": TermActionId,"org.keyproject.key.api.data.TermActionKind": TermActionKind,"org.keyproject.key.api.data.TermActionDesc": TermActionDesc,"org.keyproject.key.api.data.SortDesc": SortDesc,"org.keyproject.key.api.data.FunctionDesc": FunctionDesc,"org.keyproject.key.api.data.KeyIdentifications$ContractId": ContractId,"org.keyproject.key.api.data.ContractDesc": ContractDesc,"org.keyproject.key.api.data.LoadParams": LoadParams,"org.keyproject.key.api.data.ProblemDefinition": ProblemDefinition,"org.keyproject.key.api.remoteclient.LogTraceParams": LogTraceParams,"org.keyproject.key.api.remoteclient.MessageType": MessageType,"org.keyproject.key.api.remoteclient.ShowMessageParams": ShowMessageParams,"org.keyproject.key.api.remoteclient.ShowMessageRequestParams": ShowMessageRequestParams,"org.keyproject.key.api.remoteclient.MessageActionItem": MessageActionItem,"de.uka.ilkd.key.pp.Range": Range,"org.keyproject.key.api.remoteclient.ShowDocumentParams": ShowDocumentParams,"org.keyproject.key.api.remoteclient.ShowDocumentResult": ShowDocumentResult,"org.keyproject.key.api.data.TaskFinishedInfo": TaskFinishedInfo,"org.keyproject.key.api.data.TaskStartedInfo": TaskStartedInfo }
 
-KEY_DATA_CLASSES_REV = { "ExampleDesc": "org.keyproject.key.api.remoteapi.ExampleDesc","ProofScriptCommandDesc": "org.keyproject.key.api.data.ProofScriptCommandDesc","ProofMacroDesc": "org.keyproject.key.api.data.ProofMacroDesc","TraceValue": "org.keyproject.key.api.data.TraceValue","SetTraceParams": "org.keyproject.key.api.remoteapi.ServerManagement$SetTraceParams","EnvironmentId": "org.keyproject.key.api.data.KeyIdentifications$EnvironmentId","ProofId": "org.keyproject.key.api.data.KeyIdentifications$ProofId","NodeId": "org.keyproject.key.api.data.KeyIdentifications$NodeId","List": "java.util.List","NodeDesc": "org.keyproject.key.api.data.NodeDesc","StrategyOptions": "org.keyproject.key.api.data.StrategyOptions","MacroStatistic": "org.keyproject.key.api.data.MacroStatistic","ProofStatus": "org.keyproject.key.api.data.ProofStatus","TreeNodeId": "org.keyproject.key.api.data.KeyIdentifications$TreeNodeId","TreeNodeDesc": "org.keyproject.key.api.data.TreeNodeDesc","PrintOptions": "org.keyproject.key.api.remoteapi.PrintOptions","NodeTextId": "org.keyproject.key.api.data.KeyIdentifications$NodeTextId","NodeTextDesc": "org.keyproject.key.api.data.NodeTextDesc","TermActionId": "org.keyproject.key.api.data.KeyIdentifications$TermActionId","TermActionKind": "org.keyproject.key.api.data.TermActionKind","TermActionDesc": "org.keyproject.key.api.data.TermActionDesc","SortDesc": "org.keyproject.key.api.data.SortDesc","FunctionDesc": "org.keyproject.key.api.data.FunctionDesc","ContractId": "org.keyproject.key.api.data.KeyIdentifications$ContractId","ContractDesc": "org.keyproject.key.api.data.ContractDesc","LoadParams": "org.keyproject.key.api.data.LoadParams","ProblemDefinition": "org.keyproject.key.api.data.ProblemDefinition","LogTraceParams": "org.keyproject.key.api.remoteclient.LogTraceParams","MessageType": "org.keyproject.key.api.remoteclient.MessageType","ShowMessageParams": "org.keyproject.key.api.remoteclient.ShowMessageParams","ShowMessageRequestParams": "org.keyproject.key.api.remoteclient.ShowMessageRequestParams","MessageActionItem": "org.keyproject.key.api.remoteclient.MessageActionItem","Range": "de.uka.ilkd.key.pp.Range","ShowDocumentParams": "org.keyproject.key.api.remoteclient.ShowDocumentParams","ShowDocumentResult": "org.keyproject.key.api.remoteclient.ShowDocumentResult","TaskFinishedInfo": "org.keyproject.key.api.data.TaskFinishedInfo","TaskStartedInfo": "org.keyproject.key.api.data.TaskStartedInfo" }
+KEY_DATA_CLASSES_REV = { "ExampleDesc": "org.keyproject.key.api.remoteapi.ExampleDesc","ProofScriptCommandDesc": "org.keyproject.key.api.data.ProofScriptCommandDesc","ProofMacroDesc": "org.keyproject.key.api.data.ProofMacroDesc","TraceValue": "org.keyproject.key.api.data.TraceValue","SetTraceParams": "org.keyproject.key.api.remoteapi.ServerManagement$SetTraceParams","EnvironmentId": "org.keyproject.key.api.data.KeyIdentifications$EnvironmentId","ProofId": "org.keyproject.key.api.data.KeyIdentifications$ProofId","NodeId": "org.keyproject.key.api.data.KeyIdentifications$NodeId","List": "java.util.List","NodeDesc": "org.keyproject.key.api.data.NodeDesc","StrategyOptions": "org.keyproject.key.api.data.StrategyOptions","MacroStatistic": "org.keyproject.key.api.data.MacroStatistic","ProofStatus": "org.keyproject.key.api.data.ProofStatus","TreeNodeDesc": "org.keyproject.key.api.data.TreeNodeDesc","TreeNodeId": "org.keyproject.key.api.data.KeyIdentifications$TreeNodeId","PrintOptions": "org.keyproject.key.api.remoteapi.PrintOptions","NodeTextId": "org.keyproject.key.api.data.KeyIdentifications$NodeTextId","NodeTextDesc": "org.keyproject.key.api.data.NodeTextDesc","TermActionId": "org.keyproject.key.api.data.KeyIdentifications$TermActionId","TermActionKind": "org.keyproject.key.api.data.TermActionKind","TermActionDesc": "org.keyproject.key.api.data.TermActionDesc","SortDesc": "org.keyproject.key.api.data.SortDesc","FunctionDesc": "org.keyproject.key.api.data.FunctionDesc","ContractId": "org.keyproject.key.api.data.KeyIdentifications$ContractId","ContractDesc": "org.keyproject.key.api.data.ContractDesc","LoadParams": "org.keyproject.key.api.data.LoadParams","ProblemDefinition": "org.keyproject.key.api.data.ProblemDefinition","LogTraceParams": "org.keyproject.key.api.remoteclient.LogTraceParams","MessageType": "org.keyproject.key.api.remoteclient.MessageType","ShowMessageParams": "org.keyproject.key.api.remoteclient.ShowMessageParams","ShowMessageRequestParams": "org.keyproject.key.api.remoteclient.ShowMessageRequestParams","MessageActionItem": "org.keyproject.key.api.remoteclient.MessageActionItem","Range": "de.uka.ilkd.key.pp.Range","ShowDocumentParams": "org.keyproject.key.api.remoteclient.ShowDocumentParams","ShowDocumentResult": "org.keyproject.key.api.remoteclient.ShowDocumentResult","TaskFinishedInfo": "org.keyproject.key.api.data.TaskFinishedInfo","TaskStartedInfo": "org.keyproject.key.api.data.TaskStartedInfo" }
 

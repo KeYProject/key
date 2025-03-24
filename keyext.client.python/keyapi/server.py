@@ -59,5 +59,8 @@ class KeYProof(object):
     def auto(self, options = StrategyOptions(None, None, None, None, None, 10000)):
         return self.key.proof_auto(self.proofHandle, options)
 
+    def goals(self, open_only = False, only_enabled = False):
+        return self.key.proof_goals(self.proofHandle, open_only, only_enabled)
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.key.proof_dispose(self.proofHandle)
