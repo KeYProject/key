@@ -25,7 +25,7 @@ public interface ProofApi {
             StreategyOptions options);
 
     @JsonRequest
-    CompletableFuture<MacroStatistic> macro(ProofId proof, String macroId,
+    CompletableFuture<MacroStatistic> macro(ProofId proof, String macroName,
             StreategyOptions options);
 
     @JsonRequest
