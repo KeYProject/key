@@ -54,6 +54,8 @@ import org.keyproject.key.api.remoteapi.KeyApi;
 import org.keyproject.key.api.remoteapi.PrintOptions;
 import org.keyproject.key.api.remoteclient.ClientApi;
 
+import static de.uka.ilkd.key.proof.ProofNodeDescription.collectPathInformation;
+
 public final class KeyApiImpl implements KeyApi {
     private final KeyIdentifications data = new KeyIdentifications();
 
@@ -213,7 +215,7 @@ public final class KeyApiImpl implements KeyApi {
 
     private NodeDesc asNodeDesc(ProofId proofId, Node it) {
         return new NodeDesc(proofId, it.serialNr(), it.getNodeInfo().getBranchLabel(),
-            it.getNodeInfo().getScriptRuleApplication());
+            it.getNodeInfo().getScriptRuleApplication(), collectPathInformation(it));
     }
 
     @Override
@@ -230,7 +232,7 @@ public final class KeyApiImpl implements KeyApi {
         return new NodeDesc(new NodeId(proofId, root.serialNr()),
             root.getNodeInfo().getBranchLabel(),
             root.getNodeInfo().getScriptRuleApplication(),
-            list);
+            list, collectPathInformation(root));
     }
 
     @Override

@@ -200,8 +200,8 @@ public class StartServer implements Runnable {
     public static void configureJson(GsonBuilder gsonBuilder) {
         gsonBuilder.registerTypeAdapter(File.class, new KeyAdapter.FileTypeAdapter());
         gsonBuilder.registerTypeAdapter(Throwable.class, new KeyAdapter.ThrowableAdapter());
-        gsonBuilder.registerTypeAdapterFactory(
-            RuntimeClassNameTypeAdapterFactory.of(Object.class, "$class"));
+        gsonBuilder.registerTypeAdapterFactory(RuntimeClassNameTypeAdapterFactory.of(Object.class, "$class"));
+        gsonBuilder.serializeNulls();
     }
 
     public static Launcher<ClientApi> launch(OutputStream out, InputStream in, KeyApiImpl keyApi) {
