@@ -9,8 +9,8 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
  * @author Alexander Weigl
  * @version 1 (29.10.23)
  */
-public record ProofScriptCommandDesc() implements KeYDataTransferObject {
+public record ProofScriptCommandDesc(String macroId, String documentation) implements KeYDataTransferObject {
     public static ProofScriptCommandDesc from(ProofScriptCommand<?> proofScriptCommand) {
-        return null;
+        return new ProofScriptCommandDesc(proofScriptCommand.getName(), proofScriptCommand.getDocumentation());
     }
 }
