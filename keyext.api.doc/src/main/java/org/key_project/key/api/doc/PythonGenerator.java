@@ -200,9 +200,15 @@ public abstract class PythonGenerator implements Supplier<String> {
             metamodel.types().forEach(this::printType);
 
             var names =
-                metamodel.types().stream().map(it -> "\"%s\": %s".formatted(it.name(), it.name()))
+                metamodel.types().stream()
+                        .map(it -> "\"%s\": %s".formatted(it.identifier(), it.name()))
                         .collect(Collectors.joining(","));
             out.format("KEY_DATA_CLASSES = { %s }%n%n", names);
+            var names_reverse =
+                metamodel.types().stream()
+                        .map(it -> "\"%s\": \"%s\"".formatted(it.name(), it.identifier()))
+                        .collect(Collectors.joining(","));
+            out.format("KEY_DATA_CLASSES_REV = { %s }%n%n", names_reverse);
         }
 
         private void printType(Metamodel.Type type) {
