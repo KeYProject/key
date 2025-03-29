@@ -12,7 +12,7 @@ options { tokenVocab=JmlLexer; }
 }
 
 
-classlevel_comments: classlevel_comment* EOF;
+classlevel_comments: classlevel_comment* modifiers EOF;
 
 /* weigl: Gammar not good here. High ambiguity in the parser.
    Abstractly speaking:
@@ -20,27 +20,26 @@ classlevel_comments: classlevel_comment* EOF;
    but:            S ->    A B? | B;
       could be better.
 */
-classlevel_comment: (modifiers classlevel_element | classlevel_element) | modifiers | set_statement;
+classlevel_comment: modifiers? classlevel_element;
 classlevel_element
 // The order matters! The rules with clear lookahead in front.
 // In the new lexer w/o contract and expr mode. The keyword "ensures"   can also be an identifier.
 // This means, that the following text could also be seen as a field declaration:
 //      //@   ensures ensures;
-  : class_invariant /*| depends_clause*/     | accessible_clause
-  | method_declaration  | field_declaration  | represents_clause
+  : class_invariant       | accessible_clause
+  | method_declaration    | field_declaration  | represents_clause
   | history_constraint    | initially_clause   | class_axiom
   | monitors_for_clause   | readable_if_clause | writable_if_clause
-  | datagroup_clause    | set_statement      | nowarn_pragma
-  | assert_statement   | assume_statement
-  | method_specification
+  | datagroup_clause      | set_statement      | nowarn_pragma
+  | assert_statement      | assume_statement   | method_specification
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
 methodlevel_element
-  : field_declaration | set_statement | merge_point_statement
-  | loop_specification | assert_statement | assume_statement | nowarn_pragma
-  | debug_statement | block_specification | block_loop_specification
-  | assert_statement | assume_statement
+  : field_declaration  | set_statement       | merge_point_statement
+  | loop_specification | assert_statement    | assume_statement
+  | debug_statement    | block_specification | block_loop_specification
+  | assert_statement   | assume_statement    | nowarn_pragma
  ;
 
 modifiers: modifier+;
@@ -57,18 +56,15 @@ modifier
 class_axiom: AXIOM expression SEMI;
 initially_clause: INITIALLY expression SEMI;
 class_invariant: INVARIANT expression SEMI;
-//axiom_name: AXIOM_NAME_BEGIN IDENT AXIOM_NAME_END;
-method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
+method_specification: also_keyword* spec_case (also_keyword+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
 spec_case:
-  (modifiers)?
+  modifiers?
   behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
-           | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
+           | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR)?
   spec_body
 ;
 
-/*spec_var_decls: (old_clause | FORALL expression)+;
-spec_header: requires_clause+;*/
 
 spec_body: a+=clause+ (NEST_START inner+=clause* (also_keyword+ spec_body)* NEST_END)?;
 clauseEOF: clause EOF;
