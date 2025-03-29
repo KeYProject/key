@@ -318,21 +318,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 fieldDecl.setComments(newComments);
                 attach((FieldDeclaration) fieldDecl, (TypeDeclaration) astParent, 0); // No matter
                                                                                       // what the
-                // javadoc for attach()
-                // may say,
-                // this value is *not*
-                // used as a child
-                // index but as
-                // an index into
-                // astParent.getMembers(),
-                // which only
-                // contains some of the
-                // children, not all. 0
-                // is
-                // topmost position,
-                // which should be a
-                // safe choice
-                // in any case.
+                // javadoc for attach() may say, this value is *not* used as a child
+                // index but as an index into astParent.getMembers(), which only
+                // contains some of the children, not all. 0 is topmost position,
+                // which should be a safe choice in any case.
             } else {
                 assert astParent instanceof StatementBlock;
                 if (isModel) {
@@ -346,15 +335,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 fieldDecl = (LocalVariableDeclaration) declStatement.get(0);
                 updatePositionInformation(fieldDecl, declWithModifiers.location.getPosition());
                 attach((LocalVariableDeclaration) fieldDecl, (StatementBlock) astParent,
-                    childIndex); // Unlike
-                // above, here
-                // the value is
-                // really a
-                // child index,
-                // and here the
-                // position
-                // really
-                // matters.
+                    childIndex);
+                // Unlike above, here the value is really a child index, and here the
+                // position really matters.
             }
         } catch (Throwable e) {
             throw new SLTranslationException(e.getMessage() + " (" + e.getClass().getName() + ")",
@@ -735,16 +718,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         } catch (SLTranslationException e) {
             // Wrap the exception into a runtime exception because recoder does
-            // not allow
-            // otherwise. It will be unwrapped later ...
+            // not allow otherwise. It will be unwrapped later ...
             throw new RuntimeException(e);
-            // RuntimeException runtimeE
-            // = new RuntimeException(e.getMessage()
-            // + "\n" + e.getFileName()
-            // + ", line " + e.line()
-            // + ", column " + e.getColumn());
-            // runtimeE.setStackTrace(e.getStackTrace());
-            // throw runtimeE;
         }
     }
 

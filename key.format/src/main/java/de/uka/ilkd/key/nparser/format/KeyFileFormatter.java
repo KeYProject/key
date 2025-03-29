@@ -300,7 +300,9 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
             String line = lines[i];
             if (i != 0) {
                 // Watch out for empty line when removing the common indent
-                line = line.isEmpty() ? line : line.substring(minIndent);
+                // weigl: "line.length() < minIndent" was required for Windows.
+                line =
+                    line.isEmpty() || line.length() < minIndent ? line : line.substring(minIndent);
             } else {
                 line = line.stripLeading();
             }
