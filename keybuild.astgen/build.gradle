@@ -1,0 +1,32 @@
+plugins {    }
+configurations {antlr4}
+
+dependencies {
+    antlr4("org.antlr:antlr4:4.13.2")
+    api "org.antlr:antlr4-runtime:4.13.2"
+
+    api project(":key.core")
+
+    implementation("com.palantir.javapoet:javapoet:0.5.0")
+}
+
+
+
+def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+tasks.register('runAntlr4', JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.files "src/main/antlr4/Astgen.g4"
+    outputs.dir antlr4OutputKey
+    classpath = configurations.antlr4
+    mainClass.set("org.antlr.v4.Tool")
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
+            "-package", "de.uka.ilkd.key.nparser",
+            "src/main/antlr4/Astgen.g4"]
+    doFirst {
+        file(antlr4OutputKey).mkdirs()
+        println("create $antlr4OutputKey")
+    }
+}
+sourceSets.main.java.srcDir("$projectDir/build/generated-src/antlr4/main")
+compileJava.dependsOn runAntlr4

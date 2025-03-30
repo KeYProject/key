@@ -1,3 +1,5 @@
+include "keybuild.astgen"
+
 include "key.util"
 include "key.ui"
 include "key.ncore"

@@ -1,0 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package edu.kit.iti.formal.astgen.model;
+
+import java.util.List;
+
+import org.jspecify.annotations.Nullable;
+
+/**
+ * @author Alexander Weigl
+ * @version 1 (10.09.17)
+ */
+public record Node(String pckg, String name,
+        NodeWrapper extendz, List<Node> implementz,
+        boolean isAbstract, boolean isFinal, List<Node> children,
+        List<Attr> attributes, @Nullable String comment) {
+}
