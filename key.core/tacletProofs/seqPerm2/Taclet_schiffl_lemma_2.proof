@@ -49,10 +49,10 @@ macro split-prop;
 rule allRight;
 rule allRight;
 macro split-prop;
-rule `seqPermDefLeft`;
-rule `andLeft`;
-rule `exLeft`;
-macro split-prop;
+rule "seqPermDefLeft";
+rule "andLeft";
+rule "exLeft";
+macro "split-prop";
 // the following equations are useful in many case.
 rule  seqNPermRange;
 instantiate var=iv with=`v_x_0` occ=1;
@@ -106,8 +106,8 @@ tryclose branch;
 // 8. equation
 cut `v_x_0 = v_y_0`;
 // This corresponds to case A in the Notes.
-instantiate hide var=`v_r` with=`seqSwap(s_0,v_x_0,jv_0)`;
-// in the following r refers to this instantion
+instantiate hide var="v_r" with=`seqSwap(s_0,v_x_0,jv_0)`;
+// in the following r refers to this instantiation
 rule andRight;
 rule andRight;
 rule andRight;
@@ -116,8 +116,8 @@ rule lenOfSwap;
 tryclose branch;
 // established: r is of correct length
 rule seqNPermSwapNPerm;
-instantiate hide var=`iv` with=`v_x_0` occ=1;
-instantiate hide var=`jv` with=`jv_0`;
+instantiate hide var="iv" with=`v_x_0` occ=1;
+instantiate hide var="jv" with=`jv_0`;
 rule impLeft;
 tryclose branch;
 tryclose branch;
@@ -125,7 +125,7 @@ tryclose branch;
 rule allRight;
 rule impRight;
 rule andLeft;
-instantiate var=iv with=`v_iv_0`;
+instantiate var="iv" with=`v_iv_0`;
 rule impLeft;
 tryclose branch;
 rule getOfSwap;
