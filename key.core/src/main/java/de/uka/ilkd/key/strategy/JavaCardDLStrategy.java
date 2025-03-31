@@ -215,6 +215,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // strengthenConstraints,
             AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
             // smtF,
+                shiftUpdateF, relaxedShiftUpdateF, nestedLoopUsecaseF,
             methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
             loopBlockApplyHeadFeature, ifMatchedF, dispatcher);
     }
