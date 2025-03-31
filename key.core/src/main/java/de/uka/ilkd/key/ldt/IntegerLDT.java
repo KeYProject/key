@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -715,8 +716,50 @@ public final class IntegerLDT extends LDT {
     @Override
     public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
-        // Dead in all examples, removed in commit 1e72a5709053a87cae8d2
-        return null;
+        final Type opReturnType = op.getKeYJavaType(serv, ec).getJavaType();
+        final boolean isLong = opReturnType == PrimitiveType.JAVA_LONG;
+        final boolean isBigint = opReturnType == PrimitiveType.JAVA_BIGINT;
+
+        if (op instanceof GreaterThan) {
+            return getGreaterThan();
+        } else if (op instanceof GreaterOrEquals) {
+            return getGreaterOrEquals();
+        } else if (op instanceof LessThan) {
+            return getLessThan();
+        } else if (op instanceof LessOrEquals) {
+            return getLessOrEquals();
+        } else if (op instanceof Divide) {
+            return isLong ? getJavaDivLong() : (isBigint ? getJDivision() : getJavaDivInt());
+        } else if (op instanceof Times) {
+            return isLong ? getMulJlong() : (isBigint ? getMul() : getJavaMulInt());
+        } else if (op instanceof Plus) {
+            return isLong ? getAddJlong() : (isBigint ? getAdd() : getAddJint());
+        } else if (op instanceof Minus) {
+            return isLong ? getSubJlong() : (isBigint ? getSub() : getSubJint());
+        } else if (op instanceof Modulo) {
+            return isBigint ? getJModulo() : getJavaMod();
+        } /*else if (op instanceof ShiftLeft) {
+            return isLong ? getJavaShiftLeftLong() : getJavaShiftLeftInt();
+        } else if (op instanceof ShiftRight) {
+            return isLong ? getJavaShiftRightLong() : getJavaShiftRightInt();
+        }  else if (op instanceof UnsignedShiftRight) {
+            return isLong ? getJavaUnsignedShiftRightLong()
+                    : getJavaUnsignedShiftRightInt();
+        } else if (op instanceof BinaryAnd) {
+            return isLong ? getJavaBitwiseAndLong() : getJavaBitwiseAndInt();
+        } else if (op instanceof BinaryNot) {
+            return getJavaBitwiseNegation();
+        } else if (op instanceof BinaryOr) {
+            return isLong ? getJavaBitwiseOrLong() : getJavaBitwiseOrInt();
+        } else if (op instanceof BinaryXOr) {
+            return isLong ? getJavaBitwiseOrLong() : getJavaBitwiseXOrInt();
+        } */ else if (op instanceof Negative) {
+            return isLong ? getUnaryMinusJlong() : (isBigint ? getNegativeNumberSign() : getUnaryMinusJint());
+        } else if (op instanceof TypeCast) {
+            return getSpecCast(opReturnType);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -739,6 +782,11 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
+        if (subs.length == 1) {
+            return isResponsible(op, subs[0], services, ec);
+        } else if (subs.length == 2) {
+            return isResponsible(op, subs[0], subs[1], services, ec);
+        }
         return false;
     }
 
@@ -747,6 +795,14 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
+        if(left != null
+                && left.sort().extendsTrans(targetSort())
+                && right != null
+                && right.sort().extendsTrans(targetSort())) {
+            if(getFunctionFor(op, services, ec) != null) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -754,6 +810,11 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
+        if(sub != null && sub.sort().extendsTrans(targetSort())) {
+            if(op instanceof Negative) {
+                return true;
+            }
+        }
         return false;
     }
 
