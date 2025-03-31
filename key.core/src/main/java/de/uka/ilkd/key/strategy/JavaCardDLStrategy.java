@@ -539,6 +539,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
         }
 
+        setupLocset(d);
+        setupDependencyPredicateStrategy(d);
+
         return d;
     }
 
