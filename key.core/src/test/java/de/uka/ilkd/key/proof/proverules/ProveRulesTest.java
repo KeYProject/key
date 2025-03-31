@@ -141,11 +141,11 @@ public class ProveRulesTest {
          * Create list of constructor parameters containig one entry for each taclet name. (that
          * means there will be one test case for each taclet)
          */
-        return tacletNames.stream().map(
-            tacletName -> DynamicTest.dynamicTest(tacletName,
-                () -> loadTacletProof(tacletName,
-                    tacletObjectByTacletName.get(tacletName),
-                    proofFileByTacletName.get(tacletName))));
+        return tacletNames.stream()
+                .map(tacletName -> DynamicTest.dynamicTest(tacletName,
+                    () -> loadTacletProof(tacletName,
+                        tacletObjectByTacletName.get(tacletName),
+                        proofFileByTacletName.get(tacletName))));
     }
 
 }

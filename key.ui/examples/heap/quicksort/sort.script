@@ -1,7 +1,7 @@
 macro autopilot-prep;
 
-#
-# proof obligation for seqPerm after 3 method calls
+
+// proof obligation for seqPerm after 3 method calls
 select formula="{heapAtPre:=heap || exc:=null || heap:=heapAfter_sort_0}
    seqPerm(seqDef{int u;}(0, array.length, any::select(heap, array, arr(u))),
            seqDef{int u;}(0, array.length, any::select(heapAtPre, array, arr(u))))";
@@ -31,6 +31,6 @@ rule seqPermTrans
 rule seqPermSym
   formula="seqPerm(@seqPre, @seqSort0)";
 
-# Now, the power of autopilot is enough. 
-# Run another 10000 on each open goal.
+// Now, the power of autopilot is enough.
+// Run another 10000 on each open goal.
 tryclose;
