@@ -1672,9 +1672,9 @@ public class TermBuilder {
      * @param f the field to access
      * @return the term representing the access "o.f"
      * @see #finalDot(Sort, Term, Term) for accessing final Java or ghost fields
-     * @see #dot(Sort, Term, JFunction) for accessing final model fields
+     * @see #dot(Sort, Term, Function) for accessing final model fields
      */
-    public Term finalDot(Sort sort, Term o, JFunction f) {
+    public Term finalDot(Sort sort, Term o, Function f) {
         final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort ? finalDot(sort, o, func(f))
                 : func(f, getBaseHeap(), o);
@@ -1688,9 +1688,9 @@ public class TermBuilder {
      * @param f the field to access
      * @return the term representing the static access "C.f"
      * @see #finalDot(Sort, Term, Term) for accessing final Java or ghost fields
-     * @see #dot(Sort, Term, JFunction) for accessing final model fields
+     * @see #dot(Sort, Term, Function) for accessing final model fields
      */
-    public Term staticFinalDot(Sort sort, JFunction f) {
+    public Term staticFinalDot(Sort sort, Function f) {
         final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort ? finalDot(sort, NULL(), func(f))
                 : func(f, getBaseHeap(), NULL());
