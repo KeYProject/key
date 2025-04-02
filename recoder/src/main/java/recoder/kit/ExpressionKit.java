@@ -213,7 +213,7 @@ public class ExpressionKit {
             NonTerminalProgramElement parent = pe.getASTParent();
             Debug.assertNonnull(parent);
             if ((parent instanceof Statement parentStatement)
-                    && (parentStatement.getStatementContainer() != null)) {
+                    && (((Statement) parent).getStatementContainer() != null)) {
                 destination = StatementKit.prepareStatementMutableList(parentStatement, ch);
                 destParent = parentStatement.getStatementContainer();
                 for (destIndex = 0; destination.get(destIndex) != parent; destIndex += 1) {

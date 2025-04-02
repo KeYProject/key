@@ -658,7 +658,7 @@ public class MethodKit {
         if (candidate instanceof Constructor) {
             return null;
         }
-        List<Method> redefined = getRedefinedMethods(ni, context, name, signature);
+        List<Method> redefined = MethodKit.getRedefinedMethods(ni, context, name, signature);
         for (Method method : redefined) {
             Problem problem = checkMethodRedefinition(si, method, candidate);
             if (problem != null) {

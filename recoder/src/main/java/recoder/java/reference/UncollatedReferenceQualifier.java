@@ -19,7 +19,7 @@ import recoder.list.generic.ASTList;
 
 public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
         implements TypeReferenceInfix, ExpressionContainer, TypeReferenceContainer,
-        PackageReferenceContainer, Expression {
+        PackageReferenceContainer, Reference, Expression {
 
     /**
      * serialization id

@@ -15,7 +15,7 @@ public abstract class MemberInfo extends ByteCodeElement implements Member {
 
     List<AnnotationUseInfo> annotations;
 
-    protected MemberInfo(int accessFlags, String name, ClassFile parent) {
+    public MemberInfo(int accessFlags, String name, ClassFile parent) {
         super(accessFlags, name);
         setParent(parent);
     }

@@ -16,7 +16,7 @@ public abstract class VisibilityModifier extends recoder.java.declaration.Modifi
      * Visibility modifier.
      */
 
-    protected VisibilityModifier() {
+    public VisibilityModifier() {
         // default constructor
     }
 

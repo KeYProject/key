@@ -17,7 +17,7 @@ public abstract class ProjectFileIO {
 
     private final ServiceConfiguration config;
 
-    protected ProjectFileIO(ServiceConfiguration system) {
+    public ProjectFileIO(ServiceConfiguration system) {
         config = system;
     }
 

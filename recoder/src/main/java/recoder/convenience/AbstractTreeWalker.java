@@ -23,12 +23,12 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
         stack = new ProgramElement[initialStackCapacity];
     }
 
-    protected AbstractTreeWalker(ProgramElement root) {
+    public AbstractTreeWalker(ProgramElement root) {
         stack = new ProgramElement[16];
         reset(root);
     }
 
-    protected AbstractTreeWalker(ProgramElement root, int initialStackCapacity) {
+    public AbstractTreeWalker(ProgramElement root, int initialStackCapacity) {
         stack = new ProgramElement[Math.max(8, initialStackCapacity)];
         reset(root);
     }

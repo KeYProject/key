@@ -16,7 +16,7 @@ public abstract class JumpStatement extends JavaStatement {
      * Jump statement.
      */
 
-    protected JumpStatement() {
+    public JumpStatement() {
         // nothing to do
     }
 

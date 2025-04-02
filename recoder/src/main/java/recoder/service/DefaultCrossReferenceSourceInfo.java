@@ -7,6 +7,7 @@ package recoder.service;
 import java.util.*;
 
 import recoder.ServiceConfiguration;
+import recoder.TuningParameters;
 import recoder.abstraction.*;
 import recoder.abstraction.Package;
 import recoder.convenience.Format;
@@ -360,7 +361,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
 
     private void registerReference(Reference ref, ProgramModelElement pme) {
         Set<Reference> set = element2references.computeIfAbsent(pme, k -> new HashSet<>(
-            INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
+            TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
         set.add(ref);
     }
 
