@@ -653,7 +653,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         TypeScope scope = (TypeScope) pe;
         if (scope == null) {
             Debug.log("Null scope during type query " + name + " in context "
-                + Format.toString(ELEMENT_LONG, context));
+                + Format.toString(Formats.ELEMENT_LONG, context));
             Debug.log(Debug.makeStackTrace());
         }
         ClassType result = null;
@@ -1910,7 +1910,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             return res;
         }
         Type at = getType(apr.getParent().getParent().getTypeReference());
-        if (at instanceof ClassType ct && ct.isAnnotationType()) {
+        if (at instanceof ClassType ct && ((ClassType) at).isAnnotationType()) {
             List<? extends Method> ml = ct.getMethods();
             for (Method method : ml) {
                 if (method.getName().equals(apr.getIdentifier().getText())) {

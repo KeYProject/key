@@ -45,7 +45,7 @@ public class PackageKit {
         int i, j = -1;
         do {
             i = j + 1;
-            j = name.indexOf('.', i);
+            j = name.indexOf(".", i);
             String token = (j > i) ? name.substring(i, j) : name.substring(i);
             result = f.createPackageReference(result, f.createIdentifier(token));
         } while (j > i);

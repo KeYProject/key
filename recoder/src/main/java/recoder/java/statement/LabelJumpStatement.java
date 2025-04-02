@@ -26,7 +26,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * Label jump statement.
      */
 
-    protected LabelJumpStatement() {
+    public LabelJumpStatement() {
         // nothing to do
     }
 
@@ -36,7 +36,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * @param label an identifier.
      */
 
-    protected LabelJumpStatement(Identifier label) {
+    public LabelJumpStatement(Identifier label) {
         setIdentifier(label);
         // makeParentRoleValid() called by subclasses' constructors
     }

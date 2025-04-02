@@ -44,13 +44,15 @@ public class ReferenceCompletenessTest {
                 if (pe instanceof Reference) {
                     Assertions.assertFalse(pe instanceof UncollatedReferenceQualifier,
                         "Uncollated reference detected");
-                    if (pe instanceof VariableReference r) {
+                    if (pe instanceof VariableReference) {
+                        VariableReference r = (VariableReference) pe;
                         Variable x = xrsi.getVariable(r);
                         List<? extends VariableReference> list = xrsi.getReferences(x);
                         if (!list.contains(r)) {
                             Assertions.fail(makeReferenceError(r, x));
                         }
-                    } else if (pe instanceof TypeReference r) {
+                    } else if (pe instanceof TypeReference) {
+                        TypeReference r = (TypeReference) pe;
                         Type x = xrsi.getType(r);
                         // void type check
                         if (x != null) {
@@ -59,19 +61,22 @@ public class ReferenceCompletenessTest {
                                 Assertions.fail(makeReferenceError(r, x));
                             }
                         }
-                    } else if (pe instanceof MethodReference r) {
+                    } else if (pe instanceof MethodReference) {
+                        MethodReference r = (MethodReference) pe;
                         Method x = xrsi.getMethod(r);
                         List<? extends MemberReference> list = xrsi.getReferences(x);
                         if (!list.contains(r)) {
                             Assertions.fail(makeReferenceError(r, x));
                         }
-                    } else if (pe instanceof ConstructorReference r) {
+                    } else if (pe instanceof ConstructorReference) {
+                        ConstructorReference r = (ConstructorReference) pe;
                         Constructor x = xrsi.getConstructor(r);
                         List<ConstructorReference> list = xrsi.getReferences(x);
                         if (!list.contains(r)) {
                             Assertions.fail(makeReferenceError(r, x));
                         }
-                    } else if (pe instanceof PackageReference r) {
+                    } else if (pe instanceof PackageReference) {
+                        PackageReference r = (PackageReference) pe;
                         Package x = xrsi.getPackage(r);
                         List<PackageReference> list = xrsi.getReferences(x);
                         if (!list.contains(r)) {

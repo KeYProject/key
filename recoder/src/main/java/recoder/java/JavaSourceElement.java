@@ -34,7 +34,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * Java source element.
      */
 
-    protected JavaSourceElement() {
+    public JavaSourceElement() {
         // nothing to do here
     }
 

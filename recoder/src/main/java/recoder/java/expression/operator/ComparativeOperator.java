@@ -19,7 +19,7 @@ public abstract class ComparativeOperator extends Operator {
      * Comparative operator.
      */
 
-    protected ComparativeOperator() {
+    public ComparativeOperator() {
         super();
     }
 
@@ -30,7 +30,7 @@ public abstract class ComparativeOperator extends Operator {
      * @param rhs an expression.
      */
 
-    protected ComparativeOperator(Expression lhs, Expression rhs) {
+    public ComparativeOperator(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }
 

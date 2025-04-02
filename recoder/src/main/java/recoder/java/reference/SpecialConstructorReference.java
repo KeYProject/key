@@ -31,7 +31,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * Special constructor reference.
      */
 
-    protected SpecialConstructorReference() {
+    public SpecialConstructorReference() {
         // nothing to do
     }
 
@@ -41,7 +41,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @param arguments an expression mutable list.
      */
 
-    protected SpecialConstructorReference(ASTList<Expression> arguments) {
+    public SpecialConstructorReference(ASTList<Expression> arguments) {
         setArguments(arguments);
     }
 

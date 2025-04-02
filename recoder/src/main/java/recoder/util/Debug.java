@@ -20,7 +20,7 @@ public class Debug {
      * uppercase versions thereof) are considered unset.
      */
     protected final static String[] NEGATIVE_VALUES =
-        { "", "0", "false", "off", "no", "none" };
+        new String[] { "", "0", "false", "off", "no", "none" };
     protected final static String DEBUGGING_OPTION_FILE = "debug.properties";
     final static String ESC_PREFIX = "\033[3;31m";
     final static String ESC_SUFFIX = "\033[0m";

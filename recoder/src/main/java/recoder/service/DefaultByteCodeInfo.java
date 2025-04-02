@@ -69,7 +69,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     public Type getType(ByteCodeElement bce) {
         Type result = null;
         String typeName = bce.getTypeName();
-        if (bce instanceof MethodInfo mi) {
+        if (bce instanceof MethodInfo) {
+            MethodInfo mi = (MethodInfo) bce;
             List<? extends TypeParameter> tpl = mi.getContainingClassType().getTypeParameters();
             for (TypeParameter tp : tpl) {
                 if (typeName.equals(tp.getName())) {
@@ -80,7 +81,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         if (result == null) {
             result = getNameInfo().getType(typeName);
         }
-        if (bce instanceof MethodInfo mi) {
+        if (bce instanceof MethodInfo) {
+            MethodInfo mi = (MethodInfo) bce;
             List<TypeArgumentInfo> typeArgs = mi.getTypeArgumentsForReturnType();
             if (typeArgs != null && typeArgs.size() != 0) {
                 if (result instanceof ArrayType) {

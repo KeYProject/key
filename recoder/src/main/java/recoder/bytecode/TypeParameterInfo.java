@@ -15,7 +15,7 @@ import recoder.service.ProgramModelInfo;
 /**
  * @author Tobias Gutzmann
  */
-public class TypeParameterInfo implements TypeParameter {
+public class TypeParameterInfo implements TypeParameter, ClassType {
     protected final String name;
 
     protected final String[] boundNames;

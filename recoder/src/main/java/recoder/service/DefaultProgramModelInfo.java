@@ -498,7 +498,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             ta = ((ArrayType) ta).getBaseType();
             tb = ((ArrayType) tb).getBaseType();
         }
-        if (tb instanceof TypeParameter tp && ta instanceof ArrayType) {
+        if (tb instanceof TypeParameter && ta instanceof ArrayType) {
+            TypeParameter tp = (TypeParameter) tb;
             if (tp.getBoundCount() == 0) {
                 return true;
             }
@@ -508,7 +509,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             }
             return tp.getBoundName(0).equals("java.lang.Object");
         }
-        if (tb instanceof TypeParameter tp && ta instanceof ClassType) {
+        if (tb instanceof TypeParameter && ta instanceof ClassType) {
+            TypeParameter tp = (TypeParameter) tb;
             for (int i = 0; i < tp.getBoundCount(); i++) {
                 // must be compatible to all bounds!
                 ClassType t;

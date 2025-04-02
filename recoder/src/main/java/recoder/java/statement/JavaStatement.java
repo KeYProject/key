@@ -27,7 +27,7 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
      * Java statement.
      */
 
-    protected JavaStatement() {
+    public JavaStatement() {
         // nothing to do
     }
 

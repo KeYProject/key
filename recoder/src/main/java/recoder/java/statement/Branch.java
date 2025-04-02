@@ -26,7 +26,7 @@ public abstract class Branch extends JavaNonTerminalProgramElement implements St
      * Branch.
      */
 
-    protected Branch() {
+    public Branch() {
         super();
     }
 

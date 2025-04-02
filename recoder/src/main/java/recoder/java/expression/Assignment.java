@@ -27,7 +27,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      * Assignment.
      */
 
-    protected Assignment() {
+    public Assignment() {
         // nothing to do
     }
 
@@ -37,7 +37,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      * @param unaryChild an expression.
      */
 
-    protected Assignment(Expression unaryChild) {
+    public Assignment(Expression unaryChild) {
         super(unaryChild);
     }
 
@@ -48,7 +48,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      * @param rhs an expression.
      */
 
-    protected Assignment(Expression lhs, Expression rhs) {
+    public Assignment(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }
 

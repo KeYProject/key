@@ -87,9 +87,9 @@ public class ASTIterator {
             if (pe instanceof NonTerminalProgramElement ntpe) {
                 int childCount;
                 switch (listener.enterChildren(this, ntpe)) {
-                case ENTER_NONE:
+                case ASTIterator.ENTER_NONE:
                     break;
-                case ENTER_SOME:
+                case ASTIterator.ENTER_SOME:
                     childCount = ntpe.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         ProgramElement child = ntpe.getChildAt(i);
@@ -99,7 +99,7 @@ public class ASTIterator {
                         }
                     }
                     break;
-                case ENTER_ALL:
+                case ASTIterator.ENTER_ALL:
                     childCount = ntpe.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         ProgramElement child = ntpe.getChildAt(i);

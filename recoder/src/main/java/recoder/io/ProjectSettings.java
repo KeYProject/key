@@ -270,7 +270,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
 
         // add all the jars from extDir in the path
         StringBuilder additions = null;
-        File[] jars = extDir.listFiles(jarFilter);
+        File[] jars = extDir.listFiles(ProjectSettings.jarFilter);
         if (jars.length > 0) {
             additions = new StringBuilder();
             for (File jar : jars) {
