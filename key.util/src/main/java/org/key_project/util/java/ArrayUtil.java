@@ -213,7 +213,7 @@ public final class ArrayUtil {
                 result.add(element);
             }
         }
-        return result.toArray((T[]) java.lang.reflect.Array
+        return (T[]) result.toArray((T[]) java.lang.reflect.Array
                 .newInstance(getComponentType(array), result.size()));
     }
 

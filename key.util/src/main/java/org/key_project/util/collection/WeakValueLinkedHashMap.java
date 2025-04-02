@@ -136,7 +136,7 @@ public class WeakValueLinkedHashMap<K, V> {
          * @return {@code true} if the objects are equal, otherwise {@code false}
          */
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(@Nullable Object other) {
             if (this == other)
                 return true;
             if (!(other instanceof KeyWeakValuePair<?, ?> weakVal)) {

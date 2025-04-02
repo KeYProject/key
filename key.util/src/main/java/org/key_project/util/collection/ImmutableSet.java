@@ -77,10 +77,10 @@ public interface ImmutableSet<T extends @Nullable Object>
     boolean exists(Predicate<T> predicate);
 
     /** @return true iff obj in set */
-    boolean contains(Object obj);
+    boolean contains(@Nullable Object obj);
 
     /** @return true iff this set is subset of set s */
-    boolean subset(ImmutableSet<? extends Object> s);
+    boolean subset(ImmutableSet<? extends @Nullable Object> s);
 
     /** @return int the cardinality of the set */
     int size();
