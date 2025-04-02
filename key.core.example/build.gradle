@@ -8,5 +8,5 @@ mainClassName ="org.key_project.Main"
 
 dependencies {
     implementation project(":key.core")
-    implementation 'ch.qos.logback:logback-classic:1.5.17'
+    implementation 'ch.qos.logback:logback-classic:1.5.18'
 }
