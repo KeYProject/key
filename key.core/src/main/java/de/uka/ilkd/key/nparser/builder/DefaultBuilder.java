@@ -19,8 +19,9 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration.Variance;
+import de.uka.ilkd.key.logic.sort.ParametricSortDeclaration.SortParameter;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
 
@@ -28,7 +29,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -96,7 +98,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             if (lookup != null && (l = lookup.lookup(n)) != null) {
                 try {
                     return (T) l;
-                } catch (ClassCastException e) {
+                } catch (ClassCastException ignored) {
                 }
             }
         }
@@ -187,10 +189,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return null;
     }
 
-    public Sort toArraySort(Pair<Sort, Type> p, int numOfDimensions) {
+    public Sort toArraySort(Sort baseSort, Type t, int numOfDimensions) {
         if (numOfDimensions != 0) {
             final JavaInfo ji = getJavaInfo();
-            Sort sort = ArraySort.getArraySortForDim(p.first, p.second, numOfDimensions,
+            Sort sort = ArraySort.getArraySortForDim(baseSort, t, numOfDimensions,
                 ji.objectSort(), ji.cloneableSort(), ji.serializableSort());
             Sort s = sort;
             do {
@@ -200,7 +202,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             } while (s instanceof ArraySort && sorts().lookup(s.name()) == null);
             return sort;
         } else {
-            return p.first;
+            return baseSort;
         }
     }
 
@@ -348,15 +350,43 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             t = PrimitiveType.JAVA_BIGINT;
             primitiveName = PrimitiveType.JAVA_BIGINT.getName();
         }
-        Sort s = lookupSort(primitiveName);
-        if (s == null) {
-            semanticError(ctx, "Could not find sort: %s", ctx.getText());
+
+        if (t != null && ctx.formal_sort_parameters() != null) {
+            semanticError(ctx, "Combination of primitive type and type parameters.");
+        }
+
+        Sort s;
+        if (ctx.formal_sort_parameters() != null) {
+            // parametric sorts should be instantiated
+            ParametricSortDeclaration sortDecl = services.getNamespaces().parametricSorts().lookup(primitiveName);
+            if (sortDecl == null) {
+                semanticError(ctx, "Could not find polymorphic sort: %s", primitiveName);
+            }
+            ImmutableList<Sort> parameters = getSorts(ctx.formal_sort_parameters());
+            s = ParametricSortInstance.get(sortDecl, parameters);
+        } else {
+            s = lookupSort(primitiveName);
+            if (s == null) {
+                semanticError(ctx, "Could not find sort: %s", ctx.getText());
+            }
         }
 
         if (!ctx.EMPTYBRACKETS().isEmpty()) {
-            return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size());
+            return toArraySort(s, t, ctx.EMPTYBRACKETS().size());
         }
         return s;
+    }
+
+    private ImmutableList<Sort> getSorts(KeYParser.Formal_sort_parametersContext ctx) {
+        List<Sort> seq = accept(ctx);
+        assert seq != null;
+        return ImmutableList.fromList(seq);
+    }
+
+    @Override
+    public List<Sort> visitFormal_sort_parameters(
+            KeYParser.Formal_sort_parametersContext ctx) {
+        return mapOf(ctx.sortId());
     }
 
     @Override
