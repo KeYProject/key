@@ -12,24 +12,34 @@ options { tokenVocab=JmlLexer; }
 }
 
 
-classlevel_comments: classlevel_comment* EOF;
-classlevel_comment: classlevel_element | modifiers | set_statement;
-classlevel_element0: modifiers? (classlevel_element modifiers?);
+classlevel_comments: classlevel_comment* modifiers EOF;
+
+/* weigl: Gammar not good here. High ambiguity in the parser.
+   Abstractly speaking:
+   we have:        S ->    A? B | A;
+   but:            S ->    A B? | B;
+      could be better.
+*/
+classlevel_comment: modifiers? classlevel_element;
 classlevel_element
-  : class_invariant /*| depends_clause*/     | method_specification
-  | method_declaration  | field_declaration  | represents_clause
-  | history_constraint  | initially_clause   | class_axiom
-  | monitors_for_clause | readable_if_clause | writable_if_clause
-  | datagroup_clause    | set_statement      | nowarn_pragma
-  | accessible_clause   | assert_statement   | assume_statement
+// The order matters! The rules with clear lookahead in front.
+// In the new lexer w/o contract and expr mode. The keyword "ensures"   can also be an identifier.
+// This means, that the following text could also be seen as a field declaration:
+//      //@   ensures ensures;
+  : class_invariant       | accessible_clause
+  | method_declaration    | field_declaration  | represents_clause
+  | history_constraint    | initially_clause   | class_axiom
+  | monitors_for_clause   | readable_if_clause | writable_if_clause
+  | datagroup_clause      | set_statement      | nowarn_pragma
+  | assert_statement      | assume_statement   | method_specification
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
 methodlevel_element
-  : field_declaration | set_statement | merge_point_statement
-  | loop_specification | assert_statement | assume_statement | nowarn_pragma
-  | debug_statement | block_specification | block_loop_specification
-  | assert_statement | assume_statement
+  : field_declaration  | set_statement       | merge_point_statement
+  | loop_specification | assert_statement    | assume_statement
+  | debug_statement    | block_specification | block_loop_specification
+  | assert_statement   | assume_statement    | nowarn_pragma
  ;
 
 modifiers: modifier+;
@@ -43,21 +53,18 @@ modifier
 
 
 
-class_axiom: AXIOM expression SEMI_TOPLEVEL;
-initially_clause: INITIALLY expression SEMI_TOPLEVEL;
-class_invariant: INVARIANT expression SEMI_TOPLEVEL;
-//axiom_name: AXIOM_NAME_BEGIN IDENT AXIOM_NAME_END;
-method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
+class_axiom: AXIOM expression SEMI;
+initially_clause: INITIALLY expression SEMI;
+class_invariant: INVARIANT expression SEMI;
+method_specification: also_keyword* spec_case (also_keyword+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
 spec_case:
-  (modifiers)?
+  modifiers?
   behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
-           | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
+           | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR)?
   spec_body
 ;
 
-/*spec_var_decls: (old_clause | FORALL expression)+;
-spec_header: requires_clause+;*/
 
 spec_body: a+=clause+ (NEST_START inner+=clause* (also_keyword+ spec_body)* NEST_END)?;
 clauseEOF: clause EOF;
@@ -73,32 +80,32 @@ clause
 
 // clauses
 targetHeap : SPECIAL_IDENT+;
-ensures_clause: ENSURES targetHeap? predornot SEMI_TOPLEVEL;
-requires_clause: REQUIRES targetHeap? predornot SEMI_TOPLEVEL;
-measured_by_clause: MEASURED_BY predornot (COMMA predornot)* SEMI_TOPLEVEL;
-captures_clause: CAPTURES predornot SEMI_TOPLEVEL;
-diverges_clause: DIVERGES predornot SEMI_TOPLEVEL;
-working_space_clause: WORKING_SPACE predornot SEMI_TOPLEVEL;
-duration_clause: DURATION predornot SEMI_TOPLEVEL;
-when_clause: WHEN predornot SEMI_TOPLEVEL;
+ensures_clause: ENSURES targetHeap? predornot SEMI;
+requires_clause: REQUIRES targetHeap? predornot SEMI;
+measured_by_clause: MEASURED_BY predornot (COMMA predornot)* SEMI;
+captures_clause: CAPTURES predornot SEMI;
+diverges_clause: DIVERGES predornot SEMI;
+working_space_clause: WORKING_SPACE predornot SEMI;
+duration_clause: DURATION predornot SEMI;
+when_clause: WHEN predornot SEMI;
 accessible_clause
 :
   ACCESSIBLE targetHeap?
                     (lhs=expression COLON)? rhs=storeRefUnion
                     (MEASURED_BY mby=expression)?
-    SEMI_TOPLEVEL;
+    SEMI;
 /**
  * The name 'assignable' is kept here for legacy reasons.
  * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
  */
-assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
+assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI;
 //depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
   : REPRESENTS lhs=expression
     (((LARROW|EQUAL_SINGLE) (rhs=expression|t=storeRefUnion))
     | (SUCH_THAT predicate))
-    SEMI_TOPLEVEL
+    SEMI
   ;
 
 separates_clause
@@ -108,14 +115,14 @@ separates_clause
     | ERASES        erase+=infflowspeclist
     | NEW_OBJECTS  newobj+=infflowspeclist
     )*
-    SEMI_TOPLEVEL
+    SEMI
   ;
 
 loop_separates_clause
   : LOOP_SEPARATES
     sep=infflowspeclist
     (NEW_OBJECTS newobj+=infflowspeclist)*
-    SEMI_TOPLEVEL
+    SEMI
   ;
 
 infflowspeclist
@@ -131,7 +138,7 @@ determines_clause
     | ERASES       erases+=infflowspeclist
     | NEW_OBJECTS newObs+=infflowspeclist
     )*
-    SEMI_TOPLEVEL
+    SEMI
   ;
 
 loop_determines_clause
@@ -139,21 +146,21 @@ loop_determines_clause
     det=infflowspeclist
     BY ITSELF
     (NEW_OBJECTS newObs+=infflowspeclist)*
-    SEMI_TOPLEVEL
+    SEMI
   ;
 
-signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
-signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*)  SEMI_TOPLEVEL;
-breaks_clause: BREAKS LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
-continues_clause: CONTINUES LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
-returns_clause: RETURNS predornot? SEMI_TOPLEVEL;
+signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)? SEMI;
+signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*)  SEMI;
+breaks_clause: BREAKS LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI;
+continues_clause: CONTINUES LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI;
+returns_clause: RETURNS predornot? SEMI;
 
-name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
+name_clause: SPEC_NAME STRING_LITERAL SEMI ;
 //old_clause: OLD modifiers type IDENT INITIALISER ;
 
-field_declaration: typespec IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
-method_declaration: typespec IDENT param_list (method_body|SEMI_TOPLEVEL);
-method_body: LBRACE RETURN expression SEMI_TOPLEVEL RBRACE;
+field_declaration: typespec IDENT (LBRACKET RBRACKET)* initialiser? SEMI;
+method_declaration: typespec IDENT param_list (method_body|SEMI);
+method_body: LBRACE RETURN expression SEMI RBRACE;
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? typespec p=IDENT (LBRACKET RBRACKET)*;
 history_constraint: CONSTRAINT expression;
@@ -165,12 +172,12 @@ in_group_clause: IN expression;
 maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
-set_statement: SET (assignee=expression) EQUAL_SINGLE (value=expression) SEMI_TOPLEVEL;
+set_statement: SET (assignee=expression) EQUAL_SINGLE (value=expression) SEMI;
 merge_point_statement:
   MERGE_POINT
   (MERGE_PROC (proc=STRING_LITERAL))?
   (mergeparamsspec)?
-  SEMI_TOPLEVEL
+  SEMI
 ;
 loop_specification
   : loop_invariant
@@ -181,22 +188,22 @@ loop_specification
     | loop_assignable_clause
     | variant_function)*;
 
-loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
+loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI;
 /**
  * The name 'assignable' is kept here for legacy reasons.
  * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
  */
-loop_assignable_clause: (LOOP_ASSIGNABLE | ASSIGNABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
-variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
+loop_assignable_clause: (LOOP_ASSIGNABLE | ASSIGNABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI;
+variant_function: DECREASING expression (COMMA expression)* SEMI;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
-assume_statement: ASSUME expression SEMI_TOPLEVEL;
+assume_statement: ASSUME expression SEMI;
 initialiser: EQUAL_SINGLE expression;
 block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
+assert_statement: (ASSERT expression | UNREACHABLE) SEMI;
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
