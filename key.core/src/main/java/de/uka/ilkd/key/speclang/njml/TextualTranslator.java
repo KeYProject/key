@@ -450,6 +450,12 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visitDatatype_declaration(JmlParser.Datatype_declarationContext ctx) {
+        TextualJMLDatatype adt = new TextualJMLDatatype(new LabeledParserRuleContext(ctx));
+        constructs = constructs.append(adt);
+        return null;
+    }
 
     @Override
     public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
