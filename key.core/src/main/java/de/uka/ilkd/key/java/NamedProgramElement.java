@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.java;
 
 
+import de.uka.ilkd.key.logic.ProgramElementName;
+
 /**
  * Named program element. taken from COMPOST and changed to achieve an immutable structure
  */
@@ -15,6 +17,6 @@ public interface NamedProgramElement extends NamedModelElement, NonTerminalProgr
      *
      * @return the identifier.
      */
-    de.uka.ilkd.key.logic.ProgramElementName getProgramElementName();
+    ProgramElementName getProgramElementName();
 
 }

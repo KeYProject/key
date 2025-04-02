@@ -50,7 +50,7 @@ public class OverloadedOperatorHandler {
         }
 
         public static JMLOperator get(String image) {
-            for (JMLOperator value : JMLOperator.values()) {
+            for (JMLOperator value : values()) {
                 if (value.image.equals(image)) {
                     return value;
                 }

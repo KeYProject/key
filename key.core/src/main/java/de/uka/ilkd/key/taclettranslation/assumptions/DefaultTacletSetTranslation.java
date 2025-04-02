@@ -13,7 +13,6 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -75,8 +75,6 @@ public final class DefaultTacletSetTranslation
     private final SMTSettings settings;
 
     public DefaultTacletSetTranslation(Services services, SMTSettings settings) {
-
-
         // translators = translators.append(tt);
         this.services = services;
         this.settings = settings;
@@ -97,25 +95,16 @@ public final class DefaultTacletSetTranslation
         translation = ImmutableSLList.nil();
 
         ImmutableSet<Sort> emptySetSort = DefaultImmutableSet.nil();
-
         usedFormulaSorts = (sorts == null ? emptySetSort : sorts);
 
-
-
         for (Taclet t : settings.getTaclets()) {
-
-
             if (SupportedTaclets.REFERENCE.contains(t.name().toString(), false)) {
-
-
                 try {
-
                     AssumptionGenerator assumptionGenerator = new AssumptionGenerator(services);
                     assumptionGenerator.addListener(this);
                     TacletFormula result =
                         assumptionGenerator.translate(t, sorts, settings.getMaxNumberOfGenerics());
                     translation = translation.append(result);
-
                 } catch (IllegalTacletException e) {
                     notTranslated =
                         notTranslated.append(new AssumptionFormula(t, null, e.getMessage()));
@@ -131,7 +120,6 @@ public final class DefaultTacletSetTranslation
 
 
     public ImmutableList<TacletFormula> getNotTranslated() {
-
         return notTranslated;
     }
 
@@ -147,7 +135,6 @@ public final class DefaultTacletSetTranslation
      * @param dest the path of the file.
      */
     public void storeToFile(String dest) {
-
         FileWriter fw;
         try {
             fw = new FileWriter(dest, StandardCharsets.UTF_8);
@@ -195,7 +182,7 @@ public final class DefaultTacletSetTranslation
         if (!usedFormulaSV.isEmpty()) {
             toStore.append("\\predicates{\n\n");
             for (SchemaVariable var : usedFormulaSV) {
-                toStore.append(var.name().toString()).append(";\n");
+                toStore.append(var.name()).append(";\n");
             }
             toStore.append("}\n\n\n");
         }
@@ -203,7 +190,7 @@ public final class DefaultTacletSetTranslation
         toStore.append("\\problem{\n\n");
         int i = 0;
         for (TacletFormula tf : list) {
-            toStore.append("//").append(tf.getTaclet().name().toString()).append("\n");
+            toStore.append("//").append(tf.getTaclet().name()).append("\n");
             toStore.append(convertTerm(tf.getFormula(services)));
             if (i != list.size() - 1) {
                 toStore.append("\n\n& //and\n\n");

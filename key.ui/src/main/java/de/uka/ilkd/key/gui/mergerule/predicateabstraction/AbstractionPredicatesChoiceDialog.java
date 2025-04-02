@@ -36,6 +36,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
@@ -543,7 +544,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         final Services services = MainWindow.getInstance().getMediator().getServices();
         final Pair<LocationVariable, Term> predFormWithPh = pred.getPredicateFormWithPlaceholder();
 
-        return "(" + predFormWithPh.first.toString() + ","
+        return "(" + predFormWithPh.first + ","
             + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";
     }
 
@@ -734,7 +735,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         public Object getValueAt(int rowIndex, int columnIndex) {
             final AbstractDomainElemChoice row = abstrPredicateChoices.get(rowIndex);
             return columnIndex == 0
-                    ? row.getProgVar().sort() + " " + row.getProgVar().name().toString()
+                    ? row.getProgVar().sort() + " " + row.getProgVar().name()
                     : row.getAbstrDomElem();
         }
 

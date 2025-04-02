@@ -10,8 +10,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * creates an assignment instantiationOf(#newObjectsV).<initialized> = true
@@ -49,8 +50,7 @@ public class PostWork extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         final ProgramVariable newObject =
-            schema ? (ProgramVariable) svInst.getInstantiation((SchemaVariable) body())
-                    : (ProgramVariable) body();
+            (ProgramVariable) (schema ? svInst.getInstantiation((SchemaVariable) body()) : body());
 
         final ProgramVariable initialized = services.getJavaInfo().getAttribute(
             ImplicitFieldAdder.IMPLICIT_INITIALIZED, services.getJavaInfo().getJavaLangObject());

@@ -35,12 +35,12 @@ public abstract class TextualJMLConstruct {
      */
     protected String name;
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
+    protected TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
         assert specModifiers != null;
         this.modifiers = specModifiers;
     }
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+    protected TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
         this(specModifiers);
         this.name = name;
     }

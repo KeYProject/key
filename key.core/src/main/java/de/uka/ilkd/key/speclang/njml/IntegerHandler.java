@@ -171,7 +171,7 @@ public class IntegerHandler extends LDTHandler {
     @Override
     protected @Nullable TypedOperator getOperator(Type promotedType, JMLOperator op) {
         if (specMathMode == SpecMathMode.JAVA) {
-            return LDTHandler.getOperatorFromMap(opCategories.get(promotedType), op);
+            return getOperatorFromMap(opCategories.get(promotedType), op);
         }
 
         var isIntLike = PrimitiveType.JAVA_INT.equals(promotedType)

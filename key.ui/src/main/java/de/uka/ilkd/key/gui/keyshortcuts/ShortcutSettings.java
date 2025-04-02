@@ -151,7 +151,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     private static class ShortcutsTableModel extends AbstractTableModel {
         @Serial
         private static final long serialVersionUID = -2854179933936417703L;
-        private static final String[] COLUMNS = new String[] { "Name", "Description", "Shortcut" };
+        private static final String[] COLUMNS = { "Name", "Description", "Shortcut" };
         private final List<String> actionName;
         private final List<String> shortcut;
         private final List<Action> actions;

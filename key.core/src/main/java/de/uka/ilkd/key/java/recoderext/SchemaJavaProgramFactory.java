@@ -7,15 +7,15 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.parser.schemajava.ParseException;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;
@@ -130,8 +130,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public static void throwSortInvalid(OperatorSV sv, String s) throws ParseException {
-        throw new ParseException("Sort of declared schema variable " + sv.name().toString() + " "
-            + sv.sort().name().toString() + " does not comply with expected type " + s
+        throw new ParseException("Sort of declared schema variable " + sv.name() + " "
+            + sv.sort().name() + " does not comply with expected type " + s
             + " in Java program.");
     }
 

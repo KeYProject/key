@@ -4,18 +4,19 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
 
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     public static final AtomicLong PERF_EXECUTE = new AtomicLong();
@@ -67,36 +68,20 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all java information
-     * @return list of new created goals
      */
     @Override
-    public @Nullable ImmutableList<Goal> execute(Goal goal, Services services) {
-        var time = System.nanoTime();
-        var timeSetSequent = Goal.PERF_SET_SEQUENT.get();
-        try {
-            goal.addAppliedRuleApp(this);
-            try {
-                return Objects.requireNonNull(builtInRule.apply(goal, services, this));
-            } catch (RuleAbortException rae) {
-                goal.removeLastAppliedRuleApp();
-                goal.node().setAppliedRuleApp(null);
-                return null;
-            }
-        } finally {
-            PERF_EXECUTE.getAndAdd(System.nanoTime() - time);
-            PERF_SET_SEQUENT.getAndAdd(Goal.PERF_SET_SEQUENT.get() - timeSetSequent);
-        }
-    }
+    public void checkApplicability() {}
+
+    @Override
+    public void registerSkolemConstants(Namespace<@NonNull Function> fns) {}
 
     public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
 
     @Override
-    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
+    public abstract IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts);
 
     @Override
-    public ImmutableList<PosInOccurrence> ifInsts() {
+    public ImmutableList<PosInOccurrence> assumesInsts() {
         return ifInsts;
     }
 
@@ -141,38 +126,6 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     @Override
     public String toString() {
         return "BuiltInRule: " + rule().name() + " at pos " + pio.subTerm();
-    }
-
-
-    @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof IBuiltInRuleApp that)) {
-            return false;
-        }
-        if (!(Objects.equals(rule(), that.rule())
-                && Objects.equals(getHeapContext(), that.getHeapContext()))) {
-            return false;
-        }
-        ImmutableList<PosInOccurrence> ifInsts1 = ifInsts();
-        ImmutableList<PosInOccurrence> ifInsts2 = that.ifInsts();
-        if (ifInsts1.size() != ifInsts2.size()) {
-            return false;
-        }
-        while (!ifInsts1.isEmpty()) {
-            if (!ifInsts1.head().eqEquals(ifInsts2.head())) {
-                return false;
-            }
-            ifInsts1 = ifInsts1.tail();
-            ifInsts2 = ifInsts2.tail();
-        }
-        return posInOccurrence().eqEquals(that.posInOccurrence());
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(rule(), getHeapContext(),
-            posInOccurrence().sequentFormula().hashCodeModProofIrrelevancy(),
-            posInOccurrence().posInTerm());
     }
 
 }

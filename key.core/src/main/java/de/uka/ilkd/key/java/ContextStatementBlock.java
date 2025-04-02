@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.util.ExtList;
 
 /**
@@ -139,7 +140,7 @@ public class ContextStatementBlock extends StatementBlock {
         throw new UnsupportedOperationException(getClass() + ": We are not quite a StatementBlock");
     }
 
-    public de.uka.ilkd.key.java.declaration.TypeDeclaration getTypeDeclarationAt(int index) {
+    public TypeDeclaration getTypeDeclarationAt(int index) {
         throw new UnsupportedOperationException(getClass() + ": We are not quite a StatementBlock");
     }
 
@@ -222,10 +223,6 @@ public class ContextStatementBlock extends StatementBlock {
 
         matchCond =
             makeContextInfoComplete(matchCond, newSource, prefix, pos, relPos, src, services);
-
-        if (matchCond == null) {
-            return null;
-        }
 
         return matchCond;
     }

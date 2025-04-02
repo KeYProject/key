@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.prover.GoalChooser;
-import de.uka.ilkd.key.prover.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.engine.GoalChooserBuilder;
 
 /**
  * This {@link GoalChooserBuilder} creates a special {@link GoalChooser} for symbolic execution.
@@ -12,7 +15,7 @@ import de.uka.ilkd.key.prover.GoalChooserBuilder;
  * @author Martin Hentschel
  * @see SymbolicExecutionGoalChooser
  */
-public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder {
+public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder<Proof, Goal> {
     /**
      * The name of this goal chooser.
      */
@@ -22,7 +25,7 @@ public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder {
      * {@inheritDoc}
      */
     @Override
-    public GoalChooser create() {
+    public GoalChooser<Proof, Goal> create() {
         return new SymbolicExecutionGoalChooser();
     }
 
@@ -30,7 +33,7 @@ public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder {
      * {@inheritDoc}
      */
     @Override
-    public GoalChooserBuilder copy() {
+    public GoalChooserBuilder<Proof, Goal> copy() {
         return new SymbolicExecutionGoalChooserBuilder();
     }
 

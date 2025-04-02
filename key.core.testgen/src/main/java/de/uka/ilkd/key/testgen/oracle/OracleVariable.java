@@ -33,9 +33,7 @@ public record OracleVariable(String name, Sort sort) implements OracleTerm {
         }
     }
 
-    public String toString() {
-        return name;
-    }
+    public String toString() { return name; }
 
 
 }

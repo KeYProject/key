@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -157,19 +157,18 @@ public class SMTProblem {
     }
 
     public static Term sequentToTerm(Sequent s, Services services) {
-
         ImmutableList<Term> ante = ImmutableSLList.nil();
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
         for (SequentFormula f : s.antecedent()) {
-            ante = ante.append(f.formula());
+            ante = ante.append((Term) f.formula());
         }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
         for (SequentFormula f : s.succedent()) {
-            succ = succ.append(f.formula());
+            succ = succ.append((Term) f.formula());
         }
 
         return tb.imp(tb.and(ante), tb.or(succ));
@@ -184,13 +183,13 @@ public class SMTProblem {
         final TermBuilder tb = goal.proof().getServices().getTermBuilder();
         ante = ante.append(tb.tt());
         for (SequentFormula f : s.antecedent()) {
-            ante = ante.append(f.formula());
+            ante = ante.append((Term) f.formula());
         }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
         for (SequentFormula f : s.succedent()) {
-            succ = succ.append(f.formula());
+            succ = succ.append((Term) f.formula());
         }
 
         return tb.imp(tb.and(ante), tb.or(succ));

@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * A {@link MergePartner} consists of a {@link Goal} and a {@link PosInOccurrence}; the

@@ -65,7 +65,7 @@ public class RIFLTransformer {
         } else {
             final File riflFilename = new File(args[0]);
             final File javaFilename = new File(args[1]);
-            RIFLTransformer.transform(riflFilename, javaFilename);
+            transform(riflFilename, javaFilename);
         }
     }
 

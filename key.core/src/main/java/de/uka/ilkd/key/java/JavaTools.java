@@ -50,7 +50,7 @@ public final class JavaTools {
      */
     public static JavaBlock removeActiveStatement(JavaBlock jb, Services services) {
         assert jb.program() != null;
-        final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
+        final SourceElement activeStatement = getActiveStatement(jb);
         return replaceStatement(jb, services, activeStatement, null);
     }
 

@@ -16,7 +16,6 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 
@@ -43,7 +42,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * Creates an empty menu.
      */
-    public SequentViewMenu() {}
+    protected SequentViewMenu() {}
 
     /**
      * Creates a new menu that displays all applicable actions at the given position.
@@ -127,7 +126,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
                 GuiUtilities.copyHighlightToClipboard(sequentView, pos);
             } else if (((JMenuItem) e.getSource()).getText()
                     .startsWith("View name creation info")) {
-                Term t = pos.getPosInOccurrence().subTerm();
+                var t = pos.getPosInOccurrence().subTerm();
                 ProgramVariable var = (ProgramVariable) t.op();
                 ProgramElementName name = var.getProgramElementName();
                 NameCreationInfo info = name.getCreationInfo();
