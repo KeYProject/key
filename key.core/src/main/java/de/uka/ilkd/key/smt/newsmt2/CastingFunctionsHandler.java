@@ -33,8 +33,7 @@ public class CastingFunctionsHandler implements SMTHandler {
     private SortDependingFunction select;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(JavaDLTheory.ANY, services);
         this.select =
             services.getTypeConverter().getHeapLDT().getSelect(JavaDLTheory.ANY, services);

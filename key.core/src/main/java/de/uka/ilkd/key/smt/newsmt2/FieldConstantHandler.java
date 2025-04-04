@@ -48,8 +48,7 @@ public class FieldConstantHandler implements SMTHandler {
     private Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
@@ -91,7 +90,7 @@ public class FieldConstantHandler implements SMTHandler {
 
                 trans.addAxiom(
                     new SExpr("assert", new SExpr("=", new SExpr("fieldIdentifier", smtName),
-                        new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
+                        new SExpr("-", Type.INT, curVal.toString()))));
 
                 state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
                 trans.addKnownSymbol(smtName);

@@ -46,6 +46,11 @@ public class SExpr implements Writable {
          */
         public static final Type BOOL = new Type("Bool", "b2u", "u2b");
 
+            /** to indicate that an expression holds a value of type Int. */
+            //public static final Type INT = new Type("Int", "i2u", "u2i");
+            public static final Type INT = new Type("Int", null, null);
+
+
         @Override
         public String toString() {
             return name;
