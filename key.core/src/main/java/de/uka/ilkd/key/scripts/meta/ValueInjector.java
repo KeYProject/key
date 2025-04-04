@@ -35,7 +35,6 @@ public class ValueInjector {
     private final Map<ConverterKey<?, ?>, Converter<?, ?>> converters = new HashMap<>();
 
     /**
-     *
      * @param source
      * @param target
      * @param <S>
@@ -216,6 +215,24 @@ public class ValueInjector {
                 String.format("Could not convert value %s (%s) to type %s",
                     val, val.getClass(), meta.getField().getType().getName()),
                 e, meta);
+        }
+    }
+
+    public <T> T convert(Object val, Class<T> type)
+            throws NoSpecifiedConverterException, ConversionException {
+        Converter<T, Object> converter = (Converter<T, Object>) getConverter(type, val.getClass());
+
+        if (converter == null) {
+            throw new NoSpecifiedConverterException(
+                "No converter registered for class: " + type + " from " + val.getClass(), null);
+        }
+        try {
+            return converter.convert(val);
+        } catch (Exception e) {
+            throw new ConversionException(
+                String.format("Could not convert value %s (%s) to type %s", val, val.getClass(),
+                    type),
+                e, null);
         }
     }
 
