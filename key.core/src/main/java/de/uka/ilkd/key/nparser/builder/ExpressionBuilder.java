@@ -1835,6 +1835,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         return (new JavaQuery(packageName, className, attributeName, kjt));
     }
 
+    @Override
+    public Object visitProofScript(KeYParser.ProofScriptContext ctx) {
+        return null;// Do not traverse into proof scripts.
+    }
+
     public void setAbbrevMap(AbbrevMap abbrevMap) {
         this.abbrevMap = abbrevMap;
     }
