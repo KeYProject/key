@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
@@ -308,6 +309,11 @@ public class Services implements TermServices, LogicServices {
                 "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
+        // disable origin tracking if settings indicate it
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()
+                || !proof.getSettings().getTermLabelSettings().getUseOriginLabels()) {
+            profile.getTermLabelManager().disableOriginLabelRefactorings();
+        }
     }
 
     /*
