@@ -5,20 +5,13 @@ package de.uka.ilkd.key.testgen.macros;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.FilterStrategy;
 import de.uka.ilkd.key.macros.ModalityCache;
 import de.uka.ilkd.key.macros.StrategyProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.testgen.TestGenerationSettings;
 
 import org.key_project.logic.Name;
@@ -31,7 +24,6 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
-
 import org.jspecify.annotations.Nullable;
 
 public class TestGenMacro extends StrategyProofMacro {
@@ -74,17 +66,8 @@ class TestGenStrategy extends FilterStrategy {
      * the modality cache used by this strategy
      */
     private final ModalityCache modalityCache = new ModalityCache();
-    static {
-        unwindRules = new HashSet<>();
-        unwindRules.add("loopUnwind");
-        unwindRules.add("doWhileUnwind");
-        unwindRules.add("methodCall");
-        unwindRules.add("methodCallWithAssignment");
-        unwindRules.add("staticMethodCall");
-        unwindRules.add("staticMethodCallWithAssignment");
-    }
 
-    private static boolean isUnwindRule(@Nullable Rule rule) {
+    private static boolean isUnwindRule(org.key_project.prover.rules.Rule rule) {
         if (rule == null) {
             return false;
         }

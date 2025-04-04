@@ -6,6 +6,7 @@ package de.uka.ilkd.key.testgen.macros;
 import java.util.Set;
 
 import de.uka.ilkd.key.macros.AbstractBlastingMacro;
+
 import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.rules.Rule;
 
@@ -126,8 +127,9 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
     private record NameRuleFilter(Set<String> rules) implements RuleFilter {
 
-    @Override
-    public boolean filter(Rule rule) {
-        return rules.contains(rule.name().toString());
+        @Override
+        public boolean filter(Rule rule) {
+            return rules.contains(rule.name().toString());
+        }
     }
-}}
+}

@@ -38,7 +38,6 @@ import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.java.StringUtil;
 

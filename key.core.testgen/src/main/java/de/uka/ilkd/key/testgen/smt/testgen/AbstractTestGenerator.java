@@ -33,8 +33,6 @@ import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
-import org.jspecify.annotations.Nullable;
-
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
