@@ -11,6 +11,7 @@ import java.util.Objects;
 
 /**
  * This class manages the different paths in the output folder.
+ *
  * @author Alexander Weigl
  * @version 1 (02.02.24)
  */
@@ -37,6 +38,7 @@ public record OutputEnvironment(Path targetFolder) {
 
     /**
      * Initialize/create the necessary directories.
+     *
      * @throws IOException if the output folder is not write or the folders can not be created.
      */
     public void init() throws IOException {
@@ -47,7 +49,8 @@ public record OutputEnvironment(Path targetFolder) {
 
     private void installAntFile() throws IOException {
         try (var buildXml = getClass().getResourceAsStream("/de/uka/ilkd/key/tcg/build.xml")) {
-            Files.copy(Objects.requireNonNull(buildXml), getAntFile(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(Objects.requireNonNull(buildXml), getAntFile(),
+                StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }

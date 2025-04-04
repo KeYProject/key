@@ -6,6 +6,7 @@ package de.uka.ilkd.key.testgen.oracle;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -13,9 +14,6 @@ import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.op.Function;
-import org.key_project.logic.sort.Sort;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
@@ -27,7 +25,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.ldt.JavaDLTheory.FORMULA;
 import static de.uka.ilkd.key.testgen.Constants.*;
 
 public class OracleGenerator {
@@ -52,6 +49,7 @@ public class OracleGenerator {
     private Set<String> truePredicates = new TreeSet<>();
 
     private Set<String> falsePredicates = new TreeSet<>();
+
     private final Set<String> prestateTerms = new TreeSet<>();
 
     private final Map<Sort, OracleMethod> invariants = new HashMap<>();
@@ -467,7 +465,7 @@ public class OracleGenerator {
 
         if (!initialSelect && isPreHeap(heapTerm)
                 && term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort())) {
-            return new OracleConstant(TestCaseGenerator.OLDMap + ".get(" + value + ")",
+            return new OracleConstant(OLD_MAP + ".get(" + value + ")",
                 term.sort());
         }
 
@@ -589,9 +587,9 @@ public class OracleGenerator {
     private String getSetName(Sort s) {
 
         if (s.equals(JavaDLTheory.FORMULA)) {
-            return TestCaseGenerator.ALL_BOOLS;
+            return ALL_BOOLS;
         } else if (s.equals(services.getTypeConverter().getIntegerLDT().targetSort())) {
-            return TestCaseGenerator.ALL_INTS;
+            return ALL_INTS;
         } else if (s.equals(services.getTypeConverter().getLocSetLDT().targetSort())) {
             throw new RuntimeException("Not implemented yet.");
             // return TestCaseGenerator.ALL_LOCSETS
@@ -607,7 +605,7 @@ public class OracleGenerator {
         }
 
 
-        return TestCaseGenerator.ALL_OBJECTS;
+        return ALL_OBJECTS;
     }
 
     private OracleMethod createQuantifierMethod(Term term, boolean initialSelect) {
