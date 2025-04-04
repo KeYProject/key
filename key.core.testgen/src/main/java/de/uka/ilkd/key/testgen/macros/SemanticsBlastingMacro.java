@@ -126,8 +126,9 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
     private record NameRuleFilter(Set<String> rules) implements RuleFilter {
 
-    @Override
-    public boolean filter(Rule rule) {
-        return rules.contains(rule.name().toString());
+        @Override
+        public boolean filter(Rule rule) {
+            return rules.contains(rule.name().toString());
+        }
     }
-}}
+}
