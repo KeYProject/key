@@ -51,10 +51,12 @@ public record ProofInfo(Proof proof, Services services) {
     @Nullable
     public String getMUTCall() {
         var m = getMUT();
-        if (m == null) return null;
+        if (m == null)
+            return null;
 
         var name = m.getFullName();
-        if (name == null) return null;
+        if (name == null)
+            return null;
 
         StringBuilder params = new StringBuilder();
         for (ParameterDeclaration p : m.getParameters()) {
@@ -92,7 +94,7 @@ public record ProofInfo(Proof proof, Services services) {
 
     @Nullable
     public KeYJavaType getReturnType() {
-        var mut =  getMUT();
+        var mut = getMUT();
         return mut != null ? mut.getType() : null;
     }
 
@@ -118,7 +120,7 @@ public record ProofInfo(Proof proof, Services services) {
         if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
             return t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
-                    orig.params, orig.atPres, services);
+                orig.params, orig.atPres, services);
         }
         // no pre <==> false
         return services.getTermBuilder().ff();
@@ -208,7 +210,7 @@ public record ProofInfo(Proof proof, Services services) {
                 return "";
             }
             return "   \n" + up.lhs().sort() + " " + up.lhs().toString() + " = " + update.sub(0)
-                    + ";";
+                + ";";
         }
         StringBuilder result = new StringBuilder();
         for (Term sub : update.subs()) {
