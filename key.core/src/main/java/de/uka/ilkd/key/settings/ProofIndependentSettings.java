@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 import de.uka.ilkd.key.pp.NotationInfo;
 
@@ -53,7 +52,6 @@ public class ProofIndependentSettings {
     private final List<Settings> settings = new LinkedList<>();
 
     private final PropertyChangeListener settingsListener = e -> saveSettings();
-    private Properties lastReadedProperties;
     private Configuration lastReadedConfiguration;
 
     private ProofIndependentSettings() {
@@ -74,9 +72,6 @@ public class ProofIndependentSettings {
         if (!this.settings.contains(settings)) {
             this.settings.add(settings);
             settings.addPropertyChangeListener(settingsListener);
-            if (lastReadedProperties != null) {
-                settings.readSettings(lastReadedProperties);
-            }
             if (lastReadedConfiguration != null) {
                 settings.readSettings(lastReadedConfiguration);
             }
@@ -99,44 +94,14 @@ public class ProofIndependentSettings {
     }
 
     private void load(File file) throws IOException {
-        if (!file.getName().endsWith(".json")) {
-            try (FileInputStream in = new FileInputStream(file)) {
-                Properties properties = new Properties();
-                properties.load(in);
-                for (Settings settings : settings) {
-                    settings.readSettings(properties);
-                }
-                lastReadedProperties = properties;
-            }
-        } else {
-            this.lastReadedConfiguration = Configuration.load(file);
-            for (Settings settings : settings) {
-                settings.readSettings(lastReadedConfiguration);
-            }
+        this.lastReadedConfiguration = Configuration.load(file);
+        for (Settings settings : settings) {
+            settings.readSettings(lastReadedConfiguration);
         }
     }
 
     public void saveSettings() {
-        if (!filename.getName().endsWith(".json")) {
-            Properties result = new Properties();
-            for (Settings settings : settings) {
-                settings.writeSettings(result);
-            }
-
-            if (!filename.exists()) {
-                filename.getParentFile().mkdirs();
-            }
-
-            try (var out = new FileOutputStream(filename)) {
-                result.store(out, "Proof-Independent-Settings-File. Generated " + new Date());
-            } catch (IOException e) {
-                LOGGER.error("Could not store settings to {}", filename, e);
-            }
-        }
-
-        Configuration config = new Configuration();
-        for (var settings : settings)
-            settings.writeSettings(config);
+        Configuration config = asConfiguration();
         if (!filename.exists()) {
             filename.getParentFile().mkdirs();
         }
@@ -147,6 +112,14 @@ public class ProofIndependentSettings {
         } catch (IOException e) {
             LOGGER.error("Could not store settings to {}", filename, e);
         }
+    }
+
+    public Configuration asConfiguration() {
+        Configuration config = new Configuration();
+        for (var settings : settings) {
+            settings.writeSettings(config);
+        }
+        return config;
     }
 
     public GeneralSettings getGeneralSettings() {
