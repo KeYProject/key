@@ -2,31 +2,26 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;/*
-                                        * This file is part of KeY - https://key-project.org
-                                        * KeY is licensed under the GNU General Public License
-                                        * Version 2
-                                        * SPDX-License-Identifier: GPL-2.0-only
-                                        */
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+ * This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License
+ * Version 2
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
 
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
-
 import org.antlr.v4.runtime.CharStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import static de.uka.ilkd.key.nparser.format.KeyFileFormatter.format;
 
@@ -64,7 +59,7 @@ public class KeyFormatFacade {
      * <p>
      * {@code} output is not written when an error occurred.
      *
-     * @param input source file
+     * @param input  source file
      * @param output target file
      * @throws IOException file not found or not readable.
      */
@@ -90,23 +85,8 @@ public class KeyFormatFacade {
         }
     }
 
-    private static void formatSingleFileTo(Path input, Path outputDir) throws IOException {
-        var output = outputDir.resolve(input.getFileName());
-        formatSingleFile(input, output);
-    }
-
-    private static List<Path> expandPath(Path path) throws IOException {
-        if (!Files.exists(path)) {
-            throw new FileNotFoundException();
-        }
-
-        if (Files.isDirectory(path)) {
-            try (Stream<Path> s = Files.walk(path)) {
-                return s.collect(Collectors.toList());
-            }
-        } else {
-            return Collections.singletonList(path);
-        }
+    private static void formatSingleFileTo(Path input) throws IOException {
+        formatSingleFile(input, input);
     }
 
     @Command(name = "format")
@@ -115,23 +95,32 @@ public class KeyFormatFacade {
         private List<Path> paths = new ArrayList<>();
 
         @Override
-        public Integer call() {
-            for (var path : paths) {
+        public Integer call() throws IOException {
+            var files = expandPaths(paths);
+
+            for (var file : files) {
                 try {
-                    var files = expandPath(path);
-                    for (Path file : files) {
-                        try {
-                            formatSingleFileTo(file, file);
-                        } catch (SyntaxErrorReporter.ParserException e) {
-                            LOGGER.error("{} | Parser error", path, e);
-                        }
-                    }
-                } catch (IOException e) {
-                    LOGGER.error("{} | could not read directory", path, e);
+                    formatSingleFileTo(file);
+                } catch (SyntaxErrorReporter.ParserException e) {
+                    LOGGER.error("{} | Parser error", file, e);
                 }
             }
             return 0;
         }
+    }
+
+    static List<Path> expandPaths(List<Path> paths) throws IOException {
+        List<Path> files = new ArrayList<>(paths.size() * 128);
+        for (var path : paths) {
+            if (Files.isDirectory(path)) {
+                try (final var walk = Files.walk(path)) {
+                    files.addAll(walk.filter(Files::isRegularFile).toList());
+                }
+            } else {
+                files.add(path);
+            }
+        }
+        return files;
     }
 
     @Command(name = "check")
@@ -140,22 +129,17 @@ public class KeyFormatFacade {
         private List<Path> paths = new ArrayList<>();
 
         @Override
-        public Integer call() {
+        public Integer call() throws IOException {
             var valid = true;
-            for (Path path : paths) {
+            var files = expandPaths(paths);
+            for (Path file : files) {
                 try {
-                    for (Path file : expandPath(path)) {
-                        try {
-                            if (checkFile(file)) {
-                                valid = false;
-                                LOGGER.warn("{} | File is not formatted properly", path);
-                            }
-                        } catch (SyntaxErrorReporter.ParserException e) {
-                            LOGGER.error("{} | Syntax errors in file", path, e);
-                        }
+                    if (checkFile(file)) {
+                        valid = false;
+                        LOGGER.warn("{} | File is not formatted properly", file);
                     }
-                } catch (IOException e) {
-                    LOGGER.error("{} | could not read directory", path, e);
+                } catch (SyntaxErrorReporter.ParserException e) {
+                    LOGGER.error("{} | Syntax errors in file", file, e);
                 }
             }
             return valid ? 0 : 1;
