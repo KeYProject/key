@@ -81,6 +81,15 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     }
 
     @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!super.equalsModProofIrrelevancy(obj)
+                || !(obj instanceof AntecSuccTacletGoalTemplate other)) {
+            return false;
+        }
+        return replacewith.equalsModProofIrrelevancy(other.replacewith);
+    }
+
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + super.hashCode();
