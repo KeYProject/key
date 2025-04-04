@@ -10,7 +10,6 @@ import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
@@ -25,33 +24,29 @@ import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 
+import org.key_project.prover.engine.ProverTaskListener;
+
 public record TestgenFacade(TestGenerationSettings settings) {
     public static Callable<Boolean> generateTestcasesTask(KeYEnvironment<?> env, Proof proof,
-                                                          TestGenerationSettings settings,
-                                                          TestGenerationLifecycleListener log) {
+            TestGenerationSettings settings,
+            TestGenerationLifecycleListener log) {
         return () -> {
             generateTestcases(env, proof, settings, log);
             return true;
         };
     }
 
-    /**
-     * @param env
-     * @param proof
-     * @param settings
-     * @param log
-     * @throws InterruptedException
-     */
     public static void generateTestcases(KeYEnvironment<?> env, Proof proof,
-                                         TestGenerationSettings settings,
-                                         TestGenerationLifecycleListener log) throws InterruptedException {
+            TestGenerationSettings settings,
+            TestGenerationLifecycleListener log) throws InterruptedException {
         final TGReporter reporter = new TGReporter(log);
 
         final TestCaseGenerator tg = new TestCaseGenerator(proof, settings, reporter);
 
         NewSMTTranslationSettings newSettings = new NewSMTTranslationSettings();
         ProofDependentSMTSettings pdSettings = ProofDependentSMTSettings.getDefaultSettingsData();
-        ProofIndependentSMTSettings piSettings = ProofIndependentSMTSettings.getDefaultSettingsData();
+        ProofIndependentSMTSettings piSettings =
+            ProofIndependentSMTSettings.getDefaultSettingsData();
 
         piSettings.setTimeout(10000);
         final var smtSettings = new DefaultSMTSettings(pdSettings, piSettings, newSettings, proof);
@@ -60,7 +55,7 @@ public record TestgenFacade(TestGenerationSettings settings) {
         launcher.addListener(new SolverLauncherListener() {
             @Override
             public void launcherStopped(SolverLauncher launcher,
-                                        Collection<SMTSolver> finishedSolvers) {
+                    Collection<SMTSolver> finishedSolvers) {
                 try {
                     var first = finishedSolvers.iterator().next();
                     if (first.getException() != null) {
@@ -80,7 +75,7 @@ public record TestgenFacade(TestGenerationSettings settings) {
 
             @Override
             public void launcherStarted(Collection<SMTProblem> problems,
-                                        Collection<SolverType> solverTypes, SolverLauncher launcher) {
+                    Collection<SolverType> solverTypes, SolverLauncher launcher) {
             }
         });
 
