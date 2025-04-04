@@ -2,19 +2,11 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License
- * Version 2
- * SPDX-License-Identifier: GPL-2.0-only
- */
-
-import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
-import org.antlr.v4.runtime.CharStreams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Parameters;
+                                        * This file is part of KeY - https://key-project.org
+                                        * KeY is licensed under the GNU General Public License
+                                        * Version 2
+                                        * SPDX-License-Identifier: GPL-2.0-only
+                                        */
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,6 +14,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 
 import static de.uka.ilkd.key.nparser.format.KeyFileFormatter.format;
 
@@ -59,7 +60,7 @@ public class KeyFormatFacade {
      * <p>
      * {@code} output is not written when an error occurred.
      *
-     * @param input  source file
+     * @param input source file
      * @param output target file
      * @throws IOException file not found or not readable.
      */

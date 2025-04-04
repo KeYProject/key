@@ -262,7 +262,7 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts,
-                                                Output output) {
+            Output output) {
         // add hidden tokens after the current token (whitespace, comments etc.)
         List<Token> list = ts.getHiddenTokensToRight(currentToken.getTokenIndex());
         processHiddenTokens(list, output);
@@ -302,7 +302,7 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
                 // Watch out for empty line when removing the common indent
                 // weigl: "line.length() < minIndent" was required for Windows.
                 line =
-                        line.isEmpty() || line.length() < minIndent ? line : line.substring(minIndent);
+                    line.isEmpty() || line.length() < minIndent ? line : line.substring(minIndent);
             } else {
                 line = line.stripLeading();
             }
@@ -358,7 +358,7 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
         }
 
         boolean isLBrace =
-                token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
+            token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
         if (isLBrace) {
             output.spaceBeforeNext();
         } else if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN
@@ -372,9 +372,9 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
         }
 
         var noSpaceAround =
-                token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
+            token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
         var noSpaceBefore =
-                token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
+            token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
         if (noSpaceBefore || noSpaceAround) {
             output.noSpaceBeforeNext();
         }
@@ -408,7 +408,7 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
      * @param stream char stream
      * @return the formatted text
      * @throws de.uka.ilkd.key.util.parsing.SyntaxErrorReporter.ParserException if the given text is
-     *                                                                          not parser
+     *         not parser
      */
     public static String format(CharStream stream) {
         // weigl: Not necessary is handled within the lexer
