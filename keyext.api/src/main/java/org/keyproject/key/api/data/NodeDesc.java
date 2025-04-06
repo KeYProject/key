@@ -12,12 +12,13 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (13.10.23)
  */
 public record NodeDesc(KeyIdentifications.NodeId nodeid,
-                       String branchLabel,
-                       boolean scriptRuleApplication,
-                       @Nullable List<NodeDesc> children,
-                       String description
-) implements KeYDataTransferObject {
-    public NodeDesc(KeyIdentifications.ProofId proofId, int serialNr, String branchLabel, boolean scriptRuleApplication, String description) {
-        this(new KeyIdentifications.NodeId(proofId, serialNr), branchLabel, scriptRuleApplication, null, description);
+        String branchLabel,
+        boolean scriptRuleApplication,
+        @Nullable List<NodeDesc> children,
+        String description) implements KeYDataTransferObject {
+    public NodeDesc(KeyIdentifications.ProofId proofId, int serialNr, String branchLabel,
+            boolean scriptRuleApplication, String description) {
+        this(new KeyIdentifications.NodeId(proofId, serialNr), branchLabel, scriptRuleApplication,
+            null, description);
     }
 }
