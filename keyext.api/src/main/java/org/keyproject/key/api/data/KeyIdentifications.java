@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
 
-import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -12,7 +11,6 @@ import de.uka.ilkd.key.proof.Proof;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.jspecify.annotations.NonNull;
 import org.keyproject.key.api.internal.NodeText;
 
 /**
@@ -33,17 +31,13 @@ public class KeyIdentifications {
     }
 
     public KeYEnvironment<?> find(EnvironmentId envid) {
-        return Objects.requireNonNull(getContainer(envid).env.get(),
-            "Environment was removed by gc");
+        return getContainer(envid).env;
     }
 
-    @NonNull
     public Proof find(ProofId proofId) {
-        return Objects.requireNonNull(getContainer(proofId).wProof.get(),
-            "Could not find a proof for id " + proofId);
+        return getContainer(proofId).wProof;
     }
 
-    @NonNull
     public NodeText find(NodeTextId nodeTextId) {
         return Objects.requireNonNull(
             getContainer(nodeTextId.nodeId().proofId()).mapGoalText.get(nodeTextId),
@@ -69,7 +63,6 @@ public class KeyIdentifications {
     }
 
     public Node find(NodeId nodeId) {
-        @NonNull
         Proof p = find(nodeId.proofId);
         var opt = p.findAny(it -> it.serialNr() == nodeId.nodeId());
         return Objects.requireNonNull(opt, "Could not find node with serialNr  " + nodeId.nodeId);
@@ -151,26 +144,25 @@ public class KeyIdentifications {
      * @author Alexander Weigl
      * @version 1 (28.10.23)
      */
-    public record KeyEnvironmentContainer(WeakReference<KeYEnvironment<?>> env,
+    public record KeyEnvironmentContainer(KeYEnvironment<?> env,
             BiMap<ProofId, ProofContainer> mapProof) {
 
         public KeyEnvironmentContainer(KeYEnvironment<?> env) {
-            this(new WeakReference<>(env), HashBiMap.create(1));
+            this(env, HashBiMap.create(1));
         }
 
         void dispose() {
-            env.clear();
             mapProof.clear();
+            env.dispose();
         }
     }
 
-    private record ProofContainer(WeakReference<Proof> wProof,
-            BiMap<NodeId, WeakReference<Node>> mapNode,
-            BiMap<TreeNodeId, WeakReference<TreeNodeDesc>> mapTreeNode,
+    private record ProofContainer(Proof wProof,
+            BiMap<NodeId, Node> mapNode,
+            BiMap<TreeNodeId, TreeNodeDesc> mapTreeNode,
             BiMap<NodeTextId, NodeText> mapGoalText) {
         public ProofContainer(Proof proof) {
-            this(new WeakReference<>(proof), HashBiMap.create(16), HashBiMap.create(16),
-                HashBiMap.create(16));
+            this(proof, HashBiMap.create(16), HashBiMap.create(16), HashBiMap.create(16));
         }
 
         void dispose() {

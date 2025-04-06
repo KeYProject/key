@@ -6,7 +6,6 @@ package org.keyproject.key.api;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
@@ -19,9 +18,9 @@ import de.uka.ilkd.key.rule.*;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.util.reflection.ClassLoaderUtil;
 import org.keyproject.key.api.data.KeyIdentifications;
 import org.keyproject.key.api.data.KeyIdentifications.NodeTextId;
 import org.keyproject.key.api.data.TermActionDesc;
