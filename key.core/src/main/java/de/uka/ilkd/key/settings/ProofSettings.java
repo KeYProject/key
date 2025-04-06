@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /// MaximumNumberOfHeuristcsApplications=400
 /// number = "IntegerLDT.class"
 /// boolean = "BooleanLDT.class"
-///```
+/// ```
 ///
 /// @see Properties
 /// @see Settings
@@ -38,7 +38,7 @@ public class ProofSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSettings.class);
 
     public static final File PROVER_CONFIG_FILE =
-            new File(PathConfig.getKeyConfigDir(), "proof-settings.json");
+        new File(PathConfig.getKeyConfigDir(), "proof-settings.json");
 
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.json");
@@ -65,7 +65,7 @@ public class ProofSettings {
     private final StrategySettings strategySettings = new StrategySettings();
     private final ChoiceSettings choiceSettings = new ChoiceSettings();
     private final ProofDependentSMTSettings smtSettings =
-            ProofDependentSMTSettings.getDefaultSettingsData();
+        ProofDependentSMTSettings.getDefaultSettingsData();
     private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
 
@@ -164,7 +164,7 @@ public class ProofSettings {
     public void loadDefaultJSONSettings() {
         if (PROVER_CONFIG_FILE_TEMPLATE == null) {
             LOGGER.warn(
-                    "default proof-settings file 'default-proof-settings.json' could not be found.");
+                "default proof-settings file 'default-proof-settings.json' could not be found.");
         } else {
             try (var in = new InputStreamReader(PROVER_CONFIG_FILE_TEMPLATE.openStream())) {
                 loadSettingsFromJSONStream(in);
