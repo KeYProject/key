@@ -41,11 +41,11 @@ import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
-import org.key_project.util.reflection.ClassLoaderUtil;
 import org.keyproject.key.api.data.*;
 import org.keyproject.key.api.data.KeyIdentifications.*;
 import org.keyproject.key.api.internal.NodeText;
@@ -118,14 +118,17 @@ public final class KeyApiImpl implements KeyApi {
     @Override
     public CompletableFuture<List<ProofMacroDesc>> getAvailableMacros() {
         return CompletableFuture.completedFuture(
-                StreamSupport.stream(ClassLoaderUtil.loadServices(ProofMacro.class).spliterator(),false)
+            StreamSupport
+                    .stream(ClassLoaderUtil.loadServices(ProofMacro.class).spliterator(), false)
                     .map(ProofMacroDesc::from).toList());
     }
 
     @Override
     public CompletableFuture<List<ProofScriptCommandDesc>> getAvailableScriptCommands() {
         return CompletableFuture.completedFuture(
-                StreamSupport.stream(ClassLoaderUtil.loadServices(ProofScriptCommand.class).spliterator(),false)
+            StreamSupport
+                    .stream(ClassLoaderUtil.loadServices(ProofScriptCommand.class).spliterator(),
+                        false)
                     .map(ProofScriptCommandDesc::from).toList());
     }
 
@@ -152,7 +155,8 @@ public final class KeyApiImpl implements KeyApi {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
-            var macro = StreamSupport.stream(ClassLoaderUtil.loadServices(ProofMacro.class).spliterator(),false)
+            var macro = StreamSupport
+                    .stream(ClassLoaderUtil.loadServices(ProofMacro.class).spliterator(), false)
                     .filter(it -> it.getName().equals(macroName)).findFirst().orElseThrow();
 
             try {
@@ -173,7 +177,9 @@ public final class KeyApiImpl implements KeyApi {
             var env = data.find(proofId.env());
             options.configure(proof);
             try {
-                System.out.println("Starting proof with setting "+proof.getSettings().getStrategySettings().getActiveStrategyProperties().getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY));
+                System.out.println("Starting proof with setting "
+                    + proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                            .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY));
                 env.getProofControl().startAndWaitForAutoMode(proof);
                 // clientListener);
                 return ProofStatus.from(proofId, proof);
