@@ -76,11 +76,12 @@ public class TestProofScriptCommand {
 
         try {
             pse.execute(env.getUi(), proof);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (ScriptException ex) {
             assertTrue(props.containsKey("exception"),
                 "An exception was not expected, but got " + ex.getMessage());
-            Assertions.assertTrue(ex.getMessage().startsWith(props.get("exception").trim()),
+            // weigl: fix spurious error on Windows machine due to different file endings.
+            String msg = ex.getMessage().trim().replaceAll("\r\n", "\n");
+            Assertions.assertTrue(msg.startsWith(props.get("exception").trim()),
                 "Unexpected exception: " + ex.getMessage() + "\n expected: "
                     + props.get("exception").trim());
             return;

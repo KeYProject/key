@@ -30,7 +30,7 @@ public class FocusCommandTest {
                 \\proofScript "prop-simp;\"""");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
         Proof p = env.getLoadedProof();
-        var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus `i=1 ==> i = 4`;");
+        var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 4);");
         ProofScriptEngine pse = new ProofScriptEngine(script);
         pse.execute(env.getUi(), p);
 
@@ -46,12 +46,12 @@ public class FocusCommandTest {
         Files.writeString(temp,
             """
                         \\functions { int i; } \\problem { i=1<<SC>> -> i=(3<<origin("<none> (implicit)", "[]")>>) }\
-                        \\proofScript "prop-simp; \"
+                        \\proofScript "prop-simp;"
                     """);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
         Proof p = env.getLoadedProof();
-        var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus `i=1 ==> i = 3`;");
+        var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 3);");
         ProofScriptEngine pse = new ProofScriptEngine(script);
         pse.execute(env.getUi(), p);
 
