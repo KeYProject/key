@@ -855,7 +855,7 @@ preferences
 proofScriptEntry
 :
   PROOFSCRIPT
-    ( STRING_LITERAL
+    ( STRING_LITERAL SEMI?
     | LBRACE proofScript RBRACE
     )
 ;
@@ -874,9 +874,9 @@ proofScriptExpression:
   | integer
   | floatnum
   | string_literal
-  | BACKTICK (term | seq) BACKTICK
+  | LPAREN (term | seq) RPAREN
   | term
-  | seq;
+  ;
 
 
 // PROOF
