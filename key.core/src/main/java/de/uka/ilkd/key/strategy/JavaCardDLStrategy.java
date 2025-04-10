@@ -260,7 +260,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
-        bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
+        bindRuleSet(d, "simplify_heap_high_costs", longConst(30000));//inftyConst());
 
         bindRuleSet(d, "closure", -15000);
         bindRuleSet(d, "alpha", -7000);
@@ -288,6 +288,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "loopInvariant", -20000);
 
         setupSelectSimplification(d);
+
+        bindRuleSet(d, "noPrograms", sequentContainsNoPrograms());
+        bindRuleSet(d, "relaxedAccumulation", longConst(-100));
 
         bindRuleSet(d, "no_self_application",
             ifZero(MatchedIfFeature.INSTANCE, NoSelfApplicationFeature.INSTANCE));
@@ -939,7 +942,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // function symbol)
             add(applyTF("h",
                 not(or(PrimitiveHeapTermFeature.create(heapLDT), AnonHeapTermFeature.INSTANCE))),
-                ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.update), longConst(-4200),
+                    //delete
+                    ifZero(applyTF(FocusProjection.create(1), tf.eqF), inftyConst(), longConst(0)),
+                    ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.update), longConst(-4200),
                     longConst(-1900)),
                 NonDuplicateAppModPositionFeature.INSTANCE));
         bindRuleSet(d, "apply_select_eq",
@@ -1235,6 +1240,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     .createSum(
                         not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
                         AllowedCutPositionFeature.INSTANCE,
+                            ScaleFeature.createAffine(countOccurrences(FocusProjection.INSTANCE), -10, 10),
                         ifZero(
                             NotBelowQuantifierFeature.INSTANCE, add(
                                 applyTF(cutFormula, add(ff.cutAllowed,
@@ -2338,6 +2344,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // without changing the sequent for a really long time. This is tested by
         // TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
         bindRuleSet(d, "apply_equations", EqNonDuplicateAppFeature.INSTANCE);
+
+        bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
+        bindRuleSet(d, "strictNoEqApp", EqNonDuplicateAppFeature.INSTANCE);//StrictEqNonDuplicateAppFeature.INSTANCE);
 
         return d;
     }
