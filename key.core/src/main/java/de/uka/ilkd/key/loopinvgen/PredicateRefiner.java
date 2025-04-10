@@ -196,8 +196,8 @@ public abstract class PredicateRefiner {
         // SideProof.isProvable(sideSeq, 100000, 60000, true, services);
 
 
-         if(!provable)
-             System.out.println(pred+ " can't be proven in Seq: "+ sideSeq);
+        // if(!provable)
+        // System.out.println(pred+ " can't be proven in Seq: "+ sideSeq);
         // System.out.println(provable);
         return provable;
     }

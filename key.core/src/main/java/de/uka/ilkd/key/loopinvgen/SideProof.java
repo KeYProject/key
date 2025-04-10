@@ -151,28 +151,29 @@ public class SideProof {
     private static void printDebugAndSaveProof(ApplyStrategyInfo info, long time) {
         if (DEBUG_VERBOSITY == 0)
             return;
-        System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
+
+//        System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
 
         if (DEBUG_VERBOSITY > 1) {
-             System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
-             System.out.println("Rules: " + info.getProof().getStatistics());
-             if (!info.getProof().closed()) {
-             System.out.println("Open Goals: " + info.getProof().openGoals());
-             }
-             System.out.println("Applied rules:" + info.getAppliedRuleApps());
+//             System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
+//             System.out.println("Rules: " + info.getProof().getStatistics());
+//             if (!info.getProof().closed()) {
+//             System.out.println("Open Goals: " + info.getProof().openGoals());
+//             }
+//             System.out.println("Applied rules:" + info.getAppliedRuleApps());
         }
 
 
 
-        try {
-            new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable" + COUNTER
-                    + ".key")).save();
-
-            System.out.println(COUNTER + "   " + info.getProof().closed() + " in " + time + " ms");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable" + COUNTER
+//                    + ".key")).save();
+//
+//            System.out.println(COUNTER + "   " + info.getProof().closed() + " in " + time + " ms");
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         COUNTER++;
         System.out.println(COUNTER);
