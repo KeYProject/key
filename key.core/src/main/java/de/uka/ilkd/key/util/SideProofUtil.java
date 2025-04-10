@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDepProfile;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -49,7 +50,7 @@ public final class SideProofUtil {
         final InitConfig sourceInitConfig = source.getInitConfig();
         final RuleJustificationInfo sourceJustiInfo = sourceInitConfig.getJustifInfo();
         // Create new profile which has separate OneStepSimplifier instance
-        JavaProfile profile = new JavaProfile();
+        JavaProfile profile = new JavaDepProfile();
         // Create new InitConfig
         final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
         // Set modified taclet options in which runtime exceptions are banned.

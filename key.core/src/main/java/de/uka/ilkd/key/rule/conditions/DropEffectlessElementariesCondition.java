@@ -77,7 +77,16 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     private static Term dropEffectlessElementaries(Term update, Term target, Services services) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);
+
+
+        if (collector.containsNonRigidNonProgramVariableSymbol() && !collector.containsAtMostDepPredAsNonRigid()) {
+            return null;
+        }
         Set<LocationVariable> varsInTarget = collector.result();
+        // protected the implicit needed timestamp
+        if (target.containsJavaBlockRecursive()) {
+            varsInTarget.add(services.getTypeConverter().getDependenciesLDT().getTimestamp());
+        }
         Term simplifiedUpdate = dropEffectlessElementariesHelper(update, varsInTarget, services);
         return simplifiedUpdate == null ? null
                 : services.getTermBuilder().apply(simplifiedUpdate, target, null);

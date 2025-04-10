@@ -8,18 +8,24 @@ import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import org.key_project.logic.op.Function;
 
 public class TermProgramVariableCollector implements DefaultVisitor {
 
     private final HashSet<LocationVariable> result = new LinkedHashSet<>();
     private final Services services;
+    private final DependenciesLDT dependenciesLDT;
+    private boolean containsNonRigidFunctionSymbols = false;
+    private boolean containsAtMostDepPredAsNonRigid = true;
 
 
     public TermProgramVariableCollector(Services services) {
         this.services = services;
+        this.dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
     }
 
     /**
@@ -32,6 +38,10 @@ public class TermProgramVariableCollector implements DefaultVisitor {
     public void visit(Term visited) {
         if (visited.op() instanceof LocationVariable variable) {
             result.add(variable);
+        } else if (visited.op() instanceof Function && !visited.op().isRigid()) { // term contains non-rigid symbols that are not program variables
+            containsNonRigidFunctionSymbols = true;
+            boolean dependencePredicate = dependenciesLDT.isDependencePredicate(visited.op());
+            containsAtMostDepPredAsNonRigid &= dependencePredicate;
         }
 
         if (!visited.javaBlock().isEmpty()) {
@@ -44,5 +54,13 @@ public class TermProgramVariableCollector implements DefaultVisitor {
 
     public HashSet<LocationVariable> result() {
         return result;
+    }
+
+    public boolean containsAtMostDepPredAsNonRigid() {
+        return containsAtMostDepPredAsNonRigid;
+    }
+
+    public boolean containsNonRigidNonProgramVariableSymbol() {
+        return containsNonRigidFunctionSymbols;
     }
 }

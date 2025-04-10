@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaDepProfile;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -767,7 +768,7 @@ public final class SymbolicExecutionSideProofUtil {
                 }
             };
         } else {
-            profile = new JavaProfile() {
+            profile = new JavaDepProfile() {
                 @Override
                 protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
                     Profile sourceProfile = sourceInitConfig.getProfile();

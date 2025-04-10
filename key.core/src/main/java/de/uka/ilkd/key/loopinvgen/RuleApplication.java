@@ -193,9 +193,11 @@ public class RuleApplication {
             // }
 
             ApplyStrategyInfo info = ps.start(goals);
-            // System.out.println("info after shift: "+info);
 
             ImmutableList<Goal> subtreeGoals = ps.getProof().getSubtreeGoals(subtreeRoot);
+
+            //System.out.println("info after shift: "+info + ":" + subtreeGoals);
+
 
             return subtreeGoals;
 
@@ -261,7 +263,7 @@ public class RuleApplication {
 
             // ApplyStrategyInfo info =
             ps.start(goals);
-            // System.out.println("info after unwind: "+info);
+            // System.out.println("info after unwind: "+ currentGoal.proof().openGoals().head());
 
             // try {
             // new ProofSaver(ps.getProof(), new
