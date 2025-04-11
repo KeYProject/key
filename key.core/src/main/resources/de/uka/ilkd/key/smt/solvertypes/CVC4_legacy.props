@@ -1,4 +1,4 @@
-legacy=true
+experimental=true
 params=--no-print-success -m --interactive --lang smt2
 timeout=-1
 name=CVC4 (Legacy Translation)

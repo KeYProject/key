@@ -12,10 +12,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SMTTestSettings;
-import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -34,13 +31,8 @@ public abstract class SMTTestCommons {
     protected static final String FOLDER =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
             + File.separator + "tacletTranslation" + File.separator;
-    InitConfig initConfig = null;
-    static protected ProblemInitializer initializer = null;
-    static protected final Profile profile = init();
-
-    static Profile init() {
-        return new JavaProfile();
-    }
+    protected static ProblemInitializer initializer = null;
+    protected static final Profile profile = new JavaProfile();
 
     private TermServices services;
 
@@ -57,22 +49,10 @@ public abstract class SMTTestCommons {
 
     public abstract boolean toolInstalled();
 
-    protected boolean correctResult(String filepath, SMTSolverResult.ThreeValuedTruth expected)
-            throws ProblemLoaderException {
-        Assumptions.assumeTrue(toolInstalled());
-        SMTSolverResult result = checkFile(filepath);
-        return correctResult(expected, result);
-    }
-
     protected SMTSolverResult.ThreeValuedTruth getResult(String filepath)
             throws ProblemLoaderException {
         Assumptions.assumeTrue(toolInstalled());
         return checkFile(filepath).isValid();
-    }
-
-    private boolean correctResult(SMTSolverResult.ThreeValuedTruth expected,
-            @NonNull SMTSolverResult result) {
-        return result.isValid() == expected;
     }
 
     /**
@@ -137,7 +117,7 @@ public abstract class SMTTestCommons {
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }
-            initConfig = initializer.prepare(po);
+            InitConfig initConfig = initializer.prepare(po);
             result = initializer.startProver(initConfig, po);
             services = initConfig.getServices();
             // po.close();
