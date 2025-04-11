@@ -132,7 +132,7 @@ public final class SMTFocusResults {
             // Z3 unsat core format: all labels on one line
             numbers = parseZ3Format(lastLine);
         } else if (lastLine.equals(")")) {
-            // CVC5 unsat core format: each label on a separate line
+            // cvc5 unsat core format: each label on a separate line
             numbers = parseCVC5Format(lines);
         } else {
             // unknown format / no unsat core produced
@@ -184,7 +184,7 @@ public final class SMTFocusResults {
     }
 
     /**
-     * Parse CVC5-style unsat core output:
+     * Parse cvc5-style unsat core output:
      *
      * <pre>
      *     (
@@ -193,7 +193,7 @@ public final class SMTFocusResults {
      *     )
      * </pre>
      *
-     * @param lines CVC5 output
+     * @param lines cvc5 output
      * @return list of labels referenced in unsat core
      */
     static Integer[] parseCVC5Format(String[] lines) {

@@ -52,7 +52,7 @@ public class Z3Socket extends AbstractSolverSocket {
 
             }
             if (msg.equals("unknown")) {
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
+                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName(), false));
                 pipe.sendMessage("(exit)\n");
                 sc.setState(WAIT_FOR_DETAILS);
             }

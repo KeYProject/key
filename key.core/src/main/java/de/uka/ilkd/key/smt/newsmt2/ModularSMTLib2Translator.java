@@ -45,7 +45,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * that {@link de.uka.ilkd.key.smt.SMTFocusResults} can interpret the unsat core.
      * <p>
      * This option is currently only enabled for Z3.
-     * Currently, this option only works with a CVC5 dev build.
+     * Currently, this option only works with a cvc5 dev build.
      * Once <a href="https://github.com/cvc5/cvc5/pull/9353">the fix</a> is included in a release,
      * add this handler option to the .props file.
      * </p>

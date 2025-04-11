@@ -42,15 +42,15 @@ public class TestSMTMod {
                     && it.getName().equals("Z3"))
             .findFirst().orElse(null);
 
-    private static final SolverType CVC4_SOLVER = SolverTypes.getSolverTypes().stream()
+    private static final SolverType CVC5_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
-                    && it.getName().equals("CVC4"))
+                    && it.getName().equals("cvc5"))
             .findFirst().orElse(null);
 
     /**
      * This tests if x mod y is non-negative and x mod y < |y| for y != 0
      * thus satisfying the definition of euclidean modulo
-     * Tests for Z3 and CVC4
+     * Tests for Z3 and cvc5
      *
      * @throws ProblemLoaderException Occured Exception during load of problem file
      */
@@ -70,11 +70,11 @@ public class TestSMTMod {
             } else {
                 LOGGER.warn("Warning:Z3 solver not installed, tests skipped.");
             }
-            if (CVC4_SOLVER.isInstalled(true)) {
-                result = checkGoal(g, CVC4_SOLVER);
+            if (CVC5_SOLVER.isInstalled(true)) {
+                result = checkGoal(g, CVC5_SOLVER);
                 assertSame(SMTSolverResult.ThreeValuedTruth.VALID, result.isValid());
             } else {
-                LOGGER.warn("Warning:CVC4 solver not installed, tests skipped.");
+                LOGGER.warn("Warning:cvc5 solver not installed, tests skipped.");
             }
         } finally {
             env.dispose();
