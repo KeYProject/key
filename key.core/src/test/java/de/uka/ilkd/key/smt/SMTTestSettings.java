@@ -12,12 +12,10 @@ import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
+/**
+ * Special settings for the SMT solvers tests.
+ */
 public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
-
-
-    public long getGlobalBound() {
-        return 0;
-    }
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -41,7 +39,11 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
 
     @Override
     public long getTimeout() {
-        return 300000;
+        /* 20s should be sufficient, and since we have a few examples that are expected to run into
+         * a timeout (because the file is intentionally not provable), we want to have it as low as
+         * possible.
+         */
+        return 20000;
     }
 
     @Override
@@ -136,6 +138,4 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
     public NewSMTTranslationSettings getNewSettings() {
         return new NewSMTTranslationSettings();
     }
-
-
 }
