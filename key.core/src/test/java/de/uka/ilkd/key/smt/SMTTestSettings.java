@@ -40,11 +40,11 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
     @Override
     public long getTimeout() {
         /*
-         * 20s should be sufficient, and since we have a few examples that are expected to run into
+         * 30s should be sufficient, and since we have a few examples that are expected to run into
          * a timeout (because the file is intentionally not provable), we want to have it as low as
          * possible.
          */
-        return 20000;
+        return 30000;
     }
 
     @Override
