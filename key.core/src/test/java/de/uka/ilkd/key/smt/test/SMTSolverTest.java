@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 
 /**
  * Concrete instance of this class test that some .key files are translated to SMT-LIB correctly and
- * the SMT solver has a specified behavior on them (returns unsat, or sat/unknown).
+ * the SMT solver has a specified behavior on them (returns unsat, sat, or unknown/timeout).
  * <p>
  * Note: The settings for the solver are hard-coded in {@link de.uka.ilkd.key.smt.SMTTestSettings}!
  */
