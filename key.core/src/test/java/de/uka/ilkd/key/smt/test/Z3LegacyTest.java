@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.test;
 
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
@@ -10,8 +12,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.stream.Stream;
 
 import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.*;
 import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.VALID;
@@ -81,17 +81,17 @@ public class Z3LegacyTest extends SMTSolverTest {
             Arguments.of(VALID, "add1.key"),
             Arguments.of(VALID, "bsum1.key"),
             Arguments.of(VALID, "bsum2.key"),
-            Arguments.of(UNKNOWN, "bsum3.key"),     // timeout expected
+            Arguments.of(UNKNOWN, "bsum3.key"), // timeout expected
             Arguments.of(VALID, "bprod1.key"),
             Arguments.of(VALID, "bprod2.key"),
-            Arguments.of(UNKNOWN, "bprod3.key"),    // timeout expected
+            Arguments.of(UNKNOWN, "bprod3.key"), // timeout expected
             Arguments.of(VALID, "binder4.key"),
             Arguments.of(VALID, "binder5.key"),
             // These testcases are z3 specific, because other solvers don't support integer division
             Arguments.of(VALID, "div1.key"),
             Arguments.of(VALID, "div3.key"),
-            Arguments.of(UNKNOWN, "div5.key"),      // timeout expected
-            Arguments.of(UNKNOWN, "div6.key")       // timeout expected
+            Arguments.of(UNKNOWN, "div5.key"), // timeout expected
+            Arguments.of(UNKNOWN, "div6.key") // timeout expected
         );
     }
 }

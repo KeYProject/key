@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.smt.test;
 
 
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
@@ -11,8 +13,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.stream.Stream;
 
 import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.*;
 import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.VALID;
@@ -94,7 +94,6 @@ public class Cvc4LegacyTest extends SMTSolverTest {
             Arguments.of(VALID, "div1.key"),
             Arguments.of(VALID, "div3.key"),
             Arguments.of(UNKNOWN, "div5.key"),
-            Arguments.of(UNKNOWN, "div6.key")
-        );
+            Arguments.of(UNKNOWN, "div6.key"));
     }
 }

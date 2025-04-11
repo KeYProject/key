@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.test;
 
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
@@ -10,8 +12,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.stream.Stream;
 
 import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.*;
 import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.VALID;
@@ -61,17 +61,20 @@ public class Z3Test extends SMTSolverTest {
     }
 
     /*
-    @Test
-    @Disabled("weigl: due to performance issues")
-    public void testDiv5() throws Exception {
-        assertTrue(correctResult(TEST_DIR + "div5.key", ThreeValuedTruth.FALSIFIABLE));
-    }
-
-    @Test
-    @Disabled("weigl: due to performance issues")
-    public void testDiv6() throws Exception {
-        assertTrue(correctResult(TEST_DIR + "div6.key", ThreeValuedTruth.FALSIFIABLE));
-    }*/
+     * @Test
+     *
+     * @Disabled("weigl: due to performance issues")
+     * public void testDiv5() throws Exception {
+     * assertTrue(correctResult(TEST_DIR + "div5.key", ThreeValuedTruth.FALSIFIABLE));
+     * }
+     *
+     * @Test
+     *
+     * @Disabled("weigl: due to performance issues")
+     * public void testDiv6() throws Exception {
+     * assertTrue(correctResult(TEST_DIR + "div6.key", ThreeValuedTruth.FALSIFIABLE));
+     * }
+     */
 
     @Override
     protected final Stream<Arguments> provideTestData() {
@@ -107,7 +110,6 @@ public class Z3Test extends SMTSolverTest {
             Arguments.of(VALID, "div1.key"),
             Arguments.of(VALID, "div3.key"),
             Arguments.of(UNKNOWN, "div5.key"),
-            Arguments.of(UNKNOWN, "div6.key")
-        );
+            Arguments.of(UNKNOWN, "div6.key"));
     }
 }
