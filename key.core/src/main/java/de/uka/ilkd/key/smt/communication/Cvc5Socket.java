@@ -11,17 +11,17 @@ import de.uka.ilkd.key.smt.SMTSolverResult;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Socket for CVC5 (<a href="https://cvc5.github.io/">...</a>).
+ * Socket for cvc5 (<a href="https://cvc5.github.io/">...</a>).
  */
-public class CVC5Socket extends AbstractSolverSocket {
+public class Cvc5Socket extends AbstractSolverSocket {
 
     /**
-     * Create a new CVC5Socket.
+     * Create a new Cvc5Socket.
      *
      * @param name the socket's name (usually "CVC5", but other solvers might also use it).
      * @param query the ModelExtractor for model interpretation (currently not used by this socket)
      */
-    public CVC5Socket(String name, ModelExtractor query) {
+    public Cvc5Socket(String name, ModelExtractor query) {
         super(name, query);
     }
 
@@ -66,7 +66,7 @@ public class CVC5Socket extends AbstractSolverSocket {
 
     @Override
     public AbstractSolverSocket copy() {
-        return new CVC5Socket(getName(), getQuery());
+        return new Cvc5Socket(getName(), getQuery());
     }
 
 }

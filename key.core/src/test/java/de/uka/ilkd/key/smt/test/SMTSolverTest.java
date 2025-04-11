@@ -47,7 +47,7 @@ public abstract class SMTSolverTest extends SMTTestCommons {
                 getLogger().warn("Warning: {} is not installed, tests skipped.",
                     getSolverName());
                 getLogger().warn(
-                    "Maybe use JVM system property \"{}\" to define the path to the CVC4 command.",
+                    "Maybe use JVM system property \"{}\" to define the path to the solver binary.",
                     getSystemPropertySolverPath());
             } else if (!solverType.supportHasBeenChecked()) {
                 if (!solverType.checkForSupport()) {
