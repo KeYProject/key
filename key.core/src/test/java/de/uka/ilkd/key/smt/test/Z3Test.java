@@ -60,53 +60,36 @@ public class Z3Test extends SMTSolverTest {
         return type;
     }
 
-    /*
-     * @Test
-     *
-     * @Disabled("weigl: due to performance issues")
-     * public void testDiv5() throws Exception {
-     * assertTrue(correctResult(TEST_DIR + "div5.key", ThreeValuedTruth.FALSIFIABLE));
-     * }
-     *
-     * @Test
-     *
-     * @Disabled("weigl: due to performance issues")
-     * public void testDiv6() throws Exception {
-     * assertTrue(correctResult(TEST_DIR + "div6.key", ThreeValuedTruth.FALSIFIABLE));
-     * }
-     */
-
     @Override
     protected final Stream<Arguments> provideTestData() {
         return Stream.of(
-            Arguments.of(UNKNOWN, "andnot.key"),
+            Arguments.of(UNKNOWN, "andnot.key"), // timeout expected
             Arguments.of(VALID, "ornot.key"),
-            Arguments.of(UNKNOWN, "andornot.key"),
+            Arguments.of(UNKNOWN, "andornot.key"), // timeout expected
             Arguments.of(VALID, "andornot2.key"),
             Arguments.of(VALID, "imply.key"),
             Arguments.of(VALID, "imply2.key"),
-            Arguments.of(UNKNOWN, "imply3.key"),
+            Arguments.of(UNKNOWN, "imply3.key"), // timeout expected
             Arguments.of(VALID, "equi1.key"),
-            Arguments.of(UNKNOWN, "equi2.key"),
+            Arguments.of(UNKNOWN, "equi2.key"), // timeout expected
             Arguments.of(VALID, "allex1.key"),
-            Arguments.of(UNKNOWN, "allex2.key"),
+            Arguments.of(UNKNOWN, "allex2.key"), // timeout expected
             Arguments.of(UNKNOWN, "allex3.key"),
             Arguments.of(VALID, "logicalite1.key"),
-            Arguments.of(UNKNOWN, "logicalite2.key"),
+            Arguments.of(UNKNOWN, "logicalite2.key"), // timeout expected
             Arguments.of(VALID, "equal1.key"),
-            Arguments.of(UNKNOWN, "equal2.key"),
+            Arguments.of(UNKNOWN, "equal2.key"), // timeout expected
             Arguments.of(VALID, "subsort1.key"),
-            Arguments.of(UNKNOWN, "subsort2.key"),
+            Arguments.of(UNKNOWN, "subsort2.key"), // timeout expected
             Arguments.of(VALID, "add1.key"),
             Arguments.of(VALID, "bsum1.key"),
             Arguments.of(VALID, "bsum2.key"),
-            Arguments.of(UNKNOWN, "bsum3.key"),
+            Arguments.of(UNKNOWN, "bsum3.key"), // timeout expected
             Arguments.of(VALID, "bprod1.key"),
             Arguments.of(VALID, "bprod2.key"),
-            Arguments.of(UNKNOWN, "bprod3.key"),
-            Arguments.of(UNKNOWN, "binder4.key"),
-            Arguments.of(UNKNOWN, "binder5.key"),
-            // These testcases are z3 specific, because other solvers don't support integer division
+            Arguments.of(UNKNOWN, "bprod3.key"), // timeout expected
+            Arguments.of(UNKNOWN, "binder4.key"), // timeout expected
+            Arguments.of(UNKNOWN, "binder5.key"), // timeout expected
             Arguments.of(VALID, "div1.key"),
             Arguments.of(VALID, "div3.key"),
             Arguments.of(UNKNOWN, "div5.key"),
