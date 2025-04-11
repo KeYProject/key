@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.TermServices;
@@ -14,7 +12,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SMTTestSettings;
@@ -74,7 +71,7 @@ public abstract class SMTTestCommons {
     }
 
     private boolean correctResult(SMTSolverResult.ThreeValuedTruth expected,
-                                    @NonNull SMTSolverResult result) {
+            @NonNull SMTSolverResult result) {
         return result.isValid() == expected;
     }
 

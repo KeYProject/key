@@ -12,11 +12,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.DisabledIf;
-import org.junit.jupiter.api.condition.EnabledIf;
-import org.junit.jupiter.api.extension.ConditionEvaluationResult;
-import org.junit.jupiter.api.extension.ExecutionCondition;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -57,7 +52,7 @@ public abstract class SMTSolverTest extends SMTTestCommons {
             } else if (!solverType.supportHasBeenChecked()) {
                 if (!solverType.checkForSupport()) {
                     getLogger().warn("Warning: The version of the solver {}"
-                            + " used for the following tests may not be supported.",
+                        + " used for the following tests may not be supported.",
                         getSolverName());
                 }
             }
@@ -68,6 +63,7 @@ public abstract class SMTSolverTest extends SMTTestCommons {
     /**
      * Provides arguments for the parameterized test
      * {@link #test(SMTSolverResult.ThreeValuedTruth, String)}.
+     *
      * @return the stream of arguments
      */
     protected abstract Stream<Arguments> provideTestData();
@@ -75,7 +71,7 @@ public abstract class SMTSolverTest extends SMTTestCommons {
     @MethodSource("provideTestData")
     @ParameterizedTest(name = "test {1}")
     public void test(SMTSolverResult.ThreeValuedTruth expected, String filename)
-        throws ProblemLoaderException {
+            throws ProblemLoaderException {
         Assertions.assertSame(expected, getResult(TEST_DIR + filename));
     }
 }
