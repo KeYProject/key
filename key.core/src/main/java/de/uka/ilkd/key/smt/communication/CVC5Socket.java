@@ -56,7 +56,7 @@ public class CVC5Socket extends AbstractSolverSocket {
                 pipe.sendMessage("(exit)");
                 // pipe.close();
             } else if (msg.contains("unknown")) {
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
+                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName(), false));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
                 // pipe.close();

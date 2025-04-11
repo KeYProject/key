@@ -5,7 +5,6 @@ package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Tag;
 
@@ -33,14 +33,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * this class directly but derive subclasses to implement tests.
  */
 @Tag("slow")
-public abstract class TestCommons {
-    protected static final String folder =
+public abstract class SMTTestCommons {
+    protected static final String FOLDER =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
             + File.separator + "tacletTranslation" + File.separator;
-    /**
-     * The set of taclets
-     */
-    private final Collection<Taclet> taclets = new LinkedList<>();
     InitConfig initConfig = null;
     static protected ProblemInitializer initializer = null;
     static protected final Profile profile = init();
@@ -62,26 +58,24 @@ public abstract class TestCommons {
      */
     public abstract SolverType getSolverType();
 
-    public abstract boolean toolNotInstalled();
+    public abstract boolean toolInstalled();
 
-    protected boolean correctResult(String filepath, boolean isValid)
+    protected boolean correctResult(String filepath, SMTSolverResult.ThreeValuedTruth expected)
             throws ProblemLoaderException {
-        Assumptions.assumeFalse(toolNotInstalled());
+        Assumptions.assumeTrue(toolInstalled());
         SMTSolverResult result = checkFile(filepath);
-        // unknown is always allowed. But wrong answers are not allowed
-        return correctResult(isValid, result);
+        return correctResult(expected, result);
     }
 
-    protected boolean correctResult(Goal g, boolean isValid) {
-        return correctResult(isValid, checkGoal(g));
+    protected SMTSolverResult.ThreeValuedTruth getResult(String filepath)
+            throws ProblemLoaderException {
+        Assumptions.assumeTrue(toolInstalled());
+        return checkFile(filepath).isValid();
     }
 
-    private boolean correctResult(boolean isValid, SMTSolverResult result) {
-        if (isValid && result != null) {
-            return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE;
-        } else {
-            return result.isValid() != SMTSolverResult.ThreeValuedTruth.VALID;
-        }
+    private boolean correctResult(SMTSolverResult.ThreeValuedTruth expected,
+                                    @NonNull SMTSolverResult result) {
+        return result.isValid() == expected;
     }
 
     /**
@@ -104,7 +98,7 @@ public abstract class TestCommons {
         }
     }
 
-    private SMTSolverResult checkGoal(Goal g) {
+    private @NonNull SMTSolverResult checkGoal(Goal g) {
         SolverLauncher launcher = new SolverLauncher(new SMTTestSettings());
         SMTProblem problem = new SMTProblem(g);
         launcher.launch(problem, g.proof().getServices(), getSolverType());
@@ -117,41 +111,14 @@ public abstract class TestCommons {
     }
 
     /**
-     * Returns a set of taclets that can be used for tests. REMARK: First you have to call
-     * <code>parse</code> to instantiate the set of taclets.
-     *
-     * @return set of taclets.
-     */
-    protected Collection<Taclet> getTaclets() {
-        if (taclets.isEmpty()) {
-            if (initConfig == null) {
-                parse();
-            }
-            for (Taclet t : initConfig.getTaclets()) {
-                taclets.add(t);
-            }
-        }
-        return taclets;
-    }
-
-    protected HashSet<String> getTacletNames() {
-        Collection<Taclet> set = getTaclets();
-        HashSet<String> names = new HashSet<>();
-        for (Taclet taclet : set) {
-            names.add(taclet.name().toString());
-        }
-        return names;
-    }
-
-    /**
      * Use this method if you only need taclets for testing.
      */
     protected ProofAggregate parse() {
-        return parse(new File(folder + "dummyFile.key"));
+        return parse(new File(FOLDER + "dummyFile.key"));
     }
 
     /**
-     * Calls <code>parse(File file, Profile profile) with the standard profile for testing.
+     * Calls <code>parse(File file, Profile profile)</code> with the standard profile for testing.
      */
     protected ProofAggregate parse(File file) {
         return parse(file, profile);
