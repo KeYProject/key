@@ -62,6 +62,7 @@ public class Cvc4LegacyTest extends SMTSolverTest {
 
     @Override
     protected final Stream<Arguments> provideTestData() {
+        // no timeouts at all, either sat, unsat, or explicit unknown
         return Stream.of(
             Arguments.of(FALSIFIABLE, "andnot.key"),
             Arguments.of(VALID, "ornot.key"),
@@ -90,7 +91,6 @@ public class Cvc4LegacyTest extends SMTSolverTest {
             Arguments.of(UNKNOWN, "bprod3.key"),
             Arguments.of(VALID, "binder4.key"),
             Arguments.of(VALID, "binder5.key"),
-            // These testcases are z3 specific, because other solvers don't support integer division
             Arguments.of(VALID, "div1.key"),
             Arguments.of(VALID, "div3.key"),
             Arguments.of(UNKNOWN, "div5.key"),

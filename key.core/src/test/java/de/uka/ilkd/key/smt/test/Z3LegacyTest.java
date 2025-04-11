@@ -87,7 +87,6 @@ public class Z3LegacyTest extends SMTSolverTest {
             Arguments.of(UNKNOWN, "bprod3.key"), // timeout expected
             Arguments.of(VALID, "binder4.key"),
             Arguments.of(VALID, "binder5.key"),
-            // These testcases are z3 specific, because other solvers don't support integer division
             Arguments.of(VALID, "div1.key"),
             Arguments.of(VALID, "div3.key"),
             Arguments.of(UNKNOWN, "div5.key"), // timeout expected
