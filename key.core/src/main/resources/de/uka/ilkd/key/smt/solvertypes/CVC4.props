@@ -1,10 +1,9 @@
-params=--no-print-success -m --interactive --lang smt2
+params=--no-print-success --produce-models --no-interactive --lang smt2
 timeout=-1
 name=CVC4
 info=CVC4 solver (https://cvc4.github.io/index.html).
 command=cvc4
 version=--version
-delimiters=CVC4>
 socketClass=de.uka.ilkd.key.smt.communication.CVC4Socket
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
 de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
