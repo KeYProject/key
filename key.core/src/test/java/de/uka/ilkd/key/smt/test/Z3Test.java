@@ -18,7 +18,8 @@ import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.VALID;
 
 /**
  * Tests that some simple .key files are translated to SMT-LIB correctly and Z3 has a specified
- * behavior on them (returns unsat, or sat/unknown). The test uses the new modular SMT translation!
+ * behavior on them (returns unsat, sat, or unknown/timeout). The test uses the new modular SMT
+ * translation!
  * <p>
  * Note: The settings for the solver are hard-coded in {@link de.uka.ilkd.key.smt.SMTTestSettings}!
  */
