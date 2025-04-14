@@ -10,11 +10,13 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
+import org.key_project.util.Streams;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.slf4j.Logger;
@@ -318,9 +320,16 @@ public class SolverPropertiesLoader {
         Collection<Properties> completePropsList = new ArrayList<>();
         try {
             // load single solvers.txt files from the same location everywhere in the classpath
-            for (Iterator<URL> it = SolverPropertiesLoader.class.getClassLoader()
-                    .getResources(PACKAGE_PATH + SOLVER_LIST_FILE).asIterator(); it.hasNext();) {
-                URL res = it.next();
+            final var solverTxts =
+                    Streams.fromEnumerator(SolverPropertiesLoader.class.getClassLoader()
+                            .getResources(PACKAGE_PATH + SOLVER_LIST_FILE));
+
+            final var solverConfig = solverTxts.flatMap(it -> {
+
+
+            });
+
+            for (var res : solverTxts) {
                 try (InputStream stream = res.openStream()) {
                     if (stream == null) {
                         continue;
