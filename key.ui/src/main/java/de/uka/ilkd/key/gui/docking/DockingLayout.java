@@ -9,6 +9,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -45,7 +47,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     private static final Logger LOGGER = LoggerFactory.getLogger(DockingLayout.class);
 
     private static final float SIZE_ICON_DOCK = 12f;
-    private static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
+    private static final Path LAYOUT_FILE = PathConfig.getKeyConfigDir().resolve( "layout.xml");
     private static final String[] LAYOUT_NAMES = { "Default", "Slot 1", "Slot 2" };
     private static final int[] LAYOUT_KEYS =
         { KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12 };
@@ -85,8 +87,8 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
 
     private static void loadLayouts(CControl globalPort) {
         try {
-            if (LAYOUT_FILE.exists()) {
-                globalPort.readXML(LAYOUT_FILE);
+            if (Files.exists(LAYOUT_FILE)) {
+                globalPort.readXML(LAYOUT_FILE.toFile());
             }
         } catch (IOException e) {
             LOGGER.warn("Failed to load layouts", e);
@@ -113,7 +115,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
             @Override
             public void shutDown(EventObject e) {
                 try {
-                    window.getDockControl().writeXML(LAYOUT_FILE);
+                    window.getDockControl().writeXML(LAYOUT_FILE.toFile());
                 } catch (IOException ex) {
                     LOGGER.warn("Failed to save layouts", ex);
                 }
