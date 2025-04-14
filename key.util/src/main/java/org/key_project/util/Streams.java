@@ -31,8 +31,8 @@ public class Streams {
     /// Translates the enumeration into stream.
     public static <T> Stream<T> fromEnumerator(Enumeration<T> enumeration) {
         return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(enumeration.asIterator(), Spliterator.ORDERED), false
-        );
+            Spliterators.spliteratorUnknownSize(enumeration.asIterator(), Spliterator.ORDERED),
+            false);
     }
 
     /// Returns a list given the elements in the enumeration.
