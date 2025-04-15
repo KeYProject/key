@@ -48,6 +48,7 @@ public class CVC5Socket extends AbstractSolverSocket {
             if (msg.contains("unsat")) {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 sc.setState(FINISH);
+                pipe.sendMessage("(get-unsat-core)");
                 pipe.sendMessage("(exit)");
                 // pipe.close();
             } else if (msg.contains("sat")) {
