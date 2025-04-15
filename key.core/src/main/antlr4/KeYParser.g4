@@ -875,7 +875,9 @@ proofScriptExpression:
   | floatnum
   | string_literal
   | LPAREN (term | seq) RPAREN
-  | term
+  | simple_ident
+  | abbreviation
+  | literals
   ;
 
 
