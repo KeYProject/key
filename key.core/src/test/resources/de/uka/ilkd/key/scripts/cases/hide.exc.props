@@ -6,7 +6,7 @@
 
 ### script
 
-macro split-prop;
+macro "split-prop";
 hide "b ==>";
 
 ### exception
