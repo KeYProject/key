@@ -23,7 +23,7 @@ public class SearchNextAction extends MainWindowAction {
         setName("Find Next Occurrence");
         setIcon(IconFactory.SEARCH_NEXT.get(16));
         setTooltip("Find the next occurrence of current search term in sequent.");
-        getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
 
         this.searchBar = searchBar;
     }
