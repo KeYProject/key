@@ -383,7 +383,7 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
         if (token == KeYLexer.DOC_COMMENT) {
             processIndentationInMLComment(text, output);
         } else {
-            output.token(text);
+            output.token(node.getSymbol());
         }
 
         if (isLBrace) {
@@ -412,12 +412,9 @@ public class KeyFileFormatter extends KeYParserBaseVisitor<Void> {
      */
     public static String format(CharStream stream) {
         // weigl: Not necessary is handled within the lexer
-        // var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
+        //var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
 
         var lexer = ParsingFacade.createLexer(stream);
-        // weigl: Should not be necessary
-        // lexer.setTokenFactory(new CommonTokenFactory(true));
-
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         tokens.fill();
 
