@@ -120,7 +120,9 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
                 token == KeYLexer.AVOID ||
                 token == KeYLexer.EXISTS ||
                 token == KeYLexer.FORALL ||
-                token == KeYLexer.SEMI)) {
+                token == KeYLexer.SEMI)
+                || token==KeYLexer.IFEX
+                || token==KeYLexer.IDENT) {
             output.spaceBeforeNext();
         }
 
