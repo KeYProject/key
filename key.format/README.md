@@ -5,7 +5,7 @@ This module provide a pretty-printer / formatting utility for KeY files.
 Usage: 
 
 ```
-./gradlew :key.format:format
+./gradlew :key.format:formatKey
 ```
 
 which formats the rule base of KeY. 
