@@ -1,0 +1,17 @@
+### KeY
+
+\predicates { a; b; c; d; e; f; }
+
+\problem { a & b & c -> d | e | f }
+
+### script
+
+macro "split-prop";
+hide "a ==> d, e";
+
+### goals
+
+1
+
+### goal 1
+b, c ==> f
