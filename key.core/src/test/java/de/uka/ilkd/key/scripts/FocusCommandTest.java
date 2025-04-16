@@ -27,7 +27,8 @@ public class FocusCommandTest {
         Path temp = Files.createTempFile("key-focus-command", ".key");
         Files.writeString(temp, """
                 \\functions { int i; } \\problem { i=1&i=2 -> i=3|i=4 }\
-                \\proofScript "prop-simp;\"""");
+                \\proofScript { macro "prop-simp"; }
+                """);
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
         Proof p = env.getLoadedProof();
         var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 4);");
@@ -46,7 +47,7 @@ public class FocusCommandTest {
         Files.writeString(temp,
             """
                         \\functions { int i; } \\problem { i=1<<SC>> -> i=(3<<origin("<none> (implicit)", "[]")>>) }\
-                        \\proofScript "prop-simp;"
+                        \\proofScript { macro "prop-simp"; }
                     """);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());

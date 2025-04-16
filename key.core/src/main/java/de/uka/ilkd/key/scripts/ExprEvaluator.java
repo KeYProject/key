@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.*;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,11 +79,20 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Term visitTerm(KeYParser.TermContext ctx) {
+    public Object visitSimple_ident(Simple_identContext ctx) {
+        return evaluateExpression(ctx);
+    }
+
+    @Override
+    public Object visitTerm(KeYParser.TermContext ctx) {
+        return evaluateExpression(ctx);
+    }
+
+    private Object evaluateExpression(ParserRuleContext ctx) {
         var expressionBuilder =
             new ExpressionBuilder(state.getProof().getServices(), state.getCurrentNamespaces());
         expressionBuilder.setAbbrevMap(state.getAbbreviations());
-        var t = (Term) ctx.accept(expressionBuilder);
+        var t = ctx.accept(expressionBuilder);
         var warnings = expressionBuilder.getBuildingIssues();
         warnings.forEach(it -> LOGGER.warn("{}", it));
         warnings.clear();
