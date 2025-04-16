@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
 
+import de.uka.ilkd.key.nparser.KeYLexer;
+import org.antlr.v4.runtime.Token;
+
 /**
  * Output class for managing formatted output with indentation.
- *
+ * <p>
  * This class provides methods to manage and format output with proper
  * indentation and spacing. It supports adding tokens, characters, and
  * handling new lines and indentation levels.
@@ -63,25 +66,28 @@ class Output {
         this.spaceBeforeNextToken = false;
     }
 
-    /**
-     * Add a token to the output. Respects whitespace before token.
-     *
-     * @param value a string value
-     */
-    public void token(String value) {
+
+    public void token(Token value) {
         checkBeforeToken();
-        output.append(value);
+        if (lastTokenId == KeYLexer.IDENT && value.getType() == KeYLexer.IDENT) {
+            spaceBeforeNext();
+        }
+        output.append(value.getText());
+        lastTokenId = value.getType();
     }
 
     /**
-     * Add a character to the output. Respects whitespace before token.
+     * Add a token to the output. Respects whitespace before token.
      *
-     * @param value a char value
+     * @param text a string value
      */
-    public void token(char value) {
+    public void token(String text) {
         checkBeforeToken();
-        output.append(value);
+        output.append(text);
+        lastTokenId = 0;
     }
+
+    private int lastTokenId;
 
     /**
      * Increases the indentation level.
