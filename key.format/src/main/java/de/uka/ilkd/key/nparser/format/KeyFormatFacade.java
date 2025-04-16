@@ -11,10 +11,12 @@ package de.uka.ilkd.key.nparser.format;/*
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -51,7 +53,7 @@ public class KeyFormatFacade {
     public static boolean checkFile(Path file) throws IOException {
         var formatted = format(CharStreams.fromPath(file));
         var content = Files.readString(file);
-        return !content.equals(formatted);
+        return content.equals(formatted);
     }
 
 
@@ -97,10 +99,12 @@ public class KeyFormatFacade {
 
         @Override
         public Integer call() throws IOException {
+            System.out.println("Formatting ...");
             var files = expandPaths(paths);
 
             for (var file : files) {
                 try {
+                    System.out.printf("Formatting %s\n",file);
                     formatSingleFileTo(file);
                 } catch (SyntaxErrorReporter.ParserException e) {
                     LOGGER.error("{} | Parser error", file, e);
@@ -131,13 +135,19 @@ public class KeyFormatFacade {
 
         @Override
         public Integer call() throws IOException {
+            System.out.println("Checking ... ");
             var valid = true;
             var files = expandPaths(paths);
             for (Path file : files) {
                 try {
-                    if (checkFile(file)) {
-                        valid = false;
-                        LOGGER.warn("{} | File is not formatted properly", file);
+                    System.out.printf("Checking file %s", file);
+                    final var b = checkFile(file);
+                    valid &= b;
+                    if (b) {
+                        System.out.printf("  ... ok\n");
+                    } else {
+                        System.out.printf(" ... not ok\n");
+                        formatSingleFile(file, file.getParent().resolve(file.getFileName().toString() + ".formatted"));
                     }
                 } catch (SyntaxErrorReporter.ParserException e) {
                     LOGGER.error("{} | Syntax errors in file", file, e);
@@ -152,6 +162,7 @@ public class KeyFormatFacade {
     }
 
     public static void main(String[] args) {
+        System.out.println("KeY formatter. " + KeYConstants.VERSION);
         int exitCode = new CommandLine(new Cmd())
                 .addSubcommand(new Format())
                 .addSubcommand(new Check())
