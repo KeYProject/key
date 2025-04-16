@@ -45,10 +45,10 @@
  }
 
 \proofScript {
-macro split-prop;
+macro "split-prop";
 rule allRight;
 rule allRight;
-macro split-prop;
+macro "split-prop";
 rule "seqPermDefLeft";
 rule "andLeft";
 rule "exLeft";
