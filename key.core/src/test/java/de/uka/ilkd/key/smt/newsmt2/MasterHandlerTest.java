@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +37,6 @@ import org.key_project.util.Streams;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -51,7 +54,6 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
  *     gradlew :key.core:testStrictSMT
  * </pre>
  */
-@Tag("slow")
 public class MasterHandlerTest {
     /**
      * If this variable is set when running this test class, then those cases with expected result
@@ -107,7 +109,8 @@ public class MasterHandlerTest {
 
     public record TestData(String name, Path path, LineProperties props, String translation) {
 
-        public static @Nullable TestData create(Path path) throws IOException, ProblemLoaderException {
+        public static @Nullable TestData create(Path path)
+                throws IOException, ProblemLoaderException {
             var name = path.getFileName().toString();
             var props = new LineProperties();
             try (BufferedReader reader = Files.newBufferedReader(path)) {

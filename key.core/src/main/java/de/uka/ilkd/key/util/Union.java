@@ -20,10 +20,8 @@ import org.key_project.util.collection.Pair;
  * value with the respective type. An exception is raised if {@link #getFirst()}
  * is invoked while {@link #isFirst()} returns false.
  *
- * @param <A>
- *        the type for the first alternative
- * @param <B>
- *        the type for the second alternative
+ * @param <A> the type for the first alternative
+ * @param <B> the type for the second alternative
  * @see java.util.Optional
  * @see Pair
  */
@@ -33,24 +31,20 @@ public record Union<A, B>(Object value, boolean isFirst) {
      * private constructor the static methods {@link #fromFirst(Object)} and
      * {@link #fromSecond(Object)}.
      *
-     * @param value
-     *        the value to store, may be null
-     * @param isFirst
-     *        true if of first, false if of second type
+     * @param value the value to store, may be null
+     * @param isFirst true if of first, false if of second type
      */
-    public Union {}
+    public Union {
+    }
 
     /**
      * Instantiate a new union type with the value stored from the first type.
      * <p>
      * The result will return true for {@link #isFirst()}.
      *
-     * @param value
-     *        the value to store, may be null
-     * @param <A>
-     *        the type of the first alternative
-     * @param <B>
-     *        the type of the second alternative
+     * @param value the value to store, may be null
+     * @param <A> the type of the first alternative
+     * @param <B> the type of the second alternative
      * @return a freshly created immutable union object.
      */
     public static <A, B> Union<A, B> fromFirst(A value) {
@@ -62,12 +56,9 @@ public record Union<A, B>(Object value, boolean isFirst) {
      * <p>
      * The result will return true for {@link #isSecond()}.
      *
-     * @param value
-     *        the value to store, may be null
-     * @param <A>
-     *        the type of the first alternative
-     * @param <B>
-     *        the type of the second alternative
+     * @param value the value to store, may be null
+     * @param <A> the type of the first alternative
+     * @param <B> the type of the second alternative
      * @return a freshly created immutable union object.
      */
     public static <A, B> Union<A, B> fromSecond(B value) {
@@ -131,10 +122,8 @@ public record Union<A, B>(Object value, boolean isFirst) {
      * Create a new union object. If {@link #isFirst()} returns true, then
      * the function is applied to the value, if not the value remains untouched.
      *
-     * @param function
-     *        non-null function to apply to the value
-     * @param <C>
-     *        the result type of function
+     * @param function non-null function to apply to the value
+     * @param <C> the result type of function
      * @return a fresh union object
      */
     public <C> Union<C, B> mapFirst(Function<A, C> function) {
@@ -149,10 +138,8 @@ public record Union<A, B>(Object value, boolean isFirst) {
      * Create a new union object. If {@link #isSecond()} returns true, then
      * the function is applied to the value, if not the value remains untouched.
      *
-     * @param function
-     *        non-null function to apply to the value
-     * @param <C>
-     *        the result type of function
+     * @param function non-null function to apply to the value
+     * @param <C> the result type of function
      * @return a fresh union object
      */
     public <C> Union<A, C> mapSecond(Function<B, C> function) {
@@ -166,7 +153,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
     @Override
     public String toString() {
         return "Union{" + (isFirst ? "first" : "second") +
-                " alternative, value=" + value +
-                '}';
+            " alternative, value=" + value +
+            '}';
     }
 }

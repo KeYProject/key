@@ -484,7 +484,8 @@ public class Services implements TermServices, LogicServices {
         return javaService;
     }
 
-    private JavaService activateJavaPath(@NonNull Path bootClassPath, @NonNull Collection<Path> libraryPaths) {
+    private JavaService activateJavaPath(@NonNull Path bootClassPath,
+            @NonNull Collection<Path> libraryPaths) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
                 && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
             return javaService;
@@ -495,7 +496,8 @@ public class Services implements TermServices, LogicServices {
         return javaService;
     }
 
-    public JavaService activateJava(@Nullable Path bootClassPath, @NonNull Collection<Path> libraryPaths) {
+    public JavaService activateJava(@Nullable Path bootClassPath,
+            @NonNull Collection<Path> libraryPaths) {
         Path path;
         if (bootClassPath != null) {
             path = bootClassPath;

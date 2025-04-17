@@ -677,5 +677,6 @@ public final class ProofManagementDialog extends JDialog {
      */
     private record ContractId(
             @Nullable String keyJavaTypeName, @Nullable String methodName,
-            @Nullable String contractName) {}
+            @Nullable String contractName) {
+    }
 }

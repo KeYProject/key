@@ -31,7 +31,8 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * @param id
      *        The unique ID of this term label in the {@link Sequent}.
      */
-    public SymbolicExecutionTermLabel {}
+    public SymbolicExecutionTermLabel {
+    }
 
     /**
      * {@inheritDoc}
@@ -52,7 +53,9 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      */
     @Override
     public Object getTLChild(int i) {
-        if (i == 0) { return id(); }
+        if (i == 0) {
+            return id();
+        }
         return null;
     }
 

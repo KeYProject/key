@@ -1350,5 +1350,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             GUIProofTreeModel model,
             Collection<TreePath> expansionState,
             TreePath selectionPath,
-            Integer scrollState) {}
+            Integer scrollState) {
+    }
 }

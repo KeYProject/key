@@ -65,8 +65,12 @@ public non-sealed class FloatLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         return ((FloatLiteral) o).getValue().equals(getValue());
     }
 

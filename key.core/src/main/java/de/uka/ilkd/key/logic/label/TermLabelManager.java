@@ -147,8 +147,7 @@ public class TermLabelManager {
     /**
      * Constructor.
      *
-     * @param configurations
-     *        The {@link TermLabelConfiguration} which defines how to support each
+     * @param configurations The {@link TermLabelConfiguration} which defines how to support each
      *        {@link TermLabel}.
      */
     public TermLabelManager(ImmutableList<TermLabelConfiguration> configurations) {
@@ -177,10 +176,8 @@ public class TermLabelManager {
     /**
      * Analyzes the given {@link TermLabelMerger} and adds it to {@link #mergerMap}.
      *
-     * @param termLabelName
-     *        The name of the supported {@link TermLabel}.
-     * @param termLabelMerger
-     *        The {@link TermLabelMerger} to use.
+     * @param termLabelName The name of the supported {@link TermLabel}.
+     * @param termLabelMerger The {@link TermLabelMerger} to use.
      */
     private void analyzeMerger(Name termLabelName, TermLabelMerger termLabelMerger) {
         if (termLabelMerger != null) {
@@ -196,12 +193,9 @@ public class TermLabelManager {
      * This is a helper {@link Map} of {@link #TermLabelManager(ImmutableList)}.
      * </p>
      *
-     * @param termLabelName
-     *        The name of the supported {@link TermLabel}.
-     * @param policies
-     *        The {@link TermLabelPolicy} instances to analyze.
-     * @param policyMap
-     *        The policy {@link Map} to update.
+     * @param termLabelName The name of the supported {@link TermLabel}.
+     * @param policies The {@link TermLabelPolicy} instances to analyze.
+     * @param policyMap The policy {@link Map} to update.
      */
     private void analyzeTermPolicies(Name termLabelName, ImmutableList<TermLabelPolicy> policies,
             Map<Name, TermLabelPolicy> policyMap) {
@@ -220,14 +214,10 @@ public class TermLabelManager {
      * This is a helper {@link Map} of {@link #TermLabelManager(ImmutableList)}.
      * </p>
      *
-     * @param termLabelName
-     *        The name of the supported {@link TermLabel}.
-     * @param policies
-     *        The {@link ChildTermLabelPolicy} instances to analyze.
-     * @param allRulesPolicyMap
-     *        The policy {@link Map} with all rules to update.
-     * @param ruleSpecificPolicyMap
-     *        The rule specific policy {@link Map} to update.
+     * @param termLabelName The name of the supported {@link TermLabel}.
+     * @param policies The {@link ChildTermLabelPolicy} instances to analyze.
+     * @param allRulesPolicyMap The policy {@link Map} with all rules to update.
+     * @param ruleSpecificPolicyMap The rule specific policy {@link Map} to update.
      */
     private void analyzeChildTermPolicies(Name termLabelName,
             ImmutableList<ChildTermLabelPolicy> policies,
@@ -261,8 +251,7 @@ public class TermLabelManager {
      * This is a helper {@link Map} of {@link #TermLabelManager(ImmutableList)}.
      * </p>
      *
-     * @param updates
-     *        The {@link TermLabelUpdate}s to analyze.
+     * @param updates The {@link TermLabelUpdate}s to analyze.
      */
     private void analyzeUpdates(ImmutableList<TermLabelUpdate> updates) {
         if (updates != null) {
@@ -319,8 +308,7 @@ public class TermLabelManager {
      * Returns the {@link TermLabelManager} defined by the {@link Profile} of the given
      * {@link Services}.
      *
-     * @param services
-     *        The {@link Services} which provides the {@link TermLabelManager}.
+     * @param services The {@link Services} which provides the {@link TermLabelManager}.
      * @return The {@link TermLabelManager}s or {@code null} if not available.
      */
     public static TermLabelManager getTermLabelManager(Services services) {
@@ -337,8 +325,7 @@ public class TermLabelManager {
     /**
      * Returns the {@link Name}s of the supported {@link TermLabel}s.
      *
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which the {@link Name}s of
+     * @param services The {@link Services} used by the {@link Proof} on which the {@link Name}s of
      *        supported {@link TermLabel}s are requested.
      * @return The {@link Name}s of the supported {@link TermLabel}s.
      */
@@ -374,15 +361,11 @@ public class TermLabelManager {
      * asked for.
      * </p>
      *
-     * @param name
-     *        The name of the term label, not <code>null</code>
-     * @param args
-     *        The arguments, not <code>null</code>, no entry <code>null</code>
-     * @param services
-     *        a non-<code>null</code> services object to look up symbols
+     * @param name The name of the term label, not <code>null</code>
+     * @param args The arguments, not <code>null</code>, no entry <code>null</code>
+     * @param services a non-<code>null</code> services object to look up symbols
      * @return term label of kind {@code name} with parameters as parsed.
-     * @throws TermLabelException
-     *         if name is not a registered label name or the arguments cannot be
+     * @throws TermLabelException if name is not a registered label name or the arguments cannot be
      *         parsed.
      */
     public TermLabel parseLabel(String name, List<String> args, TermServices services)
@@ -402,28 +385,19 @@ public class TermLabelManager {
      * and refactors the labels below the new {@link Term} in addition via
      * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param ruleApp
-     *        The {@link RuleApp} which is currently performed.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param ruleApp The {@link RuleApp} which is currently performed.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built-in rules.
-     * @param newTerm
-     *        The new {@link Term} to update its labels.
+     * @param newTerm The new {@link Term} to update its labels.
      * @return The {@link Term} with updates labels.
      */
     public static Term label(Services services, TermLabelState state,
@@ -441,31 +415,21 @@ public class TermLabelManager {
      * and refactors the labels below the new {@link Term} in addition via
      * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param ruleApp
-     *        The {@link RuleApp} which is currently performed.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param ruleApp The {@link RuleApp} which is currently performed.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built-in rules.
-     * @param newTerm
-     *        The new {@link Term} to update its labels.
+     * @param newTerm The new {@link Term} to update its labels.
      * @return The {@link Term} with updates labels.
      */
     public static Term label(Services services, TermLabelState state, Term applicationTerm,
@@ -486,31 +450,21 @@ public class TermLabelManager {
      * and refactors the labels below the new {@link Term} in addition via
      * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param ruleApp
-     *        The {@link RuleApp} which is currently performed.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param ruleApp The {@link RuleApp} which is currently performed.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built-in rules.
-     * @param newTerm
-     *        The new {@link Term} to update its labels.
+     * @param newTerm The new {@link Term} to update its labels.
      * @return The {@link Term} with updates labels.
      */
     public Term label(TermLabelState state, Services services, Term applicationTerm,
@@ -533,28 +487,19 @@ public class TermLabelManager {
      * {@link Services} if possible. Otherwise no labels are returned.
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param ruleApp
-     *        The {@link RuleApp} which is currently performed.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param ruleApp The {@link RuleApp} which is currently performed.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
      */
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
@@ -576,31 +521,21 @@ public class TermLabelManager {
      * {@link Services} if possible. Otherwise no labels are returned.
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param ruleApp
-     *        The {@link RuleApp} which is currently performed.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param ruleApp The {@link RuleApp} which is currently performed.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
      */
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
@@ -619,31 +554,21 @@ public class TermLabelManager {
     /**
      * Do application term specific stuff.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
-     * @param newLabels
-     *        The set accumulating the {@link TermLabel}s to add to the new {@link Term}
+     * @param newTerm the template for the new {@link Term} to create
+     * @param newLabels The set accumulating the {@link TermLabel}s to add to the new {@link Term}
      *        which should be created.
      */
     private void addLabelsBasedOnApplicationTerm(TermLabelState state, Services services,
@@ -692,31 +617,21 @@ public class TermLabelManager {
      * <li>Result {@link List} is returned.</li>
      * </ol>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param ruleApp
-     *        The {@link RuleApp} which is currently performed.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param ruleApp The {@link RuleApp} which is currently performed.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
+     * @param newTerm the template for the new {@link Term} to create
      * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
      */
     public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
@@ -767,11 +682,9 @@ public class TermLabelManager {
      * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built-in rules.
-     * @param newLabels
-     *        The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performTacletTerm(Term tacletTerm, Set<TermLabel> newLabels) {
         for (TermLabel label : tacletTerm.getLabels()) {
@@ -788,33 +701,22 @@ public class TermLabelManager {
      * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
-     * @param policies
-     *        The {@link TermLabelPolicy} instances to perform.
-     * @param newLabels
-     *        The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+     * @param newTerm the template for the new {@link Term} to create
+     * @param policies The {@link TermLabelPolicy} instances to perform.
+     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performTermLabelPolicies(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
@@ -838,35 +740,23 @@ public class TermLabelManager {
      * {@link #performTermLabelPolicies(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term, Term, Map, Set)}
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
-     * @param policies
-     *        The {@link TermLabelPolicy} instances to perform.
-     * @param newLabels
-     *        The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
-     * @param label
-     *        The current {@link TermLabel} to ask its {@link TermLabelPolicy}.
+     * @param newTerm the template for the new {@link Term} to create
+     * @param policies The {@link TermLabelPolicy} instances to perform.
+     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+     * @param label The current {@link TermLabel} to ask its {@link TermLabelPolicy}.
      */
     protected void performTermLabelPolicies(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
@@ -892,31 +782,21 @@ public class TermLabelManager {
      * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
-     * @param ruleSpecificPolicies
-     *        Rule specific {@link ChildTermLabelPolicy} instances.
-     * @param ruleIndependentPolicies
-     *        All rules {@link ChildTermLabelPolicy} instances.
+     * @param newTerm the template for the new {@link Term} to create
+     * @param ruleSpecificPolicies Rule specific {@link ChildTermLabelPolicy} instances.
+     * @param ruleIndependentPolicies All rules {@link ChildTermLabelPolicy} instances.
      * @return The active {@link ChildTermLabelPolicy} which have to be performed.
      */
     protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
@@ -959,31 +839,21 @@ public class TermLabelManager {
      * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
-     * @param policies
-     *        The {@link ChildTermLabelPolicy} instances to perform.
-     * @param newLabels
-     *        The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+     * @param newTerm the template for the new {@link Term} to create
+     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
+     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performDirectChildPolicies(TermServices services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
@@ -1009,31 +879,21 @@ public class TermLabelManager {
      * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
-     * @param policies
-     *        The {@link ChildTermLabelPolicy} instances to perform.
-     * @param newLabels
-     *        The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+     * @param newTerm the template for the new {@link Term} to create
+     * @param policies The {@link ChildTermLabelPolicy} instances to perform.
+     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performChildAndGrandchildPolicies(final TermServices services,
             final PosInOccurrence applicationPosInOccurrence, final Term applicationTerm,
@@ -1066,33 +926,22 @@ public class TermLabelManager {
      * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param modalityTerm
-     *        The optional modality {@link Term}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param ruleApp
-     *        The {@link RuleApp} which is currently performed.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param modalityTerm The optional modality {@link Term}.
+     * @param rule The {@link Rule} which is applied.
+     * @param ruleApp The {@link RuleApp} which is currently performed.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional {@link Term} in the taclet which is responsible to instantiate
+     * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
      *        the new {@link Term} for the new proof node or {@code null} in case of built in rules.
-     * @param newTerm
-     *        the template for the new {@link Term} to create
-     * @param newLabels
-     *        The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
+     * @param newTerm the template for the new {@link Term} to create
+     * @param newLabels The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performUpdater(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
@@ -1109,23 +958,16 @@ public class TermLabelManager {
      * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} of a
      * {@link SequentFormula}.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param tacletTerm The optional taclet {@link Term}.
      * @return The updated application {@link Term}.
      */
     public static Term refactorSequentFormula(TermLabelState state, Services services,
@@ -1144,23 +986,16 @@ public class TermLabelManager {
      * Refactors all labels on the {@link PosInOccurrence} in the given {@link Term} of a
      * {@link SequentFormula}.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param rule The {@link Rule} which is applied.
+     * @param tacletTerm The optional taclet {@link Term}.
      * @return The updated application {@link Term}.
      */
     public Term refactorSequentFormula(TermLabelState state, Services services, Term sequentFormula,
@@ -1199,23 +1034,16 @@ public class TermLabelManager {
      * {@link Services} if possible. Otherwise no labels are returned.
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param tacletTerm The optional taclet {@link Term}.
      * @return The updated application {@link Term}.
      */
     public static Term refactorTerm(TermLabelState state, Services services,
@@ -1233,26 +1061,18 @@ public class TermLabelManager {
     /**
      * Refactors all labels in the given application {@link Term}.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param rule The {@link Rule} which is applied.
+     * @param tacletTerm The optional taclet {@link Term}.
      * @return The updated application {@link Term}.
      */
     public Term refactorTerm(TermLabelState state, Services services,
@@ -1278,23 +1098,16 @@ public class TermLabelManager {
      * {@link Services} if possible. Otherwise no labels are returned.
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param tacletTerm The optional taclet {@link Term}.
      */
     public static void refactorGoal(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule, Goal goal, Object hint,
@@ -1318,26 +1131,18 @@ public class TermLabelManager {
      * {@link Services} if possible. Otherwise no labels are returned.
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param tacletTerm The optional taclet {@link Term}.
      */
     public void refactorGoal(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
@@ -1383,23 +1188,16 @@ public class TermLabelManager {
      * {@link Services} if possible. Otherwise no labels are returned.
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param tacletTerm The optional taclet {@link Term}.
      */
     public static void refactorSequent(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule, Goal goal, Object hint,
@@ -1423,26 +1221,18 @@ public class TermLabelManager {
      * {@link Services} if possible. Otherwise no labels are returned.
      * </p>
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param tacletTerm The optional taclet {@link Term}.
      */
     public void refactorSequent(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
@@ -1465,34 +1255,22 @@ public class TermLabelManager {
     /**
      * Replaces the {@link Term} at the specified {@link PosInOccurrence}.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param pio
-     *        The {@link PosInOccurrence} to replace {@link Term} at.
-     * @param newTerm
-     *        The new {@link Term} to set.
-     * @param tf
-     *        The {@link TermFactory} to use.
-     * @param parentRefactorings
-     *        The {@link RefactoringsContainer} to consider.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param pio The {@link PosInOccurrence} to replace {@link Term} at.
+     * @param newTerm The new {@link Term} to set.
+     * @param tf The {@link TermFactory} to use.
+     * @param parentRefactorings The {@link RefactoringsContainer} to consider.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param tacletTerm The optional taclet {@link Term}.
      * @return The root of the {@link PosInOccurrence} containing the new {@link Term} at the
      *         specified {@link PosInOccurrence}.
      */
@@ -1532,28 +1310,19 @@ public class TermLabelManager {
     /**
      * Computes the rule-independent {@link TermLabelRefactoring} to consider.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param refactorings
-     *        The already accumulated refactorings to be expanded with rule specific
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param refactorings The already accumulated refactorings to be expanded with rule specific
      *        refactorings
      */
     private void determineAndCollectRuleSpecificRefactorings(TermLabelState state,
@@ -1588,28 +1357,19 @@ public class TermLabelManager {
     /**
      * Computes the rule-independent {@link TermLabelRefactoring} to consider.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param refactorings
-     *        The already accumulated refactorings to be expanded with rule independent
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param refactorings The already accumulated refactorings to be expanded with rule independent
      *        refactorings
      */
     private void determineAndRuleIndependentRefactorings(TermLabelState state,
@@ -1639,26 +1399,18 @@ public class TermLabelManager {
     /**
      * Computes the {@link TermLabelRefactoring} to consider.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
+     * @param tacletTerm The optional taclet {@link Term}.
      * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
      */
     protected RefactoringsContainer computeRefactorings(TermLabelState state, Services services,
@@ -1676,23 +1428,19 @@ public class TermLabelManager {
      * Utility class used by
      * {@link TermLabelManager#computeRefactorings(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term)}
      *
-     * @param sequentRefactorings
-     *        The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
-     * @param belowUpdatesRefactorings
-     *        The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
-     * @param childAndGrandchildRefactorings
-     *        The {@link TermLabelRefactoring} for
+     * @param sequentRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#SEQUENT}.
+     * @param belowUpdatesRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
+     * @param childAndGrandchildRefactorings The {@link TermLabelRefactoring} for
      *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
-     * @param childAndGrandchildRefactoringsAndParents
-     *        The {@link TermLabelRefactoring} for
+     * @param childAndGrandchildRefactoringsAndParents The {@link TermLabelRefactoring} for
      *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
-     * @param directChildRefactorings
-     *        The {@link TermLabelRefactoring} for
+     * @param directChildRefactorings The {@link TermLabelRefactoring} for
      *        {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
      * @author Martin Hentschel
      */
-    protected record RefactoringsContainer(
-            Set<TermLabelRefactoring> sequentRefactorings,
+    protected record RefactoringsContainer(Set<TermLabelRefactoring> sequentRefactorings,
             Set<TermLabelRefactoring> belowUpdatesRefactorings,
             Set<TermLabelRefactoring> childAndGrandchildRefactorings,
             Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
@@ -1720,31 +1468,21 @@ public class TermLabelManager {
     /**
      * Do direct child refactoring if required.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param refactorings
-     *        The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
      *        to consider.
-     * @param tf
-     *        The {@link TermFactory} to create the term.
+     * @param tf The {@link TermFactory} to create the term.
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     private Term refactorChildTerms(TermLabelState state, Services services,
@@ -1780,33 +1518,22 @@ public class TermLabelManager {
     /**
      * Perform below-updates refactoring if required.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param refactorings
-     *        The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
      *        to consider.
-     * @param tf
-     *        The {@link TermFactory} to create the term.
-     * @param newApplicationTerm
-     *        The refactored application term until now.
+     * @param tf The {@link TermFactory} to create the term.
+     * @param newApplicationTerm The refactored application term until now.
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     private Term refactorBelowUpdates(TermLabelState state, Services services,
@@ -1832,33 +1559,22 @@ public class TermLabelManager {
     /**
      * Do child and grandchild refactoring if required.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param refactorings
-     *        The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
      *        to consider.
-     * @param tf
-     *        The {@link TermFactory} to create the term.
-     * @param newApplicationTerm
-     *        The refactored application term until now.
+     * @param tf The {@link TermFactory} to create the term.
+     * @param newApplicationTerm The refactored application term until now.
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     private Term refactorChildrenRecursively(TermLabelState state, Services services,
@@ -1890,31 +1606,21 @@ public class TermLabelManager {
     /**
      * Refactors the labels of the application term.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param refactorings
-     *        The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param refactorings The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s
      *        to consider.
-     * @param tf
-     *        The {@link TermFactory} to create the term.
+     * @param tf The {@link TermFactory} to create the term.
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     protected Term refactorApplicationTerm(TermLabelState state, Services services,
@@ -1944,32 +1650,21 @@ public class TermLabelManager {
     /**
      * Performs a {@link TermLabel} refactoring on the given {@link Semisequent}.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param semisequent
-     *        The {@link Semisequent} to refactor.
-     * @param inAntec
-     *        {@code true} antecedent, {@code false} succedent.
-     * @param activeRefactorings
-     *        The active {@link TermLabelRefactoring}s to execute.
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param semisequent The {@link Semisequent} to refactor.
+     * @param inAntec {@code true} antecedent, {@code false} succedent.
+     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      */
     protected void refactorSemisequent(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
@@ -1992,30 +1687,20 @@ public class TermLabelManager {
     /**
      * Performs a {@link TermLabel} refactoring recursively on the given {@link Term}.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param term
-     *        The {@link Term} to refactor.
-     * @param activeRefactorings
-     *        The active {@link TermLabelRefactoring}s to execute.
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param term The {@link Term} to refactor.
+     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      * @return The refactored {@link Term} in which the {@link TermLabel}s may have changed.
      */
     protected Term refactorLabelsRecursive(TermLabelState state, Services services,
@@ -2043,30 +1728,20 @@ public class TermLabelManager {
     /**
      * Computes the new labels as part of the refactoring for the given {@link Term}.
      *
-     * @param state
-     *        The {@link TermLabelState} of the current rule application.
-     * @param services
-     *        The {@link Services} used by the {@link Proof} on which a {@link Rule} is
+     * @param state The {@link TermLabelState} of the current rule application.
+     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
      *        applied right now.
-     * @param applicationPosInOccurrence
-     *        The {@link PosInOccurrence} in the previous {@link Sequent}
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent}
      *        which defines the {@link Term} that is rewritten.
-     * @param applicationTerm
-     *        The {@link Term} defined by the {@link PosInOccurrence} in the
+     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the
      *        previous {@link Sequent}.
-     * @param rule
-     *        The {@link Rule} which is applied.
-     * @param goal
-     *        The optional {@link Goal} on which the {@link Term} to create will be used.
-     * @param hint
-     *        An optional hint passed from the active rule to describe the term which should be
+     * @param rule The {@link Rule} which is applied.
+     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+     * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm
-     *        The optional taclet {@link Term}.
-     * @param term
-     *        The {@link Term} to refactor.
-     * @param activeRefactorings
-     *        The active {@link TermLabelRefactoring}s to execute.
+     * @param tacletTerm The optional taclet {@link Term}.
+     * @param term The {@link Term} to refactor.
+     * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      * @return The new {@link TermLabel} which should be used for the given {@link Term}.
      */
     protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state, Services services,
@@ -2143,10 +1818,8 @@ public class TermLabelManager {
         /**
          * Constructor.
          *
-         * @param termLabelName
-         *        The {@link Name} of the supported {@link TermLabel}.
-         * @param factory
-         *        The {@link TermLabelFactory} to use.
+         * @param termLabelName The {@link Name} of the supported {@link TermLabel}.
+         * @param factory The {@link TermLabelFactory} to use.
          */
         public TermLabelConfiguration(Name termLabelName, TermLabelFactory<?> factory) {
             this(termLabelName, factory, null, null, null, null, null, null, null);
@@ -2155,28 +1828,19 @@ public class TermLabelManager {
         /**
          * Constructor.
          *
-         * @param termLabelName
-         *        The {@link Name} of the supported {@link TermLabel}.
-         * @param factory
-         *        The {@link TermLabelFactory} to use.
-         * @param applicationTermPolicies
-         *        The {@link TermLabelPolicy} instances applied on the
+         * @param termLabelName The {@link Name} of the supported {@link TermLabel}.
+         * @param factory The {@link TermLabelFactory} to use.
+         * @param applicationTermPolicies The {@link TermLabelPolicy} instances applied on the
          *        application term.
-         * @param modalityTermPolicies
-         *        The {@link TermLabelPolicy} instances applied on the modality
+         * @param modalityTermPolicies The {@link TermLabelPolicy} instances applied on the modality
          *        term.
-         * @param directChildTermLabelPolicies
-         *        The direct {@link ChildTermLabelPolicy} instances to
+         * @param directChildTermLabelPolicies The direct {@link ChildTermLabelPolicy} instances to
          *        use.
-         * @param childAndGrandchildTermLabelPolicies
-         *        The child and grandchild
+         * @param childAndGrandchildTermLabelPolicies The child and grandchild
          *        {@link ChildTermLabelPolicy} instances to use.
-         * @param termLabelUpdates
-         *        The {@link TermLabelUpdate} instances.
-         * @param termLabelRefactorings
-         *        The {@link TermLabelRefactoring} instances.
-         * @param termLabelMerger
-         *        The {@link TermLabelMerger} instance.
+         * @param termLabelUpdates The {@link TermLabelUpdate} instances.
+         * @param termLabelRefactorings The {@link TermLabelRefactoring} instances.
+         * @param termLabelMerger The {@link TermLabelMerger} instance.
          */
         public TermLabelConfiguration(Name termLabelName, TermLabelFactory<?> factory,
                 ImmutableList<TermLabelPolicy> applicationTermPolicies,
@@ -2285,10 +1949,8 @@ public class TermLabelManager {
      * Searches the innermost {@link TermLabel} wit the given {@link Name} in the parent hierarchy
      * of the {@link PosInOccurrence}.
      *
-     * @param pio
-     *        The {@link PosInOccurrence} to search in.
-     * @param termLabelName
-     *        The {@link Name} of the {@link TermLabel} to search.
+     * @param pio The {@link PosInOccurrence} to search in.
+     * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
      * @return The found {@link TermLabel} or {@code null} if not available.
      */
     public static TermLabel findInnerMostParentLabel(PosInOccurrence pio, Name termLabelName) {
@@ -2305,11 +1967,9 @@ public class TermLabelManager {
      * Merges the {@link TermLabel}s of the rejected {@link SequentFormula}s into the resulting
      * {@link Sequent}.
      *
-     * @param currentSequent
-     *        The {@link SequentChangeInfo} which lists the rejected
+     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected
      *        {@link SequentFormula}s.
-     * @param services
-     *        The {@link Services} to use.
+     * @param services The {@link Services} to use.
      */
     public static void mergeLabels(SequentChangeInfo currentSequent, Services services) {
         TermLabelManager manager = getTermLabelManager(services);
@@ -2322,10 +1982,8 @@ public class TermLabelManager {
      * Merges the {@link TermLabel}s of the rejected {@link SequentFormula}s into the resulting
      * {@link Sequent}.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param currentSequent
-     *        The {@link SequentChangeInfo} which lists the rejected
+     * @param services The {@link Services} to use.
+     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected
      *        {@link SequentFormula}s.
      */
     public void mergeLabels(Services services, SequentChangeInfo currentSequent) {
@@ -2343,15 +2001,11 @@ public class TermLabelManager {
      * Merges the {@link TermLabel}s of the given {@link SequentFormula} into the resulting
      * {@link Sequent}.
      *
-     * @param currentSequent
-     *        The {@link SequentChangeInfo} which lists the rejected
+     * @param currentSequent The {@link SequentChangeInfo} which lists the rejected
      *        {@link SequentFormula}s.
-     * @param services
-     *        The {@link Services} to use.
-     * @param rejectedSF
-     *        The rejected {@link SequentFormula} to work with.
-     * @param inAntecedent
-     *        {@code true} rejected {@link SequentFormula} is in antecedent,
+     * @param services The {@link Services} to use.
+     * @param rejectedSF The rejected {@link SequentFormula} to work with.
+     * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent,
      *        {@code false} it is in succedent.
      */
     protected void mergeLabels(SequentChangeInfo currentSequent, Services services,
@@ -2398,10 +2052,8 @@ public class TermLabelManager {
     /**
      * Remove all irrelevant labels from a term.
      *
-     * @param term
-     *        the term to transform.
-     * @param services
-     *        services.
+     * @param term the term to transform.
+     * @param services services.
      * @return the transformed term.
      * @see TermLabel#isProofRelevant()
      */
@@ -2416,10 +2068,8 @@ public class TermLabelManager {
     /**
      * Remove all irrelevant labels from a term.
      *
-     * @param term
-     *        the term to transform.
-     * @param tf
-     *        a term factory.
+     * @param term the term to transform.
+     * @param tf a term factory.
      * @return the transformed term.
      * @see TermLabel#isProofRelevant()
      */

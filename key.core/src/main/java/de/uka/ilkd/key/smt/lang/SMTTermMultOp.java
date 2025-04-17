@@ -46,16 +46,20 @@ public class SMTTermMultOp extends SMTTerm {
         public Op sign(boolean pol) {
             return switch (this) {
             case AND -> {
-                if (pol) { yield this; }
+                if (pol) {
+                    yield this;
+                }
                 yield OR;
             }
             case OR -> {
-                if (pol) { yield this; }
+                if (pol) {
+                    yield this;
+                }
                 yield AND;
             }
             default -> throw new RuntimeException(
                 "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
-                        + this);
+                    + this);
             };
         }
     }

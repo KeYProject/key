@@ -38,6 +38,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -87,16 +88,11 @@ public class KeYFile implements EnvInput {
      * creates a new representation for a given file by indicating a name and a RuleSource
      * representing the physical source of the .key file.
      *
-     * @param name
-     *        the name of the file
-     * @param file
-     *        the physical rule source of the .key file
-     * @param monitor
-     *        monitor for reporting progress
-     * @param profile
-     *        the profile
-     * @param fileRepo
-     *        the FileRepo which will store the file
+     * @param name the name of the file
+     * @param file the physical rule source of the .key file
+     * @param monitor monitor for reporting progress
+     * @param profile the profile
+     * @param fileRepo the FileRepo which will store the file
      */
     public KeYFile(String name, RuleSource file, ProgressMonitor monitor, Profile profile,
             FileRepo fileRepo) {
@@ -116,16 +112,11 @@ public class KeYFile implements EnvInput {
      * Creates a new representation for a given file by indicating a name and a file representing
      * the physical source of the .key file.
      *
-     * @param name
-     *        the name of the resource
-     * @param file
-     *        the file to find it
-     * @param monitor
-     *        a possibly null reference to a monitor for the loading progress
-     * @param profile
-     *        the KeY profile under which the file is to be load
-     * @param compressed
-     *        <code>true</code> iff the file has compressed content
+     * @param name the name of the resource
+     * @param file the file to find it
+     * @param monitor a possibly null reference to a monitor for the loading progress
+     * @param profile the KeY profile under which the file is to be load
+     * @param compressed <code>true</code> iff the file has compressed content
      */
     public KeYFile(String name, Path file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
@@ -137,18 +128,12 @@ public class KeYFile implements EnvInput {
      * Creates a new representation for a given file by indicating a name and a file representing
      * the physical source of the .key file.
      *
-     * @param name
-     *        the name of the resource
-     * @param file
-     *        the file to find it
-     * @param fileRepo
-     *        the FileRepo which will store the file
-     * @param monitor
-     *        a possibly null reference to a monitor for the loading progress
-     * @param profile
-     *        the KeY profile under which the file is to be load
-     * @param compressed
-     *        <code>true</code> iff the file has compressed content
+     * @param name the name of the resource
+     * @param file the file to find it
+     * @param fileRepo the FileRepo which will store the file
+     * @param monitor a possibly null reference to a monitor for the loading progress
+     * @param profile the KeY profile under which the file is to be load
+     * @param compressed <code>true</code> iff the file has compressed content
      */
     public KeYFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
@@ -231,6 +216,8 @@ public class KeYFile implements EnvInput {
             try {
                 KeyAst.File ctx = getParseContext();
                 includes = ctx.getIncludes(file.url());
+            } catch (ParseCancellationException e) {
+                throw new ParseCancellationException(e);
             } catch (Exception e) {
                 throw new ProofInputException(e);
             }

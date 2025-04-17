@@ -51,7 +51,8 @@ public class SolverCommunication {
      * @param type
      *        the type of the message (INPUT/OUTPUT/ERROR)
      */
-    public record Message(String content, MessageType type) {}
+    public record Message(String content, MessageType type) {
+    }
 
     /**
      * Returns all messages that were sent between KeY and the solver. Note that input and output

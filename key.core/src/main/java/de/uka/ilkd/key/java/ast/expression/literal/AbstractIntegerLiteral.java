@@ -63,8 +63,12 @@ public abstract non-sealed class AbstractIntegerLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         return ((AbstractIntegerLiteral) o).getValue() == getValue();
     }
 
@@ -98,9 +102,13 @@ public abstract non-sealed class AbstractIntegerLiteral extends Literal {
      *         decimal too.
      */
     public static boolean representsDecLiteral(String literalStr) {
-        if (literalStr.length() == 0) { throw new NumberFormatException(literalStr + "does not represent a number."); }
+        if (literalStr.length() == 0) {
+            throw new NumberFormatException(literalStr + "does not represent a number.");
+        }
 
-        if (literalStr.charAt(0) == '-' || literalStr.charAt(0) == '+') { literalStr = literalStr.substring(1); }
+        if (literalStr.charAt(0) == '-' || literalStr.charAt(0) == '+') {
+            literalStr = literalStr.substring(1);
+        }
 
         /*
          * we have to remove the char indicating a long literal as the length of the literal is

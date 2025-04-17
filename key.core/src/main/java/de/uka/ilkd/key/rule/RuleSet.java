@@ -18,7 +18,8 @@ public record RuleSet(Name name) implements Named {
      * @param name
      *        Name object that contains name of the heuristic
      */
-    public RuleSet {}
+    public RuleSet {
+    }
 
     /**
      * gets name of the heuristic
@@ -38,7 +39,9 @@ public record RuleSet(Name name) implements Named {
      * returns true it the o is the same object as this
      */
     public boolean equals(Object o) {
-        if (o instanceof RuleSet) { return this.name().equals(((RuleSet) o).name()); }
+        if (o instanceof RuleSet) {
+            return this.name().equals(((RuleSet) o).name());
+        }
         return false;
     }
 

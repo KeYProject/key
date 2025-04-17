@@ -114,7 +114,7 @@ public class FieldSpecification extends VariableSpecification implements Field {
      * Test whether the declaration is static.
      */
     public boolean isStatic() {
-        return ((ProgramVariable) var).isStatic();
+        return ((ProgramVariable) programVariable).isStatic();
     }
 
     /**
@@ -177,6 +177,8 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     @Override
     public boolean isImplicit() {
-        return var instanceof ProgramVariable && ((ProgramVariable) var).isImplicit();
+        return programVariable instanceof ProgramVariable
+                && ((ProgramVariable) programVariable).isImplicit();
     }
+
 }

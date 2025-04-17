@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * Instances of this interface are used to customize and extend the behavior of a
@@ -20,8 +21,7 @@ public interface POExtension {
     /**
      * Checks if the given {@link ProofOblInput} is supported.
      *
-     * @param po
-     *        The {@link ProofOblInput} to check.
+     * @param po The {@link ProofOblInput} to check.
      * @return {@code true} is supported, {@code false} is not supported.
      */
     boolean isPOSupported(ProofOblInput po);
@@ -29,14 +29,15 @@ public interface POExtension {
     /**
      * Modifies the post condition.
      *
-     * @param proofConfig
-     *        The {@link InitConfig} to use.
-     * @param services
-     *        The {@link Services} to use.
-     * @param postTerm
-     *        The post condition to modify.
+     * @param abstractOperationPO The proof obligation for which the mdification is done
+     * @param proofConfig The {@link InitConfig} to use.
+     * @param services The {@link Services} to use.
+     * @param selfTerm The {@link ProgramVariable} representing the current receiver object.
+     * @param postTerm The post condition to modify.
      * @return The modified post condition or the original post condition if no modifications were
      *         performed.
      */
-    Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm);
+    Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
+            Services services, ProgramVariable selfTerm,
+            Term postTerm);
 }

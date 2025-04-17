@@ -404,7 +404,8 @@ public final class ProblemInitializer {
     private void activateInitConfigJava(InitConfig config, EnvInput envInput) {
         var bootClassPath = envInput.readBootClassPath();
         var classPath = envInput.readClassPath();
-        config.getServices().activateJava(bootClassPath, classPath != null ? classPath : Collections.emptyList());
+        config.getServices().activateJava(bootClassPath,
+            classPath != null ? classPath : Collections.emptyList());
     }
 
     /**
@@ -630,7 +631,8 @@ public final class ProblemInitializer {
             // done
             proofCreated(pa);
             return pa;
-        } catch (ProofInputException e) {
+        } catch (Exception e) {
+            // This has been generalised from ProofInputException to not miss exceptions
             reportException(po, e);
             throw e;
         } finally {

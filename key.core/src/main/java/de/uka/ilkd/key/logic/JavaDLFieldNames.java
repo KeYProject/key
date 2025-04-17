@@ -63,7 +63,9 @@ public class JavaDLFieldNames {
 
     public record ParsedFieldName(@Nullable String scope, String name) {
         public String nameWithoutFieldPrefix() {
-            if (!name.isEmpty() && name.charAt(0) == JavaDLFieldNames.FIELD_PREFIX) { return name.substring(1); }
+            if (!name.isEmpty() && name.charAt(0) == JavaDLFieldNames.FIELD_PREFIX) {
+                return name.substring(1);
+            }
             return name;
         }
     }

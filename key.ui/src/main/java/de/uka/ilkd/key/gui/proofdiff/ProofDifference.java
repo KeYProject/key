@@ -90,7 +90,8 @@ public class ProofDifference {
      * @param idxRight index of the right candidate
      * @param distance measure of difference between candidates
      */
-    private record QueueEntry(int idxLeft, int idxRight, int distance) {}
+    private record QueueEntry(int idxLeft, int idxRight, int distance) {
+    }
 
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());

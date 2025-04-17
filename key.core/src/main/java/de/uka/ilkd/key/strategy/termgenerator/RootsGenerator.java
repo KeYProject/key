@@ -105,9 +105,9 @@ public class RootsGenerator implements TermGenerator {
             // the even case
             return switch (lit.signum()) {
             case -1 -> // no solutions
-                    tb.ff();
+                tb.ff();
             case 0 -> // exactly one solution
-                    tb.equals(var, zero);
+                tb.equals(var, zero);
             case 1 -> {
                 final BigInteger r = root(lit, pow);
                 if (power(r, pow).equals(lit)) {
@@ -143,7 +143,7 @@ public class RootsGenerator implements TermGenerator {
 
             return switch (lit.signum()) {
             case -1, 0 -> // the inequation is no restriction
-                    tb.ff();
+                tb.ff();
             case 1 -> {
                 final BigInteger r = rootRoundingUpwards(lit, pow);
                 final Term rTerm = tb.zTerm(r.toString());
@@ -164,7 +164,7 @@ public class RootsGenerator implements TermGenerator {
 
             return switch (lit.signum()) {
             case -1 -> // no solutions
-                    tb.ff();
+                tb.ff();
             case 0 -> tb.equals(var, tb.zero());
             case 1 -> {
                 final BigInteger r = root(lit, pow);

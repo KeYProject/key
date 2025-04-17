@@ -3,20 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.resolution.declarations.AssociableToAST;
-import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
-import com.github.javaparser.resolution.types.ResolvedType;
+import java.util.*;
+
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
+
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.resolution.declarations.AssociableToAST;
+import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -104,9 +104,9 @@ public class KeYJPMapping {
     public KeYJavaType resolvedTypeToKeY(ResolvedType pe, boolean processOnDemand) {
         var type = typeMap.get(pe);
 
-        //var ast = pe.asReferenceType().getTypeDeclaration().get().toAst();
+        // var ast = pe.asReferenceType().getTypeDeclaration().get().toAst();
 
-        if (processOnDemand && type == null  && pe.isReferenceType()) {
+        if (processOnDemand && type == null && pe.isReferenceType()) {
             try {
                 pe.asReferenceType()
                         .getTypeDeclaration()
@@ -146,7 +146,7 @@ public class KeYJPMapping {
         var formerNode = revMap.putIfAbsent(value, node);
         if (formerValue != null && formerValue != value)
             LOGGER.error("Duplicate registration of value: {}, formerValue: {}", value,
-                    formerValue);
+                formerValue);
         if (formerNode != null && formerNode != node)
             LOGGER.error("Duplicate registration of node: {}, formerNode: {}", node, formerNode);
     }
@@ -158,7 +158,7 @@ public class KeYJPMapping {
         var formerType = typeMapRev.putIfAbsent(key, rec);
         if (formerType != null && !Objects.equals(rec, formerType))
             LOGGER.error("Duplicate registration of resolved type: {}, former: {}", rec,
-                    formerType);
+                formerType);
     }
 
     public boolean mapped(Node rec) {
@@ -231,7 +231,7 @@ public class KeYJPMapping {
      * not
      *
      * @param b boolean indicating if the special classes have been
-     *          parsed in
+     *        parsed in
      */
     public void setParsedSpecial(boolean b) {
         parsedSpecial = b;

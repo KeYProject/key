@@ -190,7 +190,8 @@ public final class SortDependingFunction extends JFunction {
 
     private record SortDependingFunctionTemplate(
             GenericSort sortDependingOn, Name kind, Sort sort,
-            ImmutableArray<Sort> argSorts, boolean unique) {}
+            ImmutableArray<Sort> argSorts, boolean unique) {
+    }
 
     @Override
     public int getChildCount() {

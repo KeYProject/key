@@ -265,7 +265,8 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         MARK_END_JAVA_BLOCK,
     }
 
-    public record Mark(MarkType type, int parameter) {}
+    public record Mark(MarkType type, int parameter) {
+    }
 
     /**
      * Utility class for stack entries containing the position table and the position of the start

@@ -28,7 +28,8 @@ public abstract class LDTHandler implements JMLOperatorHandler {
      * @param operator
      *        operator
      */
-    public record TypedOperator(KeYJavaType type, Operator operator) {}
+    public record TypedOperator(KeYJavaType type, Operator operator) {
+    }
 
     protected final Services services;
 

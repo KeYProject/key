@@ -108,8 +108,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * Splits and sorts a (specification) term in such a way that implicit parts are in the first
      * and explicit parts in the second list.
      *
-     * @param spec
-     *        specification term
+     * @param spec specification term
      * @return two lists for implicit and explicit specification parts
      */
     private Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
@@ -302,8 +301,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * specification) and reforms the conjunction in a sorted way, where implicit parts appear
      * first, and also labeled with the short-circuit term label.
      *
-     * @param spec
-     *        specification term
+     * @param spec specification term
      * @return sorted and short-circuit conjuncted specification term
      */
     private Condition split(Term spec) {
@@ -472,12 +470,9 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Non-helper constructor methods cannot assume the free precondition, but establish it.
      *
-     * @param pre
-     *        specified precondition
-     * @param self
-     *        self variable
-     * @param heap
-     *        heap variable
+     * @param pre specified precondition
+     * @param self self variable
+     * @param heap heap variable
      * @param services
      * @return specified precondition appended with free precondition
      */
@@ -495,8 +490,7 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Generates the general assumption that self is not null.
      *
-     * @param selfVar
-     *        The self variable.
+     * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
     private Term generateSelfNotNull(AbstractSortedOperator selfVar) {
@@ -507,8 +501,7 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Generates the general assumption that self is created.
      *
-     * @param selfVar
-     *        The self variable.
+     * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
     private Term generateSelfCreated(AbstractSortedOperator selfVar, AbstractSortedOperator heap) {
@@ -523,8 +516,7 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Generates the general assumption which defines the type of self.
      *
-     * @param selfVar
-     *        The self variable.
+     * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
     private Term generateSelfExactType(AbstractSortedOperator selfVar) {
@@ -535,8 +527,7 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Generates the general assumption that all parameter arguments are valid.
      *
-     * @param paramVars
-     *        The parameters {@link LocationVariable}s.
+     * @param paramVars The parameters {@link LocationVariable}s.
      * @return The term representing the general assumption.
      */
     private Term generateParamsOK(ImmutableList<? extends AbstractSortedOperator> paramVars) {
@@ -565,14 +556,10 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Builds the "general assumption"
      *
-     * @param implicitPre
-     *        the implicit precondition
-     * @param self
-     *        self variable
-     * @param heap
-     *        heap variable
-     * @param params
-     *        list of parameter variables
+     * @param implicitPre the implicit precondition
+     * @param self self variable
+     * @param heap heap variable
+     * @param params list of parameter variables
      * @param services
      * @return The {@link Term} containing the general assumptions.
      */
@@ -624,14 +611,10 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Builds the "general assumption"
      *
-     * @param implicitPre
-     *        the implicit precondition
-     * @param self
-     *        self variable
-     * @param heap
-     *        heap variable
-     * @param params
-     *        list of parameter variables
+     * @param implicitPre the implicit precondition
+     * @param self self variable
+     * @param heap heap variable
+     * @param params list of parameter variables
      * @param services
      * @return The {@link Term} containing the general assumptions.
      */
@@ -671,16 +654,11 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Conjoins two well-definedness taclets for pure method invocations
      *
-     * @param name
-     *        taclet name
-     * @param find1
-     *        first find term
-     * @param find2
-     *        second find term
-     * @param goal1
-     *        first precondition
-     * @param goal2
-     *        second precondition
+     * @param name taclet name
+     * @param find1 first find term
+     * @param find2 second find term
+     * @param goal1 first precondition
+     * @param goal2 second precondition
      * @param services
      * @return conjoined taclet
      */
@@ -711,16 +689,11 @@ public abstract class WellDefinednessCheck implements Contract {
      * Creates new well-definedness taclet for either an invariant reference or a pure method
      * invocation.
      *
-     * @param name
-     *        taclet name
-     * @param callee
-     *        the receiver variable as a term
-     * @param callTerm
-     *        the whole invocation term
-     * @param pre
-     *        the method's or invariant's precondition
-     * @param isStatic
-     *        a boolean to tell if the method is static
+     * @param name taclet name
+     * @param callee the receiver variable as a term
+     * @param callTerm the whole invocation term
+     * @param pre the method's or invariant's precondition
+     * @param isStatic a boolean to tell if the method is static
      * @param services
      * @return created taclet
      */
@@ -741,10 +714,8 @@ public abstract class WellDefinednessCheck implements Contract {
      * Creates new well-definedness taclet for a pure method invocation, which can potentially throw
      * an exception.
      *
-     * @param name
-     *        taclet name
-     * @param callTerm
-     *        the whole invocation term
+     * @param name taclet name
+     * @param callTerm the whole invocation term
      * @param services
      * @return created taclet with false as replacewith term
      */
@@ -918,8 +889,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * Combines two well-definedness checks having the same name, id, target, type, behaviour and
      * are either both model fields or both not a model field.
      *
-     * @param wdc
-     *        the well-definedness check to be combined with the current one
+     * @param wdc the well-definedness check to be combined with the current one
      * @param services
      * @return the combined well-definedness contract
      */
@@ -1012,14 +982,10 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Gets the full valid precondition, which holds in the element's pre-state.
      *
-     * @param pre
-     *        the precondition with the original variables
-     * @param self
-     *        the new self variable
-     * @param heap
-     *        the new heap variable
-     * @param parameters
-     *        the new parameter list
+     * @param pre the precondition with the original variables
+     * @param self the new self variable
+     * @param heap the new heap variable
+     * @param parameters the new parameter list
      * @param services
      * @return the full valid pre-condition assumed in the pre-state including the measured-by
      *         function
@@ -1044,14 +1010,10 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Gets the full valid precondition, which holds in the element's pre-state.
      *
-     * @param pre
-     *        the precondition with the original variables
-     * @param self
-     *        the new self variable
-     * @param heap
-     *        the new heap variable
-     * @param parameters
-     *        the new parameter list
+     * @param pre the precondition with the original variables
+     * @param self the new self variable
+     * @param heap the new heap variable
+     * @param parameters the new parameter list
      * @param services
      * @return the full valid pre-condition assumed in the pre-state including the measured-by
      *         function
@@ -1069,10 +1031,8 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Gets the full valid post-condition
      *
-     * @param post
-     *        post-condition with original variables
-     * @param result
-     *        the new result variable
+     * @param post post-condition with original variables
+     * @param result the new result variable
      * @param services
      * @return the full valid post-condition
      */
@@ -1090,14 +1050,10 @@ public abstract class WellDefinednessCheck implements Contract {
     /**
      * Gets the necessary updates applicable to the post-condition
      *
-     * @param modifiable
-     *        the modifiable-clause
-     * @param heap
-     *        the current heap variable
-     * @param heapAtPre
-     *        the current variable for the heap of the pre-state
-     * @param anonHeap
-     *        the anonymous heap term
+     * @param modifiable the modifiable-clause
+     * @param heap the current heap variable
+     * @param heapAtPre the current variable for the heap of the pre-state
+     * @param anonHeap the anonymous heap term
      * @param services
      * @return the applicable update term including an update for old-expressions and the
      *         anonymisation update
@@ -1401,8 +1357,7 @@ public abstract class WellDefinednessCheck implements Contract {
         /**
          * Applies a unary operator to every term in this object.
          *
-         * @param op
-         *        the operator to apply.
+         * @param op the operator to apply.
          * @return this object with the operator applied.
          */
         Condition map(UnaryOperator<Term> op) {
@@ -1415,7 +1370,8 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @author Michael Kirsten
      */
-    public record TermAndFunc(Term term, JFunction func) {}
+    public record TermAndFunc(Term term, JFunction func) {
+    }
 
     /**
      * A data structure for storing and passing all specifications of a specification element
@@ -1424,7 +1380,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @author Michael Kirsten
      */
-    public record POTerms(
-            Condition pre, Term modifiable, ImmutableList<Term> rest,
-            Condition post) {}
+    public record POTerms(Condition pre, Term modifiable, ImmutableList<Term> rest,
+            Condition post) {
+    }
 }

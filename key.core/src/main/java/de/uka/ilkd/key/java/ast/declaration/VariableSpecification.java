@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
 
-import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.abstraction.Variable;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
@@ -51,33 +51,35 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     protected final Type type;
 
-    protected final IProgramVariable var;
+    protected final IProgramVariable programVariable;
 
     public VariableSpecification() {
         this(null, 0, null, null, null);
     }
 
-    public VariableSpecification(IProgramVariable var) {
-        this(var, var.getKeYJavaType());
+    public VariableSpecification(IProgramVariable programVariable) {
+        this(programVariable, programVariable.getKeYJavaType());
     }
 
-    public VariableSpecification(IProgramVariable var, Type type) {
-        this(var, 0, null, type, null);
+    public VariableSpecification(IProgramVariable programVariable, Type type) {
+        this(programVariable, 0, null, type, null);
     }
 
 
-    public VariableSpecification(IProgramVariable var, Expression init, Type type) {
-        this(var, 0, init, type, null);
+    public VariableSpecification(IProgramVariable programVariable, Expression init, Type type) {
+        this(programVariable, 0, init, type, null);
     }
 
-    public VariableSpecification(IProgramVariable var, int dim, Expression init, Type type) {
-        this(var, dim, init, type, PositionInfo.UNDEFINED);
+    public VariableSpecification(IProgramVariable programVariable, int dim, Expression init,
+            Type type) {
+        this(programVariable, dim, init, type, PositionInfo.UNDEFINED);
     }
 
-    public VariableSpecification(IProgramVariable var, int dim, Expression init, Type type,
+    public VariableSpecification(IProgramVariable programVariable, int dim, Expression init,
+            Type type,
             PositionInfo pi) {
         super(pi);
-        this.var = var;
+        this.programVariable = programVariable;
         this.initializer = init;
         this.dimensions = dim;
         this.type = type;
@@ -93,18 +95,19 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * @param dim
      *        the dimension of this type
      */
-    public VariableSpecification(ExtList children, IProgramVariable var, int dim, Type type) {
+    public VariableSpecification(ExtList children, IProgramVariable programVariable, int dim,
+            Type type) {
         super(children);
-        this.var = var;
+        this.programVariable = programVariable;
         initializer = children.get(Expression.class);
         dimensions = dim;
         this.type = type;
     }
 
     public VariableSpecification(PositionInfo pi, List<Comment> comments, Expression init,
-            IProgramVariable var, int dim, Type type) {
+            IProgramVariable programVariable, int dim, Type type) {
         super(pi, comments);
-        this.var = var;
+        this.programVariable = programVariable;
         initializer = init;
         dimensions = dim;
         this.type = type;
@@ -117,7 +120,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (var != null) {
+        if (programVariable != null) {
             result++;
         }
         if (initializer != null) {
@@ -136,9 +139,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (var != null) {
+        if (programVariable != null) {
             if (index == 0) {
-                return var;
+                return programVariable;
             }
             index--;
         }
@@ -186,7 +189,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * @return the string.
      */
     public final String getName() {
-        return (var == null) ? null : var.name().toString();
+        return (programVariable == null) ? null : programVariable.name().toString();
     }
 
     /**
@@ -195,10 +198,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * @return the name.
      */
     public ProgramElementName getProgramElementName() {
-        if (var.name() instanceof ProgramElementName) {
-            return (ProgramElementName) var.name();
+        if (programVariable.name() instanceof ProgramElementName) {
+            return (ProgramElementName) programVariable.name();
         } else {
-            return new ProgramElementName(var.name().toString()); // only with SVs
+            return new ProgramElementName(programVariable.name().toString()); // only with SVs
         }
     }
 
@@ -209,7 +212,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * @return the program variable.
      */
     public IProgramVariable getProgramVariable() {
-        return var;
+        return programVariable;
     }
 
 
@@ -232,6 +235,14 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
 
+    public boolean isModel() {
+        if (programVariable instanceof ProgramVariable pv) {
+            return pv.isModel();
+        }
+        // This used to return always false.
+        throw new UnsupportedOperationException("Cannot determine finality of " + programVariable);
+    }
+
     public boolean hasInitializer() {
         return initializer != null;
     }
@@ -253,7 +264,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     @NonNull
     @Override
     public SourceElement getFirstElement() {
-        return var;
+        return programVariable;
     }
 
     @NonNull
@@ -262,7 +273,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         if (initializer != null) {
             return initializer.getLastElement();
         } else {
-            return var;
+            return programVariable;
         }
     }
 

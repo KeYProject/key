@@ -25,8 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Type declaration.
- * taken from COMPOST and changed to achieve an immutable structure
+ * Type declaration. taken from COMPOST and changed to achieve an immutable structure
  */
 public abstract class TypeDeclaration extends JavaDeclaration
         implements NamedProgramElement, MemberDeclaration,
@@ -35,26 +34,26 @@ public abstract class TypeDeclaration extends JavaDeclaration
     private static final Logger LOGGER = LoggerFactory.getLogger(TypeDeclaration.class);
 
     protected final ProgramElementName name;
+
     protected final ProgramElementName fullName;
+
     protected final ImmutableArray<MemberDeclaration> members;
+
     protected final boolean parentIsInterfaceDeclaration;
+
     protected final boolean isLibrary;
 
     /**
      * JML modifiers of a type
      *
-     * @param strictlyPure
-     *        strictly pure
-     * @param pure
-     *        pure
-     * @param nullableByDefault
-     *        nullable by default
-     * @param specMathMode
-     *        spec math mode
+     * @param strictlyPure strictly pure
+     * @param pure pure
+     * @param nullableByDefault nullable by default
+     * @param specMathMode spec math mode
      */
-    public record JMLModifiers(
-            boolean strictlyPure, boolean pure, boolean nullableByDefault,
-            SpecMathMode specMathMode) {}
+    public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
+            SpecMathMode specMathMode) {
+    }
 
     protected final JMLModifiers jmlModifiers;
 
@@ -87,21 +86,12 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * Type declaration.
      *
-     * @param mods
-     *        a modifier array.
-     * @param name
-     *        ProgramElementName of the type
-     * @param members
-     *        an array containing the memberdeclarations of
-     *        this type
+     * @param mods a modifier array.
+     * @param name ProgramElementName of the type
+     * @param members an array containing the memberdeclarations of this type
      */
-    public TypeDeclaration(
-            Modifier[] mods,
-            ProgramElementName name,
-            ProgramElementName fullName,
-            MemberDeclaration[] members,
-            boolean parentIsInterfaceDeclaration,
-            boolean isLibrary) {
+    public TypeDeclaration(Modifier[] mods, ProgramElementName name, ProgramElementName fullName,
+            MemberDeclaration[] members, boolean parentIsInterfaceDeclaration, boolean isLibrary) {
         super(mods);
         this.name = name;
         this.fullName = fullName;
@@ -112,20 +102,12 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     /**
-     * @param children
-     *        an ExtList of children.
-     * @param name
-     *        the ProgramElementName of the type
-     *        May contain:
-     *        several MemberDeclaration (as members of the type),
-     *        a parentIsInterfaceDeclaration (indicating if parent is interface),
-     *        several Modifier (as modifiers of the type decl),
-     *        Comments
+     * @param children an ExtList of children.
+     * @param name the ProgramElementName of the type May contain: several MemberDeclaration (as
+     *        members of the type), a parentIsInterfaceDeclaration (indicating if parent is
+     *        interface), several Modifier (as modifiers of the type decl), Comments
      */
-    public TypeDeclaration(
-            ExtList children,
-            ProgramElementName name,
-            ProgramElementName fullName,
+    public TypeDeclaration(ExtList children, ProgramElementName name, ProgramElementName fullName,
             boolean isLibrary) {
         super(children);
         this.name = name;
@@ -142,25 +124,14 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     /**
-     * @param children
-     *        an ExtList of children.
-     *        May contain:
-     *        a ProgramElementName (as name),
-     *        several MemberDeclaration (as members of the type),
-     *        a parentIsInterfaceDeclaration (indicating if parent is interface),
-     *        several Modifier (as modifiers of the type decl),
-     *        Comments
+     * @param children an ExtList of children. May contain: a ProgramElementName (as name), several
+     *        MemberDeclaration (as members of the type), a parentIsInterfaceDeclaration (indicating
+     *        if parent is interface), several Modifier (as modifiers of the type decl), Comments
      */
-    public TypeDeclaration(
-            ExtList children,
-            ProgramElementName fullName,
-            boolean isLibrary) {
-        this(children,
-            children.get(ProgramElementName.class),
-            fullName, isLibrary);
+    public TypeDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
+        this(children, children.get(ProgramElementName.class), fullName, isLibrary);
     }
 
-    @NonNull
     public SourceElement getFirstElement() {
         if (modArray != null && (!modArray.isEmpty())) {
             return modArray.get(0);
@@ -169,7 +140,6 @@ public abstract class TypeDeclaration extends JavaDeclaration
         }
     }
 
-    @NonNull
     public SourceElement getLastElement() {
         // end of member block
         return this;
@@ -190,11 +160,9 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     /**
-     * returns the default value of the given type
-     * according to JLS 4.5.5
+     * returns the default value of the given type according to JLS 4.5.5
      *
-     * @return the default value of the given type
-     *         according to JLS 4.5.5
+     * @return the default value of the given type according to JLS 4.5.5
      */
     public Literal getDefaultValue() {
         return NullLiteral.NULL;
@@ -334,15 +302,14 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     /*
-     * Return the type declaration at the specified index in this node's
-     * "virtual" type declaration array.
+     * Return the type declaration at the specified index in this node's "virtual" type declaration
+     * array.
      *
      * @param index an index for a type declaration.
      *
      * @return the type declaration with the given index.
      *
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     * of bounds.
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
 
     public TypeDeclaration getTypeDeclarationAt(int index) {

@@ -36,6 +36,6 @@ public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements
             mother = motherTaclet().rule().name().toString();
         }
         return "added rule justification \nintroduced at node " + node.serialNr() + " by rule \n"
-                + mother;
+            + mother;
     }
 }

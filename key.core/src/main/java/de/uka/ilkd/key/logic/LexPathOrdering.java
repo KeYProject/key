@@ -91,7 +91,8 @@ public class LexPathOrdering implements TermOrdering {
     };
 
 
-    private record CacheKey(Term left, Term right) {}
+    private record CacheKey(Term left, Term right) {
+    }
 
 
     private final HashMap<CacheKey, CompRes> cache = new LinkedHashMap<>();

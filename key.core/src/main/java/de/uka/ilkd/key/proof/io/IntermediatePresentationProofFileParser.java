@@ -418,6 +418,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     public record Result(
             List<Throwable> errors, String status,
-            BranchNodeIntermediate parsedResult) {}
+            BranchNodeIntermediate parsedResult) {
+    }
 
 }

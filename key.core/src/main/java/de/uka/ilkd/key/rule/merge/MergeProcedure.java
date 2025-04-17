@@ -124,6 +124,7 @@ public abstract class MergeProcedure {
     public record ValuesMergeResult(
             ImmutableSet<Term> newConstraints, Term mergeVal,
             LinkedHashSet<Name> newNames,
-            LinkedHashSet<Term> sideConditions) {}
+            LinkedHashSet<Term> sideConditions) {
+    }
 
 }

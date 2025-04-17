@@ -74,7 +74,8 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public record JMLModifiers(
             boolean pure, boolean strictlyPure, boolean helper,
-            SpecMathMode specMathMode) {}
+            SpecMathMode specMathMode) {
+    }
 
 
     /**

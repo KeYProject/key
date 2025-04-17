@@ -52,10 +52,8 @@ public class ChoiceSelector extends JDialog {
     /**
      * Creates a new dialog for choosing taclet options.
      *
-     * @param mainWindow
-     *        the parent window (dialog is centered on this)
-     * @param settings
-     *        the currently selected settings
+     * @param mainWindow the parent window (dialog is centered on this)
+     * @param settings the currently selected settings
      */
     public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
         super(mainWindow, "Taclet Base Configuration", true);
@@ -206,8 +204,7 @@ public class ChoiceSelector extends JDialog {
      * and it is also used by the eclipse projects.
      * </p>
      *
-     * @param category
-     *        The category for which the explanation is requested.
+     * @param category The category for which the explanation is requested.
      * @return The explanation for the given category.
      */
     public static String getExplanation(String category) {
@@ -236,8 +233,7 @@ public class ChoiceSelector extends JDialog {
     /**
      * Checks if the given choice makes a proof unsound.
      *
-     * @param choice
-     *        The choice to check.
+     * @param choice The choice to check.
      * @return {@code true} proof will be unsound, {@code false} proof will be sound as long as all
      *         other choices are sound.
      */
@@ -250,8 +246,7 @@ public class ChoiceSelector extends JDialog {
     /**
      * Checks if the given choice makes a proof incomplete.
      *
-     * @param choice
-     *        The choice to check.
+     * @param choice The choice to check.
      * @return {@code true} proof will be incomplete, {@code false} proof will be complete as long
      *         as all other choices are complete.
      */
@@ -265,8 +260,7 @@ public class ChoiceSelector extends JDialog {
     /**
      * Checks if additional information for the choice are available.
      *
-     * @param choice
-     *        The choice to check.
+     * @param choice The choice to check.
      * @return The additional information or {@code null} if no information are available.
      */
     public static String getInformation(String choice) {
@@ -286,10 +280,8 @@ public class ChoiceSelector extends JDialog {
     /**
      * Searches the choice in the given {@link ChoiceEntry}s.
      *
-     * @param choices
-     *        The {@link ChoiceEntry}s to search in.
-     * @param choice
-     *        The choice to search.
+     * @param choices The {@link ChoiceEntry}s to search in.
+     * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
@@ -299,8 +291,7 @@ public class ChoiceSelector extends JDialog {
     /**
      * Creates {@link ChoiceEntry}s for all given choices.
      *
-     * @param choices
-     *        The choices.
+     * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
     public static ChoiceEntry[] createChoiceEntries(Set<String> choices) {
@@ -320,8 +311,7 @@ public class ChoiceSelector extends JDialog {
     /**
      * Creates a {@link ChoiceEntry} for the given choice.
      *
-     * @param choice
-     *        The choice.
+     * @param choice The choice.
      * @return The created {@link ChoiceEntry}.
      */
     public static ChoiceEntry createChoiceEntry(String choice) {
@@ -332,17 +322,14 @@ public class ChoiceSelector extends JDialog {
     /**
      * Represents a choice with all its meta information.
      *
-     * @param choice
-     *        The choice.
-     * @param unsound
-     *        Is unsound?
-     * @param incomplete
-     *        Is incomplete?
-     * @param information
-     *        An optionally information.
+     * @param choice The choice.
+     * @param unsound Is unsound?
+     * @param incomplete Is incomplete?
+     * @param information An optionally information.
      * @author Martin Hentschel
      */
-    public record ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
+    public record ChoiceEntry(String choice, boolean unsound, boolean incomplete,
+            String information) {
 
         /**
          * Text shown to the user in case of incompletness.
@@ -357,14 +344,10 @@ public class ChoiceSelector extends JDialog {
         /**
          * Constructor.
          *
-         * @param choice
-         *        The choice.
-         * @param unsound
-         *        Is unsound?
-         * @param incomplete
-         *        Is incomplete?
-         * @param information
-         *        An optionally information.
+         * @param choice The choice.
+         * @param unsound Is unsound?
+         * @param incomplete Is incomplete?
+         * @param information An optionally information.
          */
         public ChoiceEntry {
             assert choice != null;
@@ -432,7 +415,7 @@ public class ChoiceSelector extends JDialog {
             if (unsound && incomplete) {
                 if (information != null) {
                     return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", "
-                            + information + ")";
+                        + information + ")";
                 } else {
                     return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
                 }

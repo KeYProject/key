@@ -52,22 +52,14 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Executes the test steps of test methods.
      *
-     * @param baseDir
-     *        The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir
-     *        The path to the java file inside the base directory.
-     * @param containerTypeName
-     *        The name of the type which contains the method.
-     * @param targetName
-     *        The target name to search.
-     * @param useContracts
-     *        Use contracts or inline method bodies instead.
-     * @param analyst
-     *        The {@link IProofReferencesAnalyst} to use.
-     * @param expectedReferences
-     *        The expected proof references.
-     * @throws Exception
-     *         Occurred Exception.
+     * @param baseDir The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir The path to the java file inside the base directory.
+     * @param containerTypeName The name of the type which contains the method.
+     * @param targetName The target name to search.
+     * @param useContracts Use contracts or inline method bodies instead.
+     * @param analyst The {@link IProofReferencesAnalyst} to use.
+     * @param expectedReferences The expected proof references.
+     * @throws Exception Occurred Exception.
      */
     protected void doReferenceFunctionTest(File baseDir, String javaPathInBaseDir,
             String containerTypeName, String targetName, boolean useContracts,
@@ -81,24 +73,15 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Executes the test steps of test methods.
      *
-     * @param baseDir
-     *        The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir
-     *        The path to the java file inside the base directory.
-     * @param containerTypeName
-     *        The name of the type which contains the method.
-     * @param targetName
-     *        The target name to search.
-     * @param useContracts
-     *        Use contracts or inline method bodies instead.
-     * @param analyst
-     *        The {@link IProofReferencesAnalyst} to use.
-     * @param currentReferenceFilter
-     *        An optional {@link Predicate} to limit the references to test.
-     * @param expectedReferences
-     *        The expected proof references.
-     * @throws Exception
-     *         Occurred Exception.
+     * @param baseDir The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir The path to the java file inside the base directory.
+     * @param containerTypeName The name of the type which contains the method.
+     * @param targetName The target name to search.
+     * @param useContracts Use contracts or inline method bodies instead.
+     * @param analyst The {@link IProofReferencesAnalyst} to use.
+     * @param currentReferenceFilter An optional {@link Predicate} to limit the references to test.
+     * @param expectedReferences The expected proof references.
+     * @throws Exception Occurred Exception.
      */
     protected void doReferenceFunctionTest(File baseDir, String javaPathInBaseDir,
             String containerTypeName, String targetName, boolean useContracts,
@@ -113,22 +96,14 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Executes the test steps of test methods.
      *
-     * @param baseDir
-     *        The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir
-     *        The path to the java file inside the base directory.
-     * @param containerTypeName
-     *        The name of the type which contains the method.
-     * @param methodFullName
-     *        The method name to search.
-     * @param useContracts
-     *        Use contracts or inline method bodies instead.
-     * @param analyst
-     *        The {@link IProofReferencesAnalyst} to use.
-     * @param expectedReferences
-     *        The expected proof references.
-     * @throws Exception
-     *         Occurred Exception.
+     * @param baseDir The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir The path to the java file inside the base directory.
+     * @param containerTypeName The name of the type which contains the method.
+     * @param methodFullName The method name to search.
+     * @param useContracts Use contracts or inline method bodies instead.
+     * @param analyst The {@link IProofReferencesAnalyst} to use.
+     * @param expectedReferences The expected proof references.
+     * @throws Exception Occurred Exception.
      */
     protected void doReferenceMethodTest(File baseDir, String javaPathInBaseDir,
             String containerTypeName, String methodFullName, boolean useContracts,
@@ -141,24 +116,15 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Executes the test steps of test methods.
      *
-     * @param baseDir
-     *        The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir
-     *        The path to the java file inside the base directory.
-     * @param containerTypeName
-     *        The name of the type which contains the method.
-     * @param methodFullName
-     *        The method name to search.
-     * @param useContracts
-     *        Use contracts or inline method bodies instead.
-     * @param analyst
-     *        The {@link IProofReferencesAnalyst} to use.
-     * @param currentReferenceFilter
-     *        An optional {@link Predicate} to limit the references to test.
-     * @param expectedReferences
-     *        The expected proof references.
-     * @throws Exception
-     *         Occurred Exception.
+     * @param baseDir The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir The path to the java file inside the base directory.
+     * @param containerTypeName The name of the type which contains the method.
+     * @param methodFullName The method name to search.
+     * @param useContracts Use contracts or inline method bodies instead.
+     * @param analyst The {@link IProofReferencesAnalyst} to use.
+     * @param currentReferenceFilter An optional {@link Predicate} to limit the references to test.
+     * @param expectedReferences The expected proof references.
+     * @throws Exception Occurred Exception.
      */
     protected void doReferenceMethodTest(File baseDir, String javaPathInBaseDir,
             String containerTypeName, String methodFullName, boolean useContracts,
@@ -175,12 +141,9 @@ public abstract class AbstractProofReferenceTestCase {
      * {@link #doProofFunctionTest(File, String, String, String, boolean, IProofTester)} and
      * {@link #doProofMethodTest(File, String, String, String, boolean, IProofTester)}.
      *
-     * @param analyst
-     *        The {@link IProofReferencesAnalyst} to use.
-     * @param currentReferenceFilter
-     *        An optional {@link Predicate} to limit the references to test.
-     * @param expectedReferences
-     *        The expected proof references.
+     * @param analyst The {@link IProofReferencesAnalyst} to use.
+     * @param currentReferenceFilter An optional {@link Predicate} to limit the references to test.
+     * @param expectedReferences The expected proof references.
      * @return The created {@link IProofTester}.
      */
     protected IProofTester createReferenceMethodTester(final IProofReferencesAnalyst analyst,
@@ -214,10 +177,8 @@ public abstract class AbstractProofReferenceTestCase {
      * Extracts all {@link IProofReference}s of the given once which are extracted from the given
      * {@link Node}.
      *
-     * @param references
-     *        The {@link IProofReference}s to search in.
-     * @param node
-     *        The {@link Node} to look for.
+     * @param references The {@link IProofReference}s to search in.
+     * @param node The {@link Node} to look for.
      * @return The contained {@link IProofReference}s with the given node.
      */
     protected LinkedHashSet<IProofReference<?>> findReferences(
@@ -234,10 +195,8 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Tests the given {@link IProofReference}s.
      *
-     * @param expected
-     *        The expected {@link IProofReference}s.
-     * @param current
-     *        The current {@link IProofReference}s.
+     * @param expected The expected {@link IProofReference}s.
+     * @param current The current {@link IProofReference}s.
      */
     protected void assertReferences(LinkedHashSet<IProofReference<?>> expected,
             LinkedHashSet<IProofReference<?>> current) {
@@ -265,10 +224,8 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Tests the given {@link IProofReference}s.
      *
-     * @param current
-     *        The current {@link IProofReference}s.
-     * @param expected
-     *        The expected {@link ExpectedProofReferences}s.
+     * @param current The current {@link IProofReference}s.
+     * @param expected The expected {@link ExpectedProofReferences}s.
      */
     protected void assertReferences(LinkedHashSet<IProofReference<?>> current,
             ExpectedProofReferences... expected) {
@@ -293,22 +250,19 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Defines the values of an expected proof reference.
      *
-     * @param kind
-     *        The expected kind.
-     * @param target
-     *        The expected target.
+     * @param kind The expected kind.
+     * @param target The expected target.
      * @author Martin Hentschel
      */
     protected record ExpectedProofReferences(String kind, String target) {
         /**
          * Constructor.
          *
-         * @param kind
-         *        The expected kind.
-         * @param target
-         *        The expected target.
+         * @param kind The expected kind.
+         * @param target The expected target.
          */
-        public ExpectedProofReferences {}
+        public ExpectedProofReferences {
+        }
 
         /**
          * Returns the expected kind.
@@ -334,20 +288,13 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Does some test steps with a {@link Proof}.
      *
-     * @param baseDir
-     *        The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir
-     *        The path to the java file inside the base directory.
-     * @param containerTypeName
-     *        The name of the type which contains the method.
-     * @param targetName
-     *        The target name to search.
-     * @param useContracts
-     *        Use contracts or inline method bodies instead.
-     * @param tester
-     *        The {@link IProofTester} which executes the test steps.
-     * @throws Exception
-     *         Occurred Exception.
+     * @param baseDir The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir The path to the java file inside the base directory.
+     * @param containerTypeName The name of the type which contains the method.
+     * @param targetName The target name to search.
+     * @param useContracts Use contracts or inline method bodies instead.
+     * @param tester The {@link IProofTester} which executes the test steps.
+     * @throws Exception Occurred Exception.
      */
     protected void doProofFunctionTest(File baseDir, String javaPathInBaseDir,
             String containerTypeName, final String targetName, boolean useContracts,
@@ -414,20 +361,13 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Does some test steps with a {@link Proof}.
      *
-     * @param baseDir
-     *        The base directory which contains test and oracle file.
-     * @param javaPathInBaseDir
-     *        The path to the java file inside the base directory.
-     * @param containerTypeName
-     *        The name of the type which contains the method.
-     * @param methodFullName
-     *        The method name to search.
-     * @param useContracts
-     *        Use contracts or inline method bodies instead.
-     * @param tester
-     *        The {@link IProofTester} which executes the test steps.
-     * @throws Exception
-     *         Occurred Exception.
+     * @param baseDir The base directory which contains test and oracle file.
+     * @param javaPathInBaseDir The path to the java file inside the base directory.
+     * @param containerTypeName The name of the type which contains the method.
+     * @param methodFullName The method name to search.
+     * @param useContracts Use contracts or inline method bodies instead.
+     * @param tester The {@link IProofTester} which executes the test steps.
+     * @throws Exception Occurred Exception.
      */
     protected void doProofMethodTest(File baseDir, String javaPathInBaseDir,
             String containerTypeName, String methodFullName, boolean useContracts,
@@ -487,16 +427,11 @@ public abstract class AbstractProofReferenceTestCase {
     /**
      * Does some test steps with a {@link Proof}.
      *
-     * @param environment
-     *        The {@link KeYEnvironment} which provides the {@link Proof}.
-     * @param proof
-     *        The {@link Proof} to test.
-     * @param useContracts
-     *        Use contracts or inline method bodies instead.
-     * @param tester
-     *        The {@link IProofTester} which executes the test steps.
-     * @throws Exception
-     *         Occurred Exception.
+     * @param environment The {@link KeYEnvironment} which provides the {@link Proof}.
+     * @param proof The {@link Proof} to test.
+     * @param useContracts Use contracts or inline method bodies instead.
+     * @param tester The {@link IProofTester} which executes the test steps.
+     * @throws Exception Occurred Exception.
      */
     protected void doProofTest(KeYEnvironment<?> environment, Proof proof, boolean useContracts,
             IProofTester tester) throws Exception {
@@ -524,12 +459,9 @@ public abstract class AbstractProofReferenceTestCase {
         /**
          * Execute the test.
          *
-         * @param environment
-         *        The {@link KeYEnvironment} to test.
-         * @param proof
-         *        The {@link Proof} to test.
-         * @throws Exception
-         *         Occurred Exception.
+         * @param environment The {@link KeYEnvironment} to test.
+         * @param proof The {@link Proof} to test.
+         * @throws Exception Occurred Exception.
          */
         void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception;
     }

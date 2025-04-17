@@ -34,6 +34,7 @@ import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLParameters;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.TermUtil;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
@@ -1720,10 +1721,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert expr != null;
         final Term body = expr.getTerm();
         return switch (ctx.quantifier().start.getType()) {
-        case JmlLexer.FORALL -> termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
-            expr.getType());
-        case JmlLexer.EXISTS -> termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
-            expr.getType());
+        case JmlLexer.FORALL ->
+            termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
+                expr.getType());
+        case JmlLexer.EXISTS ->
+            termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
+                expr.getType());
         case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
             declVars.second);
         case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
@@ -1734,10 +1737,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
             yield termFactory.quantifiedNumOf(guard, body, declVars.first, nullable,
                 declVars.second, kjtInt);
         }
-        case JmlLexer.SUM -> termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
-            expr.getType());
-        case JmlLexer.PRODUCT -> termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
-            body, expr.getType());
+        case JmlLexer.SUM ->
+            termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
+                expr.getType());
+        case JmlLexer.PRODUCT ->
+            termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
+                body, expr.getType());
         default -> {
             raiseError(ctx, "Unexpected syntax case.");
             yield null;
@@ -2366,6 +2371,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression body = accept(ctx.method_body().expression());
         SLParameters params = visitParameters(ctx.param_list());
         SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
+
+        var forbiddenHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
+        boolean applyContainsHeap = TermUtil.contains(apply.getTerm(), forbiddenHeapVar);
+        boolean bodyContainsHeap = TermUtil.contains(body.getTerm(), forbiddenHeapVar);
+
+
+        if (!applyContainsHeap && bodyContainsHeap) {
+            // NOT (no heap in applies --> no heap in body)
+            raiseError(ctx, "Heap used in a `no_state` method.");
+        }
 
         return termFactory.eq(apply, body);
     }

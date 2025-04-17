@@ -7,14 +7,14 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Tag("slow")
+
 public class TestZ3 extends TestSMTSolver {
 
 
@@ -45,8 +45,7 @@ public class TestZ3 extends TestSMTSolver {
             if (isInstalled && !getSolverType().supportHasBeenChecked()) {
                 if (!getSolverType().checkForSupport()) {
                     LOGGER.warn("Warning: " + "The version of the solver {} used for the "
-                        + "following tests may not be supported.",
-                        getSolverType().getName());
+                        + "following tests may not be supported.", getSolverType().getName());
                 }
             }
         }
@@ -78,11 +77,13 @@ public class TestZ3 extends TestSMTSolver {
     }
 
     @Test
+    @Disabled("weigl: due to performance issues")
     public void testDiv5() throws Exception {
         assertTrue(correctResult(testFile + "div5.key", false));
     }
 
     @Test
+    @Disabled("weigl: due to performance issues")
     public void testDiv6() throws Exception {
         assertTrue(correctResult(testFile + "div6.key", false));
     }

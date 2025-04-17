@@ -4,11 +4,8 @@
 package de.uka.ilkd.key.rule;
 
 import java.io.File;
-import java.nio.file.Path;
 
-import de.uka.ilkd.key.api.KeYApi;
-import de.uka.ilkd.key.api.ProofApi;
-import de.uka.ilkd.key.api.ProofManagementApi;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
@@ -32,20 +29,18 @@ class IntSemanticsTest {
     /**
      * This test checks that certain proofs containing integer corner cases are reloadable.
      *
-     * @param filename
-     *        name of the .proof file containing a closed proof and also setting the
+     * @param filename name of the .proof file containing a closed proof and also setting the
      *        desired taclet option for the integer semantics.
-     * @throws ProblemLoaderException
-     *         should not happen
+     * @throws ProblemLoaderException should not happen
      */
     @ParameterizedTest
     @ValueSource(strings = { "java/mJava.proof",
         "uncheckedOF/mBigint.proof",
         "checkedOF/mOFCheck.proof" })
     void testSemanticsProvable(String filename) throws ProblemLoaderException {
-        Path proofFile = new File(TEST_DIR, filename).toPath();
-        ProofManagementApi pmapi = KeYApi.loadProof(proofFile);
-        Proof proof = pmapi.getLoadedProof().getProof();
+        var proofFile = TEST_DIR.toPath().resolve(filename);
+        KeYEnvironment<?> pmapi = KeYEnvironment.load(proofFile);
+        Proof proof = pmapi.getLoadedProof();
         // Proof should be reloaded completely now. If not, the int semantics are probably broken.
         Assertions.assertTrue(proof.closed());
     }
@@ -53,22 +48,19 @@ class IntSemanticsTest {
     /**
      * This test checks that certain contracts are not provable with the selected integer semantics.
      *
-     * @param filename
-     *        name of the .key file that points to the contract. The desired integer
+     * @param filename name of the .key file that points to the contract. The desired integer
      *        semantics need to be set correctly here!
-     * @throws ProblemLoaderException
-     *         should not happen
+     * @throws ProblemLoaderException should not happen
      */
     @ParameterizedTest
     @ValueSource(strings = { "java/mJavaWrong.key",
         "uncheckedOF/mBigintWrong.key",
         "checkedOF/mOFCheckWrong.key", })
     void testSemanticsUnprovable(String filename) throws ProblemLoaderException {
-        Path keyFile = new File(TEST_DIR, filename).toPath();
-        ProofManagementApi pmapi = KeYApi.loadFromKeyFile(keyFile);
-        ProofApi proofApi = pmapi.getLoadedProof();
-        Proof proof = proofApi.getProof();
-        proofApi.getEnv().getProofControl().startAndWaitForAutoMode(proof);
+        File keyFile = new File(TEST_DIR, filename);
+        KeYEnvironment<?> pmapi = KeYEnvironment.load(keyFile.toPath());
+        Proof proof = pmapi.getLoadedProof();
+        pmapi.getProofControl().startAndWaitForAutoMode(proof);
         // we expect that exactly one branch (the overflow check) is open now:
         Assertions.assertEquals(1, proof.openGoals().size());
     }

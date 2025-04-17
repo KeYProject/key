@@ -23,11 +23,13 @@ import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
+import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
@@ -38,6 +40,9 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 
 import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -56,9 +61,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String ERROR = "java.lang.Error";
     private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
-    /**
-     * The default signals only clause for errors and runtime exceptions.
-     **/
+    /** The default signals only clause for errors and runtime exceptions. **/
     private static final String DEFAULT_SIGNALS_ONLY =
         format("signals_only %s, %s;", ERROR, RUNTIME_EXCEPTION);
     /**
@@ -76,8 +79,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     // constructors
     // -------------------------------------------------------------------------
 
-    public JMLSpecExtractor(Services services) {
-        this.services = services;
+    public JMLSpecExtractor(InitConfig initConfig) {
+        FinalHeapResolution.rememberIfFinalEnabled(initConfig);
+        this.services = initConfig.getServices();
         this.jsf = new JMLSpecFactory(services);
     }
 
