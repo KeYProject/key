@@ -339,6 +339,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     } else if (c instanceof TextualJMLClassAxiom) {
                         ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom) c);
                         result = result.add(ax);
+                    } else if (c instanceof TextualJMLDatatype a) {
+                        JmlAdt adt = jsf.createJMLAdt(a);
+                        result = result.add(adt);
                     } else {
                         // DO NOTHING
                         // There may be other kinds of JML constructs which are
