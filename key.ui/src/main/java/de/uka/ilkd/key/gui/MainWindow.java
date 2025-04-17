@@ -26,6 +26,10 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.util.SystemInfo;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -294,7 +298,6 @@ public final class MainWindow extends JFrame {
         if (!applyTaskbarIcon()) {
             applyMacOsWorkaround();
         }
-        setLaF();
         setIconImages(IconFactory.applicationLogos());
 
 
@@ -404,6 +407,15 @@ public final class MainWindow extends JFrame {
             return instance;
         }
         if (instance == null) {
+            //FlatDarculaLaf.setup();
+            FlatLightLaf.setup();
+
+            if( SystemInfo.isLinux ) {
+                // enable custom window decorations
+                JFrame.setDefaultLookAndFeelDecorated( true );
+                JDialog.setDefaultLookAndFeelDecorated( true );
+            }
+
             instance = new MainWindow();
             if (ensureIsVisible) {
                 instance.setVisible(true);
