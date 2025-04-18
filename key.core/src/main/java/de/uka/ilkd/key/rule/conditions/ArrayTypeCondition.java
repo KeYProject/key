@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -32,8 +32,10 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
      * creates an instance of this condition checking if an instantiation of a schema variable is an
      * array or not
      *
-     * @param var the SchemaVariable to be checked
-     * @param negated if the result is to be negated upon finding
+     * @param var
+     *        the SchemaVariable to be checked
+     * @param negated
+     *        if the result is to be negated upon finding
      */
     public ArrayTypeCondition(SchemaVariable var, boolean negated) {
         this.var = var;

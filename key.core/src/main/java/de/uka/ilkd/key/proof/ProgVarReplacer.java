@@ -6,10 +6,10 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -279,7 +279,8 @@ public final class ProgVarReplacer {
      * replaces a program variable on the lefthandside of an elementary update
      * requires the given term to have an elementary update operator as top level operator
      *
-     * @param t the Term where to replace renamed variables
+     * @param t
+     *        the Term where to replace renamed variables
      * @return the term with all replacements done
      */
     private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {

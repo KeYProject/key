@@ -38,8 +38,10 @@ public class MutableState {
     /**
      * assign the given {@link TermBuffer} the provided value
      *
-     * @param v the {@link TermBuffer}
-     * @param value the Term which is assigned as the value
+     * @param v
+     *        the {@link TermBuffer}
+     * @param value
+     *        the Term which is assigned as the value
      */
     public void assign(TermBuffer v, Term value) {
         if (content == null) {
@@ -51,7 +53,8 @@ public class MutableState {
     /**
      * retrieves the current value of the given {@link TermBuffer}
      *
-     * @param v the TermBuffer whose value is asked for
+     * @param v
+     *        the TermBuffer whose value is asked for
      * @return the current value of the {@link TermBuffer} or {@code null} if there is none
      */
     public Term read(TermBuffer v) {

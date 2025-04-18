@@ -26,12 +26,18 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * Create a new info object.
      * Make sure your source object is documented in {@link TaskFinishedInfo}!
      *
-     * @param source source object
-     * @param result task result
-     * @param proof the proof the task worked on
-     * @param time time the task took (milliseconds)
-     * @param appliedRules how many nodes were created
-     * @param closedGoals how many goals were closed
+     * @param source
+     *        source object
+     * @param result
+     *        task result
+     * @param proof
+     *        the proof the task worked on
+     * @param time
+     *        time the task took (milliseconds)
+     * @param appliedRules
+     *        how many nodes were created
+     * @param closedGoals
+     *        how many goals were closed
      */
     public DefaultTaskFinishedInfo(Object source, Object result, Proof proof, long time,
             int appliedRules, int closedGoals) {

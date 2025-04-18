@@ -7,8 +7,8 @@ import java.io.File;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -70,7 +70,8 @@ public class ContractFactoryTest {
      * Checks that two equal assignable clauses are combined correctly, i.e., without
      * if-expressions.
      *
-     * @throws SLTranslationException is not thrown if the test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if the test succeeds
      */
     @Test
     public void testCombineEqualModifiable() throws SLTranslationException {
@@ -96,7 +97,8 @@ public class ContractFactoryTest {
      * Checks that two different assignable clauses are combined correctly: \nothing and
      * \strictly_nothing should be combined to empty (w/o if-then-else).
      *
-     * @throws SLTranslationException is not thrown if test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if test succeeds
      */
     @Test
     public void testCombineEmptyModifiable() throws SLTranslationException {
@@ -122,7 +124,8 @@ public class ContractFactoryTest {
      * Checks that two different assignable clauses are combined correctly, i.e. using intersection
      * and if-expressions with preconditions of the original contracts in their conditions.
      *
-     * @throws SLTranslationException is not thrown if test succeeds
+     * @throws SLTranslationException
+     *         is not thrown if test succeeds
      */
     @Test
     public void testCombineDifferentModifiable() throws SLTranslationException {
@@ -143,17 +146,20 @@ public class ContractFactoryTest {
         Term woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
             + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
-            + "allLocs))", woLabels.toString());
+            + "allLocs))",
+            woLabels.toString());
     }
 
     /**
      * Helper for the tests: Parses the given contracts (must always be two), combines them and
      * returns the modifiable term of the resulting combined contract (with origin labels removed).
      *
-     * @param contractStr the string containing the contracts for method m
+     * @param contractStr
+     *        the string containing the contracts for method m
      * @return the combined modifiable term of the contracts in the input string, without origin
      *         labels
-     * @throws SLTranslationException should not be thrown
+     * @throws SLTranslationException
+     *         should not be thrown
      */
     private Term calculateCombinedModifiableWOLabels(String contractStr)
             throws SLTranslationException {

@@ -46,7 +46,8 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
 
     /**
-     * @param svInsts the SVInstantiations that have been already found (needed by unwind loop
+     * @param svInsts
+     *        the SVInstantiations that have been already found (needed by unwind loop
      *        constructs to determine which labels are needed)
      */
     public TacletSchemaVariableCollector(SVInstantiations svInsts) {
@@ -58,8 +59,10 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * collects all SchemVariables that occur in the JavaBlock
      *
-     * @param jb the JavaBlock where to look for Schemavariables
-     * @param vars the IList<SchemaVariable> where to add the found SchemaVariables
+     * @param jb
+     *        the JavaBlock where to look for Schemavariables
+     * @param vars
+     *        the IList<SchemaVariable> where to add the found SchemaVariables
      * @return the extended list of found schemavariables
      */
     protected ImmutableList<SchemaVariable> collectSVInProgram(JavaBlock jb,
@@ -76,7 +79,8 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      * collects all found
      * schema variables
      *
-     * @param visited the Term whose schema variables are collected
+     * @param visited
+     *        the Term whose schema variables are collected
      */
     @Override
     public void visit(Term visited) {
@@ -114,8 +118,10 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * collects all schema variables occurring on the lhs of an elementary update
      *
-     * @param op the ElementaryUpdate operator to be scanned for schemavariables
-     * @param vars the ImmutableList<SchemaVariable> with already found schema variables
+     * @param op
+     *        the ElementaryUpdate operator to be scanned for schemavariables
+     * @param vars
+     *        the ImmutableList<SchemaVariable> with already found schema variables
      * @return a list of schema variables containing the ones of <code>vars</code> together with the
      *         schema variables found in <code>op</code>
      */
@@ -156,7 +162,8 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * collects all variables in a Semisequent
      *
-     * @param semiseq the Semisequent to visit
+     * @param semiseq
+     *        the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
         for (SequentFormula aSemiseq : semiseq) {
@@ -168,7 +175,8 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * goes through the given sequent an collects all vars found
      *
-     * @param seq the Sequent to visit
+     * @param seq
+     *        the Sequent to visit
      */
     public void visit(Sequent seq) {
         visit(seq.antecedent());
@@ -178,8 +186,10 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     /**
      * collects all schema variables of a taclet
      *
-     * @param taclet the Taclet where the variables have to be collected to
-     * @param visitAddrules a boolean that contols if the addrule sections are to be ignored (iff
+     * @param taclet
+     *        the Taclet where the variables have to be collected to
+     * @param visitAddrules
+     *        a boolean that contols if the addrule sections are to be ignored (iff
      *        false) or if the visitor descends into them (iff true)
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
@@ -220,7 +230,8 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      * collects all variables in a Taclet but ignores the variables that appear only in the addrule
      * sections of the Taclet
      *
-     * @param taclet the Taclet where the variables have to be collected to
+     * @param taclet
+     *        the Taclet where the variables have to be collected to
      */
     public void visitWithoutAddrule(Taclet taclet) {
         visit(taclet, false);

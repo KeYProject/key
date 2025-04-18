@@ -73,7 +73,8 @@ public class TermLabelSettings extends AbstractSettings {
     /**
      * Sets the value returned by {@link #getUseOriginLabels()}
      *
-     * @param useOriginLabels whether {@link OriginTermLabel}s should be used.
+     * @param useOriginLabels
+     *        whether {@link OriginTermLabel}s should be used.
      */
     public void setUseOriginLabels(boolean useOriginLabels) {
         var old = this.useOriginLabels;

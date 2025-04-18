@@ -88,14 +88,16 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
      * This constructor only exists to have uniform constructors for both the modular and the legacy
      * translation.
      *
-     * @param handlerNames not used by this translator!
-     * @param handlerOptions also not used by this translator
-     * @param preamble also also not used
+     * @param handlerNames
+     *        not used by this translator!
+     * @param handlerOptions
+     *        also not used by this translator
+     * @param preamble
+     *        also also not used
      */
     @SuppressWarnings("unused") // can be called via reflection
     public SmtLib2Translator(String[] handlerNames, String[] handlerOptions,
-            @Nullable String preamble) {
-    }
+            @Nullable String preamble) {}
 
     @Override
     protected StringBuilder buildCompleteText(StringBuilder formula,
@@ -306,8 +308,10 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     /**
      * Translate a sort.
      *
-     * @param name the sorts name
-     * @param isIntVal true, if the sort should represent some kind of integer
+     * @param name
+     *        the sorts name
+     * @param isIntVal
+     *        true, if the sort should represent some kind of integer
      * @return Argument 1 of the return value is the sort used in var declarations, Argument2 is the
      *         sort used for type predicates
      */

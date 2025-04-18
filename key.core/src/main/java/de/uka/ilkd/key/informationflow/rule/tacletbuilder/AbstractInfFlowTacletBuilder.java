@@ -117,11 +117,16 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     /**
      * Get eqAtLocs function as a term.
      *
-     * @param services the Services object.
-     * @param heap1 the first heap term.
-     * @param locset1 the first location set term.
-     * @param heap2 the first heap term.
-     * @param locset2 the first location set term.
+     * @param services
+     *        the Services object.
+     * @param heap1
+     *        the first heap term.
+     * @param locset1
+     *        the first location set term.
+     * @param heap2
+     *        the first heap term.
+     * @param locset2
+     *        the first location set term.
      * @return The eqAtLocs function term.
      */
     public Term eqAtLocs(Services services, Term heap1, Term locset1, Term heap2, Term locset2) {
@@ -133,13 +138,20 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     /**
      * Get eqAtLocsPost function as a term.
      *
-     * @param services the Services object.
-     * @param heap1Pre the first pre-heap term.
-     * @param heap1Post the first post-heap term.
-     * @param locset1 the first location set term.
-     * @param heap2Pre the second pre-heap term.
-     * @param heap2Post the second post-heap term.
-     * @param locset2 the second location set term.
+     * @param services
+     *        the Services object.
+     * @param heap1Pre
+     *        the first pre-heap term.
+     * @param heap1Post
+     *        the first post-heap term.
+     * @param locset1
+     *        the first location set term.
+     * @param heap2Pre
+     *        the second pre-heap term.
+     * @param heap2Post
+     *        the second post-heap term.
+     * @param locset2
+     *        the second location set term.
      * @return The eqAtLocsPost function term.
      */
     public Term eqAtLocsPost(Services services, Term heap1Pre, Term heap1Post, Term locset1,

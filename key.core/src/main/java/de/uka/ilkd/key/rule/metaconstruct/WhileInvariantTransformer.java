@@ -8,11 +8,15 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.TransactionStatement;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.statement.If;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.TransactionStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -28,6 +32,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import com.github.javaparser.ast.key.KeyTransactionStatement;
 
 public final class WhileInvariantTransformer {
     /** the outer label that is used to leave the while loop ('l1') */
@@ -59,15 +65,17 @@ public final class WhileInvariantTransformer {
 
     private KeYJavaType returnType;
 
-    public WhileInvariantTransformer() {
-    }
+    public WhileInvariantTransformer() {}
 
     /**
      * initialises this meta operator
      *
-     * @param initialPost the instantiated Term passed to the TermTransformer
-     * @param invariantFramingTermination TODO
-     * @param services the Services providing access to signature and type model
+     * @param initialPost
+     *        the instantiated Term passed to the TermTransformer
+     * @param invariantFramingTermination
+     *        TODO
+     * @param services
+     *        the Services providing access to signature and type model
      */
     private void init(Term initialPost, Term invariantFramingTermination, Services services) {
         root = (JavaNonTerminalProgramElement) initialPost.javaBlock().program();
@@ -211,7 +219,7 @@ public final class WhileInvariantTransformer {
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
                     new TransactionStatement(
-                        de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
+                        KeyTransactionStatement.TransactionType.FINISH))
                 : new StatementBlock(resSta));
         return services.getTermBuilder().prog(loopBodyModalityKind, mainJavaBlock, result,
             computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,
@@ -224,15 +232,24 @@ public final class WhileInvariantTransformer {
      * Computes the {@link TermLabel} which should be added to the created loop body modality
      * {@link Term}.
      *
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services}.
-     * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
-     * @param rule The {@link Rule} to apply.
-     * @param goal The {@link Goal} to compute the result for.
-     * @param loopBodyModality The {@link Modality} of the loop body.
-     * @param result The postcondition of the modality.
-     * @param mainJavaBlock The {@link JavaBlock} to execute within the modality.
-     * @param applicationSequent The {@link Sequent} to rewrite.
+     * @param termLabelState
+     *        The {@link TermLabelState} of the current rule application.
+     * @param services
+     *        The {@link Services}.
+     * @param applicationPos
+     *        The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
+     * @param rule
+     *        The {@link Rule} to apply.
+     * @param goal
+     *        The {@link Goal} to compute the result for.
+     * @param loopBodyModality
+     *        The {@link Modality} of the loop body.
+     * @param result
+     *        The postcondition of the modality.
+     * @param mainJavaBlock
+     *        The {@link JavaBlock} to execute within the modality.
+     * @param applicationSequent
+     *        The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the loop body modality {@link Term}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
@@ -248,9 +265,12 @@ public final class WhileInvariantTransformer {
     /**
      * creates a new program variable
      *
-     * @param varNameBase a String specifying the basename of the new variable
-     * @param varType a String specifying the typename of the new variable
-     * @param services the Services allowing access to the variablenaming facilities
+     * @param varNameBase
+     *        a String specifying the basename of the new variable
+     * @param varType
+     *        a String specifying the typename of the new variable
+     * @param services
+     *        the Services allowing access to the variablenaming facilities
      * @return a new program variable of the given type and a name as near as possible to the given
      *         basename
      */
@@ -264,9 +284,12 @@ public final class WhileInvariantTransformer {
     /**
      * creates a new program variable
      *
-     * @param varNameBase a String specifying the basename of the new variable
-     * @param varType the KeYJavaType of the new variable
-     * @param services the Services allowing access to the variablenaming facilities
+     * @param varNameBase
+     *        a String specifying the basename of the new variable
+     * @param varType
+     *        the KeYJavaType of the new variable
+     * @param services
+     *        the Services allowing access to the variablenaming facilities
      * @return a new program variable of the given type and a name as near as possible to the given
      *         basename
      */
@@ -412,14 +435,22 @@ public final class WhileInvariantTransformer {
      * Computes the {@link TermLabel} which should be added to the implication of the normal
      * termination branch of a loop body.
      *
-     * @param termLabelState The {@link TermLabelState} of the current rule application.
-     * @param services The {@link Services}.
-     * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
-     * @param rule The {@link Rule} to apply.
-     * @param goal The {@link Goal} to compute the result for.
-     * @param operator The {@link Operator} of the new {@link Term}.
-     * @param subs The children of the new {@link Term}.
-     * @param applicationSequent The {@link Sequent} to rewrite.
+     * @param termLabelState
+     *        The {@link TermLabelState} of the current rule application.
+     * @param services
+     *        The {@link Services}.
+     * @param applicationPos
+     *        The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
+     * @param rule
+     *        The {@link Rule} to apply.
+     * @param goal
+     *        The {@link Goal} to compute the result for.
+     * @param operator
+     *        The {@link Operator} of the new {@link Term}.
+     * @param subs
+     *        The children of the new {@link Term}.
+     * @param applicationSequent
+     *        The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the new {@link Term}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,

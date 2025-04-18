@@ -93,7 +93,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     /**
      * Constructor.
      *
-     * @param predicateEvaluationEnabled {@code true} predicate evaluation is enabled, {@code false}
+     * @param predicateEvaluationEnabled
+     *        {@code true} predicate evaluation is enabled, {@code false}
      *        predicate evaluation is disabled.
      */
     public SymbolicExecutionJavaProfile(boolean predicateEvaluationEnabled) {
@@ -135,7 +136,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     /**
      * Returns the additional {@link TermLabelFactory} instances used for symbolic execution.
      *
-     * @param predicateEvaluationEnabled {@code true} predicate evaluation is enabled, {@code false}
+     * @param predicateEvaluationEnabled
+     *        {@code true} predicate evaluation is enabled, {@code false}
      *        predicate evaluation is disabled.
      * @return The additional {@link TermLabelFactory} instances used for symbolic execution.
      */
@@ -261,7 +263,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@link Thread}).
      * </p>
      *
-     * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled,
+     * @param truthValueEvaluationEnabled
+     *        {@code true} truth value evaluation is enabled,
      *        {@code false} truth value evaluation is disabled.
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
@@ -283,7 +286,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     /**
      * Checks if truth value evaluation is enabled in the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to check.
+     * @param proof
+     *        The {@link Proof} to check.
      * @return {@code true} truth value evaluation is enabled, {@code false} truth value evaluation
      *         is disabled.
      */
@@ -298,7 +302,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     /**
      * Checks if truth value evaluation is enabled in the given {@link InitConfig}.
      *
-     * @param initConfig The {@link InitConfig} to check.
+     * @param initConfig
+     *        The {@link InitConfig} to check.
      * @return {@code true} truth value evaluation is enabled, {@code false} truth value evaluation
      *         is disabled.
      */
@@ -313,7 +318,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     /**
      * Checks if predicate evaluation is enabled in the given {@link Profile}.
      *
-     * @param profile The {@link Profile} to check.
+     * @param profile
+     *        The {@link Profile} to check.
      * @return {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is
      *         disabled.
      */

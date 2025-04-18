@@ -644,7 +644,8 @@ public class SolverListener implements SolverLauncherListener {
     /**
      * Checks if the given {@link Term} contains a modality, query, or update.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */

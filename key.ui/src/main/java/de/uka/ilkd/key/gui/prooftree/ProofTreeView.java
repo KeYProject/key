@@ -39,6 +39,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -483,7 +484,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * sets up the proof tree view if a proof has been loaded
      *
-     * @param p the Proof that has been loaded
+     * @param p
+     *        the Proof that has been loaded
      */
     private void setProof(Proof p) {
         if (proof == p) {
@@ -785,8 +787,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * if invoked node is modelled as branch node, select the branch node
      *
-     * @param invokedNode the selected node in the proof
-     * @param defaultPath the {@link TreePath} to be returned if the invokedNode does not have an
+     * @param invokedNode
+     *        the selected node in the proof
+     * @param defaultPath
+     *        the {@link TreePath} to be returned if the invokedNode does not have an
      *        associated branch node
      * @return the path to the branch node if available otherwise {@code defaultPath}
      */
@@ -1174,9 +1178,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.tooltip.addRule(node.getAppliedRuleApp().rule().name().toString());
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             if (pio != null) {
-                String on = LogicPrinter.quickPrintTerm(
-                    pio.subTerm(), node.proof().getServices());
-                style.tooltip.addAppliedOn(cutIfTooLong(on));
+                try {
+                    // String on = LogicPrinter.quickPrintTerm(
+                    // pio.subTerm(), node.proof().getServices());
+                    // style.tooltip.addAppliedOn(cutIfTooLong(on));
+                } catch (UnbalancedBlocksException e) {
+                    // ignore
+                }
             }
 
             final String notes = node.getNodeInfo().getNotes();
@@ -1329,12 +1337,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * be stored and
      * restored when switching proofs
      *
-     * @param model the {@link GUIProofTreeModel} of the proof
-     * @param expansionState the expanded tree paths
-     * @param selectionPath the path to the currently selected node
-     * @param scrollState the state of the scroll pane
+     * @param model
+     *        the {@link GUIProofTreeModel} of the proof
+     * @param expansionState
+     *        the expanded tree paths
+     * @param selectionPath
+     *        the path to the currently selected node
+     * @param scrollState
+     *        the state of the scroll pane
      */
-    record ProofTreeViewState(GUIProofTreeModel model,
+    record ProofTreeViewState(
+            GUIProofTreeModel model,
             Collection<TreePath> expansionState,
             TreePath selectionPath,
             Integer scrollState) {

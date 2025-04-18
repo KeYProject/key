@@ -19,8 +19,7 @@ public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
         new IsSelectSkolemConstantTermFeature();
 
 
-    private IsSelectSkolemConstantTermFeature() {
-    }
+    private IsSelectSkolemConstantTermFeature() {}
 
 
     @Override

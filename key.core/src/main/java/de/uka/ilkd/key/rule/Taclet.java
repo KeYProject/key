@@ -188,12 +188,17 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
-     * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequence, the
+     * @param name
+     *        the name of the Taclet
+     * @param applPart
+     *        contains the application part of an Taclet that is the if-sequence, the
      *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param ruleSets a list of rule sets for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     * @param goalTemplates
+     *        a list of goal descriptions.
+     * @param ruleSets
+     *        a list of rule sets for the Taclet
+     * @param attrs
+     *        attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
@@ -233,12 +238,17 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
      *
-     * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequence, the
+     * @param name
+     *        the name of the Taclet
+     * @param applPart
+     *        contains the application part of an Taclet that is the if-sequence, the
      *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param ruleSets a list of rule sets for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     * @param goalTemplates
+     *        a list of goal descriptions.
+     * @param ruleSets
+     *        a list of rule sets for the Taclet
+     * @param attrs
+     *        attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
@@ -309,7 +319,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * looks if a variable is declared as new and returns its sort to match with or the schema
      * variable it shares the match-sort with. Returns null if the SV is not declared to as new.
      *
-     * @param var the SchemaVariable to look for
+     * @param var
+     *        the SchemaVariable to look for
      * @return the sort of the SV to match or the SV it shares the same match-sort with
      */
     public NewVarcond varDeclaredNew(SchemaVariable var) {
@@ -415,7 +426,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * variables that can appear free in an instantiation of the schemvariable sv (rewrite taclets
      * have some special handling, see paper of M. Giese and comment of method isContextInPrefix).
      *
-     * @param sv the Schemavariable
+     * @param sv
+     *        the Schemavariable
      * @return prefix of schema variable sv
      */
     public TacletPrefix getPrefix(SchemaVariable sv) {
@@ -779,8 +791,10 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         /**
          * Constructor.
          *
-         * @param tacletOperation The currently performed operation.
-         * @param sequent The optional {@link Sequent} of the add or replace part of the taclet.
+         * @param tacletOperation
+         *        The currently performed operation.
+         * @param sequent
+         *        The optional {@link Sequent} of the add or replace part of the taclet.
          */
         public TacletLabelHint(TacletOperation tacletOperation, Sequent sequent) {
             assert tacletOperation != null;
@@ -796,7 +810,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
          * Constructor creating a hint indicating
          * {@link TacletOperation#REPLACE_TERM} as the currently performed operation.
          *
-         * @param term The optional replace {@link Term} of the taclet.
+         * @param term
+         *        The optional replace {@link Term} of the taclet.
          */
         public TacletLabelHint(Term term) {
             assert term != null;
@@ -809,8 +824,10 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         /**
          * Constructor.
          *
-         * @param labelHint The previous {@link TacletLabelHint} which is now specialised.
-         * @param sequentFormula The optional {@link SequentFormula} contained in
+         * @param labelHint
+         *        The previous {@link TacletLabelHint} which is now specialised.
+         * @param sequentFormula
+         *        The optional {@link SequentFormula} contained in
          *        {@link #getSequent()}.
          */
         public TacletLabelHint(TacletLabelHint labelHint, SequentFormula sequentFormula) {
@@ -862,7 +879,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         /**
          * Sets the stack maintained during application of a taclet {@link Term}.
          *
-         * @param tacletTermStack The stack maintained during application of a taclet {@link Term}.
+         * @param tacletTermStack
+         *        The stack maintained during application of a taclet {@link Term}.
          */
         public void setTacletTermStack(Deque<Term> tacletTermStack) {
             this.tacletTermStack = tacletTermStack;
@@ -946,9 +964,12 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     /**
      * applies the given rule application to the specified goal
      *
-     * @param goal the goal that the rule application should refer to.
-     * @param services the Services encapsulating all java information
-     * @param tacletApp the rule application that is executed.
+     * @param goal
+     *        the goal that the rule application should refer to.
+     * @param services
+     *        the Services encapsulating all java information
+     * @param tacletApp
+     *        the rule application that is executed.
      * @return List of the goals created by the rule which have to be proved. If this is a
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).

@@ -12,8 +12,7 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -34,7 +33,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
@@ -58,50 +56,36 @@ public class HelperClassForTests {
         }
     };
 
-    public HelperClassForTests() {
-
-    }
-
-    public ProofAggregate parse(File file) {
+    public static ProofAggregate parse(File file) {
         return parse(file, profile);
     }
 
-    public ProofAggregate parse(File file, Profile profile) {
-        ProblemInitializer pi = null;
-        ProofAggregate result = null;
-
+    public static ProofAggregate parse(File file, Profile profile) {
         try {
-            KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
-            pi = new ProblemInitializer(profile);
-
-            result = pi.startProver(po, po);
-
-        } catch (Exception e) {
+            return parseThrowException(file, profile);
+        } catch (ProofInputException e) {
             throw new RuntimeException(e);
         }
-        return result;
     }
 
-    public ProofAggregate parseThrowException(File file) throws ProofInputException {
+    public static ProofAggregate parseThrowException(File file) throws ProofInputException {
         return parseThrowException(file, profile);
     }
 
 
-    public ProofAggregate parseThrowException(File file, Profile profile)
+    public static ProofAggregate parseThrowException(File file, Profile profile)
             throws ProofInputException {
-        KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
+        KeYUserProblemFile po =
+            new KeYUserProblemFile("Test", file.toPath(), null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
-    }
-
-    public Term extractProblemTerm(Proof p) {
-        return p.root().sequent().succedent().iterator().next().formula();
     }
 
     /**
      * Checks if one step simplification is enabled in the given {@link Proof}.
      *
-     * @param proof The {@link Proof} to read from or {@code null} to return the general settings
+     * @param proof
+     *        The {@link Proof} to read from or {@code null} to return the general settings
      *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
@@ -120,8 +104,10 @@ public class HelperClassForTests {
     /**
      * Defines if one step simplification is enabled in general and within the {@link Proof}.
      *
-     * @param proof The optional {@link Proof}.
-     * @param enabled {@code true} use one step simplification, {@code false} do not use one step
+     * @param proof
+     *        The optional {@link Proof}.
+     * @param enabled
+     *        {@code true} use one step simplification, {@code false} do not use one step
      *        simplification.
      */
     public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
@@ -148,11 +134,15 @@ public class HelperClassForTests {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param baseDir The base directory which contains the java file.
-     * @param javaPathInBaseDir The path in the base directory to the java file.
+     * @param baseDir
+     *        The base directory which contains the java file.
+     * @param javaPathInBaseDir
+     *        The path in the base directory to the java file.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptions(File baseDir,
             String javaPathInBaseDir)
@@ -163,7 +153,7 @@ public class HelperClassForTests {
             // Assert.assertTrue(javaFile.exists());
             // Load java file
             KeYEnvironment<DefaultUserInterfaceControl> environment =
-                KeYEnvironment.load(javaFile, null, null, null);
+                KeYEnvironment.load(javaFile.toPath(), null, null, null);
             try {
                 // Start proof
                 ImmutableSet<Contract> contracts =
@@ -184,12 +174,17 @@ public class HelperClassForTests {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param javaFile The java file to load.
-     * @param containerTypeName The type name which provides the target.
-     * @param targetName The target to proof.
+     * @param javaFile
+     *        The java file to load.
+     * @param containerTypeName
+     *        The type name which provides the target.
+     * @param targetName
+     *        The target to proof.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException
+     *         Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
             String containerTypeName,
@@ -199,7 +194,7 @@ public class HelperClassForTests {
             Proof proof = null;
             try {
                 // Load java file
-                environment = KeYEnvironment.load(javaFile, null, null, null);
+                environment = KeYEnvironment.load(javaFile.toPath(), null, null, null);
                 // Search type
                 KeYJavaType containerKJT =
                     environment.getJavaInfo().getTypeByClassName(containerTypeName);
@@ -257,7 +252,8 @@ public class HelperClassForTests {
     /**
      * Restores the given taclet options.
      *
-     * @param options The taclet options to restore.
+     * @param options
+     *        The taclet options to restore.
      */
     public static void restoreTacletOptions(Map<String, String> options) {
         if (options != null) {
@@ -275,9 +271,12 @@ public class HelperClassForTests {
     /**
      * Searches a {@link IProgramMethod} in the given {@link Services}.
      *
-     * @param services The {@link Services} to search in.
-     * @param containerTypeName The name of the type which contains the method.
-     * @param methodFullName The method name to search.
+     * @param services
+     *        The {@link Services} to search in.
+     * @param containerTypeName
+     *        The name of the type which contains the method.
+     * @param methodFullName
+     *        The method name to search.
      * @return The first found {@link IProgramMethod} in the type.
      */
     public static IProgramMethod searchProgramMethod(Services services, String containerTypeName,
@@ -285,7 +284,7 @@ public class HelperClassForTests {
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
         // Assert.assertNotNull(containerKJT);
-        ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
+        Iterable<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
         IProgramMethod pm =
             CollectionUtil.search(pms, element -> methodFullName.equals(element.getFullName()));
         if (pm == null) {
@@ -298,8 +297,7 @@ public class HelperClassForTests {
     }
 
     public static Services createServices(File keyFile) {
-        JavaInfo javaInfo = new HelperClassForTests().parse(keyFile).getFirstProof().getJavaInfo();
-        return javaInfo.getServices();
+        return HelperClassForTests.parse(keyFile).getFirstProof().getServices();
     }
 
     public static Services createServices() {
@@ -308,7 +306,7 @@ public class HelperClassForTests {
 
     public static KeYEnvironment<DefaultUserInterfaceControl> createKeYEnvironment()
             throws ProblemLoaderException {
-        return KeYEnvironment.load(DUMMY_KEY_FILE);
+        return KeYEnvironment.load(DUMMY_KEY_FILE.toPath());
     }
 
 }

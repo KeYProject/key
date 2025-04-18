@@ -29,8 +29,7 @@ public class SemisequentChangeInfo {
     /** */
     private int lastFormulaIndex = -1;
 
-    public SemisequentChangeInfo() {
-    }
+    public SemisequentChangeInfo() {}
 
     public SemisequentChangeInfo(ImmutableList<SequentFormula> formulas) {
         this.modifiedSemisequent = formulas;
@@ -123,7 +122,8 @@ public class SemisequentChangeInfo {
      * adding formula <tt>f</tt> to the semisequent failed due to a redundance check. This means an
      * equal or stronger formula is already present in the semisequent
      *
-     * @param f the SequentFormula
+     * @param f
+     *        the SequentFormula
      */
     public void rejectedFormula(SequentFormula f) {
         this.rejected = this.rejected.append(f);
@@ -158,7 +158,8 @@ public class SemisequentChangeInfo {
      * takes over ownership over <code>succ</code> and does not release it. This means when
      * invoking the method it must be snsured that succ is never used afterwards.
      *
-     * @param succ the SemisequentChangeInfo to combine with
+     * @param succ
+     *        the SemisequentChangeInfo to combine with
      */
     public void combine(SemisequentChangeInfo succ) {
         final SemisequentChangeInfo predecessor = this;

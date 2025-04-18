@@ -7,15 +7,15 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
@@ -121,33 +121,60 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * Creates an operation contract. Using this constructor is discouraged: it may change in the
      * future. Please use the factory methods in {@link de.uka.ilkd.key.speclang.ContractFactory}.
      *
-     * @param baseName base name of the contract (does not have to be unique)
-     * @param name name of the contract (should be unique)
-     * @param kjt the KeYJavaType of the method's Java class
-     * @param pm the IProgramMethod to which the contract belongs
-     * @param specifiedIn TODO
-     * @param modalityKind the modality of the contract
-     * @param pres the precondition of the contract
-     * @param freePres the free/unchecked precondition of the contract
-     * @param mby the measured_by clause of the contract
-     * @param posts the postcondition of the contract
-     * @param freePosts the free/unchecked postcondition of the contract
-     * @param axioms the class axioms of the method
-     * @param modifiables the modifiable clause of the contract
-     * @param modifiables the free modifiable clause of the contract
-     * @param accessibles the dependency clause of the contract
-     * @param hasRealModifiable whether the contract has a modifiable set
-     * @param hasRealFreeModifiable whether the contract has a free modifiable set
-     * @param selfVar the variable used for the receiver object
-     * @param paramVars the variables used for the operation parameters
-     * @param resultVar the variables used for the operation result
-     * @param excVar the variable used for the thrown exception
-     * @param atPreVars the variable used for the pre-heap
-     * @param globalDefs definitions for the whole contract
-     * @param id id of the contract (should be unique or INVALID_ID)
-     * @param toBeSaved TODO
-     * @param transaction TODO
-     * @param services TODO
+     * @param baseName
+     *        base name of the contract (does not have to be unique)
+     * @param name
+     *        name of the contract (should be unique)
+     * @param kjt
+     *        the KeYJavaType of the method's Java class
+     * @param pm
+     *        the IProgramMethod to which the contract belongs
+     * @param specifiedIn
+     *        TODO
+     * @param modalityKind
+     *        the modality of the contract
+     * @param pres
+     *        the precondition of the contract
+     * @param freePres
+     *        the free/unchecked precondition of the contract
+     * @param mby
+     *        the measured_by clause of the contract
+     * @param posts
+     *        the postcondition of the contract
+     * @param freePosts
+     *        the free/unchecked postcondition of the contract
+     * @param axioms
+     *        the class axioms of the method
+     * @param modifiables
+     *        the modifiable clause of the contract
+     * @param modifiables
+     *        the free modifiable clause of the contract
+     * @param accessibles
+     *        the dependency clause of the contract
+     * @param hasRealModifiable
+     *        whether the contract has a modifiable set
+     * @param hasRealFreeModifiable
+     *        whether the contract has a free modifiable set
+     * @param selfVar
+     *        the variable used for the receiver object
+     * @param paramVars
+     *        the variables used for the operation parameters
+     * @param resultVar
+     *        the variables used for the operation result
+     * @param excVar
+     *        the variable used for the thrown exception
+     * @param atPreVars
+     *        the variable used for the pre-heap
+     * @param globalDefs
+     *        definitions for the whole contract
+     * @param id
+     *        id of the contract (should be unique or INVALID_ID)
+     * @param toBeSaved
+     *        TODO
+     * @param transaction
+     *        TODO
+     * @param services
+     *        TODO
      */
     FunctionalOperationContractImpl(String baseName, String name, KeYJavaType kjt,
             IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
@@ -180,7 +207,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method " + pm;
         } else {
             assert (!pm.isVoid() && !pm.isConstructor())
-                    : "non-null result variable for void method or constructor " + pm
+                    : "non-null result variable for void method or constructor "
+                        + pm
                         + " with return type " + pm.getReturnType();
         }
         assert pm.isModel() || excVar != null;
@@ -256,12 +284,18 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /**
      * Get the according replace map for the given variables.
      *
-     * @param selfVar the self variable
-     * @param paramVars the parameter variables
-     * @param resultVar the result variable
-     * @param excVar the exception variable
-     * @param atPreVars a map of pre-heaps to their variables
-     * @param services the services object
+     * @param selfVar
+     *        the self variable
+     * @param paramVars
+     *        the parameter variables
+     * @param resultVar
+     *        the result variable
+     * @param excVar
+     *        the exception variable
+     * @param atPreVars
+     *        a map of pre-heaps to their variables
+     * @param services
+     *        the services object
      * @return the replacement map
      */
     protected Map<LocationVariable, LocationVariable> getReplaceMap(LocationVariable selfVar,
@@ -337,13 +371,20 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /**
      * Get the according replace map for the given variable terms.
      *
-     * @param heapTerms the heap terms
-     * @param selfTerm the self term
-     * @param paramTerms the parameter terms
-     * @param resultTerm the result term
-     * @param excTerm the exception variable term
-     * @param atPres a map of pre-heaps to their variable terms
-     * @param services the services object
+     * @param heapTerms
+     *        the heap terms
+     * @param selfTerm
+     *        the self term
+     * @param paramTerms
+     *        the parameter terms
+     * @param resultTerm
+     *        the result term
+     * @param excTerm
+     *        the exception variable term
+     * @param atPres
+     *        a map of pre-heaps to their variable terms
+     * @param services
+     *        the services object
      * @return the replacement map
      */
     protected Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> heapTerms, Term selfTerm,

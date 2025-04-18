@@ -11,9 +11,11 @@ public interface SyntaxElement {
     /**
      * Get the {@code n}-th child of this syntax element.
      *
-     * @param n index of the child.
+     * @param n
+     *        index of the child.
      * @return the {@code n}-th child of this syntax element.
-     * @throws IndexOutOfBoundsException if there is no {@code n}-th child.
+     * @throws IndexOutOfBoundsException
+     *         if there is no {@code n}-th child.
      */
     SyntaxElement getChild(int n);
 

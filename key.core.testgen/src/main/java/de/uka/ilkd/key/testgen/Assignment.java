@@ -44,7 +44,8 @@ public class Assignment {
     }
 
     /**
-     * @param rfl If this argument is true, then an invokation of a setter method is created,
+     * @param rfl
+     *        If this argument is true, then an invokation of a setter method is created,
      *        otherwise an assignment is created.
      * @return String representation of an assignment or a call to a setter method.
      */

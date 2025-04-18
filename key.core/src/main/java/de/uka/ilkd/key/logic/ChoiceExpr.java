@@ -22,8 +22,7 @@ public abstract class ChoiceExpr {
     public static final ChoiceExpr TRUE = new True();
 
 
-    protected ChoiceExpr() {
-    }
+    protected ChoiceExpr() {}
 
     public static ChoiceExpr and(ChoiceExpr left, ChoiceExpr right) {
         return new And(left, right);
@@ -44,7 +43,8 @@ public abstract class ChoiceExpr {
     /**
      * Evaluate the expression to a boolean value given the current activated choices.
      *
-     * @param current activated choices
+     * @param current
+     *        activated choices
      * @return true if the expr is true given the assignment in {@code current}
      */
     public abstract boolean eval(@NonNull Set<Choice> current);

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -52,7 +52,8 @@ public class ContractFactory {
     /**
      * Creates a new contract factory.
      *
-     * @param services the services object
+     * @param services
+     *        the services object
      */
     public ContractFactory(Services services) {
         assert services != null;
@@ -66,13 +67,20 @@ public class ContractFactory {
      * Returns another contract like this one, except that the passed term has been added as a
      * postcondition (regardless of termination case).
      *
-     * @param old the old contract
-     * @param addedPost the post condition to be added
-     * @param selfVar the used self variable
-     * @param resultVar the used result variable
-     * @param excVar the used exception variable
-     * @param paramVars the used program variables
-     * @param atPreVars the used pre-heap variables
+     * @param old
+     *        the old contract
+     * @param addedPost
+     *        the post condition to be added
+     * @param selfVar
+     *        the used self variable
+     * @param resultVar
+     *        the used result variable
+     * @param excVar
+     *        the used exception variable
+     * @param paramVars
+     *        the used program variables
+     * @param atPreVars
+     *        the used pre-heap variables
      * @return the resulting contract
      */
     public FunctionalOperationContract addPost(FunctionalOperationContract old, Term addedPost,
@@ -108,8 +116,10 @@ public class ContractFactory {
     /**
      * Add the specification contained in InitiallyClause as a postcondition.
      *
-     * @param old the old contract
-     * @param ini the initially clause to be added
+     * @param old
+     *        the old contract
+     * @param ini
+     *        the initially clause to be added
      * @return the resulting contract
      */
     public FunctionalOperationContract addPost(FunctionalOperationContract old,
@@ -122,11 +132,16 @@ public class ContractFactory {
      * Returns another contract like this one, except that the passed term has been added as a
      * precondition.
      *
-     * @param old the old contract
-     * @param addedPre precondition to be added
-     * @param selfVar used self variable
-     * @param paramVars used program variables
-     * @param atPreVars used pre-heap variables
+     * @param old
+     *        the old contract
+     * @param addedPre
+     *        precondition to be added
+     * @param selfVar
+     *        used self variable
+     * @param paramVars
+     *        used program variables
+     * @param atPreVars
+     *        used pre-heap variables
      * @return the resulting contract
      */
     public FunctionalOperationContract addPre(FunctionalOperationContract old, Term addedPre,
@@ -163,8 +178,10 @@ public class ContractFactory {
     /**
      * Add global variable definitions (aka. old clause) to the contract.
      *
-     * @param opc the functional method contract
-     * @param globalDefs the global variable definitions
+     * @param opc
+     *        the functional method contract
+     * @param globalDefs
+     *        the global variable definitions
      * @return the resulting method contract
      */
     public FunctionalOperationContract addGlobalDefs(FunctionalOperationContract opc,
@@ -254,7 +271,8 @@ public class ContractFactory {
     /**
      * Create a new {@link FunctionalBlockContract} from an existing {@link BlockContract}.
      *
-     * @param blockContract the {@link BlockContract}.
+     * @param blockContract
+     *        the {@link BlockContract}.
      * @return a new {@link FunctionalBlockContract}.
      */
     public FunctionalBlockContract funcBlock(BlockContract blockContract) {
@@ -264,7 +282,8 @@ public class ContractFactory {
     /**
      * Create a new {@link FunctionalLoopContract} from an existing {@link LoopContract}.
      *
-     * @param loopContract the {@link LoopContract}.
+     * @param loopContract
+     *        the {@link LoopContract}.
      * @return a new {@link FunctionalLoopContract}.
      */
     public FunctionalLoopContract funcLoop(LoopContract loopContract) {
@@ -275,10 +294,13 @@ public class ContractFactory {
      * Create a new {@link FunctionalOperationContract} from an existing {@link IProgramMethod} and
      * {@link InitiallyClause}.
      *
-     * @param pm the {@link IProgramMethod}.
-     * @param ini the {@link InitiallyClause}.
+     * @param pm
+     *        the {@link IProgramMethod}.
+     * @param ini
+     *        the {@link InitiallyClause}.
      * @return a new {@link FunctionalOperationContract}.
-     * @throws SLTranslationException in case translating the initially clause fails.
+     * @throws SLTranslationException
+     *         in case translating the initially clause fails.
      */
     public FunctionalOperationContract func(IProgramMethod pm, InitiallyClause ini)
             throws SLTranslationException {
@@ -288,27 +310,48 @@ public class ContractFactory {
     /**
      * Creates a new functional operation contract.
      *
-     * @param baseName base name of the contract (does not have to be unique)
-     * @param kjt the KeYJavaType of the class
-     * @param pm the IProgramMethod to which the contract belongs
-     * @param modalityKind the modality of the contract
-     * @param pres the precondition of the contract
-     * @param freePres the free/unchecked precondition of the contract
-     * @param mby the measured_by clause of the contract
-     * @param posts the postcondition of the contract
-     * @param freePosts the free/unchecked postcondition of the contract
-     * @param axioms the class axioms of the method
-     * @param modifiables the modifiable clause of the contract
-     * @param freeModifiables the free modifiable clause of the contract
-     * @param accs the dependency clause of the contract
-     * @param hasModifiable whether the contract has a modifiable set
-     * @param hasFreeModifiable whether the contract has a free modifiable set
-     * @param selfVar the self variable
-     * @param paramVars the parameter variables
-     * @param resultVar the exception variable
-     * @param excVar the result variable
-     * @param atPreVars a map of all pre-heap variables
-     * @param toBeSaved TODO
+     * @param baseName
+     *        base name of the contract (does not have to be unique)
+     * @param kjt
+     *        the KeYJavaType of the class
+     * @param pm
+     *        the IProgramMethod to which the contract belongs
+     * @param modalityKind
+     *        the modality of the contract
+     * @param pres
+     *        the precondition of the contract
+     * @param freePres
+     *        the free/unchecked precondition of the contract
+     * @param mby
+     *        the measured_by clause of the contract
+     * @param posts
+     *        the postcondition of the contract
+     * @param freePosts
+     *        the free/unchecked postcondition of the contract
+     * @param axioms
+     *        the class axioms of the method
+     * @param modifiables
+     *        the modifiable clause of the contract
+     * @param freeModifiables
+     *        the free modifiable clause of the contract
+     * @param accs
+     *        the dependency clause of the contract
+     * @param hasModifiable
+     *        whether the contract has a modifiable set
+     * @param hasFreeModifiable
+     *        whether the contract has a free modifiable set
+     * @param selfVar
+     *        the self variable
+     * @param paramVars
+     *        the parameter variables
+     * @param resultVar
+     *        the exception variable
+     * @param excVar
+     *        the result variable
+     * @param atPreVars
+     *        a map of all pre-heap variables
+     * @param toBeSaved
+     *        TODO
      * @return the resulting functional operation contract
      */
     public FunctionalOperationContract func(String baseName, KeYJavaType kjt, IProgramMethod pm,
@@ -337,21 +380,36 @@ public class ContractFactory {
     /**
      * Creates a new functional operation contract.
      *
-     * @param baseName base name of the contract (does not have to be unique)
-     * @param pm the IProgramMethod to which the contract belongs
-     * @param terminates a boolean determining whether we also prove termination
-     * @param pres the precondition of the contract
-     * @param freePres the free/unchecked precondition of the contract
-     * @param mby the measured_by clause of the contract
-     * @param posts the postcondition of the contract
-     * @param freePosts the free/unchecked postcondition of the contract
-     * @param axioms the class axioms of the method
-     * @param modifiables the modifiable clause of the contract
-     * @param freeModifiables the free modifiable clause of the contract
-     * @param accessibles the dependency clause of the contract
-     * @param hasModifiable whether the contract has a modifiable set
-     * @param hasFreeModifiable whether the contract has a modifiable set
-     * @param pv a collection of the program variables
+     * @param baseName
+     *        base name of the contract (does not have to be unique)
+     * @param pm
+     *        the IProgramMethod to which the contract belongs
+     * @param terminates
+     *        a boolean determining whether we also prove termination
+     * @param pres
+     *        the precondition of the contract
+     * @param freePres
+     *        the free/unchecked precondition of the contract
+     * @param mby
+     *        the measured_by clause of the contract
+     * @param posts
+     *        the postcondition of the contract
+     * @param freePosts
+     *        the free/unchecked postcondition of the contract
+     * @param axioms
+     *        the class axioms of the method
+     * @param modifiables
+     *        the modifiable clause of the contract
+     * @param freeModifiables
+     *        the free modifiable clause of the contract
+     * @param accessibles
+     *        the dependency clause of the contract
+     * @param hasModifiable
+     *        whether the contract has a modifiable set
+     * @param hasFreeModifiable
+     *        whether the contract has a modifiable set
+     * @param pv
+     *        a collection of the program variables
      * @return the resulting functional operation contract
      */
     public FunctionalOperationContract func(String baseName, IProgramMethod pm, boolean terminates,
@@ -373,23 +431,40 @@ public class ContractFactory {
     /**
      * Creates a new functional operation contract.
      *
-     * @param baseName base name of the contract (does not have to be unique)
-     * @param pm the IProgramMethod to which the contract belongs
-     * @param modalityKind the modality of the contract
-     * @param pres the precondition of the contract
-     * @param freePres the free/unchecked precondition of the contract
-     * @param mby the measured_by clause of the contract
-     * @param posts the postcondition of the contract
-     * @param freePosts the free/unchecked postcondition of the contract
-     * @param axioms the class axioms of the method
-     * @param modifiables the modifiable clause of the contract
-     * @param freeModifiables the free modifiable clause of the contract
-     * @param accessibles the dependency clause of the contract
-     * @param hasModifiable whether the contract has a modifiable set
-     * @param hasFreeModifiable whether the contract has a modifiable set
-     * @param progVars the program variables
-     * @param toBeSaved TODO
-     * @param transaction TODO
+     * @param baseName
+     *        base name of the contract (does not have to be unique)
+     * @param pm
+     *        the IProgramMethod to which the contract belongs
+     * @param modalityKind
+     *        the modality of the contract
+     * @param pres
+     *        the precondition of the contract
+     * @param freePres
+     *        the free/unchecked precondition of the contract
+     * @param mby
+     *        the measured_by clause of the contract
+     * @param posts
+     *        the postcondition of the contract
+     * @param freePosts
+     *        the free/unchecked postcondition of the contract
+     * @param axioms
+     *        the class axioms of the method
+     * @param modifiables
+     *        the modifiable clause of the contract
+     * @param freeModifiables
+     *        the free modifiable clause of the contract
+     * @param accessibles
+     *        the dependency clause of the contract
+     * @param hasModifiable
+     *        whether the contract has a modifiable set
+     * @param hasFreeModifiable
+     *        whether the contract has a modifiable set
+     * @param progVars
+     *        the program variables
+     * @param toBeSaved
+     *        TODO
+     * @param transaction
+     *        TODO
      * @return the resulting functional operation contract
      */
     public FunctionalOperationContract func(String baseName, IProgramMethod pm,
@@ -541,7 +616,7 @@ public class ContractFactory {
             Term a2 = other.getDep(h, false, t.originalSelfVar, t.originalParamVars,
                 t.originalAtPreVars, services);
             if (a1 != null || a2 != null) {
-                Term na = null;
+                Term na;
                 if (a1 == null) {
                     na = a2;
                 } else if (a2 == null) {
@@ -558,7 +633,7 @@ public class ContractFactory {
                 Term a2Pre = other.getDep(hPre, true, t.originalSelfVar, t.originalParamVars,
                     t.originalAtPreVars, services);
                 if (a1Pre != null || a2Pre != null) {
-                    Term naPre = null;
+                    Term naPre;
                     if (a1Pre == null) {
                         naPre = a2Pre;
                     } else if (a2Pre == null) {
@@ -577,20 +652,34 @@ public class ContractFactory {
     /**
      * Join with other contracts.
      *
-     * @param name name of the contract union
-     * @param t the first passed contract
-     * @param others the other passed contracts
-     * @param pres the first contract's precondition
-     * @param mby the first contract's measuredBy term
-     * @param hasModifiable whether the first contract has a modifiable clause
-     * @param hasFreeModifiable whether the first contract has a free modifiable clause
-     * @param posts the first contract's postcondition
-     * @param freePosts the first contract's free postconditions
-     * @param axioms the first contract's axioms
-     * @param modifiables the first contract's modifiable clause
-     * @param freeModifiables the first contract's free modifiable clause
-     * @param deps the first contract's dependency clause
-     * @param modalityKind the first contract's modality
+     * @param name
+     *        name of the contract union
+     * @param t
+     *        the first passed contract
+     * @param others
+     *        the other passed contracts
+     * @param pres
+     *        the first contract's precondition
+     * @param mby
+     *        the first contract's measuredBy term
+     * @param hasModifiable
+     *        whether the first contract has a modifiable clause
+     * @param hasFreeModifiable
+     *        whether the first contract has a free modifiable clause
+     * @param posts
+     *        the first contract's postcondition
+     * @param freePosts
+     *        the first contract's free postconditions
+     * @param axioms
+     *        the first contract's axioms
+     * @param modifiables
+     *        the first contract's modifiable clause
+     * @param freeModifiables
+     *        the first contract's free modifiable clause
+     * @param deps
+     *        the first contract's dependency clause
+     * @param modalityKind
+     *        the first contract's modality
      * @return the joined contract
      */
     private FunctionalOperationContract joinWithOtherContracts(final String name,
@@ -684,9 +773,12 @@ public class ContractFactory {
      * SpecificationRepository.combineContracts() instead, which additionally takes care that the
      * combined contract can be loaded later. The resulting contract has id "INVALID_ID".
      *
-     * @param name name of the contract union
-     * @param t the first contract
-     * @param others the other contracts
+     * @param name
+     *        name of the contract union
+     * @param t
+     *        the first contract
+     * @param others
+     *        the other contracts
      * @return the joined contract
      */
     private FunctionalOperationContract union(final String name, FunctionalOperationContractImpl t,
@@ -760,8 +852,10 @@ public class ContractFactory {
      * SpecificationRepository.combineContracts() instead, which additionally takes care that the
      * combined contract can be loaded later. The resulting contract has id "INVALID_ID".
      *
-     * @param t the first passed contract
-     * @param others the remaining passed contracts
+     * @param t
+     *        the first passed contract
+     * @param others
+     *        the remaining passed contracts
      * @return the union contract
      */
     private FunctionalOperationContract union(FunctionalOperationContractImpl t,
@@ -784,7 +878,8 @@ public class ContractFactory {
      * SpecificationRepository.combineContracts() instead, which additionally takes care that the
      * combined contract can be loaded later. The resulting contract has id "INVALID_ID".
      *
-     * @param contracts the passed contracts
+     * @param contracts
+     *        the passed contracts
      * @return the union contract
      */
     public FunctionalOperationContract union(FunctionalOperationContract... contracts) {

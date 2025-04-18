@@ -24,7 +24,8 @@ public class Issue3437Test {
         GeneralSettings.noPruningClosed = false;
 
         var file = new File(testCaseDirectory,
-            "issues/3437/Newnames(Newnames__createArray()).JML normal_behavior operation contract.0.proof");
+            "issues/3437/Newnames(Newnames__createArray()).JML normal_behavior operation contract.0.proof")
+                .toPath();
         var env = KeYEnvironment.load(file);
         var proof = env.getLoadedProof();
         var tracker = new DependencyTracker(proof);
@@ -42,7 +43,7 @@ public class Issue3437Test {
         ProblemLoaderControl control = new DefaultUserInterfaceControl();
         SlicingProofReplayer replayer = SlicingProofReplayer
                 .constructSlicer(control, proof, results, env.getUi());
-        var newFile = replayer.slice();
+        var newFile = replayer.slice().toPath();
         var env2 = KeYEnvironment.load(newFile);
         var proof2 = env.getLoadedProof();
         assertTrue(proof2.closed());

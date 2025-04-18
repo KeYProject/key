@@ -21,9 +21,12 @@ public class FocussedAutoModeUserAction extends ProofModifyingUserAction {
     /**
      * Construct a new focussed auto mode user action.
      *
-     * @param mediator mediator
-     * @param proof selected proof
-     * @param focus formula to apply rules on
+     * @param mediator
+     *        mediator
+     * @param proof
+     *        selected proof
+     * @param focus
+     *        formula to apply rules on
      */
     public FocussedAutoModeUserAction(KeYMediator mediator, Proof proof, PosInOccurrence focus) {
         super(mediator, proof);

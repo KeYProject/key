@@ -7,9 +7,10 @@ import java.io.File;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -20,15 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestTermBuilder {
-
+    private static Proof PROOF = null;
     private Services services;
     private TermBuilder tb;
 
     @BeforeEach
     public void setUp() {
-        HelperClassForTests helper = new HelperClassForTests();
-        final ProofAggregate agg = helper.parse(new File(TestJavaInfo.testfile));
-        services = agg.getFirstProof().getServices();
+        if (PROOF == null) {
+            final ProofAggregate agg = HelperClassForTests.parse(new File(TestJavaInfo.testfile));
+            PROOF = agg.getFirstProof();
+        }
+
+        services = PROOF.getServices().copy(false);
         tb = services.getTermBuilder();
     }
 

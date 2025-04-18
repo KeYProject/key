@@ -7,13 +7,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -43,8 +43,10 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionAuxiliaryContract(ITreeSettings settings, Node proofNode) {
@@ -142,8 +144,10 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
     /**
      * Returns the variable declared by the statement at the given index as {@link Term}.
      *
-     * @param sb The {@link StatementBlock} which contains all variable declarations.
-     * @param statementIndex The index in the {@link StatementBlock} with the variable declaration
+     * @param sb
+     *        The {@link StatementBlock} which contains all variable declarations.
+     * @param statementIndex
+     *        The index in the {@link StatementBlock} with the variable declaration
      *        of interest.
      * @return The variable as {@link Term}.
      */
@@ -160,9 +164,12 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
     /**
      * Collects recursive all remembrance variables.
      *
-     * @param term The {@link Term} to start collecting.
-     * @param remembranceHeaps The {@link Map} to fill.
-     * @param remembranceLocalVariables The {@link Map} to fill.
+     * @param term
+     *        The {@link Term} to start collecting.
+     * @param remembranceHeaps
+     *        The {@link Map} to fill.
+     * @param remembranceLocalVariables
+     *        The {@link Map} to fill.
      */
     protected void collectRemembranceVariables(Term term,
             Map<LocationVariable, Term> remembranceHeaps,

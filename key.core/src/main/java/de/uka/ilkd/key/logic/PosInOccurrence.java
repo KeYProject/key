@@ -89,7 +89,8 @@ public final class PosInOccurrence {
      * Contrary to <code>eqEquals</code>, this method returns true only for pio objects that point
      * to the same (identical) formula
      *
-     * @param obj the Object to which this one is compared
+     * @param obj
+     *        the Object to which this one is compared
      * @return true if both objects are equal
      */
     @Override
@@ -163,7 +164,8 @@ public final class PosInOccurrence {
     /**
      * Replace the formula this object points to with the new formula given
      *
-     * @param p_newFormula the new formula
+     * @param p_newFormula
+     *        the new formula
      * @return a <code>PosInOccurrence</code> object that points to the same position within the
      *         formula <code>p_newFormula</code> as this object does within the formula
      *         <code>constrainedFormula()</code>. It is not tested whether this position exists

@@ -84,13 +84,20 @@ public class UndoHistoryButton {
      * Create a new UndoHistoryButton with a given icon size used to display the selection
      * component's icon.
      *
-     * @param mainWindow the main window
-     * @param iconSize the size of the selection component's icon (e.g. down-arrow)
-     * @param actionIcon icon for the action button
-     * @param prefix the prefix to prepend to every label
-     * @param pressedAction callback if the button is pressed / dropdown entry is selected
-     * @param pressedSelection callback if a dropdown entry is selected
-     * @param actionSupplier callback that provides the list of actions to display
+     * @param mainWindow
+     *        the main window
+     * @param iconSize
+     *        the size of the selection component's icon (e.g. down-arrow)
+     * @param actionIcon
+     *        icon for the action button
+     * @param prefix
+     *        the prefix to prepend to every label
+     * @param pressedAction
+     *        callback if the button is pressed / dropdown entry is selected
+     * @param pressedSelection
+     *        callback if a dropdown entry is selected
+     * @param actionSupplier
+     *        callback that provides the list of actions to display
      */
     public UndoHistoryButton(MainWindow mainWindow, int iconSize, IconFontProvider actionIcon,
             String prefix,
@@ -107,7 +114,8 @@ public class UndoHistoryButton {
     /**
      * Enables or disables the action button (enabling is only possible if the items aren't empty).
      *
-     * @param b true iff the action button should be enabled
+     * @param b
+     *        true iff the action button should be enabled
      */
     public void setEnabled(boolean b) {
         if (items.isEmpty()) {
@@ -196,7 +204,8 @@ public class UndoHistoryButton {
     /**
      * Set the actions that can be selected.
      *
-     * @param it the selectable actions
+     * @param it
+     *        the selectable actions
      */
     private void setItems(List<UserAction> it) {
         items = it;
@@ -227,7 +236,8 @@ public class UndoHistoryButton {
     /**
      * Set new selection items/actions while keeping all other components of the popup menu.
      *
-     * @param newMenuItems the new actions that can be selected
+     * @param newMenuItems
+     *        the new actions that can be selected
      */
     public void refreshSelectionItems(Collection<JMenuItem> newMenuItems) {
         /*
@@ -266,8 +276,10 @@ public class UndoHistoryButton {
         /**
          * Construct a new undo action.
          *
-         * @param mainWindow main window
-         * @param callback callback responsible for undoing actions
+         * @param mainWindow
+         *        main window
+         * @param callback
+         *        callback responsible for undoing actions
          */
         UndoAction(MainWindow mainWindow, Consumer<UserAction> callback) {
             super(mainWindow);

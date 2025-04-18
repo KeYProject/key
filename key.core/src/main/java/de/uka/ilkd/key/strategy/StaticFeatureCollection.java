@@ -80,7 +80,8 @@ public abstract class StaticFeatureCollection {
     }
 
     /**
-     * @param cost The specified cost.
+     * @param cost
+     *        The specified cost.
      * @return a feature for {@link BlockContractInternalRule} with the specified cost.
      */
     protected static Feature blockContractInternalFeature(Feature cost) {
@@ -90,7 +91,8 @@ public abstract class StaticFeatureCollection {
     }
 
     /**
-     * @param cost The specified cost.
+     * @param cost
+     *        The specified cost.
      * @return a feature for {@link BlockContractExternalRule} with the specified cost.
      */
     protected static Feature blockContractExternalFeature(Feature cost) {
@@ -100,7 +102,8 @@ public abstract class StaticFeatureCollection {
     }
 
     /**
-     * @param cost The specified cost.
+     * @param cost
+     *        The specified cost.
      * @return a feature for {@link LoopContractInternalRule} with the specified cost.
      */
     protected static Feature loopContractInternalFeature(Feature cost) {
@@ -110,7 +113,8 @@ public abstract class StaticFeatureCollection {
     }
 
     /**
-     * @param cost The specified cost.
+     * @param cost
+     *        The specified cost.
      * @return a feature for {@link LoopContractExternalRule} with the specified cost.
      */
     protected static Feature loopContractExternalFeature(Feature cost) {
@@ -120,7 +124,8 @@ public abstract class StaticFeatureCollection {
     }
 
     /**
-     * @param cost The specified cost.
+     * @param cost
+     *        The specified cost.
      * @return a feature for {@link LoopApplyHeadRule} with the specified cost.
      */
     protected static Feature loopContractApplyHead(Feature cost) {
@@ -315,7 +320,8 @@ public abstract class StaticFeatureCollection {
      * <code>schemaVar</code>. If <code>schemaVar</code> is not instantiated for a particular taclet
      * app, an error will be raised
      *
-     * @param schemaVar schema variable
+     * @param schemaVar
+     *        schema variable
      * @return projection of taclet applications
      */
     protected static ProjectionToTerm instOf(String schemaVar) {
@@ -327,7 +333,8 @@ public abstract class StaticFeatureCollection {
      * <code>schemaVar</code>. The projection will be partial and undefined for those taclet
      * applications that do not instantiate <code>schemaVar</code>
      *
-     * @param schemaVar schema variable
+     * @param schemaVar
+     *        schema variable
      * @return projection of taclet applications
      */
     protected static ProjectionToTerm instOfNonStrict(String schemaVar) {
@@ -414,8 +421,10 @@ public abstract class StaticFeatureCollection {
      * <code>schemaVar</code>. This is the strict/safe version that raises an error of
      * <code>schemaVar</code> is not instantiated for a particular taclet app
      *
-     * @param schemaVar schema variable
-     * @param tf term feature
+     * @param schemaVar
+     *        schema variable
+     * @param tf
+     *        term feature
      * @return feature
      */
     protected static Feature applyTF(String schemaVar, TermFeature tf) {
@@ -427,8 +436,10 @@ public abstract class StaticFeatureCollection {
      * <code>schemaVar</code>. This is the non-strict/unsafe version that simply returns zero if
      * <code>schemaVar</code> is not instantiated for a particular taclet app
      *
-     * @param schemaVar schema variable
-     * @param tf term feature
+     * @param schemaVar
+     *        schema variable
+     * @param tf
+     *        term feature
      * @return feature
      */
     protected static Feature applyTFNonStrict(String schemaVar, TermFeature tf) {
@@ -440,8 +451,10 @@ public abstract class StaticFeatureCollection {
      * <code>term</code>. If <code>term</code> is undefined for a particular rule app, an exception
      * is raised
      *
-     * @param term term describing the projection
-     * @param tf term feature
+     * @param term
+     *        term describing the projection
+     * @param tf
+     *        term feature
      * @return feature
      */
     protected static Feature applyTF(ProjectionToTerm term, TermFeature tf) {
@@ -453,8 +466,10 @@ public abstract class StaticFeatureCollection {
      * <code>term</code>. If <code>term</code> is undefined for a particular rule app, zero is
      * returned
      *
-     * @param term term describing the projection
-     * @param tf term feature
+     * @param term
+     *        term describing the projection
+     * @param tf
+     *        term feature
      * @return feature
      */
     protected static Feature applyTFNonStrict(ProjectionToTerm term, TermFeature tf) {

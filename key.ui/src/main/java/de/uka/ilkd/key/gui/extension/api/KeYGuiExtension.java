@@ -98,7 +98,8 @@ public interface KeYGuiExtension {
          * {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY} to control their position in the
          * menu.
          *
-         * @param mainWindow the window of the main menu
+         * @param mainWindow
+         *        the window of the main menu
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
@@ -114,8 +115,10 @@ public interface KeYGuiExtension {
         /**
          * Earliest initialization method. Called before layout of the main window.
          *
-         * @param window main window
-         * @param mediator mediator
+         * @param window
+         *        main window
+         * @param mediator
+         *        mediator
          */
         default void preInit(MainWindow window, KeYMediator mediator) {
 
@@ -136,8 +139,10 @@ public interface KeYGuiExtension {
          * <p>
          * Called before any other method; can be used to construct the UI.
          *
-         * @param window parent of this extension
-         * @param mediator the current mediator
+         * @param window
+         *        parent of this extension
+         * @param mediator
+         *        the current mediator
          */
         @NonNull
         Collection<TabPanel> getPanels(@NonNull MainWindow window, @NonNull KeYMediator mediator);
@@ -157,9 +162,12 @@ public interface KeYGuiExtension {
          * {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY} to control their position in the
          * menu.
          *
-         * @param mediator the window of the main menu
-         * @param kind the type of context menu
-         * @param underlyingObject the object for which the context menu is requested
+         * @param mediator
+         *        the window of the main menu
+         * @param kind
+         *        the type of context menu
+         * @param underlyingObject
+         *        the object for which the context menu is requested
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
@@ -177,7 +185,8 @@ public interface KeYGuiExtension {
         /**
          * A toolbar which will be embedded into the main window.s
          *
-         * @param mainWindow the parent of the toolbar
+         * @param mainWindow
+         *        the parent of the toolbar
          * @return non-null
          */
         @NonNull
@@ -195,8 +204,10 @@ public interface KeYGuiExtension {
 
         /**
          *
-         * @param mainWindow the main window.
-         * @param pos the position of the term whose info shall be shown.
+         * @param mainWindow
+         *        the main window.
+         * @param pos
+         *        the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
         List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos);
@@ -261,8 +272,10 @@ public interface KeYGuiExtension {
      */
     interface TermInfo {
         /**
-         * @param mainWindow the main window.
-         * @param pos the position of the term whose info shall be shown.
+         * @param mainWindow
+         *        the main window.
+         * @param pos
+         *        the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
         @NonNull

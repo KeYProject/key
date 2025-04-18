@@ -5,6 +5,7 @@ package de.uka.ilkd.key.ui;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -74,11 +75,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Current key problem file that is attempted to be proven.
      */
-    private File keyProblemFile = null;
+    private Path keyProblemFile = null;
 
     /**
      * We want to record whether there was a proof that could not be proven. {@link Main} calls
-     * System.exit() after all files have been loaded with {@link #loadProblem(java.io.File)}.
+     * System.exit() after all files have been loaded with {@link #loadProblem(java.nio.file.Path)}.
      * Program return value depends on whether there has been a proof attempt that was not
      * successful.
      */
@@ -197,7 +198,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public void loadProblem(File file) {
+    public void loadProblem(Path file) {
         /*
          * Current file is stored in a private field. It will be used in method printResults() to
          * determine file names, in which proofs will be written.
@@ -209,20 +210,24 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * loads the problem or proof from the given file
      *
-     * @param file the File with the problem description or the proof
-     * @param classPath the class path entries to use.
-     * @param bootClassPath the boot class path to use.
-     * @param includes the included files to use
+     * @param file
+     *        the File with the problem description or the proof
+     * @param classPath
+     *        the class path entries to use.
+     * @param bootClassPath
+     *        the boot class path to use.
+     * @param includes
+     *        the included files to use
      */
-    public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
+    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes) {
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
-    public void loadProofFromBundle(File proofBundle, File proofFilename) {
+    public void loadProofFromBundle(Path proofBundle, Path proofFilename) {
         ProblemLoader problemLoader =
             getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
@@ -363,18 +368,21 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Save proof.
      *
-     * @param result the result
-     * @param proof the proof
-     * @param keyProblemFile the key problem file
+     * @param result
+     *        the result
+     * @param proof
+     *        the proof
+     * @param keyProblemFile
+     *        the key problem file
      * @return true, if successful
      */
-    public static boolean saveProof(Object result, Proof proof, File keyProblemFile) {
+    public static boolean saveProof(Object result, Proof proof, Path keyProblemFile) {
         if (result instanceof Throwable) {
             throw new RuntimeException("Error in batchmode.", (Throwable) result);
         }
 
         // Save the proof before exit.
-        String baseName = keyProblemFile.getAbsolutePath();
+        String baseName = keyProblemFile.toAbsolutePath().toString();
         int idx = baseName.indexOf(".key");
         if (idx == -1) {
             idx = baseName.indexOf(".proof");

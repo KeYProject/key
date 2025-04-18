@@ -44,7 +44,8 @@ public final class PosInTerm {
      * The string contains a comma separated list of integers. The position created from the string
      * encapsulated the given list but in reverse order
      *
-     * @param s the String with the list of integers to be interpreted as term indices in reverse
+     * @param s
+     *        the String with the list of integers to be interpreted as term indices in reverse
      *        order
      * @return the PosInTerm encapsulating the integer list in reverse order
      */
@@ -96,11 +97,14 @@ public final class PosInTerm {
     /**
      * creates an instance representing the position <code>positions[0..size-1]</code>
      *
-     * @param positions the integer array where each element describes the position to be taken (in
+     * @param positions
+     *        the integer array where each element describes the position to be taken (in
      *        top-to-bottom order)
-     * @param size the size of the integer list (attention: might be shorter than the length of the
+     * @param size
+     *        the size of the integer list (attention: might be shorter than the length of the
      *        position array)
-     * @param copy indicates (i.e. true) if the position array has to be copied when going downwards
+     * @param copy
+     *        indicates (i.e. true) if the position array has to be copied when going downwards
      */
     private PosInTerm(char[] positions, char size, boolean copy) {
         assert size > 0 && size <= positions.length;
@@ -142,9 +146,11 @@ public final class PosInTerm {
     /**
      * returns the position of the <code>depth-n</code> parent term
      *
-     * @param n the integer specifying the length of the prefix
+     * @param n
+     *        the integer specifying the length of the prefix
      * @return the prefix of this position of length <code>n</code>
-     * @throws IndexOutOfBoundsException if <code>n</code> is greater than the depth of this
+     * @throws IndexOutOfBoundsException
+     *         if <code>n</code> is greater than the depth of this
      *         position
      */
     public PosInTerm firstN(int n) {
@@ -162,7 +168,8 @@ public final class PosInTerm {
      * returns the position for the <code>i</code>-th subterm of the subterm described by this
      * position
      *
-     * @param i the index of the subterm
+     * @param i
+     *        the index of the subterm
      * @return the position of the i-th subterm
      */
     public PosInTerm down(int i) {
@@ -197,7 +204,8 @@ public final class PosInTerm {
     /**
      * returns the index of the subterm at depth <code>i</code>
      *
-     * @param i the depth of the subterm whose index it to be returned
+     * @param i
+     *        the depth of the subterm whose index it to be returned
      * @return an int such that
      *         <code>term.subAt(this).sub(getIndex(i)) == term.subAt(firstN(i+1))</code>
      */
@@ -222,9 +230,11 @@ public final class PosInTerm {
      * navigate to the subterm described by this position and return it if the described position
      * does not exist in the term an {@link IndexOutOfBoundsException} is thrown
      *
-     * @param t the {@link Term}
+     * @param t
+     *        the {@link Term}
      * @return the sub term of term <code>t</code> at this position
-     * @throws IndexOutOfBoundsException if no subterm exists at this position
+     * @throws IndexOutOfBoundsException
+     *         if no subterm exists at this position
      */
     public Term getSubTerm(Term t) {
         Term sub = t;
@@ -272,7 +282,8 @@ public final class PosInTerm {
      * returns a comma separated list of integers enclosed in brackets (the list contains all
      * integers in the order as returned by the iterator)
      *
-     * @param it the iterator
+     * @param it
+     *        the iterator
      * @return the String with the list of integers
      */
     public String integerList(IntIterator it) {
@@ -350,7 +361,8 @@ public final class PosInTerm {
     /**
      * Checks whether this pit is the prefix of a given pit.
      *
-     * @param pit the given pit
+     * @param pit
+     *        the given pit
      * @return true if this is a prefix of the given pit
      */
     public boolean isPrefixOf(PosInTerm pit) {

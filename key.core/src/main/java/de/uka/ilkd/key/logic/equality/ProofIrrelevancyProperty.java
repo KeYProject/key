@@ -48,12 +48,16 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * LabeledTermImpl.
      * </p>
      *
-     * @param term1 a term
-     * @param term2 the term compared to {@code term1}
-     * @param v should not be used for this equality check
+     * @param term1
+     *        a term
+     * @param term2
+     *        the term compared to {@code term1}
+     * @param v
+     *        should not be used for this equality check
      * @return true iff {@code term2} is a term syntactically equal to {@code term1}, except for
      *         proof-irrelevant attributes.
-     * @param <V> is not needed for this equality check
+     * @param <V>
+     *        is not needed for this equality check
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
@@ -101,7 +105,8 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
      *
-     * @param term the term to compute the hashcode for
+     * @param term
+     *        the term to compute the hashcode for
      * @return the hashcode
      */
     @Override

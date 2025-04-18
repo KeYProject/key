@@ -52,7 +52,8 @@ public class KeYSelectionModel {
     /**
      * Sets the selected proof.
      *
-     * @param p the proof to select.
+     * @param p
+     *        the proof to select.
      *
      * @see KeYMediator#getSelectionModel()#setProof(Proof)
      */
@@ -96,7 +97,8 @@ public class KeYSelectionModel {
     /**
      * sets the node that is focused by the user
      *
-     * @param n the selected node
+     * @param n
+     *        the selected node
      */
     public synchronized void setSelectedNode(Node n) {
         final Node previousSelectedNode = selectedNode;
@@ -114,8 +116,10 @@ public class KeYSelectionModel {
     /**
      * Sets the node and sequent focused by the user.
      *
-     * @param node selected node
-     * @param sequent selected sequent
+     * @param node
+     *        selected node
+     * @param sequent
+     *        selected sequent
      */
     public synchronized void setSelectedSequentAndRuleApp(Node node, Sequent sequent,
             RuleApp ruleApp) {
@@ -135,7 +139,8 @@ public class KeYSelectionModel {
     /**
      * sets the node that is focused by the user
      *
-     * @param g the Goal that contains the selected node
+     * @param g
+     *        the Goal that contains the selected node
      */
     public synchronized void setSelectedGoal(Goal g) {
         final Node previousNode = selectedNode;
@@ -291,7 +296,8 @@ public class KeYSelectionModel {
      * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof, the
      * proof root is selected.
      *
-     * @param old the Node to start looking for open goals
+     * @param old
+     *        the Node to start looking for open goals
      */
     // XXX this method is never used
     public void nearestOpenGoalSelection(Node old) {
@@ -319,7 +325,8 @@ public class KeYSelectionModel {
      * retrieves the first open goal below the given node, i.e. the goal containing the first leaf
      * of the subtree starting at <code>n</code> which is not already closed
      *
-     * @param n the Node where to start from
+     * @param n
+     *        the Node where to start from
      * @return the goal containing the first leaf of the subtree starting at <code>n</code>, which
      *         is not already closed. <code>null</code> is returned if no such goal exists.
      */

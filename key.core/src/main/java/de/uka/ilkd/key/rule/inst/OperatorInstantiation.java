@@ -13,7 +13,8 @@ public class OperatorInstantiation extends InstantiationEntry<Operator> {
     /**
      * creates a new ContextInstantiationEntry
      *
-     * @param op the Operator the SchemaVariable is instantiated with
+     * @param op
+     *        the Operator the SchemaVariable is instantiated with
      */
     OperatorInstantiation(Operator op) {
         super(op);

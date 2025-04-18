@@ -70,7 +70,8 @@ public interface IPersistablePO extends ProofOblInput {
      * {@link Sequent} (if code and specifications are unchanged).
      *
      * @return
-     * @throws IOException Occurred Exception.
+     * @throws IOException
+     *         Occurred Exception.
      */
     Configuration createLoaderConfig() throws IOException;
 
@@ -98,7 +99,8 @@ public interface IPersistablePO extends ProofOblInput {
         /**
          * Constructor.
          *
-         * @param proofOblInput The created {@link ProofOblInput}.
+         * @param proofOblInput
+         *        The created {@link ProofOblInput}.
          */
         public LoadedPOContainer(ProofOblInput proofOblInput) {
             this(proofOblInput, 0);
@@ -107,8 +109,10 @@ public interface IPersistablePO extends ProofOblInput {
         /**
          * Constructor.
          *
-         * @param proofOblInput The created {@link ProofOblInput}.
-         * @param proofNum The proof number which is {@code 0} by default.
+         * @param proofOblInput
+         *        The created {@link ProofOblInput}.
+         * @param proofNum
+         *        The proof number which is {@code 0} by default.
          */
         public LoadedPOContainer(ProofOblInput proofOblInput, int proofNum) {
             super();

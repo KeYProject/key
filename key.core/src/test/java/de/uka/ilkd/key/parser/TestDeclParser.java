@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test cases for validating the correct handling of declarations inside KeY files.
  */
 public class TestDeclParser {
+    private static Services SERVICES = null;
     private NamespaceSet nss;
     private Services serv;
     private Namespace<SchemaVariable> parsedSchemaVars;
@@ -40,19 +41,21 @@ public class TestDeclParser {
 
     @BeforeEach
     public void setUp() {
-        serv = new Services(AbstractProfile.getDefaultProfile());
+        if (SERVICES == null) {
+            SERVICES = new Services(AbstractProfile.getDefaultProfile());
+            var nss = SERVICES.getNamespaces();
+            NamespaceBuilder nb = new NamespaceBuilder(nss);
+            nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
+                    .addSort("float");
+            assertNotNull(nss.sorts().lookup("boolean"));
+            assertNotNull(nss.sorts().lookup("int"));
+            assertNotNull(nss.sorts().lookup("boolean"));
+            SERVICES.activateJava(null);
+            SERVICES.getJavaService().parseSpecialClasses();
+        }
+        serv = SERVICES.copy(false);
         nss = serv.getNamespaces();
         io = new KeyIO(serv, nss);
-        NamespaceBuilder nb = new NamespaceBuilder(nss);
-        nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
-                .addSort("float");
-        // String sorts = "\\sorts{boolean;int;LocSet;}";
-        // parseDecls(sorts);
-        assertNotNull(nss.sorts().lookup("boolean"));
-        assertNotNull(nss.sorts().lookup("int"));
-        assertNotNull(nss.sorts().lookup("boolean"));
-        Recoder2KeY r2k = new Recoder2KeY(serv, nss);
-        r2k.parseSpecialClasses();
     }
 
     private void evaluateDeclarations(String s) {
@@ -64,7 +67,6 @@ public class TestDeclParser {
             throw new RuntimeException("'" + s + "' was not parseable and evaluatable", e);
         }
     }
-
 
     @Test
     public void testSortDecl() {

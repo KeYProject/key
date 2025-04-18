@@ -25,7 +25,7 @@ public class ContractLoadingTests {
     public void sumAndMax() throws ProblemLoaderException {
         final File javaFile =
             new File(EXAMPLES_DIR, "heap/vstte10_01_SumAndMax/src/SumAndMax.java");
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
         Services services = file.getServices();
         Logger LOGGER = LoggerFactory.getLogger(ContractLoadingTests.class);
         for (Contract proofContract : file.getProofContracts()) {
@@ -38,8 +38,8 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
-        Assertions.assertTrue(file.getProofContracts().size() > 0);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
+        Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
     @Test
@@ -47,7 +47,7 @@ public class ContractLoadingTests {
         File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1717/UnderscoreZero.java");
         Assumptions.assumeTrue(javaFile.exists());
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
         Assertions.assertFalse(file.getProofContracts().isEmpty());
         final var contract = file.getProofContracts().get(0);
         var proof = file.createProof(contract.createProofObl(file.getInitConfig()));
@@ -59,7 +59,7 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/java/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
         Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
@@ -68,7 +68,7 @@ public class ContractLoadingTests {
         final File javaFile =
             new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/bigint/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
         Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 }

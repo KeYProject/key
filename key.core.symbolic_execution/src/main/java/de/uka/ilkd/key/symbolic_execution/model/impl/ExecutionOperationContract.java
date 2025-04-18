@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -71,8 +71,10 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionOperationContract(ITreeSettings settings, Node proofNode) {
@@ -140,9 +142,12 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * Tries to find the self {@link Term} of the given {@link KeYJavaType}.
      *
-     * @param term The {@link Term} to start search in.
-     * @param staticType The expected {@link KeYJavaType}.
-     * @param services The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to start search in.
+     * @param staticType
+     *        The expected {@link KeYJavaType}.
+     * @param services
+     *        The {@link Services} to use.
      * @return The found self {@link Term} or {@code null} if not available.
      */
     protected Term searchConstructorSelfDefinition(Term term, KeYJavaType staticType,
@@ -268,9 +273,12 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * Searches the result {@link Term}.
      *
-     * @param contract The {@link FunctionalOperationContract}.
-     * @param inst The {@link Instantiation}.
-     * @param services The {@link Services}.
+     * @param contract
+     *        The {@link FunctionalOperationContract}.
+     * @param inst
+     *        The {@link Instantiation}.
+     * @param services
+     *        The {@link Services}.
      * @return The found result {@link Term} or {@code null} otherwise.
      */
     protected Term searchResultTerm(FunctionalOperationContract contract, Instantiation inst,
@@ -292,9 +300,11 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * Extracts the result variable from the given post branch.
      *
-     * @param node The {@link Node} which is the post or exceptional post branch of an applied
+     * @param node
+     *        The {@link Node} which is the post or exceptional post branch of an applied
      *        {@link ContractRuleApp}.
-     * @param services The {@link Services} to use.
+     * @param services
+     *        The {@link Services} to use.
      * @return The found {@link LocationVariable} or {@code null} if not found.
      */
     protected static LocationVariable extractResultVariableFromPostBranch(Node node,

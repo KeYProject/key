@@ -31,7 +31,8 @@ public abstract class AbstractProverCore implements ProverCore {
     /**
      * propagation method for the event that a task started
      *
-     * @param maxSteps an int with the maximal number of steps to be performed by the current task
+     * @param maxSteps
+     *        an int with the maximal number of steps to be performed by the current task
      */
     protected void fireTaskStarted(int maxSteps) {
         // no need to synchronize here as we use immutable list and hence
@@ -56,7 +57,8 @@ public abstract class AbstractProverCore implements ProverCore {
     /**
      * propagation method for the event that a task has finished
      *
-     * @param info an information object about the work done by the task e.g. number of applied
+     * @param info
+     *        an information object about the work done by the task e.g. number of applied
      *        rules
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
@@ -70,7 +72,8 @@ public abstract class AbstractProverCore implements ProverCore {
     /**
      * adds a listener to the prover
      *
-     * @param observer the listener
+     * @param observer
+     *        the listener
      */
     @Override
     public void addProverTaskObserver(ProverTaskListener observer) {
@@ -82,7 +85,8 @@ public abstract class AbstractProverCore implements ProverCore {
     /**
      * removes a listener from the prover
      *
-     * @param observer the listener
+     * @param observer
+     *        the listener
      */
     @Override
     public void removeProverTaskObserver(ProverTaskListener observer) {

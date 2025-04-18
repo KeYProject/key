@@ -5,9 +5,9 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -84,7 +84,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * creates a new SVInstantions object using the given map
      *
-     * @param map the ImmMap<SchemaVariable,InstantiationEntry<?>> with the instantiations
+     * @param map
+     *        the ImmMap<SchemaVariable,InstantiationEntry<?>> with the instantiations
      */
     private SVInstantiations(ImmutableMap<SchemaVariable, InstantiationEntry<?>> map,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
@@ -120,8 +121,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param subst the Term the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param subst
+     *        the Term the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, Term subst, Services services) {
@@ -163,8 +166,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pe
+     *        the ProgramElement the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, ProgramElement pe, Services services) {
@@ -189,10 +194,14 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * adds the given pair to the instantiations for the context.If the context has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param prefix the PosInProgram describing the prefix
-     * @param postfix the PosInProgram describing the postfix
-     * @param activeStatementContext the ExecutionContext of the first active statement
-     * @param pe the ProgramElement the context positions are related to
+     * @param prefix
+     *        the PosInProgram describing the prefix
+     * @param postfix
+     *        the PosInProgram describing the postfix
+     * @param activeStatementContext
+     *        the ExecutionContext of the first active statement
+     * @param pe
+     *        the ProgramElement the context positions are related to
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
@@ -256,8 +265,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param entry
+     *        the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, Services services) {
@@ -293,8 +304,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param entry
+     *        the InstantiationEntry the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
             Services services) {
@@ -305,7 +318,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * adds the schemvariable to the set of interesting ones
      *
-     * @throws IllegalInstantiationException, if sv has not yet been instantiated
+     * @throws IllegalInstantiationException,
+     *         if sv has not yet been instantiated
      */
     public SVInstantiations makeInteresting(SchemaVariable sv, Services services) {
         final InstantiationEntry<?> entry = getInstantiationEntry(sv);
@@ -325,8 +339,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param term the Term the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param term
+     *        the Term the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, Term term, Services services) {
         return replace(sv, new TermInstantiation(sv, term), services);
@@ -336,8 +352,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pe
+     *        the ProgramElement the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ProgramElement pe, Services services) {
         return replace(sv, new ProgramInstantiation(pe), services);
@@ -347,8 +365,10 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pes the ArrayOf<t> the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pes
+     *        the ArrayOf<t> the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes,
             Services services) {
@@ -359,12 +379,16 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * replaces the given pair in the instantiations. If the context has been instantiated already,
      * the new pair is taken without a warning.
      *
-     * @param prefix the PosInProgram describing the position of the first statement after the
+     * @param prefix
+     *        the PosInProgram describing the position of the first statement after the
      *        prefix
-     * @param postfix the PosInProgram describing the position of the statement just before the
+     * @param postfix
+     *        the PosInProgram describing the position of the statement just before the
      *        postfix
-     * @param activeStatementContext the ExecutionContext of the first active statement
-     * @param pe the ProgramElement the context positions are related to
+     * @param activeStatementContext
+     *        the ExecutionContext of the first active statement
+     * @param pe
+     *        the ProgramElement the context positions are related to
      */
     public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
             ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
@@ -427,7 +451,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * adds an update to the update context
      *
-     * @param updateApplicationlabels the TermLabels attached to the application operator term
+     * @param updateApplicationlabels
+     *        the TermLabels attached to the application operator term
      */
     public SVInstantiations addUpdate(Term update,
             ImmutableArray<TermLabel> updateApplicationlabels) {

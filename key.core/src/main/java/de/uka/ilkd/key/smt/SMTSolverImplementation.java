@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -147,10 +147,14 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * Creates a new instance an SMT solver.
      *
-     * @param problem the problem to send to the external solver process
-     * @param listener the listener that has to be informed when the solver state changes
-     * @param services the services needed to translate the problem to SMT format
-     * @param myType the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
+     * @param problem
+     *        the problem to send to the external solver process
+     * @param listener
+     *        the listener that has to be informed when the solver state changes
+     * @param services
+     *        the services needed to translate the problem to SMT format
+     * @param myType
+     *        the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
      */
     public SMTSolverImplementation(SMTProblem problem, SolverListener listener, Services services,
             SolverType myType) {
@@ -168,8 +172,10 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      * <code>SolverLauncher</code>. If you want to start a solver please have a look at
      * <code>SolverLauncher</code>.
      *
-     * @param timeout the timeout to use for the solver
-     * @param settings the SMTSettings to use for this solver
+     * @param timeout
+     *        the timeout to use for the solver
+     * @param settings
+     *        the SMTSettings to use for this solver
      */
     @Override
     public void start(SolverTimeout timeout, SMTSettings settings) {

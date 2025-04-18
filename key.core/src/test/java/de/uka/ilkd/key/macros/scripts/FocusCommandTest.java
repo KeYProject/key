@@ -28,7 +28,7 @@ public class FocusCommandTest {
         Path temp = Files.createTempFile("key-focus-command", ".key");
         Files.writeString(temp, "\\functions { int i; } \\problem { i=1&i=2 -> i=3|i=4 }" +
             "\\proofScript \"prop-simp; \"");
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp);
         Proof p = env.getLoadedProof();
         ProofScriptEngine pse = new ProofScriptEngine(
             "macro 'nosplit-prop'; focus 'i=1 ==> i = 4';",
@@ -49,7 +49,7 @@ public class FocusCommandTest {
                 +
                 "\\proofScript \"prop-simp; \"");
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp);
         Proof p = env.getLoadedProof();
         ProofScriptEngine pse = new ProofScriptEngine(
             "macro 'nosplit-prop'; focus 'i=1 ==> i = 3';",

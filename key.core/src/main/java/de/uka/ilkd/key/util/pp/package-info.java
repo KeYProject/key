@@ -3,19 +3,13 @@
  * indentation. For instance, it can be used to print
  *
  * <pre>
- * while (i > 0) {
- *     i--;
- *     j++;
- * }
+ * while (i > 0) { i--; j++; }
  * </pre>
  *
  * instead of
  *
  * <pre>
- * while (i > 0) {
- *     i--;
- *     j++;
- * }
+ * while (i > 0) { i--; j++; }
  * </pre>
  *
  * if a maximum line width of 15 characters is chosen. The frontend

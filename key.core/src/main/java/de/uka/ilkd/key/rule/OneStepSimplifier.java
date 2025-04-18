@@ -162,9 +162,11 @@ public final class OneStepSimplifier implements BuiltInRule {
         // (Checks are pretty expensive O(n); could be removed after some time)
         // MU May 2016
 
-        assert Immutables.isDuplicateFree(appsTakenOver)
+        assert Immutables.isDuplicateFree(
+            appsTakenOver)
                 : "If this fails unexpectedly, add a call to Immutables.removeDuplicates.";
-        assert Immutables.isDuplicateFree(result)
+        assert Immutables
+                .isDuplicateFree(result)
                 : "If this fails unexpectedly, add a call to Immutables.removeDuplicates.";
 
         // remove apps in appsTakenOver from taclet indices of all goals
@@ -326,7 +328,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      * Helper for replaceKnown (handles recursion).
      *
      * @param protocol
-     * @param services TODO
+     * @param services
+     *        TODO
      */
     private Term replaceKnownHelper(Map<TermReplacementKey, PosInOccurrence> map, Term in,
             boolean inAntecedent, /* out */ List<PosInOccurrence> ifInsts, Protocol protocol,
@@ -545,7 +548,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      * been set / changed for the current proof. So make sure that everything is done in proper
      * order.
      *
-     * @param proof The {@link Proof} for which to refresh the {@link OneStepSimplifier} instance.
+     * @param proof
+     *        The {@link Proof} for which to refresh the {@link OneStepSimplifier} instance.
      */
     public static void refreshOSS(Proof proof) {
         OneStepSimplifier simplifierInstance = MiscTools.findOneStepSimplifier(proof);
@@ -724,7 +728,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         /**
          * Constructor.
          *
-         * @param term The {@link Term} to represent.
+         * @param term
+         *        The {@link Term} to represent.
          */
         public TermReplacementKey(Term term) {
             assert term != null;

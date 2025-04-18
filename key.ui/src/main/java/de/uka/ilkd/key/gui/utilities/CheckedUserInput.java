@@ -29,7 +29,8 @@ public class CheckedUserInput extends JPanel {
         String NO_USER_INPUT = " ";
 
         /**
-         * @param toBeChecked the user input to be checked.
+         * @param toBeChecked
+         *        the user input to be checked.
          * @return <code>null</code> if the user input is valid, otherwise a string describing the
          *         error.
          */

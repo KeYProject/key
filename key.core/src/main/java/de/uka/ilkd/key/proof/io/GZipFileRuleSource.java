@@ -8,6 +8,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 
 import org.antlr.v4.runtime.CharStream;
@@ -26,16 +27,17 @@ public class GZipFileRuleSource extends FileRuleSource {
      *
      * This is only instantiated from {@link RuleSourceFactory#initRuleFile(File, boolean)}.
      *
-     * @param ruleFile the file to read from.
+     * @param ruleFile
+     *        the file to read from.
      */
-    GZipFileRuleSource(File ruleFile) {
+    GZipFileRuleSource(Path ruleFile) {
         super(ruleFile);
     }
 
     @Override
     public InputStream getNewStream() {
         try {
-            return new GZIPInputStream(new FileInputStream(ruleFile));
+            return new GZIPInputStream(new FileInputStream(ruleFile.toFile()));
         } catch (IOException e) {
             throw new RuntimeException("Error while reading rules.", e);
         }

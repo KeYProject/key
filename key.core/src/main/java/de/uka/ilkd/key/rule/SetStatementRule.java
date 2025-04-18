@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.SetStatement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.SetStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -80,7 +80,8 @@ public final class SetStatementRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
         final Term formula = occurrence.subTerm();
-        assert formula.op() instanceof UpdateApplication
+        assert formula
+                .op() instanceof UpdateApplication
                 : "Currently, this can only be applied if there is an update application in front of the modality";
 
         Term update = UpdateApplication.getUpdate(formula);

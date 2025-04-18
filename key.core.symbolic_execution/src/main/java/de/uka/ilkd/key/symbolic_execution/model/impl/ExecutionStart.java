@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
@@ -33,8 +33,10 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionStart(ITreeSettings settings, Node proofNode) {
@@ -76,7 +78,8 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Registers the given {@link IExecutionTermination}.
      *
-     * @param termination The {@link IExecutionTermination} to register.
+     * @param termination
+     *        The {@link IExecutionTermination} to register.
      */
     public void addTermination(IExecutionTermination termination) {
         if (termination != null) {
@@ -106,7 +109,8 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Removes the given termination.
      *
-     * @param termination The termination to be deleted.
+     * @param termination
+     *        The termination to be deleted.
      * @author Anna Filighera
      */
     public void removeTermination(IExecutionTermination termination) {

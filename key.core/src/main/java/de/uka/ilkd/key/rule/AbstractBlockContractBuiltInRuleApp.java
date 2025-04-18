@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.JavaStatement;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -33,9 +33,12 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param rule the rule being applied.
-     * @param occurrence the position at which the rule is applied.
-     * @param ifInstantiations if instantiations.
+     * @param rule
+     *        the rule being applied.
+     * @param occurrence
+     *        the position at which the rule is applied.
+     * @param ifInstantiations
+     *        if instantiations.
      */
     public AbstractBlockContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
@@ -49,8 +52,10 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param goal the current goal.
-     * @param rule the rule being applied.
+     * @param goal
+     *        the current goal.
+     * @param rule
+     *        the rule being applied.
      * @return this.
      */
     public AbstractBlockContractBuiltInRuleApp tryToInstantiate(final Goal goal,
@@ -78,9 +83,12 @@ public abstract class AbstractBlockContractBuiltInRuleApp
 
     /**
      *
-     * @param statement the new statement.
-     * @param contract the new contract.
-     * @param heaps the new heap context.
+     * @param statement
+     *        the new statement.
+     * @param contract
+     *        the new contract.
+     * @param heaps
+     *        the new heap context.
      */
     public void update(final JavaStatement statement, final BlockContract contract,
             final List<LocationVariable> heaps) {

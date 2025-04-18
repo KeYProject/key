@@ -7,12 +7,12 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Stack;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.ContextStatementBlock;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
@@ -65,15 +65,24 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *
-     * @param termLabelState the termlabel state
-     * @param labelHint hints about how to deal with labels
-     * @param applicationPosInOccurrence the application position
-     * @param svInst mapping of schemavariables to their instantiation
-     * @param goal the current goal
-     * @param rule the applied rule
-     * @param ruleApp the rule application
-     * @param services the Services
-     * @param termBuilder the TermBuilder to use (allows to use the non cached version)
+     * @param termLabelState
+     *        the termlabel state
+     * @param labelHint
+     *        hints about how to deal with labels
+     * @param applicationPosInOccurrence
+     *        the application position
+     * @param svInst
+     *        mapping of schemavariables to their instantiation
+     * @param goal
+     *        the current goal
+     * @param rule
+     *        the applied rule
+     * @param ruleApp
+     *        the rule application
+     * @param services
+     *        the Services
+     * @param termBuilder
+     *        the TermBuilder to use (allows to use the non cached version)
      */
     private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
@@ -97,14 +106,22 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * constructs a term visitor replacing any occurrence of a schemavariable found in
      * {@code svInst} by its instantiation
      *
-     * @param termLabelState the termlabel state
-     * @param labelHint hints about how to deal with labels
-     * @param applicationPosInOccurrence the application position
-     * @param svInst mapping of schemavariables to their instantiation
-     * @param goal the current goal
-     * @param rule the applied rule
-     * @param ruleApp the rule application
-     * @param services the Services
+     * @param termLabelState
+     *        the termlabel state
+     * @param labelHint
+     *        hints about how to deal with labels
+     * @param applicationPosInOccurrence
+     *        the application position
+     * @param svInst
+     *        mapping of schemavariables to their instantiation
+     * @param goal
+     *        the current goal
+     * @param rule
+     *        the applied rule
+     * @param ruleApp
+     *        the rule application
+     * @param services
+     *        the Services
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
@@ -410,7 +427,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * can override this method when the visitor behaviour depends on informations bound to
      * subtrees.
      *
-     * @param subtreeRoot root of the subtree which the visitor leaves.
+     * @param subtreeRoot
+     *        root of the subtree which the visitor leaves.
      */
     @Override
     public void subtreeLeft(Term subtreeRoot) {

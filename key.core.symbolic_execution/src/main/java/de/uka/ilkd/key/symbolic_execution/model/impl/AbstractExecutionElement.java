@@ -40,8 +40,10 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public AbstractExecutionElement(ITreeSettings settings, Node proofNode) {
@@ -117,7 +119,8 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     /**
      * Sets the name.
      *
-     * @param name The new name to set.
+     * @param name
+     *        The new name to set.
      */
     protected void setName(String name) {
         this.name = name;
@@ -143,8 +146,10 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * Converts the given {@link Term} into a {@link String} respecting
      * {@link ITreeSettings#usePrettyPrinting()}.
      *
-     * @param term The {@link Term} to convert.
-     * @param services The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to convert.
+     * @param services
+     *        The {@link Services} to use.
      * @return The {@link String} representation of the given {@link Term}.
      */
     protected String formatTerm(Term term, Services services) {

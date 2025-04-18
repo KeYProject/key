@@ -144,7 +144,8 @@ public final class DefaultTacletSetTranslation
     /**
      * Stores the translation to a file by using the key-format for problem files.
      *
-     * @param dest the path of the file.
+     * @param dest
+     *        the path of the file.
      */
     public void storeToFile(String dest) {
 
@@ -167,9 +168,9 @@ public final class DefaultTacletSetTranslation
         StringBuilder toStore = new StringBuilder();
         toStore = new StringBuilder("//" + Calendar.getInstance().getTime() + "\n");
 
-        String modelDir = services.getJavaModel().getModelDir();
+        var modelDir = services.getJavaModel().getModelDir();
 
-        if (modelDir != null && !modelDir.isEmpty()) {
+        if (modelDir != null && !modelDir.toString().isEmpty()) {
             toStore.append("\\javaSource \"").append(modelDir).append("\";\n\n");
         }
 

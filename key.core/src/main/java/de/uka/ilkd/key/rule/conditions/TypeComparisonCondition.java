@@ -10,8 +10,8 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -46,9 +46,12 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
      * creates a condition that checks if the declaration types of the schemavariable's
      * instantiations are unequal
      *
-     * @param fst one of the SchemaVariable whose type is checked
-     * @param snd one of the SchemaVariable whose type is checked
-     * @param mode an int encoding if testing of not same or not compatible
+     * @param fst
+     *        one of the SchemaVariable whose type is checked
+     * @param snd
+     *        one of the SchemaVariable whose type is checked
+     * @param mode
+     *        an int encoding if testing of not same or not compatible
      */
     public TypeComparisonCondition(TypeResolver fst, TypeResolver snd, Mode mode) {
         this.fst = fst;

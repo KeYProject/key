@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -35,15 +35,12 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-import recoder.ParserException;
 
 /**
  * The main entry point for KeY
@@ -173,8 +170,7 @@ public final class Main {
      */
     public static final boolean showExampleChooserIfExamplesDirIsDefined = true;
 
-    private Main() {
-    }
+    private Main() {}
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
@@ -223,7 +219,7 @@ public final class Main {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
             for (File f : fileArguments) {
-                ui.loadProblem(f);
+                ui.loadProblem(f.toPath());
             }
             if (ui instanceof ConsoleUserInterfaceControl) {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
@@ -303,7 +299,8 @@ public final class Main {
     /**
      * Evaluate the commandline options
      *
-     * @param cl parsed command lines, not null
+     * @param cl
+     *        parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
         Integer verbosity = null;
@@ -624,16 +621,16 @@ public final class Main {
      *
      * @return {@link File} object representing working directory.
      */
-    public static File getWorkingDir() {
+    public static Path getWorkingDir() {
         if (fileArguments != null && !fileArguments.isEmpty()) {
             File f = fileArguments.get(0);
             if (f.isDirectory()) {
-                return f;
+                return f.toPath();
             } else {
-                return f.getParentFile();
+                return f.toPath().getParent();
             }
         } else {
-            return IOUtil.getCurrentDirectory();
+            return IOUtil.getCurrentDirectory().toPath();
         }
     }
 
@@ -652,18 +649,21 @@ public final class Main {
             // only use one input file
             File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
             // final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
-            try {
-                RIFLTransformer transformer = new RIFLTransformer();
-                transformer.doTransform(riflFileName, fileNameOnStartUp,
-                    RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
-
-                LOGGER.info("[RIFL] Writing transformed Java files to {}  ...",
-                    fileNameOnStartUp);
-                return transformer.getProblemFiles();
-            } catch (ParserConfigurationException | SAXException | ParserException
-                    | IOException e) {
-                LOGGER.warn("rifl transform failed", e);
-            }
+            /*
+             * weigl: disable rifl
+             * try {
+             * RIFLTransformer transformer = new RIFLTransformer();
+             * transformer.doTransform(riflFileName, fileNameOnStartUp,
+             * RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
+             *
+             * LOGGER.info("[RIFL] Writing transformed Java files to {}  ...",
+             * fileNameOnStartUp);
+             * return transformer.getProblemFiles();
+             * } catch (ParserConfigurationException | SAXException | ParserException
+             * | IOException e) {
+             * LOGGER.warn("rifl transform failed", e);
+             * }
+             */
 
             return result;
         }
@@ -679,7 +679,8 @@ public final class Main {
      * Defines the examples directory. This method is used by the Eclipse integration (KeY4Eclipse)
      * to use the examples extract from the plug-in into the workspace.
      *
-     * @param newExamplesDir The new examples directory to use.
+     * @param newExamplesDir
+     *        The new examples directory to use.
      */
     public static void setExamplesDir(String newExamplesDir) {
         examplesDir = newExamplesDir;

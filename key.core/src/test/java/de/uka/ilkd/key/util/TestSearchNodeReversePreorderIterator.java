@@ -106,7 +106,8 @@ public class TestSearchNodeReversePreorderIterator {
     /**
      * Starts at all {@link Node}s of the given proof tree a reverse order traversal.
      *
-     * @param root The root of the proof tree.
+     * @param root
+     *        The root of the proof tree.
      */
     protected void assertRoot(Node root) {
         NodePreorderIterator iter = new NodePreorderIterator(root);
@@ -121,8 +122,10 @@ public class TestSearchNodeReversePreorderIterator {
     /**
      * Tests a reverse iteration starting at the given {@link Node}.
      *
-     * @param start The {@link Node} to start iteration.
-     * @param expectedReverseList The expected previous {@link Node}s.
+     * @param start
+     *        The {@link Node} to start iteration.
+     * @param expectedReverseList
+     *        The expected previous {@link Node}s.
      */
     protected void assertReversePreorder(Node start, ImmutableList<Node> expectedReverseList) {
         SearchNodeReversePreorderIterator reverseIter =
@@ -140,8 +143,10 @@ public class TestSearchNodeReversePreorderIterator {
     /**
      * Appends a new node to the given parent {@link Node}.
      *
-     * @param proof The {@link Proof} which forms the test model.
-     * @param parent The parent {@link Node} to add to.
+     * @param proof
+     *        The {@link Proof} which forms the test model.
+     * @param parent
+     *        The parent {@link Node} to add to.
      * @return The new created child {@link Node}.
      */
     protected Node appendNode(Proof proof, Node parent) {
@@ -153,7 +158,8 @@ public class TestSearchNodeReversePreorderIterator {
     /**
      * Sets a new root {@link Node} on the proof.
      *
-     * @param proof The {@link Proof} to set root on.
+     * @param proof
+     *        The {@link Proof} to set root on.
      * @return The created root {@link Node}.
      */
     protected Node appendRoot(Proof proof) {

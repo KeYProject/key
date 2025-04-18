@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -113,10 +113,14 @@ public class TriggersSet {
 
     /**
      *
-     * @param trigger a <code>Term</code>
-     * @param qvs all universal variables of <code>trigger</code>
-     * @param isUnify true if <code>trigger</code>contains existential variable
-     * @param isElement true if the <code>Trigger</code> to be created is taken as a element of
+     * @param trigger
+     *        a <code>Term</code>
+     * @param qvs
+     *        all universal variables of <code>trigger</code>
+     * @param isUnify
+     *        true if <code>trigger</code>contains existential variable
+     * @param isElement
+     *        true if the <code>Trigger</code> to be created is taken as a element of
      *        multi-trigger
      * @return a <code>Trigger</code> with <code>trigger</code> as its term
      */
@@ -133,8 +137,10 @@ public class TriggersSet {
     /**
      *
      * @param trs
-     * @param clause a <code>Term</code> of clause form
-     * @param qvs all universal varaibles of all <code>clause</code>
+     * @param clause
+     *        a <code>Term</code> of clause form
+     * @param qvs
+     *        all universal varaibles of all <code>clause</code>
      * @return the MultTrigger for the given triggers
      */
     private Trigger createMultiTrigger(ImmutableSet<Trigger> trs, Term clause,
@@ -192,8 +198,10 @@ public class TriggersSet {
         }
 
         /**
-         * @param term one atom at the begining
-         * @param services the Services
+         * @param term
+         *        one atom at the begining
+         * @param services
+         *        the Services
          * @return true if find any trigger from <code>term</code>
          */
         private boolean recAddTriggers(Term term, Services services) {
@@ -291,12 +299,12 @@ public class TriggersSet {
         private boolean isAcceptableTrigger(Term term, Services services) {
             final Operator op = term.op();
 
-            // we do not want to match on expressions a.<created>
+            // we do not want to match on expressions a.$created
 
             if (term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(),
                 services)) {
                 if (term.sub(2).op().name().toString()
-                        .endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
+                        .endsWith(PipelineConstants.IMPLICIT_CREATED)) {
                     return false;
                 }
             }
@@ -341,7 +349,8 @@ public class TriggersSet {
          * all variables of this clause, it will be used to construct the multi-trigger which will
          * be add to triggers set
          *
-         * @param ts elements of multi-triggers at the beginning
+         * @param ts
+         *        elements of multi-triggers at the beginning
          * @return a set of triggers
          */
         private Set<ImmutableSet<Trigger>> setMultiTriggers(Iterator<Trigger> ts) {
@@ -368,7 +377,8 @@ public class TriggersSet {
         /**
          * try to construct a multi-trigger by given <code>ts</code>
          *
-         * @param trs a set of trigger
+         * @param trs
+         *        a set of trigger
          * @return true if <code>trs</code> contains all universal varaibles of this clause, and add
          *         the contstructed multi-trigger to triggers set
          */

@@ -35,9 +35,12 @@ class TwoSidedMatching {
     /**
      * creates an instance of a two sided matching
      *
-     * @param trigger the UniTrigger
-     * @param targetTerm the term to match
-     * @param services the Services
+     * @param trigger
+     *        the UniTrigger
+     * @param targetTerm
+     *        the term to match
+     * @param services
+     *        the Services
      */
     TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
         this.trigger = trigger;
@@ -61,7 +64,8 @@ class TwoSidedMatching {
     /**
      * returns the found matchings
      *
-     * @param services the Services
+     * @param services
+     *        the Services
      * @return the found matchings
      */
     ImmutableSet<Substitution> getSubstitutions(Services services) {

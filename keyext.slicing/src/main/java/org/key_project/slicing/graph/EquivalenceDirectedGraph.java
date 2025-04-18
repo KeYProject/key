@@ -55,7 +55,8 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
     }
 
     /**
-     * @param v vertex to search for
+     * @param v
+     *        vertex to search for
      * @return all vertices in the graph equal to the parameter
      *         (according to {@link org.key_project.util.EqualsModProofIrrelevancy})
      */

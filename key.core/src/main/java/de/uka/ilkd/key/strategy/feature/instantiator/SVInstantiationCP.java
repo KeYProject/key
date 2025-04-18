@@ -107,7 +107,9 @@ public class SVInstantiationCP implements Feature {
             final CPBranch branch = new CPBranch() {
                 public void choose() {}
 
-                public RuleApp getRuleAppForBranch() { return newApp; }
+                public RuleApp getRuleAppForBranch() {
+                    return newApp;
+                }
             };
 
             return ImmutableSLList.<CPBranch>nil().prepend(branch).iterator();

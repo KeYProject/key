@@ -23,7 +23,8 @@ public abstract class AbstractElement implements ISymbolicElement {
     /**
      * Constructor.
      *
-     * @param settings The {@link IModelSettings} to use.
+     * @param settings
+     *        The {@link IModelSettings} to use.
      */
     public AbstractElement(IModelSettings settings) {
         this.settings = settings;
@@ -41,8 +42,10 @@ public abstract class AbstractElement implements ISymbolicElement {
      * Converts the given {@link Term} into a {@link String} respecting
      * {@link IModelSettings#isUsePrettyPrinting()}.
      *
-     * @param term The {@link Term} to convert.
-     * @param services The {@link Services} to use.
+     * @param term
+     *        The {@link Term} to convert.
+     * @param services
+     *        The {@link Services} to use.
      * @return The {@link String} representation of the given {@link Term}.
      */
     protected String formatTerm(Term term, Services services) {

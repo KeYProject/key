@@ -7,14 +7,14 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
 import de.uka.ilkd.key.smt.lang.*;
@@ -46,7 +46,7 @@ public class SMTObjTranslator implements SMTTranslator {
     private static final String EMPTY_CONSTANT = "empty";
     public static final String ELEMENTOF = "elementOf";
     private static final String SELECT = "select";
-    private static final String CREATED_FIELD_NAME = "java.lang.Object::<created>";
+    private static final String CREATED_FIELD_NAME = "java.lang.Object::#$created";
     private static final String ARR_FUNCTION_NAME = "arr";
     private static final String SEQ_EMPTY = "seqEmpty";
     private static final String SEQ_OUTSIDE = "seqGetOutside";
@@ -744,8 +744,10 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Casts a term to the specified sort, if the term is not already of that sort.
      *
-     * @param term the term to be casted
-     * @param target the sort to which the term must be casted
+     * @param term
+     *        the term to be casted
+     * @param target
+     *        the sort to which the term must be casted
      * @return the casted term, or the original term if no cast was necessary
      */
     private SMTTerm castTermIfNecessary(SMTTerm term, SMTSort target) {
@@ -788,9 +790,12 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Adds the necessary assertions for a cast function
      *
-     * @param source source sort of the cast function
-     * @param target target sort of the cast function
-     * @param id key where the cast function can be found in the function table
+     * @param source
+     *        source sort of the cast function
+     * @param target
+     *        target sort of the cast function
+     * @param id
+     *        key where the cast function can be found in the function table
      */
     private void addCastAssertions(SMTSort source, SMTSort target, String id) {
         SMTTermVariable v = new SMTTermVariable("v", source);
@@ -896,8 +901,10 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Recursively finds all sorts in a term
      *
-     * @param sorts list of accumulated sorts
-     * @param term the term where we look for the sorts
+     * @param sorts
+     *        list of accumulated sorts
+     * @param term
+     *        the term where we look for the sorts
      */
     private void findSorts(Set<Sort> sorts, Term term) {
         Sort s = term.sort();
@@ -934,7 +941,8 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a KeY problem into a SMTFile.
      *
-     * @param problem The KeY proof obligation.
+     * @param problem
+     *        The KeY proof obligation.
      */
     private SMTFile translateProblem(Term problem) throws IllegalFormulaException {
         SMTFile file = new SMTFile();
@@ -1014,7 +1022,8 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a KeY term to an SMT term.
      *
-     * @param term the KeY term.
+     * @param term
+     *        the KeY term.
      * @return the SMT term.
      */
     private SMTTerm translateTerm(Term term) throws IllegalFormulaException {
@@ -1432,7 +1441,7 @@ public class SMTObjTranslator implements SMTTranslator {
         String name = fun.name().toString();
         // handle sort constants
         if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
-            name = name.replace("$", "");
+            name = JavaDLFieldNames.toJava(name);
             JavaInfo info = services.getJavaInfo();
             Sort sort = info.getAttribute(name).getKeYJavaType().getSort();
             fieldSorts.put(name, sort);

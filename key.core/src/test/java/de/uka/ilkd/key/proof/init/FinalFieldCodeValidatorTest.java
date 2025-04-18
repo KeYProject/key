@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +11,7 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -40,11 +39,11 @@ class FinalFieldCodeValidatorTest {
         URL url = getClass().getResource(directory);
         assert url != null : directory + " not found.";
         assert "file".equals(url.getProtocol()) : "Test cases must be in file system";
-        File dir = new File(url.getPath());
+        var dir = new File(url.getPath()).toPath();
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(dir, null, null, null);
 
-        Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
+        var kjts = env.getJavaInfo().getAllKeYJavaTypes();
         Set<Contract> contracts = new HashSet<>();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
@@ -72,7 +71,7 @@ class FinalFieldCodeValidatorTest {
     }
 
     private void testConstructor(Contract c, KeYEnvironment<?> env)
-            throws ProofInputException, MalformedURLException {
+            throws ProofInputException {
         try {
             // System.out.println("Contract id: " + c.getName());
             ContractPO po = c.createProofObl(env.getInitConfig());
