@@ -45,6 +45,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
+
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
     protected abstract RuleFilter getSemanticsRuleFilter();

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 import org.key_project.util.collection.ImmutableList;
 
+
 /**
  * The interface ProofMacro is the entry point to a general strategy extension system.
  *
