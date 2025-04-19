@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class ObserverFunction extends JFunction implements IObserverFunction {
 
-    private final Qualifier<KeYJavaType> container;
+    private final QualifierWrapper<KeYJavaType> container;
     private final boolean isStatic;
     private final ImmutableArray<KeYJavaType> paramTypes;
     private final KeYJavaType type;
@@ -43,7 +43,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
         assert type == null || type.getSort() == sort;
         assert container != null;
         this.type = type;
-        this.container = Qualifier.create(container);
+        this.container = QualifierWrapper.get(container);
         this.isStatic = isStatic;
         this.paramTypes = paramTypes;
         this.heapCount = heapCount;
