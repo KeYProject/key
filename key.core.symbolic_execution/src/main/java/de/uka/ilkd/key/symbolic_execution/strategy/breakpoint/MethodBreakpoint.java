@@ -16,11 +16,12 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.rules.RuleApp;
 
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
@@ -81,12 +82,12 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
-        return !proof.isDisposed()
+    public boolean isBreakpointHit(SourceElement activeStatement,
+            RuleApp ruleApp, Node node) {
+        return !node.proof().isDisposed()
                 && ((isEntry && isMethodCallNode(node, ruleApp))
                         || (isExit && isMethodReturnNode(node, ruleApp)))
-                && (!isConditionEnabled() || conditionMet(ruleApp, proof, node)) && isEnabled()
+                && (!isConditionEnabled() || conditionMet(ruleApp, node)) && isEnabled()
                 && hitcountExceeded(node);
     }
 
@@ -95,7 +96,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param ruleApp the applied rule app
      * @return true if the node represents a method call
      */
-    private boolean isMethodCallNode(Node node, RuleApp ruleApp) {
+    private boolean isMethodCallNode(Node node, org.key_project.prover.rules.RuleApp ruleApp) {
         SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
         IProgramMethod currentPm = null;
         if (statement instanceof MethodBodyStatement mbs) {
@@ -118,7 +119,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param ruleApp the applied rule app
      * @return true if the node represents a method return
      */
-    private boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
+    private boolean isMethodReturnNode(Node node, org.key_project.prover.rules.RuleApp ruleApp) {
         if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp))
                 && isCorrectMethodReturn(node, ruleApp)) {
@@ -133,8 +134,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     private boolean isCorrectMethodReturn(Node node, RuleApp ruleApp) {
-        Term term = ruleApp.posInOccurrence().subTerm();
-        term = TermBuilder.goBelowUpdates(term);
+        var t = ruleApp.posInOccurrence().subTerm();
+        Term term = TermBuilder.goBelowUpdates(t);
         MethodFrame mf =
             JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
         return Objects.equals(getPm(), mf.getProgramMethod());

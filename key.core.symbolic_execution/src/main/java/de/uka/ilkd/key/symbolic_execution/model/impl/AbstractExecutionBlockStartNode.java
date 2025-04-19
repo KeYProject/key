@@ -36,7 +36,7 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionBlockStartNode(ITreeSettings settings, Node proofNode) {
+    protected AbstractExecutionBlockStartNode(ITreeSettings settings, Node proofNode) {
         super(settings, proofNode);
     }
 

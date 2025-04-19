@@ -372,8 +372,7 @@ public abstract class SMTTerm {
 
         List<SMTTerm> subForms = new LinkedList<>();
 
-        if (this instanceof SMTTermMultOp) {
-            SMTTermMultOp t = (SMTTermMultOp) this;
+        if (this instanceof SMTTermMultOp t) {
             if (t.operator == Op.OR) {
                 subForms.addAll(t.subs);
             } else {
@@ -383,8 +382,7 @@ public abstract class SMTTerm {
             subForms.add(this);
         }
 
-        if (right instanceof SMTTermMultOp) {
-            SMTTermMultOp t = (SMTTermMultOp) right;
+        if (right instanceof SMTTermMultOp t) {
             if (t.operator == Op.OR) {
                 subForms.addAll(t.subs);
             } else {
@@ -418,8 +416,7 @@ public abstract class SMTTerm {
 
         List<SMTTerm> subForms = new LinkedList<>();
 
-        if (this instanceof SMTTermMultOp) {
-            SMTTermMultOp t = (SMTTermMultOp) this;
+        if (this instanceof SMTTermMultOp t) {
             if (t.operator == Op.AND) {
                 subForms.addAll(t.subs);
             } else {
@@ -429,8 +426,7 @@ public abstract class SMTTerm {
             subForms.add(this);
         }
 
-        if (right instanceof SMTTermMultOp) {
-            SMTTermMultOp t = (SMTTermMultOp) right;
+        if (right instanceof SMTTermMultOp t) {
             if (t.operator == Op.AND) {
                 subForms.addAll(t.subs);
             } else {
@@ -448,15 +444,13 @@ public abstract class SMTTerm {
     public SMTTerms c(SMTTerm f) {
         List<SMTTerm> subForms = new LinkedList<>();
 
-        if (this instanceof SMTTerms) {
-            SMTTerms t = (SMTTerms) this;
+        if (this instanceof SMTTerms t) {
             subForms.addAll(t.getTerms());
         } else {
             subForms.add(this);
         }
 
-        if (f instanceof SMTTerms) {
-            SMTTerms t = (SMTTerms) f;
+        if (f instanceof SMTTerms t) {
             subForms.addAll(t.getTerms());
         } else {
             subForms.add(f);
@@ -468,8 +462,7 @@ public abstract class SMTTerm {
     public SMTTerm concat(SMTTerm f) {
         List<SMTTerm> subForms = new LinkedList<>();
 
-        if (this instanceof SMTTermMultOp) {
-            SMTTermMultOp t = (SMTTermMultOp) this;
+        if (this instanceof SMTTermMultOp t) {
             if (t.operator == Op.CONCAT) {
                 subForms.addAll(t.subs);
             } else {
@@ -479,8 +472,7 @@ public abstract class SMTTerm {
             subForms.add(this);
         }
 
-        if (f instanceof SMTTermMultOp) {
-            SMTTermMultOp t = (SMTTermMultOp) f;
+        if (f instanceof SMTTermMultOp t) {
             if (t.operator == Op.CONCAT) {
                 subForms.addAll(t.subs);
             } else {
@@ -583,19 +575,19 @@ public abstract class SMTTerm {
 
         if (this.sort() == SMTSort.BOOL) {
 
-            if (this == SMTTerm.TRUE) {
+            if (this == TRUE) {
                 return right;
             }
 
-            if (this == SMTTerm.FALSE) {
+            if (this == FALSE) {
                 return right.not();
             }
 
-            if (right == SMTTerm.TRUE) {
+            if (right == TRUE) {
                 return this;
             }
 
-            if (right == SMTTerm.FALSE) {
+            if (right == FALSE) {
                 return this.not();
             }
 
@@ -630,7 +622,7 @@ public abstract class SMTTerm {
             if (ln.getIntValue() == 0)
             // return SMTTerm.number(0);
             {
-                return SMTTerm.number(0, (int) this.sort().getBitSize());
+                return number(0, (int) this.sort().getBitSize());
             }
             if (ln.getIntValue() == 1) {
                 return right;
@@ -638,7 +630,7 @@ public abstract class SMTTerm {
         }
         if (right instanceof SMTTermNumber rn) {
             if (rn.getIntValue() == 0) {
-                return SMTTerm.number(0, (int) this.sort().getBitSize());
+                return number(0, (int) this.sort().getBitSize());
             }
             if (rn.getIntValue() == 1) {
                 return this;
@@ -652,7 +644,7 @@ public abstract class SMTTerm {
     public SMTTerm div(SMTTerm right) {
         if (this instanceof SMTTermNumber ln) {
             if (ln.getIntValue() == 0) {
-                return SMTTerm.number(0, (int) this.sort().getBitSize());
+                return number(0, (int) this.sort().getBitSize());
             }
         }
         if (right instanceof SMTTermNumber rn) {
@@ -863,7 +855,7 @@ public abstract class SMTTerm {
             if (pol) {
                 return this;
             } else {
-                return SMTTerm.FALSE;
+                return FALSE;
             }
         }
 
@@ -958,7 +950,7 @@ public abstract class SMTTerm {
             if (pol) {
                 return this;
             } else {
-                return SMTTerm.TRUE;
+                return TRUE;
             }
         }
 

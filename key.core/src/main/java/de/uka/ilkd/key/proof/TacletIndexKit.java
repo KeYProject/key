@@ -50,10 +50,12 @@ public abstract class TacletIndexKit {
      */
     private static class SingleThreadedTacletIndexKit extends TacletIndexKit {
 
+        @Override
         public TacletIndex createTacletIndex() {
             return new SingleThreadedTacletIndex();
         }
 
+        @Override
         public TacletIndex createTacletIndex(Iterable<Taclet> tacletSet) {
             return new SingleThreadedTacletIndex(tacletSet);
         }
@@ -65,10 +67,12 @@ public abstract class TacletIndexKit {
      */
     private static class MultiThreadedTacletIndexKit extends TacletIndexKit {
 
+        @Override
         public TacletIndex createTacletIndex() {
             return new MultiThreadedTacletIndex();
         }
 
+        @Override
         public TacletIndex createTacletIndex(Iterable<Taclet> tacletSet) {
             return new MultiThreadedTacletIndex(tacletSet);
         }

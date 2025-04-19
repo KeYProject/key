@@ -50,7 +50,7 @@ public class ConstantStringExpressionEvaluator extends RecoderModelTransformer {
                     boolean isCTC = false;
                     try {
                         isCTC = cee.isCompileTimeConstant((Expression) pe, res);
-                    } catch (java.lang.ArithmeticException t) {
+                    } catch (ArithmeticException t) {
                         //
                     }
                     if (isCTC && res.getTypeCode() == ConstantEvaluator.STRING_TYPE) {

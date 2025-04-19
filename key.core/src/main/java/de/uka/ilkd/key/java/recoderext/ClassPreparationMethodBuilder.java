@@ -23,6 +23,7 @@ import recoder.java.reference.FieldReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import recoder.service.ConstantEvaluator;
 
 /**
  * Each class is prepared before it is initialised. The preparation of a class consists of
@@ -71,7 +72,7 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
         if (!result) {
             return false;
         }
-        recoder.service.ConstantEvaluator ce = services.getConstantEvaluator();
+        ConstantEvaluator ce = services.getConstantEvaluator();
 
         try {
             result = ce.isCompileTimeConstant(spec.getInitializer());

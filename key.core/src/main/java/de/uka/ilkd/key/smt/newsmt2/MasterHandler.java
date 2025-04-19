@@ -16,13 +16,13 @@ import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -222,7 +222,7 @@ public class MasterHandler {
         } else {
             // unknown value depends on quantified variables
             var names = freeVars.stream()
-                    .map(x -> new SExpr(LogicalVariableHandler.VAR_PREFIX + x.name().toString()))
+                    .map(x -> new SExpr(LogicalVariableHandler.VAR_PREFIX + x.name()))
                     .toList();
             var types = freeVars.stream()
                     .map(x -> LogicalVariableHandler.makeVarDecl("", x.sort()).getChildren().get(0))
@@ -309,7 +309,8 @@ public class MasterHandler {
      * @return a list of translations
      * @throws SMTTranslationException if the type conversion is impossible
      */
-    public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
+    public List<SExpr> translate(Iterable<? extends Term> terms, Type type)
+            throws SMTTranslationException {
         return SExprs.coerce(translate(terms), type);
     }
 
@@ -319,7 +320,7 @@ public class MasterHandler {
      * @param terms non-null list of terms.
      * @return a list of translations
      */
-    public List<SExpr> translate(Iterable<Term> terms) {
+    public List<SExpr> translate(Iterable<? extends Term> terms) {
         List<SExpr> result = new LinkedList<>();
         for (Term term : terms) {
             result.add(translate(term));

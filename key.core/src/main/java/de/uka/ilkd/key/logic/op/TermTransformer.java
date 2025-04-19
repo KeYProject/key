@@ -8,12 +8,13 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.TerminalSyntaxElement;
+import org.key_project.logic.op.SortedOperator;
 
 /**
  * TermTransformer perform complex term transformation which cannot be (efficiently or at all)
  * described by taclets.
  */
-public interface TermTransformer extends org.key_project.logic.op.SortedOperator, Operator,
+public interface TermTransformer extends SortedOperator, Operator,
         /* TODO: check */ TerminalSyntaxElement {
 
     /**

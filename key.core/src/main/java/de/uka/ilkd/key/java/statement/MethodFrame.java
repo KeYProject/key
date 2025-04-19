@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableArray;
  * The statement inserted by KeY if a method call is executed.
  */
 public class MethodFrame extends JavaStatement
-        implements Statement, StatementContainer, ProgramPrefix {
+        implements StatementContainer, ProgramPrefix {
 
     /**
      * result

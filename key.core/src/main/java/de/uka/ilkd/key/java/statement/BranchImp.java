@@ -21,17 +21,17 @@ public abstract class BranchImp extends JavaNonTerminalProgramElement implements
      *
      * @param children the children of this AST element as KeY classes. May contain: Comments
      */
-    public BranchImp(ExtList children) {
+    protected BranchImp(ExtList children) {
         super(children);
     }
 
 
-    public BranchImp() {
+    protected BranchImp() {
         super();
     }
 
 
-    public BranchImp(ExtList children, PositionInfo pos) {
+    protected BranchImp(ExtList children, PositionInfo pos) {
         super(children, pos);
     }
 

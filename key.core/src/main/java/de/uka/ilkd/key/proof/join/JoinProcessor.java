@@ -15,11 +15,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.delayedcut.NodeGoalPair;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -116,13 +121,16 @@ public class JoinProcessor implements Runnable {
 
     private void orRight(Goal goal) {
         SequentFormula sf = goal.sequent().succedent().get(0);
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
+        PosInOccurrence pio =
+            new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
         apply(new String[] { OR_RIGHT_TACLET }, goal, pio);
 
     }
 
-    private SequentFormula findFormula(Sequent sequent, Term content, boolean antecedent) {
-        for (SequentFormula sf : (antecedent ? sequent.antecedent() : sequent.succedent())) {
+    private SequentFormula findFormula(Sequent sequent, Term content,
+            boolean antecedent) {
+        for (SequentFormula sf : (antecedent ? sequent.antecedent()
+                : sequent.succedent())) {
             if (sf.formula().equals(content)) {
                 return sf;
             }
@@ -132,9 +140,11 @@ public class JoinProcessor implements Runnable {
 
     private Goal simplifyUpdate(Goal goal, DelayedCut cut) {
 
-        SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
+        SequentFormula sf =
+            findFormula(goal.sequent(), cut.getFormula(), false);
 
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel().down(0), false);
+        PosInOccurrence pio =
+            new PosInOccurrence(sf, PosInTerm.getTopLevel().down(0), false);
         Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
 
         return result == null ? goal : result;
@@ -143,7 +153,8 @@ public class JoinProcessor implements Runnable {
     /**
      * Applies one of the given taclets if this possible otherwise an exception is thrown.
      */
-    private ImmutableList<Goal> apply(final String[] tacletNames, Goal goal, PosInOccurrence pio) {
+    private ImmutableList<Goal> apply(final String[] tacletNames, Goal goal,
+            PosInOccurrence pio) {
 
         TacletFilter filter = new TacletFilter() {
 
@@ -177,7 +188,8 @@ public class JoinProcessor implements Runnable {
         }
         int index = goal.sequent().formulaNumberInSequent(false, partner.getFormulaForHiding());
         PosInOccurrence pio =
-            PosInOccurrence.findInSequent(goal.sequent(), index, PosInTerm.getTopLevel());
+            PosInOccurrence.findInSequent(goal.sequent(), index,
+                PosInTerm.getTopLevel());
         return apply(new String[] { HIDE_RIGHT_TACLET }, goal, pio).head();
 
     }
@@ -204,9 +216,9 @@ public class JoinProcessor implements Runnable {
         Collection<Term> commonGamma = computeCommonFormulas(partner.getSequent(0).antecedent(),
             partner.getSequent(1).antecedent(), partner.getCommonFormula());
         Collection<Term> delta1 = computeDifference(partner.getSequent(0).succedent(), commonDelta,
-            partner.getFormula(0).formula());
+            (Term) partner.getFormula(0).formula());
         Collection<Term> delta2 = computeDifference(partner.getSequent(1).succedent(), commonDelta,
-            partner.getFormula(1).formula());
+            (Term) partner.getFormula(1).formula());
 
         Collection<Term> gamma1 =
             computeDifference(partner.getSequent(0).antecedent(), commonGamma, null);
@@ -264,7 +276,7 @@ public class JoinProcessor implements Runnable {
         TreeSet<Term> result = createTree();
         for (SequentFormula sf : s2) {
             if (formulas1.contains(sf.formula())) {
-                result.add(sf.formula());
+                result.add((Term) sf.formula());
             }
         }
         return result;
@@ -275,7 +287,7 @@ public class JoinProcessor implements Runnable {
         LinkedList<Term> result = new LinkedList<>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
-                result.add(sf.formula());
+                result.add((Term) sf.formula());
             }
         }
         return result;
@@ -285,7 +297,7 @@ public class JoinProcessor implements Runnable {
         TreeSet<Term> set = createTree();
         for (SequentFormula sf : semisequent) {
             if (sf.formula() != exclude) {
-                set.add(sf.formula());
+                set.add((Term) sf.formula());
             }
         }
         return set;

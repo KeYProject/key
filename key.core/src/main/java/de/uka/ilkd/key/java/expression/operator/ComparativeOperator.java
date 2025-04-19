@@ -27,11 +27,11 @@ public abstract class ComparativeOperator extends Operator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public ComparativeOperator(ExtList children) {
+    protected ComparativeOperator(ExtList children) {
         super(children);
     }
 
-    public ComparativeOperator(Expression lhs, Expression rhs) {
+    protected ComparativeOperator(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }
 

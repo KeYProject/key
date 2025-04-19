@@ -34,7 +34,7 @@ import recoder.abstraction.TypeArgument.WildcardMode;
 import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.recoderext.adt.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import org.key_project.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;

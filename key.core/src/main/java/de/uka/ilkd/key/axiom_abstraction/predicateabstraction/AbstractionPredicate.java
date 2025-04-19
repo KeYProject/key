@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
@@ -116,7 +117,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
         final Sort fInputSort = placeholder.sort();
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
-            private final Name name = new Name("abstrPred_" + predicate.op().toString());
+            private final Name name = new Name("abstrPred_" + predicate.op());
             private Function<Term, Term> mapping = null;
 
             @Override

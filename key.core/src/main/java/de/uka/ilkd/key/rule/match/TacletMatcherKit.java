@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.rule.match;
 
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
+
+import org.key_project.prover.rules.TacletMatcher;
 
 
 /**

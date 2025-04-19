@@ -14,24 +14,22 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -189,9 +187,9 @@ public final class QueryAxiom extends ClassAxiom {
         } else {
             final Term ifFormula = tb.exactInstance(kjt.getSort(), tb.var(selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
-            final Semisequent ifSemiSeq =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
-            ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+            final ImmutableList<SequentFormula> antecedent =
+                ImmutableSLList.singleton(ifCf);
+            ifSeq = JavaDLSequentKit.createAnteSequent(antecedent);
         }
 
         // create find
@@ -218,9 +216,8 @@ public final class QueryAxiom extends ClassAxiom {
         final Term addedFormula =
             tb.apply(update, tb.prog(Modality.JavaModalityKind.BOX, jb, post), null);
         final SequentFormula addedCf = new SequentFormula(addedFormula);
-        final Semisequent addedSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-        final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
+        final Sequent addedSeq =
+            JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(addedCf));
 
         // build taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =

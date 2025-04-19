@@ -72,14 +72,14 @@ public class LoadUserTacletsDialog extends JPanel {
 
             super(BoxLayout.Y_AXIS);
             this.title = title;
-            Box box = Box.createHorizontalBox();
+            Box box = createHorizontalBox();
 
             if (title != null) {
                 this.setBorder(BorderFactory.createTitledBorder(title));
             }
 
             box.add(getFileField());
-            box.add(Box.createHorizontalStrut(5));
+            box.add(createHorizontalStrut(5));
             box.add(getChooseFileButton());
             this.add(box);
         }

@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -42,14 +42,16 @@ public interface ProofControl {
      *
      * @return a list of Taclets with all applicable RewriteTaclets
      */
-    ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos);
+    ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal,
+            PosInOccurrence pos);
 
     /**
      * collects all applicable FindTaclets of the current goal (called by the SequentViewer)
      *
      * @return a list of Taclets with all applicable FindTaclets
      */
-    ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos);
+    ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal,
+            PosInOccurrence pos);
 
     /**
      * collects all applicable NoFindTaclets of the current goal (called by the SequentViewer)
@@ -65,7 +67,8 @@ public interface ProofControl {
      */
     ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
 
-    boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos);
+    boolean selectedTaclet(Taclet taclet, Goal goal,
+            PosInOccurrence pos);
 
     /**
      * Apply a RuleApp and continue with update simplification or strategy application according to
@@ -179,5 +182,6 @@ public interface ProofControl {
      * @param posInOcc The exact {@link PosInOccurrence} at which the {@link ProofMacro} is started
      *        at.
      */
-    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc);
+    void runMacro(Node node, ProofMacro macro,
+            PosInOccurrence posInOcc);
 }

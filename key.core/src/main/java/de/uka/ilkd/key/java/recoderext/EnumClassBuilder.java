@@ -123,7 +123,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
     /**
      * substitute EnumDeclarations by EnumClassDeclarations.
      *
-     * @see de.uka.ilkd.key.java.recoderext.RecoderModelTransformer#makeExplicit(recoder.java.declaration.TypeDeclaration)
+     * @see RecoderModelTransformer#makeExplicit(TypeDeclaration)
      * @deprecated THIS DOES NOT WORK ANY MORE, SINCE THE CACHE ONLY CONSIDERS CLASSE TYPES, NOT
      *             ENUMS!
      */
@@ -135,7 +135,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      *
      * call super class to invoke "makeExplicit".
      *
-     * @see de.uka.ilkd.key.java.recoderext.RecoderModelTransformer#transform()
+     * @see RecoderModelTransformer#transform()
      */
     @Override
     public void transform() {

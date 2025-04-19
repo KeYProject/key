@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -46,7 +46,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
      * @param root the ProgramElement where to begin
      * @param services the Services object
      */
-    public JavaASTVisitor(ProgramElement root, Services services) {
+    protected JavaASTVisitor(ProgramElement root, Services services) {
         super(root);
         this.services = services;
     }
