@@ -23,8 +23,7 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
  */
 public class IntegerOpHandler implements SMTHandler {
 
-    /** to indicate that an expression holds a value of type Int. */
-    public static final Type INT = new Type("Int", "i2u", "u2i");
+
 
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_PRESBURGER =
         new BooleanProperty("Presburger", "Limit arithmetics to Presburger arithmetic (LIA)",
@@ -38,8 +37,7 @@ public class IntegerOpHandler implements SMTHandler {
     private IntegerLDT integerLDT;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         supportedOperators.clear();
         this.integerLDT = services.getTypeConverter().getIntegerLDT();
 
@@ -98,7 +96,7 @@ public class IntegerOpHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        List<SExpr> children = trans.translate(term.subs(), IntegerOpHandler.INT);
+        List<SExpr> children = trans.translate(term.subs(), Type.INT);
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;
@@ -107,7 +105,7 @@ public class IntegerOpHandler implements SMTHandler {
         if (predicateOperators.contains(op)) {
             resultType = Type.BOOL;
         } else {
-            resultType = IntegerOpHandler.INT;
+            resultType = Type.INT;
         }
 
         return new SExpr(smtOp, resultType, children);
