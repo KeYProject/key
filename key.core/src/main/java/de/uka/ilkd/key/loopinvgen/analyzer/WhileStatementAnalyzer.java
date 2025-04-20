@@ -119,7 +119,7 @@ public class WhileStatementAnalyzer {
             assert proofStarter.getProof().openGoals().size() == 1;
             Sequent initSequent = proofStarter.getProof().openGoals().head().sequent();
             var lowerBound = determineLowerBound(initSequent, init);
-            System.out.println(lowerBound);
+            System.out.println("Initial index is " + lowerBound);
             return lowerBound;
         } catch (ProofInputException e) {
             throw new RuntimeException(e);
