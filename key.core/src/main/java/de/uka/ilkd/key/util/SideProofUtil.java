@@ -5,7 +5,7 @@ package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.logic.Choice;
+import org.key_project.logic.Choice;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;

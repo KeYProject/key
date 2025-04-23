@@ -1,40 +1,21 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule;
+package org.key_project.prover.rules;
 
-import de.uka.ilkd.key.logic.*;
-
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
-import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.RuleSet;
-import org.key_project.prover.rules.TacletAnnotation;
-import org.key_project.prover.rules.TacletApplPart;
-import org.key_project.prover.rules.TacletAttributes;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-
-
-/**
- * An abstract class to represent Taclets with a find part. This means, they have to be attached to
- * a formula or term of the sequent. This class is extended by several subclasses to distinct
- * between taclets that have to attached to a top level formula of the antecedent
- * ({@link AntecTaclet}), to the succedent ({@link SuccTaclet}) or to an arbitrary term that matches
- * the find part somewhere in the sequent ({@link RewriteTaclet}).
- */
-public abstract class FindTaclet extends Taclet {
-
+public abstract class FindTaclet extends Taclet{
     /** contains the find term */
     protected final Term find;
 
     /** Set of schema variables of the assumes sequent and the (optional) find expression/sequent */
-    private ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
+    protected ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
 
     /**
      * this method is used to determine if top level updates are allowed to be ignored. This is the
@@ -64,11 +45,11 @@ public abstract class FindTaclet extends Taclet {
                          ImmutableList<TacletGoalTemplate> goalTemplates,
                          ImmutableList<RuleSet> ruleSets,
                          TacletAttributes attrs, Term find,
-                         ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+                         ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
                          ChoiceExpr choices, boolean surviveSymbExec,
                          ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
-            tacletAnnotations);
+                tacletAnnotations);
         this.find = find;
     }
 
@@ -89,13 +70,13 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                         ImmutableList<TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
+                         TacletAttributes attrs, Term find,
+                         ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+                         ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
-            tacletAnnotations);
+                tacletAnnotations);
     }
 
     /** returns the find term of the taclet to be matched */
@@ -106,29 +87,7 @@ public abstract class FindTaclet extends Taclet {
     /**
      * @return Set of schemavariables of the if and the (optional) find part
      */
-    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
-        if (assumesAndFindSchemaVariables == null) {
-            TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
-            find().execPostOrder(svc);
-
-            assumesAndFindSchemaVariables = getAssumesVariables();
-
-            for (final SchemaVariable sv : svc.vars()) {
-                assumesAndFindSchemaVariables = assumesAndFindSchemaVariables.add(sv);
-            }
-        }
-
-        return assumesAndFindSchemaVariables;
-    }
-
-    /**
-     * returns the variables that occur bound in the find part
-     */
-    protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {
-        final BoundVarsVisitor bvv = new BoundVarsVisitor();
-        bvv.visit(find());
-        return bvv.getBoundVariables();
-    }
+    public abstract ImmutableSet<SchemaVariable> getAssumesAndFindVariables();
 
     /** {@inheritDoc} */
     @Override

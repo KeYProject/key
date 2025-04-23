@@ -6,7 +6,7 @@ package org.key_project.proofmanagement.check;
 import java.nio.file.Path;
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Choice;
+import org.key_project.logic.Choice;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;

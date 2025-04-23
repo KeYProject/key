@@ -5,6 +5,7 @@ package org.key_project.prover.rules;
 
 import java.util.Iterator;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -27,7 +28,6 @@ import static org.key_project.util.Strings.formatAsList;
  * within the KeY verification system.
  */
 public abstract class Taclet implements Rule {
-
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
     /** unique name of the taclet */
@@ -66,6 +66,9 @@ public abstract class Taclet implements Rule {
      * the list of taclet goal descriptions
      */
     protected final ImmutableList<TacletGoalTemplate> goalTemplates;
+
+    /** the set of taclet options for this taclet */
+    protected final ChoiceExpr choices;
 
     /**
      * map from a schemavariable to its prefix. The prefix is used to test correct instantiations of
@@ -129,7 +132,7 @@ public abstract class Taclet implements Rule {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
             boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
@@ -145,6 +148,7 @@ public abstract class Taclet implements Rule {
         this.surviveSymbExec = surviveSmbExec;
         this.trigger = attrs.trigger();
         this.ruleSets = ruleSets;
+        this.choices = choices;
     }
 
     public boolean hasTrigger() {
@@ -176,9 +180,9 @@ public abstract class Taclet implements Rule {
     protected Taclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, false,
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,choices, false,
             tacletAnnotations);
     }
 
@@ -320,6 +324,15 @@ public abstract class Taclet implements Rule {
         return prefixMap.get(sv);
     }
 
+    public ChoiceExpr getChoices() {
+        return choices;
+    }
+
+    /** returns an iterator over the rule sets. */
+    public Iterator<RuleSet> ruleSets() {
+        return ruleSets.iterator();
+    }
+
     /**
      * returns the set of schemavariables of the taclet's assumes-part
      *
@@ -415,6 +428,12 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
+    StringBuffer toStringAttribs(StringBuffer sb) {
+        // if (noninteractive()) sb = sb.append(" \\noninteractive");
+        sb.append("\nChoices: ").append(choices);
+        return sb;
+    }
+
     /**
      * returns a representation of the Taclet as String
      *
@@ -430,6 +449,7 @@ public abstract class Taclet implements Rule {
             sb = toStringVarCond(sb);
             sb = toStringGoalTemplates(sb);
             sb = toStringRuleSets(sb);
+            sb = toStringAttribs(sb);
             sb = toStringTriggers(sb);
             tacletAsString = sb.append("}").toString();
         }
