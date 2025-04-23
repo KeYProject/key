@@ -87,6 +87,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     /** Integer to cache the hashcode */
     private int hashcode = 0;
 
+    /* TODO: find better solution */
+    private final boolean surviveSymbExec;
+
+
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
@@ -109,8 +113,8 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
-            surviveSmbExec,
             tacletAnnotations);
+        this.surviveSymbExec = surviveSmbExec;
     }
 
     /**
@@ -306,6 +310,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         for (SequentFormula cf : s) {
             cf.formula().execPostOrder(oc);
         }
+    }
+
+    public boolean getSurviveSymbExec() {
+        return surviveSymbExec;
     }
 
     /**
