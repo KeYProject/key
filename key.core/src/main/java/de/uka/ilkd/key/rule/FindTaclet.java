@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.*;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleSet;
@@ -29,20 +30,8 @@ import org.jspecify.annotations.NonNull;
  * the find part somewhere in the sequent ({@link RewriteTaclet}).
  */
 public abstract class FindTaclet extends Taclet {
-
-    /** contains the find term */
-    protected final Term find;
-
     /** Set of schema variables of the assumes sequent and the (optional) find expression/sequent */
     private ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
-
-    /**
-     * this method is used to determine if top level updates are allowed to be ignored. This is the
-     * case if we have an AntecTaclet or SuccTaclet but not for a RewriteTaclet
-     *
-     * @return true if top level updates shall be ignored
-     */
-    public abstract boolean ignoreTopLevelUpdates();
 
     /**
      * creates a FindTaclet
@@ -61,15 +50,15 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-                         ImmutableList<TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
-                         TacletAttributes attrs, Term find,
-                         ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-                         ChoiceExpr choices, boolean surviveSymbExec,
-                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, SyntaxElement find,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, boolean surviveSymbExec,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
+            surviveSymbExec,
             tacletAnnotations);
-        this.find = find;
     }
 
     /**
@@ -91,7 +80,7 @@ public abstract class FindTaclet extends Taclet {
     protected FindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find,
+            TacletAttributes attrs, SyntaxElement find,
             ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
@@ -100,7 +89,7 @@ public abstract class FindTaclet extends Taclet {
 
     /** returns the find term of the taclet to be matched */
     public Term find() {
-        return find;
+        return (Term) find;
     }
 
     /**
