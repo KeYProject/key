@@ -339,19 +339,8 @@ public class LogicPrinter {
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) {
-        final int applicationRestriction = taclet.getApplicationRestriction();
-        if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
-            layouter.nl().print("\\sameUpdateLevel");
-        }
-        if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
-            layouter.nl().print("\\inSequentState");
-        }
-        if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
-            layouter.nl().print("\\antecedentPolarity");
-        }
-        if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
-            layouter.nl().print("\\succedentPolarity");
-        }
+        final var applicationRestriction = taclet.applicationRestriction();
+        layouter.nl().print(applicationRestriction.toString());
     }
 
     protected void printVarCond(Taclet taclet) {

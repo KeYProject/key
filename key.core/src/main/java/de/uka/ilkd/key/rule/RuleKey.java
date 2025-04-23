@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.logic.ChoiceExpr;
-
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 

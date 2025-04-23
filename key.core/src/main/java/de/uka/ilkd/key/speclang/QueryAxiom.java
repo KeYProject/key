@@ -28,6 +28,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -236,7 +237,8 @@ public final class QueryAxiom extends ClassAxiom {
             tacletBuilder.addVarsNew(paramProgSVs[i], target.getParamType(i));
         }
         tacletBuilder.addVarsNew(resultProgSV, target.getReturnType());
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         tacletBuilder.addTacletGoalTemplate(
             new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.nil(), replacewith));
         tacletBuilder.setName(MiscTools.toValidTacletName(name));

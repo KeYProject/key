@@ -6,7 +6,6 @@ package de.uka.ilkd.key.nparser;
 import java.util.*;
 
 import org.key_project.logic.Choice;
-
 import org.key_project.logic.Namespace;
 
 /**
