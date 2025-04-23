@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.informationflow.rule;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
-import org.key_project.logic.ChoiceExpr;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Rule;
@@ -68,10 +68,10 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
             ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            int p_applicationRestriction, ChoiceExpr choices,
+            ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
-            p_applicationRestriction, choices, tacletAnnotations);
+            choices, tacletAnnotations);
     }
 
 
@@ -80,10 +80,10 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
             ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            int p_applicationRestriction, ChoiceExpr choices, boolean surviveSymbExec,
+            ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
-            p_applicationRestriction, choices, surviveSymbExec, tacletAnnotations);
+            choices, surviveSymbExec, tacletAnnotations);
     }
 
     @Override
@@ -94,14 +94,15 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
     @Override
     public InfFlowContractAppTaclet setName(String s) {
         final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
+                varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs =
             new TacletAttributes(displayName(), trigger);
 
         return new InfFlowContractAppTaclet(new Name(s), applPart,
             goalTemplates(), getRuleSets(),
-            attrs, find, prefixMap, getApplicationRestriction(),
+            attrs, (Term) find, prefixMap,
             choices, getSurviveSymbExec(),
             tacletAnnotations);
     }

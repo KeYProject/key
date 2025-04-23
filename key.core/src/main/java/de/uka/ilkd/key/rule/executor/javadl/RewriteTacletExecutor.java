@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -90,8 +91,8 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
             Services services, TacletApp app) {
         assert taclet.goalTemplates().size() == 1;
         assert taclet.goalTemplates().head().sequent().isEmpty();
-        assert ((RewriteTaclet) taclet)
-                .getApplicationRestriction() != RewriteTaclet.IN_SEQUENT_STATE;
+        assert !taclet
+                .applicationRestriction().matches(ApplicationRestriction.IN_SEQUENT_STATE);
         assert app.complete();
         final RewriteTacletGoalTemplate gt =
             (RewriteTacletGoalTemplate) taclet.goalTemplates().head();

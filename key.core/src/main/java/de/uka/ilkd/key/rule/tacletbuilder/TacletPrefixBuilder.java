@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
@@ -125,8 +126,11 @@ public class TacletPrefixBuilder {
 
         if (tacletBuilder instanceof FindTacletBuilder findBuilder) {
             @SuppressWarnings("unchecked")
-            final Term find = findBuilder.getFind();
-            visit(find);
+            final SyntaxElement find = findBuilder.getFind();
+            if (find instanceof Term t)
+                visit(t);
+            else if (find instanceof Sequent s)
+                visit(s);
         }
 
         for (final var tgt : tacletBuilder.goalTemplates()) {

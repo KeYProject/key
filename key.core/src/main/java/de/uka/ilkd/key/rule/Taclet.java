@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
@@ -90,6 +91,9 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
      * @param name the name of the Taclet
+     * @param find the Term or Sequent that is the pattern that has to be found in a sequent and the
+     *        places
+     *        where it matches the Taclet can be applied
      * @param applPart contains the application part of an Taclet that is the if-sequence, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
@@ -97,14 +101,15 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
-    protected Taclet(Name name, TacletApplPart applPart,
+    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSmbExec,
+        super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
+            surviveSmbExec,
             tacletAnnotations);
     }
 
@@ -112,6 +117,9 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
      *
      * @param name the name of the Taclet
+     * @param find the Term or Sequent that is the pattern that has to be found in a sequent and the
+     *        places
+     *        where it matches the Taclet can be applied
      * @param applPart contains the application part of an Taclet that is the if-sequence, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
@@ -119,13 +127,13 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
-    protected Taclet(Name name, TacletApplPart applPart,
+    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
+        this(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
     }
 
