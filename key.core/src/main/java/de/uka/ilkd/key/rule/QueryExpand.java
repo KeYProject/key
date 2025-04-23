@@ -27,6 +27,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -89,7 +90,8 @@ public class QueryExpand implements BuiltInRule {
         tb.setName(tacletName);
         tb.setDisplayName("replaceKnownQuery");
         tb.setFind(query);
-        tb.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
+        tb.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE));
         tb.addGoalTerm(queryEval.second);
         tb.addRuleSet(new RuleSet(new Name("concrete")));
 

@@ -26,6 +26,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -341,7 +342,8 @@ public class TacletGenerator {
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs, selfSV, paramSVs,
                 schemaRepresents, tacletBuilder);
         }
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         result = result.add(tacletBuilder.getTaclet());
         // return
         return result;
@@ -550,7 +552,8 @@ public class TacletGenerator {
         }
 
         tacletBuilder.setFind(find);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         tacletBuilder.addTacletGoalTemplate(
             new TacletGoalTemplate(addedSeq, ImmutableSLList.nil()));
         tacletBuilder.setName(name);
@@ -633,7 +636,8 @@ public class TacletGenerator {
             new RewriteTacletBuilder<>();
 
         replaceTacletBuilder.setFind(findTerm);
-        replaceTacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        replaceTacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         replaceTacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceTerm));
         replaceTacletBuilder.setName(name);
         replaceTacletBuilder.addRuleSet(new RuleSet(new Name("simplify_prog"))); // TODO ?
