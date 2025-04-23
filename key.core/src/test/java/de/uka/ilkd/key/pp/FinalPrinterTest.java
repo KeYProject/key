@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
+import org.key_project.logic.Choice;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;

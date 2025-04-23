@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -77,10 +78,6 @@ import org.jspecify.annotations.Nullable;
  * </p>
  */
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
-
-    /** the set of taclet options for this taclet */
-    protected final ChoiceExpr choices;
-
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
      */
@@ -107,9 +104,8 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec,
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSmbExec,
             tacletAnnotations);
-        this.choices = choices;
     }
 
     /**
@@ -179,15 +175,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * @return set of variables that occur bound in taclet entities others than goal templates
      */
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
-
-    public ChoiceExpr getChoices() {
-        return choices;
-    }
-
-    /** returns an iterator over the rule sets. */
-    public Iterator<RuleSet> ruleSets() {
-        return ruleSets.iterator();
-    }
 
     @Override
     public @NonNull TacletExecutor getExecutor() {
