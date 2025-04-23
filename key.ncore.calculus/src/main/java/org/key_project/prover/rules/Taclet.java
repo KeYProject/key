@@ -107,9 +107,6 @@ public abstract class Taclet implements Rule {
      */
     protected final Trigger trigger;
 
-    /* TODO: find better solution */
-    private final boolean surviveSymbExec;
-
     // The two rule engines for matching and execution (application) of taclets
     // In the long run, we should think about keeping those somewhere else, e.g., in the services
     // such that we gain more flexibility like combined matchers that do not just match one taclet
@@ -143,7 +140,6 @@ public abstract class Taclet implements Rule {
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
-            boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
         this.name = name;
@@ -157,31 +153,10 @@ public abstract class Taclet implements Rule {
         this.goalTemplates = goalTemplates;
         this.prefixMap = prefixMap;
         this.displayName = attrs.displayName() == null ? name.toString() : attrs.displayName();
-        this.surviveSymbExec = surviveSmbExec;
         this.trigger = attrs.trigger();
         this.ruleSets = ruleSets;
         this.choices = choices;
         check();
-    }
-
-    /**
-     * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
-     *
-     * @param name the name of the Taclet
-     * @param applPart contains the application part of a Taclet that is the if-sequence, the
-     *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
-     *        or recursive use of the Taclet.
-     */
-    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
-            ChoiceExpr choices,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
-            tacletAnnotations);
     }
 
     private void check() {
@@ -206,10 +181,6 @@ public abstract class Taclet implements Rule {
 
     public final TacletMatcher getMatcher() {
         return matcher;
-    }
-
-    public boolean getSurviveSymbExec() {
-        return surviveSymbExec;
     }
 
     /**
