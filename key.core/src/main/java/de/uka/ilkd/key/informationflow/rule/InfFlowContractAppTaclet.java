@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.informationflow.rule;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
-import de.uka.ilkd.key.logic.ChoiceExpr;
+import org.key_project.logic.ChoiceExpr;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 

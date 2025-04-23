@@ -1,43 +1,22 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule;
+package org.key_project.prover.rules;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.*;
-import org.key_project.prover.rules.TacletPrefix;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PIOPathIterator;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * A RewriteTaclet represents a taclet, whose find can be matched against any term in the sequent no
  * matter where it occurs. The only constraint to be fulfilled is that the term matches the
  * structure described by the term of the find-part.
  */
-public class RewriteTaclet extends FindTaclet {
-
+public abstract class RewriteTaclet extends FindTaclet {
     /** does not pose state restrictions on valid matchings */
     public static final int NONE = 0;
 
@@ -89,7 +68,6 @@ public class RewriteTaclet extends FindTaclet {
      */
     private final int applicationRestriction;
 
-
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters that represents a
      * rewrite rule.
@@ -109,33 +87,28 @@ public class RewriteTaclet extends FindTaclet {
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find,
-            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
-            int p_applicationRestriction, ChoiceExpr choices,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                         ImmutableList<TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
+                         TacletAttributes attrs, Term find,
+                         ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+                         int p_applicationRestriction, ChoiceExpr choices,
+                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
-            p_applicationRestriction, choices, false, tacletAnnotations);
+                p_applicationRestriction, choices, false, tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find,
-            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
-            int p_applicationRestriction, ChoiceExpr choices,
-            boolean surviveSymbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                         ImmutableList<TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
+                         TacletAttributes attrs, Term find,
+                         ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+                         int p_applicationRestriction, ChoiceExpr choices,
+                         boolean surviveSymbExec,
+                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
-            surviveSymbExec, tacletAnnotations);
+                surviveSymbExec, tacletAnnotations);
         applicationRestriction = p_applicationRestriction;
         createTacletServices();
-    }
-
-    @Override
-    protected void createAndInitializeExecutor() {
-        this.executor = new RewriteTacletExecutor(this);
     }
 
     /**
@@ -158,7 +131,6 @@ public class RewriteTaclet extends FindTaclet {
         return applicationRestriction;
     }
 
-
     /**
      * the top level operator has to be a simultaneous update. This method checks if the assignment
      * pairs of the update contain free logic variables and gives a veto if positive
@@ -169,84 +141,6 @@ public class RewriteTaclet extends FindTaclet {
     private boolean veto(Term t) {
         return !t.freeVars().isEmpty();
     }
-
-    /**
-     * For taclets with <code>getSameUpdatePrefix ()</code>, collect the updates above
-     * <code>p_pos</code> and add them to the update context of the instantiations object
-     * <code>p_mc</code>.
-     *
-     * @return the new instantiations with the additional updates, or <code>null</code>, if program
-     *         modalities appear above <code>p_pos</code>
-     */
-    public MatchConditions checkPrefix(
-            PosInOccurrence p_pos,
-            MatchConditions p_mc) {
-        int polarity = p_pos.isInAntec() ? -1 : 1; // init polarity
-        SVInstantiations svi = p_mc.getInstantiations();
-        // this is assumed to hold
-        assert p_pos.posInTerm() != null;
-
-        PIOPathIterator it = p_pos.iterator();
-        while (it.next() != -1) {
-            final Term t = (Term) it.getSubTerm();
-            var op = t.op();
-            if (op instanceof Transformer) {
-                return null;
-            } else if (op instanceof UpdateApplication
-                    && it.getChild() == UpdateApplication.targetPos()
-                    && getApplicationRestriction() != NONE) {
-                if ((getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t)) {
-                    return null;
-                } else {
-                    Term update = UpdateApplication.getUpdate(t);
-                    svi = svi.addUpdate(update, t.getLabels());
-                }
-            } else if (getApplicationRestriction() != NONE
-                    && (op instanceof Modality)) {
-                return null;
-            }
-
-            if (polarity != 0) {
-                polarity = polarity(op, it, polarity);
-            }
-        }
-
-        if (getApplicationRestriction() == NONE) {
-            return p_mc;
-        }
-        if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1)
-                || ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
-            return null;
-        }
-        return p_mc.setInstantiations(svi);
-    }
-
-    /**
-     * Compute polarity
-     *
-     * (the {@code AntecSuccPrefixChecker} seems to reimplement this.
-     */
-    private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
-        // toggle polarity if find term is
-        // subterm of
-        if ((op == Junctor.NOT) || // not
-                (op == Junctor.IMP && it.getChild() == 0)) { // left hand side of implication
-            polarity = polarity * -1;
-            // do not change polarity if find term
-            // is subterm of
-        } else if ((op == Junctor.AND) || // and
-                (op == Junctor.OR) || // or
-                (op == Junctor.IMP && it.getChild() != 0) || // right hand side of implication
-                (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { // then or else part of
-                                                                         // if-then-else
-            // do nothing
-        } else { // find term has no polarity in any
-                 // other case
-            polarity = 0;
-        }
-        return polarity;
-    }
-
 
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
@@ -264,22 +158,5 @@ public class RewriteTaclet extends FindTaclet {
             res.append("\\succedentPolarity");
         }
         return res;
-    }
-
-    public SequentFormula getRewriteResult(Goal goal, TermLabelState termLabelState,
-            Services services, TacletApp app) {
-        return ((RewriteTacletExecutor) getExecutor()).getRewriteResult(goal, termLabelState,
-            services, app);
-    }
-
-    @Override
-    public RewriteTaclet setName(String s) {
-        final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
-                varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
-
-        return new RewriteTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs, find,
-            prefixMap, applicationRestriction, choices, getSurviveSymbExec(), tacletAnnotations);
     }
 }
