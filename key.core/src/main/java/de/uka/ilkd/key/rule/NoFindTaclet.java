@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import org.key_project.logic.ChoiceExpr;
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -42,7 +42,7 @@ public class NoFindTaclet extends Taclet {
             TacletAttributes attrs,
             ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
+        super(name, null, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
             tacletAnnotations);
         createTacletServices();
     }
@@ -74,7 +74,8 @@ public class NoFindTaclet extends Taclet {
     @Override
     public NoFindTaclet setName(String s) {
         final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
+                varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -219,10 +220,10 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     }
 
     private int getPolarity(RewriteTaclet rwTaclet) {
-        int restr = rwTaclet.getApplicationRestriction();
-        if ((restr & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+        var restr = rwTaclet.applicationRestriction();
+        if (restr.matches(ApplicationRestriction.ANTECEDENT_POLARITY)) {
             return -1;
-        } else if ((restr & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+        } else if (restr.matches(ApplicationRestriction.SUCCEDENT_POLARITY)) {
             return +1;
         } else {
             return 0;

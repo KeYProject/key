@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-import java.util.List;
 import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;

@@ -7,6 +7,8 @@ import java.util.Iterator;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.ProofGoal;
@@ -35,6 +37,11 @@ public abstract class Taclet implements Rule {
 
     /** name displayed by the pretty printer */
     protected final String displayName;
+
+    /** contains the find term */
+    protected final SyntaxElement find;
+
+    protected final ApplicationRestriction applicationRestriction;
 
     /**
      * the <tt>assumes</tt> sequent of the taclet
@@ -122,13 +129,16 @@ public abstract class Taclet implements Rule {
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
      * @param name the name of the Taclet
+     * @param find the Term or Sequent that is the pattern that has to be found in a sequent and the
+     *        places
+     *        where it matches the Taclet can be applied
      * @param applPart contains the application part of a Taclet that is the if-sequence, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
-    protected Taclet(Name name, TacletApplPart applPart,
+    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
@@ -137,6 +147,8 @@ public abstract class Taclet implements Rule {
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
         this.name = name;
+        this.find = find;
+        applicationRestriction = applPart.restriction();
         assumesSequent = applPart.assumesSequent();
         varsNew = applPart.varsNew();
         varsNotFreeIn = applPart.varsNotFreeIn();
@@ -149,6 +161,39 @@ public abstract class Taclet implements Rule {
         this.trigger = attrs.trigger();
         this.ruleSets = ruleSets;
         this.choices = choices;
+        check();
+    }
+
+    /**
+     * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
+     *
+     * @param name the name of the Taclet
+     * @param applPart contains the application part of a Taclet that is the if-sequence, the
+     *        variable conditions
+     * @param goalTemplates a list of goal descriptions.
+     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     *        or recursive use of the Taclet.
+     */
+    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            ChoiceExpr choices,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        this(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
+            tacletAnnotations);
+    }
+
+    private void check() {
+        if ((find == null || find instanceof Term)
+                && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
+            throw new IllegalStateException(
+                "NoFind and rewrite taclets must not be marked as \\inSequentState");
+        }
+        if (find instanceof Sequent seq && seq.size() != 1) {
+            throw new IllegalStateException(
+                "Antec and Succ taclets must have exactly one formula in sequent");
+        }
     }
 
     public boolean hasTrigger() {
@@ -165,25 +210,6 @@ public abstract class Taclet implements Rule {
 
     public boolean getSurviveSymbExec() {
         return surviveSymbExec;
-    }
-
-    /**
-     * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
-     *
-     * @param name the name of the Taclet
-     * @param applPart contains the application part of a Taclet that is the if-sequence, the
-     *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
-     *        or recursive use of the Taclet.
-     */
-    protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,choices, false,
-            tacletAnnotations);
     }
 
     /**
@@ -270,6 +296,13 @@ public abstract class Taclet implements Rule {
     }
 
     /**
+     * returns the application restrictions of the Taclet.
+     */
+    public ApplicationRestriction applicationRestriction() {
+        return applicationRestriction;
+    }
+
+    /**
      * returns an iterator over the variables that are new in the Taclet.
      */
     public ImmutableList<? extends NewVarcond> varsNew() {
@@ -339,6 +372,16 @@ public abstract class Taclet implements Rule {
      * @return Set of schemavariables of the {@code if} part
      */
     protected abstract ImmutableSet<? extends SchemaVariable> getAssumesVariables();
+
+    /**
+     * this method is used to determine if top level updates are allowed to be ignored. This is the
+     * case if we have an AntecTaclet or SuccTaclet but not for a RewriteTaclet
+     *
+     * @return true if top level updates shall be ignored
+     */
+    public boolean ignoreTopLevelUpdates() {
+        return !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE);
+    }
 
     /**
      * returns true iff a context flag is set in one of the entries in the prefix map. Is cached
@@ -471,5 +514,90 @@ public abstract class Taclet implements Rule {
 
     public ImmutableList<RuleSet> getRuleSets() {
         return ruleSets;
+    }
+
+    public record ApplicationRestriction(int value) {
+        public ApplicationRestriction {
+            if ((value & ANTECEDENT_POLARITY) == ANTECEDENT_POLARITY
+                    && (value & SUCCEDENT_POLARITY) == SUCCEDENT_POLARITY) {
+                throw new IllegalArgumentException(
+                    "Polarity cannot be antecedent and succedent at the same time");
+            }
+        }
+
+        /** does not pose state restrictions on valid matchings */
+        public static final ApplicationRestriction NONE = new ApplicationRestriction(0);
+        /**
+         * all taclet constituents must appear in the same state (and not below a modality (for
+         * efficiency reasons))
+         */
+        public static final int SAME_UPDATE_LEVEL = 1;
+        /**
+         * all taclet constituents must be in the same state as the sequent
+         */
+        public static final int IN_SEQUENT_STATE = 2;
+        /**
+         * If the surrounding formula has been decomposed completely, the find-term will NOT appear
+         * on
+         * the succedent. The formula {@code wellformed(h)} in {@code wellformed(h) ==>} or in
+         * {@code ==> wellformed(h) ->
+         * (inv(h) = inv(h2))} or in {@code ==> \if(b) \then(!wellformed(h)) \else(!wellformed(h2))}
+         * has
+         * antecedent polarity. The formula {@code wellformed(h)} in
+         * {@code wellformed(h) <-> wellformed(h2) ==>}
+         * has NO antecedent polarity.
+         * <br>
+         * If this flag is set, the rule matches <b>only</b> on positions with antecedent polarity.
+         */
+        public static final int ANTECEDENT_POLARITY = 4;
+        /**
+         * If the surrounding formula has been decomposed completely, the find-term will NOT appear
+         * on
+         * the antecedent. The formula {@code wellformed(h)} in {@code==> wellformed(h)} or in
+         * {@code wellformed(h) ->
+         * (inv(h) = inv(h2)) ==>} or in
+         * {@code \if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>}
+         * has
+         * succedent polarity. The formula {@code wellformed(h)} in
+         * {@code wellformed(h) <-> wellformed(h2) ==>} has
+         * NO succedent polarity.
+         * <br>
+         * If this flag is set, the rule matches <b>only</b> on positions with succedent polarity.
+         */
+        public static final int SUCCEDENT_POLARITY = 8;
+
+        public boolean matches(ApplicationRestriction o) {
+            return (value() & o.value()) != 0;
+        }
+
+        public boolean matches(int value) {
+            return (value() & value) != 0;
+        }
+
+        public ApplicationRestriction combine(ApplicationRestriction restriction) {
+            return new ApplicationRestriction(this.value | restriction.value());
+        }
+
+        public ApplicationRestriction combine(int value) {
+            return new ApplicationRestriction(this.value | value);
+        }
+
+        @Override
+        public String toString() {
+            String res = "";
+            if (matches(SAME_UPDATE_LEVEL)) {
+                res += "\\sameUpdateLevel";
+            }
+            if (matches(IN_SEQUENT_STATE)) {
+                res += "\\inSequentState";
+            }
+            if (matches(ANTECEDENT_POLARITY)) {
+                res += "\\antecedentPolarity";
+            }
+            if (matches(SUCCEDENT_POLARITY)) {
+                res += "\\succedentPolarity";
+            }
+            return res;
+        }
     }
 }
