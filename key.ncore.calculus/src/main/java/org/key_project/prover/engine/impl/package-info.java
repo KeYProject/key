@@ -1,4 +1,4 @@
 @NullMarked
-package org.key_project.prover.rules;
+package org.key_project.prover.engine.impl;
 
 import org.jspecify.annotations.NullMarked;

@@ -1,4 +1,4 @@
 @NullMarked
-package org.key_project.prover.rules;
+package org.key_project.prover.strategy;
 
 import org.jspecify.annotations.NullMarked;
