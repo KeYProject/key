@@ -39,6 +39,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.Sequent;
@@ -188,7 +189,7 @@ public final class SymbolicExecutionSideProofUtil {
                 methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract relevant things
-            Set<Operator> relevantThingsInSequentToProve =
+            Set<org.key_project.logic.op.Operator> relevantThingsInSequentToProve =
                 extractRelevantThings(info.getProof().getServices(), sequentToProve);
             // Extract results and conditions from side proof
             List<ResultsAndCondition> conditionsAndResultsMap = new LinkedList<>();
@@ -203,7 +204,7 @@ public final class SymbolicExecutionSideProofUtil {
                 for (SequentFormula sf : sequent.antecedent()) {
                     final Term formula = (Term) sf.formula();
                     if (newPredicateIsSequentFormula) {
-                        if (Operator.opEquals(formula.op(), operator)) {
+                        if (de.uka.ilkd.key.logic.op.Operator.opEquals(formula.op(), operator)) {
                             throw new IllegalStateException(
                                 "Result predicate found in antecedent.");
                         } else {
@@ -225,7 +226,7 @@ public final class SymbolicExecutionSideProofUtil {
                 for (SequentFormula sf : sequent.succedent()) {
                     final Term formula = (Term) sf.formula();
                     if (newPredicateIsSequentFormula) {
-                        if (Operator.opEquals(formula.op(), operator)) {
+                        if (de.uka.ilkd.key.logic.op.Operator.opEquals(formula.op(), operator)) {
                             if (result != null) {
                                 throw new IllegalStateException(
                                     "Result predicate found multiple times in succedent.");
@@ -272,7 +273,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     private static Term constructResultIfContained(Services services, Term term,
             Operator operator) {
-        if (Operator.opEquals(term.op(), operator)) {
+        if (de.uka.ilkd.key.logic.op.Operator.opEquals(term.op(), operator)) {
             return term.sub(0);
         } else {
             Term result = null;
@@ -300,7 +301,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
         return CollectionUtil.search(sequent,
-            element -> Operator.opEquals(element.formula().op(), operator)) != null;
+            element -> de.uka.ilkd.key.logic.op.Operator.opEquals(element.formula().op(), operator)) != null;
     }
 
     /**
@@ -315,10 +316,10 @@ public final class SymbolicExecutionSideProofUtil {
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
         term.execPreOrder((DefaultVisitor) visited -> {
-            if (visited.op() instanceof Function) {
-                functions.add((Function) visited.op());
-            } else if (visited.op() instanceof IProgramVariable) {
-                progVars.add((IProgramVariable) visited.op());
+            if (visited.op() instanceof Function function) {
+                functions.add(function);
+            } else if (visited.op() instanceof IProgramVariable progVar) {
+                progVars.add(progVar);
             }
         });
     }
@@ -363,7 +364,7 @@ public final class SymbolicExecutionSideProofUtil {
          * {@inheritDoc}
          */
         @Override
-        public void visit(Term visited) {
+        public void visit(org.key_project.logic.Term visited) {
             if (visited.op() instanceof Modality) {
                 containsModalityOrQuery = true;
             } else if (visited.op() instanceof IProgramMethod) {
@@ -390,16 +391,13 @@ public final class SymbolicExecutionSideProofUtil {
      * @param sequentToProve The {@link Sequent} to extract relevant things from.
      * @return The found relevant things.
      */
-    public static Set<Operator> extractRelevantThings(final Services services,
+    public static Set<org.key_project.logic.op.Operator> extractRelevantThings(final Services services,
             Sequent sequentToProve) {
-        final Set<Operator> result = new HashSet<>();
+        final Set<org.key_project.logic.op.Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
-            sf.formula().execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    if (isRelevantThing(services, visited)) {
-                        result.add(visited.op());
-                    }
+            sf.formula().execPreOrder((DefaultVisitor) visited -> {
+                if (isRelevantThing(services, visited)) {
+                    result.add(visited.op());
                 }
             });
         }
@@ -418,7 +416,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is relevant thing, {@code false} is not relevant.
      */
-    private static boolean isRelevantThing(Services services, Term term) {
+    private static boolean isRelevantThing(Services services, org.key_project.logic.Term term) {
         if (term.op() instanceof IProgramVariable) {
             return true;
         } else if (term.op() instanceof Function) {
@@ -446,7 +444,7 @@ public final class SymbolicExecutionSideProofUtil {
      *         {@link SequentFormula} is not a relevant condition.
      */
     public static boolean isIrrelevantCondition(Services services, Sequent initialSequent,
-            Set<Operator> relevantThingsInSequentToProve,
+            Set<org.key_project.logic.op.Operator> relevantThingsInSequentToProve,
             SequentFormula sf) {
         return initialSequent.antecedent().contains(sf) || initialSequent.succedent().contains(sf)
                 || containsModalityOrQuery(sf) // isInOrOfAntecedent(initialSequent, sf) ||
@@ -492,7 +490,7 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static boolean containsIrrelevantThings(Services services,
             SequentFormula sf,
-            Set<Operator> relevantThings) {
+            Set<org.key_project.logic.op.Operator> relevantThings) {
         ContainsIrrelevantThingsVisitor visitor =
             new ContainsIrrelevantThingsVisitor(services, relevantThings);
         sf.formula().execPostOrder(visitor);
@@ -514,7 +512,7 @@ public final class SymbolicExecutionSideProofUtil {
         /**
          * The relevant things.
          */
-        private final Set<Operator> relevantThings;
+        private final Set<org.key_project.logic.op.Operator> relevantThings;
 
         /**
          * The result.
@@ -527,7 +525,7 @@ public final class SymbolicExecutionSideProofUtil {
          * @param services The {@link Services} to use.
          * @param relevantThings The relevant things.
          */
-        public ContainsIrrelevantThingsVisitor(Services services, Set<Operator> relevantThings) {
+        public ContainsIrrelevantThingsVisitor(Services services, Set<org.key_project.logic.op.Operator> relevantThings) {
             this.services = services;
             this.relevantThings = relevantThings;
         }
@@ -536,7 +534,7 @@ public final class SymbolicExecutionSideProofUtil {
          * {@inheritDoc}
          */
         @Override
-        public void visit(Term visited) {
+        public void visit(org.key_project.logic.Term visited) {
             if (isRelevantThing(services, visited)) {
                 if (!SymbolicExecutionUtil.isSelect(services, visited)
                         && !SymbolicExecutionUtil.isBoolean(services, visited.op())

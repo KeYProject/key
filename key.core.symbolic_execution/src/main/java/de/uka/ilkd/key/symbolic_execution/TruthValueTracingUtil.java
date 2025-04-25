@@ -452,14 +452,10 @@ public final class TruthValueTracingUtil {
             final Map<String, MultiEvaluationResult> results) {
         if (parentPio != null) {
             // Check application term and all of its children and grand children
-            parentPio.subTerm().execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    checkForNewMinorIdsOSS(childPio.sequentFormula(), visited,
-                        termLabelName,
-                        parentPio, tb, results);
-                }
-            });
+            parentPio.subTerm().execPreOrder((DefaultVisitor) visited ->
+                    checkForNewMinorIdsOSS(childPio.sequentFormula(), (Term) visited,
+                termLabelName,
+                parentPio, tb, results));
             // Check application term parents
             PosInOccurrence currentPio = parentPio;
             while (!currentPio.isTopLevel()) {
@@ -487,11 +483,11 @@ public final class TruthValueTracingUtil {
             TermBuilder tb,
             Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
-        if (label instanceof FormulaTermLabel) {
-            Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (FormulaTermLabel) label,
+        if (label instanceof final FormulaTermLabel formulaLabel) {
+            Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, formulaLabel,
                 parentPio.isInAntec(), tb);
             if (replacement != null) {
-                updatePredicateResult((FormulaTermLabel) label, replacement, results);
+                updatePredicateResult(formulaLabel, replacement, results);
             }
         }
     }
@@ -545,8 +541,8 @@ public final class TruthValueTracingUtil {
                 // Check application term and all of its children and grand children
                 parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                     @Override
-                    public void visit(Term visited) {
-                        checkForNewMinorIds(childNode, visited, termLabelName, parentPio, tb,
+                    public void visit(org.key_project.logic.Term visited) {
+                        checkForNewMinorIds(childNode, (Term) visited, termLabelName, parentPio, tb,
                             results);
                     }
                 });
@@ -638,12 +634,13 @@ public final class TruthValueTracingUtil {
             final String labelId, final List<Term> resultToFill) {
         sf.formula().execPreOrder(new DefaultVisitor() {
             @Override
-            public boolean visitSubtree(Term visited) {
-                return !hasLabelOfInterest(visited);
+            public boolean visitSubtree(org.key_project.logic.Term visited) {
+                return !hasLabelOfInterest((Term) visited);
             }
 
             @Override
-            public void visit(Term visited) {
+            public void visit(org.key_project.logic.Term p_visited) {
+                final Term visited = (Term) p_visited;
                 if (hasLabelOfInterest(visited)) {
                     resultToFill.add(visited);
                 }
