@@ -87,10 +87,10 @@ public abstract class FindTaclet extends Taclet {
             tacletAnnotations);
     }
 
-    /** returns the find term of the taclet to be matched */
-    public Term find() {
-        return (Term) find;
-    }
+    /**
+     * returns the find term of the taclet to be matched
+     */
+    public abstract Term find();
 
     /**
      * @return Set of schemavariables of the if and the (optional) find part
