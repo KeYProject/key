@@ -22,6 +22,8 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSources;
 import org.key_project.util.Streams;
 
 import org.junit.jupiter.api.AfterAll;
@@ -105,7 +107,7 @@ public class ProveSMTLemmasTest {
         }
     }
 
-    public static List<String[]> data() throws IOException {
+    public static List<Arguments> data() throws IOException {
         URL url = DefinedSymbolsHandler.class.getResource("DefinedSymbolsHandler.preamble.xml");
         if (url == null) {
             throw new FileNotFoundException(
@@ -117,12 +119,11 @@ public class ProveSMTLemmasTest {
             props.loadFromXML(in);
         }
 
-        List<String[]> result = new ArrayList<>();
+        List<Arguments> result = new ArrayList<>();
 
         for (String name : props.stringPropertyNames()) {
             if (name.matches(".*\\.dl(\\.[0-9]+)?")) {
-                String[] params = { name, props.getProperty(name) };
-                result.add(params);
+                result.add(Arguments.arguments(name, props.getProperty(name)));
             }
         }
 
