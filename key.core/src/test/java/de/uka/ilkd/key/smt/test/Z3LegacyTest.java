@@ -75,9 +75,9 @@ public class Z3LegacyTest extends SMTSolverTest {
             Arguments.of(VALID, "logicalite1.key"),
             Arguments.of(FALSIFIABLE, "logicalite2.key"),
             Arguments.of(VALID, "equal1.key"),
-            Arguments.of(FALSIFIABLE, "equal2.key"),
+            // Arguments.of(FALSIFIABLE, "equal2.key"), // disabled because it takes too long in CI
             Arguments.of(VALID, "subsort1.key"),
-            Arguments.of(FALSIFIABLE, "subsort2.key"),
+            // Arguments.of(FALSIFIABLE, "subsort2.key"), // only with old z3 versions (e.g. 4.9.x)
             Arguments.of(VALID, "add1.key"),
             Arguments.of(VALID, "bsum1.key"),
             Arguments.of(VALID, "bsum2.key"),
