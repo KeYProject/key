@@ -122,7 +122,7 @@ public class RewriteTaclet extends FindTaclet {
                 return null;
             } else if (op instanceof UpdateApplication
                     && it.getChild() == UpdateApplication.targetPos()
-                    && !applicationRestriction().matches(ApplicationRestriction.NONE)) {
+                    && !applicationRestriction().equals(ApplicationRestriction.NONE)) {
                 if (applicationRestriction().matches(ApplicationRestriction.IN_SEQUENT_STATE)
                         || veto(t)) {
                     return null;
@@ -130,7 +130,7 @@ public class RewriteTaclet extends FindTaclet {
                     Term update = UpdateApplication.getUpdate(t);
                     svi = svi.addUpdate(update, t.getLabels());
                 }
-            } else if (!applicationRestriction().matches(ApplicationRestriction.NONE)
+            } else if (!applicationRestriction().equals(ApplicationRestriction.NONE)
                     && (op instanceof Modality)) {
                 return null;
             }
@@ -140,7 +140,7 @@ public class RewriteTaclet extends FindTaclet {
             }
         }
 
-        if (applicationRestriction().matches(ApplicationRestriction.NONE)) {
+        if (applicationRestriction().equals(ApplicationRestriction.NONE)) {
             return p_mc;
         }
         if (applicationRestriction().matches(ApplicationRestriction.ANTECEDENT_POLARITY)

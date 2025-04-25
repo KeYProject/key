@@ -540,13 +540,9 @@ public final class TruthValueTracingUtil {
                 parentRuleApp.posInOccurrence();
             if (parentPio != null) {
                 // Check application term and all of its children and grand children
-                parentPio.subTerm().execPreOrder(new DefaultVisitor() {
-                    @Override
-                    public void visit(org.key_project.logic.Term visited) {
+                parentPio.subTerm().execPreOrder((DefaultVisitor) visited ->
                         checkForNewMinorIds(childNode, (Term) visited, termLabelName, parentPio, tb,
-                            results);
-                    }
-                });
+                    results));
                 // Check application term parents
                 PosInOccurrence currentPio = parentPio;
                 while (!currentPio.isTopLevel()) {
