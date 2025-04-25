@@ -16,6 +16,11 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
  * Special settings for the SMT solvers tests.
  */
 public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
+    /*
+     * We set the default timeout to 50s. This should be sufficient for the unsat/sat cases which we
+     * have currently. For the unknown/timeout cases, we set a shorter timeout via setTimeout().
+     */
+    private long timeout = 50000;
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -39,12 +44,17 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
 
     @Override
     public long getTimeout() {
-        /*
-         * 30s should be sufficient, and since we have a few examples that are expected to run into
-         * a timeout (because the file is intentionally not provable), we want to have it as low as
-         * possible.
-         */
-        return 30000;
+        return timeout;
+    }
+
+    /**
+     * This is needed as a quick fix, so we can set a shorter timeout for test cases with expected
+     * unknown results, while keeping the default timeout for all other cases.
+     *
+     * @param timeout the timeout in milliseconds
+     */
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
     }
 
     @Override
