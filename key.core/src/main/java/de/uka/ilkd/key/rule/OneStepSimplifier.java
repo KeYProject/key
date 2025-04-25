@@ -136,7 +136,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                     || !tac.assumesSequent().isEmpty() || tac.goalTemplates().size() != 1
                     || !tac.goalTemplates().head().sequent().isEmpty() || !tac.varsNew().isEmpty()
                     || !tac.varsNewDependingOn().isEmpty()
-                    || !tac.applicationRestriction().matches(ApplicationRestriction.NONE)
+                    || !tac.applicationRestriction().equals(ApplicationRestriction.NONE)
                     || !proof.getInitConfig().getJustifInfo().getJustification(tac)
                             .isAxiomJustification()) {
                 continue;

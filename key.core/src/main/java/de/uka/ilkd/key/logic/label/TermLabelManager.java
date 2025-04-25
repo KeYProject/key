@@ -916,18 +916,15 @@ public class TermLabelManager {
             final Rule rule, final Goal goal, final Object hint, final Term tacletTerm,
             final Term newTerm, final Map<Name, ChildTermLabelPolicy> policies,
             final Set<TermLabel> newLabels) {
-        applicationTerm.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(final org.key_project.logic.Term p_visited) {
-                final Term visited = (Term) p_visited;
-                if (visited != applicationTerm) {
-                    for (TermLabel label : visited.getLabels()) {
-                        ChildTermLabelPolicy policy = policies.get(label.name());
-                        if (policy != null && policy.addLabel(services, applicationPosInOccurrence,
-                            applicationTerm, rule, goal, hint, tacletTerm, newTerm, visited,
-                            label)) {
-                            newLabels.add(label);
-                        }
+        applicationTerm.execPreOrder((DefaultVisitor) p_visited -> {
+            final Term visited = (Term) p_visited;
+            if (visited != applicationTerm) {
+                for (TermLabel label : visited.getLabels()) {
+                    ChildTermLabelPolicy policy = policies.get(label.name());
+                    if (policy != null && policy.addLabel(services, applicationPosInOccurrence,
+                        applicationTerm, rule, goal, hint, tacletTerm, newTerm, visited,
+                        label)) {
+                        newLabels.add(label);
                     }
                 }
             }
