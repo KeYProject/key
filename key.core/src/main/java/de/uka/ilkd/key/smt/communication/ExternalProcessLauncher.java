@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.*;
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.jspecify.annotations.NonNull;
 
@@ -27,7 +29,7 @@ public class ExternalProcessLauncher {
     /**
      * the delimiters which separate the messages
      */
-    private final @NonNull String[] messageDelimiters;
+    private final @NonNull Collection<String> messageDelimiters;
 
     /**
      * the external process
@@ -46,9 +48,9 @@ public class ExternalProcessLauncher {
      * @param messageDelimiters delimiters which separate the messages
      */
     public ExternalProcessLauncher(@NonNull SolverCommunication session,
-            @NonNull String[] messageDelimiters) {
+            @NonNull Collection<String> messageDelimiters) {
         this.session = session;
-        this.messageDelimiters = messageDelimiters;
+        this.messageDelimiters = new HashSet<>(messageDelimiters);
     }
 
     /**
