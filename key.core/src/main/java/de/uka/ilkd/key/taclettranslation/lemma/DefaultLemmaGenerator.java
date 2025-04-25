@@ -67,7 +67,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
-            public void visit(Term visited) {
+            public void visit(org.key_project.logic.Term visited) {
                 String res = checkForIllegalOps(visited, taclet, true);
                 if (res != null) {
                     failureOccurred(res);
@@ -105,7 +105,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         return null;
     }
 
-    public static String checkForIllegalOps(Term formula, Taclet owner,
+    public static String checkForIllegalOps(org.key_project.logic.Term formula, Taclet owner,
             boolean schemaVarsAreAllowed) {
         if ((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable)
                 || formula.op() instanceof Modality
@@ -114,7 +114,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             return "The given taclet " + owner.name()
                 + " contains a operator that is not allowed:\n" + formula.op().name();
         }
-        for (Term sub : formula.subs()) {
+        for (final var sub : formula.subs()) {
             String s = checkForIllegalOps(sub, owner, schemaVarsAreAllowed);
             if (s != null) {
                 return s;
@@ -162,14 +162,14 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     }
 
     private Term createInstantiation(Taclet owner, SchemaVariable sv, TermServices services) {
-        if (sv instanceof VariableSV) {
-            return createInstantiation(owner, (VariableSV) sv, services);
+        if (sv instanceof VariableSV varSV) {
+            return createInstantiation(owner, varSV, services);
         }
-        if (sv instanceof TermSV) {
-            return createInstantiation(owner, (TermSV) sv, services);
+        if (sv instanceof TermSV termSV) {
+            return createInstantiation(owner, termSV, services);
         }
-        if (sv instanceof FormulaSV) {
-            return createInstantiation(owner, (FormulaSV) sv, services);
+        if (sv instanceof FormulaSV formulaSV) {
+            return createInstantiation(owner, formulaSV, services);
         }
         throw new IllegalTacletException("The taclet contains a schema variable which"
             + "is not supported.\n" + "Taclet: " + owner.name() + "\n"

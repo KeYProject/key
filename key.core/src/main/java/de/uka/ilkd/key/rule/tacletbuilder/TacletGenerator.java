@@ -818,7 +818,7 @@ public class TacletGenerator {
         final OpCollector oc = new OpCollector();
         oc.visit(t);
         final Set<Name> usedNames = new LinkedHashSet<>();
-        for (Operator op : oc.ops()) {
+        for (final var op : oc.ops()) {
             usedNames.add(op.name());
         }
 

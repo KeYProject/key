@@ -202,7 +202,8 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
      * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
-    public void visit(final Term visited) {
+    public void visit(final org.key_project.logic.Term p_visited) {
+        final Term visited = (Term) p_visited;
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
@@ -214,11 +215,11 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         } else {
             // instantiation of java block
             boolean jblockChanged = false;
-            JavaBlock jb = visited.javaBlock();
-
-            if (jb != JavaBlock.EMPTY_JAVABLOCK) {
-                jb = replacePrg(svInst, jb);
-                if (jb != visited.javaBlock()) {
+            JavaBlock jb = JavaBlock.EMPTY_JAVABLOCK;
+            if (visited.op() instanceof final Modality mod) {
+                final JavaBlock originalBlock = mod.program();
+                jb = replacePrg(svInst, originalBlock);
+                if (jb != originalBlock) {
                     jblockChanged = true;
                 }
             }
@@ -295,7 +296,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     @Override
-    public void subtreeLeft(Term subtreeRoot) {
+    public void subtreeLeft(org.key_project.logic.Term subtreeRoot) {
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = //
                 mop.transform((Term) subStack.pop(), svInst, services);

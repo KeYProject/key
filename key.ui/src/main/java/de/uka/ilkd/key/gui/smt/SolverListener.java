@@ -671,7 +671,7 @@ public class SolverListener implements SolverLauncherListener {
          * {@inheritDoc}
          */
         @Override
-        public void visit(Term visited) {
+        public void visit(org.key_project.logic.Term visited) {
             if (visited.op() instanceof Modality || visited.op() instanceof IProgramMethod) {
                 containsModQuery = true;
             }

@@ -65,7 +65,7 @@ public class EqualityConstraint implements Constraint {
     }
 
 
-    public static ImmutableSet<Metavariable> metaVars(Term t, Services services) {
+    public static ImmutableSet<Metavariable> metaVars(org.key_project.logic.Term t, Services services) {
 
         var mvCache = services.getCaches().getMVCache();
 
@@ -75,7 +75,7 @@ public class EqualityConstraint implements Constraint {
 
         ImmutableSet<Metavariable> metaVars = DefaultImmutableSet.nil();
 
-        Operator op = t.op();
+        var op = t.op();
 
         if (op instanceof Metavariable) {
             metaVars = metaVars.add((Metavariable) op);

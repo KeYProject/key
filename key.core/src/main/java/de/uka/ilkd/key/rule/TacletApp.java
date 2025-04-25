@@ -220,8 +220,7 @@ public abstract class TacletApp implements RuleApp {
      * @param term the term to be searched in
      * @return the term below the given quantifier in the given term
      */
-    private static Term getTermBelowQuantifier(SchemaVariable varSV,
-            Term term) {
+    private static Term getTermBelowQuantifier(SchemaVariable varSV, Term term) {
         for (int i = 0; i < term.arity(); i++) {
             for (int j = 0; j < term.varsBoundHere(i).size(); j++) {
                 if (term.varsBoundHere(i).get(j) == varSV) {
