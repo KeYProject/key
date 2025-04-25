@@ -1312,7 +1312,8 @@ public final class SymbolicExecutionUtil {
      * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no
      *         {@link SymbolicExecutionTermLabel} is provided.
      */
-    public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(org.key_project.logic.Term term) {
+    public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(
+            org.key_project.logic.Term term) {
         if (term instanceof Term jTerm) {
             jTerm = TermBuilder.goBelowUpdates(jTerm);
             return (SymbolicExecutionTermLabel) CollectionUtil.search(jTerm.getLabels(),
