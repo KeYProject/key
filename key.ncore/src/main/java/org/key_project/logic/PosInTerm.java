@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
@@ -118,7 +120,7 @@ public class PosInTerm {
      *
      * @return the position of the parent
      */
-    public PosInTerm up() {
+    public @Nullable PosInTerm up() {
         if (size == 0) {
             return null;
         }
@@ -232,7 +234,7 @@ public class PosInTerm {
         return hash;
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

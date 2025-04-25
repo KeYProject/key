@@ -41,14 +41,14 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * Construct an empty Namespace without a parent namespace.
      */
     public Namespace() {
-        this.parent = null;
+        this(null);
     }
 
     /**
      * Construct a Namespace that uses <code>parent</code> as a fallback for finding symbols not
      * defined in this one.
      */
-    public Namespace(Namespace<E> parent) {
+    public Namespace(@Nullable Namespace<E> parent) {
         this.parent = parent;
     }
 
@@ -202,7 +202,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if (parent == null) {
             return new ArrayList<>(elements());
         } else {
-            Collection<E> result = parent().allElements();
+            Collection<E> result = parent.allElements();
             result.addAll(elements());
             return result;
         }
@@ -256,7 +256,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public Namespace<E> simplify() {
-        if (parent != null && isSealed() && isEmpty()) {
+        if (isSealed() && isEmpty() && parent != null) {
             return parent;
         } else {
             return this;
@@ -278,6 +278,8 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if (parent == null) {
             return;
         }
+
+        var parent = this.parent;
 
         for (E element : elements()) {
             parent.add(element);
