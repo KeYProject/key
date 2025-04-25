@@ -72,6 +72,8 @@ public abstract class SMTSolverTest extends SMTTestCommons {
     @ParameterizedTest(name = "test {1}")
     public void test(SMTSolverResult.ThreeValuedTruth expected, String filename)
             throws ProblemLoaderException {
-        Assertions.assertSame(expected, getResult(TEST_DIR + filename));
+        SMTSolverResult.ThreeValuedTruth actual = getResult(expected, TEST_DIR + filename);
+        Assertions.assertSame(expected, actual, "Expected \"" + expected.name() + "\" for "
+            + filename + ", but result was \"" + actual.name() + "\"!");
     }
 }

@@ -49,39 +49,49 @@ public abstract class SMTTestCommons {
 
     public abstract boolean toolInstalled();
 
-    protected SMTSolverResult.ThreeValuedTruth getResult(String filepath)
+    protected SMTSolverResult.ThreeValuedTruth getResult(SMTSolverResult.ThreeValuedTruth expected,
+            String filepath)
             throws ProblemLoaderException {
         Assumptions.assumeTrue(toolInstalled());
-        return checkFile(filepath).isValid();
+        return checkFile(expected, filepath).isValid();
     }
 
     /**
      * check a problem file
      *
+     * @param expected the expected result. Needed for setting a shorter timeout for unknown cases
      * @param filepath the path to the file
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
-    protected SMTSolverResult checkFile(String filepath) throws ProblemLoaderException {
+    protected SMTSolverResult checkFile(SMTSolverResult.ThreeValuedTruth expected, String filepath)
+            throws ProblemLoaderException {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
             Proof proof = p.getLoadedProof();
             assertNotNull(proof);
             assertEquals(1, proof.openGoals().size());
             Goal g = proof.openGoals().iterator().next();
-            return checkGoal(g);
+            return checkGoal(expected, g);
         } finally {
             p.dispose();
         }
     }
 
-    private @NonNull SMTSolverResult checkGoal(Goal g) {
-        SolverLauncher launcher = new SolverLauncher(new SMTTestSettings());
+    private @NonNull SMTSolverResult checkGoal(SMTSolverResult.ThreeValuedTruth expected, Goal g) {
+        SMTTestSettings settings = new SMTTestSettings();
+        if (expected == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
+            /*
+             * Hack: For test cases with unknown/timeout as expected result, we do not want to hold
+             * up the test unnecessarily long, so we set a short SMT timeout.
+             */
+            settings.setTimeout(2000);
+        }
+        SolverLauncher launcher = new SolverLauncher(settings);
         SMTProblem problem = new SMTProblem(g);
         launcher.launch(problem, g.proof().getServices(), getSolverType());
         return problem.getFinalResult();
     }
-
 
     protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
         return KeYEnvironment.load(new File(filepath), null, null, null);
