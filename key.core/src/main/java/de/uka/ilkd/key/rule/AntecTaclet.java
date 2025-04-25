@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.rule.executor.javadl.AntecTacletExecutor;
+import de.uka.ilkd.key.logic.Term;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
@@ -48,6 +49,11 @@ public class AntecTaclet extends FindTaclet {
         createTacletServices();
     }
 
+    @Override
+    public Term find() {
+        return (Term) ((Sequent)find).antecedent().getFirst().formula();
+    }
+
     /** toString for the find part */
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
@@ -69,7 +75,6 @@ public class AntecTaclet extends FindTaclet {
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new AntecTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
-            (Sequent) find,
-            prefixMap, choices, tacletAnnotations);
+            (Sequent) find, prefixMap, choices, tacletAnnotations);
     }
 }
