@@ -104,7 +104,8 @@ public class ProofObligationCreator {
 
 
 
-    private void collectUserDefinedSymbols(org.key_project.logic.Term term, UserDefinedSymbols userDefinedSymbols) {
+    private void collectUserDefinedSymbols(org.key_project.logic.Term term,
+            UserDefinedSymbols userDefinedSymbols) {
         for (var sub : term.subs()) {
             collectUserDefinedSymbols(sub, userDefinedSymbols);
         }

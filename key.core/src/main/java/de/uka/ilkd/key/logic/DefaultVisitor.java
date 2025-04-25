@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.logic;
 
 
-import org.key_project.logic.Visitor;
 import org.key_project.logic.Term;
+import org.key_project.logic.Visitor;
 
 /**
  * This abstract Vistor class declares the interface for a common term visitor.

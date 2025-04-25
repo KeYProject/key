@@ -109,7 +109,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
             varList = varList.prepend((SchemaVariable) op);
         }
 
-        for (TermLabel label : ((de.uka.ilkd.key.logic.Term)visited).getLabels()) {
+        for (TermLabel label : ((de.uka.ilkd.key.logic.Term) visited).getLabels()) {
             if (label instanceof TermLabelSV) {
                 varList = varList.prepend((SchemaVariable) label);
             }

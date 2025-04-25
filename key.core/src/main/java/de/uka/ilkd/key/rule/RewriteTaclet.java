@@ -24,7 +24,6 @@ import org.key_project.prover.rules.TacletPrefix;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -80,7 +79,7 @@ public class RewriteTaclet extends FindTaclet {
 
     @Override
     public Term find() {
-        return (Term)find;
+        return (Term) find;
     }
 
     @Override
