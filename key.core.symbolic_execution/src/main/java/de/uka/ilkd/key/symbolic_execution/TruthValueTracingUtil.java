@@ -452,10 +452,11 @@ public final class TruthValueTracingUtil {
             final Map<String, MultiEvaluationResult> results) {
         if (parentPio != null) {
             // Check application term and all of its children and grand children
-            parentPio.subTerm().execPreOrder((DefaultVisitor) visited ->
-                    checkForNewMinorIdsOSS(childPio.sequentFormula(), (Term) visited,
-                termLabelName,
-                parentPio, tb, results));
+            parentPio.subTerm()
+                    .execPreOrder((DefaultVisitor) visited -> checkForNewMinorIdsOSS(
+                        childPio.sequentFormula(), (Term) visited,
+                        termLabelName,
+                        parentPio, tb, results));
             // Check application term parents
             PosInOccurrence currentPio = parentPio;
             while (!currentPio.isTopLevel()) {

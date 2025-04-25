@@ -155,7 +155,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
             @Override
             public void visit(org.key_project.logic.Term visited) {
-                result = replace((Term)visited);
+                result = replace((Term) visited);
             }
 
             public Term getResult() {
