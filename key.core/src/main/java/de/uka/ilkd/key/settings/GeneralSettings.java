@@ -223,27 +223,6 @@ public class GeneralSettings extends AbstractSettings {
         }
     }
 
-    /**
-     * implements the method required by the Settings interface. The settings are written to the
-     * given Properties object. Only entries of the form
-     * <key> = <value> (,<value>)* are allowed.
-     *
-     * @param props the Properties object where to write the settings as (key, value) pair
-     */
-    @Override
-    public void writeSettings(Properties props) {
-        var prefix = "[" + CATEGORY + "]";
-        props.setProperty(prefix + TACLET_FILTER, String.valueOf(tacletFilter));
-        props.setProperty(prefix + DND_DIRECTION_SENSITIVE_KEY,
-            String.valueOf(dndDirectionSensitive));
-        props.setProperty(prefix + RIGHT_CLICK_MACROS_KEY, String.valueOf(rightClickMacros));
-        props.setProperty(prefix + USE_JML_KEY, String.valueOf(useJML));
-        props.setProperty(prefix + AUTO_SAVE, String.valueOf(autoSave));
-        props.setProperty(prefix + ENSURE_SOURCE_CONSISTENCY,
-            String.valueOf(ensureSourceConsistency));
-        props.setProperty(KEY_JML_ENABLED_KEYS, String.join(",", jmlEnabledKeys));
-    }
-
     @Override
     public void readSettings(Configuration props) {
         setTacletFilter(props.getBool(TACLET_FILTER));
