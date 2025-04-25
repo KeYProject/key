@@ -8,6 +8,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.logic.Term;
+
 
 /**
  * Visitor traversing a term and collecting all variables that occur bound. The visitor implements
@@ -28,6 +30,7 @@ public class BoundVarsVisitor implements DefaultVisitor {
     /**
      * only called by execPostOrder in Term.
      */
+    @Override
     public void visit(Term visited) {
         for (int i = 0, ar = visited.arity(); i < ar; i++) {
             for (int j = 0,
@@ -42,7 +45,7 @@ public class BoundVarsVisitor implements DefaultVisitor {
      */
     public void visit(Sequent visited) {
         for (SequentFormula cf : visited) {
-            visit((Term) cf.formula());
+            visit(cf.formula());
         }
     }
 

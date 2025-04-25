@@ -918,7 +918,8 @@ public class TermLabelManager {
             final Set<TermLabel> newLabels) {
         applicationTerm.execPreOrder(new DefaultVisitor() {
             @Override
-            public void visit(Term visited) {
+            public void visit(final org.key_project.logic.Term p_visited) {
+                final Term visited = (Term) p_visited;
                 if (visited != applicationTerm) {
                     for (TermLabel label : visited.getLabels()) {
                         ChildTermLabelPolicy policy = policies.get(label.name());

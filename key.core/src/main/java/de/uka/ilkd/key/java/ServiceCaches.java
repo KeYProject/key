@@ -153,7 +153,7 @@ public class ServiceCaches {
         new AppliedRuleAppsNameCache();
 
     /** Cache used by EqualityConstraint to speed up meta variable search */
-    private final LRUCache<Term, ImmutableSet<Metavariable>> mvCache = new LRUCache<>(2000);
+    private final LRUCache<org.key_project.logic.Term, ImmutableSet<Metavariable>> mvCache = new LRUCache<>(2000);
 
 
     /**
@@ -229,7 +229,7 @@ public class ServiceCaches {
         return appliedRuleAppsNameCache;
     }
 
-    public LRUCache<Term, ImmutableSet<Metavariable>> getMVCache() {
+    public LRUCache<org.key_project.logic.Term, ImmutableSet<Metavariable>> getMVCache() {
         return mvCache;
     }
 

@@ -297,9 +297,9 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             }
         }
 
-        for (Operator op : oc.ops()) {
-            if (op instanceof SchemaVariable) {
-                result.add((SchemaVariable) op);
+        for (final var op : oc.ops()) {
+            if (op instanceof SchemaVariable sv) {
+                result.add(sv);
             }
         }
 
