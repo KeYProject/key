@@ -160,10 +160,9 @@ public abstract class Taclet implements Rule {
     }
 
     private void check() {
-        if ((find == null || find instanceof Term)
+        if (find == null
                 && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
-            throw new IllegalStateException(
-                "NoFind and rewrite taclets must not be marked as \\inSequentState");
+            throw new IllegalStateException("NoFind taclets should imply \\inSequentState");
         }
         if (find instanceof Sequent seq && seq.size() != 1) {
             throw new IllegalStateException(
