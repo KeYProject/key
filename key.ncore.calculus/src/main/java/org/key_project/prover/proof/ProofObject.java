@@ -8,7 +8,6 @@ import org.key_project.logic.LogicServices;
 import org.jspecify.annotations.Nullable;
 
 /**
- * <p>
  * A proof object provides an interface to the current proof status.
  * It mainly manages the proof goals still to be proven.
  * </p>

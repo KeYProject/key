@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
 /**
- * Common class for provers which takes care of listener registration and task event propagation
+ * Common class for provers which takes care of listener registration and task event propagation.
  *
  * @author Richard Bubel
  */
@@ -23,8 +24,7 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      * We use an immutable list to store listeners to allow for addition/removal within listener
      * code without causing a deadlock
      */
-    private final CopyOnWriteArrayList<ProverTaskListener> proverTaskObservers =
-        new CopyOnWriteArrayList<>();
+    private final List<ProverTaskListener> proverTaskObservers = new CopyOnWriteArrayList<>();
 
     /**
      * propagation method for the event that a task started
