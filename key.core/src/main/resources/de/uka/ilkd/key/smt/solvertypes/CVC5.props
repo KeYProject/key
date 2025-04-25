@@ -1,4 +1,4 @@
-params=--interactive -m --lang smt2
+params=--no-interactive --produce-models --lang smt2
 timeout=-1
 name=CVC5
 info=CVC5 solver (https://cvc5.github.io/).
@@ -20,3 +20,4 @@ de.uka.ilkd.key.smt.newsmt2.FloatHandler,\
 de.uka.ilkd.key.smt.newsmt2.CastingFunctionsHandler,\
 de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler,\
 de.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler
+handlerOptions=getUnsatCore

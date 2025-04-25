@@ -21,7 +21,7 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "7.0.2"
+    id "com.diffplug.spotless" version "7.0.3"
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.53"
@@ -103,11 +103,12 @@ subprojects {
 
         testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
-        testImplementation(platform("org.junit:junit-bom:5.11.4"))
+        testImplementation(platform("org.junit:junit-bom:5.12.2"))
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-params")
         testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
         testImplementation project(':key.util')
 
     }
