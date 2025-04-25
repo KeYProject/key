@@ -1301,7 +1301,7 @@ public final class SymbolicExecutionUtil {
      *         contain a {@link SymbolicExecutionTermLabel} or the given {@link Term} is
      *         {@code null}.
      */
-    public static boolean hasSymbolicExecutionLabel(Term term) {
+    public static boolean hasSymbolicExecutionLabel(org.key_project.logic.Term term) {
         return getSymbolicExecutionLabel(term) != null;
     }
 
@@ -1312,10 +1312,10 @@ public final class SymbolicExecutionUtil {
      * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no
      *         {@link SymbolicExecutionTermLabel} is provided.
      */
-    public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(Term term) {
-        if (term != null) {
-            term = TermBuilder.goBelowUpdates(term);
-            return (SymbolicExecutionTermLabel) CollectionUtil.search(term.getLabels(),
+    public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(org.key_project.logic.Term term) {
+        if (term instanceof Term jTerm) {
+            jTerm = TermBuilder.goBelowUpdates(jTerm);
+            return (SymbolicExecutionTermLabel) CollectionUtil.search(jTerm.getLabels(),
                 element -> element instanceof SymbolicExecutionTermLabel);
         } else {
             return null;
@@ -1541,7 +1541,7 @@ public final class SymbolicExecutionUtil {
          * {@inheritDoc}
          */
         @Override
-        public void visit(Term visited) {
+        public void visit(org.key_project.logic.Term visited) {
             SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
             if (label != null) {
                 if (posInTerm == null
@@ -1556,7 +1556,7 @@ public final class SymbolicExecutionUtil {
          * {@inheritDoc}
          */
         @Override
-        public void subtreeEntered(Term subtreeRoot) {
+        public void subtreeEntered(org.key_project.logic.Term subtreeRoot) {
             if (currentPosInTerm == null) {
                 currentPosInTerm = PosInTerm.getTopLevel();
             } else {
@@ -1570,7 +1570,7 @@ public final class SymbolicExecutionUtil {
          * {@inheritDoc}
          */
         @Override
-        public void subtreeLeft(Term subtreeRoot) {
+        public void subtreeLeft(org.key_project.logic.Term subtreeRoot) {
             currentPosInTerm = currentPosInTerm.up();
             indexStack.removeFirst();
             if (!indexStack.isEmpty()) {
@@ -3257,12 +3257,10 @@ public final class SymbolicExecutionUtil {
      */
     private static Set<Term> collectSkolemConstantsNonRecursive(Term term) {
         final Set<Term> result = new HashSet<>();
-        term.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (isSkolemConstant(visited)) {
-                    result.add(visited);
-                }
+        term.execPreOrder((DefaultVisitor) visited -> {
+            final Term visitedTerm = (Term) visited;
+            if (isSkolemConstant(visitedTerm)) {
+                result.add(visitedTerm);
             }
         });
         return result;
@@ -3839,7 +3837,7 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} {@link Operator} is heap, {@code false} {@link Operator} is something
      *         else.
      */
-    public static boolean isHeap(Operator op, HeapLDT heapLDT) {
+    public static boolean isHeap(org.key_project.logic.op.Operator op, HeapLDT heapLDT) {
         if (op instanceof final SortedOperator sortedOperator) {
             final Sort opSort = sortedOperator.sort();
             return CollectionUtil.search(heapLDT.getAllHeaps(),
@@ -3884,7 +3882,7 @@ public final class SymbolicExecutionUtil {
      * @param op The {@link Operator} to check.
      * @return {@code true} is number, {@code false} is something else.
      */
-    public static boolean isNumber(Operator op) {
+    public static boolean isNumber(org.key_project.logic.op.Operator op) {
         if (op instanceof Function) {
             String[] numbers =
                 { "#", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Z", "neglit" };
@@ -3902,7 +3900,7 @@ public final class SymbolicExecutionUtil {
      * @param op The {@link Operator} to check.
      * @return {@code true} is boolean, {@code false} is something else.
      */
-    public static boolean isBoolean(Services services, Operator op) {
+    public static boolean isBoolean(Services services, org.key_project.logic.op.Operator op) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
         return booleanLDT.getFalseConst() == op || booleanLDT.getTrueConst() == op;
     }

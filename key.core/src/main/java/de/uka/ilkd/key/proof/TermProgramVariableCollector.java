@@ -9,8 +9,9 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import org.key_project.logic.Term;
 
 public class TermProgramVariableCollector implements DefaultVisitor {
 
@@ -34,9 +35,9 @@ public class TermProgramVariableCollector implements DefaultVisitor {
             result.add(variable);
         }
 
-        if (!visited.javaBlock().isEmpty()) {
+        if (visited.op() instanceof Modality mod && !mod.program().isEmpty()) {
             ProgramVariableCollector pvc =
-                new ProgramVariableCollector(visited.javaBlock().program(), services);
+                new ProgramVariableCollector(mod.program().program(), services);
             pvc.start();
             result.addAll(pvc.result());
         }
