@@ -39,8 +39,8 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
-import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -301,7 +301,8 @@ public final class SymbolicExecutionSideProofUtil {
 
     private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
         return CollectionUtil.search(sequent,
-            element -> de.uka.ilkd.key.logic.op.Operator.opEquals(element.formula().op(), operator)) != null;
+            element -> de.uka.ilkd.key.logic.op.Operator.opEquals(element.formula().op(),
+                operator)) != null;
     }
 
     /**
@@ -391,7 +392,8 @@ public final class SymbolicExecutionSideProofUtil {
      * @param sequentToProve The {@link Sequent} to extract relevant things from.
      * @return The found relevant things.
      */
-    public static Set<org.key_project.logic.op.Operator> extractRelevantThings(final Services services,
+    public static Set<org.key_project.logic.op.Operator> extractRelevantThings(
+            final Services services,
             Sequent sequentToProve) {
         final Set<org.key_project.logic.op.Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
@@ -525,7 +527,8 @@ public final class SymbolicExecutionSideProofUtil {
          * @param services The {@link Services} to use.
          * @param relevantThings The relevant things.
          */
-        public ContainsIrrelevantThingsVisitor(Services services, Set<org.key_project.logic.op.Operator> relevantThings) {
+        public ContainsIrrelevantThingsVisitor(Services services,
+                Set<org.key_project.logic.op.Operator> relevantThings) {
             this.services = services;
             this.relevantThings = relevantThings;
         }
