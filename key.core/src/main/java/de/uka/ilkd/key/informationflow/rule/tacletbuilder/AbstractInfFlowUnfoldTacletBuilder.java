@@ -9,12 +9,10 @@ import java.util.Map;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -23,10 +21,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 
 /**
@@ -82,7 +82,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // collect quantifiable variables of the find term and replacewith term
         // and replace all quantifiable variables by schema variables
-        Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+        Map<QuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
             collectQuantifiableVariables(schemaFind, services);
         quantifiableVarsToSchemaVars
                 .putAll(collectQuantifiableVariables(schemaReplaceWith, services));

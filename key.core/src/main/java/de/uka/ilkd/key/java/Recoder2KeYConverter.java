@@ -28,15 +28,16 @@ import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -49,6 +50,7 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.io.DataLocation;
 import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
 
@@ -397,22 +399,23 @@ public class Recoder2KeYConverter {
      */
     private Literal getLiteralFor(recoder.service.ConstantEvaluator.EvaluationResult p_er) {
         return switch (p_er.getTypeCode()) {
-            case recoder.service.ConstantEvaluator.BOOLEAN_TYPE -> BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
-            case recoder.service.ConstantEvaluator.CHAR_TYPE -> new CharLiteral(p_er.getChar());
-            case recoder.service.ConstantEvaluator.DOUBLE_TYPE -> new DoubleLiteral(p_er.getDouble());
-            case recoder.service.ConstantEvaluator.FLOAT_TYPE -> new FloatLiteral(p_er.getFloat());
-            case recoder.service.ConstantEvaluator.BYTE_TYPE -> new IntLiteral(p_er.getByte());
-            case recoder.service.ConstantEvaluator.SHORT_TYPE -> new IntLiteral(p_er.getShort());
-            case recoder.service.ConstantEvaluator.INT_TYPE -> new IntLiteral(p_er.getInt());
-            case recoder.service.ConstantEvaluator.LONG_TYPE -> new LongLiteral(p_er.getLong());
-            case recoder.service.ConstantEvaluator.STRING_TYPE -> {
-                if (p_er.getString() == null) {
-                    yield NullLiteral.NULL;
-                }
-                yield new StringLiteral("\"" + p_er.getString() + "\"");
+        case recoder.service.ConstantEvaluator.BOOLEAN_TYPE ->
+            BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
+        case recoder.service.ConstantEvaluator.CHAR_TYPE -> new CharLiteral(p_er.getChar());
+        case recoder.service.ConstantEvaluator.DOUBLE_TYPE -> new DoubleLiteral(p_er.getDouble());
+        case recoder.service.ConstantEvaluator.FLOAT_TYPE -> new FloatLiteral(p_er.getFloat());
+        case recoder.service.ConstantEvaluator.BYTE_TYPE -> new IntLiteral(p_er.getByte());
+        case recoder.service.ConstantEvaluator.SHORT_TYPE -> new IntLiteral(p_er.getShort());
+        case recoder.service.ConstantEvaluator.INT_TYPE -> new IntLiteral(p_er.getInt());
+        case recoder.service.ConstantEvaluator.LONG_TYPE -> new LongLiteral(p_er.getLong());
+        case recoder.service.ConstantEvaluator.STRING_TYPE -> {
+            if (p_er.getString() == null) {
+                yield NullLiteral.NULL;
             }
-            default -> throw new ConvertException(
-                    "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
+            yield new StringLiteral("\"" + p_er.getString() + "\"");
+        }
+        default -> throw new ConvertException(
+            "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
         };
     }
 
@@ -716,6 +719,11 @@ public class Recoder2KeYConverter {
         return new SeqReverse(children);
     }
 
+    public SeqPut convert(de.uka.ilkd.key.java.recoderext.adt.SeqPut e) {
+        ExtList children = collectChildren(e);
+        return new SeqPut(children);
+    }
+
     public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
         return EmptyMapLiteral.INSTANCE;
     }
@@ -770,7 +778,7 @@ public class Recoder2KeYConverter {
         }
 
 
-        Function named = namespaceSet.functions().lookup(new Name(name));
+        JFunction named = namespaceSet.functions().lookup(new Name(name));
 
         if (named == null) {
             // TODO provide position information?!
@@ -940,7 +948,7 @@ public class Recoder2KeYConverter {
      * @return the converted statement
      */
     public JmlAssert convert(de.uka.ilkd.key.java.recoderext.JmlAssert ja) {
-        return new JmlAssert(ja.getKind(), ja.getCondition(), positionInfo(ja), services);
+        return new JmlAssert(ja.getKind(), ja.getCondition(), positionInfo(ja));
     }
 
     // ------------------- declaration ---------------------
@@ -1021,7 +1029,7 @@ public class Recoder2KeYConverter {
                 .getContainingClassType((recoder.abstraction.Member) cd);
 
         final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
-        Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result = new ProgramMethod(consDecl, containerKJT, KeYJavaType.VOID_TYPE,
             positionInfo(cd), heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
@@ -1040,7 +1048,7 @@ public class Recoder2KeYConverter {
             new ConstructorDeclaration(children, dc.getContainingClassType().isInterface());
         recoder.abstraction.ClassType cont = dc.getContainingClassType();
         final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
-        Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result =
             new ProgramMethod(consDecl, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
@@ -1119,8 +1127,12 @@ public class Recoder2KeYConverter {
 
             final ProgramElementName name =
                 VariableNamer.parseName(makeAdmissibleName(recoderVarSpec.getName()));
+            var isGhost = containsModifier(recoderVarSpec.getParent(),
+                de.uka.ilkd.key.java.recoderext.Ghost.class);
+            var isFinal = recoderVarSpec.isFinal();
+
             final ProgramVariable pv =
-                new LocationVariable(name, getKeYJavaType(recoderType), recoderVarSpec.isFinal());
+                new LocationVariable(name, getKeYJavaType(recoderType), isGhost, isFinal);
             varSpec = new VariableSpecification(collectChildren(recoderVarSpec), pv,
                 recoderVarSpec.getDimensions(), pv.getKeYJavaType());
 
@@ -1172,7 +1184,7 @@ public class Recoder2KeYConverter {
                         .getContainingClassType((recoder.abstraction.Member) md);
 
             final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
-            Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+            Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
             final KeYJavaType containerType = getKeYJavaType(cont);
             assert containerType != null;
             final Type returnType = md.getReturnType();
@@ -1222,6 +1234,18 @@ public class Recoder2KeYConverter {
         return varSpec;
     }
 
+    private static boolean containsModifier(recoder.java.declaration.JavaDeclaration fs,
+            Class<? extends DeclarationSpecifier> cls) {
+        ASTList<DeclarationSpecifier> specifiers = fs.getDeclarationSpecifiers();
+        int s = (specifiers == null) ? 0 : specifiers.size();
+        for (int i = 0; i < s; i += 1) {
+            if (cls.isInstance(specifiers.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * this is needed by #convert(FieldSpecification).
      */
@@ -1248,20 +1272,16 @@ public class Recoder2KeYConverter {
                 final Literal compileTimeConstant =
                     getCompileTimeConstantInitializer(recoderVarSpec);
 
-                boolean isModel = false;
+                boolean isModel = containsModifier(recoderVarSpec.getParent(),
+                    de.uka.ilkd.key.java.recoderext.Model.class);
                 boolean isFinal = recoderVarSpec.isFinal();
-                for (recoder.java.declaration.Modifier mod : recoderVarSpec.getParent()
-                        .getModifiers()) {
-                    if (mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
-                        isModel = true;
-                        break;
-                    }
-                }
+                boolean isGhost = containsModifier(recoderVarSpec.getParent(),
+                    de.uka.ilkd.key.java.recoderext.Ghost.class);
 
                 if (compileTimeConstant == null) {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                         getKeYJavaType(recContainingClassType), recoderVarSpec.isStatic(), isModel,
-                        false, isFinal);
+                        isGhost, isFinal);
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                         getKeYJavaType(recContainingClassType), recoderVarSpec.isStatic(),
@@ -1763,6 +1783,11 @@ public class Recoder2KeYConverter {
 
     public CopyAssignment convert(recoder.java.expression.operator.CopyAssignment arg) {
         return new CopyAssignment(collectChildrenAndComments(arg));
+    }
+
+    public SetStatement convert(
+            de.uka.ilkd.key.java.recoderext.SetStatement arg) {
+        return new SetStatement(arg.getParserContext(), positionInfo(arg));
     }
 
     public TransactionStatement convert(de.uka.ilkd.key.java.recoderext.TransactionStatement tr) {

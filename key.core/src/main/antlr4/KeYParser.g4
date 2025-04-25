@@ -39,7 +39,7 @@ problem
 :
   ( PROBLEM LBRACE ( t=termorseq ) RBRACE
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
-  | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
+  | PROOFOBLIGATION  (proofObligation=cvalue)? SEMI?
   )
   proofScript?
 ;
@@ -670,6 +670,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISARRAY
   | ISARRAYLENGTH
   | IS_ABSTRACT_OR_INTERFACE
+  | IS_FINAL
   | ENUM_CONST
   | FINAL
   | STATIC
@@ -688,6 +689,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | NEW
   | NEW_TYPE_OF
   | NEW_DEPENDING_ON
+  | NEW_LOCAL_VARS
   | HAS_ELEMENTARY_SORT
   | SAME
   | ISSUBTYPE
@@ -804,7 +806,7 @@ one_contract
 :
    contractName = simple_ident LBRACE
    (prog_var_decls)?
-   fma=term MODIFIES modifiesClause=term
+   fma=term MODIFIABLE modifiableClause=term
    RBRACE SEMI
 ;
 

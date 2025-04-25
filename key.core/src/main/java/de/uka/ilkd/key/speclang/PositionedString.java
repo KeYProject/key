@@ -19,11 +19,10 @@ import org.jspecify.annotations.NonNull;
  * used for error reporting.
  */
 public class PositionedString {
-    @NonNull
-    public final String text;
 
-    @NonNull
-    public final Location location;
+    public final @NonNull String text;
+
+    public final @NonNull Location location;
 
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
@@ -63,13 +62,11 @@ public class PositionedString {
             + location.getPosition() + ")";
     }
 
-    @NonNull
-    public String getText() {
+    public @NonNull String getText() {
         return text;
     }
 
-    @NonNull
-    public Location getLocation() {
+    public @NonNull Location getLocation() {
         return location;
     }
 

@@ -21,6 +21,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -492,11 +494,12 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         } else {
             ImmutableList<SequentFormula> if1 = ifSequent.asList();
             ImmutableList<SequentFormula> if2 = t2.ifSequent.asList();
-            while (if1.head() != null && if1.head().equalsModProofIrrelevancy(if2.head())) {
+            while (!if1.isEmpty() && !if2.isEmpty()
+                    && if1.head().equalsModProofIrrelevancy(if2.head())) {
                 if1 = if1.tail();
                 if2 = if2.tail();
             }
-            if (if1.head() != null || if2.head() != null) {
+            if (!if1.isEmpty() || !if2.isEmpty()) {
                 return false;
             }
         }
@@ -950,9 +953,8 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
         return getExecutor().apply(goal, services, tacletApp);
     }
 
@@ -972,8 +974,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     private @Nullable String origin;
 
     @Override
-    @Nullable
-    public String getOrigin() {
+    public @Nullable String getOrigin() {
         return origin;
     }
 

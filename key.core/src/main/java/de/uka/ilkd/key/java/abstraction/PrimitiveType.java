@@ -9,8 +9,9 @@ import java.util.Map;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.ldt.*;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
+import org.key_project.logic.Name;
 
 /**
  * A program model element representing primitive types.
@@ -54,6 +55,8 @@ public final class PrimitiveType implements Type {
         new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
     public static final PrimitiveType JAVA_MAP =
         new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
+    public static final PrimitiveType JAVA_TYPE =
+        new PrimitiveType("\\TYPE", NullLiteral.NULL, SortLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 

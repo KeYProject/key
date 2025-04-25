@@ -22,12 +22,15 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * <p>
@@ -1297,7 +1300,7 @@ public class TermLabelManager {
                 if (!newSubsImmutable.equals(newTerm.subs())
                         || !newLabels.equals(newTerm.getLabels())) {
                     newTerm = tf.createTerm(newTerm.op(), newSubsImmutable, newTerm.boundVars(),
-                        newTerm.javaBlock(), newLabels);
+                        newLabels);
                 }
             }
         } while (pio != null);
@@ -1425,24 +1428,26 @@ public class TermLabelManager {
      * Utility class used by
      * {@link TermLabelManager#computeRefactorings(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term)}
      *
-     * @param sequentRefactorings                      The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
-     * @param belowUpdatesRefactorings                 The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
-     * @param childAndGrandchildRefactorings           The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
+     * @param sequentRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#SEQUENT}.
+     * @param belowUpdatesRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
+     * @param childAndGrandchildRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
      * @param childAndGrandchildRefactoringsAndParents The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
-     * @param directChildRefactorings                  The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
+     *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
+     * @param directChildRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
      * @author Martin Hentschel
      */
     protected record RefactoringsContainer(Set<TermLabelRefactoring> sequentRefactorings,
-                                           Set<TermLabelRefactoring> belowUpdatesRefactorings,
-                                           Set<TermLabelRefactoring> childAndGrandchildRefactorings,
-                                           Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
-                                           Set<TermLabelRefactoring> directChildRefactorings) {
+            Set<TermLabelRefactoring> belowUpdatesRefactorings,
+            Set<TermLabelRefactoring> childAndGrandchildRefactorings,
+            Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
+            Set<TermLabelRefactoring> directChildRefactorings) {
         public RefactoringsContainer() {
             this(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(),
-                    new LinkedHashSet<>(), new LinkedHashSet<>());
+                new LinkedHashSet<>(), new LinkedHashSet<>());
         }
 
         /**
@@ -1454,7 +1459,7 @@ public class TermLabelManager {
          */
         public Set<TermLabelRefactoring> getAllApplicationChildAndGrandchildRefactorings() {
             final LinkedHashSet<TermLabelRefactoring> result =
-                    new LinkedHashSet<>(childAndGrandchildRefactorings);
+                new LinkedHashSet<>(childAndGrandchildRefactorings);
             result.addAll(childAndGrandchildRefactoringsAndParents);
             return result;
         }
@@ -1495,7 +1500,7 @@ public class TermLabelManager {
 
                 if (newLabels != sub.getLabels()) {
                     newSubs[i] =
-                        tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(),
+                        tf.createTerm(sub.op(), sub.subs(), sub.boundVars(),
                             newLabels);
                     changed = true;
                 } else {
@@ -1503,7 +1508,7 @@ public class TermLabelManager {
                 }
             }
             newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
-                newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(),
+                newApplicationTerm.boundVars(),
                 newApplicationTerm.getLabels()) : applicationTerm;
         }
         return newApplicationTerm;
@@ -1542,7 +1547,7 @@ public class TermLabelManager {
                 pair.second, refactorings.belowUpdatesRefactorings());
             if (newLabels != pair.second.getLabels()) {
                 Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(),
-                    pair.second.boundVars(), pair.second.javaBlock(), newLabels);
+                    pair.second.boundVars(), newLabels);
                 newApplicationTerm =
                     services.getTermBuilder().applyParallel(pair.first, newModality,
                         newApplicationTerm.getLabels());
@@ -1591,7 +1596,7 @@ public class TermLabelManager {
                 }
             }
             newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
-                newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(),
+                newApplicationTerm.boundVars(),
                 newApplicationTerm.getLabels()) : newApplicationTerm;
         }
         return newApplicationTerm;
@@ -1716,7 +1721,7 @@ public class TermLabelManager {
             performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule,
                 goal, hint, tacletTerm, term, activeRefactorings);
         return subsChanged || newLabels != term.getLabels() ? services.getTermFactory()
-                .createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels)
+                .createTerm(term.op(), newSubs, term.boundVars(), newLabels)
                 : term;
     }
 
@@ -2010,7 +2015,8 @@ public class TermLabelManager {
             // Search existing SequentFormula
             Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
             SequentFormula existingSF = CollectionUtil.search(s,
-                element -> element.formula().equalsModRenaming(rejectedTerm));
+                element -> element.formula().equalsModProperty(rejectedTerm,
+                    RENAMING_TERM_PROPERTY));
             if (existingSF != null) {
                 // Create list of new labels
                 Term existingTerm = existingSF.formula();
@@ -2032,7 +2038,7 @@ public class TermLabelManager {
                 // Replace sequent formula
                 if (labelsChanged) {
                     Term newTerm = services.getTermFactory().createTerm(existingTerm.op(),
-                        existingTerm.subs(), existingTerm.boundVars(), existingTerm.javaBlock(),
+                        existingTerm.subs(), existingTerm.boundVars(),
                         new ImmutableArray<>(mergedLabels));
                     SequentChangeInfo sci =
                         currentSequent.sequent().changeFormula(new SequentFormula(newTerm),
@@ -2071,7 +2077,7 @@ public class TermLabelManager {
         return tf.createTerm(term.op(),
             new ImmutableArray<>(term.subs().stream().map(t -> removeIrrelevantLabels(t, tf))
                     .collect(Collectors.toList())),
-            term.boundVars(), term.javaBlock(), new ImmutableArray<>(term.getLabels().stream()
+            term.boundVars(), new ImmutableArray<>(term.getLabels().stream()
                     .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
     }
 }

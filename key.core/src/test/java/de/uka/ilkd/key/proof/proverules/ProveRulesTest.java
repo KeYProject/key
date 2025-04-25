@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -18,7 +17,6 @@ import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.helper.FindResources;
 
@@ -26,8 +24,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit test class for re-running taclet proofs (formerly implemented as Perl script
@@ -62,16 +59,16 @@ public class ProveRulesTest {
         assertNotNull(taclet, "Proof file " + proofFile
             + " claims that it contains a proof for taclet " + tacletName
             + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
-        assertTrue(taclet.getRuleJustification() instanceof LemmaJustification,
+        assertInstanceOf(LemmaJustification.class, taclet.getRuleJustification(),
             "Found a taclet proof for taclet " + tacletName
                 + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
                 + "adding annotation \\lemma to the declaration of the taclet.");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
         Proof proof = env.getLoadedProof();
 
-        Pair<String, Location> script = env.getProofScript();
+        var script = env.getProofScript();
         if (script != null) {
-            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
             pse.execute(env.getUi(), proof);
         }
 

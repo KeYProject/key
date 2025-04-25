@@ -19,12 +19,13 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
@@ -35,6 +36,9 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 
 import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -70,8 +74,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     // constructors
     // -------------------------------------------------------------------------
 
-    public JMLSpecExtractor(Services services) {
-        this.services = services;
+    public JMLSpecExtractor(InitConfig initConfig) {
+        FinalHeapResolution.rememberIfFinalEnabled(initConfig);
+        this.services = initConfig.getServices();
         this.jsf = new JMLSpecFactory(services);
     }
 
@@ -90,13 +95,40 @@ public final class JMLSpecExtractor implements SpecExtractor {
         StringBuilder sb = new StringBuilder(comments[0].getText());
 
         for (int i = 1; i < comments.length; i++) {
-            var relativePos = comments[i].getRelativePosition();
-            for (int j = 0; j < relativePos.getLine(); j++) {
-                sb.append("\n");
+            Position previousStart = comments[i - 1].getStartPosition();
+
+            // this also includes // or /* ... */
+            String previousText = comments[i - 1].getText();
+
+            int previousEndLine = previousStart.line() +
+                    (int) previousText.chars().filter(x -> x == '\n').count();
+
+            // /*ab*/ => length: 6, lastIndex: -1, so we get 6
+            // /*\nb*/ => length: 6, lastIndex: 2, so we get 3
+            int previousEndColumn = previousStart.column() - 1 +
+                    previousText.length() - (previousText.lastIndexOf('\n') + 1);
+
+            Position currentStart = comments[i].getStartPosition();
+            if (currentStart.isNegative()) {
+                // The comment is an artificial one; we cannot reproduce positions anyway, so just
+                // paste them. ...
+                while (i < comments.length) {
+                    sb.append(comments[i].getText());
+                    i++;
+                }
+                break;
             }
-            for (int j = 0; j < relativePos.getColumn(); j++) {
-                sb.append(" ");
-            }
+
+            int insertRows = currentStart.line() - previousEndLine;
+
+            // the columns are starting at 1 and not at 0
+            int insertColumns = insertRows > 0 ? // line break between the comments
+                    currentStart.column() - 1 : (currentStart.column() - 1) - previousEndColumn;
+
+            assert insertRows >= 0 && insertColumns >= 0;
+
+            sb.append("\n".repeat(insertRows));
+            sb.append(" ".repeat(insertColumns));
             sb.append(comments[i].getText());
         }
 
@@ -397,12 +429,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
             // add purity. Strict purity overrides purity.
             if (isStrictlyPure || pm.isModel()) {
-                for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+                for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
                     specCase.addClause(ASSIGNABLE, heap.name(),
                         JmlFacade.parseExpr("\\strictly_nothing"));
                 }
             } else if (isPure) {
-                for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+                for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
                     specCase.addClause(ASSIGNABLE, heap.name(), JmlFacade.parseExpr("\\nothing"));
                 }
             }
@@ -567,7 +599,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     @Override
     public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<ProgramVariable> methodParams)
+            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
         // In cases of specifications immediately following each other (like a
         // merge_point and a block contract / loop invariant), it might happen
@@ -713,5 +745,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
     @Override
     public ImmutableList<PositionedString> getWarnings() {
         return warnings.append(JMLTransformer.getWarningsOfLastInstance());
+    }
+
+    @Override
+    public Contract createDefaultContract(IProgramMethod method, boolean useSoundDefault) {
+        return jsf.createDefaultContract(method, useSoundDefault);
     }
 }

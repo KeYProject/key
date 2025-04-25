@@ -12,6 +12,7 @@ package org.key_project.util;
  * @param <T> type to wrap
  * @author Arne Keller
  */
+@SuppressWarnings("nullness")
 public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevancy> {
     /**
      * The wrapped object.

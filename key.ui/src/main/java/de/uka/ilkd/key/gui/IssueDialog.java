@@ -25,7 +25,9 @@ import javax.swing.text.html.HTMLDocument;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.sourceview.JavaDocument;
+import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
+import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
+import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
@@ -41,6 +43,9 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
 
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -600,6 +605,17 @@ public final class IssueDialog extends JDialog {
             String message = exception.getMessage();
             String info = sw.toString();
 
+            if (exception instanceof ParseCancellationException) {
+                exception = exception.getCause();
+            }
+
+            if (exception instanceof InputMismatchException ime) {
+                message = ExceptionTools.getNiceMessage(ime);
+            }
+            if (exception instanceof NoViableAltException nvae) {
+                message = ExceptionTools.getNiceMessage(nvae);
+            }
+
             // also add message of the cause to the string if available
             if (exception.getCause() != null) {
                 String causeMessage = exception.getCause().getMessage();
@@ -610,9 +626,9 @@ public final class IssueDialog extends JDialog {
 
             URI resourceLocation = null;
             Position pos = Position.UNDEFINED;
-            Optional<Location> location = ExceptionTools.getLocation(exception);
-            if (location.isPresent()) {
-                var loc = location.get();
+            Location location = ExceptionTools.getLocation(exception);
+            if (location != null) {
+                var loc = location;
                 if (!loc.getPosition().isNegative()) {
                     pos = loc.getPosition();
                 }
@@ -661,7 +677,11 @@ public final class IssueDialog extends JDialog {
                 String source = StringUtil.replaceNewlines(
                     fileContentsCache.computeIfAbsent(uri, fn -> {
                         try {
-                            return IOUtil.readFrom(finalUri).orElseThrow();
+                            String result = IOUtil.readFrom(finalUri);
+                            if (result == null) {
+                                throw new NullPointerException();
+                            }
+                            return result;
                         } catch (IOException e) {
                             LOGGER.debug("Unknown IOException!", e);
                             return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
@@ -669,7 +689,9 @@ public final class IssueDialog extends JDialog {
                     }), "\n");
 
                 if (isJava(uri.getPath())) {
-                    showJavaSourceCode(source);
+                    showSourceCode(source, new JavaJMLEditorLexer());
+                } else if (isKeY(uri.getPath())) {
+                    showSourceCode(source, new KeYEditorLexer());
                 } else {
                     txtSource.setText(source);
                 }
@@ -691,9 +713,9 @@ public final class IssueDialog extends JDialog {
         txtStacktrace.setText(issue.getAdditionalInfo());
     }
 
-    private void showJavaSourceCode(String source) {
+    private void showSourceCode(String source, SourceHighlightDocument.EditorLexer lexer) {
         try {
-            JavaDocument doc = new JavaDocument();
+            SourceHighlightDocument doc = new SourceHighlightDocument(lexer);
             txtSource.setDocument(doc);
             doc.insertString(0, source, new SimpleAttributeSet());
         } catch (BadLocationException e) {
@@ -730,7 +752,12 @@ public final class IssueDialog extends JDialog {
     }
 
     private boolean isJava(String fileName) {
-        return fileName.endsWith(".java");
+        // fileName can be null for URIs like "jar:file:/xxx/yyy.jar!aaa.java"
+        return fileName != null && fileName.endsWith(".java");
+    }
+
+    private boolean isKeY(String fileName) {
+        return fileName != null && (fileName.endsWith(".key") || fileName.endsWith(".proof"));
     }
 
     public static int getOffsetFromLineColumn(String source, Position pos) {

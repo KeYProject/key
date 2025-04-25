@@ -4,10 +4,8 @@
 package de.uka.ilkd.key.symbolic_execution.rule;
 
 import java.util.List;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -15,17 +13,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
@@ -34,9 +23,12 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -195,7 +187,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
         try {
             // Extract required Terms from goal
@@ -228,12 +220,12 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goalSequent, equalitySF);
-            Function newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
+            JFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =
                 sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
             // Compute results and their conditions
-            List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
+            List<ResultsAndCondition> conditionsAndResultsMap =
                 computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
@@ -242,10 +234,11 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             final TermBuilder tb = services.getTermBuilder();
             resultGoal.removeFormula(pio);
             if (pio.isTopLevel() || queryConditionTerm != null) {
-                for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
-                    Term conditionTerm = tb.and(conditionsAndResult.second);
-                    Term newEqualityTerm = varFirst ? tb.equals(varTerm, conditionsAndResult.first)
-                            : tb.equals(conditionsAndResult.first, varTerm);
+                for (ResultsAndCondition conditionsAndResult : conditionsAndResultsMap) {
+                    Term conditionTerm = tb.and(conditionsAndResult.conditions());
+                    Term newEqualityTerm =
+                        varFirst ? tb.equals(varTerm, conditionsAndResult.result())
+                                : tb.equals(conditionsAndResult.result(), varTerm);
                     Term resultTerm = pio.isInAntec() ? tb.imp(conditionTerm, newEqualityTerm)
                             : tb.and(conditionTerm, newEqualityTerm);
                     if (queryConditionTerm != null) {
@@ -254,18 +247,18 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                     resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
                 }
             } else {
-                Function resultFunction = createResultConstant(services, varTerm.sort());
+                JFunction resultFunction = createResultConstant(services, varTerm.sort());
                 Term resultFunctionTerm = tb.func(resultFunction);
                 resultGoal.addFormula(
                     replace(pio,
                         tb.equals(resultFunctionTerm, varTerm),
                         services),
                     pio.isInAntec(), false);
-                for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
-                    Term conditionTerm = tb.and(conditionsAndResult.second);
+                for (ResultsAndCondition conditionsAndResult : conditionsAndResultsMap) {
+                    Term conditionTerm = tb.and(conditionsAndResult.conditions());
                     Term resultTerm = tb.imp(conditionTerm,
-                        varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first)
-                                : tb.equals(conditionsAndResult.first, resultFunctionTerm));
+                        varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.result())
+                                : tb.equals(conditionsAndResult.result(), resultFunctionTerm));
                     resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
                 }
             }

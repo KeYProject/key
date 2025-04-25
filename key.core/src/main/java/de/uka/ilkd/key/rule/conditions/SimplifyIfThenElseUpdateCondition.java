@@ -9,13 +9,15 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.Named;
+import org.key_project.logic.SyntaxElement;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
@@ -150,7 +152,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
 

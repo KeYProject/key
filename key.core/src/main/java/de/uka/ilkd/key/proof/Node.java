@@ -16,18 +16,18 @@ import java.util.ListIterator;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NonNull;
@@ -53,7 +53,7 @@ public class Node implements Iterable<Node> {
     private final Proof proof;
 
     /** The parent node. **/
-    private Node parent = null;
+    private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
      */
@@ -77,7 +77,7 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
+    private ImmutableList<JFunction> localFunctions = ImmutableSLList.nil();
 
     private boolean closed = false;
 
@@ -110,8 +110,7 @@ public class Node implements Iterable<Node> {
 
     private String cachedName = null;
 
-    @Nullable
-    private Lookup userData = null;
+    private @Nullable Lookup userData = null;
 
 
     /**
@@ -232,10 +231,10 @@ public class Node implements Iterable<Node> {
 
     /**
      * Returns the set of created program variables known in this node.
-     *
+     * <p>
      * In the resulting list, the newest additions come first.
      *
-     * @returns a non-null immutable list of program variables.
+     * @return a non-null immutable list of program variables.
      */
     public ImmutableList<IProgramVariable> getLocalProgVars() {
         return localProgVars;
@@ -254,12 +253,12 @@ public class Node implements Iterable<Node> {
      *
      * @return a non-null immutable list of function symbols.
      */
-    public Iterable<Function> getLocalFunctions() {
+    public Iterable<JFunction> getLocalFunctions() {
         return localFunctions;
     }
 
-    public void addLocalFunctions(Collection<? extends Function> elements) {
-        for (Function op : elements) {
+    public void addLocalFunctions(Collection<? extends JFunction> elements) {
+        for (JFunction op : elements) {
             localFunctions = localFunctions.prepend(op);
         }
     }
@@ -276,7 +275,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
-    public Node parent() {
+    public @Nullable Node parent() {
         return parent;
     }
 

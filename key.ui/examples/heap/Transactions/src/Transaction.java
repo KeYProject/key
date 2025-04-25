@@ -5,28 +5,28 @@ final class Transaction {
     //@ ghost int total;
     //@ ghost int id;
     //@ ghost \locset footprint;
-    /*@ public invariant footprint == \set_union(\all_fields(this), 
+    /*@ public invariant footprint == \set_union(\all_fields(this),
          (this.next == null) ? \empty : this.next.footprint);
     */
 
-    /* @ public invariant footprint ==              
+    /* @ public invariant footprint ==
              \set_union(\singleton(this.footprint),
-             \set_union(\singleton(this.amount), 
+             \set_union(\singleton(this.amount),
              \set_union(\singleton(this.id),
              \set_union(\singleton(this.next),
              \set_union(\singleton(this.total),
              (next==null) ? \empty : next.footprint)))));
     */
-    
-    /*@ public invariant 
+
+    /*@ public invariant
           \subset(footprint, (\infinite_union Transaction t; t.*));
     */
 
     //@ invariant id >= 0;
     //@ invariant total == amount + ((next == null) ? 0 : next.total);
-    /*@ invariant next == null || 
-         (id > next.id && 
-          next.\inv && 
+    /*@ invariant next == null ||
+         (id > next.id &&
+          next.\inv &&
           \disjoint(this.*, next.footprint));
     */
 
@@ -35,7 +35,7 @@ final class Transaction {
     /*@ requires next == null || next.\inv;
       @ ensures this.next == next && this.amount == amount &&
       @   total == amount + ((next == null) ? 0 : next.total);
-      @ modifies \nothing;
+      @ assignable \nothing;
       @*/
     Transaction(/*@nullable*/ Transaction next, int amount) {
         this.next = next;
@@ -43,7 +43,7 @@ final class Transaction {
         //@ set this.total = amount + ((next == null) ? 0 : next.total);
         //@ set this.id = (next == null) ? 0 : next.id + 1;
         /*@ set this.footprint =
-             \set_union(\all_fields(this), 
+             \set_union(\all_fields(this),
              (next == null) ? \empty : next.footprint);
         */
         //      while(false);
@@ -51,7 +51,7 @@ final class Transaction {
 
     /*@ requires true;
       @ ensures \result == total;
-      @ modifies \nothing;
+      @ assignable \nothing;
       @ measured_by this.id;
       @*/
     int getTotal() {
@@ -61,5 +61,5 @@ final class Transaction {
             return next.getTotal() + amount;
         }
     }
-        
+
 }

@@ -3,17 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.java.StringUtil;
 
@@ -37,8 +40,8 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (5.12.19)
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
-    @NonNull
-    final T ctx;
+
+    final @NonNull T ctx;
 
     protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;
@@ -51,6 +54,15 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     @Override
     public String toString() {
         return getClass().getName() + ": " + BuilderHelpers.getPosition(ctx);
+    }
+
+    public Location getStartLocation() {
+        return Location.fromToken(ctx.start);
+    }
+
+    public String getText() {
+        var interval = new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1);
+        return ctx.start.getInputStream().getText(interval);
     }
 
     public static class File extends KeyAst<KeYParser.FileContext> {
@@ -73,12 +85,24 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return settings;
         }
 
-        public @Nullable Triple<String, Integer, Integer> findProofScript() {
+        /**
+         * Returns the a {@link ProofScriptEntry} from the underlying AST if an {@code \proofscript}
+         * entry is present.
+         * The {@code url} is used as the source of input and might be later used for error message,
+         * or including
+         * other files.
+         *
+         * @param url location pointing to the source of the AST
+         * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
+         */
+        public @Nullable ProofScriptEntry findProofScript(URI url) {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
+                Location location = new Location(url,
+                    Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
+
                 String text = pctx.ps.getText();
-                return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
-                    pctx.ps.getCharPositionInLine());
+                return new ProofScriptEntry(StringUtil.trim(text, '"'), location);
             }
             return null;
         }
@@ -145,7 +169,28 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             if (!res.isEmpty())
                 return (Configuration) res.get(0);
             else
-                throw new RuntimeException();
+                throw new RuntimeException("Error in configuration. Source: "
+                    + ctx.start.getTokenSource().getSourceName());
+        }
+    }
+
+    public static class SetStatementContext extends KeyAst<JmlParser.Set_statementContext> {
+        public SetStatementContext(JmlParser.@NonNull Set_statementContext ctx) {
+            super(ctx);
+        }
+
+        public Expression getAssignee() {
+            return new Expression(ctx.assignee);
+        }
+
+        public Expression getValue() {
+            return new Expression(ctx.value);
+        }
+    }
+
+    public static class Expression extends KeyAst<JmlParser.ExpressionContext> {
+        public Expression(JmlParser.@NonNull ExpressionContext ctx) {
+            super(ctx);
         }
     }
 

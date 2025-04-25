@@ -17,11 +17,10 @@ import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.pp.*;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
-
-
 
 /*
  * Search bar implementing search function for SequentView.
@@ -204,7 +203,7 @@ public class SequentViewSearchBar extends SearchBar {
         boolean loopEntered = false;
         while (m.find()) {
             int foundAt = m.start();
-            Object highlight = sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get());
+            Object highlight = sequentView.createColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get());
             searchResults.add(new Pair<>(foundAt, highlight));
             sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
             loopEntered = true;
@@ -230,13 +229,14 @@ public class SequentViewSearchBar extends SearchBar {
     }
 
     private void setExtraHighlight(int resultIndex) {
-        resetHighlight(resultIndex, sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_1.get()));
+        resetHighlight(resultIndex,
+            sequentView.createColorHighlight(SEARCH_HIGHLIGHT_COLOR_1.get()));
         sequentView.setCaretPosition(searchResults.get(resultIndex).first);
     }
 
     private void resetExtraHighlight() {
         resetHighlight(resultIteratorPos,
-            sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get()));
+            sequentView.createColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get()));
     }
 
     private void resetHighlight(int resultIndex, Object highlight) {

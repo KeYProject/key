@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramConstruct;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -22,6 +21,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.pp.Layouter;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -32,7 +33,8 @@ import org.slf4j.LoggerFactory;
  * Objects of this class are schema variables matching program constructs within modal operators.
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
-public final class ProgramSV extends AbstractSV implements ProgramConstruct, UpdateableOperator {
+public final class ProgramSV extends OperatorSV
+        implements ProgramConstruct, UpdateableOperator, SyntaxElement {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =
@@ -52,14 +54,6 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
 
     public boolean isListSV() {
         return isListSV;
-    }
-
-    /**
-     * this method tests on object identity
-     */
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return se == this;
     }
 
     /**
@@ -142,13 +136,18 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     }
 
     @Override
-    public int getChildCount() {
-        return 0;
+    public ProgramElement getChildAt(int index) {
+        return this;
     }
 
     @Override
-    public ProgramElement getChildAt(int index) {
-        return this;
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException("ProgramSV " + this + " has no children");
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
     }
 
     @Override
@@ -402,7 +401,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
 
     @Override
     public int getHeapCount(Services services) {
-        return HeapContext.getModHeaps(services, false).size();
+        return HeapContext.getModifiableHeaps(services, false).size();
     }
 
     @Override

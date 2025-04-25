@@ -7,11 +7,13 @@ import java.io.IOException;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * This SMT translation handler takes care of cast expressions <code>T::cast(term)</code>.
@@ -26,7 +28,7 @@ public class CastHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) throws IOException {
-        this.anyCast = Sort.ANY.getCastSymbol(services);
+        this.anyCast = services.getJavaDLTheory().getCastSymbol(JavaDLTheory.ANY, services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 

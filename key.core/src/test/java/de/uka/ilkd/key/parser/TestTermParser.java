@@ -9,10 +9,10 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,13 +21,14 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTermParser extends AbstractTestTermParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParser.class);
 
     private Sort elem, list;
-    private Function head, tail, nil, cons, isempty;
+    private JFunction head, tail, nil, cons, isempty;
     private LogicVariable x, y, z, xs, ys;
     private Term t_x, t_y, t_z, t_xs, t_ys;
     private Term t_headxs, t_tailys, t_nil;
@@ -257,7 +258,11 @@ public class TestTermParser extends AbstractTestTermParser {
         Term t4 =
             parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;" + " {int s = 2;} }\\>" + " true ->"
                 + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
-        assertTrue(t3.equalsModRenaming(t4), "Terms should be equalModRenaming");
+        assertTrue(t3.equalsModProperty(t4, RENAMING_TERM_PROPERTY),
+            "Terms should be equalModRenaming");
+        assertEquals(t3.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            t4.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equalModRenaming");
     }
 
     @Test

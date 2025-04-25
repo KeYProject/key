@@ -6,13 +6,14 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.logic.Name;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves the
@@ -65,7 +66,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
                 if (ruleApp instanceof TacletApp tacletApp) {
                     final Object inst = tacletApp.matchConditions().getInstantiations()
                             .lookupValue(new Name(value));
-                    if (inst != null && ((Term) inst).op() instanceof Function) {
+                    if (inst != null && ((Term) inst).op() instanceof JFunction) {
                         abbrMap.put((Term) inst, key, true);
                     } else {
                         throw new ScriptException(String.format(

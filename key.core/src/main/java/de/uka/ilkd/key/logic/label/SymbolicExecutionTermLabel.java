@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
+
+import org.key_project.logic.Name;
 
 /**
  * Label attached to a symbolic execution thread.
@@ -49,7 +50,7 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public Object getChild(int i) {
+    public Object getTLChild(int i) {
         if (i == 0) {
             return id();
         }
@@ -60,7 +61,7 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         return 1;
     }
 

@@ -22,14 +22,17 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
 public final class UseDependencyContractRule implements BuiltInRule {
@@ -207,7 +210,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             return false;
         }
         for (int i = 1, n = candidate.arity(); i < n; i++) {
-            if (!(candidate.sub(i).equalsModIrrelevantTermLabels(focus.sub(i))
+            if (!(candidate.sub(i).equalsModProperty(focus.sub(i), IRRELEVANT_TERM_LABELS_PROPERTY)
                     || candidate.sub(i).op() instanceof LogicVariable)) {
                 return false;
             }
@@ -341,7 +344,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         // heap term of observer must be store-term (or anon, create,
         // memset, ...)
         final Services services = goal.proof().getServices();
-        // final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        // final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         boolean hasRawSteps = false;
         for (int i = 0; i < target.getHeapCount(services) * target.getStateCount(); i++) {
             if (hasRawSteps(focus.sub(i), goal.sequent(), services)) {
@@ -370,16 +373,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         return goal.proof().mgt().isContractApplicable(contracts.iterator().next());
     }
 
-
-    @NonNull
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
         // collect information
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term focus = pio.subTerm();
         final IObserverFunction target = (IObserverFunction) focus.op();
-        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         final TermBuilder TB = services.getTermBuilder();
 
         final Term selfTerm;
@@ -396,12 +397,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
 
         // configure contract
-        final DependencyContract contract =
+        DependencyContract contract =
             (DependencyContract) ((UseDependencyContractApp) ruleApp).getInstantiation();
+
         assert contract != null;
 
         // get step
-        final PosInOccurrence step = ((UseDependencyContractApp) ruleApp).step();
+        final PosInOccurrence step =
+            ((UseDependencyContractApp) ruleApp).step();
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);

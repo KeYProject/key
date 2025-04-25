@@ -1,5 +1,5 @@
 legacy=true
-params=--no-print-success -m --interactive --lang smt2
+params=--no-print-success --produce-models --no-interactive --lang smt2
 timeout=-1
 name=CVC4 (Legacy Translation)
 info=CVC4 solver

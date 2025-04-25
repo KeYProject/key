@@ -201,6 +201,7 @@ public class ProofScriptEngine {
     public record EchoMessage(String message) implements Message {
     }
 
-    public record ExecuteInfo(String command, Location location, int nodeSerial) implements Message {
+    public record ExecuteInfo(String command, Location location, int nodeSerial)
+            implements Message {
     }
 }

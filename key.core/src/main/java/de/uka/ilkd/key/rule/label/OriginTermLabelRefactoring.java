@@ -7,7 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.LabelCollection;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -129,8 +129,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         TermLabel label = term.getLabel(OriginTermLabel.NAME);
 
         if (label != null) {
-            result.add((Origin) label.getChild(0));
-            result.addAll((Set<Origin>) label.getChild(1));
+            result.add((Origin) label.getTLChild(0));
+            result.addAll((Set<Origin>) label.getTLChild(1));
         }
 
         ImmutableArray<Term> subterms = term.subs();
