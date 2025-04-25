@@ -93,13 +93,10 @@ public interface ApplicationCheck {
 
         private String checkFormula(Term formula) {
             final List<String> newSymbols = new LinkedList<>();
-            formula.execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    String name = visited.op().name().toString();
-                    if (names.contains(name)) {
-                        newSymbols.add(name);
-                    }
+            formula.execPreOrder((DefaultVisitor) visited -> {
+                String name = visited.op().name().toString();
+                if (names.contains(name)) {
+                    newSymbols.add(name);
                 }
             });
 
