@@ -90,7 +90,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
         if (taclet instanceof FindTaclet) {
             findExp = ((FindTaclet) taclet).find();
-            ignoreTopLevelUpdates = ((FindTaclet) taclet).ignoreTopLevelUpdates()
+            ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
             findMatchProgram = TacletMatchProgram.createProgram(findExp);
 

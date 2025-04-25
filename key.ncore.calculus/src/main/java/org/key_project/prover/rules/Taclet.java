@@ -349,7 +349,8 @@ public abstract class Taclet implements Rule {
      * @return true if top level updates shall be ignored
      */
     public boolean ignoreTopLevelUpdates() {
-        return !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE);
+        return find instanceof Sequent &&
+                !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE);
     }
 
     /**
