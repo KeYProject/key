@@ -53,7 +53,7 @@ public class SuccTaclet extends FindTaclet {
 
     @Override
     public Term find() {
-        return (Term) ((Sequent)find).succedent().getFirst().formula();
+        return (Term) ((Sequent) find).succedent().getFirst().formula();
     }
 
     @Override
