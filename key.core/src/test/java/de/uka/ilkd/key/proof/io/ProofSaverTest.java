@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -27,7 +28,7 @@ class ProofSaverTest {
         Sequent seq = loader.parseFile().loadProblem().getProblem();
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
-        Proof proof = new Proof("test", seq, "", initConfig, null);
+        Proof proof = new Proof("test", seq, "", initConfig, (Path) null);
         File file = File.createTempFile("proofSaveTest", ".key");
         file.deleteOnExit();
         String status = new ProofSaver(proof, file).save();

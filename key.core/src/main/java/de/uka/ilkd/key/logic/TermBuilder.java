@@ -10,8 +10,8 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
@@ -34,6 +34,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -74,7 +76,8 @@ public class TermBuilder {
      * Parses the given string that represents the term (or createTerm) using the service's
      * namespaces.
      *
-     * @param s the String to parse
+     * @param s
+     *        the String to parse
      */
     public Term parseTerm(String s) throws ParserException {
         return parseTerm(s, services.getNamespaces());
@@ -84,9 +87,12 @@ public class TermBuilder {
      * Parses the given string that represents the term (or createTerm) using the provided
      * namespaces.
      *
-     * @param s the String to parse
-     * @param namespaces the namespaces used for name lookup.
-     * @throws ParserException if the given String cannot be parsed
+     * @param s
+     *        the String to parse
+     * @param namespaces
+     *        the namespaces used for name lookup.
+     * @throws ParserException
+     *         if the given String cannot be parsed
      */
     public Term parseTerm(String s, NamespaceSet namespaces) throws ParserException {
         final AbbrevMap abbr =
@@ -119,7 +125,8 @@ public class TermBuilder {
      * {@link #newName(String, NamespaceSet)} to make sure that you have all the {@link Name}s you
      * need available.
      *
-     * @param baseName The base name (prefix) for the name to generate.
+     * @param baseName
+     *        The base name (prefix) for the name to generate.
      * @return An available name constructed by affixing a counter to the passed base name, or some
      *         available free name (please consult comment above).
      * @see #newName(String, NamespaceSet)
@@ -137,8 +144,10 @@ public class TermBuilder {
      * introduced (and saved) new name. In this case, the order of new names in the saved proof file
      * matters (the first unused name is returned, regardless of the baseName).
      *
-     * @param baseName The base name (prefix) for the name to generate.
-     * @param localNamespace The local {@link NamespaceSet} to check.
+     * @param baseName
+     *        The base name (prefix) for the name to generate.
+     * @param localNamespace
+     *        The local {@link NamespaceSet} to check.
      * @return An available name constructed by affixing a counter to the passed base name, or some
      *         available free name (please consult comment above).
      */
@@ -300,9 +309,12 @@ public class TermBuilder {
      * Creates a location variable for prestate variables. Take care to register it in the
      * namespaces.
      *
-     * @param baseName the base name to use
-     * @param sort the sort of the variable
-     * @param makeNameUnique whether to change the base name to be unique
+     * @param baseName
+     *        the base name to use
+     * @param sort
+     *        the sort of the variable
+     * @param makeNameUnique
+     *        whether to change the base name to be unique
      * @return a location variable for the given name and type
      */
     public LocationVariable atPreVar(String baseName, Sort sort, boolean makeNameUnique) {
@@ -313,9 +325,12 @@ public class TermBuilder {
      * Creates a location variable for prestate variables. Take care to register it in the
      * namespaces.
      *
-     * @param baseName the base name to use
-     * @param kjt the type of the variable
-     * @param makeNameUnique whether to change the base name to be unique
+     * @param baseName
+     *        the base name to use
+     * @param kjt
+     *        the type of the variable
+     * @param makeNameUnique
+     *        whether to change the base name to be unique
      * @return a location variable for the given name and type
      */
     public LocationVariable atPreVar(String baseName, KeYJavaType kjt, boolean makeNameUnique) {
@@ -326,9 +341,12 @@ public class TermBuilder {
      * Creates a location variable for example for prestate variables. Take care to register it in
      * the namespaces.
      *
-     * @param baseName the base name to use
-     * @param sort the sort of the variable
-     * @param makeNameUnique whether to change the base name to be unique
+     * @param baseName
+     *        the base name to use
+     * @param sort
+     *        the sort of the variable
+     * @param makeNameUnique
+     *        whether to change the base name to be unique
      * @return a location variable for the given name and type
      */
     public LocationVariable locationVariable(String baseName, Sort sort, boolean makeNameUnique) {
@@ -339,9 +357,12 @@ public class TermBuilder {
      * Creates a location variable for example for prestate variables. Take care to register it in
      * the namespaces.
      *
-     * @param baseName the base name to use
-     * @param kjt the type of the variable
-     * @param makeNameUnique whether to change the base name to be unique
+     * @param baseName
+     *        the base name to use
+     * @param kjt
+     *        the type of the variable
+     * @param makeNameUnique
+     *        whether to change the base name to be unique
      * @return a location variable for the given name and type
      */
     public LocationVariable locationVariable(String baseName, KeYJavaType kjt,
@@ -364,7 +385,7 @@ public class TermBuilder {
         return tf.createTerm(v);
     }
 
-    public Term var(ProgramVariable v) {
+    public Term var(@NonNull ProgramVariable v) {
         // if(v.isMember()) {
         // throw new TermCreationException(
         // "Cannot create term for \"member\" "
@@ -794,9 +815,12 @@ public class TermBuilder {
     /**
      * Creates a substitution term
      *
-     * @param substVar the QuantifiableVariable to be substituted
-     * @param substTerm the Term that replaces substVar
-     * @param origTerm the Term that is substituted
+     * @param substVar
+     *        the QuantifiableVariable to be substituted
+     * @param substTerm
+     *        the Term that replaces substVar
+     * @param origTerm
+     *        the Term that is substituted
      */
     public Term subst(SubstOp op, QuantifiableVariable substVar, Term substTerm, Term origTerm) {
         return tf.createTerm(op, new ImmutableArray<>(substTerm, origTerm),
@@ -1181,9 +1205,11 @@ public class TermBuilder {
      * Creates terms to be used in Z/C/FP/DFP/R notations. The result does not have such a
      * constructor applied yet.
      *
-     * @param numberString a string containing the number in a decimal representation
+     * @param numberString
+     *        a string containing the number in a decimal representation
      * @return Term in "number" notation representing the given number
-     * @throws NumberFormatException if <code>numberString</code> is not a number
+     * @throws NumberFormatException
+     *         if <code>numberString</code> is not a number
      */
     private Term numberTerm(String numberString) {
         if (numberString == null || numberString.isEmpty()) {
@@ -1223,9 +1249,11 @@ public class TermBuilder {
     /**
      * Get term for an integer literal.
      *
-     * @param numberString String representing an integer with radix 10, may be negative
+     * @param numberString
+     *        String representing an integer with radix 10, may be negative
      * @return Term in Z-Notation representing the given number
-     * @throws NumberFormatException if <code>numberString</code> is not a number
+     * @throws NumberFormatException
+     *         if <code>numberString</code> is not a number
      */
     public Term zTerm(String numberString) {
         return func(services.getTypeConverter().getIntegerLDT().getNumberSymbol(),
@@ -1235,7 +1263,8 @@ public class TermBuilder {
     /**
      * Get term for an integer literal.
      *
-     * @param number an integer
+     * @param number
+     *        an integer
      * @return Term in Z-Notation representing the given number
      */
     public Term zTerm(long number) {
@@ -1243,9 +1272,11 @@ public class TermBuilder {
     }
 
     /**
-     * @param numberString String containing the value of the char as a decimal number
+     * @param numberString
+     *        String containing the value of the char as a decimal number
      * @return Term in C-Notation representing the given char
-     * @throws NumberFormatException if <code>numberString</code> is not a number
+     * @throws NumberFormatException
+     *         if <code>numberString</code> is not a number
      */
     public Term cTerm(String numberString) {
         return func(services.getTypeConverter().getIntegerLDT().getCharSymbol(),
@@ -1255,7 +1286,8 @@ public class TermBuilder {
     /**
      * Create a floating point literal value from a float value.
      *
-     * @param value any float value (even NaN)
+     * @param value
+     *        any float value (even NaN)
      * @return a term representing the value
      */
     public Term fpTerm(float value) {
@@ -1268,7 +1300,8 @@ public class TermBuilder {
     /**
      * Create a double floating point literal value from a double value.
      *
-     * @param value any double value (even NaN)
+     * @param value
+     *        any double value (even NaN)
      * @return a term representing the value
      */
     public Term dfpTerm(double value) {
@@ -1717,8 +1750,10 @@ public class TermBuilder {
      * The labels are not added to heap variables.
      * </p>
      *
-     * @param term term to label.
-     * @param labels the labels to apply.
+     * @param term
+     *        term to label.
+     * @param labels
+     *        the labels to apply.
      * @return a labeled term.
      */
     public Term addLabelToAllSubs(Term term, ImmutableArray<TermLabel> labels) {
@@ -1748,8 +1783,10 @@ public class TermBuilder {
      * The label is not added to heap variables.
      * </p>
      *
-     * @param term term to label.
-     * @param label the label to apply.
+     * @param term
+     *        term to label.
+     * @param label
+     *        the label to apply.
      * @return a labeled term.
      */
     public Term addLabelToAllSubs(Term term, TermLabel label) {
@@ -1759,8 +1796,10 @@ public class TermBuilder {
     /**
      * Adds labels to a term, removing any existing labels of the same type.
      *
-     * @param term the term.
-     * @param labels the labels to add.
+     * @param term
+     *        the term.
+     * @param labels
+     *        the labels to add.
      * @return the term with the labels added.
      */
     public Term addLabel(Term term, ImmutableArray<TermLabel> labels) {
@@ -1793,8 +1832,10 @@ public class TermBuilder {
     /**
      * Adds a label to a term, removing any existing labels of the same type.
      *
-     * @param term the term.
-     * @param label the label to add.
+     * @param term
+     *        the term.
+     * @param label
+     *        the label to add.
      * @return the term with the label added.
      */
     public Term addLabel(Term term, TermLabel label) {
@@ -1808,8 +1849,10 @@ public class TermBuilder {
     /**
      * Applies labels to a term, removing any existing labels.
      *
-     * @param term the term.
-     * @param labels the labels to apply.
+     * @param term
+     *        the term.
+     * @param labels
+     *        the labels to apply.
      * @return the modified term.
      */
     public Term label(Term term, ImmutableArray<TermLabel> labels) {
@@ -1824,8 +1867,10 @@ public class TermBuilder {
     /**
      * Applies a label to a term, removing any existing labels.
      *
-     * @param term the term.
-     * @param label the label to apply.
+     * @param term
+     *        the term.
+     * @param label
+     *        the label to apply.
      * @return the modified term.
      */
     public Term label(Term term, TermLabel label) {
@@ -2138,9 +2183,12 @@ public class TermBuilder {
     /**
      * Replaces a child term by another one.
      *
-     * @param term the term in which to perform the replacement.
-     * @param pos the position at which to perform the replacement.
-     * @param replacement the replacement term.
+     * @param term
+     *        the term in which to perform the replacement.
+     * @param pos
+     *        the position at which to perform the replacement.
+     * @param replacement
+     *        the replacement term.
      * @return {@code term}, with the child at {@code pos} replaced by {@code replacement}.
      */
     public Term replace(Term term, PosInTerm pos, Term replacement) {
@@ -2219,7 +2267,8 @@ public class TermBuilder {
     /**
      * Returns the {@link Sort}s of the given {@link Term}s.
      *
-     * @param terms The given {@link Term}s.
+     * @param terms
+     *        The given {@link Term}s.
      * @return The {@link Term} {@link Sort}s.
      */
     public ImmutableList<Sort> getSorts(Iterable<Term> terms) {
@@ -2234,8 +2283,10 @@ public class TermBuilder {
      * Similar behavior as {@link #imp(Term, Term)} but simplifications are not performed if
      * {@link TermLabel}s would be lost.
      *
-     * @param t1 The left side.
-     * @param t2 The right side.
+     * @param t1
+     *        The left side.
+     * @param t2
+     *        The right side.
      * @return The created {@link Term}.
      */
     public Term impPreserveLabels(Term t1, Term t2) {
@@ -2255,7 +2306,8 @@ public class TermBuilder {
      * Similar behavior as {@link #not(Term)} but simplifications are not performed if
      * {@link TermLabel}s would be lost.
      *
-     * @param t The child {@link Term}.
+     * @param t
+     *        The child {@link Term}.
      * @return The created {@link Term}.
      */
     public Term notPreserveLabels(Term t) {
@@ -2274,7 +2326,8 @@ public class TermBuilder {
      * Similar behavior as {@link #and(Iterable)} but simplifications are not performed if
      * {@link TermLabel}s would be lost.
      *
-     * @param subTerms The sub {@link Term}s.
+     * @param subTerms
+     *        The sub {@link Term}s.
      * @return The created {@link Term}.
      */
     public Term andPreserveLabels(Iterable<Term> subTerms) {
@@ -2289,8 +2342,10 @@ public class TermBuilder {
      * Similar behavior as {@link #and(Term, Term)} but simplifications are not performed if
      * {@link TermLabel}s would be lost.
      *
-     * @param t1 The left side.
-     * @param t2 The right side.
+     * @param t1
+     *        The left side.
+     * @param t2
+     *        The right side.
      * @return The created {@link Term}.
      */
     public Term andPreserveLabels(Term t1, Term t2) {
@@ -2310,7 +2365,8 @@ public class TermBuilder {
      * Similar behavior as {@link #or(Iterable)} but simplifications are not performed if
      * {@link TermLabel}s would be lost.
      *
-     * @param subTerms The sub {@link Term}s.
+     * @param subTerms
+     *        The sub {@link Term}s.
      * @return The created {@link Term}.
      */
     public Term orPreserveLabels(Iterable<Term> subTerms) {
@@ -2325,8 +2381,10 @@ public class TermBuilder {
      * Similar behavior as {@link #or(Term, Term)} but simplifications are not performed if
      * {@link TermLabel}s would be lost.
      *
-     * @param t1 The left side.
-     * @param t2 The right side.
+     * @param t1
+     *        The left side.
+     * @param t2
+     *        The right side.
      * @return The created {@link Term}.
      */
     public Term orPreserveLabels(Term t1, Term t2) {
@@ -2363,8 +2421,10 @@ public class TermBuilder {
      * add origin information to the term and all its sub terms
      * nothing will be done if no origin term label factory is present
      *
-     * @param term the term where to start to add the origin information
-     * @param origin the Origin information
+     * @param term
+     *        the term where to start to add the origin information
+     * @param origin
+     *        the Origin information
      * @return the labeled term or the same term, if no origin term label factory is present
      */
     public Term addLabelToAllSubs(Term term, OriginTermLabel.Origin origin) {
@@ -2379,8 +2439,10 @@ public class TermBuilder {
      * add origin information to the term
      * nothing will be done if no origin term label factory is present
      *
-     * @param term the term where to add the origin information
-     * @param origin the Origin information
+     * @param term
+     *        the term where to add the origin information
+     * @param origin
+     *        the Origin information
      * @return the labeled term or the same term, if no origin term label factory is present
      */
     public Term addLabel(Term term, OriginTermLabel.Origin origin) {

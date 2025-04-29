@@ -6,8 +6,8 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -41,10 +41,14 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     /**
      * Creates a contract to check well-definedness of a block contract
      *
-     * @param block the block belonging to the block contract
-     * @param variables the variables of the block contract
-     * @param params the parameters of the block
-     * @param services the services instance
+     * @param block
+     *        the block belonging to the block contract
+     * @param variables
+     *        the variables of the block contract
+     * @param params
+     *        the parameters of the block
+     * @param services
+     *        the services instance
      */
     public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
             ImmutableSet<LocationVariable> params, Services services) {

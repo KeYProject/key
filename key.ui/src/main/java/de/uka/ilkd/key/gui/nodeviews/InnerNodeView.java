@@ -116,7 +116,8 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     /**
-     * @param tapp The taclet app for which the if formulae should be highlighted.
+     * @param tapp
+     *        The taclet app for which the if formulae should be highlighted.
      * @throws BadLocationException
      */
     private void highlightIfFormulas(TacletApp tapp) throws BadLocationException {
@@ -155,8 +156,10 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     /**
-     * @param pos the PosInOccurrence that should be highlighted.
-     * @param light the painter for the highlight.
+     * @param pos
+     *        the PosInOccurrence that should be highlighted.
+     * @param light
+     *        the painter for the highlight.
      * @return the range of characters that was highlighted. returns null if nothing has been
      *         highlighted.
      * @throws BadLocationException

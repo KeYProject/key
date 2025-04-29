@@ -29,7 +29,8 @@ public interface RuleAppCost extends Comparable<RuleAppCost> {
      * This function is associative. this.mul(a) == a.mul(this)
      * </p>
      *
-     * @param cost - non-null {@link RuleAppCost}
+     * @param cost
+     *        - non-null {@link RuleAppCost}
      */
     @NonNull
     RuleAppCost mul(@NonNull RuleAppCost cost);

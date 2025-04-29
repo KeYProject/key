@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TypeOf extends ProgramTransformer {
@@ -19,7 +19,8 @@ public class TypeOf extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe the instance of expression contained by the meta construct
+     * @param pe
+     *        the instance of expression contained by the meta construct
      */
     public TypeOf(ProgramElement pe) {
         super("#typeof", pe);

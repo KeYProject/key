@@ -38,7 +38,7 @@ class IntSemanticsTest {
         "uncheckedOF/mBigint.proof",
         "checkedOF/mOFCheck.proof" })
     void testSemanticsProvable(String filename) throws ProblemLoaderException {
-        File proofFile = new File(TEST_DIR, filename);
+        var proofFile = TEST_DIR.toPath().resolve(filename);
         KeYEnvironment<?> pmapi = KeYEnvironment.load(proofFile);
         Proof proof = pmapi.getLoadedProof();
         // Proof should be reloaded completely now. If not, the int semantics are probably broken.
@@ -58,7 +58,7 @@ class IntSemanticsTest {
         "checkedOF/mOFCheckWrong.key", })
     void testSemanticsUnprovable(String filename) throws ProblemLoaderException {
         File keyFile = new File(TEST_DIR, filename);
-        KeYEnvironment<?> pmapi = KeYEnvironment.load(keyFile);
+        KeYEnvironment<?> pmapi = KeYEnvironment.load(keyFile.toPath());
         Proof proof = pmapi.getLoadedProof();
         pmapi.getProofControl().startAndWaitForAutoMode(proof);
         // we expect that exactly one branch (the overflow check) is open now:

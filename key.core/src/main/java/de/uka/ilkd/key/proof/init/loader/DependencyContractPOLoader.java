@@ -24,8 +24,10 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link de.uka.ilkd.key.proof.init.InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
+     * @param initConfig
+     *        The already load {@link de.uka.ilkd.key.proof.init.InitConfig}.
+     * @param properties
+     *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,

@@ -55,8 +55,10 @@ public class TermTacletAppIndex {
      * collects all RewriteTacletInstantiations for the given heuristics in a subterm of the
      * constrainedFormula described by a PosInOccurrence
      *
-     * @param pos the {@link PosInOccurrence} to focus
-     * @param services the {@link Services} object encapsulating information about the java
+     * @param pos
+     *        the {@link PosInOccurrence} to focus
+     * @param services
+     *        the {@link Services} object encapsulating information about the java
      *        datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -69,8 +71,10 @@ public class TermTacletAppIndex {
     /**
      * collects all FindTaclets with instantiations for the given heuristics and position
      *
-     * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param pos
+     *        the PosInOccurrence to focus
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -93,9 +97,11 @@ public class TermTacletAppIndex {
     /**
      * collects all AntecedentTaclet instantiations for the given heuristics and SequentFormula
      *
-     * @param pos the PosInOccurrence of the SequentFormula the taclets have to be connected to (pos
+     * @param pos
+     *        the PosInOccurrence of the SequentFormula the taclets have to be connected to (pos
      *        must point to the top level formula, i.e. <tt>pos.isTopLevel()</tt> must be true)
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -107,9 +113,11 @@ public class TermTacletAppIndex {
     /**
      * collects all SuccedentTaclet instantiations for the given heuristics and SequentFormula
      *
-     * @param pos the PosInOccurrence of the SequentFormula the taclets have to be connected to (pos
+     * @param pos
+     *        the PosInOccurrence of the SequentFormula the taclets have to be connected to (pos
      *        must point to the top level formula, i.e. <tt>pos.isTopLevel()</tt> must be true)
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -121,7 +129,8 @@ public class TermTacletAppIndex {
     /**
      * Descend and create indices for each of the direct subterms of the given term
      *
-     * @param pos pointer to the term/formula for whose subterms indices are to be created
+     * @param pos
+     *        pointer to the term/formula for whose subterms indices are to be created
      * @return list of the index objects
      */
     private static ImmutableArray<TermTacletAppIndex> createSubIndices(PosInOccurrence pos,
@@ -142,7 +151,8 @@ public class TermTacletAppIndex {
     /**
      * Create an index for the given term
      *
-     * @param pos Pointer to the term/formula for which an index is to be created. <code>pos</code>
+     * @param pos
+     *        Pointer to the term/formula for which an index is to be created. <code>pos</code>
      *        has to be a top-level term position
      * @return the index object
      */
@@ -197,8 +207,10 @@ public class TermTacletAppIndex {
      * Create a new tree of indices that additionally contain the taclets that are selected by
      * <code>filter</code>
      *
-     * @param filter The taclets that are supposed to be added
-     * @param pos Pointer to the term/formula for which an index is to be created. <code>pos</code>
+     * @param filter
+     *        The taclets that are supposed to be added
+     * @param pos
+     *        Pointer to the term/formula for which an index is to be created. <code>pos</code>
      *        has to be a top-level term position
      * @return the index object
      */
@@ -245,7 +257,8 @@ public class TermTacletAppIndex {
      * Recursively update the term index, starting at <code>this</code> and descending along the
      * given path iterator to the term position below which a modification was performed
      *
-     * @param pathToModification an iterator that walks from the root of the formula to the position
+     * @param pathToModification
+     *        an iterator that walks from the root of the formula to the position
      *        of modification
      * @return the updated TermTacletAppIndex
      */
@@ -397,11 +410,16 @@ public class TermTacletAppIndex {
     /**
      * Updates the TermTacletAppIndex after a change at or below position <code>pos</code>
      *
-     * @param pos Pointer to the term/formula where a change occurred
-     * @param services the Services
-     * @param tacletIndex the TacletIndex to access taclets
-     * @param listener the NewRuleListener to be register such that new rules can be reported
-     * @param indexCaches caches
+     * @param pos
+     *        Pointer to the term/formula where a change occurred
+     * @param services
+     *        the Services
+     * @param tacletIndex
+     *        the TacletIndex to access taclets
+     * @param listener
+     *        the NewRuleListener to be register such that new rules can be reported
+     * @param indexCaches
+     *        caches
      * @return the updated index object
      */
     TermTacletAppIndex update(PosInOccurrence pos, Services services, TacletIndex tacletIndex,
@@ -476,7 +494,8 @@ public class TermTacletAppIndex {
      * <code>this</code>). <code>NoPosTacletApp</code>s are converted to <code>PosTacletApp</code>s
      * using the parameter <code>pos</code>
      *
-     * @param pos The position of this index
+     * @param pos
+     *        The position of this index
      * @return a list of all taclet apps
      */
     private ImmutableList<TacletApp> collectTacletApps(PosInOccurrence pos, RuleFilter p_filter,
@@ -498,8 +517,10 @@ public class TermTacletAppIndex {
      * Report all <code>NoPosTacletApp</code> s that are stored by <code>this</code> (and by the
      * sub-indices of <code>this</code>).
      *
-     * @param pos The position of this index
-     * @param listener The listener to which the taclet apps found are supposed to be reported
+     * @param pos
+     *        The position of this index
+     * @param listener
+     *        The listener to which the taclet apps found are supposed to be reported
      */
     void reportTacletApps(PosInOccurrence pos, NewRuleListener listener) {
 
@@ -517,8 +538,10 @@ public class TermTacletAppIndex {
      * Collect all <code>NoPosTacletApp</code> s that are stored by <code>this</code> (and by the
      * sub-indices of <code>this</code>).
      *
-     * @param pos The position of this index
-     * @param collectedApps the {@link ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>>}
+     * @param pos
+     *        The position of this index
+     * @param collectedApps
+     *        the {@link ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>>}
      *        to which to add the found taclet applications; it must not contain {@code pos} or any
      *        position below pos as key
      * @return the resulting list of taclet applications from this and all subterm taclet indices
@@ -603,8 +626,10 @@ public class TermTacletAppIndex {
 
 
     /**
-     * @param p_filter the {@link RuleFilter} to be used
-     * @param taclets the list of {@link Taclet}s to be filtered
+     * @param p_filter
+     *        the {@link RuleFilter} to be used
+     * @param taclets
+     *        the list of {@link Taclet}s to be filtered
      * @return filtered list
      */
     public static ImmutableList<NoPosTacletApp> filter(RuleFilter p_filter,

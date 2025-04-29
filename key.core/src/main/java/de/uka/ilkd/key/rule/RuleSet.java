@@ -15,7 +15,8 @@ public record RuleSet(Name name) implements Named {
     /**
      * creates a heuristic
      *
-     * @param name Name object that contains name of the heuristic
+     * @param name
+     *        Name object that contains name of the heuristic
      */
     public RuleSet {
     }

@@ -95,7 +95,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
             }
             symbols.put(sym.name(), sym);
         }
-
+        LOGGER.debug("Registered {} {}", sym.getClass().getSimpleName(), sym.name());
     }
 
     public void add(Namespace<E> source) {
@@ -132,7 +132,8 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      *
      * Removal is not delegated to the parent namespace.
      *
-     * @param name non-null name whose symbol is to be removed.
+     * @param name
+     *        non-null name whose symbol is to be removed.
      */
     public void remove(Name name) {
         if (symbols != null) {
@@ -167,7 +168,8 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     /**
      * looks if a registered object is declared in this namespace, if negative it asks its parent
      *
-     * @param name a Name representing the name of the symbol to look for
+     * @param name
+     *        a Name representing the name of the symbol to look for
      * @return Object with name "name" or null if no such an object has been found
      */
     public @Nullable E lookup(Name name) {

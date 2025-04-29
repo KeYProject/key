@@ -9,10 +9,10 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -63,8 +63,10 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param initConfig the initial proof configuration.
-     * @param contract the contract from which this PO is generated.
+     * @param initConfig
+     *        the initial proof configuration.
+     * @param contract
+     *        the contract from which this PO is generated.
      */
     public FunctionalLoopContractPO(InitConfig initConfig, FunctionalLoopContract contract) {
         super(initConfig, contract.getName());
@@ -236,9 +238,12 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     /**
      * Creates postconditions for the current loop iteration.
      *
-     * @param modifiableClauses the contract's modifiable clauses.
-     * @param freeModifiableClauses the loop's free modifiable clauses.
-     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder
+     * @param modifiableClauses
+     *        the contract's modifiable clauses.
+     * @param freeModifiableClauses
+     *        the loop's free modifiable clauses.
+     * @param conditionsAndClausesBuilder
+     *        a ConditionsAndClausesBuilder
      * @return the postconditions for the current loop iteration.
      */
     private Term[] createPostconditions(
@@ -255,12 +260,18 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     /**
      * Creates postconditions for the next loop iteration.
      *
-     * @param selfTerm the self term.
-     * @param heaps the heaps.
-     * @param nextVariables the variables for the next loop iteration.
-     * @param modifiableClauses the modifiable clauses.
-     * @param freeModifiableClauses the free modifiable clauses.
-     * @param services services.
+     * @param selfTerm
+     *        the self term.
+     * @param heaps
+     *        the heaps.
+     * @param nextVariables
+     *        the variables for the next loop iteration.
+     * @param modifiableClauses
+     *        the modifiable clauses.
+     * @param freeModifiableClauses
+     *        the free modifiable clauses.
+     * @param services
+     *        services.
      * @return the postconditions for the next loop iteration.
      */
     private Term[] createPostconditionsNext(
@@ -281,11 +292,16 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param selfVar the self variable.
-     * @param heaps the heaps.
-     * @param wellFormedHeapsCondition the condition that all heaps are well-formed.
-     * @param services services.
-     * @param conditionsAndClausesBuilder a conditions and clauses builder.
+     * @param selfVar
+     *        the self variable.
+     * @param heaps
+     *        the heaps.
+     * @param wellFormedHeapsCondition
+     *        the condition that all heaps are well-formed.
+     * @param services
+     *        services.
+     * @param conditionsAndClausesBuilder
+     *        a conditions and clauses builder.
      * @return the preconditions.
      */
     private Term[] createAssumptions(final ProgramVariable selfVar,
@@ -307,9 +323,12 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param heaps heaps.
-     * @param services services.
-     * @param tb a term builder.
+     * @param heaps
+     *        heaps.
+     * @param services
+     *        services.
+     * @param tb
+     *        a term builder.
      * @return a map from every heap to an anonymization heap.
      */
     private static Map<LocationVariable, JFunction> createAnonInHeaps(
@@ -330,9 +349,12 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param heaps heaps.
-     * @param services services.
-     * @param tb a term builder.
+     * @param heaps
+     *        heaps.
+     * @param services
+     *        services.
+     * @param tb
+     *        a term builder.
      * @return a map from every heap to an anonymization heap.
      */
     private Map<LocationVariable, JFunction> createAnonOutHeaps(
@@ -355,11 +377,16 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param selfVar the self variable.
-     * @param selfTerm the self term.
-     * @param variables the contract's variables.
-     * @param services services.
-     * @param tb a term builder.
+     * @param selfVar
+     *        the self variable.
+     * @param selfTerm
+     *        the self term.
+     * @param variables
+     *        the contract's variables.
+     * @param services
+     *        services.
+     * @param tb
+     *        a term builder.
      * @return a goal configurator.
      */
     private GoalsConfigurator createGoalConfigurator(final ProgramVariable selfVar,
@@ -383,21 +410,36 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     /**
      *
-     * @param selfTerm the self term
-     * @param heaps the heaps.
-     * @param anonOutHeaps the heaps used in the anonOut update.
-     * @param variables the contract's variables.
-     * @param nextVariables the variables for the next loop iteration.
-     * @param modifiableClauses the modifiable clauses.
-     * @param assumptions the preconditions.
-     * @param decreasesCheck the decreases check.
-     * @param postconditions the postconditions for the current loop iteration.
-     * @param postconditionsNext the postconditions for the next loop iteration.
-     * @param wellFormedHeapsCondition the condition that all heaps are well-formed.
-     * @param configurator a goal configurator.
-     * @param conditionsAndClausesBuilder a conditions and clauses builder.
-     * @param services services.
-     * @param tb a term builder.
+     * @param selfTerm
+     *        the self term
+     * @param heaps
+     *        the heaps.
+     * @param anonOutHeaps
+     *        the heaps used in the anonOut update.
+     * @param variables
+     *        the contract's variables.
+     * @param nextVariables
+     *        the variables for the next loop iteration.
+     * @param modifiableClauses
+     *        the modifiable clauses.
+     * @param assumptions
+     *        the preconditions.
+     * @param decreasesCheck
+     *        the decreases check.
+     * @param postconditions
+     *        the postconditions for the current loop iteration.
+     * @param postconditionsNext
+     *        the postconditions for the next loop iteration.
+     * @param wellFormedHeapsCondition
+     *        the condition that all heaps are well-formed.
+     * @param configurator
+     *        a goal configurator.
+     * @param conditionsAndClausesBuilder
+     *        a conditions and clauses builder.
+     * @param services
+     *        services.
+     * @param tb
+     *        a term builder.
      * @return the validity formula for the contract.
      */
     private Term setUpValidityGoal(final Term selfTerm, final List<LocationVariable> heaps,

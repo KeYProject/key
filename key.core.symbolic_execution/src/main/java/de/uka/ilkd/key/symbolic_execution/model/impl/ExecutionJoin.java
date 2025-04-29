@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionJoin;
@@ -20,8 +20,10 @@ public class ExecutionJoin extends AbstractExecutionNode<SourceElement> implemen
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionJoin(ITreeSettings settings, Node proofNode) {

@@ -30,8 +30,10 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     /**
      * creates TacletMenuItem attached to a Taclet
      *
-     * @param connectedTo the TacletApp that is represented by the item
-     * @param notationInfo the NotationInfo used to print terms
+     * @param connectedTo
+     *        the TacletApp that is represented by the item
+     * @param notationInfo
+     *        the NotationInfo used to print terms
      */
     public DefaultTacletMenuItem(TacletApp connectedTo, NotationInfo notationInfo,
             Services services) {
@@ -103,7 +105,8 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     /**
      * Replaces {@literal <},{@literal >},{@literal &} and new lines with their HTML masks.
      *
-     * @param sb The StringBuffer with forbidden HTML characters
+     * @param sb
+     *        The StringBuffer with forbidden HTML characters
      * @return A new StringBuffer with the masked characters.
      */
     protected static StringBuilder ascii2html(String sb) {

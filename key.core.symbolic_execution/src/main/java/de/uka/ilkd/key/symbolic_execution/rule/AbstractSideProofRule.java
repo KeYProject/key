@@ -43,8 +43,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * The used name is registered in the {@link Namespace} of the {@link Services}.
      * </p>
      *
-     * @param services The {@link Services} to use-
-     * @param sort The {@link Sort} to use.
+     * @param services
+     *        The {@link Services} to use-
+     * @param sort
+     *        The {@link Sort} to use.
      * @return The created constant.
      */
     protected JFunction createResultConstant(Services services, Sort sort) {
@@ -59,8 +61,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * side
      * proof.
      *
-     * @param services The {@link Services} to use.
-     * @param sort The {@link Sort} to use.
+     * @param services
+     *        The {@link Services} to use.
+     * @param sort
+     *        The {@link Sort} to use.
      * @return The created result {@link JFunction}.
      */
     protected JFunction createResultFunction(Services services, Sort sort) {
@@ -76,13 +80,19 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * New used names are automatically added to the {@link Namespace} of the {@link Services}.
      * </p>
      *
-     * @param services The {@link Services} to use.
-     * @param goal The {@link Goal} on which this {@link BuiltInRule} should be applied on.
-     * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
-     * @param sequentToProve The {@link Sequent} to prove in a side proof.
-     * @param newPredicate The {@link JFunction} which is used to compute the result.
+     * @param services
+     *        The {@link Services} to use.
+     * @param goal
+     *        The {@link Goal} on which this {@link BuiltInRule} should be applied on.
+     * @param sideProofEnvironment
+     *        The given {@link ProofEnvironment} of the side proof.
+     * @param sequentToProve
+     *        The {@link Sequent} to prove in a side proof.
+     * @param newPredicate
+     *        The {@link JFunction} which is used to compute the result.
      * @return The found result {@link Term} and the conditions.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected List<ResultsAndCondition> computeResultsAndConditions(Services services,
             Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
@@ -98,8 +108,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * Replaces the {@link Term} defined by the given {@link PosInOccurrence} with the given new
      * {@link Term}.
      *
-     * @param pio The {@link PosInOccurrence} which defines the {@link Term} to replace.
-     * @param newTerm The new {@link Term}.
+     * @param pio
+     *        The {@link PosInOccurrence} which defines the {@link Term} to replace.
+     * @param newTerm
+     *        The new {@link Term}.
      * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
      */
     protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {

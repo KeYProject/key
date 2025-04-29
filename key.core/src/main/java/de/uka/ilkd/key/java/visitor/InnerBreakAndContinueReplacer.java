@@ -6,10 +6,12 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.ArrayDeque;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
@@ -48,11 +50,16 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     /**
      *
-     * @param block a block that begins with a loop.
-     * @param loopLabels all labels belonging to the loop.
-     * @param breakLabel the label used for break statements.
-     * @param continueLabel the label used for continue statements.
-     * @param services services.
+     * @param block
+     *        a block that begins with a loop.
+     * @param loopLabels
+     *        all labels belonging to the loop.
+     * @param breakLabel
+     *        the label used for break statements.
+     * @param continueLabel
+     *        the label used for continue statements.
+     * @param services
+     *        services.
      */
     public InnerBreakAndContinueReplacer(final StatementBlock block,
             final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,

@@ -23,8 +23,10 @@ import org.key_project.logic.Name;
 public interface ApplicationCheck {
 
     /**
-     * @param cutNode The node at which to apply the delayed cut.
-     * @param cutFormula The cut formula.
+     * @param cutNode
+     *        The node at which to apply the delayed cut.
+     * @param cutFormula
+     *        The cut formula.
      * @return A String representation of a possible conflict affecting a delayed cut application
      *         for the given node and cut formula or null if there is no conflict.
      */

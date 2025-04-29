@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -26,7 +26,8 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
 
     /**
      *
-     * @param contract a block contract.
+     * @param contract
+     *        a block contract.
      */
     FunctionalBlockContract(BlockContract contract) {
         super(contract);
@@ -34,8 +35,10 @@ public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockCo
 
     /**
      *
-     * @param contract a block contract.
-     * @param id an ID.
+     * @param contract
+     *        a block contract.
+     * @param id
+     *        an ID.
      */
     FunctionalBlockContract(BlockContract contract, int id) {
         super(contract, id);

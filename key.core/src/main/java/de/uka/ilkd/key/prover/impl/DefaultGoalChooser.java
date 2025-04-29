@@ -43,8 +43,7 @@ public class DefaultGoalChooser implements GoalChooser {
 
     protected Node currentSubtreeRoot = null;
 
-    public DefaultGoalChooser() {
-    }
+    public DefaultGoalChooser() {}
 
     /*
      * (non-Javadoc)

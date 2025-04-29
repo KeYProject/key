@@ -26,8 +26,10 @@ public final class RuleAppUtil {
     /**
      * Compute the sequent formulas used by the provided rule application (if-instantiations):
      *
-     * @param ruleApp the rule application
-     * @param node proof node which contains that rule application
+     * @param ruleApp
+     *        the rule application
+     * @param node
+     *        proof node which contains that rule application
      * @return sequent formulas used
      */
     public static Set<PosInOccurrence> ifInstsOfRuleApp(RuleApp ruleApp, Node node) {

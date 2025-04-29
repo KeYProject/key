@@ -7,13 +7,13 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -135,7 +135,8 @@ public final class JmlTermFactory {
     /**
      * Creates an "all-objects" term from a store-ref term.
      *
-     * @param t store-ref term, needs to be a union of singletons
+     * @param t
+     *        store-ref term, needs to be a union of singletons
      * @return allObjects term (see <code>LocSetADT</code>) @ in case <code>t</code> is not a
      *         store-ref term cosisting of unions of singletons
      */
@@ -324,8 +325,10 @@ public final class JmlTermFactory {
     /**
      * Extracts lower bound from <code>a</code> if it matches the pattern.
      *
-     * @param a guard to be disected
-     * @param lv variable bound by quantifier
+     * @param a
+     *        guard to be disected
+     * @param lv
+     *        variable bound by quantifier
      * @return lower bound term (or null)
      */
     private Term lowerBound(Term a, LogicVariable lv) {
@@ -340,8 +343,10 @@ public final class JmlTermFactory {
     /**
      * Extracts upper bound from <code>a</code> if it matches the pattern.
      *
-     * @param a guard to be disected
-     * @param lv variable bound by quantifier
+     * @param a
+     *        guard to be disected
+     * @param lv
+     *        variable bound by quantifier
      * @return upper bound term (or null)
      */
     public Term upperBound(Term a, LogicVariable lv) {
@@ -730,8 +735,10 @@ public final class JmlTermFactory {
     /**
      * Truncates a bigint term to resultType depending on the spec math mode
      *
-     * @param resultType the desired result type
-     * @param term the term
+     * @param resultType
+     *        the desired result type
+     * @param term
+     *        the term
      * @return the maybe truncated expression
      */
     private SLExpression buildBigintTruncationExpression(KeYJavaType resultType, Term term) {
@@ -1240,8 +1247,7 @@ public final class JmlTermFactory {
         if (symbol != null) {
             // Function or predicate symbol found
 
-            assert symbol instanceof JFunction
-                    : "Expecting a function symbol in this namespace";
+            assert symbol instanceof JFunction : "Expecting a function symbol in this namespace";
             JFunction function = (JFunction) symbol;
 
             Term[] args;

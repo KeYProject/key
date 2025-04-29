@@ -213,7 +213,8 @@ public class TestApplyUpdateOnRigidCondition {
      * update cannot be applied,
      * the original formula is returned.
      *
-     * @param term the {@link Term} that must be an update applied on a formula
+     * @param term
+     *        the {@link Term} that must be an update applied on a formula
      * @return the original formula if the update cannot be applied; else, the updated formula is
      *         returned
      */
@@ -230,7 +231,8 @@ public class TestApplyUpdateOnRigidCondition {
      * cannot be applied,
      * the original term is returned.
      *
-     * @param term the {@link Term} that must be an update applied on a formula
+     * @param term
+     *        the {@link Term} that must be an update applied on a formula
      * @return the original term if the update cannot be applied; else, the updated term is returned
      */
     private Term applyUpdateOnTerm(Term term) {
@@ -246,11 +248,15 @@ public class TestApplyUpdateOnRigidCondition {
     /**
      * Instantiates the given schema variables with the content of <code>term</code>.
      *
-     * @param term the {@link Term} that must be an update applied on a formula or term
-     * @param u the {@link UpdateSV} that is instantiated with the update in <code>term</code>
-     * @param tOrPhi the {@link SchemaVariable} that is instantiated with the term or formula in
+     * @param term
+     *        the {@link Term} that must be an update applied on a formula or term
+     * @param u
+     *        the {@link UpdateSV} that is instantiated with the update in <code>term</code>
+     * @param tOrPhi
+     *        the {@link SchemaVariable} that is instantiated with the term or formula in
      *        <code>term</code>
-     * @param result the {@link SchemaVariable} that is instantiated with the result of a
+     * @param result
+     *        the {@link SchemaVariable} that is instantiated with the result of a
      *        {@link ApplyUpdateOnRigidCondition#check(SchemaVariable, SyntaxElement, MatchConditions, Services)}
      *        call
      *

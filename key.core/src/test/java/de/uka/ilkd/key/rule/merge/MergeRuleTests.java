@@ -26,6 +26,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dominic Scheurer
  */
 public class MergeRuleTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleTests.class);
 
     private static final File TEST_RESOURCES_DIR_PREFIX =
         new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
@@ -43,7 +46,8 @@ public class MergeRuleTests {
      * Simple regression test case loading an existing closed proof (standard Gcd example) including
      * two merges with ITE antecedent merges and trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * @throws ProblemLoaderException
+     *         If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProof() {
@@ -55,7 +59,8 @@ public class MergeRuleTests {
      * Simple regression test case loading an existing closed proof (standard Gcd example) including
      * two merges with predicate abstraction and trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * @throws ProblemLoaderException
+     *         If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstr() {
@@ -68,7 +73,8 @@ public class MergeRuleTests {
      * two merges with predicate abstraction (with lattice elements manually chosen by the user) and
      * trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * @throws ProblemLoaderException
+     *         If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstrAndUserChoices() {
@@ -171,7 +177,8 @@ public class MergeRuleTests {
      * <p>
      * At the end, the proof should be closed.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
+     * @throws ProblemLoaderException
+     *         If the proof could not be loaded.
      */
     @Test
     public void testDoManualGcdProof() throws Exception {
@@ -240,7 +247,8 @@ public class MergeRuleTests {
     /**
      * Runs the automatic JavaDL strategy on the given proof.
      *
-     * @param proof Proof to prove automatically.
+     * @param proof
+     *        Proof to prove automatically.
      */
     public static void startAutomaticStrategy(final Proof proof) {
         ProofStarter starter = new ProofStarter(false);
@@ -252,7 +260,8 @@ public class MergeRuleTests {
      * Merges the first open goal in the given proof. Asserts that the constructed merge rule
      * application is complete.
      *
-     * @param proof The proof the first goal of which to merge with suitable partner(s).
+     * @param proof
+     *        The proof the first goal of which to merge with suitable partner(s).
      */
     private void mergeFirstGoal(final Proof proof, MergeProcedure mergeProc) {
         final Services services = proof.getServices();
@@ -279,7 +288,8 @@ public class MergeRuleTests {
     }
 
     /**
-     * @param sequent Sequent to get the PIO of the first succedent formula for.
+     * @param sequent
+     *        Sequent to get the PIO of the first succedent formula for.
      * @return The PIO for the first succedent formula of the given sequent.
      */
     private PosInOccurrence getPioFirstFormula(Sequent sequent) {
@@ -289,8 +299,10 @@ public class MergeRuleTests {
     /**
      * Runs the given macro on the given proof node.
      *
-     * @param macro The macro to execute.
-     * @param node The node to execute the macro on.
+     * @param macro
+     *        The macro to execute.
+     * @param node
+     *        The node to execute the macro on.
      */
     private void runMacro(AbstractProofMacro macro, Node node) {
         try {
@@ -309,7 +321,8 @@ public class MergeRuleTests {
      * fails if the proof could not be loaded.
      *
      * @param directory
-     * @param proofFileName The file name of the proof file to load.
+     * @param proofFileName
+     *        The file name of the proof file to load.
      * @return The loaded proof.
      */
     public static @NonNull Proof loadProof(File directory, String proofFileName) {
@@ -317,17 +330,21 @@ public class MergeRuleTests {
         assertTrue(proofFile.exists(),
             "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");
 
-        try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                proofFile, null, null, null, true);
-            Proof proof = environment.getLoadedProof();
-            Assertions.assertNotNull(proof);
-
-            return proof;
-        } catch (ProblemLoaderException e) {
-            Assertions.fail("Proof could not be loaded", e);
-            return null;
+        var environment = Assertions
+                .assertDoesNotThrow(() -> KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFile.toPath(), null, null, null, true));
+        Proof proof = environment.getLoadedProof();
+        Assertions.assertNotNull(proof, "Loaded proof should not be null");
+        var errors = environment.getReplayResult().getErrorList();
+        if (!errors.isEmpty()) {
+            LOGGER.warn("There were errors during load");
+            for (int i = 0; i < errors.size(); i++) {
+                var error = errors.get(i);
+                LOGGER.warn("Error " + i + ": ", error);
+            }
+            Assertions.fail("There were errors during load");
         }
+        return proof;
     }
 
     private static class IncompleteRuleAppException extends RuntimeException {

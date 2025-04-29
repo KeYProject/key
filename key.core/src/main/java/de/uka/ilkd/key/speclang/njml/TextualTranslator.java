@@ -33,7 +33,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     /**
      * Translates a token to a JMLModifier
      *
-     * @param token the token
+     * @param token
+     *        the token
      * @return the modifier
      */
     public static JMLModifier modifierFromToken(Token token) {

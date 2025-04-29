@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
@@ -36,7 +36,7 @@ public class NJmlTranslatorTests {
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =
-            new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
+            HelperClassForTests.parse(new File(testFile)).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
         services.setOriginFactory(new OriginTermLabelFactory());
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");

@@ -46,8 +46,8 @@
    inReachableState
 -> \forall java.lang.String s; 
      \forall java.lang.String t; 
-       (     s.<created>@(java.lang.Object) = TRUE
-           & t.<created>@(java.lang.Object) = TRUE
+       (     s.$created@(java.lang.Object) = TRUE
+           & t.$created@(java.lang.Object) = TRUE
         ->   StringDistance.distance(s, t)
            = StringDistance.distance(t, s))
 

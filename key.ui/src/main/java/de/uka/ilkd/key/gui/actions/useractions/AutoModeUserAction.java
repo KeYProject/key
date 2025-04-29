@@ -16,8 +16,10 @@ public class AutoModeUserAction extends ProofModifyingUserAction {
     /**
      * Construct a new auto mode user action.
      *
-     * @param mediator mediator
-     * @param proof selected proof
+     * @param mediator
+     *        mediator
+     * @param proof
+     *        selected proof
      */
     public AutoModeUserAction(KeYMediator mediator, Proof proof) {
         super(mediator, proof);

@@ -12,8 +12,7 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new TriggerVarInstantiatedFeature();
 
-    private TriggerVarInstantiatedFeature() {
-    }
+    private TriggerVarInstantiatedFeature() {}
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert app.taclet().hasTrigger();

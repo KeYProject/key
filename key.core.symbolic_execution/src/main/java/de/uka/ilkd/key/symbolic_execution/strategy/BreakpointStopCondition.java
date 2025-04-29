@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -37,7 +37,8 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     /**
      * Creates a new {@link BreakpointStopCondition}.
      *
-     * @param breakpoints The {@link IBreakpoint} to use.
+     * @param breakpoints
+     *        The {@link IBreakpoint} to use.
      */
     public BreakpointStopCondition(IBreakpoint... breakpoints) {
         if (breakpoints != null) {
@@ -94,10 +95,14 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     /**
      * Checks if a breakpoint is hit.
      *
-     * @param activeStatement the activeStatement of the node
-     * @param ruleApp the applied {@link RuleApp}
-     * @param proof the current proof
-     * @param node the current node
+     * @param activeStatement
+     *        the activeStatement of the node
+     * @param ruleApp
+     *        the applied {@link RuleApp}
+     * @param proof
+     *        the current proof
+     * @param node
+     *        the current node
      * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not
      *         hit.
      */

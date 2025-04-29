@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.NotEquals;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
@@ -47,6 +49,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import com.github.javaparser.ast.key.KeyTransactionStatement;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -67,8 +71,7 @@ public final class AuxiliaryContractBuilders {
      */
     public static final String ANON_OUT_PREFIX = "anonOut_";
 
-    private AuxiliaryContractBuilders() {
-    }
+    private AuxiliaryContractBuilders() {}
 
     /**
      * This class is used to construct {@code block'} from {@code block} (see Wacker 2012, 3.3).
@@ -114,11 +117,16 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param labels all labels belonging to the block.
-         * @param block the block.
-         * @param variables the variables.
-         * @param exceptionParameter the exception variable.
-         * @param services services.
+         * @param labels
+         *        all labels belonging to the block.
+         * @param block
+         *        the block.
+         * @param variables
+         *        the variables.
+         * @param exceptionParameter
+         *        the exception variable.
+         * @param services
+         *        services.
          */
         public ValidityProgramConstructor(final Iterable<Label> labels, final StatementBlock block,
                 final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
@@ -128,12 +136,18 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param labels all labels belonging to the block.
-         * @param block the block.
-         * @param variables the variables.
-         * @param exceptionParameter the exception variable.
-         * @param services services.
-         * @param alreadyDeclared the subset of variables that have already been declared.
+         * @param labels
+         *        all labels belonging to the block.
+         * @param block
+         *        the block.
+         * @param variables
+         *        the variables.
+         * @param exceptionParameter
+         *        the exception variable.
+         * @param services
+         *        services.
+         * @param alreadyDeclared
+         *        the subset of variables that have already been declared.
          */
         public ValidityProgramConstructor(final Iterable<Label> labels, final StatementBlock block,
                 final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
@@ -247,8 +261,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param block a block.
-         * @param labels labels that should be added to the block.
+         * @param block
+         *        a block.
+         * @param labels
+         *        labels that should be added to the block.
          * @return a labeled statement.
          */
         private Statement label(final StatementBlock block, Iterable<Label> labels) {
@@ -261,8 +277,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param block a block.
-         * @param breakOutLabel a label belonging to the block.
+         * @param block
+         *        a block.
+         * @param breakOutLabel
+         *        a label belonging to the block.
          * @return the block with all outer breaks, continues, and returns replaced.
          * @see OuterBreakContinueAndReturnReplacer
          */
@@ -275,8 +293,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param labeledBlock the labeled block.
-         * @param exceptionParameter the exception variable.
+         * @param labeledBlock
+         *        the labeled block.
+         * @param exceptionParameter
+         *        the exception variable.
          * @return wraps the labeled block in a try-catch structure
          */
         private Statement wrapInTryCatch(final Statement labeledBlock,
@@ -313,10 +333,13 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param goal If this is not null, all created variables are added to it. If it is null,
+         * @param goal
+         *        If this is not null, all created variables are added to it. If it is null,
          *        the variables are instead added to the {@code services}' namespace.
-         * @param placeholderVariables the placeholders from which to create the variables.
-         * @param services services.
+         * @param placeholderVariables
+         *        the placeholders from which to create the variables.
+         * @param services
+         *        services.
          */
         public VariablesCreatorAndRegistrar(final Goal goal,
                 final BlockContract.Variables placeholderVariables, final Services services) {
@@ -327,8 +350,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param self the self term
-         * @param existingPO {@code true} if we are applying a rule in an existing proof obligation,
+         * @param self
+         *        the self term
+         * @param existingPO
+         *        {@code true} if we are applying a rule in an existing proof obligation,
          *        {@code false} if we are creating a new proof obligation.
          * @return the registered variables.
          */
@@ -338,10 +363,13 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param self the self term
-         * @param existingPO {@code true} if we are applying a rule in an existing proof obligation,
+         * @param self
+         *        the self term
+         * @param existingPO
+         *        {@code true} if we are applying a rule in an existing proof obligation,
          *        {@code false} if we are creating a new proof obligation.
-         * @param pe if {@code existingPO == false}, all contracts on blocks in this program element
+         * @param pe
+         *        if {@code existingPO == false}, all contracts on blocks in this program element
          *        will have their remembrance variables replaced by the one created here.
          * @return the registered variables.
          */
@@ -390,7 +418,8 @@ public final class AuxiliaryContractBuilders {
         /**
          * Creates and registers copies of the remembrance variables and heaps.
          *
-         * @param suffix a suffix for the new variables' names.
+         * @param suffix
+         *        a suffix for the new variables' names.
          * @return a {@link Variables} object containing the new {@link ProgramVariable}s.
          */
         public Variables createAndRegisterCopies(String suffix) {
@@ -407,8 +436,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param map a map containing variables.
-         * @param suffix a suffix.
+         * @param map
+         *        a map containing variables.
+         * @param suffix
+         *        a suffix.
          * @return the map with the suffix appended to every variable's name.
          */
         private <K> Map<K, LocationVariable> appendSuffix(final Map<K, LocationVariable> map,
@@ -432,7 +463,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param placeholderFlags the placeholder flags.
+         * @param placeholderFlags
+         *        the placeholder flags.
          * @return newly created and registered flags with the same names.
          */
         private Map<Label, LocationVariable> createAndRegisterFlags(
@@ -446,7 +478,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param remembranceVariables the placeholder remembrance variables.
+         * @param remembranceVariables
+         *        the placeholder remembrance variables.
          * @return newly created and registered remembrance variables with the same names.
          */
         private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(
@@ -463,7 +496,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param placeholderVariable a placeholder variable
+         * @param placeholderVariable
+         *        a placeholder variable
          * @return a newly created and registered variable with the same name.
          */
         private LocationVariable createAndRegisterVariable(
@@ -494,9 +528,12 @@ public final class AuxiliaryContractBuilders {
         /**
          * Replace the outer remembrance variables of all contracts on blocks in {@code pe}.
          *
-         * @param pe the program elements.
-         * @param outerRemembranceHeaps the new outer remembrance heaps.
-         * @param outerRemembranceVariables the new outer remembrance variables.
+         * @param pe
+         *        the program elements.
+         * @param outerRemembranceHeaps
+         *        the new outer remembrance heaps.
+         * @param outerRemembranceVariables
+         *        the new outer remembrance variables.
          * @see #createAndRegister(Term, boolean, ProgramElement)
          */
         private void replaceOuterRemembranceVarsInInnerContracts(ProgramElement pe,
@@ -542,8 +579,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param variables the variables for the contract being applied.
-         * @param services services.
+         * @param variables
+         *        the variables for the contract being applied.
+         * @param services
+         *        services.
          */
         public UpdatesBuilder(final BlockContract.Variables variables, final Services services) {
             super(services.getTermFactory(), services);
@@ -552,7 +591,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param heaps the heaps.
+         * @param heaps
+         *        the heaps.
          * @return a remembrance update for the specified heaps.
          */
         public Term buildRemembranceUpdate(final List<LocationVariable> heaps) {
@@ -592,8 +632,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param anonymisationHeaps anonymization heaps.
-         * @param modifiableClauses modifiable clauses for the specified heaps.
+         * @param anonymisationHeaps
+         *        anonymization heaps.
+         * @param modifiableClauses
+         *        modifiable clauses for the specified heaps.
          * @return an anonymization update for the specified modifiable clauses.
          */
         public Term buildAnonOutUpdate(
@@ -605,9 +647,12 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param el a program element
-         * @param anonymisationHeaps anonymization heaps.
-         * @param modifiableClauses modifiable clauses for the specified heaps.
+         * @param el
+         *        a program element
+         * @param anonymisationHeaps
+         *        anonymization heaps.
+         * @param modifiableClauses
+         *        modifiable clauses for the specified heaps.
          * @return an anonymization update for the specified modifiable clauses and for every
          *         modified variable that occurs in the specified program element.
          */
@@ -619,10 +664,14 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param el a program element
-         * @param anonymisationHeaps anonymization heaps.
-         * @param modifiableClauses modifiable clauses for the specified heaps.
-         * @param prefix a prefix for the name of the anon functions.
+         * @param el
+         *        a program element
+         * @param anonymisationHeaps
+         *        anonymization heaps.
+         * @param modifiableClauses
+         *        modifiable clauses for the specified heaps.
+         * @param prefix
+         *        a prefix for the name of the anon functions.
          * @return an anonymization update for the specified modifiable clauses and for every
          *         modified variable that occurs in the specified program element.
          */
@@ -638,10 +687,14 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param vars a set of variables
-         * @param anonymisationHeaps anonymization heaps.
-         * @param modifiableClauses modifiable clauses for the specified heaps.
-         * @param prefix a prefix for the name of the anon functions.
+         * @param vars
+         *        a set of variables
+         * @param anonymisationHeaps
+         *        anonymization heaps.
+         * @param modifiableClauses
+         *        modifiable clauses for the specified heaps.
+         * @param prefix
+         *        a prefix for the name of the anon functions.
          * @return an anonymization update for the specified modifiable clauses and for every
          *         variable in the specified set.
          */
@@ -667,7 +720,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param anonymisationHeaps anonymization heaps.
+         * @param anonymisationHeaps
+         *        anonymization heaps.
          * @return an anonymization update for all heap locations.
          */
         public Term buildAnonInUpdate(
@@ -692,8 +746,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param vars a collection of variables.
-         * @param prefix a prefix for the name of the anonymization constants.
+         * @param vars
+         *        a collection of variables.
+         * @param prefix
+         *        a prefix for the name of the anonymization constants.
          * @return an anonymization update for the specified variables.
          */
         private Term buildLocalVariablesAnonUpdate(Collection<LocationVariable> vars,
@@ -742,11 +798,16 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param contract the contract being applied.
-         * @param heaps the heaps.
-         * @param variables the variables.
-         * @param self the self term.
-         * @param services services.
+         * @param contract
+         *        the contract being applied.
+         * @param heaps
+         *        the heaps.
+         * @param variables
+         *        the variables.
+         * @param self
+         *        the self term.
+         * @param services
+         *        services.
          */
         public ConditionsAndClausesBuilder(final AuxiliaryContract contract,
                 final List<LocationVariable> heaps, final BlockContract.Variables variables,
@@ -810,7 +871,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param localInVariables all free local variables in the block.
+         * @param localInVariables
+         *        all free local variables in the block.
          * @return the condition that all of those variables have valid values.
          */
         public Term buildReachableInCondition(
@@ -820,7 +882,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param localOutVariables all free local variables modified by the block.
+         * @param localOutVariables
+         *        all free local variables modified by the block.
          * @return the condition that all of those variables have valid values.
          */
         public Term buildReachableOutCondition(
@@ -834,7 +897,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param variables a set of variables.
+         * @param variables
+         *        a set of variables.
          * @return the condition that all of those variables have valid values.
          */
         public Term buildReachableCondition(final ImmutableSet<LocationVariable> variables) {
@@ -922,8 +986,10 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param modifiableClauses the contract's modifiable clauses
-         * @param freeModifiableClauses the contract's free modifiable clauses
+         * @param modifiableClauses
+         *        the contract's modifiable clauses
+         * @param freeModifiableClauses
+         *        the contract's free modifiable clauses
          * @return the contract's framing condition.
          */
         public Term buildFrameCondition(
@@ -989,7 +1055,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param anonymisationHeaps anonymisation heaps.
+         * @param anonymisationHeaps
+         *        anonymisation heaps.
          * @return the condition that all anonymisation heaps are well-formed.
          */
         public Term buildWellFormedAnonymisationHeapsCondition(
@@ -1037,11 +1104,16 @@ public final class AuxiliaryContractBuilders {
          * Builds the assumptions for the {@code self} variable
          * ({@code self != null & self.created == true & exactInstance(self)})
          *
-         * @param heaps the heaps.
-         * @param pm the method containg the block.
-         * @param selfKJT the self variable's type.
-         * @param self the self variable.
-         * @param services services.
+         * @param heaps
+         *        the heaps.
+         * @param pm
+         *        the method containg the block.
+         * @param selfKJT
+         *        the self variable's type.
+         * @param self
+         *        the self variable.
+         * @param services
+         *        services.
          * @return the assumptions for the {@code self} variable.
          */
         public Term buildSelfConditions(List<LocationVariable> heaps, IProgramMethod pm,
@@ -1072,7 +1144,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param flags a collection of boolean variables.
+         * @param flags
+         *        a collection of boolean variables.
          * @return the condition that all flags are {@code false}.
          */
         private List<Term> buildFlagsNotSetConditions(final Collection<LocationVariable> flags) {
@@ -1085,7 +1158,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param flag a boolean variable.
+         * @param flag
+         *        a boolean variable.
          * @return the condition that the flag is {@code false}.
          */
         private Term buildFlagNotSetCondition(final LocationVariable flag) {
@@ -1140,14 +1214,22 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param application the rule application.
-         * @param termLabelState the term label state.
-         * @param instantiation the instantiation
-         * @param labels all labels belonging to the block.
-         * @param variables the contract's variables.
-         * @param occurrence the position at which the rule is applied.
-         * @param services services.
-         * @param rule the rule being applied.
+         * @param application
+         *        the rule application.
+         * @param termLabelState
+         *        the term label state.
+         * @param instantiation
+         *        the instantiation
+         * @param labels
+         *        all labels belonging to the block.
+         * @param variables
+         *        the contract's variables.
+         * @param occurrence
+         *        the position at which the rule is applied.
+         * @param services
+         *        services.
+         * @param rule
+         *        the rule being applied.
          */
         public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
                 final TermLabelState termLabelState, final Instantiation instantiation,
@@ -1167,7 +1249,8 @@ public final class AuxiliaryContractBuilders {
         /**
          * Adds information flow properties to the specified goal.
          *
-         * @param goal a goal.
+         * @param goal
+         *        a goal.
          */
         private static void addInfFlow(final Goal goal) {
             final boolean oldInfFlowCheckInfoValue =
@@ -1181,7 +1264,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param services services.
+         * @param services
+         *        services.
          * @return additional program variables necessary for loop contract rules.
          */
         private static LocationVariable[] createLoopVariables(final Services services) {
@@ -1201,33 +1285,59 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param goal the current goal
-         * @param contract a loop contract.
-         * @param unfold the evaluation of the loop guard.
-         * @param body the loop body.
-         * @param tail all statements in the block after the loop.
-         * @param modality the contract's modality.
-         * @param bodyBreakFound whether or not the body contains a break statement.
-         * @param context the context update.
-         * @param remember the remembrance update.
-         * @param rememberNext the remembracne update for the next loop iteration.
-         * @param decreasesCheck the decreases check.
-         * @param anonOut the anonOut update.
-         * @param anonOut2 a copy of the anonOut update.
-         * @param post the current loop iteration's postconditon.
-         * @param postNext the next loop iteration's postconditon.
-         * @param postAfterTail the formula {@code [[tail]] -> post} where {@code [[]]} the
+         * @param goal
+         *        the current goal
+         * @param contract
+         *        a loop contract.
+         * @param unfold
+         *        the evaluation of the loop guard.
+         * @param body
+         *        the loop body.
+         * @param tail
+         *        all statements in the block after the loop.
+         * @param modality
+         *        the contract's modality.
+         * @param bodyBreakFound
+         *        whether or not the body contains a break statement.
+         * @param context
+         *        the context update.
+         * @param remember
+         *        the remembrance update.
+         * @param rememberNext
+         *        the remembracne update for the next loop iteration.
+         * @param decreasesCheck
+         *        the decreases check.
+         * @param anonOut
+         *        the anonOut update.
+         * @param anonOut2
+         *        a copy of the anonOut update.
+         * @param post
+         *        the current loop iteration's postconditon.
+         * @param postNext
+         *        the next loop iteration's postconditon.
+         * @param postAfterTail
+         *        the formula {@code [[tail]] -> post} where {@code [[]]} the
          *        contract's modality.
-         * @param pre the contract's precondition.
-         * @param brokeLoop the formula {@code brokeLoop = true}
-         * @param notBrokeLoop the formula {@code not brokeLoop = true}
-         * @param exceptionEqNull the formula {@code exception = null}
-         * @param exceptionNeqNull the formula {@code not exception = null}
-         * @param cond the formula {@code cond = true}
-         * @param notCond the formula {@code not cond = true}
-         * @param abrupt the formula for abrupt termination.
-         * @param notAbrupt the negation of the formula for abrupt termination.
-         * @param tb a term builder.
+         * @param pre
+         *        the contract's precondition.
+         * @param brokeLoop
+         *        the formula {@code brokeLoop = true}
+         * @param notBrokeLoop
+         *        the formula {@code not brokeLoop = true}
+         * @param exceptionEqNull
+         *        the formula {@code exception = null}
+         * @param exceptionNeqNull
+         *        the formula {@code not exception = null}
+         * @param cond
+         *        the formula {@code cond = true}
+         * @param notCond
+         *        the formula {@code not cond = true}
+         * @param abrupt
+         *        the formula for abrupt termination.
+         * @param notAbrupt
+         *        the negation of the formula for abrupt termination.
+         * @param tb
+         *        a term builder.
          * @return the sequent for the validity branch in a loop contract rule.
          */
         private static Term buildLoopValiditySequent(final Goal goal, final LoopContract contract,
@@ -1336,13 +1446,20 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param goal If this is not {@code null}, the returned formula is added to this goal.
-         * @param contract the contract being applied.
-         * @param update the update.
-         * @param anonUpdate the anonymization update.
-         * @param heap the heap.
-         * @param anonHeap the anonymization heap.
-         * @param localIns all free local variables in the block.
+         * @param goal
+         *        If this is not {@code null}, the returned formula is added to this goal.
+         * @param contract
+         *        the contract being applied.
+         * @param update
+         *        the update.
+         * @param anonUpdate
+         *        the anonymization update.
+         * @param heap
+         *        the heap.
+         * @param anonHeap
+         *        the anonymization heap.
+         * @param localIns
+         *        all free local variables in the block.
          * @return the well-definedness formula.
          */
         public Term setUpWdGoal(final Goal goal, final BlockContract contract, final Term update,
@@ -1368,12 +1485,18 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param goal If this is not {@code null}, the returned term is added to this goal.
-         * @param updates the updates.
-         * @param assumptions the preconditions.
-         * @param postconditions the postconditions.
-         * @param exceptionParameter the exception variable.
-         * @param terms the termified variables.
+         * @param goal
+         *        If this is not {@code null}, the returned term is added to this goal.
+         * @param updates
+         *        the updates.
+         * @param assumptions
+         *        the preconditions.
+         * @param postconditions
+         *        the postconditions.
+         * @param exceptionParameter
+         *        the exception variable.
+         * @param terms
+         *        the termified variables.
          * @return the term for the validity goal.
          */
         public Term setUpValidityGoal(final Goal goal, final Term[] updates,
@@ -1425,20 +1548,34 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param goal If this is not {@code null}, the returned term is added to this goal.
-         * @param contract the contract being applied.
-         * @param context the context update.
-         * @param remember the remembrance update for the current loop iteration.
-         * @param rememberNext the remembrance update for the next loop iteration.
-         * @param anonOutHeaps the heaps used in the anonOut update.
-         * @param modifiableClauses the modified clauses.
-         * @param assumptions the assumptions.
-         * @param decreasesCheck the decreases check.
-         * @param postconditions the current loop iteration's postconditions.
-         * @param postconditionsNext the next loop iteration's postconditions.
-         * @param exceptionParameter the exception variable.
-         * @param terms the termified variables.
-         * @param nextVars the variables for the next loop iteration.
+         * @param goal
+         *        If this is not {@code null}, the returned term is added to this goal.
+         * @param contract
+         *        the contract being applied.
+         * @param context
+         *        the context update.
+         * @param remember
+         *        the remembrance update for the current loop iteration.
+         * @param rememberNext
+         *        the remembrance update for the next loop iteration.
+         * @param anonOutHeaps
+         *        the heaps used in the anonOut update.
+         * @param modifiableClauses
+         *        the modified clauses.
+         * @param assumptions
+         *        the assumptions.
+         * @param decreasesCheck
+         *        the decreases check.
+         * @param postconditions
+         *        the current loop iteration's postconditions.
+         * @param postconditionsNext
+         *        the next loop iteration's postconditions.
+         * @param exceptionParameter
+         *        the exception variable.
+         * @param terms
+         *        the termified variables.
+         * @param nextVars
+         *        the variables for the next loop iteration.
          * @return the term for the validity goal in a loop contract rule app.
          */
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
@@ -1520,9 +1657,12 @@ public final class AuxiliaryContractBuilders {
         /**
          * Sets up the precondition goal.
          *
-         * @param goal the precondition goal.
-         * @param update the update.
-         * @param preconditions the preconditions.
+         * @param goal
+         *        the precondition goal.
+         * @param update
+         *        the update.
+         * @param preconditions
+         *        the preconditions.
          */
         public void setUpPreconditionGoal(final Goal goal, final Term update,
                 final Term[] preconditions) {
@@ -1540,9 +1680,12 @@ public final class AuxiliaryContractBuilders {
         /**
          * Sets up the usage goal.
          *
-         * @param goal the usage goal.
-         * @param updates the updates.
-         * @param assumptions the preconditions.
+         * @param goal
+         *        the usage goal.
+         * @param updates
+         *        the updates.
+         * @param assumptions
+         *        the preconditions.
          */
         public void setUpUsageGoal(final Goal goal, final Term[] updates,
                 final Term[] assumptions) {
@@ -1559,7 +1702,8 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param block a block.
+         * @param block
+         *        a block.
          * @return the block wrapped in a method frame if one is available, otherwise the block
          *         itself.
          */
@@ -1572,11 +1716,16 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
-         * @param contract the contract being applied.
-         * @param conditionVariable the variable used to store the loop guard's value.
-         * @param exceptionParameter the exception variable.
-         * @param breakFlags the break flags.
-         * @param continueFlags the continue flags.
+         * @param contract
+         *        the contract being applied.
+         * @param conditionVariable
+         *        the variable used to store the loop guard's value.
+         * @param exceptionParameter
+         *        the exception variable.
+         * @param breakFlags
+         *        the break flags.
+         * @param continueFlags
+         *        the continue flags.
          * @return Java blocks for every program fragment.
          */
         private JavaBlock[] createJavaBlocks(final LoopContract contract,
@@ -1610,7 +1759,7 @@ public final class AuxiliaryContractBuilders {
                 final Statement statement) {
             if (instantiation.isTransactional()) {
                 return new StatementBlock(statement, new TransactionStatement(
-                    de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH));
+                    KeyTransactionStatement.TransactionType.FINISH));
             } else {
                 if (statement instanceof StatementBlock) {
                     return (StatementBlock) statement;

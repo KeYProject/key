@@ -71,7 +71,8 @@ public interface ImmutableSet<T extends @Nullable Object>
     /**
      * return true if predicate is fullfilled for at least one element
      *
-     * @param predicate the predicate
+     * @param predicate
+     *        the predicate
      * @return true if predicate is fullfilled for at least one element
      */
     boolean exists(Predicate<T> predicate);
@@ -103,8 +104,10 @@ public interface ImmutableSet<T extends @Nullable Object>
     /**
      * adds an element, barfs if the element is already present
      *
-     * @param element of type <T> that has to be added to this set
-     * @throws NotUniqueException if the element is already present
+     * @param element
+     *        of type <T> that has to be added to this set
+     * @throws NotUniqueException
+     *         if the element is already present
      */
     ImmutableSet<T> addUnique(T element) throws NotUniqueException;
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
@@ -24,8 +24,10 @@ public class ProgramSVCollector extends JavaASTWalker {
     /**
      * create the ProgramSVCollector
      *
-     * @param root the ProgramElement where to begin
-     * @param vars the IList<SchemaVariable> where to add the new found ones
+     * @param root
+     *        the ProgramElement where to begin
+     * @param vars
+     *        the IList<SchemaVariable> where to add the new found ones
      */
     public ProgramSVCollector(ProgramElement root, ImmutableList<SchemaVariable> vars) {
         super(root);
@@ -35,9 +37,12 @@ public class ProgramSVCollector extends JavaASTWalker {
     /**
      * create the ProgramSVCollector
      *
-     * @param root the ProgramElement where to begin
-     * @param vars the IList<SchemaVariable> where to add the new found ones
-     * @param svInst the SVInstantiations previously found in order to determine the needed labels
+     * @param root
+     *        the ProgramElement where to begin
+     * @param vars
+     *        the IList<SchemaVariable> where to add the new found ones
+     * @param svInst
+     *        the SVInstantiations previously found in order to determine the needed labels
      *        for the UnwindLoop construct.
      */
     public ProgramSVCollector(ProgramElement root, ImmutableList<SchemaVariable> vars,

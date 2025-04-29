@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -80,20 +80,16 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
 
         @Override
-        public void started() {
-        }
+        public void started() {}
 
         @Override
-        public void resetStatus(Object sender) {
-        }
+        public void resetStatus(Object sender) {}
 
         @Override
-        public void reportStatus(Object sender, String string) {
-        }
+        public void reportStatus(Object sender, String string) {}
 
         @Override
-        public void progressStarted(Object sender) {
-        }
+        public void progressStarted(Object sender) {}
     };
 
     private final InitConfig environmentConfig;
@@ -102,8 +98,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     /**
      * Instantiates a new taclet proof obligation input object.
      *
-     * @param tacletName the name of the taclet which is to be created
-     * @param initConfig the initconfig under which the PO is to be examined
+     * @param tacletName
+     *        the name of the taclet which is to be created
+     * @param initConfig
+     *        the initconfig under which the PO is to be examined
      */
     public TacletProofObligationInput(String tacletName, InitConfig initConfig) {
         this.tacletName = tacletName;
@@ -169,7 +167,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         poloader.startSynchronously();
         if (proofObligation == null) {
             throw new ProofInputException("Cannot instantiate the proof obligation for taclet '"
-                + tacletName + "'. Is it defined (in the specified tacletFile?)", ex);
+                + tacletName + "'. Is it defined (in the specified tacletFile?)",
+                ex);
         }
     }
 

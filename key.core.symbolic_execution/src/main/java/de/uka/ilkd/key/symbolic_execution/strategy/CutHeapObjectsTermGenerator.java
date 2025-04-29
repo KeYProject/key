@@ -54,11 +54,16 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     /**
      * Computes all possible equality terms between objects in the given {@link SequentFormula}.
      *
-     * @param sf The {@link SequentFormula} to work with.
-     * @param equalityTerms The result {@link Set} with the equality {@link Term}s to fill.
-     * @param topTerms The terms of all sequent formulas
-     * @param heapLDT The {@link HeapLDT} to use.
-     * @param services TODO
+     * @param sf
+     *        The {@link SequentFormula} to work with.
+     * @param equalityTerms
+     *        The result {@link Set} with the equality {@link Term}s to fill.
+     * @param topTerms
+     *        The terms of all sequent formulas
+     * @param heapLDT
+     *        The {@link HeapLDT} to use.
+     * @param services
+     *        TODO
      */
     protected void collectEqualityTerms(SequentFormula sf, Set<Term> equalityTerms,
             Set<Term> topTerms, HeapLDT heapLDT, Services services) {
@@ -91,9 +96,12 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     /**
      * Collects recursive all possible targets of store operations on a heap.
      *
-     * @param term The {@link Term} to start search in.
-     * @param storeLocations The result {@link Set} to fill.
-     * @param heapLDT The {@link HeapLDT} to use (it provides the store and create
+     * @param term
+     *        The {@link Term} to start search in.
+     * @param storeLocations
+     *        The result {@link Set} to fill.
+     * @param heapLDT
+     *        The {@link HeapLDT} to use (it provides the store and create
      *        {@link JFunction}).
      */
     protected void collectStoreLocations(Term term, final Set<Term> storeLocations,

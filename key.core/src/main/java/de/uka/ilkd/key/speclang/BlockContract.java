@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -33,14 +33,22 @@ public interface BlockContract extends AuxiliaryContract {
 
     /**
      *
-     * @param newBlock the new block.
-     * @param newPreconditions the new preconditions.
-     * @param newPostconditions the new postconditions.
-     * @param newModifiableClauses the new modifiable clauses.
-     * @param newFreeModifiableClauses the new free modifiable clauses.
-     * @param newInfFlowSpecs the new information flow specifications.
-     * @param newVariables the new variables.
-     * @param newMeasuredBy the new measured-by clause.
+     * @param newBlock
+     *        the new block.
+     * @param newPreconditions
+     *        the new preconditions.
+     * @param newPostconditions
+     *        the new postconditions.
+     * @param newModifiableClauses
+     *        the new modifiable clauses.
+     * @param newFreeModifiableClauses
+     *        the new free modifiable clauses.
+     * @param newInfFlowSpecs
+     *        the new information flow specifications.
+     * @param newVariables
+     *        the new variables.
+     * @param newMeasuredBy
+     *        the new measured-by clause.
      * @return a new block contract with the specified attributes.
      */
     BlockContract update(StatementBlock newBlock,
@@ -54,15 +62,18 @@ public interface BlockContract extends AuxiliaryContract {
             Term newMeasuredBy);
 
     /**
-     * @param newKJT the type containing the new target method.
-     * @param newPM the new target method.
+     * @param newKJT
+     *        the type containing the new target method.
+     * @param newPM
+     *        the new target method.
      * @return a new block contract equal to this one except that it belongs to a different target.
      */
     @Override
     BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
-     * @param newBlock the new block.
+     * @param newBlock
+     *        the new block.
      * @return a new block contract equal to this one except that it belongs to a different block.
      */
     @Override

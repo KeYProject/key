@@ -4,7 +4,6 @@
 package org.key_project.slicing.ui;
 
 import java.awt.*;
-import java.io.File;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,10 +81,14 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     /**
      * Construct a new dialog.
      *
-     * @param mediator KeY mediator
-     * @param window main window
-     * @param analyzeCallback function that provides analysis results on the last loaded proof
-     * @param sliceButton function that slices the last loaded proof
+     * @param mediator
+     *        KeY mediator
+     * @param window
+     *        main window
+     * @param analyzeCallback
+     *        function that provides analysis results on the last loaded proof
+     * @param sliceButton
+     *        function that slices the last loaded proof
      */
     public SliceToFixedPointDialog(KeYMediator mediator, Window window,
             Function<Void, AnalysisResults> analyzeCallback,
@@ -146,7 +149,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
      * Wrap the provided analyze callback such that results of the callback will first be recorded
      * in {@link #tableRows}.
      *
-     * @param analyzeCallback callback to provide analysis results
+     * @param analyzeCallback
+     *        callback to provide analysis results
      * @return function that provides analysis results
      */
     private Function<Void, AnalysisResults> wrapAnalysisCallback(
@@ -177,9 +181,10 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                             name,
                             (k, v) -> v == null ? 1 : v + 1);
                     }
-                    File filename = results.proof.getProofFile();
+                    var filename = results.proof.getProofFile();
                     String label =
-                        filename != null ? filename.getName() : results.proof.name().toString();
+                        filename != null ? filename.getFileName().toString()
+                                : results.proof.name().toString();
                     tableRows.add(List.of(
                         label,
                         String.valueOf(results.totalSteps),
@@ -221,7 +226,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     /**
      * Start analyzing and slicing the currently selected proof.
      *
-     * @param proof the currently selected proof
+     * @param proof
+     *        the currently selected proof
      */
     void start(Proof proof) {
         worker = new SliceToFixedPointWorker(proof, null, analyzeButton, sliceButton, () -> {

@@ -17,7 +17,8 @@ interface Checker {
     /**
      * Called to get the result of the prefix check.
      *
-     * @param pio the initial position of occurrence
+     * @param pio
+     *        the initial position of occurrence
      */
     boolean check(PosInOccurrence pio);
 }

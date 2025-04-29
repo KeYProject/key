@@ -10,14 +10,14 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -222,7 +222,7 @@ public final class SpecificationRepository {
         // search through all locally available methods
         final String name = pm.getMethodDeclaration().getName();
         final int numParams = pm.getParameterDeclarationCount();
-        final ImmutableList<IProgramMethod> candidatePMs =
+        final List<IProgramMethod> candidatePMs =
             services.getJavaInfo().getAllProgramMethods(kjt);
         outer: for (IProgramMethod candidatePM : candidatePMs) {
             if (candidatePM.getMethodDeclaration().getName().equals(name)
@@ -238,7 +238,9 @@ public final class SpecificationRepository {
 
         // not found (happens for private methods of superclasses)
         // -> search through superclasses
-        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt).removeAll(kjt)) {
+        final var allSupertypes = services.getJavaInfo().getAllSupertypes(kjt);
+        allSupertypes.remove(kjt);
+        for (KeYJavaType sup : allSupertypes) {
             final IProgramMethod result = (IProgramMethod) getCanonicalFormForKJT(obs, sup);
             if (result != null) {
                 return result;
@@ -1165,7 +1167,7 @@ public final class SpecificationRepository {
                     ImmutableList<FunctionalOperationContract> lookupContracts =
                         ImmutableSLList.nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
-                    ImmutableList<KeYJavaType> superTypes =
+                    List<KeYJavaType> superTypes =
                         services.getJavaInfo().getAllSupertypes(kjt);
                     for (KeYJavaType superType : superTypes) {
                         for (FunctionalOperationContract fop : cs) {
@@ -1871,13 +1873,14 @@ public final class SpecificationRepository {
      * <b>Note:</b> There is a immutability hole in {@link ProgramVariableCollection} due to mutable
      * {@link Map}
      * <p>
-     * For {@link de.uka.ilkd.key.java.statement.JmlAssert} this is the formula behind the assert.
-     * For {@link de.uka.ilkd.key.java.statement.SetStatement} this is the target and the value
+     * For {@link de.uka.ilkd.key.java.ast.statement.JmlAssert} this is the formula behind the
+     * assert.
+     * For {@link de.uka.ilkd.key.java.ast.statement.SetStatement} this is the target and the value
      * terms.
      * You may want to use the index constant for accessing them:
-     * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_TARGET},
-     * {@link de.uka.ilkd.key.java.statement.SetStatement#INDEX_VALUE},
-     * {@link de.uka.ilkd.key.java.statement.JmlAssert#INDEX_CONDITION}
+     * {@link de.uka.ilkd.key.java.ast.statement.SetStatement#INDEX_TARGET},
+     * {@link de.uka.ilkd.key.java.ast.statement.SetStatement#INDEX_VALUE},
+     * {@link de.uka.ilkd.key.java.ast.statement.JmlAssert#INDEX_CONDITION}
      *
      * @param vars
      * @param terms

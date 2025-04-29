@@ -100,11 +100,16 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * Constructs a new JTextArea with the specified number of rows and columns, and the given
      * model. All of the constructors feed through this constructor.
      *
-     * @param doc the model to use, or create a default one if null
-     * @param text the text to be displayed, null if none
-     * @param rows the number of rows >= 0
-     * @param columns the number of columns >= 0
-     * @exception IllegalArgumentException if the rows or columns arguments are negative.
+     * @param doc
+     *        the model to use, or create a default one if null
+     * @param text
+     *        the text to be displayed, null if none
+     * @param rows
+     *        the number of rows >= 0
+     * @param columns
+     *        the number of columns >= 0
+     * @exception IllegalArgumentException
+     *            if the rows or columns arguments are negative.
      */
     public BracketMatchingTextArea(Document doc, String text, int rows, int columns) {
         super(doc, text, rows, columns);
@@ -115,7 +120,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * Constructs a new JTextArea with the given document model, and defaults for all of the other
      * arguments (null, 0, 0).
      *
-     * @param doc the model to use
+     * @param doc
+     *        the model to use
      */
     public BracketMatchingTextArea(Document doc) {
         super(doc);
@@ -126,9 +132,12 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * Constructs a new empty TextArea with the specified number of rows and columns. A default
      * model is created, and the initial string is null.
      *
-     * @param rows the number of rows >= 0
-     * @param columns the number of columns >= 0
-     * @exception IllegalArgumentException if the rows or columns arguments are negative.
+     * @param rows
+     *        the number of rows >= 0
+     * @param columns
+     *        the number of columns >= 0
+     * @exception IllegalArgumentException
+     *            if the rows or columns arguments are negative.
      */
     public BracketMatchingTextArea(int rows, int columns) {
         super(rows, columns);
@@ -139,10 +148,14 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * Constructs a new TextArea with the specified text and number of rows and columns. A default
      * model is created.
      *
-     * @param text the text to be displayed, or null
-     * @param rows the number of rows >= 0
-     * @param columns the number of columns >= 0
-     * @exception IllegalArgumentException if the rows or columns arguments are negative.
+     * @param text
+     *        the text to be displayed, or null
+     * @param rows
+     *        the number of rows >= 0
+     * @param columns
+     *        the number of columns >= 0
+     * @exception IllegalArgumentException
+     *            if the rows or columns arguments are negative.
      */
     public BracketMatchingTextArea(String text, int rows, int columns) {
         super(text, rows, columns);
@@ -153,7 +166,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * Constructs a new TextArea with the specified text displayed. A default model is created and
      * rows/columns are set to 0.
      *
-     * @param text the text to be displayed, or null
+     * @param text
+     *        the text to be displayed, or null
      */
     public BracketMatchingTextArea(String text) {
         super(text);
@@ -232,7 +246,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
     /**
      * resets both highlights
      *
-     * @throws BadLocationException if the caret is invalid
+     * @throws BadLocationException
+     *         if the caret is invalid
      */
     protected void resetHighlights() throws BadLocationException {
         getHighlighter().changeHighlight(theSameParensHighlight, 0, 0);
@@ -245,7 +260,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * Go through the string and find the closing partner. There may be other open/close parens in
      * between
      *
-     * @param dot position to start search from (must be an opening paren)
+     * @param dot
+     *        position to start search from (must be an opening paren)
      * @return either the index of the closing partner or -1 if it does not exist.
      */
     private int findMatchingClose(int dot) {
@@ -274,7 +290,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * Go backward through the string and find the opening partner. There may be other open/close
      * parens in between
      *
-     * @param dot position to start search from (must be a closing paren)
+     * @param dot
+     *        position to start search from (must be a closing paren)
      * @return either the index of the opening partner or -1 if it does not exist.
      */
     private int findMatchingOpen(int dot) {

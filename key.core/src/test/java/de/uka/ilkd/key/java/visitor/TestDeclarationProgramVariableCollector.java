@@ -6,9 +6,8 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Named;
@@ -50,9 +49,9 @@ public class TestDeclarationProgramVariableCollector {
         if (down != 0) {
             return;
         }
-        final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
+        final JavaService r2k = TacletForTests.services().getJavaService();
         for (int i = 0; i < jblocks.length; i++) {
-            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
+            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i], null);
         }
     }
 

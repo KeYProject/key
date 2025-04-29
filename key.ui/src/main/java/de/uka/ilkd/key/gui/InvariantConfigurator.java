@@ -14,7 +14,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -82,13 +82,18 @@ public class InvariantConfigurator {
      * parsed and a new loop invariant is returned. In case of a ParserException an error-message
      * is shown.
      *
-     * @param loopInv the {@link LoopSpecification} (complete or partial) to be displayed and
+     * @param loopInv
+     *        the {@link LoopSpecification} (complete or partial) to be displayed and
      *        edited in the dialog
-     * @param services the {@link Services} object
-     * @param requiresVariant a boolean indicating whether termination shall be proven
-     * @param heapContext a list of {@link LocationVariable}s representing the relevant heaps
+     * @param services
+     *        the {@link Services} object
+     * @param requiresVariant
+     *        a boolean indicating whether termination shall be proven
+     * @param heapContext
+     *        a list of {@link LocationVariable}s representing the relevant heaps
      * @return the user edited/completed loop invariant
-     * @throws RuleAbortException if the user cancelled the dialog
+     * @throws RuleAbortException
+     *         if the user cancelled the dialog
      */
     public LoopSpecification getLoopInvariant(final LoopSpecification loopInv,
             final Services services, final boolean requiresVariant,
@@ -197,7 +202,8 @@ public class InvariantConfigurator {
             /**
              * Sets up the Button Panel on the Bottom of the Invariant Dialog
              *
-             * @param buttonPanel the JPanel on which the buttons are placed
+             * @param buttonPanel
+             *        the JPanel on which the buttons are placed
              */
             private void initButtonPanel(JPanel buttonPanel) {
                 buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -356,7 +362,8 @@ public class InvariantConfigurator {
             /**
              * wrapper for the pretty printer
              *
-             * @param t the {@link Term} to be printed
+             * @param t
+             *        the {@link Term} to be printed
              * @return the String representation of the term
              */
             private String printTerm(Term t, boolean pretty) {

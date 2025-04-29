@@ -18,7 +18,8 @@ public interface GoalChooser {
     /**
      * Initialise this DefaultGoalChooser for use with a given Proof and a list of goals.
      *
-     * @param p_proof *param p_goals the initial list of goals
+     * @param p_proof
+     *        *param p_goals the initial list of goals
      */
     void init(Proof p_proof, ImmutableList<Goal> p_goals);
 
