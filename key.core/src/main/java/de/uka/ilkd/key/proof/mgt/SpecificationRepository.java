@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.nparser.AdtHelper;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.JmlAdt;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -1638,6 +1640,26 @@ public final class SpecificationRepository {
         blockContracts.compute(b, (k, set) -> set.remove(contract));
     }
 
+    private boolean isJmlAdtsActivated = false;
+    private List<AdtHelper.Adt> adts = new ArrayList<>(16);
+
+    /**
+     *
+     */
+    public void addAdt(JmlAdt adt) {
+        var a = new AdtHelper.Adt(adt.getKJT().createPackagePrefix().toString(),
+                adt.getName());
+        adts.add(a);
+    }
+
+    public void activateAdts() {
+        if(isJmlAdtsActivated) {return;}
+        isJmlAdtsActivated=true;
+
+        AdtHelper adtHelper = new AdtHelper(services);
+        adtHelper.process(adts);
+    }
+
     /**
      * Adds a new {@code LoopContract} and a new {@link FunctionalLoopContract} to the repository.
      *
@@ -1740,11 +1762,14 @@ public final class SpecificationRepository {
                 addLoopContract((LoopContract) spec);
             } else if (spec instanceof MergeContract) {
                 addMergeContract((MergeContract) spec);
+            } else if (spec instanceof JmlAdt adt) {
+                addAdt(adt);
             } else {
                 assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
             }
         }
     }
+
 
     public Pair<IObserverFunction, ImmutableSet<Taclet>> limitObs(IObserverFunction obs) {
         assert limitedToUnlimited.get(obs) == null : " observer is already limited: " + obs;
