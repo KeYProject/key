@@ -74,7 +74,7 @@ subprojects {
 
     java {
         sourceCompatibility = 21
-        targetCompatibility = 17
+        targetCompatibility = 21
     }
 
     repositories {
