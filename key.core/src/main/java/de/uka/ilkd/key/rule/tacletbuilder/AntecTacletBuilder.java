@@ -86,7 +86,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
 
         AntecTaclet t = new AntecTaclet(name,
             new TacletApplPart(ifseq,
-                new ApplicationRestriction(ApplicationRestriction.ANTECEDENT_POLARITY), varsNew,
+                applicationRestriction.combine(ApplicationRestriction.ANTECEDENT_POLARITY), varsNew,
                 varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
             goals, ruleSets, attrs, (Sequent) find,
