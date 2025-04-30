@@ -11,13 +11,13 @@ import org.jspecify.annotations.NonNull;
 /**
  * Interface to be implemented by builders returning a goal chooser.
  */
-public interface GoalChooserBuilder<P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> {
+public interface GoalChooserFactory<P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> {
 
     /** returns a new goal chooser */
     GoalChooser<P, G> create();
 
     /** returns a clone of this goal chooser */
-    GoalChooserBuilder<P, G> copy();
+    GoalChooserFactory<P, G> copy();
 
     /** returns the name of the goal chooser */
     String name();

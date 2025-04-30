@@ -43,7 +43,7 @@ import org.jspecify.annotations.NonNull;
  * </p>
  *
  * @author Martin Hentschel
- * @see SymbolicExecutionGoalChooserBuilder
+ * @see SymbolicExecutionGoalChooserFactory
  */
 public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
     /**
