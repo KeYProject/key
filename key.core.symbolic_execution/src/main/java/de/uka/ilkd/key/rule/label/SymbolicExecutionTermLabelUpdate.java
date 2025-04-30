@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -44,7 +45,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
     @Override
     public void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, org.key_project.prover.rules.RuleApp ruleApp, Object hint, Term tacletTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm,
             Term newTerm,
             Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint)

@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.LinkedList;
 import java.util.StringTokenizer;
+
+import org.jspecify.annotations.Nullable;
 
 public class PosInTerm {
     private static final PosInTerm TOP_LEVEL = new PosInTerm();

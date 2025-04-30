@@ -534,7 +534,7 @@ public class TestApplyTaclet {
 
 
         assertEquals(1, goals.size(), "Expected one goal");
-        Iterator<org.key_project.prover.sequent.SequentFormula> it =
+        Iterator<SequentFormula> it =
             goals.head().sequent().antecedent().iterator();
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
@@ -576,7 +576,7 @@ public class TestApplyTaclet {
 
         assertEquals(1, goals.size(), "Expected one goal");
 
-        Iterator<org.key_project.prover.sequent.SequentFormula> it =
+        Iterator<SequentFormula> it =
             goals.head().sequent().antecedent().iterator();
 
         assertTrue(

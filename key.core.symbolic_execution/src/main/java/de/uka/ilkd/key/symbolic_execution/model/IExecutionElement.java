@@ -9,8 +9,8 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -61,7 +61,7 @@ public interface IExecutionElement {
      *
      * @return The applied {@link RuleApp}.
      */
-    org.key_project.prover.rules.RuleApp getAppliedRuleApp();
+    RuleApp getAppliedRuleApp();
 
     /**
      * Returns the {@link PosInOccurrence} of the modality of interest including updates.

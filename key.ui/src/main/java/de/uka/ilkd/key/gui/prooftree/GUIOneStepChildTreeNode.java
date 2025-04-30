@@ -21,12 +21,12 @@ import org.jspecify.annotations.NonNull;
  */
 public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
-    private final org.key_project.prover.rules.RuleApp app;
+    private final RuleApp app;
     private final int formulaNr;
     private final GUIAbstractTreeNode parent;
 
     public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent,
-            org.key_project.prover.rules.RuleApp app, int formulaNr) {
+            RuleApp app, int formulaNr) {
         super(tree, parent.getNode());
         this.parent = parent;
         this.app = app;

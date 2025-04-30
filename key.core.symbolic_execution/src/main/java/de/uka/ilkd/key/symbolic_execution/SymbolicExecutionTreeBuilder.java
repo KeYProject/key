@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -317,7 +317,7 @@ public class SymbolicExecutionTreeBuilder {
      *        {@link SymbolicExecutionTermLabel}.
      * @return The {@link Set} of {@link Node}s to ignore its return.
      */
-    protected Set<Node> getMethodReturnsToIgnore(org.key_project.prover.rules.RuleApp ruleApp) {
+    protected Set<Node> getMethodReturnsToIgnore(RuleApp ruleApp) {
         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
         return getMethodReturnsToIgnore(label);
     }
@@ -360,7 +360,7 @@ public class SymbolicExecutionTreeBuilder {
      *         {@link SymbolicExecutionTermLabel}.
      */
     protected Map<Node, ImmutableList<Node>> getMethodCallStack(
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
         return getMethodCallStack(label);
     }
@@ -893,7 +893,7 @@ public class SymbolicExecutionTreeBuilder {
             // Update call stack
             updateCallStack(node, statement);
             // Update block map
-            org.key_project.prover.rules.RuleApp currentOrFutureRuleApplication =
+            RuleApp currentOrFutureRuleApplication =
                 node.getAppliedRuleApp();
             if (currentOrFutureRuleApplication == null && node != proof.root()) { // Executing
                                                                                   // peekNext() on
@@ -1252,7 +1252,7 @@ public class SymbolicExecutionTreeBuilder {
     private boolean checkBlockPossibility(Node node, int expectedStackSize,
             SourceElement... expectedSourceElements) {
         if (node != null && expectedSourceElements != null && expectedSourceElements.length >= 1) {
-            org.key_project.prover.rules.RuleApp ruleApp = null;
+            RuleApp ruleApp = null;
             boolean seNodeFound = false;
             // Find single symbolic execution child node
             while (!seNodeFound && node != null) {
@@ -1367,7 +1367,7 @@ public class SymbolicExecutionTreeBuilder {
      * @return The now completed blocks.
      */
     protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(Node node,
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks =
             new LinkedHashMap<>();
         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
@@ -1540,10 +1540,11 @@ public class SymbolicExecutionTreeBuilder {
      * @return {@code true} is not implicit, {@code false} is implicit
      */
     protected boolean isNotInImplicitMethod(Node node) {
-        var t = node.getAppliedRuleApp().posInOccurrence().subTerm();
-        Term term = TermBuilder.goBelowUpdates(t);
+        var term = node.getAppliedRuleApp().posInOccurrence().subTerm();
+        Term termNoUpdates = TermBuilder.goBelowUpdates(term);
         Services services = proof.getServices();
-        IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
+        IExecutionContext ec =
+            JavaTools.getInnermostExecutionContext(termNoUpdates.javaBlock(), services);
         IProgramMethod pm = ec.getMethodContext();
         return SymbolicExecutionUtil.isNotImplicit(services, pm);
     }
@@ -1712,7 +1713,7 @@ public class SymbolicExecutionTreeBuilder {
      * @return The found call {@link Node} or {@code null} if no one was found.
      */
     protected Node findMethodCallNode(Node currentNode,
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         // Compute the stack frame size before the method is called
         int returnStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
         // Return the method from the call stack

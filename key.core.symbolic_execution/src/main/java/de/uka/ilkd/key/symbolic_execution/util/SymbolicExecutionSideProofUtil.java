@@ -500,7 +500,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     /**
      * Utility class used by
-     * {@link #containsIrrelevantThings(Services, org.key_project.prover.sequent.SequentFormula, Set)}.
+     * {@link #containsIrrelevantThings(Services, SequentFormula, Set)}.
      *
      * @author Martin Hentschel
      */

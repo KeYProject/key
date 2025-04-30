@@ -12,9 +12,9 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
@@ -22,7 +22,7 @@ import org.key_project.prover.sequent.Sequent;
 /**
  * <p>
  * A {@link TermLabelUpdate} is used by
- * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
+ * {@link TermLabelManager#instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
  * to add or remove maintained {@link TermLabel}s which will be added to the new {@link Term}.
  * </p>
  * <p>
@@ -61,7 +61,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Term modalityTerm,
-            Rule rule, org.key_project.prover.rules.RuleApp ruleApp, Object hint, Term tacletTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm,
             Term newTerm,
             Set<TermLabel> labels);
 }

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.EnhancedStringBuffer;
 import org.key_project.util.collection.Pair;
 
@@ -316,7 +317,7 @@ public class Statistics {
             interactive += interactiveRuleApps(node, interactiveAppsDetails);
             symbExApps += NodeInfo.isSymbolicExecutionRuleApplied(node) ? 1 : 0;
 
-            final org.key_project.prover.rules.RuleApp ruleApp = node.getAppliedRuleApp();
+            final RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
                 if (ruleApp instanceof OneStepSimplifierRuleApp) {
                     oss++;
@@ -395,7 +396,7 @@ public class Statistics {
          * @param ruleApp the rule application considered
          * @return the number of captured oss rule applications
          */
-        private int tmpOssCaptured(final org.key_project.prover.rules.RuleApp ruleApp) {
+        private int tmpOssCaptured(final RuleApp ruleApp) {
             int tmpOssCaptured = 0;
             final Protocol protocol =
                 ((OneStepSimplifierRuleApp) ruleApp).getProtocol();
@@ -412,7 +413,7 @@ public class Statistics {
          * @return 1 or 0.
          */
         private int tmpLoopScopeInvTacletRuleApps(
-                final org.key_project.prover.rules.RuleApp ruleApp) {
+                final RuleApp ruleApp) {
             return tacletHasRuleSet(ruleApp, "loop_scope_inv_taclet");
         }
 
@@ -422,7 +423,7 @@ public class Statistics {
          * @param ruleApp The {@link RuleApp} to check.
          * @return 1 or 0.
          */
-        private int tacletHasRuleSet(final org.key_project.prover.rules.RuleApp ruleApp,
+        private int tacletHasRuleSet(final RuleApp ruleApp,
                 final String ruleSet) {
             return ((TacletApp) ruleApp).taclet().getRuleSets().stream()
                     .map(rs -> rs.name().toString()).anyMatch(n -> n.equals(ruleSet)) ? 1 : 0;
@@ -434,7 +435,7 @@ public class Statistics {
          * @param ruleApp the considered rule application
          * @return the number of quantifier rules
          */
-        private int tmpQuantificationRuleApps(final org.key_project.prover.rules.RuleApp ruleApp) {
+        private int tmpQuantificationRuleApps(final RuleApp ruleApp) {
             final int res;
             final String tName = ((TacletApp) ruleApp).taclet().name().toString();
             if (tName.startsWith("allLeft") || tName.startsWith("exRight")

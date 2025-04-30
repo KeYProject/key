@@ -11,12 +11,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * <p>
@@ -107,7 +107,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
-            org.key_project.prover.rules.RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
                 // Check if the result for the current node was already computed.
                 Boolean value = goalAllowedResultPerSetNode.get(node);
@@ -171,7 +171,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      */
     protected void handleNodeLimitNotExceeded(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal, Node node,
-            org.key_project.prover.rules.RuleApp ruleApp,
+            RuleApp ruleApp,
             Integer executedNumberOfSetNodes) {
         goalAllowedResultPerSetNode.put(node, Boolean.TRUE);
     }

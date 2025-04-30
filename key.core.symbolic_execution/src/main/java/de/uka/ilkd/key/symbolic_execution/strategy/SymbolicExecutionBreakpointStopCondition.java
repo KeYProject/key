@@ -13,9 +13,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * An {@link IBreakpointStopCondition} which can be used during symbolic execution.
@@ -68,7 +69,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
     @Override
     protected void handleNodeLimitNotExceeded(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal, Node node,
-            org.key_project.prover.rules.RuleApp ruleApp,
+            RuleApp ruleApp,
             Integer executedNumberOfSetNodes) {
         super.handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime, countApplied,
             goal, node, ruleApp, executedNumberOfSetNodes);
@@ -89,7 +90,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
      *         hit.
      */
     protected boolean isBreakpointHit(SourceElement activeStatement,
-            org.key_project.prover.rules.RuleApp ruleApp, Proof proof,
+            RuleApp ruleApp, Proof proof,
             Node node) {
         boolean result = false;
         Iterator<IBreakpoint> iter = breakpoints.iterator();

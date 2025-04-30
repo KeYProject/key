@@ -45,7 +45,7 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
 
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(
-            org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+            RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         long begin = System.nanoTime();

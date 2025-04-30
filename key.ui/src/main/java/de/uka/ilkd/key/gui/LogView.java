@@ -133,7 +133,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         private static final SimpleAttributeSet ATTRIB_FILE = new SimpleAttributeSet();
         private static final SimpleAttributeSet ATTRIB_MSG = new SimpleAttributeSet();
         private static final SimpleAttributeSet ATTRIB_EX = new SimpleAttributeSet();
-        private static final AttributeSet[] STYLES = { ATTRIB_TIME, ATTRIB_LEVEL,
+        private static final AttributeSet[] STYLES = new AttributeSet[] { ATTRIB_TIME, ATTRIB_LEVEL,
             ATTRIB_THREAD, ATTRIB_CLASS, ATTRIB_FILE, ATTRIB_MSG, ATTRIB_EX };
 
         static {

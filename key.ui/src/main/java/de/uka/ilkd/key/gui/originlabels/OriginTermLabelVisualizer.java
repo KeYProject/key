@@ -440,7 +440,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         if (parentPos == null) {
             int index = 0;
 
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> children =
+            ImmutableList<SequentFormula> children =
                 sequent.antecedent().asList();
 
             for (SequentFormula child : children) {
