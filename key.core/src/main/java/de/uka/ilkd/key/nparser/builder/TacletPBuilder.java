@@ -791,10 +791,12 @@ public class TacletPBuilder extends ExpressionBuilder {
             } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().isEmpty()) {
                 AntecTacletBuilder b = new AntecTacletBuilder();
                 b.setFind(findSeq);
+                b.setApplicationRestriction(applicationRestriction);
                 return b;
             } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
                 SuccTacletBuilder b = new SuccTacletBuilder();
                 b.setFind(findSeq);
+                b.setApplicationRestriction(applicationRestriction);
                 return b;
             } else {
                 semanticError(ctx, "Unknown find-sequent (perhaps null?):" + findSeq);

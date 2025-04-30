@@ -70,7 +70,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         prefixBuilder.build();
         SuccTaclet t = new SuccTaclet(name,
             new TacletApplPart(ifseq,
-                new ApplicationRestriction(ApplicationRestriction.SUCCEDENT_POLARITY), varsNew,
+                applicationRestriction.combine(ApplicationRestriction.SUCCEDENT_POLARITY), varsNew,
                 varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
             goals, ruleSets, attrs, (Sequent) find,
