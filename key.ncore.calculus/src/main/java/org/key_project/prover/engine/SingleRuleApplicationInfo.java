@@ -30,7 +30,7 @@ import org.jspecify.annotations.NonNull;
  *
  *
  * @see org.key_project.prover.proof.ProofGoal
- * @see org.key_project.prover.rules.RuleApp
+ * @see RuleApp
  */
 public class SingleRuleApplicationInfo {
 

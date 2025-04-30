@@ -443,7 +443,7 @@ public final class DependencyAnalyzer {
             }
             // groups proof steps that act upon this graph node by their rule app
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
-            Map<EqualsAndHashCodeDelegator<org.key_project.prover.rules.RuleApp>, Set<Node>> foundDupes =
+            Map<EqualsAndHashCodeDelegator<RuleApp>, Set<Node>> foundDupes =
                 new HashMap<>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
                 Node proofNode = t.fromNode();

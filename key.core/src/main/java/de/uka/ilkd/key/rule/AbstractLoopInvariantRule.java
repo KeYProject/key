@@ -27,6 +27,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -37,8 +38,8 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
- * {@link #doPreparations(Goal, org.key_project.prover.rules.RuleApp)} directly at the beginning of
- * the {@link BuiltInRule#apply(Goal, org.key_project.prover.rules.RuleApp)} method.
+ * {@link #doPreparations(Goal, RuleApp)} directly at the beginning of
+ * the {@link BuiltInRule#apply(Goal, RuleApp)} method.
  *
  * @see LoopScopeInvariantRule
  * @see WhileInvariantRule
@@ -74,7 +75,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *         of loop invariant rules.
      */
     public LoopInvariantInformation doPreparations(Goal goal,
-            org.key_project.prover.rules.RuleApp ruleApp)
+            RuleApp ruleApp)
             throws RuleAbortException {
         final var services = goal.getOverlayServices();
         // Basic objects needed for rule application

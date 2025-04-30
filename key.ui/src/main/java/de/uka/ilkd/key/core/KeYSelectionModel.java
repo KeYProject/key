@@ -38,7 +38,7 @@ public class KeYSelectionModel {
      * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
      * unless we are displaying an OSS node.
      */
-    private org.key_project.prover.rules.RuleApp selectedRuleApp;
+    private RuleApp selectedRuleApp;
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
 
@@ -119,7 +119,7 @@ public class KeYSelectionModel {
      * @param sequent selected sequent
      */
     public synchronized void setSelectedSequentAndRuleApp(Node node, Sequent sequent,
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         final Node previousNode = selectedNode;
         // switch proof if needed
         if (node.proof() != getSelectedProof()) {

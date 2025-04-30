@@ -96,7 +96,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param ruleApp the applied rule app
      * @return true if the node represents a method call
      */
-    private boolean isMethodCallNode(Node node, org.key_project.prover.rules.RuleApp ruleApp) {
+    private boolean isMethodCallNode(Node node, RuleApp ruleApp) {
         SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
         IProgramMethod currentPm = null;
         if (statement instanceof MethodBodyStatement mbs) {
@@ -119,7 +119,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param ruleApp the applied rule app
      * @return true if the node represents a method return
      */
-    private boolean isMethodReturnNode(Node node, org.key_project.prover.rules.RuleApp ruleApp) {
+    private boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
         if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp))
                 && isCorrectMethodReturn(node, ruleApp)) {

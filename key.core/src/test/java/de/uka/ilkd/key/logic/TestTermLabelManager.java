@@ -155,8 +155,8 @@ public class TestTermLabelManager {
 
     protected void compareSequents(Sequent expected, Sequent current, boolean changed,
             RefactoringScope scope) {
-        Iterator<org.key_project.prover.sequent.SequentFormula> expectedIter = expected.iterator();
-        Iterator<org.key_project.prover.sequent.SequentFormula> currentIter = current.iterator();
+        Iterator<SequentFormula> expectedIter = expected.iterator();
+        Iterator<SequentFormula> currentIter = current.iterator();
         while (expectedIter.hasNext() && currentIter.hasNext()) {
             SequentFormula expectedSF = expectedIter.next();
             SequentFormula currentSF = currentIter.next();

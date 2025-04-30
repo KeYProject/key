@@ -26,7 +26,7 @@ public final class BackTrackingManager {
      * The original rule application in question, i.e., the application without the changes that can
      * possibly be applied by <code>ChoicePoint</code>s
      */
-    private org.key_project.prover.rules.RuleApp initialApp = null;
+    private RuleApp initialApp = null;
 
     /**
      * Stack of <code>Iterator<CPBranch></code>: the branches of <code>ChoicePoint</code>s that have
@@ -81,7 +81,7 @@ public final class BackTrackingManager {
      *
      * @param initialApp the original rule application in question
      */
-    public void setup(org.key_project.prover.rules.RuleApp initialApp) {
+    public void setup(RuleApp initialApp) {
         this.initialApp = initialApp;
         choices.clear();
         chosenBranches.clear();
@@ -122,7 +122,7 @@ public final class BackTrackingManager {
      * @return the resulting rule application when all choice points have applied their
      *         modifications
      */
-    public org.key_project.prover.rules.RuleApp getResultingapp() {
+    public RuleApp getResultingapp() {
         return getOldRuleApp();
     }
 
@@ -132,7 +132,7 @@ public final class BackTrackingManager {
     }
 
     private void addChoicePoint(ChoicePoint cp) {
-        final org.key_project.prover.rules.RuleApp oldApp = getOldRuleApp();
+        final RuleApp oldApp = getOldRuleApp();
         if (oldApp == null) {
             // This means that an earlier <code>ChoicePoint</code> did not have
             // any branches. It is necessary to backtrack and to choose a

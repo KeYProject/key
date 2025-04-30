@@ -104,7 +104,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @return all formulas used by the rule application
      */
     private static Set<PosInOccurrence> inputsOfRuleApp(
-            org.key_project.prover.rules.RuleApp ruleApp, Node node) {
+            RuleApp ruleApp, Node node) {
         Set<PosInOccurrence> inputs = new HashSet<>();
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
@@ -124,7 +124,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      */
     private List<Pair<GraphNode, Boolean>> inputsOfNode(Node n,
             Set<PosInOccurrence> removed) {
-        org.key_project.prover.rules.RuleApp ruleApp = n.getAppliedRuleApp();
+        RuleApp ruleApp = n.getAppliedRuleApp();
         List<Pair<GraphNode, Boolean>> input = new ArrayList<>();
 
         // check whether the rule of this proof step was added by another proof step
@@ -269,7 +269,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 "dependency tracker received rule application on wrong proof");
         }
         RuleAppInfo ruleAppInfo = e.getRuleAppInfo();
-        org.key_project.prover.rules.RuleApp ruleApp = ruleAppInfo.getRuleApp();
+        RuleApp ruleApp = ruleAppInfo.getRuleApp();
         ImmutableList<Goal> goalList = e.getNewGoals();
         Node n = ruleAppInfo.getOriginalNode();
 

@@ -6,11 +6,11 @@ package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Defines the basic functionality of a breakpoint.
@@ -52,5 +52,5 @@ public interface IBreakpoint {
      * @return true if execution should hold
      */
     boolean isBreakpointHit(SourceElement activeStatement,
-            org.key_project.prover.rules.RuleApp ruleApp, Node node);
+            RuleApp ruleApp, Node node);
 }

@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -131,7 +131,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         super.updateState(goal, maxApplications, timeout, startTime, countApplied);
         if (goal != null) {
             Node node = goal.node();
-            org.key_project.prover.rules.RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             if (getVarsForCondition() != null && ruleApp != null && node != null) {
                 refreshVarMaps(ruleApp, node);
             }
@@ -186,7 +186,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param ruleApp
      * @param inScope
      */
-    private void freeVariablesAfterReturn(Node node, org.key_project.prover.rules.RuleApp ruleApp,
+    private void freeVariablesAfterReturn(Node node, RuleApp ruleApp,
             boolean inScope) {
         if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) && inScope) {
@@ -205,7 +205,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope,
             Map<SyntaxElement, SyntaxElement> oldMap,
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         // look for renamings KeY did
         boolean found = false;
         // get current renaming tables
@@ -265,7 +265,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param ruleApp the applied rule app
      * @param node the current node
      */
-    protected void refreshVarMaps(org.key_project.prover.rules.RuleApp ruleApp, Node node) {
+    protected void refreshVarMaps(RuleApp ruleApp, Node node) {
         boolean inScope = isInScope(node);
         // collect old values
         Map<SyntaxElement, SyntaxElement> oldMap = getOldMap();
@@ -352,7 +352,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param node the current {@link Node}
      * @return true if the condition evaluates to true
      */
-    protected boolean conditionMet(org.key_project.prover.rules.RuleApp ruleApp, Node node) {
+    protected boolean conditionMet(RuleApp ruleApp, Node node) {
         ApplyStrategyInfo info = null;
         try {
             // initialize values
@@ -395,7 +395,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     @Override
     public boolean isBreakpointHit(SourceElement activeStatement,
-            org.key_project.prover.rules.RuleApp ruleApp, Node node) {
+            RuleApp ruleApp, Node node) {
         return (!conditionEnabled || conditionMet(ruleApp, node))
                 && super.isBreakpointHit(activeStatement, ruleApp, node);
     }

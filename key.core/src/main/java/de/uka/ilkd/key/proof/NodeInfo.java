@@ -23,12 +23,12 @@ import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
@@ -119,7 +119,7 @@ public class NodeInfo {
         if (determinedFstAndActiveStatement) {
             return;
         }
-        final org.key_project.prover.rules.RuleApp ruleApp = node.getAppliedRuleApp();
+        final RuleApp ruleApp = node.getAppliedRuleApp();
         if (ruleApp instanceof PosTacletApp) {
             firstStatement = computeFirstStatement(ruleApp);
             firstStatementString = null;
@@ -141,7 +141,7 @@ public class NodeInfo {
      * @return The active statement or {@code null} if no one is provided.
      */
     public static SourceElement computeActiveStatement(
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         SourceElement firstStatement = computeFirstStatement(ruleApp);
         return computeActiveStatement(firstStatement);
     }
@@ -159,7 +159,7 @@ public class NodeInfo {
      * @return The first statement or {@code null} if no one is provided.
      */
     public static SourceElement computeFirstStatement(
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
         if (ruleApp instanceof PosTacletApp pta) {
@@ -228,7 +228,7 @@ public class NodeInfo {
      * @param app The {@link RuleApp} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
-    public static boolean isSymbolicExecutionRuleApplied(org.key_project.prover.rules.RuleApp app) {
+    public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp
                 || app instanceof AbstractContractRuleApp
                 || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp
@@ -310,7 +310,7 @@ public class NodeInfo {
         if (node.parent() == null) {
             return;
         }
-        org.key_project.prover.rules.RuleApp ruleApp = node.parent().getAppliedRuleApp();
+        RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp tacletApp) {
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);

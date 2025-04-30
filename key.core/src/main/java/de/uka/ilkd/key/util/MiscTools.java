@@ -35,12 +35,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
@@ -459,7 +459,7 @@ public final class MiscTools {
      * @param ruleApp The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
-    public static String getRuleDisplayName(org.key_project.prover.rules.RuleApp ruleApp) {
+    public static String getRuleDisplayName(RuleApp ruleApp) {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
@@ -503,7 +503,7 @@ public final class MiscTools {
      * @param ruleApp The given {@link RuleApp}.
      * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
      */
-    public static String getRuleName(org.key_project.prover.rules.RuleApp ruleApp) {
+    public static String getRuleName(RuleApp ruleApp) {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();

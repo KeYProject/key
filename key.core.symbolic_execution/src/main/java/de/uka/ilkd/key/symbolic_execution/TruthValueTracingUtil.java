@@ -260,7 +260,7 @@ public final class TruthValueTracingUtil {
                 }
             } else if (parent.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp app) {
                 PosInOccurrence parentPio = null;
-                for (org.key_project.prover.rules.RuleApp protocolApp : app.getProtocol()) {
+                for (RuleApp protocolApp : app.getProtocol()) {
                     if (parentPio != null) {
                         updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(),
                             parentPio, termLabelName, services.getTermBuilder(), nodeResult);

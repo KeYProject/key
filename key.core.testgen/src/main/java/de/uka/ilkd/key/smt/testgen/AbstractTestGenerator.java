@@ -281,7 +281,7 @@ public abstract class AbstractTestGenerator {
         final Proof oldProof = node.proof();
         final Sequent oldSequent = node.sequent();
         Sequent newSequent = JavaDLSequentKit.getInstance().getEmptySequent();
-        Iterator<org.key_project.prover.sequent.SequentFormula> it =
+        Iterator<SequentFormula> it =
             oldSequent.antecedent().iterator();
         while (it.hasNext()) {
             final SequentFormula sf = it.next();

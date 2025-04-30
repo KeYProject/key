@@ -43,7 +43,7 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
      */
     public String getEdgeLabel() {
         var sb = new StringBuilder();
-        org.key_project.prover.rules.RuleApp ruleApp1 = initial.getAppliedRuleApp();
+        RuleApp ruleApp1 = initial.getAppliedRuleApp();
         if (ruleApp1 != null) {
             sb.append(ruleApp1.rule().displayName()).append("_").append(initial.serialNr());
             sb.append(" ... ");

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
@@ -142,7 +143,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal,
-            org.key_project.prover.rules.RuleApp ruleApp)
+            RuleApp ruleApp)
             throws RuleAbortException {
         // Initial assertions
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
@@ -198,7 +199,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @param reachableState The reachable state formula.
      */
     private void constructInitiallyGoal(Services services,
-            org.key_project.prover.rules.RuleApp ruleApp,
+            RuleApp ruleApp,
             final TermLabelState termLabelState, Goal initiallyGoal, final Instantiation inst,
             final Term invTerm, Term reachableState) {
         initiallyGoal.setBranchLabel("Invariant Initially Valid");
@@ -232,7 +233,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *        update.
      */
     private void constructPresrvAndUCGoal(Services services,
-            org.key_project.prover.rules.RuleApp ruleApp, Goal presrvAndUCGoal,
+            RuleApp ruleApp, Goal presrvAndUCGoal,
             final Instantiation inst, Optional<Label> loopLabel, Statement stmtToReplace,
             Term anonUpdate, Term wellFormedAnon, final Term uAnonInv, Term frameCondition,
             Term variantPO, TermLabelState termLabelState, Term invTerm,
@@ -417,7 +418,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @return All the {@link Label}s before <code>whileLoop</code>.
      */
     private Pair<Optional<Label>, Statement> findLoopLabel(
-            org.key_project.prover.rules.RuleApp ruleApp, While whileLoop) {
+            RuleApp ruleApp, While whileLoop) {
         Optional<Label> loopLabel = Optional.empty();
         Statement stmtToRepl = whileLoop;
 

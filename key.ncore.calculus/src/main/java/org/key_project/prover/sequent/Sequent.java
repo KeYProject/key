@@ -477,7 +477,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
         }
 
         @Override
-        public @NonNull Iterator<org.key_project.prover.sequent.SequentFormula> iterator() {
+        public @NonNull Iterator<SequentFormula> iterator() {
             return ImmutableSLList.<SequentFormula>nil().iterator();
         }
     }
