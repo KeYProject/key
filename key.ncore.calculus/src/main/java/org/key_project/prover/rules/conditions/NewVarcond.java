@@ -6,6 +6,9 @@ package org.key_project.prover.rules.conditions;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+/**
+ * Variable condition used if a new variable is introduced
+ */
 public interface NewVarcond {
     SchemaVariable getSchemaVariable();
 
