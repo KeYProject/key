@@ -6,32 +6,10 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
-import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.rules.TacletApplPart;
 
 /** class builds RewriteTaclet objects. */
 public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T> {
-    /**
-     * encodes restrictions on the state where a rewrite taclet is applicable If the value is equal
-     * to
-     * <ul>
-     * <li>{@link ApplicationRestriction#NONE} no state restrictions are posed</li>
-     * <li>{@link ApplicationRestriction#SAME_UPDATE_LEVEL} then <code>\assumes</code> must match on
-     * a
-     * formula within the same state as <code>\find</code> rsp. <code>\add</code>. For efficiency no
-     * modalities are allowed above the <code>\find</code> position</li>
-     * <li>{@link ApplicationRestriction#IN_SEQUENT_STATE} the <code>\find</code> part is only
-     * allowed to
-     * match on formulas which are evaluated in the same state as the sequent</li>
-     * </ul>
-     */
-    protected ApplicationRestriction applicationRestriction;
-
-    public RewriteTacletBuilder<T> setApplicationRestriction(
-            ApplicationRestriction p_applicationRestriction) {
-        applicationRestriction = p_applicationRestriction;
-        return this;
-    }
 
 
     /* for information flow purposes; TODO: find better solution */
