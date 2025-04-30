@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserFactory;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.label.OriginTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
@@ -56,7 +56,7 @@ public class JavaProfile extends AbstractProfile {
 
     protected JavaProfile(String standardRules) {
         super(standardRules);
-        setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
+        setSelectedGoalChooserBuilder(DepthFirstGoalChooserFactory.NAME);
     }
 
     public JavaProfile() {

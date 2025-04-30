@@ -7,15 +7,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.engine.GoalChooser;
-import org.key_project.prover.engine.GoalChooserBuilder;
+import org.key_project.prover.engine.GoalChooserFactory;
 
 /**
- * This {@link GoalChooserBuilder} creates a special {@link GoalChooser} for symbolic execution.
+ * This {@link GoalChooserFactory} creates a special {@link GoalChooser} for symbolic execution.
  *
  * @author Martin Hentschel
  * @see SymbolicExecutionGoalChooser
  */
-public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder<Proof, Goal> {
+public class SymbolicExecutionGoalChooserFactory implements GoalChooserFactory<Proof, Goal> {
     /**
      * The name of this goal chooser.
      */
@@ -33,8 +33,8 @@ public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder<P
      * {@inheritDoc}
      */
     @Override
-    public GoalChooserBuilder<Proof, Goal> copy() {
-        return new SymbolicExecutionGoalChooserBuilder();
+    public GoalChooserFactory<Proof, Goal> copy() {
+        return new SymbolicExecutionGoalChooserFactory();
     }
 
     /**

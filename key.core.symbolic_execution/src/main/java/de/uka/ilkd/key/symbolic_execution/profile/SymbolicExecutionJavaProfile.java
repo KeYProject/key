@@ -34,12 +34,12 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserFactory;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
-import org.key_project.prover.engine.GoalChooserBuilder;
+import org.key_project.prover.engine.GoalChooserFactory;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -106,9 +106,9 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableSet<GoalChooserBuilder<Proof, Goal>> computeSupportedGoalChooserBuilder() {
+    protected ImmutableSet<GoalChooserFactory<Proof, Goal>> computeSupportedGoalChooserBuilder() {
         return super.computeSupportedGoalChooserBuilder()
-                .add(new SymbolicExecutionGoalChooserBuilder());
+                .add(new SymbolicExecutionGoalChooserFactory());
     }
 
     /**

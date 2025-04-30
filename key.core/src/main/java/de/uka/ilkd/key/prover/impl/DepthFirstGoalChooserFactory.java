@@ -7,20 +7,20 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.engine.GoalChooser;
-import org.key_project.prover.engine.GoalChooserBuilder;
+import org.key_project.prover.engine.GoalChooserFactory;
 
-public class DepthFirstGoalChooserBuilder implements GoalChooserBuilder<Proof, Goal> {
+public class DepthFirstGoalChooserFactory implements GoalChooserFactory<Proof, Goal> {
 
     public static final String NAME = "Depth First Goal Chooser";
 
-    public DepthFirstGoalChooserBuilder() {}
+    public DepthFirstGoalChooserFactory() {}
 
     public GoalChooser<Proof, Goal> create() {
         return new DepthFirstGoalChooser();
     }
 
-    public GoalChooserBuilder<Proof, Goal> copy() {
-        return new DepthFirstGoalChooserBuilder();
+    public GoalChooserFactory<Proof, Goal> copy() {
+        return new DepthFirstGoalChooserFactory();
     }
 
     public String name() {

@@ -11,7 +11,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.logic.Name;
-import org.key_project.prover.engine.GoalChooserBuilder;
+import org.key_project.prover.engine.GoalChooserFactory;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
@@ -94,7 +94,7 @@ public interface Profile {
     /**
      * returns the default builder for a goal chooser
      */
-    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserBuilder<P, G> getDefaultGoalChooserBuilder();
+    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getDefaultGoalChooserBuilder();
 
     /**
      * sets the user selected goal chooser builder to be used as prototype
@@ -107,7 +107,7 @@ public interface Profile {
     /**
      * returns a new builder instance for the selected goal choooser
      */
-    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserBuilder<P, G> getSelectedGoalChooserBuilder();
+    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getSelectedGoalChooserBuilder();
 
     /** returns the (default) justification for the given rule */
     RuleJustification getJustification(Rule r);
