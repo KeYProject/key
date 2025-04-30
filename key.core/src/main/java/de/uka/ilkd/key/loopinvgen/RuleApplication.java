@@ -196,7 +196,7 @@ public class RuleApplication {
 
             ImmutableList<Goal> subtreeGoals = ps.getProof().getSubtreeGoals(subtreeRoot);
 
-            //System.out.println("info after shift: "+info + ":" + subtreeGoals);
+            // System.out.println("info after shift: "+info + ":" + subtreeGoals);
 
 
             return subtreeGoals;

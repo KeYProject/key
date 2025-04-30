@@ -12,6 +12,7 @@ import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+
 import org.key_project.logic.op.Function;
 
 public class TermProgramVariableCollector implements DefaultVisitor {
@@ -38,7 +39,11 @@ public class TermProgramVariableCollector implements DefaultVisitor {
     public void visit(Term visited) {
         if (visited.op() instanceof LocationVariable variable) {
             result.add(variable);
-        } else if (visited.op() instanceof Function && !visited.op().isRigid()) { // term contains non-rigid symbols that are not program variables
+        } else if (visited.op() instanceof Function && !visited.op().isRigid()) { // term contains
+                                                                                  // non-rigid
+                                                                                  // symbols that
+                                                                                  // are not program
+                                                                                  // variables
             containsNonRigidFunctionSymbols = true;
             boolean dependencePredicate = dependenciesLDT.isDependencePredicate(visited.op());
             containsAtMostDepPredAsNonRigid &= dependencePredicate;

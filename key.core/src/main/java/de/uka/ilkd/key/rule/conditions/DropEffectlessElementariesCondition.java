@@ -79,7 +79,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
         target.execPostOrder(collector);
 
 
-        if (collector.containsNonRigidNonProgramVariableSymbol() && !collector.containsAtMostDepPredAsNonRigid()) {
+        if (collector.containsNonRigidNonProgramVariableSymbol()
+                && !collector.containsAtMostDepPredAsNonRigid()) {
             return null;
         }
         Set<LocationVariable> varsInTarget = collector.result();

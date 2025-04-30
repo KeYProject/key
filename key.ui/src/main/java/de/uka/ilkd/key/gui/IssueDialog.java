@@ -584,10 +584,12 @@ public final class IssueDialog extends JDialog {
                             : new PositionedIssueString(o, ""))
                     .collect(Collectors.toSet());
 
-          /*  IssueDialog dialog =
-                new IssueDialog(parent, SLEnvInput.getLanguage() + " warning(s)", issues, false);
-            dialog.setVisible(true);
-            dialog.dispose();*/
+            /*
+             * IssueDialog dialog =
+             * new IssueDialog(parent, SLEnvInput.getLanguage() + " warning(s)", issues, false);
+             * dialog.setVisible(true);
+             * dialog.dispose();
+             */
         }
     }
 

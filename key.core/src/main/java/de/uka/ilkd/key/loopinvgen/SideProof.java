@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.loopinvgen;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -17,7 +16,6 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -152,28 +150,28 @@ public class SideProof {
         if (DEBUG_VERBOSITY == 0)
             return;
 
-//        System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
+        // System.out.println("Proof Status: " + (info.getProof().closed() ? "closed" : "open"));
 
         if (DEBUG_VERBOSITY > 1) {
-//             System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
-//             System.out.println("Rules: " + info.getProof().getStatistics());
-//             if (!info.getProof().closed()) {
-//             System.out.println("Open Goals: " + info.getProof().openGoals());
-//             }
-//             System.out.println("Applied rules:" + info.getAppliedRuleApps());
+            // System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
+            // System.out.println("Rules: " + info.getProof().getStatistics());
+            // if (!info.getProof().closed()) {
+            // System.out.println("Open Goals: " + info.getProof().openGoals());
+            // }
+            // System.out.println("Applied rules:" + info.getAppliedRuleApps());
         }
 
 
 
-//        try {
-//            new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable" + COUNTER
-//                    + ".key")).save();
-//
-//            System.out.println(COUNTER + "   " + info.getProof().closed() + " in " + time + " ms");
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        // try {
+        // new ProofSaver(info.getProof(), new java.io.File("C:\\Users\\Asma\\Unprovable" + COUNTER
+        // + ".key")).save();
+        //
+        // System.out.println(COUNTER + " " + info.getProof().closed() + " in " + time + " ms");
+        //
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
 
         COUNTER++;
         System.out.println(COUNTER);

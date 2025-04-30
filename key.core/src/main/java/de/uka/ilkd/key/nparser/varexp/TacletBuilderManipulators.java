@@ -294,26 +294,27 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder CONSTANT =
         new ConstructorBasedBuilder("isConstant", ConstantCondition.class, ASV);
     public static final AbstractConditionBuilder ONLY_INVERSE_EVENT_UPDATES =
-            new ConstructorBasedBuilder("onlyInverseEventUpdates", OnlyInverseEventUpdates.class, USV);
+        new ConstructorBasedBuilder("onlyInverseEventUpdates", OnlyInverseEventUpdates.class, USV);
     public static final AbstractConditionBuilder ONLY_EVENT_UPDATES =
-            new ConstructorBasedBuilder("onlyEventUpdates", OnlyEventUpdates.class, USV);
+        new ConstructorBasedBuilder("onlyEventUpdates", OnlyEventUpdates.class, USV);
     public static final AbstractConditionBuilder ONLY_ELEMENTARY =
-            new ConstructorBasedBuilder("onlyElementary", OnlyElementary.class, USV);
+        new ConstructorBasedBuilder("onlyElementary", OnlyElementary.class, USV);
     public static final AbstractConditionBuilder ONLY_INVERSE_ANON_EVENT_UPDATES =
-            new ConstructorBasedBuilder("onlyInverseAnonEventUpdates",
-                    OnlyInverseAnonEventUpdates.class, USV);
+        new ConstructorBasedBuilder("onlyInverseAnonEventUpdates",
+            OnlyInverseAnonEventUpdates.class, USV);
     public static final AbstractConditionBuilder ONLY_ANON_EVENT_UPDATES =
-            new ConstructorBasedBuilder("onlyAnonEventUpdates",
-                    OnlyAnonEventUpdates.class, USV);
+        new ConstructorBasedBuilder("onlyAnonEventUpdates",
+            OnlyAnonEventUpdates.class, USV);
 
     public static final AbstractConditionBuilder NO_ELEMENTARY =
-            new ConstructorBasedBuilder("noElementary", NoElementary.class, USV);
+        new ConstructorBasedBuilder("noElementary", NoElementary.class, USV);
     public static final AbstractConditionBuilder NO_EVENT_UPDATE =
-            new ConstructorBasedBuilder("noEventUpdate", NoEventUpdate.class, USV);
+        new ConstructorBasedBuilder("noEventUpdate", NoEventUpdate.class, USV);
     public static final AbstractConditionBuilder NO_INVERSE_ANON_EVENT_UPDATE =
-            new ConstructorBasedBuilder("noInverseAnonEventUpdate", NoInverseAnonEventUpdate.class, USV);
+        new ConstructorBasedBuilder("noInverseAnonEventUpdate", NoInverseAnonEventUpdate.class,
+            USV);
     public static final AbstractConditionBuilder NO_INVERSE_EVENT_UPDATE =
-            new ConstructorBasedBuilder("noInverseEventUpdate", NoInverseEventUpdate.class, USV);
+        new ConstructorBasedBuilder("noInverseEventUpdate", NoInverseEventUpdate.class, USV);
 
 
 
@@ -398,9 +399,9 @@ public class TacletBuilderManipulators {
             applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, SUBFORMULAS,
             STATIC_FIELD, MODEL_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
             META_DISJOINT, ONLY_ELEMENTARY, ONLY_EVENT_UPDATES, ONLY_ANON_EVENT_UPDATES,
-                ONLY_INVERSE_ANON_EVENT_UPDATES,
-            ONLY_INVERSE_EVENT_UPDATES,NO_ELEMENTARY,NO_EVENT_UPDATE,
-                NO_INVERSE_ANON_EVENT_UPDATE,NO_INVERSE_EVENT_UPDATE,
+            ONLY_INVERSE_ANON_EVENT_UPDATES,
+            ONLY_INVERSE_EVENT_UPDATES, NO_ELEMENTARY, NO_EVENT_UPDATE,
+            NO_INVERSE_ANON_EVENT_UPDATE, NO_INVERSE_EVENT_UPDATE,
             IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);

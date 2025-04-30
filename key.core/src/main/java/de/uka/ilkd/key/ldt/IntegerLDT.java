@@ -749,32 +749,33 @@ public final class IntegerLDT extends LDT {
             return isLong ? getJavaSubLong() : (isBigint ? getSub() : getJavaSubInt());
         } else if (op instanceof Modulo) {
             return isBigint ? getJModulo() : getJavaMod();
-        }         else if (op instanceof Negative) {
-            return isLong ? getJavaUnaryMinusLong() : (isBigint ? getNegativeNumberSign() : getJavaUnaryMinusInt());
+        } else if (op instanceof Negative) {
+            return isLong ? getJavaUnaryMinusLong()
+                    : (isBigint ? getNegativeNumberSign() : getJavaUnaryMinusInt());
         } else {
             return null;
         }
-//
-//          else if (op instanceof ShiftLeft) {
-//            return isLong ? getJavaShiftLeftLong() : getJavaShiftLeftInt();
-//        } else if (op instanceof ShiftRight) {
-//            return isLong ? getJavaShiftRightLong() : getJavaShiftRightInt();
-//        }  else if (op instanceof UnsignedShiftRight) {
-//            return isLong ? getJavaUnsignedShiftRightLong()
-//                    : getJavaUnsignedShiftRightInt();
-//        } else if (op instanceof BinaryAnd) {
-//            return isLong ? getJavaBitwiseAndLong() : getJavaBitwiseAndInt();
-//        } else if (op instanceof BinaryNot) {
-//            return getJavaBitwiseNegation();
-//        } else if (op instanceof BinaryOr) {
-//            return isLong ? getJavaBitwiseOrLong() : getJavaBitwiseOrInt();
-//        } else if (op instanceof BinaryXOr) {
-//            return isLong ? getJavaBitwiseOrLong() : getJavaBitwiseXOrInt();
-//        } else if (op instanceof TypeCast) {
-//            return getJavaCast(opReturnType);
-//        } else {
-//            return null;
-//        }
+        //
+        // else if (op instanceof ShiftLeft) {
+        // return isLong ? getJavaShiftLeftLong() : getJavaShiftLeftInt();
+        // } else if (op instanceof ShiftRight) {
+        // return isLong ? getJavaShiftRightLong() : getJavaShiftRightInt();
+        // } else if (op instanceof UnsignedShiftRight) {
+        // return isLong ? getJavaUnsignedShiftRightLong()
+        // : getJavaUnsignedShiftRightInt();
+        // } else if (op instanceof BinaryAnd) {
+        // return isLong ? getJavaBitwiseAndLong() : getJavaBitwiseAndInt();
+        // } else if (op instanceof BinaryNot) {
+        // return getJavaBitwiseNegation();
+        // } else if (op instanceof BinaryOr) {
+        // return isLong ? getJavaBitwiseOrLong() : getJavaBitwiseOrInt();
+        // } else if (op instanceof BinaryXOr) {
+        // return isLong ? getJavaBitwiseOrLong() : getJavaBitwiseXOrInt();
+        // } else if (op instanceof TypeCast) {
+        // return getJavaCast(opReturnType);
+        // } else {
+        // return null;
+        // }
     }
 
     @Override
@@ -810,11 +811,11 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
-        if(left != null
+        if (left != null
                 && left.sort().extendsTrans(targetSort())
                 && right != null
                 && right.sort().extendsTrans(targetSort())) {
-            if(getFunctionFor(op, services, ec) != null) {
+            if (getFunctionFor(op, services, ec) != null) {
                 return true;
             }
         }
@@ -825,8 +826,8 @@ public final class IntegerLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
-        if(sub != null && sub.sort().extendsTrans(targetSort())) {
-            if(op instanceof Negative) {
+        if (sub != null && sub.sort().extendsTrans(targetSort())) {
+            if (op instanceof Negative) {
                 return true;
             }
         }

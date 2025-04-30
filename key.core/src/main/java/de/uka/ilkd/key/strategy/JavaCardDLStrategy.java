@@ -50,7 +50,6 @@ import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.op.Function;
 
 /**
  * Strategy tailored to be used as long as a java program can be found in the sequent.
@@ -215,7 +214,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // strengthenConstraints,
             AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
             // smtF,
-                shiftUpdateF, relaxedShiftUpdateF, nestedLoopUsecaseF,
+            shiftUpdateF, relaxedShiftUpdateF, nestedLoopUsecaseF,
             methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
             loopBlockApplyHeadFeature, ifMatchedF, dispatcher);
     }
@@ -260,7 +259,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
-        bindRuleSet(d, "simplify_heap_high_costs", longConst(30000));//inftyConst());
+        bindRuleSet(d, "simplify_heap_high_costs", longConst(30000));// inftyConst());
 
         bindRuleSet(d, "closure", -15000);
         bindRuleSet(d, "alpha", -7000);
@@ -573,116 +572,128 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
         final TermFeature isDepPredicate =
-                or(op(noRaW), op(noWaR), op(noWaW), op(noR), op(noW),
-                        op(noRaWH), op(noWaRH), op(noWaWH), op(noRH), op(noWH));
+            or(op(noRaW), op(noWaR), op(noWaW), op(noR), op(noW),
+                op(noRaWH), op(noWaRH), op(noWaWH), op(noRH), op(noWH));
 
         bindRuleSet(d, "pull_out_dep_locations",
-                add(applyTF(FocusProjection.create(1), isDepPredicate),
-                        applyTF(FocusProjection.create(2), ff.update),
-                        applyTF("t", IsNonRigidTermFeature.INSTANCE),
-                        longConst(100)));
+            add(applyTF(FocusProjection.create(1), isDepPredicate),
+                applyTF(FocusProjection.create(2), ff.update),
+                applyTF("t", IsNonRigidTermFeature.INSTANCE),
+                longConst(100)));
 
         final Operator setMinus = getServices().getTypeConverter().getLocSetLDT().getSetMinus();
         final ProjectionToTerm findLocSet = sub(FocusProjection.create(0), 0);
 
-/*		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
-				ifZero(applyTF(findLocSet, op(setMinus)), not(eq(sub(findLocSet, 1), instOfNonStrict("loc1"))), longConst(0)));
-*/
+        /*
+         * final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
+         * ifZero(applyTF(findLocSet, op(setMinus)), not(eq(sub(findLocSet, 1),
+         * instOfNonStrict("loc1"))), longConst(0)));
+         */
         TermBuffer assumesLocSet = new TermBuffer();
         TermBuffer findSubTerms = new TermBuffer();
         final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
-                let(assumesLocSet, instOfNonStrict("loc1"),
-                        sum(findSubTerms, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
-                                ifZero(applyTF(findSubTerms,op(setMinus)),
-                                        not(eq(assumesLocSet, sub(findSubTerms,1))),
-                                        longConst(0)))), longConst(0));
+            let(assumesLocSet, instOfNonStrict("loc1"),
+                sum(findSubTerms, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
+                    ifZero(applyTF(findSubTerms, op(setMinus)),
+                        not(eq(assumesLocSet, sub(findSubTerms, 1))),
+                        longConst(0)))),
+            longConst(0));
 
 
-//		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
-//				forEach(arg2, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
-//						not(eq(instOfNonStrict("loc1"), arg2))), longConst(0));
-//
+        // final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE,
+        // forEach(arg2, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
+        // not(eq(instOfNonStrict("loc1"), arg2))), longConst(0));
+        //
         bindRuleSet(d, "rewriteDependenciesAfterArgumentSimplification",
-                add(noDoubleMinus, longConst(-100)));
-        bindRuleSet(d, "simplify_dependency_predicates", longConst(-4000) );
+            add(noDoubleMinus, longConst(-100)));
+        bindRuleSet(d, "simplify_dependency_predicates", longConst(-4000));
         bindRuleSet(d, "dep_setMinus", noDoubleMinus);
 
-        bindRuleSet(d, "dep_replace_known", add(longConst(8000), NonDuplicateAppFeature.INSTANCE));//EqNonDuplicateAppFeature
+        bindRuleSet(d, "dep_replace_known", add(longConst(8000), NonDuplicateAppFeature.INSTANCE));// EqNonDuplicateAppFeature
 
         Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
 
         bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
         bindRuleSet(d, "strictNoEqApp", EqNonDuplicateAppFeature.INSTANCE);
-        //StrictEqNonDuplicateAppFeature.INSTANCE);
+        // StrictEqNonDuplicateAppFeature.INSTANCE);
 
         bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
 
         bindRuleSet(d, "similarLocSetArguments",
-                ifZero(MatchedIfFeature.INSTANCE,
-                        ScaleFeature.createAffine(
-                                SimilarityCountFeature.create(instOf("loc1"),
-                                        instOf("loc2")),
-                                -10, 250),
-                        longConst(-500)));
+            ifZero(MatchedIfFeature.INSTANCE,
+                ScaleFeature.createAffine(
+                    SimilarityCountFeature.create(instOf("loc1"),
+                        instOf("loc2")),
+                    -10, 250),
+                longConst(-500)));
 
 
         final Feature accessAtEarlierTime = gt("label1", "label2");
         final Feature accessAtLaterTime = lt("label1", "label2");
 
         bindRuleSet(d, "accessAtEarlierTime",
-                ifZero(MatchedIfFeature.INSTANCE, accessAtEarlierTime, longConst(0)));
+            ifZero(MatchedIfFeature.INSTANCE, accessAtEarlierTime, longConst(0)));
 
         bindRuleSet(d, "accessAtLaterTime",
-                ifZero(MatchedIfFeature.INSTANCE, accessAtLaterTime, longConst(0)));
+            ifZero(MatchedIfFeature.INSTANCE, accessAtLaterTime, longConst(0)));
 
 
         bindRuleSet(d, "accessAtSameOrLaterTime",
-                ifZero(MatchedIfFeature.INSTANCE,
-               /* ifZero(eq(instOf("label1"), instOf("label2")),
-                        longConst(-200),*/
-                        ifZero(leq("label1", "label2"), longConst(-100),
-                                ifZero(lt("label2", "label1"), inftyConst(),
-                                        longConst(0))),
-                        longConst(-110))); // costs slightly lower than -100 to ensure that first unmatched assumes apps
+            ifZero(MatchedIfFeature.INSTANCE,
+                /*
+                 * ifZero(eq(instOf("label1"), instOf("label2")),
+                 * longConst(-200),
+                 */
+                ifZero(leq("label1", "label2"), longConst(-100),
+                    ifZero(lt("label2", "label1"), inftyConst(),
+                        longConst(0))),
+                longConst(-110))); // costs slightly lower than -100 to ensure that first unmatched
+                                   // assumes apps
         // get their cost computed
 
 
         bindRuleSet(d, "accessAtSameOrEarlierTime",
-                ifZero(MatchedIfFeature.INSTANCE,
-               /* ifZero(eq(instOf("label1"), instOf("label2")),
-                        longConst(-200),*/
-                        ifZero(leq("label2", "label1"), longConst(-100),
-                                ifZero(lt("label1", "label2"), inftyConst(),
-                                        longConst(0))),
-                        longConst(-110))); // costs slightly lower than -100 to ensure that first unmatched assumes apps
+            ifZero(MatchedIfFeature.INSTANCE,
+                /*
+                 * ifZero(eq(instOf("label1"), instOf("label2")),
+                 * longConst(-200),
+                 */
+                ifZero(leq("label2", "label1"), longConst(-100),
+                    ifZero(lt("label1", "label2"), inftyConst(),
+                        longConst(0))),
+                longConst(-110))); // costs slightly lower than -100 to ensure that first unmatched
+                                   // assumes apps
         // get their cost computed
 
 
         bindRuleSet(d, "dep_pred_known",
-                add(ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 3000),
-                        longConst(5000)));//+100
-        bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));//+100
-        bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(10)));
-        bindRuleSet(d, "dep_pred_known_2c", add(noDoubleMinus,longConst(-2500)));
-        bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-5000)));//-500
+            add(ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 3000),
+                longConst(5000)));// +100
+        bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus, longConst(100)));// +100
+        bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus, longConst(10)));
+        bindRuleSet(d, "dep_pred_known_2c", add(noDoubleMinus, longConst(-2500)));
+        bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus, longConst(-5000)));// -500
 
 
 
         bindRuleSet(d, "saturate_dep_locset_relations_def",
-                add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 1000), longConst(3000)));
-        bindRuleSet(d, "self_app_prevention", add(NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 10000), longConst(300)));
+            add(noDoubleMinus, NonDuplicateAppModPositionFeature.INSTANCE,
+                ScaleFeature.createScaled(FocusTermDepthFeature.INSTANCE, 1000), longConst(3000)));
+        bindRuleSet(d, "self_app_prevention", add(NonDuplicateAppModPositionFeature.INSTANCE,
+            ScaleFeature.createScaled(depth, 10000), longConst(300)));
         bindRuleSet(d, "lateSimplification", longConst(1000));
 
-        //This one is not used anymore:
-        bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-100)));
+        // This one is not used anymore:
+        bindRuleSet(d, "saturate_dep_locset_relations",
+            add(noDoubleMinus, NonDuplicateAppModPositionFeature.INSTANCE, longConst(-100)));
 
         final Feature isDepPredLocSet =
-                applyTF(FocusProjection.create(1), isDepPredicate);
+            applyTF(FocusProjection.create(1), isDepPredicate);
 
 
         Feature pullOutFeature = ifZero(add(isDepPredLocSet, isBelow(ff.update),
-                        applyTF(instOf("t"), IsNonRigidTermFeature.INSTANCE)),
-                longConst(-100), d.get(new RuleSet(new Name("semantics_blasting"))));
+            applyTF(instOf("t"), IsNonRigidTermFeature.INSTANCE)),
+            longConst(-100), d.get(new RuleSet(new Name("semantics_blasting"))));
 
         bindRuleSet(d, "pullOutRestricted", pullOutFeature);
     }
@@ -693,30 +704,30 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private Feature leq(String left, String right) {
         return add(
-                applyTF(left, tf.polynomial),
-                applyTF(right, tf.polynomial),
-                PolynomialValuesCmpFeature.leq(instOf(left), instOf(right)));
+            applyTF(left, tf.polynomial),
+            applyTF(right, tf.polynomial),
+            PolynomialValuesCmpFeature.leq(instOf(left), instOf(right)));
     }
 
     private Feature gt(String left, String right) {
         return add(
-                applyTF(left, tf.polynomial),
-                applyTF(right, tf.polynomial),
-                not(PolynomialValuesCmpFeature.leq(instOf(right), instOf(left))));
+            applyTF(left, tf.polynomial),
+            applyTF(right, tf.polynomial),
+            not(PolynomialValuesCmpFeature.leq(instOf(right), instOf(left))));
     }
 
     private Feature geq(String left, String right) {
         return add(
-                applyTF(left, tf.polynomial),
-                applyTF(right, tf.polynomial),
-                not(PolynomialValuesCmpFeature.lt(instOf(right), instOf(left))));
+            applyTF(left, tf.polynomial),
+            applyTF(right, tf.polynomial),
+            not(PolynomialValuesCmpFeature.lt(instOf(right), instOf(left))));
     }
 
     private Feature lt(String left, String right) {
         return add(
-                applyTF(left, tf.polynomial),
-                applyTF(right, tf.polynomial),
-                PolynomialValuesCmpFeature.lt(instOf(left), instOf(right)));
+            applyTF(left, tf.polynomial),
+            applyTF(right, tf.polynomial),
+            PolynomialValuesCmpFeature.lt(instOf(left), instOf(right)));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -726,34 +737,35 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     //
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
-    private  void setupLocset(RuleSetDispatchFeature d) {
+    private void setupLocset(RuleSetDispatchFeature d) {
         Feature rowIndexInBetween = inClosedInterval("rowStart", "rowIndex", "rowEnd");
-        Feature colNotInInterval = or(PolynomialValuesCmpFeature.lt(instOf("colIndex"), instOf("colStart")),
+        Feature colNotInInterval =
+            or(PolynomialValuesCmpFeature.lt(instOf("colIndex"), instOf("colStart")),
                 PolynomialValuesCmpFeature.lt(instOf("rowEnd"), instOf("rowIndex")));
 
         bindRuleSet(d, "rowInInterval", rowIndexInBetween);
 
 
         bindRuleSet(d, "locsetExpandSetMinusMatrix", add(ifZero(MatchedIfFeature.INSTANCE,
-                or(rowIndexInBetween, colNotInInterval), longConst(-1)), longConst(100)));
+            or(rowIndexInBetween, colNotInInterval), longConst(-1)), longConst(100)));
 
 
 
         Feature covered =
-                ifZero(add( applyTF("lRow1", tf.polynomial),
-                                applyTF("hRow1", tf.polynomial),
-                                applyTF("lCol1", tf.polynomial),
-                                applyTF("hCol1", tf.polynomial),
-                                applyTF("lRow2", tf.polynomial),
-                                applyTF("hRow2", tf.polynomial),
-                                applyTF("lCol2", tf.polynomial),
-                                applyTF("hCol2", tf.polynomial)),
-                        add(leq("lRow2", "lRow1"), leq("hRow1", "hRow2"),
-                                leq("lCol2", "lCol1"), leq("hCol1", "hCol2")),
-                        inftyConst());
+            ifZero(add(applyTF("lRow1", tf.polynomial),
+                applyTF("hRow1", tf.polynomial),
+                applyTF("lCol1", tf.polynomial),
+                applyTF("hCol1", tf.polynomial),
+                applyTF("lRow2", tf.polynomial),
+                applyTF("hRow2", tf.polynomial),
+                applyTF("lCol2", tf.polynomial),
+                applyTF("hCol2", tf.polynomial)),
+                add(leq("lRow2", "lRow1"), leq("hRow1", "hRow2"),
+                    leq("lCol2", "lCol1"), leq("hCol1", "hCol2")),
+                inftyConst());
 
         bindRuleSet(d, "coveredMatrix", add(ifZero(covered,
-                ScaleFeature.createAffine(FindDepthFeature.INSTANCE, 100, -2500), inftyConst())));
+            ScaleFeature.createAffine(FindDepthFeature.INSTANCE, 100, -2500), inftyConst())));
 
         bindRuleSet(d, "locset_expand_setMinus", longConst(100));
 
@@ -763,176 +775,178 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "locset_expand_setMinus_low_priority", 5000);
 
-        /*final IntegerLDT integerLDT = getServices().getTypeConverter().getIntegerLDT();
-        bindRuleSet(d, "simplify_matrix_range_literal",
-            ifZero(
-                or(NumberLiteralsSmallerThanFeature.create(instOf("rowEnd"), instOf("rowEnd"),
-                        integerLDT),
-                    NumberLiteralsSmallerThanFeature.create(instOf("colEnd"), instOf("colStart"),
-                        integerLDT)), longConst(-4000),
-                    ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
-                        add(applyTF(instOf("colEnd"), tf.negLiteral)), longConst(-250),
-                            ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
-                        inftyConst()))
-        );*/
+        /*
+         * final IntegerLDT integerLDT = getServices().getTypeConverter().getIntegerLDT();
+         * bindRuleSet(d, "simplify_matrix_range_literal",
+         * ifZero(
+         * or(NumberLiteralsSmallerThanFeature.create(instOf("rowEnd"), instOf("rowEnd"),
+         * integerLDT),
+         * NumberLiteralsSmallerThanFeature.create(instOf("colEnd"), instOf("colStart"),
+         * integerLDT)), longConst(-4000),
+         * ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
+         * add(applyTF(instOf("colEnd"), tf.negLiteral)), longConst(-250),
+         * ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
+         * inftyConst()))
+         * );
+         */
 
         Feature rowEndLessThanRowStart = add(
-                applyTF("rowStart", tf.polynomial),
-                applyTF("rowEnd", tf.polynomial),
-                PolynomialValuesCmpFeature.lt(
-                        instOf("rowEnd"),
-                        instOf("rowStart")));
+            applyTF("rowStart", tf.polynomial),
+            applyTF("rowEnd", tf.polynomial),
+            PolynomialValuesCmpFeature.lt(
+                instOf("rowEnd"),
+                instOf("rowStart")));
 
         Feature colEndLessThanColStart = add(
-                applyTF("colStart", tf.polynomial),
-                applyTF("colEnd", tf.polynomial),
-                PolynomialValuesCmpFeature.lt(
-                        instOf("colEnd"),
-                        instOf("colStart")));
+            applyTF("colStart", tf.polynomial),
+            applyTF("colEnd", tf.polynomial),
+            PolynomialValuesCmpFeature.lt(
+                instOf("colEnd"),
+                instOf("colStart")));
 
         Feature nonEmptyRows = add(
-                applyTF("rowStart", tf.polynomial),
-                applyTF("rowEnd", tf.polynomial),
-                PolynomialValuesCmpFeature.leq(
-                        instOf("rowStart"),
-                        instOf("rowEnd")));
+            applyTF("rowStart", tf.polynomial),
+            applyTF("rowEnd", tf.polynomial),
+            PolynomialValuesCmpFeature.leq(
+                instOf("rowStart"),
+                instOf("rowEnd")));
 
         Feature nonEmptyCols = add(
-                applyTF("colStart", tf.polynomial),
-                applyTF("colEnd", tf.polynomial),
-                PolynomialValuesCmpFeature.leq(
-                        instOf("colStart"),
-                        instOf("colEnd")));
+            applyTF("colStart", tf.polynomial),
+            applyTF("colEnd", tf.polynomial),
+            PolynomialValuesCmpFeature.leq(
+                instOf("colStart"),
+                instOf("colEnd")));
 
         Feature matrixRangeloc1OutSideLoc2 = ifZero(
-                or(
-                        PolynomialValuesCmpFeature.lt(
-                                sub(instOf("loc2"), 3),
-                                sub(instOf("loc1"), 2)),
-                        PolynomialValuesCmpFeature.lt(
-                                sub(instOf("loc1"), 3),
-                                sub(instOf("loc2"), 2)),
-                        PolynomialValuesCmpFeature.lt(
-                                sub(instOf("loc2"), 5),
-                                sub(instOf("loc1"), 4)),
-                        PolynomialValuesCmpFeature.lt(
-                                sub(instOf("loc1"), 5),
-                                sub(instOf("loc2"), 4))
-                ), inftyConst(), longConst(0));
+            or(
+                PolynomialValuesCmpFeature.lt(
+                    sub(instOf("loc2"), 3),
+                    sub(instOf("loc1"), 2)),
+                PolynomialValuesCmpFeature.lt(
+                    sub(instOf("loc1"), 3),
+                    sub(instOf("loc2"), 2)),
+                PolynomialValuesCmpFeature.lt(
+                    sub(instOf("loc2"), 5),
+                    sub(instOf("loc1"), 4)),
+                PolynomialValuesCmpFeature.lt(
+                    sub(instOf("loc1"), 5),
+                    sub(instOf("loc2"), 4))),
+            inftyConst(), longConst(0));
 
         Feature arrayRangeloc1OutSideLoc2 = ifZero(
-                or(
-                        PolynomialValuesCmpFeature.lt(
-                                sub(instOf("loc2"), 2),
-                                sub(instOf("loc1"), 1)),
-                        PolynomialValuesCmpFeature.lt(
-                                sub(instOf("loc1"), 2),
-                                sub(instOf("loc2"), 1))
-                ), inftyConst(), longConst(0));
+            or(
+                PolynomialValuesCmpFeature.lt(
+                    sub(instOf("loc2"), 2),
+                    sub(instOf("loc1"), 1)),
+                PolynomialValuesCmpFeature.lt(
+                    sub(instOf("loc1"), 2),
+                    sub(instOf("loc2"), 1))),
+            inftyConst(), longConst(0));
 
 
         JFunction matrixRange = getServices().getTypeConverter().getLocSetLDT().getMatrixRange();
         JFunction arrayRange = getServices().getTypeConverter().getLocSetLDT().getArrayRange();
         bindRuleSet(d, "preventDisjointLocationSets",
-                ifZero(MatchedIfFeature.INSTANCE,
-                        ifZero(add(applyTF("loc1", op(matrixRange)),
-                                        applyTF("loc2", op(matrixRange))),
-                                matrixRangeloc1OutSideLoc2,
-                                ifZero(add(applyTF("loc1", op(arrayRange)),
-                                                applyTF("loc2", op(arrayRange))),
-                                        arrayRangeloc1OutSideLoc2,
-                                        longConst(0))),
-                        longConst(-110)));
-//        Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
-//        Feature colEndGeqColStart = geq("colEnd", "colStart");
+            ifZero(MatchedIfFeature.INSTANCE,
+                ifZero(add(applyTF("loc1", op(matrixRange)),
+                    applyTF("loc2", op(matrixRange))),
+                    matrixRangeloc1OutSideLoc2,
+                    ifZero(add(applyTF("loc1", op(arrayRange)),
+                        applyTF("loc2", op(arrayRange))),
+                        arrayRangeloc1OutSideLoc2,
+                        longConst(0))),
+                longConst(-110)));
+        // Feature rowEndGeqRowStart = geq("rowEnd", "rowStart");
+        // Feature colEndGeqColStart = geq("colEnd", "colStart");
 
         Feature emptyRows = IsInRangeCustom.create(instOf("rowStart"),
-                instOf("rowEnd"));
+            instOf("rowEnd"));
         Feature emptyCols = IsInRangeCustom.create(instOf("colStart"),
-                instOf("colEnd"));
+            instOf("colEnd"));
 
         Feature rowStartIsLiteral = applyTF(instOf("rowStart"), tf.literal);
         Feature rowEndIsLiteral = applyTF(instOf("rowEnd"), tf.literal);
         Feature colStartIsLiteral = applyTF(instOf("colStart"), tf.literal);
         Feature colEndIsLiteral = applyTF(instOf("colEnd"), tf.literal);
 
-        TermFeature hasNonEmptyLabel = TermLabelTermFeature.create(ParameterlessTermLabel.LOCATION_SET_NON_EMPTY);
+        TermFeature hasNonEmptyLabel =
+            TermLabelTermFeature.create(ParameterlessTermLabel.LOCATION_SET_NON_EMPTY);
         bindRuleSet(d, "simplify_matrix_range_literal",
-                ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
-                        longConst(-3000),
-                        ifZero(add(nonEmptyRows, nonEmptyCols),
-                                inftyConst(),
-                                ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
-                                                applyTF(instOf("colEnd"), tf.negLiteral)),
-                                        add(longConst(-250),
-                                                ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
-                                        //   ifZero(add(nonEmptyRows, nonEmptyCols),
-                                        //   inftyConst(),
-                                        ifZero(applyTF(FocusProjection.INSTANCE, hasNonEmptyLabel),
-                                                inftyConst(),
-                                                longConst(-1910))
-                                ))));
-
-        bindRuleSet(d, "arrayRange_known_empty",
-                ifZero(lt("high", "low"),
-                        add(ifZero(applyTF(FocusProjection.INSTANCE, hasNonEmptyLabel),
-                                inftyConst(), longConst(-5000))),
-                        inftyConst()));
-
-/*        bindRuleSet(d, "simplify_matrix_range_literal_2",
             ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
                 longConst(-3000),
-                ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
+                ifZero(add(nonEmptyRows, nonEmptyCols),
+                    inftyConst(),
+                    ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
                         applyTF(instOf("colEnd"), tf.negLiteral)),
                         add(longConst(-250),
                             ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
-                     //   ifZero(add(nonEmptyRows, nonEmptyCols),
-                     //   inftyConst(),
-                        ifZero(or(
-                                //or(add(rowStartIsLiteral, not(rowEndIsLiteral)),
-                                   add(not(rowStartIsLiteral), rowEndIsLiteral),
-                                //or(add(colStartIsLiteral, not(colEndIsLiteral)),
-                                        add(not(colStartIsLiteral), colEndIsLiteral)
-                                ),
-                            ifZero(or(emptyRows, emptyCols),
-                                add(longConst(-250),
-                                        ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
-                                                         inftyConst()), inftyConst()))));
-*/
+                        // ifZero(add(nonEmptyRows, nonEmptyCols),
+                        // inftyConst(),
+                        ifZero(applyTF(FocusProjection.INSTANCE, hasNonEmptyLabel),
+                            inftyConst(),
+                            longConst(-1910))))));
+
+        bindRuleSet(d, "arrayRange_known_empty",
+            ifZero(lt("high", "low"),
+                add(ifZero(applyTF(FocusProjection.INSTANCE, hasNonEmptyLabel),
+                    inftyConst(), longConst(-5000))),
+                inftyConst()));
+
+        /*
+         * bindRuleSet(d, "simplify_matrix_range_literal_2",
+         * ifZero(or(rowEndLessThanRowStart, colEndLessThanColStart),
+         * longConst(-3000),
+         * ifZero(or(applyTF(instOf("rowEnd"), tf.negLiteral),
+         * applyTF(instOf("colEnd"), tf.negLiteral)),
+         * add(longConst(-250),
+         * ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
+         * // ifZero(add(nonEmptyRows, nonEmptyCols),
+         * // inftyConst(),
+         * ifZero(or(
+         * //or(add(rowStartIsLiteral, not(rowEndIsLiteral)),
+         * add(not(rowStartIsLiteral), rowEndIsLiteral),
+         * //or(add(colStartIsLiteral, not(colEndIsLiteral)),
+         * add(not(colStartIsLiteral), colEndIsLiteral)
+         * ),
+         * ifZero(or(emptyRows, emptyCols),
+         * add(longConst(-250),
+         * ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 50)),
+         * inftyConst()), inftyConst()))));
+         */
 
         bindRuleSet(d, "pull_out_matrixRange",
-                add(not(isBelow(tf.eqF)), longConst(-3500)));
+            add(not(isBelow(tf.eqF)), longConst(-3500)));
 
 
         final LocSetLDT locLDT = getServices().getTypeConverter().getLocSetLDT();
         TermFeature setMinus = op(locLDT.getSetMinus());
 
         bindRuleSet(d, "pullOutLocSet",
-                add(not(isBelow(tf.eqF)),
-                        not(isBelow(setMinus)),
-                        applyTF(FocusProjection.INSTANCE, sub(setMinus,any())),
-                        longConst(-800)));
+            add(not(isBelow(tf.eqF)),
+                not(isBelow(setMinus)),
+                applyTF(FocusProjection.INSTANCE, sub(setMinus, any())),
+                longConst(-800)));
 
         bindRuleSet(d, "simplifyMatrixAnonHeap", add(not(isBelow(ff.ifThenElse)),
-                longConst(-2000) /* slightly faster than simplify_ENLARGING */, EqNonDuplicateAppFeature.INSTANCE));
+            longConst(-2000) /* slightly faster than simplify_ENLARGING */,
+            EqNonDuplicateAppFeature.INSTANCE));
 
         bindRuleSet(d, "simplifyAnonHeapMatrixRange", add(
-                DirectlyBelowSymbolFeature.create(Equality.EQUALS),
-                longConst(-1000)));
+            DirectlyBelowSymbolFeature.create(Equality.EQUALS),
+            longConst(-1000)));
 
         bindRuleSet(d, "apply_matrix_eq_reverse",
-                ifZero(
-                        add(MatchedIfFeature.INSTANCE,applyTF("matrixRangeDescription", or(tf.constant,
-                                        OperatorClassTF.create(IProgramVariable.class))),
-                                applyTF("heapSV",
-                                        not(OperatorTF.
-                                                create(getServices().getTypeConverter().getHeapLDT().getAnon())))
-                        ),
-                        longConst(-10000),  inftyConst() )
-        );
+            ifZero(
+                add(MatchedIfFeature.INSTANCE, applyTF("matrixRangeDescription", or(tf.constant,
+                    OperatorClassTF.create(IProgramVariable.class))),
+                    applyTF("heapSV",
+                        not(OperatorTF
+                                .create(getServices().getTypeConverter().getHeapLDT().getAnon())))),
+                longConst(-10000), inftyConst()));
 
         bindRuleSet(d, "checkArrayElementSort",
-                IncompatibleArrayElementSort.create(instOf("row"), instOf("matrix")));
+            IncompatibleArrayElementSort.create(instOf("row"), instOf("matrix")));
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
@@ -942,9 +956,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // function symbol)
             add(applyTF("h",
                 not(or(PrimitiveHeapTermFeature.create(heapLDT), AnonHeapTermFeature.INSTANCE))),
-                    //delete
-                    ifZero(applyTF(FocusProjection.create(1), tf.eqF), inftyConst(), longConst(0)),
-                    ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.update), longConst(-4200),
+                // delete
+                ifZero(applyTF(FocusProjection.create(1), tf.eqF), inftyConst(), longConst(0)),
+                ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.update), longConst(-4200),
                     longConst(-1900)),
                 NonDuplicateAppModPositionFeature.INSTANCE));
         bindRuleSet(d, "apply_select_eq",
@@ -1240,7 +1254,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     .createSum(
                         not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
                         AllowedCutPositionFeature.INSTANCE,
-                            ScaleFeature.createAffine(countOccurrences(FocusProjection.INSTANCE), -10, 10),
+                        ScaleFeature.createAffine(countOccurrences(FocusProjection.INSTANCE), -10,
+                            10),
                         ifZero(
                             NotBelowQuantifierFeature.INSTANCE, add(
                                 applyTF(cutFormula, add(ff.cutAllowed,
@@ -2346,7 +2361,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "apply_equations", EqNonDuplicateAppFeature.INSTANCE);
 
         bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
-        bindRuleSet(d, "strictNoEqApp", EqNonDuplicateAppFeature.INSTANCE);//StrictEqNonDuplicateAppFeature.INSTANCE);
+        bindRuleSet(d, "strictNoEqApp", EqNonDuplicateAppFeature.INSTANCE);// StrictEqNonDuplicateAppFeature.INSTANCE);
 
         return d;
     }
