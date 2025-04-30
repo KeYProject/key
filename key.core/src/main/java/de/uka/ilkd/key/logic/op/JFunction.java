@@ -67,6 +67,16 @@ public class JFunction extends Function implements Operator, Sorted {
             isSkolemConstant);
     }
 
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+            boolean unique,
+            boolean isRigid,
+            boolean isSkolemConstant) {
+        this(name, sort, new ImmutableArray<>(argSorts),
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
+            isRigid, isSkolemConstant);
+    }
+
+
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
         this(name, sort, argSorts, null, false, isRigid, false);
     }
