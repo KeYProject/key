@@ -16,14 +16,10 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SMTTestSettings;
-import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Tag;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,7 +62,7 @@ public abstract class TestCommons {
 
     protected boolean correctResult(String filepath, boolean isValid)
             throws ProblemLoaderException {
-        Assumptions.assumeFalse(toolNotInstalled());
+        SmtTestUtils.assumeSmtIsInstalled(!toolNotInstalled());
         SMTSolverResult result = checkFile(filepath);
         // unknown is always allowed. But wrong answers are not allowed
         return correctResult(isValid, result);
