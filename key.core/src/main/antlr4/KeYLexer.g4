@@ -227,9 +227,10 @@ INVARIANTS : '\\invariants';
 // Taclet annotations (see TacletAnnotations.java for more details)
 LEMMA : '\\lemma';
 
-// The first two guys are not really meta operators, treated separately
+// The first three guys are not really meta operators, treated separately
 IN_TYPE : '\\inType';
 IS_ABSTRACT_OR_INTERFACE : '\\isAbstractOrInterface';
+IS_FINAL : '\\isFinal';
 CONTAINERTYPE : '\\containerType';
 
 // types that need to be declared as keywords
@@ -387,7 +388,7 @@ LESS: '<';
 LESSEQUAL: '<' '=' | '\u2264';
 LGUILLEMETS: '<' '<' | '«' | '‹';
 RGUILLEMETS: '>''>' | '»' | '›';
-IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
+IMPLICIT_IDENT: '<' '$'? (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
 PRIMES:	('\'')+;

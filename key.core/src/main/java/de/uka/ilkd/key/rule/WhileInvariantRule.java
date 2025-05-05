@@ -593,7 +593,8 @@ public final class WhileInvariantRule implements BuiltInRule {
      * @param trueTerm a boolean term
      * @param falseTerm the negation (at least semantically) of {@code trueTerm}
      */
-    private record Guard(JavaBlock javaBlock, Term trueTerm, Term falseTerm) {}
+    private record Guard(JavaBlock javaBlock, Term trueTerm, Term falseTerm) {
+    }
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
             RuleApp ruleApp, Instantiation inst, final Term invTerm, Term reachableState,
@@ -995,39 +996,40 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
-    private record InfFlowData(ProofObligationVars symbExecVars, Term guardAtPre, Term guardAtPost, JavaBlock guardJb,
-                               Term guardTerm, ImmutableList<Term> localOuts, ImmutableList<Term> localOutsAtPre,
-                               ImmutableList<Term> localOutsAtPost, Pair<Term, Term> updates, Term applPredTerm,
-                               Taclet infFlowApp) {
-            private InfFlowData(ProofObligationVars symbExecVars, Term guardAtPre, Term guardAtPost,
-                                JavaBlock guardJb, Term guardTerm, ImmutableList<Term> localOuts,
-                                ImmutableList<Term> localOutsAtPre, ImmutableList<Term> localOutsAtPost,
-                                Pair<Term, Term> updates, Term applPredTerm, Taclet infFlowApp) {
-                this.symbExecVars = symbExecVars;
-                this.guardAtPre = guardAtPre;
-                this.guardAtPost = guardAtPost;
-                this.guardJb = guardJb;
-                this.guardTerm = guardTerm;
-                this.localOuts = localOuts;
-                this.localOutsAtPre = localOutsAtPre;
-                this.localOutsAtPost = localOutsAtPost;
-                this.updates = updates;
-                this.infFlowApp = infFlowApp;
-                this.applPredTerm = applPredTerm;
+    private record InfFlowData(ProofObligationVars symbExecVars, Term guardAtPre, Term guardAtPost,
+            JavaBlock guardJb,
+            Term guardTerm, ImmutableList<Term> localOuts, ImmutableList<Term> localOutsAtPre,
+            ImmutableList<Term> localOutsAtPost, Pair<Term, Term> updates, Term applPredTerm,
+            Taclet infFlowApp) {
+        private InfFlowData(ProofObligationVars symbExecVars, Term guardAtPre, Term guardAtPost,
+                JavaBlock guardJb, Term guardTerm, ImmutableList<Term> localOuts,
+                ImmutableList<Term> localOutsAtPre, ImmutableList<Term> localOutsAtPost,
+                Pair<Term, Term> updates, Term applPredTerm, Taclet infFlowApp) {
+            this.symbExecVars = symbExecVars;
+            this.guardAtPre = guardAtPre;
+            this.guardAtPost = guardAtPost;
+            this.guardJb = guardJb;
+            this.guardTerm = guardTerm;
+            this.localOuts = localOuts;
+            this.localOutsAtPre = localOutsAtPre;
+            this.localOutsAtPost = localOutsAtPost;
+            this.updates = updates;
+            this.infFlowApp = infFlowApp;
+            this.applPredTerm = applPredTerm;
 
-                assert symbExecVars != null;
-                assert guardAtPre != null;
-                assert guardAtPost != null;
-                assert guardJb != null;
-                assert guardTerm != null;
-                assert localOuts != null;
-                assert localOutsAtPre != null;
-                assert localOutsAtPost != null;
-                assert updates != null;
-                assert applPredTerm != null;
-                assert infFlowApp != null;
-            }
+            assert symbExecVars != null;
+            assert guardAtPre != null;
+            assert guardAtPost != null;
+            assert guardJb != null;
+            assert guardTerm != null;
+            assert localOuts != null;
+            assert localOutsAtPre != null;
+            assert localOutsAtPost != null;
+            assert updates != null;
+            assert applPredTerm != null;
+            assert infFlowApp != null;
         }
+    }
 
     /**
      * {@inheritDoc}

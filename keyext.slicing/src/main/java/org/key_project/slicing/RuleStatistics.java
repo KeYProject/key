@@ -125,5 +125,6 @@ public class RuleStatistics {
      * @param numberOfInitialUselessApplications
      */
     public record StatisticEntry(int numberOfApplications, int numberOfUselessApplications,
-            int numberOfInitialUselessApplications) {}
+            int numberOfInitialUselessApplications) {
+    }
 }

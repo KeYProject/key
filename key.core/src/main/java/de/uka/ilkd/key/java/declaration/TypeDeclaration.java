@@ -45,7 +45,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
      * @param specMathMode spec math mode
      */
     public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
-            SpecMathMode specMathMode) {}
+            SpecMathMode specMathMode) {
+    }
 
     protected final JMLModifiers jmlModifiers;
 
