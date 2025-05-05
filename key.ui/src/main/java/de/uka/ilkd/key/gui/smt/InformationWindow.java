@@ -6,16 +6,12 @@ package de.uka.ilkd.key.gui.smt;
 import java.awt.*;
 import java.util.Collection;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Element;
 
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-
-import org.key_project.util.java.StringUtil;
 
 
 /**
@@ -125,48 +121,21 @@ public class InformationWindow extends JDialog {
     }
 
     private Component newTab(Information information) {
-        final JTextArea lines = new JTextArea("1");
-        final JTextArea content = new JTextArea();
-        content.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
-        lines.setBackground(Color.LIGHT_GRAY);
-        lines.setEditable(false);
+        final JTextPane content = new JTextPane();
+        Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+        content.setFont(font);
         content.setEditable(false);
-
-        content.getDocument().addDocumentListener(new DocumentListener() {
-            public String getText() {
-                int caretPosition = content.getDocument().getLength();
-                Element root = content.getDocument().getDefaultRootElement();
-                StringBuilder text = new StringBuilder("1" + StringUtil.NEW_LINE);
-                for (int i = 2; i < root.getElementIndex(caretPosition) + 2; i++) {
-                    text.append(i).append(StringUtil.NEW_LINE);
-                }
-                return text.toString();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent de) {
-                lines.setText(getText());
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent de) {
-                lines.setText(getText());
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent de) {
-                lines.setText(getText());
-            }
-
-        });
         content.setText(information.content);
-        JScrollPane pane = new JScrollPane();
-        pane.getViewport().add(content);
-        pane.setRowHeaderView(lines);
-        pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
+        JPanel nowrap = new JPanel(new BorderLayout());
+        nowrap.add(content);
+        JScrollPane scrPreview = new JScrollPane();
+        scrPreview.setViewportView(nowrap);
 
-        return pane;
+        TextLineNumber lineNumbers = new TextLineNumber(content, 1);
+        scrPreview.setRowHeaderView(lineNumbers);
+
+        return scrPreview;
     }
 
 

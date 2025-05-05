@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
 import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.gui.utilities.CurrentLineHighlighter;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
@@ -135,6 +136,7 @@ public class EditSourceFileAction extends KeyAction {
                 textAreaGoto(this, location.getPosition());
             }
         };
+        textPane.setHighlighter(new CurrentLineHighlighter(textPane.getHighlighter()));
         Optional<URI> fileOpt = location.getFileURI();
         if (fileOpt.isEmpty()) {
             JTextPane jTextPane = new JTextPane();

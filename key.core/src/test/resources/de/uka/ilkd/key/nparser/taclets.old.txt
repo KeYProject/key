@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Nov 04 13:26:34 CET 2024
+# Date: Mon Mar 03 18:42:58 CET 2025
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1840,21 +1840,42 @@ assignment_read_attribute {
 \find(==>#allmodal ((modal operator))|{{ ..
   #v0 = #v.#a;
 ... }}| (post))
-\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \not\isModelField(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)))
+\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)),  \not \final(#a (program Variable)))
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::select(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
-Choices: (programRules:Java & runtimeExceptions:ban)}
+Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
+-----------------------------------------------------
+== assignment_read_attribute_final (assignment_read_attribute_final) =========================================
+assignment_read_attribute_final {
+\find(==>#allmodal ((modal operator))|{{ ..
+  #v0 = #v.#a;
+... }}| (post))
+\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), \final(#a (program Variable)))
+\add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::final(#v,#memberPVToField(#a))),#allmodal(post))]) 
+\heuristics(simplify_prog_subset, simplify_prog)
+Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
 -----------------------------------------------------
 == assignment_read_attribute_this (assignment_read_attribute_this) =========================================
 assignment_read_attribute_this {
 \find(==>#allmodal ((modal operator))|{{ ..
   #v0 = #v.#a;
 ... }}| (post))
-\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \not\isModelField(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)))
+\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \not\isModelField(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)),  \not \final(#a (program Variable)))
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::select(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
-Choices: (programRules:Java & runtimeExceptions:ban)}
+Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
+-----------------------------------------------------
+== assignment_read_attribute_this_final (assignment_read_attribute_this_final) =========================================
+assignment_read_attribute_this_final {
+\find(==>#allmodal ((modal operator))|{{ ..
+  #v0 = #v.#a;
+... }}| (post))
+\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), \final(#a (program Variable)))
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::final(#v,#memberPVToField(#a))),#allmodal(post))]) 
+\heuristics(simplify_prog_subset, simplify_prog)
+Choices: ((programRules:Java & runtimeExceptions:ban) & finalFields:immutable)}
 -----------------------------------------------------
 == assignment_read_length (assignment_read_length) =========================================
 assignment_read_length {
@@ -1882,10 +1903,20 @@ assignment_read_static_attribute {
 \find(#allmodal ((modal operator))|{{ ..
   #v0 = @(#sv);
 ... }}| (post))
-\sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G))
+\sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G),  \not \final(#sv (program StaticVariable)))
 \replacewith(update-application(elem-update(#v0 (program Variable))(G::select(heap,null,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
-Choices: programRules:Java}
+Choices: (programRules:Java & finalFields:immutable)}
+-----------------------------------------------------
+== assignment_read_static_attribute_final (assignment_read_static_attribute_final) =========================================
+assignment_read_static_attribute_final {
+\find(#allmodal ((modal operator))|{{ ..
+  #v0 = @(#sv);
+... }}| (post))
+\sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G), \final(#sv (program StaticVariable)))
+\replacewith(update-application(elem-update(#v0 (program Variable))(G::final(null,#memberPVToField(#sv))),#allmodal(post))) 
+\heuristics(simplify_prog_subset, simplify_prog)
+Choices: (programRules:Java & finalFields:immutable)}
 -----------------------------------------------------
 == assignment_read_static_attribute_with_variable_prefix (assignment) =========================================
 assignment_read_static_attribute_with_variable_prefix {
@@ -7246,6 +7277,13 @@ equal_literals {
 \replacewith(#eq(Z(iz),Z(jz))) 
 \heuristics(simplify_literals)
 Choices: true}
+-----------------------------------------------------
+== equalityOfSingleton (equalityOfSingleton) =========================================
+equalityOfSingleton {
+\find(equals(singleton(o1,f1),singleton(o2,f2)))
+\replacewith(and(equals(o1,o2),equals(f1,f2))) 
+\heuristics(simplify)
+Choices: programRules:Java}
 -----------------------------------------------------
 == equalityToElementOf (equalityToElementOf) =========================================
 equalityToElementOf {
@@ -13486,6 +13524,15 @@ multiply_inEq1 {
 
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
+== narrowFinalArrayType (narrowFinalArrayType) =========================================
+narrowFinalArrayType {
+\assumes ([]==>[equals(o,null)]) 
+\find(beta::final(o,arr(idx)))
+\sameUpdateLevel\varcond(\hasSort(\elemSort(o (java.lang.Object term)), alpha), \strict\sub(alpha, beta))
+\replacewith(alpha::final(o,arr(idx))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
 == narrowSelectArrayType (narrowSelectArrayType) =========================================
 narrowSelectArrayType {
 \assumes ([wellFormed(h)]==>[equals(o,null)]) 
@@ -13501,6 +13548,14 @@ narrowSelectType {
 \find(beta::select(h,o,f))
 \varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta))
 \replacewith(alpha::select(h,o,f)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== narrowTypeFinal (narrowTypeFinal) =========================================
+narrowTypeFinal {
+\find(beta::final(o,f))
+\varcond(\fieldType(f (Field term), alpha), \strict\sub(alpha, beta))
+\replacewith(alpha::final(o,f)) 
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -13915,6 +13970,22 @@ onlyCreatedObjectsAreInLocSetsEQ {
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
+== onlyCreatedObjectsAreInLocSetsEQFinal (onlyCreatedObjectsAreInLocSetsEQFinal) =========================================
+onlyCreatedObjectsAreInLocSetsEQFinal {
+\assumes ([wellFormed(h),equals(LocSet::final(o,f),EQ)]==>[]) 
+\find(elementOf(o2,f2,EQ)==>)
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\heuristics(inReachableStateImplication)
+Choices: programRules:Java}
+-----------------------------------------------------
+== onlyCreatedObjectsAreInLocSetsFinal (onlyCreatedObjectsAreInLocSetsFinal) =========================================
+onlyCreatedObjectsAreInLocSetsFinal {
+\assumes ([wellFormed(h)]==>[]) 
+\find(elementOf(o2,f2,LocSet::final(o,f))==>)
+\add [or(equals(o2,null),equals(boolean::select(h,o2,java.lang.Object::<created>),TRUE))]==>[] 
+\heuristics(inReachableStateImplication)
+Choices: programRules:Java}
+-----------------------------------------------------
 == onlyCreatedObjectsAreObserved (onlyCreatedObjectsAreObserved) =========================================
 onlyCreatedObjectsAreObserved {
 \find(obs)
@@ -13945,6 +14016,14 @@ onlyCreatedObjectsAreReferenced {
 \assumes ([wellFormed(h)]==>[]) 
 \find(deltaObject::select(h,o,f))
 \sameUpdateLevel\add [or(equals(deltaObject::select(h,o,f),null),equals(boolean::select(h,deltaObject::select(h,o,f),java.lang.Object::<created>),TRUE))]==>[] 
+\heuristics(inReachableStateImplication)
+Choices: programRules:Java}
+-----------------------------------------------------
+== onlyCreatedObjectsAreReferencedFinal (onlyCreatedObjectsAreReferencedFinal) =========================================
+onlyCreatedObjectsAreReferencedFinal {
+\assumes ([wellFormed(h),equals(boolean::select(h,o,java.lang.Object::<created>),TRUE)]==>[]) 
+\find(deltaObject::final(o,f))
+\sameUpdateLevel\add [or(equals(deltaObject::final(o,f),null),equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::<created>),TRUE))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -15078,6 +15157,14 @@ reference_type_cast {
 \heuristics(simplify_prog)
 Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
+== referencedObjectIsCreatedRighFinalEQ (referencedObjectIsCreatedRighFinalEQ) =========================================
+referencedObjectIsCreatedRighFinalEQ {
+\assumes ([equals(deltaObject::final(o,f),EQ)]==>[equals(EQ,null)]) 
+\find(==>equals(boolean::select(h,EQ,java.lang.Object::<created>),TRUE))
+\add []==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))] 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
 == referencedObjectIsCreatedRight (referencedObjectIsCreatedRight) =========================================
 referencedObjectIsCreatedRight {
 \assumes ([]==>[equals(deltaObject::select(h,o,f),null)]) 
@@ -15092,6 +15179,14 @@ referencedObjectIsCreatedRightEQ {
 \find(==>equals(boolean::select(h,EQ,java.lang.Object::<created>),TRUE))
 \replacewith([]==>[wellFormed(h)]) 
 \heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== referencedObjectIsCreatedRightFinal (referencedObjectIsCreatedRightFinal) =========================================
+referencedObjectIsCreatedRightFinal {
+\assumes ([]==>[equals(deltaObject::final(o,f),null)]) 
+\find(==>equals(boolean::select(h,deltaObject::final(o,f),java.lang.Object::<created>),TRUE))
+\replacewith([]==>[or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(o,null))]) 
+\heuristics(simplify_enlarging)
 Choices: programRules:Java}
 -----------------------------------------------------
 == regExAxiom (regExAxiom) =========================================

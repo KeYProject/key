@@ -1745,46 +1745,46 @@ public class MergeRuleUtils {
     }
 
     /**
-         * Simple term wrapper for comparing terms modulo renaming.
-         *
-         * @author Dominic Scheurer
-         * @see TermWrapperFactory
-         */
-        record TermWrapper(Term term, int hashcode) {
+     * Simple term wrapper for comparing terms modulo renaming.
+     *
+     * @author Dominic Scheurer
+     * @see TermWrapperFactory
+     */
+    record TermWrapper(Term term, int hashcode) {
 
         @Override
-            public boolean equals(Object obj) {
-                return obj instanceof TermWrapper
-                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
-            }
-
-            @Override
-            public int hashCode() {
-                return hashcode;
-            }
-
-            @Override
-            public String toString() {
-                return term.toString();
-            }
-
-            /**
-             * Adds the wrapped content of the Iterable object into the given target collection.
-             *
-             * @param target            The collection to insert the wrapped terms into.
-             * @param wrappedCollection Iterable to transform.
-             * @return The target collection with inserted terms.
-             */
-            public static <T extends Collection<Term>> T toTermList(T target,
-                                                                    Iterable<TermWrapper> wrappedCollection) {
-
-                for (TermWrapper termWrapper : wrappedCollection) {
-                    target.add(termWrapper.term());
-                }
-
-                return target;
-            }
+        public boolean equals(Object obj) {
+            return obj instanceof TermWrapper
+                    && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
         }
+
+        @Override
+        public int hashCode() {
+            return hashcode;
+        }
+
+        @Override
+        public String toString() {
+            return term.toString();
+        }
+
+        /**
+         * Adds the wrapped content of the Iterable object into the given target collection.
+         *
+         * @param target The collection to insert the wrapped terms into.
+         * @param wrappedCollection Iterable to transform.
+         * @return The target collection with inserted terms.
+         */
+        public static <T extends Collection<Term>> T toTermList(T target,
+                Iterable<TermWrapper> wrappedCollection) {
+
+            for (TermWrapper termWrapper : wrappedCollection) {
+                target.add(termWrapper.term());
+            }
+
+            return target;
+        }
+    }
 
     /**
      * Visitor for collecting program locations in a Java block.

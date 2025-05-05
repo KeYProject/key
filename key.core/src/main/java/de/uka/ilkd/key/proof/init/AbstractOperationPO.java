@@ -531,16 +531,17 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     /**
      * Modifies the post condition with help of
-     * {@link POExtension#modifyPostTerm(InitConfig, Services, Term)}.
+     * {@link POExtension#modifyPostTerm(AbstractOperationPO, InitConfig, Services, ProgramVariable, Term)}.
      *
      * @param proofServices The {@link Services} to use.
+     * @param self
      * @param post The post condition to modify.
      * @return The modified post condition or the original one if no modifications were performed.
      */
-    protected Term modifyPostTerm(Services proofServices, Term post) {
+    protected Term modifyPostTerm(Services proofServices, ProgramVariable self, Term post) {
         ImmutableList<POExtension> extensions = ProofInitServiceUtil.getOperationPOExtension(this);
         for (POExtension extension : extensions) {
-            post = extension.modifyPostTerm(proofConfig, proofServices, post);
+            post = extension.modifyPostTerm(this, proofConfig, proofServices, self, post);
         }
         return post;
     }
@@ -1133,7 +1134,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // build program term
         Term post = createPost(selfVar, paramVars, formalParamVars, resultVar, exceptionVar,
             modifiableHeaps, atPreVars, modifiableHeaps, heapToAtPre, proofServices);
-        post = modifyPostTerm(proofServices, post);
+        post = modifyPostTerm(proofServices, selfVar, post);
 
         final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
             exceptionVar, atPreVars, post, sb, proofServices);
