@@ -10,16 +10,14 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SMTTestSettings;
-import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,13 +66,21 @@ public class TestSMTMod {
                 result = checkGoal(g, Z3_SOLVER);
                 assertSame(SMTSolverResult.ThreeValuedTruth.VALID, result.isValid());
             } else {
-                LOGGER.warn("Warning:Z3 solver not installed, tests skipped.");
+                if (SmtTestUtils.failIfSmtSolverIsUnavailable) {
+                    Assertions.fail("z3 solver not installed");
+                } else {
+                    LOGGER.warn("Warning:Z3 solver not installed, tests skipped.");
+                }
             }
             if (CVC4_SOLVER.isInstalled(true)) {
                 result = checkGoal(g, CVC4_SOLVER);
                 assertSame(SMTSolverResult.ThreeValuedTruth.VALID, result.isValid());
             } else {
-                LOGGER.warn("Warning:CVC4 solver not installed, tests skipped.");
+                if (SmtTestUtils.failIfSmtSolverIsUnavailable) {
+                    Assertions.fail("cvc4 solver not installed");
+                } else {
+                    LOGGER.warn("Warning:CVC4 solver not installed, tests skipped.");
+                }
             }
         } finally {
             env.dispose();
