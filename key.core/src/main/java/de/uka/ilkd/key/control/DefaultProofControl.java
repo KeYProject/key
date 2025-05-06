@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.*;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -19,12 +23,20 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The default implementation of {@link ProofControl}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class DefaultProofControl extends AbstractProofControl {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultProofControl.class);
+
     /**
      * The {@link UserInterfaceControl} in which this {@link ProofControl} is used.
      */
@@ -33,7 +45,14 @@ public class DefaultProofControl extends AbstractProofControl {
     /**
      * The currently running {@link Thread}.
      */
+    @Nullable
     private Thread autoModeThread;
+
+    /**
+     * A condition for waiting during active auto-mode.
+     */
+    @Nullable
+    private Condition notInAutoMode;
 
     /**
      * Constructor.
@@ -81,10 +100,16 @@ public class DefaultProofControl extends AbstractProofControl {
 
     @Override
     public void waitWhileAutoMode() {
-        while (isInAutoMode()) { // Wait until auto mode has stopped.
+        if (SwingUtilities.isEventDispatchThread()) {
+            LOGGER.error("", new IllegalStateException(
+                "tried to block the UI thread whilst waiting for auto mode to finish"));
+            return; // do not block the UI thread
+        }
+        if (notInAutoMode != null) {
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
+                notInAutoMode.await();
+            } catch (InterruptedException ignore) {
+
             }
         }
     }
@@ -101,10 +126,13 @@ public class DefaultProofControl extends AbstractProofControl {
 
         private final ProverTaskListener ptl;
 
+        private final ReentrantLock lock = new ReentrantLock();
+
         public AutoModeThread(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
             this.proof = proof;
             this.goals = goals;
             this.ptl = ptl;
+            notInAutoMode = lock.newCondition();
         }
 
         @Override
@@ -122,6 +150,10 @@ public class DefaultProofControl extends AbstractProofControl {
                     starter.start();
                 }
             } finally {
+                lock.lock();
+                notInAutoMode.signalAll();
+                lock.unlock();
+
                 autoModeThread = null;
                 fireAutoModeStopped(new ProofEvent(proof));
             }
@@ -146,10 +178,13 @@ public class DefaultProofControl extends AbstractProofControl {
 
         private final PosInOccurrence posInOcc;
 
+        private final ReentrantLock lock = new ReentrantLock();
+
         public MacroThread(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
             this.node = node;
             this.macro = macro;
             this.posInOcc = posInOcc;
+            notInAutoMode = lock.newCondition();
         }
 
         @Override
@@ -172,6 +207,11 @@ public class DefaultProofControl extends AbstractProofControl {
                 if (ptl != null) {
                     ptl.taskFinished(info);
                 }
+
+                lock.lock();
+                notInAutoMode.signalAll();
+                lock.unlock();
+
                 autoModeThread = null;
                 fireAutoModeStopped(new ProofEvent(proof));
             }
