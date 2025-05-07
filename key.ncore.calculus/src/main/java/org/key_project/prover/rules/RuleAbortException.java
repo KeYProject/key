@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
-import java.io.Serial;
 
 /**
  *
@@ -13,10 +12,6 @@ import java.io.Serial;
  *
  */
 public class RuleAbortException extends RuntimeException {
-
-    @Serial
-    private static final long serialVersionUID = -645034125571021135L;
-
     public RuleAbortException() {
         super("A rule application has been aborted");
     }

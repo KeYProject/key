@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
  * objects have to implement the interface {@link Named}. It is possible to have nested namespaces
  * in order to represent different visibility scopes.
  */
-public class Namespace<E extends Named> implements java.io.Serializable {
-
-    private static final long serialVersionUID = 7510655524858729144L;
+public class Namespace<E extends Named> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Namespace.class);
 
     /**
@@ -56,15 +54,15 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * Adds the object <code>sym</code> to this Namespace. If an object with the same name is
      * already there, it is quietly replaced by <code>sym</code>. Use addSafely() instead if
      * possible.
-     *
+     * <br>
      * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet. (This is
      * no longer self-explanatory. mu 2016)
-     *
+     * <br>
      * If the local table is empty, then the new symbol is added as "singleton map". This has been
      * adapted from an earlier implementation, done for memory efficiency reasons: Many namespaces
      * only contain a single element; no need to allocate a hash map. The hash map is only created
      * when the 2nd element is added.
-     *
+     * <br>
      * This is not threadsafe.
      */
     public void add(E sym) {
@@ -123,7 +121,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     /**
      * Remove a name from the namespace.
-     *
+     * <br>
      * Removal is not delegated to the parent namespace.
      *
      * @param name non-null name whose symbol is to be removed.
@@ -165,7 +163,6 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * @return Object with name "name" or null if no such an object has been found
      */
     public @Nullable E lookup(Name name) {
-        @Nullable
         E symbol = lookupLocally(name);
         if (symbol != null) {
             return symbol;
