@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -508,7 +509,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             return false;
         }
 
-        if (!goalTemplates.equals(t2.goalTemplates)) {
+        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(goalTemplates, t2.goalTemplates)) {
             return false;
         }
 
