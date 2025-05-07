@@ -36,7 +36,9 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
                 Currently supports Isabelle2024-RC1.
                 """;
 
-    private static final Collection<String> SUPPORTED_VERSIONS_TEXT = List.of("Isabelle2024-RC1");
+    private static final Collection<String> SUPPORTED_VERSIONS_TEXT = List.of("Isabelle2023", "Isabelle2024-RC1", "Isabelle2024");
+
+    private enum IsabelleSupportState{SUPPORTED, NOT_SUPPORTED, NO_ISABELLE}
 
     /**
      * Panel for inputting the path to where translations are stored
@@ -128,16 +130,16 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         return checkForSupportButton;
     }
 
-    private boolean checkForSupport() {
+    private IsabelleSupportState checkForSupport() {
         String isabelleVersion;
         Path isabelleIdentifierPath =
             Paths.get(isabellePathPanel.getText(), "/etc/ISABELLE_IDENTIFIER");
         try {
             isabelleVersion = Files.readAllLines(isabelleIdentifierPath).getFirst();
         } catch (IOException e) {
-            return false;
+            return IsabelleSupportState.NO_ISABELLE;
         }
-        return SUPPORTED_VERSIONS_TEXT.contains(isabelleVersion);
+        return SUPPORTED_VERSIONS_TEXT.contains(isabelleVersion) ? IsabelleSupportState.SUPPORTED : IsabelleSupportState.NOT_SUPPORTED;
     }
 
     protected JTextField createSolverSupported() {
@@ -155,8 +157,11 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     }
 
     private String getSolverSupportText() {
-        return checkForSupport() ? "Version of Isabelle is supported."
-                : "Version of Isabelle may not be supported.";
+        return switch(checkForSupport()) {
+            case NOT_SUPPORTED -> "This version of Isabelle is not supported and is thus unlikely to work.";
+            case SUPPORTED -> "This version of Isabelle is supported.";
+            case NO_ISABELLE -> "Isabelle could not be found in the chosen directory.";
+        };
     }
 
 
