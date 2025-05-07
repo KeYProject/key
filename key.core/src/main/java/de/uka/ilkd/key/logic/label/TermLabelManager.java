@@ -2080,4 +2080,14 @@ public class TermLabelManager {
             term.boundVars(), new ImmutableArray<>(term.getLabels().stream()
                     .filter(TermLabel::isProofRelevant).collect(Collectors.toList())));
     }
+
+    /**
+     * Fully disable origin tracking. This will remove the {@link OriginTermLabelRefactoring} from
+     * the manager.
+     */
+    public void disableOriginLabelRefactorings() {
+        allRulesRefactorings = ImmutableList.fromList(
+            allRulesRefactorings.stream().filter(x -> !(x instanceof OriginTermLabelRefactoring))
+                    .toList());
+    }
 }
