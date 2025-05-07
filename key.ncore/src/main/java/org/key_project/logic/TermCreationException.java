@@ -10,12 +10,6 @@ import org.key_project.util.collection.ImmutableArray;
 
 
 public class TermCreationException extends RuntimeException {
-
-    /**
-     * generated serial version UID
-     */
-    private static final long serialVersionUID = -7173044450561438150L;
-
     public TermCreationException(String errorMessage) {
         super(errorMessage);
     }
@@ -62,19 +56,9 @@ public class TermCreationException extends RuntimeException {
         for (int i = 0, n = subs.size(); i < n; i++) {
             sb.append(i + 1).append(".) ");
             Term subi = subs.get(i);
-            if (subi != null) {
-                sb.append(subi);
-                Sort subiSort = subi.sort();
-                if (subiSort != null) {
-                    sb.append("(sort: ").append(subi.sort()).append(", sort hash: ")
-                            .append(subi.sort().hashCode()).append(")\n");
-                } else {
-                    sb.append("(Unknown sort, \"null pointer\")");
-                }
-            } else {
-                sb.append(" !null!\n");
-            }
-
+            sb.append(subi);
+            sb.append("(sort: ").append(subi.sort()).append(", sort hash: ")
+                    .append(subi.sort().hashCode()).append(")\n");
         }
         return sb.toString();
     }
