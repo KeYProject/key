@@ -53,7 +53,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal ex
     private final @Nullable Goal nonCloseableGoal;
 
     /** The exception encountered during the strategy application, if any. */
-    private final Throwable error;
+    private final @Nullable Throwable error;
 
     /** The total time taken for the strategy execution, in milliseconds. */
     private final long timeInMillis;
@@ -147,17 +147,13 @@ public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal ex
      * @return a string summarizing the state of this {@code ApplyStrategyInfo} object
      */
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Apply Strategy Info:");
-        sb.append("\n Message: ").append(message);
-        sb.append("\n Error:").append(isError());
-        if (isError()) {
-            sb.append("\n ").append(error.getMessage());
-        }
-        sb.append("\n Applied Rules: ").append(appliedRuleAppsCount);
-        sb.append("\n Time: ").append(timeInMillis);
-        sb.append("\n Closed Goals: ").append(nrClosedGoals);
-        return sb.toString();
+        return String.format("""
+                Apply Strategy Info:\
+                 Message: %s\
+                 Error: %s\
+                 Applied Rules: %s\
+                 Time: %s\
+                 Closed Goals: %s""", message, isError() ? error.getMessage() : null,
+            appliedRuleAppsCount, timeInMillis, nrClosedGoals);
     }
-
 }
