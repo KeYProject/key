@@ -97,13 +97,13 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
 
     private JTextField createTranslationPathPanel() {
         return addFileChooserPanel("Location for translation files:", "", infoTranslationPathPanel,
-            true, e -> {
+            false, e -> {
             });
     }
 
     private JTextField createIsabellePathPanel() {
         return addFileChooserPanel("Isabelle installation folder:", "", infoIsabellePathPanel,
-            true, e -> {
+            false, e -> {
             });
     }
 
