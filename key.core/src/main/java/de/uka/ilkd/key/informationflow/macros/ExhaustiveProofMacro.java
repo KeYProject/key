@@ -26,6 +26,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply
  * the macro given by {@link #getProofMacro()} directly, or --if not directly applicable-- search on

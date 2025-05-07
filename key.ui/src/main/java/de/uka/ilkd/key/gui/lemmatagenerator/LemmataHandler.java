@@ -60,7 +60,7 @@ public class LemmataHandler implements TacletFilter {
         println("Start problem creation:");
         println(options.toString());
 
-        File file = new File(options.getPathOfRuleFile());
+        File file = options.getPathOfRuleFile();
         Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
 
         final ProblemInitializer problemInitializer =
