@@ -96,14 +96,6 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
             info.getClosedGoals() + stratInfo.getNumberOfClosedGoals());
     }
 
-    ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ProofSearchInformation stratInfo,
-            ImmutableList<Goal> goals) {
-        this(info.getMacro(), goals, (Proof) stratInfo.getProof(),
-            info.getTime() + stratInfo.getTime(),
-            info.getAppliedRules() + stratInfo.getNumberOfAppliedRuleApps(),
-            goals.size() <= info.getGoals().size() ? (info.getGoals().size() - goals.size()) : 0);
-    }
-
     public void addInfo(String key, Object value) {
         proofMacroSpecificData.put(key, value);
     }

@@ -8,7 +8,7 @@ import org.key_project.prover.proof.ProofGoal;
 /**
  * <p>
  * Implementation of this interface can be used by implementations of
- * {@link org.key_project.prover.engine.ProverCore}
+ * {@link ProverCore}
  * to determine if the strategy should stop or continue.
  * </p>
  * <p>
