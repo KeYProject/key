@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -72,7 +73,7 @@ public class NoFindTaclet extends Taclet {
     }
 
     @Override
-    public NoFindTaclet setName(String s) {
+    public @NonNull NoFindTaclet setName(@NonNull String s) {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
                 varsNotFreeIn(),

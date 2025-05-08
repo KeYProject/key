@@ -67,7 +67,7 @@ public class AntecTaclet extends FindTaclet {
     }
 
     @Override
-    public AntecTaclet setName(String s) {
+    public @NonNull AntecTaclet setName(@NonNull String s) {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
                 varsNotFreeIn(),
