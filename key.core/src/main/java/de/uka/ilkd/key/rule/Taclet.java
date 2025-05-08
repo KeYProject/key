@@ -514,7 +514,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         }
     }
 
-    public abstract Taclet setName(String s);
+    public abstract @NonNull Taclet setName(@NonNull String s);
 
     /**
      * Information about the origin of the taclet. Should be a location where the user can find the

@@ -5,6 +5,7 @@ package org.key_project.prover.rules;
 
 import java.util.Iterator;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -29,6 +30,9 @@ import static org.key_project.util.Strings.formatAsList;
  * within the KeY verification system.
  */
 public abstract class Taclet implements Rule {
+    /**
+     * Annotations attached to taclets, specifying their kind, e.g., lemma.
+     */
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
     /** unique name of the taclet */
@@ -38,7 +42,7 @@ public abstract class Taclet implements Rule {
     protected final String displayName;
 
     /** contains the find term */
-    protected final SyntaxElement find;
+    protected final @Nullable SyntaxElement find;
 
     protected final ApplicationRestriction applicationRestriction;
 
@@ -85,16 +89,16 @@ public abstract class Taclet implements Rule {
     protected final ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
 
     /** cache; contains set of all bound variables */
-    protected ImmutableSet<QuantifiableVariable> boundVariables = null;
+    protected @Nullable ImmutableSet<QuantifiableVariable> boundVariables = null;
 
     /** tracks state of pre-computation */
     private boolean contextInfoComputed = false;
     private boolean contextIsInPrefix = false;
 
-    protected String tacletAsString;
+    protected @Nullable String tacletAsString;
 
     /** Set of schema variables of the {@code assumes} part */
-    protected ImmutableSet<SchemaVariable> assumesVariables = null;
+    protected @Nullable ImmutableSet<SchemaVariable> assumesVariables = null;
 
     /**
      * list of rulesets (formerly known as heuristics) the taclet belongs to
@@ -104,7 +108,7 @@ public abstract class Taclet implements Rule {
     /**
      * trigger of the taclet
      */
-    protected final Trigger trigger;
+    protected final @Nullable Trigger trigger;
 
     // The two rule engines for matching and execution (application) of taclets
     // In the long run, we should think about keeping those somewhere else, e.g., in the services
@@ -173,7 +177,7 @@ public abstract class Taclet implements Rule {
         return trigger != null;
     }
 
-    public Trigger getTrigger() {
+    public @Nullable Trigger getTrigger() {
         return trigger;
     }
 
@@ -225,7 +229,7 @@ public abstract class Taclet implements Rule {
      * @param var the SchemaVariable to look for
      * @return the sort of the SV to match or the SV it shares the same match-sort with
      */
-    public NewVarcond varDeclaredNew(SchemaVariable var) {
+    public@Nullable NewVarcond varDeclaredNew(SchemaVariable var) {
         for (final NewVarcond nv : varsNew) {
             if (nv.getSchemaVariable() == var) {
                 return nv;
@@ -322,7 +326,7 @@ public abstract class Taclet implements Rule {
      * @param sv the Schemavariable
      * @return prefix of schema variable sv
      */
-    public TacletPrefix getPrefix(SchemaVariable sv) {
+    public @Nullable TacletPrefix getPrefix(SchemaVariable sv) {
         return prefixMap.get(sv);
     }
 
@@ -477,10 +481,11 @@ public abstract class Taclet implements Rule {
     }
 
     public @NonNull <G extends ProofGoal<@NonNull G>> TacletExecutor<@NonNull G, ?> getExecutor() {
+        //noinspection unchecked
         return (TacletExecutor<@NonNull G, ?>) executor;
     }
 
-    public abstract Taclet setName(String s);
+    public abstract Taclet setName(String name);
 
     public ImmutableList<RuleSet> getRuleSets() {
         return ruleSets;
@@ -523,7 +528,7 @@ public abstract class Taclet implements Rule {
         /**
          * If the surrounding formula has been decomposed completely, the find-term will NOT appear
          * on
-         * the antecedent. The formula {@code wellformed(h)} in {@code==> wellformed(h)} or in
+         * the antecedent. The formula {@code wellformed(h)} in {@code ==> wellformed(h)} or in
          * {@code wellformed(h) ->
          * (inv(h) = inv(h2)) ==>} or in
          * {@code \if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>}

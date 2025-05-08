@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.tacletbuilder;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Taclet;
@@ -84,7 +85,7 @@ public abstract class TacletGoalTemplate {
         return addedProgVars;
     }
 
-    public Object replaceWithExpressionAsObject() {
+    public @Nullable Object replaceWithExpressionAsObject() {
         return null;
     }
 
