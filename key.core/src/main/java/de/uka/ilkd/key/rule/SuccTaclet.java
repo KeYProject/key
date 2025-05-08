@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.executor.javadl.SuccTacletExecutor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -67,7 +68,7 @@ public class SuccTaclet extends FindTaclet {
     }
 
     @Override
-    public SuccTaclet setName(String s) {
+    public @NonNull SuccTaclet setName(@NonNull String s) {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
                 varsNotFreeIn(),

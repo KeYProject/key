@@ -7,6 +7,7 @@ import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExe
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -92,7 +93,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
     }
 
     @Override
-    public InfFlowContractAppTaclet setName(String s) {
+    public @NonNull InfFlowContractAppTaclet setName(@NonNull String s) {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
                 varsNotFreeIn(),
