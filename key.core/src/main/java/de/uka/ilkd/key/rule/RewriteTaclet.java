@@ -192,7 +192,7 @@ public class RewriteTaclet extends FindTaclet {
     }
 
     @Override
-    public RewriteTaclet setName(String s) {
+    public @NonNull RewriteTaclet setName(@NonNull String s) {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
                 varsNotFreeIn(),
