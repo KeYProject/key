@@ -229,7 +229,6 @@ public class KeYFile implements EnvInput {
 
     @Override
     public File readBootClassPath() {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) {
