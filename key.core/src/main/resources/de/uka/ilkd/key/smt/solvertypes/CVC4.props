@@ -1,3 +1,4 @@
+experimental=true
 params=--no-print-success --produce-models --no-interactive --lang smt2
 timeout=-1
 name=CVC4
