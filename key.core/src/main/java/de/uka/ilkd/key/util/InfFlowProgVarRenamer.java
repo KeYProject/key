@@ -28,6 +28,7 @@ import org.key_project.logic.op.Function;
  *
  * @author christoph
  */
+@SuppressWarnings("nullness")
 public class InfFlowProgVarRenamer extends TermBuilder {
     /** The set of terms on which the renaming should be applied. */
     private final Term[] terms;

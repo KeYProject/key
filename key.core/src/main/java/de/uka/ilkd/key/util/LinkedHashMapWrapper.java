@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
  * @param <K> the type of the keys in the wrapped LinkedHashMap
  * @param <V> the type of the values in the wrapped LinkedHashMap
  */
+@SuppressWarnings("nullness")
 public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /*
      * Internally, the elements are wrapped so that EqualsModProperty can be used for equality

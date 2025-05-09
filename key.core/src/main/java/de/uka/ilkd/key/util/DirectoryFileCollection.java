@@ -29,6 +29,7 @@ import recoder.io.DataLocation;
  *
  * @author MU
  */
+@SuppressWarnings("nullness")
 public class DirectoryFileCollection implements FileCollection {
 
     /** directory under inspection */

@@ -40,6 +40,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Richard Bubel
  */
+@SuppressWarnings("nullness")
 public class ProofStarter {
 
     /**

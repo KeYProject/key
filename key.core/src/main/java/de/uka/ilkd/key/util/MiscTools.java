@@ -63,6 +63,7 @@ import recoder.io.DataLocation;
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
  */
+@SuppressWarnings("nullness")
 public final class MiscTools {
 
     /**
