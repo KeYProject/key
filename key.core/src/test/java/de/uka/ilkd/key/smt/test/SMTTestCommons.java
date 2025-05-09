@@ -4,9 +4,6 @@
 package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.TermServices;
@@ -15,14 +12,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SMTTestSettings;
-import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Tag;
 
@@ -33,21 +27,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * this class directly but derive subclasses to implement tests.
  */
 @Tag("slow")
-public abstract class TestCommons {
-    protected static final String folder =
+public abstract class SMTTestCommons {
+    protected static final String FOLDER =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
             + File.separator + "tacletTranslation" + File.separator;
-    /**
-     * The set of taclets
-     */
-    private final Collection<Taclet> taclets = new LinkedList<>();
-    InitConfig initConfig = null;
-    static protected ProblemInitializer initializer = null;
-    static protected final Profile profile = init();
-
-    static Profile init() {
-        return new JavaProfile();
-    }
+    protected static ProblemInitializer initializer = null;
+    protected static final Profile profile = new JavaProfile();
 
     private TermServices services;
 
@@ -62,96 +47,65 @@ public abstract class TestCommons {
      */
     public abstract SolverType getSolverType();
 
-    public abstract boolean toolNotInstalled();
+    public abstract boolean toolInstalled();
 
-    protected boolean correctResult(String filepath, boolean isValid)
+    protected SMTSolverResult.ThreeValuedTruth getResult(SMTSolverResult.ThreeValuedTruth expected,
+            String filepath)
             throws ProblemLoaderException {
-        Assumptions.assumeFalse(toolNotInstalled());
-        SMTSolverResult result = checkFile(filepath);
-        // unknown is always allowed. But wrong answers are not allowed
-        return correctResult(isValid, result);
-    }
-
-    protected boolean correctResult(Goal g, boolean isValid) {
-        return correctResult(isValid, checkGoal(g));
-    }
-
-    private boolean correctResult(boolean isValid, SMTSolverResult result) {
-        if (isValid && result != null) {
-            return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE;
-        } else {
-            return result.isValid() != SMTSolverResult.ThreeValuedTruth.VALID;
-        }
+        Assumptions.assumeTrue(toolInstalled());
+        return checkFile(expected, filepath).isValid();
     }
 
     /**
      * check a problem file
      *
+     * @param expected the expected result. Needed for setting a shorter timeout for unknown cases
      * @param filepath the path to the file
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
-    protected SMTSolverResult checkFile(String filepath) throws ProblemLoaderException {
+    protected SMTSolverResult checkFile(SMTSolverResult.ThreeValuedTruth expected, String filepath)
+            throws ProblemLoaderException {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
             Proof proof = p.getLoadedProof();
             assertNotNull(proof);
             assertEquals(1, proof.openGoals().size());
             Goal g = proof.openGoals().iterator().next();
-            return checkGoal(g);
+            return checkGoal(expected, g);
         } finally {
             p.dispose();
         }
     }
 
-    private SMTSolverResult checkGoal(Goal g) {
-        SolverLauncher launcher = new SolverLauncher(new SMTTestSettings());
+    private @NonNull SMTSolverResult checkGoal(SMTSolverResult.ThreeValuedTruth expected, Goal g) {
+        SMTTestSettings settings = new SMTTestSettings();
+        if (expected == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
+            /*
+             * Hack: For test cases with unknown/timeout as expected result, we do not want to hold
+             * up the test unnecessarily long, so we set a short SMT timeout.
+             */
+            settings.setTimeout(2000);
+        }
+        SolverLauncher launcher = new SolverLauncher(settings);
         SMTProblem problem = new SMTProblem(g);
         launcher.launch(problem, g.proof().getServices(), getSolverType());
         return problem.getFinalResult();
     }
-
 
     protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
         return KeYEnvironment.load(new File(filepath), null, null, null);
     }
 
     /**
-     * Returns a set of taclets that can be used for tests. REMARK: First you have to call
-     * <code>parse</code> to instantiate the set of taclets.
-     *
-     * @return set of taclets.
-     */
-    protected Collection<Taclet> getTaclets() {
-        if (taclets.isEmpty()) {
-            if (initConfig == null) {
-                parse();
-            }
-            for (Taclet t : initConfig.getTaclets()) {
-                taclets.add(t);
-            }
-        }
-        return taclets;
-    }
-
-    protected HashSet<String> getTacletNames() {
-        Collection<Taclet> set = getTaclets();
-        HashSet<String> names = new HashSet<>();
-        for (Taclet taclet : set) {
-            names.add(taclet.name().toString());
-        }
-        return names;
-    }
-
-    /**
      * Use this method if you only need taclets for testing.
      */
     protected ProofAggregate parse() {
-        return parse(new File(folder + "dummyFile.key"));
+        return parse(new File(FOLDER + "dummyFile.key"));
     }
 
     /**
-     * Calls <code>parse(File file, Profile profile) with the standard profile for testing.
+     * Calls <code>parse(File file, Profile profile)</code> with the standard profile for testing.
      */
     protected ProofAggregate parse(File file) {
         return parse(file, profile);
@@ -173,7 +127,7 @@ public abstract class TestCommons {
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }
-            initConfig = initializer.prepare(po);
+            InitConfig initConfig = initializer.prepare(po);
             result = initializer.startProver(initConfig, po);
             services = initConfig.getServices();
             // po.close();

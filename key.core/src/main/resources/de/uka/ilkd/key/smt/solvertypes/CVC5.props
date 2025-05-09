@@ -1,10 +1,10 @@
 params=--no-interactive --produce-models --lang smt2
 timeout=-1
-name=CVC5
-info=CVC5 solver (https://cvc5.github.io/).
+name=cvc5
+info=cvc5 solver (https://cvc5.github.io/).
 command=cvc5
 version=--version
-socketClass=de.uka.ilkd.key.smt.communication.CVC5Socket
+socketClass=de.uka.ilkd.key.smt.communication.Cvc5Socket
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
 de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
 de.uka.ilkd.key.smt.newsmt2.QuantifierHandler,\
