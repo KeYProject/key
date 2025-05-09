@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.test;
 
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
 import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.stream.Stream;
 
 import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.UNKNOWN;
 import static de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth.VALID;
