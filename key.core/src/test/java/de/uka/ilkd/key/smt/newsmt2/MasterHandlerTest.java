@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -27,6 +22,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTSettings;
+import de.uka.ilkd.key.smt.SmtTestUtils;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
@@ -34,6 +30,7 @@ import de.uka.ilkd.key.util.LineProperties;
 
 import org.key_project.util.Streams;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
@@ -89,7 +86,7 @@ public class MasterHandlerTest {
 
         List<Path> files;
         try (var s = Files.list(directory)) {
-            files = s.collect(Collectors.toList());
+            files = s.toList();
         }
         List<Arguments> result = new ArrayList<>(files.size());
         for (Path file : files) {
@@ -129,7 +126,7 @@ public class MasterHandlerTest {
                 Path srcDir = Files.createTempDirectory("SMT_key_" + name);
                 Path tmpSrc = srcDir.resolve("src.java");
                 Files.write(tmpSrc, sources);
-                lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
+                lines.addFirst("\\javaSource \"" + srcDir + "\";\n");
             }
 
             Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
@@ -158,7 +155,7 @@ public class MasterHandlerTest {
         }
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return name;
         }
     }
@@ -194,9 +191,9 @@ public class MasterHandlerTest {
     @ParameterizedTest
     @MethodSource("data")
     public void testZ3(TestData data) throws Exception {
+        SmtTestUtils.assumeZ3Installed();
+
         Assumptions.assumeTrue(Z3_SOLVER != null);
-        Assumptions.assumeTrue(Z3_SOLVER.isInstalled(false),
-            "Z3 is not installed, this testcase is ignored.");
 
         String expectation = data.props.get("expected");
         Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");

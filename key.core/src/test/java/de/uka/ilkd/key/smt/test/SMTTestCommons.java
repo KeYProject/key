@@ -17,7 +17,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.jspecify.annotations.NonNull;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Tag;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,7 +51,7 @@ public abstract class SMTTestCommons {
     protected SMTSolverResult.ThreeValuedTruth getResult(SMTSolverResult.ThreeValuedTruth expected,
             String filepath)
             throws ProblemLoaderException {
-        Assumptions.assumeTrue(toolInstalled());
+        SmtTestUtils.assumeSmtIsInstalled(toolInstalled());
         return checkFile(expected, filepath).isValid();
     }
 
