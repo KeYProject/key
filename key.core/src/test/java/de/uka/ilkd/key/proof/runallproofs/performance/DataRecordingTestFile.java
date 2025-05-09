@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
@@ -28,7 +28,7 @@ class DataRecordingTestFile extends TestFile {
 
     @Override
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            ProofScriptEntry script) throws Exception {
+            KeyAst.ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             DataRecordingStrategy strategy = new DataRecordingStrategy(loadedProof, this);
