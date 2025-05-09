@@ -47,6 +47,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.checkerframework.checker.nullness.util.NullnessUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Filenames;
@@ -63,7 +64,6 @@ import recoder.io.DataLocation;
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
  */
-@SuppressWarnings("nullness")
 public final class MiscTools {
 
     /**
@@ -148,7 +148,9 @@ public final class MiscTools {
         }
 
         if (isPermissions(services)) {
-            result.add(services.getTypeConverter().getHeapLDT().getPermissionHeap());
+            LocationVariable permissionHeap = services.getTypeConverter().getHeapLDT().getPermissionHeap();
+            result.add(NullnessUtil.castNonNull(permissionHeap, "permission heap is null"));
+
         }
         return result;
     }
@@ -251,7 +253,7 @@ public final class MiscTools {
         ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
         if (t.op() instanceof IObserverFunction obs) {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
-            result = result.add(new Pair<>(s, obs));
+            result = result.add(new Pair<>(NullnessUtil.castNonNull(s), obs));
         }
         for (Term sub : t.subs()) {
             result = result.union(collectObservers(sub));
