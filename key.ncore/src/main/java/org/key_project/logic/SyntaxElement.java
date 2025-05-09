@@ -4,8 +4,14 @@
 package org.key_project.logic;
 
 /**
- * This interface declares the methods common to all logic related (terms, formulas, programs)
- * AST nodes.
+ * This interface defines the base class for abstract syntax tree structures regardless of the
+ * underlying language. All tree-like structures should implement this interface.
+ * <p>
+ * For navigating the syntax elements, see {@link SyntaxElementCursor}.
+ * </p>
+ * <p>
+ * If a class has no children, it should implement {@link TerminalSyntaxElement}.
+ * </p>
  */
 public interface SyntaxElement {
     /**
@@ -23,6 +29,9 @@ public interface SyntaxElement {
      */
     int getChildCount();
 
+    /**
+     * @return a new cursor for the subtree with the current node as root.
+     */
     default SyntaxElementCursor getCursor() {
         return new SyntaxElementCursor(this);
     }
