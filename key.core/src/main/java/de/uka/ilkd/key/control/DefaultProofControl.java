@@ -113,9 +113,9 @@ public class DefaultProofControl extends AbstractProofControl {
         public void run() {
             try {
                 fireAutoModeStarted(new ProofEvent(proof));
-                ProofStarter starter = new ProofStarter(
-                    new CompositePTListener(getDefaultProverTaskListener(), ptl), false);
-                starter.init(proof);
+                ProofStarter starter = new ProofStarter.Builder(
+                    new CompositePTListener(getDefaultProverTaskListener(), ptl), false)
+                        .build(proof);
                 if (goals != null) {
                     starter.start(goals);
                 } else {
