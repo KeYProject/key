@@ -92,7 +92,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
      */
     private ProofIndependentSMTSettings() {
         // load solver props from standard directory, see PathConfig
-        Collection<SolverType> legacyTypes = SolverTypes.getLegacySolvers();
+        Collection<SolverType> legacyTypes = SolverTypes.getExperimentalSolvers();
         Collection<SolverType> nonLegacyTypes = SolverTypes.getSolverTypes();
         solverTypes.addAll(nonLegacyTypes);
         nonLegacyTypes.removeAll(legacyTypes);
