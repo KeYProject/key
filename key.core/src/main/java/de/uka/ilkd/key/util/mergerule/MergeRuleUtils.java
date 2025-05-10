@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
@@ -1934,7 +1935,7 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
+        public Set<java.util.Map.Entry<@KeyFor("this") LocationVariable, LocationVariable>> entrySet() {
             throw new UnsupportedOperationException();
         }
     }

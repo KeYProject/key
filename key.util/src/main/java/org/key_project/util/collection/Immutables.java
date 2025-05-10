@@ -149,7 +149,7 @@ public final class Immutables {
      */
     public static <T extends @Nullable Object> ImmutableSet<T> createSetFrom(
             Iterable<? extends T> iterable) {
-        return DefaultImmutableSet.fromImmutableList(createListFrom(iterable));
+        return DefaultImmutableSet.<T>fromImmutableList(createListFrom(iterable));
     }
 
     /**
@@ -163,7 +163,7 @@ public final class Immutables {
      *
      * @return the view onto the iterable as an immutable list
      */
-    public static <T> ImmutableList<T> createListFrom(Iterable<? extends T> iterable) {
+    public static <T extends @Nullable Object> ImmutableList<T> createListFrom(Iterable<? extends T> iterable) {
         ImmutableList<T> result = ImmutableSLList.nil();
         for (T t : iterable) {
             result = result.prepend(t);

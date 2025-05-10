@@ -162,7 +162,7 @@ public class ImmutableArray<S extends @Nullable Object>
         return new ArrayIterator<>(this);
     }
 
-    private static class ArrayIterator<T> implements Iterator<T> {
+    private static class ArrayIterator<T extends @Nullable Object> implements Iterator<T> {
 
         private int i = 0;
         private final ImmutableArray<T> coll;
