@@ -5,7 +5,6 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
