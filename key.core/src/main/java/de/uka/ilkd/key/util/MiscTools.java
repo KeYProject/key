@@ -254,7 +254,7 @@ public final class MiscTools {
         ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
         if (t.op() instanceof IObserverFunction obs) {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
-            result = result.add(new Pair<>(NullnessUtil.castNonNull(s), obs));
+            result = result.add(new Pair<Sort, IObserverFunction>(NullnessUtil.castNonNull(s), obs));
         }
         for (Term sub : t.subs()) {
             result = result.union(collectObservers(sub));
