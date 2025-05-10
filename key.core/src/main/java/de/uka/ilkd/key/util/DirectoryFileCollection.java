@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.checkerframework.checker.nullness.util.NullnessUtil;
 import org.jspecify.annotations.Nullable;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
@@ -29,7 +30,6 @@ import recoder.io.DataLocation;
  *
  * @author MU
  */
-@SuppressWarnings("nullness")
 public class DirectoryFileCollection implements FileCollection {
 
     /** directory under inspection */
@@ -181,7 +181,7 @@ public class DirectoryFileCollection implements FileCollection {
         }
 
         public DataLocation getCurrentDataLocation() {
-            return new DataFileLocation(currentFile);
+            return new DataFileLocation(NullnessUtil.castNonNull(currentFile, "trying to open null file"));
         }
     }
 
