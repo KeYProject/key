@@ -368,7 +368,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * layout the component
      */
     protected void layoutKeYComponent() {
-        delegateView.setBackground(Color.white);
         delegateView.setCellRenderer(renderer);
         delegateView.putClientProperty("JTree.lineStyle", "Angled");
         delegateView.setVisible(true);

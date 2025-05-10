@@ -64,7 +64,10 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
@@ -404,15 +407,15 @@ public final class MainWindow extends JFrame {
             }
             return instance;
         }
-        if (instance == null) {
-            // FlatDarculaLaf.setup();
-            FlatLightLaf.setup();
 
-            if (SystemInfo.isLinux) {
-                // enable custom window decorations
-                JFrame.setDefaultLookAndFeelDecorated(true);
-                JDialog.setDefaultLookAndFeelDecorated(true);
-            }
+        if (instance == null) {
+            updateLookAndFeel();
+            final var viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+            final PropertyChangeListener propertyChangeListener = (evt) -> updateLookAndFeel();
+            viewSettings.addPropertyChangeListener(
+                ViewSettings.PROP_DEFAULT_LOOK_AND_FEEL_DECORATED, propertyChangeListener);
+            viewSettings.addPropertyChangeListener(
+                ViewSettings.PROP_LOOK_AND_FEEL, propertyChangeListener);
 
             instance = new MainWindow();
             if (ensureIsVisible) {
@@ -420,6 +423,23 @@ public final class MainWindow extends JFrame {
             }
         }
         return instance;
+    }
+
+    private static void updateLookAndFeel() {
+        final var viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        String laf = viewSettings.getLookAndFeel();
+        try {
+            UIManager.setLookAndFeel(laf);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException e) {
+            FlatLightLaf.setup();
+        }
+
+        if (SystemInfo.isLinux) {
+            // enable custom window decorations
+            JFrame.setDefaultLookAndFeelDecorated(viewSettings.isDefaultLookAndFeelDecorated());
+            JDialog.setDefaultLookAndFeelDecorated(viewSettings.isDefaultLookAndFeelDecorated());
+        }
     }
 
     /**
