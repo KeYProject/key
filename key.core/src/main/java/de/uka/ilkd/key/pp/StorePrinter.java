@@ -71,7 +71,7 @@ class StorePrinter extends FieldPrinter {
             final Term fieldTerm = t.sub(2);
             final Term valueTerm = t.sub(3);
 
-            if (isStaticFieldConstant(objectTerm, fieldTerm)) {
+            if (isStaticFieldConstant(fieldTerm)) {
                 printStoreOnStaticField(lp, heapTerm, fieldTerm, valueTerm, closingBrace);
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 printStoreOnGenericFieldConstant(lp, heapTerm, objectTerm, fieldTerm, valueTerm,

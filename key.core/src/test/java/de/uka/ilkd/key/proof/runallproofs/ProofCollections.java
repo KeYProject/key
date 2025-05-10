@@ -650,6 +650,8 @@ public class ProofCollections {
         g.provable("standard_key/staticInitialisation/objectOfErroneousClass.key");
         g.provable("standard_key/staticInitialisation/staticInitialisersAreNonSimple.key");
         g.provable("standard_key/types/disjoint.key");
+        g.provable("standard_key/types/finalTypes.key");
+        g.notprovable("standard_key/types/finalTypes_unprovable.key");
         g.provable("../../key.core/src/test/resources/testcase/classpath/classpath.key");
         g.notprovable("heap/inconsistent_represents/MyClass_m.key");
         g.notprovable("heap/inconsistent_represents/MyClass_n.key");

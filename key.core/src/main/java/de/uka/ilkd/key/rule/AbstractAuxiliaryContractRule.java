@@ -156,17 +156,18 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     /**
      * This encapsulates all information from the rule application that is needed to apply the rule.
      *
-     * @param update    The context update.
-     * @param formula   The update target.
-     * @param modality  The contract's modality.
-     * @param self      The self variable.
+     * @param update The context update.
+     * @param formula The update target.
+     * @param modality The contract's modality.
+     * @param self The self variable.
      * @param statement The statement the contract belongs to.
-     * @param context   The execution context in which the block occurs.
+     * @param context The execution context in which the block occurs.
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
-        public record Instantiation(@NonNull Term update, @NonNull Term formula, @NonNull Modality modality, Term self,
-                                    @NonNull JavaStatement statement,
-                                    ExecutionContext context) {
+    public record Instantiation(@NonNull Term update, @NonNull Term formula,
+            @NonNull Modality modality, Term self,
+            @NonNull JavaStatement statement,
+            ExecutionContext context) {
         public Instantiation {
             assert update != null;
             assert update.sort() == JavaDLTheory.UPDATE;
@@ -176,13 +177,13 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             assert statement != null;
         }
 
-            /**
-             * @return {@code true} iff the modality is transactional.
-             */
-            public boolean isTransactional() {
-                return modality.transaction();
-            }
+        /**
+         * @return {@code true} iff the modality is transactional.
+         */
+        public boolean isTransactional() {
+            return modality.transaction();
         }
+    }
 
     /**
      * A builder for {@link Instantiation}s.

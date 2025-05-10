@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.util.properties;
 
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractProperties implements Properties {
 

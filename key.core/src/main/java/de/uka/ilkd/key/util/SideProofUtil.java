@@ -126,7 +126,7 @@ public final class SideProofUtil {
         // Create ProofStarter
         // TODO: Avoid proof environment use only InitConfig
         ProofStarter starter = new ProofStarter.Builder(false)
-        .build(sequentToProve, sideProofEnvironment, proofName);
+                .build(sequentToProve, sideProofEnvironment, proofName);
         return starter;
     }
 }

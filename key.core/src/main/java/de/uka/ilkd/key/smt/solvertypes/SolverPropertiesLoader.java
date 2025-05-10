@@ -48,9 +48,9 @@ public class SolverPropertiesLoader {
      */
     private static final Collection<SolverType> SOLVERS = new ArrayList<>(5);
     /**
-     * The LEGACY solvers loaded by this loader.
+     * The EXPERIMENTAL solvers loaded by this loader.
      */
-    private static final Collection<SolverType> LEGACY_SOLVERS = new ArrayList<>(2);
+    private static final Collection<SolverType> EXPERIMENTAL_SOLVERS = new ArrayList<>(2);
 
     /**
      * String used to SPLIT list properties such as the delimiter list or the handler list.
@@ -135,10 +135,10 @@ public class SolverPropertiesLoader {
      */
     private static final String MIN_VERSION = "minVersion";
     /**
-     * The .props key for signalling whether the solver is a LEGACY solver (only used in
+     * The .props key for signalling whether the solver is an EXPERIMENTAL solver (only used in
      * experimental mode). Default value is false.
      */
-    private static final String LEGACY = "legacy";
+    private static final String EXPERIMENTAL = "experimental";
     /**
      * The .props key for the solver's
      * {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}. Default socket is
@@ -170,7 +170,7 @@ public class SolverPropertiesLoader {
      * All supported keys for solver props files.
      */
     private static final String[] SUPPORTED_KEYS = { NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
-        INFO, MIN_VERSION, LEGACY, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
+        INFO, MIN_VERSION, EXPERIMENTAL, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
         HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE };
 
     /**
@@ -211,10 +211,12 @@ public class SolverPropertiesLoader {
             for (Properties solverProp : loadSolvers()) {
                 SolverType createdType = makeSolver(solverProp);
                 SOLVERS.add(createdType);
-                // If the solver is a LEGACY solver (only available in experimental mode),
-                // add it to the separate list:
-                if (SettingsConverter.read(solverProp, LEGACY, false)) {
-                    LEGACY_SOLVERS.add(createdType);
+                /*
+                 * If the solver is an EXPERIMENTAL solver (only available in experimental mode),
+                 * add it to the separate list:
+                 */
+                if (SettingsConverter.read(solverProp, EXPERIMENTAL, false)) {
+                    EXPERIMENTAL_SOLVERS.add(createdType);
                 }
             }
         }
@@ -222,11 +224,11 @@ public class SolverPropertiesLoader {
     }
 
     /**
-     * @return a copy of the created list of legacy solvers
+     * @return a copy of the created list of experimental solvers
      */
-    public Collection<SolverType> getLegacySolvers() {
+    public Collection<SolverType> getExperimentalSolvers() {
         getSolvers();
-        return new ArrayList<>(LEGACY_SOLVERS);
+        return new ArrayList<>(EXPERIMENTAL_SOLVERS);
     }
 
     /**

@@ -12,8 +12,9 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The macro FinishSymbolicExecutionMacro continues automatic rule application until there is no

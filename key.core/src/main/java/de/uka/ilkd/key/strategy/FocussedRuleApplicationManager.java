@@ -12,7 +12,6 @@ import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -54,7 +53,7 @@ public class FocussedRuleApplicationManager
     }
 
     public FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, Goal goal,
-                                          PosInOccurrence focussedSubterm) {
+            PosInOccurrence focussedSubterm) {
         this(delegate, goal, goal.getFormulaTagManager().getTagForPos(focussedSubterm.topLevel()),
             focussedSubterm, true);
 

@@ -12,8 +12,9 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Apply a single proof step.

@@ -15,10 +15,10 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
-import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.util.collection.*;
 import org.key_project.util.lookup.Lookup;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

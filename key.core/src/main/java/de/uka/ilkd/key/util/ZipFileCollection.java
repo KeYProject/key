@@ -15,7 +15,6 @@ import java.util.zip.ZipFile;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
-import org.checkerframework.checker.units.qual.N;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

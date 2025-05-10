@@ -397,12 +397,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
 
         // configure contract
-        final DependencyContract contract =
+        DependencyContract contract =
             (DependencyContract) ((UseDependencyContractApp) ruleApp).getInstantiation();
+
         assert contract != null;
 
         // get step
-        final PosInOccurrence step = ((UseDependencyContractApp) ruleApp).step();
+        final PosInOccurrence step =
+            ((UseDependencyContractApp) ruleApp).step();
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);

@@ -371,9 +371,9 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
 
-    private RewriteTacletBuilder<RewriteTaclet> createAxiomTaclet(
+    private TacletBuilder<NoFindTaclet> createAxiomTaclet(
             KeYParser.Datatype_declContext ctx) {
-        var tacletBuilder = new RewriteTacletBuilder<>();
+        var tacletBuilder = new NoFindTacletBuilder();
         tacletBuilder.setName(new Name(String.format("%s_Axiom", ctx.name.getText())));
         final var sort = sorts().lookup(ctx.name.getText());
         var phi = declareSchemaVariable(ctx, "phi", JavaDLTheory.FORMULA, true,
@@ -383,8 +383,6 @@ public class TacletPBuilder extends ExpressionBuilder {
             true, false, false,
             new SchemaVariableModifierSet.VariableSV());
         var find = tb.all(qvar, tb.var(phi)); // \forall #x #phi
-        tacletBuilder.setFind(find);
-        tacletBuilder.addVarsNotFreeIn(qvar, phi);
 
         var cases = ctx.datatype_constructor().stream()
                 .map(it -> createQuantifiedFormula(it, qvar, tb.var(phi), sort))

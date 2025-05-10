@@ -126,7 +126,8 @@ public class DependencyGraph {
      * @param toNode the incoming node of the edge
      * @param annotation annotation associated to the edge
      */
-    public record Edge(Node fromNode, GraphNode toNode, AnnotatedEdge annotation) {}
+    public record Edge(Node fromNode, GraphNode toNode, AnnotatedEdge annotation) {
+    }
 
     /**
      * Returns the incoming edges of the given node.

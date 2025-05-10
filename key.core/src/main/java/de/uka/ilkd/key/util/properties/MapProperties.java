@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.properties;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.IdentityHashMap;
+
+import org.jspecify.annotations.Nullable;
 
 public class MapProperties extends AbstractProperties {
 

@@ -209,14 +209,14 @@ public final class SourceView extends JComponent {
         // add a listener for changes in the proof tree
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 if (!mainWindow.getMediator().isInAutoMode()) {
                     updateGUI();
                 }
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 clear();
                 ensureProofJavaSourceCollectionExists(e.getSource().getSelectedProof());
                 updateGUI();
@@ -634,7 +634,6 @@ public final class SourceView extends JComponent {
 
     private void clear() {
         lines = null;
-        tabs.forEach((a, b) -> b.dispose());
         tabs.clear();
         tabPane.removeAll();
     }
@@ -936,7 +935,8 @@ public final class SourceView extends JComponent {
         /**
          * The JavaDocument shown in this tab.
          */
-        private JavaDocument doc = null;
+        private final SourceHighlightDocument doc =
+            new SourceHighlightDocument(new JavaJMLEditorLexer());
 
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
@@ -944,7 +944,7 @@ public final class SourceView extends JComponent {
 
             try {
                 String text = IOUtil.readFrom(stream);
-                if (text != null && !text.isEmpty()) {
+                if (!text.isEmpty()) {
                     source = replaceTabs(text);
                 } else {
                     source = "[SOURCE COULD NOT BE LOADED]";
@@ -1012,7 +1012,6 @@ public final class SourceView extends JComponent {
 
             // insert source code into text pane
             try {
-                doc = new JavaDocument();
                 textPane.setDocument(doc);
                 doc.insertString(0, source, new SimpleAttributeSet());
             } catch (BadLocationException e) {
@@ -1188,12 +1187,6 @@ public final class SourceView extends JComponent {
         private void scrollToLine(int line) {
             int offs = lineInformation[line].getOffset();
             textPane.setCaretPosition(offs);
-        }
-
-        private void dispose() {
-            if (doc != null) {
-                doc.dispose();
-            }
         }
     }
 

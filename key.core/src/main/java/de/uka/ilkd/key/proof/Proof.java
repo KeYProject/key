@@ -30,15 +30,15 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -789,7 +789,8 @@ public class Proof implements Named {
 
 
     public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
-        @Nullable Node cur = child;
+        @Nullable
+        Node cur = child;
         do {
             visitor.visit(this, cur);
             cur = cur.parent();
@@ -1352,7 +1353,8 @@ public class Proof implements Named {
         for (Goal g : todo) {
             reOpenGoal(g);
             @SuppressWarnings("nullness") // Node lookup always contains ClosedBy datum
-            @NonNull ClosedBy c = g.node().lookup(ClosedBy.class);
+            @NonNull
+            ClosedBy c = g.node().lookup(ClosedBy.class);
             g.node().deregister(c, ClosedBy.class);
             try {
                 new CopyingProofReplayer(c.proof(), this).copy(c.node(), g, c.nodesToSkip());

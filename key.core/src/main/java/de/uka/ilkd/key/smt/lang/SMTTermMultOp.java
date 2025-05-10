@@ -45,21 +45,21 @@ public class SMTTermMultOp extends SMTTerm {
 
         public Op sign(boolean pol) {
             return switch (this) {
-                case AND -> {
-                    if (pol) {
-                        yield  this;
-                    }
-                    yield OR;
+            case AND -> {
+                if (pol) {
+                    yield this;
                 }
-                case OR -> {
-                    if (pol) {
-                        yield this;
-                    }
-                    yield AND;
+                yield OR;
+            }
+            case OR -> {
+                if (pol) {
+                    yield this;
                 }
-                default -> throw new RuntimeException(
-                        "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
-                                + this);
+                yield AND;
+            }
+            default -> throw new RuntimeException(
+                "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
+                    + this);
             };
         }
     }
@@ -211,21 +211,21 @@ public class SMTTermMultOp extends SMTTerm {
     public SMTSort sort() {
 
         return switch (operator) {
-            case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM, BVSDIV -> {
-                // Sanity check
-                if (subs.size() > 1) {
-                    if (!subs.get(0).sort().equals(subs.get(1).sort())) {
-                        String error = "Unexpected: binary operation with two diff. arg sorts";
-                        error += "\n";
-                        error += this.toSting() + "\n";
-                        error += "First sort: " + subs.get(0).sort() + "\n";
-                        error += "Second sort: " + subs.get(1).sort() + "\n";
-                        throw new RuntimeException(error);
-                    }
+        case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM, BVSDIV -> {
+            // Sanity check
+            if (subs.size() > 1) {
+                if (!subs.get(0).sort().equals(subs.get(1).sort())) {
+                    String error = "Unexpected: binary operation with two diff. arg sorts";
+                    error += "\n";
+                    error += this.toSting() + "\n";
+                    error += "First sort: " + subs.get(0).sort() + "\n";
+                    error += "Second sort: " + subs.get(1).sort() + "\n";
+                    throw new RuntimeException(error);
                 }
-                yield subs.get(0).sort();
             }
-            default -> SMTSort.BOOL;
+            yield subs.get(0).sort();
+        }
+        default -> SMTSort.BOOL;
         };
     }
 

@@ -28,9 +28,9 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.checkerframework.checker.nullness.util.NullnessUtil;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class encapsulates the registration of a proof for a given problem. It then starts a proof
@@ -61,7 +61,8 @@ public class ProofStarter {
          *
          * @throws ProofInputException if getPO fails
          */
-        public ProofStarter build(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
+        public ProofStarter build(Term formulaToProve, ProofEnvironment env)
+                throws ProofInputException {
             final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
             Proof proof = input.getPO().getFirstProof();
             assert proof != null;

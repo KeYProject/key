@@ -1551,4 +1551,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return new OriginalVariables(originalSelfVar, originalResultVar, originalExcVar, atPreVars,
             originalParamVars);
     }
+
+    @Override
+    public IProgramMethod getProgramMethod() {
+        return pm;
+    }
 }
