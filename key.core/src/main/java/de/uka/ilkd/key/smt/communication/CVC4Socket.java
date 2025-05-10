@@ -48,7 +48,7 @@ public class CVC4Socket extends AbstractSolverSocket {
                 pipe.sendMessage("(exit)");
                 // pipe.close();
             } else if (msg.equals("unknown")) {
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
+                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName(), false));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
                 // pipe.close();

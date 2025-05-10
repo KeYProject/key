@@ -230,13 +230,15 @@ public interface ProofMacro {
         private final int numberSteps;
         private int completedGoals;
 
-        ProgressBarListener(String name, int numberGoals, int numberSteps, @Nullable ProverTaskListener l) {
+        ProgressBarListener(String name, int numberGoals, int numberSteps,
+                @Nullable ProverTaskListener l) {
             super(name, l);
             this.numberGoals = numberGoals;
             this.numberSteps = numberSteps;
         }
 
-        public ProgressBarListener(int size, int numberSteps, @Nullable ProverTaskListener listener) {
+        public ProgressBarListener(int size, int numberSteps,
+                @Nullable ProverTaskListener listener) {
             this("", size, numberSteps, listener);
         }
 

@@ -16,8 +16,9 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.Nullable;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES =

@@ -37,6 +37,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -214,6 +215,8 @@ public class KeYFile implements EnvInput {
                 var inc = ctx.getIncludes(file.file().getAbsoluteFile().getParentFile().toURI());
                 includes = inc;
                 return inc;
+            } catch (ParseCancellationException e) {
+                throw new ParseCancellationException(e);
             } catch (Exception e) {
                 throw new ProofInputException(e);
             }

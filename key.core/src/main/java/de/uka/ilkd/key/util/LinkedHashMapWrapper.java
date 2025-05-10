@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.Property;
 
-import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
@@ -181,7 +180,8 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V extends @Nul
      * @param keys the iterable of keys to be inserted
      * @param vals the iterable of values corresponding to the keys
      */
-    public void putAll(LinkedHashMapWrapper<K, @Nullable V> this, Iterable<K> keys, Iterable<V> vals) {
+    public void putAll(LinkedHashMapWrapper<K, @Nullable V> this, Iterable<K> keys,
+            Iterable<V> vals) {
         Iterator<V> itVals = vals.iterator();
         for (K key : keys) {
             if (itVals.hasNext()) {

@@ -295,6 +295,12 @@ public final class JMLTransformer extends RecoderModelTransformer {
                         public boolean isStatic() {
                             return false;
                         }
+
+                        @Override
+                        public boolean isFinal() {
+                            return ((FieldDeclaration) old).getModifiers()
+                                    .contains(JMLModifier.FINAL);
+                        }
                     };
                     fieldDecl.setStartPosition(old.getStartPosition());
                     fieldDecl.setEndPosition(old.getEndPosition());

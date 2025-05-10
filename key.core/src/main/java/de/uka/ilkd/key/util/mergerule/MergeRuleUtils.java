@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
@@ -32,16 +33,16 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
-import org.checkerframework.checker.nullness.qual.KeyFor;
-import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
+import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.Nullable;
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * <li>MERGE RELATED</li>
  * <li>PRIVATE</li>
  * </ol>
- * <p>
+ *
  * Feel free to make private methods publicly visible if you need them.
  *
  * @author Dominic Scheurer
@@ -635,7 +636,9 @@ public class MergeRuleUtils {
         while (n != null && !n.root() && node.getLocalProgVars().contains(var)) {
             n = n.parent();
         }
+
         return node;
+
     }
 
     /**
@@ -848,13 +851,13 @@ public class MergeRuleUtils {
      * but possibly simpler. In the ideal case, the returned formula can be literally shorter than
      * each of the two formulae; in this case, it consists of the common elements of those.
      * <p>
-     * <p>
+     *
      * The underlying idea is based upon the observation that many path conditions that should be
      * merged are conjunctions of mostly the same elements and, in addition, formulae phi and !phi
      * that vanish after creating the disjunction of the path conditions. The corresponding valid
      * formula is {@code (phi & psi) | (phi & !psi) <-> phi}
      * <p>
-     * <p>
+     *
      * For formulae that cannot be simplified by this law, the method performs two additional
      * steps:<br>
      * (1) it applies, if possible, distributivity to simplify the result<br>
@@ -1038,15 +1041,13 @@ public class MergeRuleUtils {
      * branch-unique correspondents in order to enable merging of different branches declaring local
      * variables.
      * <p>
-     * <p>
+     *
      * The problem which makes this renaming necessary is the fact that when executing a program
      * like <code>int x; x = ...</code>, the variable x is renamed to x_1, x_2 and so on in
      * different branches, which makes a "normal" merging impossible. Branch unique names are
      * tracked in the LocationVariables when they are renamed in InnerVariableNamer. Soundness is
      * not effected by the switch to branch-unique names. However, merged nodes are then of course
      * potentially different from their predecessors concerning the involved local variable symbols.
-     *
-     * TODO calls SymbolicExecutionStateWithProgCnt() with updateTerm=null, check if this is OK!
      *
      * @param node Current node.
      * @param pio Position of update-program counter formula in goal.
@@ -1118,6 +1119,7 @@ public class MergeRuleUtils {
      * @param mergeState The {@link SymbolicExecutionState} in which the partners should be merged.
      * @param mergePartnerState The {@link SymbolicExecutionState} of the second merge partner.
      * @param services The {@link Services} object.
+     *
      * @return The renamed {@link SymbolicExecutionState} of the second merge partner.
      */
     @SuppressWarnings("nullness")
@@ -1751,6 +1753,7 @@ public class MergeRuleUtils {
      * @see TermWrapperFactory
      */
     record TermWrapper(Term term, int hashcode) {
+
         @Override
         public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             return obj instanceof TermWrapper
@@ -1770,12 +1773,12 @@ public class MergeRuleUtils {
         /**
          * Adds the wrapped content of the Iterable object into the given target collection.
          *
-         * @param target            The collection to insert the wrapped terms into.
+         * @param target The collection to insert the wrapped terms into.
          * @param wrappedCollection Iterable to transform.
          * @return The target collection with inserted terms.
          */
         public static <T extends Collection<Term>> T toTermList(T target,
-                                                                Iterable<TermWrapper> wrappedCollection) {
+                Iterable<TermWrapper> wrappedCollection) {
 
             for (TermWrapper termWrapper : wrappedCollection) {
                 target.add(termWrapper.term());
@@ -1931,7 +1934,6 @@ public class MergeRuleUtils {
         }
 
         @Override
-        @SuppressWarnings("keyfor")
         public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
             throw new UnsupportedOperationException();
         }

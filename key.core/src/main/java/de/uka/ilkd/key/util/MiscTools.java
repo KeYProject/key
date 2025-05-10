@@ -47,7 +47,6 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-import org.checkerframework.checker.nullness.util.NullnessUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Filenames;
@@ -56,6 +55,7 @@ import org.key_project.util.collection.*;
 
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.TokenSource;
+import org.checkerframework.checker.nullness.util.NullnessUtil;
 import org.jspecify.annotations.Nullable;
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
@@ -148,7 +148,8 @@ public final class MiscTools {
         }
 
         if (isPermissions(services)) {
-            LocationVariable permissionHeap = services.getTypeConverter().getHeapLDT().getPermissionHeap();
+            LocationVariable permissionHeap =
+                services.getTypeConverter().getHeapLDT().getPermissionHeap();
             result.add(NullnessUtil.castNonNull(permissionHeap, "permission heap is null"));
 
         }
@@ -737,31 +738,31 @@ public final class MiscTools {
     public static Optional<URI> extractURI(DataLocation loc) {
         try {
             return switch (loc.getType()) {
-                case "URL" -> // URLDataLocation
-                        Optional.of(((URLDataLocation) loc).url().toURI());
-                case "ARCHIVE" -> { // ArchiveDataLocation
-                    // format: "ARCHIVE:<filename>?<itemname>"
-                    ArchiveDataLocation adl = (ArchiveDataLocation) loc;
+            case "URL" -> // URLDataLocation
+                Optional.of(((URLDataLocation) loc).url().toURI());
+            case "ARCHIVE" -> { // ArchiveDataLocation
+                // format: "ARCHIVE:<filename>?<itemname>"
+                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
 
-                    // extract item name and zip file
-                    int qmindex = adl.toString().lastIndexOf('?');
-                    String itemName = adl.toString().substring(qmindex + 1);
-                    ZipFile zip = adl.getFile();
+                // extract item name and zip file
+                int qmindex = adl.toString().lastIndexOf('?');
+                String itemName = adl.toString().substring(qmindex + 1);
+                ZipFile zip = adl.getFile();
 
-                    // use special method to ensure that path separators are correct
-                    yield Optional.of(getZipEntryURI(zip, itemName));
-                }
-                case "FILE" -> // DataFileLocation
-                    // format: "FILE:<path>"
-                        Optional.of(((DataFileLocation) loc).getFile().toURI());
-                default -> // SpecDataLocation
-                    // format "<type>://<location>"
-                    // wrap into URN to ensure URI encoding is correct (no spaces!)
-                        Optional.empty();
+                // use special method to ensure that path separators are correct
+                yield Optional.of(getZipEntryURI(zip, itemName));
+            }
+            case "FILE" -> // DataFileLocation
+                // format: "FILE:<path>"
+                Optional.of(((DataFileLocation) loc).getFile().toURI());
+            default -> // SpecDataLocation
+                // format "<type>://<location>"
+                // wrap into URN to ensure URI encoding is correct (no spaces!)
+                Optional.empty();
             };
         } catch (URISyntaxException | IOException e) {
             throw new IllegalArgumentException(
-                    "The given DataLocation can not be converted into a valid URI: " + loc, e);
+                "The given DataLocation can not be converted into a valid URI: " + loc, e);
         }
     }
 

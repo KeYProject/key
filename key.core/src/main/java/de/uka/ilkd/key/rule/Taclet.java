@@ -148,7 +148,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     private boolean contextInfoComputed = false;
     private boolean contextIsInPrefix = false;
 
-    protected@Nullable String tacletAsString;
+    protected @Nullable String tacletAsString;
 
     /** Set of schemavariables of the if part */
     private @Nullable ImmutableSet<SchemaVariable> ifVariables = null;

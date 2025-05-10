@@ -35,7 +35,8 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
      * {@inheritDoc}
      */
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         return this == o;
     }
 

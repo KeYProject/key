@@ -51,7 +51,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      *
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -79,7 +80,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             // should not happen, because in this case canApplyTo returns
             // false
             throw new AssertionError();
-            //return null;
+            // return null;
         }
         List<Node> nodes = goals.stream().map(Goal::node).collect(Collectors.toList());
 

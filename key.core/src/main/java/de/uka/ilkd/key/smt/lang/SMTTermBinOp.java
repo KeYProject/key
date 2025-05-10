@@ -158,20 +158,20 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public SMTSort sort() {
         return switch (operator) {
-            case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM -> {
-                if (!left.sort().equals(right.sort())) {
+        case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM -> {
+            if (!left.sort().equals(right.sort())) {
 
-                    String error = "Unexpected: binary operation with two diff. arg sorts";
-                    error += "\n";
-                    error += this.toSting() + "\n";
-                    error += "Left sort: " + left.sort() + "\n";
-                    error += "Right sort: " + right.sort() + "\n";
-                    throw new RuntimeException(error);
+                String error = "Unexpected: binary operation with two diff. arg sorts";
+                error += "\n";
+                error += this.toSting() + "\n";
+                error += "Left sort: " + left.sort() + "\n";
+                error += "Right sort: " + right.sort() + "\n";
+                throw new RuntimeException(error);
 
-                }
-                yield left.sort();
             }
-            default -> SMTSort.BOOL;
+            yield left.sort();
+        }
+        default -> SMTSort.BOOL;
         };
     }
 

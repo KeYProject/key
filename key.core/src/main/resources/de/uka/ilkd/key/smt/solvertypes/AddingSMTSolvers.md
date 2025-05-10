@@ -109,7 +109,7 @@ If you want to use another, more solver-specific preamble, the file should be pu
 preamble = specialPreamble.smt2
 ```
 
-If this is true, the solver is only usable in experimental mode. Generally, those are the solvers that still use the SmtLib2Translator instead of the ModularSMTLib2Translator. The property is false by default, if not specified.
+If this is true, the solver is only usable in experimental mode. The property is false by default, if not specified. Generally, it is a good idea to set this to true for solvers that still use the SmtLib2Translator (legacy translation) instead of the ModularSMTLib2Translator.
 ```properties
-legacy=true/false
+experimental=true/false
 ```

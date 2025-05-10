@@ -5,6 +5,7 @@ package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
+
 import org.jspecify.annotations.Nullable;
 
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
@@ -35,7 +36,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * @param closedGoals how many goals were closed
      */
     public DefaultTaskFinishedInfo(Object source, Object result, @Nullable Proof proof, long time,
-                                   int appliedRules, int closedGoals) {
+            int appliedRules, int closedGoals) {
         this.source = source;
         this.result = result;
         this.proof = proof;

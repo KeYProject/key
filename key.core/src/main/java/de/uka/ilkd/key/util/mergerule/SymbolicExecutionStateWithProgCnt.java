@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
  * parallel update, a path condition in form of a JavaDL formula, and a program counter in form of a
  * JavaDL formula with non-empty Java Block (and a possible post condition as first, and only, sub
  * term).
+ *
  * @param symbolicState The symbolic state (parallel update).
  * @param pathCondition The path condition (formula).
  * @param programCounter The program counter: Formula with non-empty Java block and post
@@ -24,8 +25,9 @@ import org.jspecify.annotations.Nullable;
  * @param correspondingNode The node corresponding to this SE state.
  * @author Dominic Scheurer
  */
-public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition, Term programCounter,
-                                                @Nullable Node correspondingNode) {
+public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition,
+        Term programCounter,
+        @Nullable Node correspondingNode) {
     /**
      * @return The symbolic state.
      */
@@ -63,7 +65,8 @@ public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCon
 
     @Override
     public String toString() {
-        final Services services = Objects.requireNonNull(getCorrespondingNode()).proof().getServices();
+        final Services services =
+            Objects.requireNonNull(getCorrespondingNode()).proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
             + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("

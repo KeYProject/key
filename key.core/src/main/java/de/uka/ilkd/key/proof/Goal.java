@@ -29,10 +29,10 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
-import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

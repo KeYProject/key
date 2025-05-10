@@ -11,8 +11,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.LRUCache;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Caches whether a Term contains a modality operation.

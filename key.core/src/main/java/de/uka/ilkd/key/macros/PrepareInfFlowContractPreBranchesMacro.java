@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -17,11 +19,10 @@ import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFea
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.IsPostConditionTermFeature;
 
-import org.checkerframework.dataflow.qual.Pure;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
-import java.util.Objects;
+import org.checkerframework.dataflow.qual.Pure;
+import org.jspecify.annotations.Nullable;
 
 
 /**

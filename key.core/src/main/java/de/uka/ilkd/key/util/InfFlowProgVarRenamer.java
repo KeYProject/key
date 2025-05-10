@@ -19,10 +19,11 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 
-import org.checkerframework.checker.nullness.util.NullnessUtil;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+
+import org.checkerframework.checker.nullness.util.NullnessUtil;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -146,9 +147,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
             }
         } else if (pv instanceof ProgramConstant pc) {
             return new ProgramConstant(new ProgramElementName(newName.toString()),
-                    NullnessUtil.castNonNull(pc.getKeYJavaType()),
-                    NullnessUtil.castNonNull(pc.getContainerType()),
-                    pc.isStatic(), pc.getCompileTimeConstant());
+                NullnessUtil.castNonNull(pc.getKeYJavaType()),
+                NullnessUtil.castNonNull(pc.getContainerType()),
+                pc.isStatic(), pc.getCompileTimeConstant());
         } else {
             throw new IllegalArgumentException("Unknown type for pv: " + pv);
         }
@@ -200,7 +201,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Term applyRenamingsToPrograms(Term term,
             Map<LocationVariable, LocationVariable> progVarReplaceMap) {
 
-       if (term.op() instanceof Modality mod) {
+        if (term.op() instanceof Modality mod) {
             final JavaBlock renamedJavaBlock =
                 renameJavaBlock(progVarReplaceMap, mod.program().program(), services);
             final Term[] appliedSubs = applyProgramRenamingsToSubs(term, progVarReplaceMap);

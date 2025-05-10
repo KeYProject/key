@@ -7,9 +7,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.util.collection.Pair;
+
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.key_project.util.collection.Pair;
 
 public class LinkedHashMap<K, V extends @Nullable Object> extends java.util.LinkedHashMap<K, V>
         implements Iterable<Pair<K, V>> {
@@ -70,7 +71,8 @@ public class LinkedHashMap<K, V extends @Nullable Object> extends java.util.Link
         return new PairIterator<K, V>(this);
     }
 
-    private static class PairIterator<K, V extends @Nullable Object> implements Iterator<Pair<K, V>> {
+    private static class PairIterator<K, V extends @Nullable Object>
+            implements Iterator<Pair<K, V>> {
 
         private final Iterator<@KeyFor("map") K> keyIt;
         private final LinkedHashMap<K, V> map;

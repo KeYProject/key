@@ -12,31 +12,33 @@ import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+
 /**
  * A string with associated position information (file and line number). The position information is
  * used for error reporting.
  */
+@NullMarked
 public class PositionedString {
-
-    public final String text;
-
-    public final Location location;
-
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
-    public PositionedString(String text, Location location) {
-        if (text == null || location == null) {
-            throw new IllegalArgumentException();
-        }
+    public final String text;
+    public final Location location;
 
-        this.text = text;
-        this.location = location;
+    public PositionedString(String text, Location location) {
+        this.text = Objects.requireNonNull(text);
+        this.location = Objects.requireNonNull(location);
     }
 
-    public PositionedString(String text, URI fileName) {
+    public PositionedString(String text, org.antlr.v4.runtime.Token t) {
+        this(text, Location.fromToken(t));
+    }
+
+    public PositionedString(String text, @Nullable URI fileName) {
         this(text, new Location(fileName, Position.UNDEFINED));
     }
-
 
     public PositionedString(String text) {
         this(text, Location.UNDEFINED);

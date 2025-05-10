@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
  * Both line and column numbers are assumed to be 1-based. That is the first character is on line 1,
  * column 1.
  *
- * @param fileUri  The location of the resource of the Location. May be null!
+ * @param fileUri The location of the resource of the Location. May be null!
  * @param position The position in the file
  * @author Hubert Schmid
  */
@@ -48,7 +48,7 @@ public record Location(@Nullable URI fileUri, Position position) implements Comp
     public static Location fromFileName(@Nullable String filename, Position position) {
         try {
             return new Location(filename == null ? null : MiscTools.parseURL(filename),
-                    position);
+                position);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +56,7 @@ public record Location(@Nullable URI fileUri, Position position) implements Comp
 
     public static Location fromToken(Token token) {
         return new Location(MiscTools.getURIFromTokenSource(token.getTokenSource()),
-                Position.fromToken(token));
+            Position.fromToken(token));
     }
 
     public Optional<URI> getFileURI() {
@@ -77,7 +77,7 @@ public record Location(@Nullable URI fileUri, Position position) implements Comp
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -94,7 +94,11 @@ public record Location(@Nullable URI fileUri, Position position) implements Comp
 
     @Override
     public int compareTo(@NonNull Location o) {
-        return Comparator.<Location, URI>comparing(l -> l.fileUri, Comparator.nullsLast(Comparator.naturalOrder()))
-                .thenComparing(Location::getPosition, Comparator.nullsLast(Comparator.naturalOrder())).compare(this, o);
+        return Comparator
+                .<Location, URI>comparing(l -> l.fileUri,
+                    Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(Location::getPosition,
+                    Comparator.nullsLast(Comparator.naturalOrder()))
+                .compare(this, o);
     }
 }

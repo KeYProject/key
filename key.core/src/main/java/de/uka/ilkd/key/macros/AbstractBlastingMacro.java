@@ -115,7 +115,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
             Sort sort = kjt.getSort();
 
-            if (sort == null){
+            if (sort == null) {
                 continue;
             }
             if (!containsSubTypes(sort, sorts)) {

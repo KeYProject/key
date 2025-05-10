@@ -561,8 +561,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         // configure contract
-        final FunctionalOperationContract contract =
+        FunctionalOperationContract contract =
             (FunctionalOperationContract) ((AbstractContractRuleApp) ruleApp).getInstantiation();
+
         assert contract.getTarget().equals(inst.pm);
 
         final List<LocationVariable> heapContext =

@@ -16,8 +16,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.

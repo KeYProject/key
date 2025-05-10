@@ -58,7 +58,8 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if (macros.isEmpty()) {
             return false;

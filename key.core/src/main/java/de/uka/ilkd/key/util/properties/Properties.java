@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.util.properties;
 
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jspecify.annotations.Nullable;
 
 
 public interface Properties {

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -322,120 +323,122 @@ public class ChoiceSelector extends JDialog {
     /**
      * Represents a choice with all its meta information.
      *
-     * @param choice      The choice.
-     * @param unsound     Is unsound?
-     * @param incomplete  Is incomplete?
+     * @param choice The choice.
+     * @param unsound Is unsound?
+     * @param incomplete Is incomplete?
      * @param information An optionally information.
      * @author Martin Hentschel
      */
-        public record ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
-            /**
-             * Text shown to the user in case of incompletness.
-             */
-            public static final String INCOMPLETE_TEXT = "incomplete";
+    public record ChoiceEntry(String choice, boolean unsound, boolean incomplete,
+            String information) {
 
-            /**
-             * Text shown to the user in case of unsoundness.
-             */
-            public static final String UNSOUND_TEXT = "Java modeling unsound";
+        /**
+         * Text shown to the user in case of incompletness.
+         */
+        public static final String INCOMPLETE_TEXT = "incomplete";
+
+        /**
+         * Text shown to the user in case of unsoundness.
+         */
+        public static final String UNSOUND_TEXT = "Java modeling unsound";
 
         /**
          * Constructor.
          *
-         * @param choice      The choice.
-         * @param unsound     Is unsound?
-         * @param incomplete  Is incomplete?
+         * @param choice The choice.
+         * @param unsound Is unsound?
+         * @param incomplete Is incomplete?
          * @param information An optionally information.
          */
         public ChoiceEntry {
             assert choice != null;
         }
 
-            /**
-             * Returns the choice.
-             *
-             * @return The choice.
-             */
-            @Override
-            public String choice() {
-                return choice;
-            }
-
-            /**
-             * Checks for soundness.
-             *
-             * @return {@code true} unsound, {@code false} sound.
-             */
-            @Override
-            public boolean unsound() {
-                return unsound;
-            }
-
-            /**
-             * Checks for completeness.
-             *
-             * @return {@code true} incomplete, {@code false} complete.
-             */
-            @Override
-            public boolean incomplete() {
-                return incomplete;
-            }
-
-            /**
-             * Returns the optionally information.
-             *
-             * @return The optionally information.
-             */
-            @Override
-            public String information() {
-                return information;
-            }
+        /**
+         * Returns the choice.
+         *
+         * @return The choice.
+         */
+        @Override
+        public String choice() {
+            return choice;
+        }
 
         /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
-                if (obj instanceof ChoiceEntry other) {
-                    return choice.equals(other.choice()) && incomplete == other.incomplete()
-                            && unsound == other.unsound()
-                            && Objects.equals(information, other.information());
-                } else {
-                    return false;
-                }
-            }
+         * Checks for soundness.
+         *
+         * @return {@code true} unsound, {@code false} sound.
+         */
+        @Override
+        public boolean unsound() {
+            return unsound;
+        }
 
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String toString() {
-                if (unsound && incomplete) {
-                    if (information != null) {
-                        return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", "
-                                + information + ")";
-                    } else {
-                        return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
-                    }
-                } else if (unsound) {
-                    if (information != null) {
-                        return choice + " (" + UNSOUND_TEXT + ", " + information + ")";
-                    } else {
-                        return choice + " (" + UNSOUND_TEXT + ")";
-                    }
-                } else if (incomplete) {
-                    if (information != null) {
-                        return choice + " (" + INCOMPLETE_TEXT + ", " + information + ")";
-                    } else {
-                        return choice + " (" + INCOMPLETE_TEXT + ")";
-                    }
+        /**
+         * Checks for completeness.
+         *
+         * @return {@code true} incomplete, {@code false} complete.
+         */
+        @Override
+        public boolean incomplete() {
+            return incomplete;
+        }
+
+        /**
+         * Returns the optionally information.
+         *
+         * @return The optionally information.
+         */
+        @Override
+        public String information() {
+            return information;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (obj instanceof ChoiceEntry other) {
+                return choice.equals(other.choice()) && incomplete == other.incomplete()
+                        && unsound == other.unsound()
+                        && Objects.equals(information, other.information());
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            if (unsound && incomplete) {
+                if (information != null) {
+                    return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", "
+                        + information + ")";
                 } else {
-                    if (information != null) {
-                        return choice + " (" + information + ")";
-                    } else {
-                        return choice;
-                    }
+                    return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
+                }
+            } else if (unsound) {
+                if (information != null) {
+                    return choice + " (" + UNSOUND_TEXT + ", " + information + ")";
+                } else {
+                    return choice + " (" + UNSOUND_TEXT + ")";
+                }
+            } else if (incomplete) {
+                if (information != null) {
+                    return choice + " (" + INCOMPLETE_TEXT + ", " + information + ")";
+                } else {
+                    return choice + " (" + INCOMPLETE_TEXT + ")";
+                }
+            } else {
+                if (information != null) {
+                    return choice + " (" + information + ")";
+                } else {
+                    return choice;
                 }
             }
         }
+    }
 }

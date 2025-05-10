@@ -15,12 +15,12 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.checkerframework.dataflow.qual.Pure;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,7 +182,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     }
 
 
-    @Override @Pure
+    @Override
+    @Pure
     public @Nullable KeYJavaType getKeYJavaType() {
         return type;
     }

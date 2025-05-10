@@ -6,16 +6,12 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.BadLocationException;
@@ -25,8 +21,11 @@ import javax.swing.text.SimpleAttributeSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.sourceview.JavaDocument;
+import de.uka.ilkd.key.gui.sourceview.JavaJMLEditorLexer;
+import de.uka.ilkd.key.gui.sourceview.KeYEditorLexer;
+import de.uka.ilkd.key.gui.sourceview.SourceHighlightDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.gui.utilities.CurrentLineHighlighter;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
@@ -137,65 +136,36 @@ public class EditSourceFileAction extends KeyAction {
                 textAreaGoto(this, location.getPosition());
             }
         };
-        Optional<URI> file = location.getFileURI();
-        String source = IOUtil.readFrom(file.orElse(null));
+        textPane.setHighlighter(new CurrentLineHighlighter(textPane.getHighlighter()));
+        Optional<URI> fileOpt = location.getFileURI();
+        if (fileOpt.isEmpty()) {
+            JTextPane jTextPane = new JTextPane();
+            jTextPane.setText("No file location available");
+            return jTextPane;
+        }
+
+        URI file = fileOpt.get();
+        String source = IOUtil.readFrom(file);
         // workaround for #1641: replace all carriage returns, since JavaDocument can currently
         // not handle them
         source = source != null ? source.replace("\r", "") : "";
 
-        if (file.isPresent() && file.get().toString().endsWith(".java")) {
-            JavaDocument doc = new JavaDocument();
-            try {
-                doc.insertString(0, source, new SimpleAttributeSet());
-            } catch (BadLocationException e) {
-                LOGGER.warn("Failed insert string", e);
-            }
-            textPane.setDocument(doc);
-
-            // when no char is inserted for the specified interval, refresh the syntax highlighting
-            // note: When other keys are pressed or held down (e.g. arrow keys) nothing is done.
-            textPane.addKeyListener(new KeyAdapter() {
-                private Timer timer = new Timer();
-
-                @Override
-                public void keyTyped(KeyEvent e) {
-                    restartTimer();
-                }
-
-                private void restartTimer() {
-                    timer.cancel();
-                    timer = new Timer();
-                    final TimerTask task = new TimerTask() {
-                        @Override
-                        public void run() {
-                            // synchronized to avoid inserting chars during document updating
-                            synchronized (textPane) {
-                                int pos = textPane.getCaretPosition();
-                                int start = textPane.getSelectionStart();
-                                int end = textPane.getSelectionEnd();
-                                String content = textPane.getText();
-                                try {
-                                    // creating a completely new document seems to be more than
-                                    // necessary, but works well enough for the moment
-                                    JavaDocument newDoc = new JavaDocument();
-                                    newDoc.insertString(0, content, new SimpleAttributeSet());
-                                    textPane.setDocument(newDoc);
-                                    textPane.setCaretPosition(pos);
-                                    textPane.setSelectionStart(start);
-                                    textPane.setSelectionEnd(end);
-                                } catch (BadLocationException ex) {
-                                    LOGGER.warn("Failed update document", ex);
-                                }
-                                textPane.repaint();
-                            }
-                        }
-                    };
-                    timer.schedule(task, SYNTAX_HIGHLIGHTING_REFRESH_INTERVAL);
-                }
-            });
+        SourceHighlightDocument.EditorLexer lexer;
+        if (file.toString().endsWith(".java")) {
+            lexer = new JavaJMLEditorLexer();
+        } else if (file.toString().endsWith(".key") || file.toString().endsWith(".proof")) {
+            lexer = new KeYEditorLexer();
         } else {
-            textPane.setText(source);
+            lexer = SourceHighlightDocument.TRIVIAL_LEXER;
         }
+
+        SourceHighlightDocument doc = new SourceHighlightDocument(lexer);
+        try {
+            doc.insertString(0, source, new SimpleAttributeSet());
+        } catch (BadLocationException e) {
+            LOGGER.warn("Failed insert string", e);
+        }
+        textPane.setDocument(doc);
 
         Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (font == null) {

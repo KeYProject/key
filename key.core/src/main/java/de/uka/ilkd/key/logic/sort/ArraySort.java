@@ -150,9 +150,11 @@ public final class ArraySort extends SortImpl {
     }
 
 
-    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort, Sort javaLangCloneable,
-                           Sort javaLangSerializable) {
-        @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
+            Sort javaLangCloneable,
+            Sort javaLangSerializable) {
+        @Override
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (!(o instanceof SortKey sk)) {
                 return false;
             }

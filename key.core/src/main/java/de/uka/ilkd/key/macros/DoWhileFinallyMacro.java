@@ -50,7 +50,8 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc) {
         if (getCondition()) {
             return getProofMacro().canApplyTo(proof, goals, posInOcc);
         } else {

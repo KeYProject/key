@@ -116,23 +116,23 @@ public final class ExceptionTools {
      * @param exc the Throwable to extract the Location from
      * @return the Location stored inside the Throwable or null if no such can be found
      * @throws MalformedURLException if the no URL can be parsed from the String stored inside the
-     *                               given Throwable can not be successfully converted to a URL and thus no Location can
-     *                               be created
+     *         given Throwable can not be successfully converted to a URL and thus no Location can
+     *         be created
      */
     public static @Nullable Location getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
         return switch (exc) {
-            case HasLocation hasLocation -> hasLocation.getLocation();
-            case ParseException parseException -> getLocation(parseException);
-            case TokenMgrError tokenMgrError -> getLocation(tokenMgrError);
-            case InputMismatchException ime -> getLocation(ime);
-            case NoViableAltException nvae -> getLocation(nvae);
-            default -> {
-                if (exc.getCause() != null) {
-                    yield getLocation(exc.getCause());
-                }
-                yield null;
+        case HasLocation hasLocation -> hasLocation.getLocation();
+        case ParseException parseException -> getLocation(parseException);
+        case TokenMgrError tokenMgrError -> getLocation(tokenMgrError);
+        case InputMismatchException ime -> getLocation(ime);
+        case NoViableAltException nvae -> getLocation(nvae);
+        default -> {
+            if (exc.getCause() != null) {
+                yield getLocation(exc.getCause());
             }
+            yield null;
+        }
         };
     }
 

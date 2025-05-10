@@ -181,7 +181,8 @@ public class DirectoryFileCollection implements FileCollection {
         }
 
         public DataLocation getCurrentDataLocation() {
-            return new DataFileLocation(NullnessUtil.castNonNull(currentFile, "trying to open null file"));
+            return new DataFileLocation(
+                NullnessUtil.castNonNull(currentFile, "trying to open null file"));
         }
     }
 
