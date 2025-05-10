@@ -159,10 +159,10 @@ public class ImmutableArray<S extends @Nullable Object>
 
     @Override
     public Iterator<S> iterator() {
-        return new ArrayIterator<>(this);
+        return new ArrayIterator<S>(this);
     }
 
-    private static class ArrayIterator<T> implements Iterator<T> {
+    private static class ArrayIterator<T extends @Nullable Object> implements Iterator<T> {
 
         private int i = 0;
         private final ImmutableArray<T> coll;
