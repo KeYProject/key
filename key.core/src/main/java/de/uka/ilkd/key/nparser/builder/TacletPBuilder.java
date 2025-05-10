@@ -29,7 +29,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 
-import antlr.RecognitionException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
@@ -802,7 +801,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         } else {
             if (b instanceof NoFindTacletBuilder) {
                 // there is a replacewith without a find.
-                throwEx(new RecognitionException(""));
+                throwEx(new RuntimeException("there is a replacewith without a find"));
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
                 if (rwObj instanceof Sequent) {
                     gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, (Sequent) rwObj, pvs);
