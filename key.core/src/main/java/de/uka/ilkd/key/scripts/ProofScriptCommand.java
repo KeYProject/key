@@ -34,10 +34,12 @@ public interface ProofScriptCommand {
     /// @throws ScriptException if something bad happens
     /// @throws InterruptedException if something bad happens
     // TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
-    void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args, EngineState stateMap)
+    void execute(AbstractUserInterfaceControl uiControl, ScriptCommandAst args,
+            EngineState stateMap)
             throws ScriptException, InterruptedException;
 
-    /// Returns the name of this proof command. The name should be constant and not be clash with the
+    /// Returns the name of this proof command. The name should be constant and not be clash with
+    /// the
     /// name of other commands. The name is essential for finding this command within an hashmap.
     ///
     /// @return a non-null, non-empty string
@@ -51,7 +53,8 @@ public interface ProofScriptCommand {
     /// inside [ScriptCommandAst]. For example [LetCommand] announce `letf` as an
     /// alias for an overwriting binding, otherwise error are thrown on re-binding.
     ///
-    /// @return an unmodifiable list of alias names under which command can be called, including [#getName()]
+    /// @return an unmodifiable list of alias names under which command can be called, including
+    /// [#getName()]
     default List<String> getAliases() {
         return List.of(getName());
     }
