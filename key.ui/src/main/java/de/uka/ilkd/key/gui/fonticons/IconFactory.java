@@ -10,6 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +34,9 @@ public final class IconFactory {
     public static final IconFontProvider PREVIOUS =
         new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
     public static final IconFontProvider START =
-        new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN);
+        new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN, Color.GREEN.brighter().brighter());
     public static final IconFontProvider STOP =
-        new IconFontProvider(FontAwesomeSolid.STOP, Color.RED);
+        new IconFontProvider(FontAwesomeSolid.STOP, Color.RED, Color.GREEN.brighter().brighter());
     // an alternative would be TIMES_CIRCLE
     public static final IconFontProvider CLOSE = new IconFontProvider(FontAwesomeSolid.TIMES);
     public static final IconFontProvider CONFIGURE_MENU =
@@ -478,6 +482,20 @@ public final class IconFactory {
 
     public static Icon get(IconProvider provider, float size) {
         return cache.computeIfAbsent(provider.getKey(size), d -> provider.load(size));
+    }
+
+    public static void setIconAndListen(IconProvider provider, float size, JLabel ui) {
+        ui.setIcon(provider.get(size));
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addPropertyChangeListener(ViewSettings.PROP_LOOK_AND_FEEL,
+                    evt -> ui.setIcon(provider.get(size)));
+    }
+
+    public static void setIconAndListen(IconProvider provider, float size, KeyAction ui) {
+        ui.setIcon(provider.get(size));
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addPropertyChangeListener(ViewSettings.PROP_LOOK_AND_FEEL,
+                    evt -> ui.setIcon(provider.get(size)));
     }
 
     /**

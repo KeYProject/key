@@ -30,6 +30,7 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
 
         setName("Toggle Term Origin Tracking");
         setTooltip("Track where in the JML specification a every term in the sequent originates.");
+        IconFactory.setIconAndListen(IconFactory.ORIGIN_LABELS, MainWindow.TOOLBAR_ICON_SIZE, this);
         setIcon(IconFactory.ORIGIN_LABELS.get(MainWindow.TOOLBAR_ICON_SIZE));
 
         setEnabled(true);

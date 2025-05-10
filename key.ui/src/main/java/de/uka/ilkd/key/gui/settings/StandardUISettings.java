@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
@@ -15,12 +14,18 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
+
 /**
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
 public class StandardUISettings extends SettingsPanel implements SettingsProvider {
-    private static final long serialVersionUID = -7484169054465984605L;
     private static final String INFO_CLUTTER_RULESET =
         "Comma separated list of rule set names, containing clutter rules.";
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n"
@@ -29,15 +34,31 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
             Look and feel used by KeY.
             'System' tries to mimic the default looks, 'Metal' is the Java default.
             KeY must be restarted to apply changes.""";
+
+    static {
+        FlatLightLaf.installLafInfo();
+        FlatIntelliJLaf.installLafInfo();
+        FlatMacLightLaf.installLafInfo();
+        FlatDarkLaf.installLafInfo();
+        FlatDarculaLaf.installLafInfo();
+        FlatMacDarkLaf.installLafInfo();
+    }
+
+
     /**
      * Labels for the selectable look and feels. Must be kept in sync with {@link #LAF_CLASSES}.
      */
-    private static final List<String> LAF_LABELS = new ArrayList<>(List.of("Metal"));
+    private static final List<String> LAF_LABELS =
+        Arrays.stream(UIManager.getInstalledLookAndFeels()).map(UIManager.LookAndFeelInfo::getName)
+                .toList();
+
+
     /**
      * Classnames corresponding to the labels in {@link #LAF_LABELS}.
      */
     private static final List<String> LAF_CLASSES =
-        new ArrayList<>(List.of(UIManager.getCrossPlatformLookAndFeelClassName()));
+        Arrays.stream(UIManager.getInstalledLookAndFeels())
+                .map(UIManager.LookAndFeelInfo::getClassName).toList();
 
     private final JComboBox<String> lookAndFeel;
     private final JSpinner spFontSizeGlobal;
@@ -61,16 +82,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
     public StandardUISettings() {
         setHeaderText(getDescription());
-
-        // load all available look and feels
-        if (LAF_LABELS.size() == 1) {
-            for (UIManager.LookAndFeelInfo it : UIManager.getInstalledLookAndFeels()) {
-                if (!LAF_LABELS.contains(it.getName())) {
-                    LAF_LABELS.add(it.getName());
-                    LAF_CLASSES.add(it.getClassName());
-                }
-            }
-        }
 
         addSeparator("General");
         lookAndFeel = createSelection(LAF_LABELS.toArray(new String[0]), emptyValidator());
