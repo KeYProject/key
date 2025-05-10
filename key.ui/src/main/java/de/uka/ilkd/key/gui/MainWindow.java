@@ -26,10 +26,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import com.formdev.flatlaf.util.SystemInfo;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -79,6 +75,8 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.util.SystemInfo;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -407,13 +405,13 @@ public final class MainWindow extends JFrame {
             return instance;
         }
         if (instance == null) {
-            //FlatDarculaLaf.setup();
+            // FlatDarculaLaf.setup();
             FlatLightLaf.setup();
 
-            if( SystemInfo.isLinux ) {
+            if (SystemInfo.isLinux) {
                 // enable custom window decorations
-                JFrame.setDefaultLookAndFeelDecorated( true );
-                JDialog.setDefaultLookAndFeelDecorated( true );
+                JFrame.setDefaultLookAndFeelDecorated(true);
+                JDialog.setDefaultLookAndFeelDecorated(true);
             }
 
             instance = new MainWindow();
