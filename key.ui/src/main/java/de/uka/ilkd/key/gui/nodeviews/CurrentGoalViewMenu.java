@@ -64,7 +64,6 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     @Serial
     private static final long serialVersionUID = 8151230546928796116L;
 
-    private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
     private static final String CREATE_ABBREVIATION = "Create abbreviation...";
     private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
     private static final String DISABLE_ABBREVIATION = "Disable abbreviation";
@@ -112,20 +111,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         // delete RewriteTaclet from findList because they will be in
         // the rewrite list and concatenate both lists
         createMenu(removeRewrites(findList).prepend(rewriteList),
-            removeIntroduceAxiomTaclet(noFindList), builtInList, new MenuControl());
-    }
-
-    /**
-     * Removes the unsound "introduceAxiom" taclet from the list of displayed taclets.
-     *
-     * @param list The list from which to filter.
-     * @return The original list, without the "introduceAxiom" taclet.
-     */
-    private static ImmutableList<TacletApp> removeIntroduceAxiomTaclet(
-            ImmutableList<TacletApp> list) {
-        return list.stream()
-                .filter(app -> !app.rule().name().toString().equals(INTRODUCE_AXIOM_TACLET_NAME))
-                .collect(ImmutableSLList.toImmutableList());
+            noFindList, builtInList, new MenuControl());
     }
 
     /**
