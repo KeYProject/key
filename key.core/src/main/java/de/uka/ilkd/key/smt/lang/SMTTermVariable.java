@@ -6,6 +6,8 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
@@ -56,7 +58,7 @@ public class SMTTermVariable extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object term) {
+    public boolean equals(@Nullable Object term) {
         if (term == null) {
             return false;
         }

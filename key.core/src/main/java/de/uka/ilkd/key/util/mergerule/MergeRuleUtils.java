@@ -40,7 +40,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +86,7 @@ public class MergeRuleUtils {
      * @param obj The object to wrap.
      * @return None iff obj is null, Some(obj) otherwise.
      */
-    public static <T> Optional<T> wrapOption(T obj) {
+    public static <T> Optional<@NonNull T> wrapOption(@Nullable T obj) {
         if (obj == null) {
             return Optional.empty();
         } else {
@@ -143,9 +145,9 @@ public class MergeRuleUtils {
      * @param toTranslate The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
      */
-    public static Term translateToFormula(final Services services, final String toTranslate) {
+    public static @Nullable Term translateToFormula(final Services services,
+            final String toTranslate) {
         try {
-            @NonNull
             Term result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == JavaDLTheory.FORMULA ? result : null;
         } catch (Throwable e) {
@@ -308,7 +310,7 @@ public class MergeRuleUtils {
      * @return The right side in the update for the given left side, or null if the right side could
      *         not be determined.
      */
-    public static Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
+    public static @Nullable Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
         if (update.op() instanceof ElementaryUpdate
                 && ((ElementaryUpdate) update.op()).lhs().equals(leftSide)) {
 
@@ -488,7 +490,7 @@ public class MergeRuleUtils {
      *        constant.
      * @return A term equal to the input, but with constants substituted by fresh variables.
      */
-    public static Term substConstantsByFreshVars(Term term, HashSet<Function> restrictTo,
+    public static Term substConstantsByFreshVars(Term term, @Nullable HashSet<Function> restrictTo,
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
@@ -630,9 +632,9 @@ public class MergeRuleUtils {
      * @return The node where the variable was introduced.
      */
     public static Node getIntroducingNodeforLocVar(LocationVariable var, Node node) {
-
-        while (!node.root() && node.getLocalProgVars().contains(var)) {
-            node = node.parent();
+        var n = node;
+        while (n != null && !n.root() && node.getLocalProgVars().contains(var)) {
+            n = n.parent();
         }
 
         return node;
@@ -730,7 +732,6 @@ public class MergeRuleUtils {
      * @param term2 Second term to check.
      * @param services The services object.
      * @param timeout Time in milliseconds after which the side proof is aborted.
-     *
      * @throws RuntimeException iff proving the equivalence of term1 and term2 fails.
      */
     public static void assertEquivalent(Term term1, Term term2, Services services, int timeout) {
@@ -764,7 +765,6 @@ public class MergeRuleUtils {
      * @param timeout Time in milliseconds after which the side proof is aborted.
      * @return The simplified {@link Term} or the original term, if simplification was not
      *         successful.
-     *
      * @see #simplify(Proof, Term, int)
      */
     public static Term trySimplify(final Proof parentProof, final Term term,
@@ -1054,6 +1054,7 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return An SE state (U,C,p).
      */
+    @SuppressWarnings("nullness")
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
             PosInOccurrence pio, Services services) {
 
@@ -1121,6 +1122,7 @@ public class MergeRuleUtils {
      *
      * @return The renamed {@link SymbolicExecutionState} of the second merge partner.
      */
+    @SuppressWarnings("nullness")
     public static Pair<SymbolicExecutionState, SymbolicExecutionState> handleNameClashes(
             SymbolicExecutionState mergeState, SymbolicExecutionState mergePartnerState,
             Services services) {
@@ -1301,6 +1303,7 @@ public class MergeRuleUtils {
             throw new RuntimeException(
                 "An abstraction predicate must contain exactly one placeholder.");
         }
+        assert usedPlaceholder != null;
 
         return AbstractionPredicate.create(formula, usedPlaceholder, services);
     }
@@ -1581,7 +1584,6 @@ public class MergeRuleUtils {
      * @param timeout Time in milliseconds after which the side proof is aborted.
      * @return The simplified {@link Term}.
      * @throws ProofInputException Occurred Exception.
-     *
      */
     private static Term simplify(Proof parentProof, Term term, int timeout)
             throws ProofInputException {
@@ -1642,7 +1644,6 @@ public class MergeRuleUtils {
      *
      * @param name The name to check uniqueness for.
      * @param globals The global variables for the givan branch.
-     *
      */
     private static boolean isUniqueInGlobals(String name, Iterable<IProgramVariable> globals) {
         for (final IProgramVariable n : globals) {
@@ -1659,7 +1660,8 @@ public class MergeRuleUtils {
      * @param name Name to find a PV for.
      * @return The PV with the given name in the global namespace, or null if there is none.
      */
-    private static LocationVariable lookupVarInNS(String name, Services services) {
+    @Pure
+    private static @Nullable LocationVariable lookupVarInNS(String name, Services services) {
         return (LocationVariable) services.getNamespaces().programVariables()
                 .lookup(new Name(name));
     }
@@ -1753,7 +1755,7 @@ public class MergeRuleUtils {
     record TermWrapper(Term term, int hashcode) {
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             return obj instanceof TermWrapper
                     && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
         }
@@ -1878,17 +1880,18 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public boolean containsKey(Object key) {
+        @SuppressWarnings("keyfor")
+        public boolean containsKey(@Nullable Object key) {
             return key instanceof LocationVariable;
         }
 
         @Override
-        public boolean containsValue(Object value) {
-            return false;
+        public boolean containsValue(@Nullable Object value) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
-        public LocationVariable get(Object key) {
+        public @Nullable LocationVariable get(@Nullable Object key) {
             if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) {
@@ -1909,28 +1912,30 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public LocationVariable put(LocationVariable key, LocationVariable value) {
-            return null;
+        @SuppressWarnings("keyfor")
+        public @Nullable LocationVariable put(LocationVariable key, LocationVariable value) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
-        public LocationVariable remove(Object key) {
-            return null;
+        public @Nullable LocationVariable remove(@Nullable Object key) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
+        @SuppressWarnings("keyfor")
         public Set<LocationVariable> keySet() {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public Collection<LocationVariable> values() {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
-            return null;
+            throw new UnsupportedOperationException();
         }
     }
 

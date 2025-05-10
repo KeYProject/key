@@ -1178,8 +1178,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public final String proofToString(Services services) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override

@@ -97,7 +97,7 @@ public class Access {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (obj instanceof Access other) {
             return Objects.equals(programVariable, other.getProgramVariable())
                     && Objects.equals(dimensionExpressions, other.getDimensionExpressions());

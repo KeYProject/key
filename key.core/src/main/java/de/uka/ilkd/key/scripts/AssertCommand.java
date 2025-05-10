@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.scripts.meta.Option;
 
@@ -34,7 +35,7 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
             throw new ScriptException("No parameter specified!");
         }
 
-        if (state.getProof().openEnabledGoals().size() != args.goals) {
+        if (Objects.requireNonNull(state).getProof().openEnabledGoals().size() != args.goals) {
             throw new ScriptException("Assertion failed: number of open goals is "
                 + state.getProof().openGoals().size() + ", but should be " + args.goals);
         }
@@ -48,6 +49,7 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
     /**
      * The Assigned parameters (currently only the passed goals).
      */
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The number of open and enabled goals.

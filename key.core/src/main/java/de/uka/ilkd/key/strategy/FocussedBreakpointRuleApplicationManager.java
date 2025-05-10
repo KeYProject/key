@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
  * (within a goal). The real work is delegated to a second manager (delegate pattern), this class
@@ -34,7 +36,8 @@ public class FocussedBreakpointRuleApplicationManager
         this.breakpoint = breakpoint;
     }
 
-    public FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
+    public FocussedBreakpointRuleApplicationManager(
+            @Nullable AutomatedRuleApplicationManager delegate,
             Goal goal, Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
         this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
                 .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
@@ -70,8 +73,8 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public void setGoal(Goal p_goal) {
-        delegate.setGoal(p_goal);
+    public void setGoal(Goal goal) {
+        delegate.setGoal(goal);
     }
 
     @Override

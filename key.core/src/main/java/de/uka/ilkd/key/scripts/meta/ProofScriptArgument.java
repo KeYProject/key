@@ -8,6 +8,9 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (21.04.17)
@@ -15,7 +18,7 @@ import de.uka.ilkd.key.scripts.ProofScriptCommand;
 public class ProofScriptArgument<T> {
     private ProofScriptCommand<T> command;
     private String name;
-    private Class<?> type;
+    private Class<@NonNull ?> type;
     private boolean required;
     private boolean flag;
     private Field field;
@@ -46,11 +49,11 @@ public class ProofScriptArgument<T> {
         return this;
     }
 
-    public Class<?> getType() {
+    public Class<@NonNull ?> getType() {
         return type;
     }
 
-    public ProofScriptArgument<T> setType(Class<?> type) {
+    public ProofScriptArgument<T> setType(Class<@NonNull ?> type) {
         this.type = type;
         return this;
     }
@@ -74,7 +77,7 @@ public class ProofScriptArgument<T> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

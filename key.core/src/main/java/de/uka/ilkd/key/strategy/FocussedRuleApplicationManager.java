@@ -89,9 +89,9 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public void setGoal(Goal p_goal) {
-        goal = p_goal;
-        delegate.setGoal(p_goal);
+    public void setGoal(Goal goal) {
+        this.goal = goal;
+        delegate.setGoal(goal);
     }
 
     @Override

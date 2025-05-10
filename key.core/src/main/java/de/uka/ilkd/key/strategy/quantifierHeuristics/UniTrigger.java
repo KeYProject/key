@@ -73,7 +73,8 @@ class UniTrigger implements Trigger {
         return trigger;
     }
 
-    public boolean equals(Object arg0) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object arg0) {
         if (!(arg0 instanceof UniTrigger a)) {
             return false;
         }

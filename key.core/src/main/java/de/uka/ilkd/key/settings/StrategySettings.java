@@ -16,6 +16,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class StrategySettings extends AbstractSettings {
     private static final String PROP_STRATEGY_PROPERTIES = "strategyProperties";
 
 
-    private Name activeStrategy;
+    private @Nullable Name activeStrategy;
 
     /**
      * maximal number of automatic rule applications before an interaction is required
@@ -178,10 +179,11 @@ public class StrategySettings extends AbstractSettings {
 
     @Override
     public void readSettings(Configuration props) {
-        props = props.getSection(CATEGORY);
-        if (props == null) {
+        var section = props.getSection(CATEGORY);
+        if (section == null) {
             return;
         }
+        props = section;
 
         try {
             setMaxSteps(props.getInt(STEPS_KEY));

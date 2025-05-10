@@ -12,12 +12,14 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 
 import org.key_project.logic.op.Function;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 // W I P
 public class SumProdHandler implements SMTHandler {
 
-    private Function bsumOp, bprodOp;
+    private @MonotonicNonNull Function bsumOp, bprodOp;
 
     // key is the term to identify the bsum, value is the name used for that function.
     private final Map<Term, SExpr> usedBsumTerms = new LinkedHashMap<>();

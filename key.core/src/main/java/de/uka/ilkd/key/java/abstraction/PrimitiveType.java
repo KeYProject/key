@@ -102,7 +102,7 @@ public final class PrimitiveType implements Type {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         return o instanceof PrimitiveType && ((PrimitiveType) o).getName().equals(name);
     }
 

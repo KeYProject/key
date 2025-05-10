@@ -14,6 +14,7 @@ import java.util.stream.Collector;
 
 import org.key_project.util.Strings;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -364,13 +365,14 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         /** @return int the number of elements in list */
         @Override
+        @Pure
         public int size() {
             return size;
         }
 
         /** @return boolean true iff. obj in list */
         @Override
-        public boolean contains(S obj) {
+        public boolean contains(@Nullable S obj) {
             ImmutableList<S> list = this;
             S t;
             while (!list.isEmpty()) {
@@ -540,6 +542,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         @Override
+        @Pure
         public int size() {
             return 0;
         }
@@ -585,7 +588,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         @Override
-        public boolean contains(S obj) {
+        public boolean contains(@Nullable S obj) {
             return false;
         }
 

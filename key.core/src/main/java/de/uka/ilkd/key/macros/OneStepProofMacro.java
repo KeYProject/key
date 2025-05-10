@@ -14,6 +14,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Apply a single proof step.
  *
@@ -42,7 +44,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new OneStepStrategy(proof.getActiveStrategy());
     }
 

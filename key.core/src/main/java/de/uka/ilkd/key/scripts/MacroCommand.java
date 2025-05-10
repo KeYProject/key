@@ -21,6 +21,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.Varargs;
 
+import org.jspecify.annotations.Nullable;
+
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();
 
@@ -162,17 +164,28 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                 .replace(" +", " ");
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
-        /** Macro name parameter */
+        /**
+         * Macro name parameter
+         */
         @Option("#2")
         public String macroName;
-        /** Run on formula number "occ" parameter */
+        /**
+         * Run on formula number "occ" parameter
+         */
         @Option(value = "occ", required = false)
+        @Nullable
         public Integer occ = -1;
-        /** Run on formula matching the given regex */
+        /**
+         * Run on formula matching the given regex
+         */
         @Option(value = "matches", required = false)
+        @Nullable
         public String matches = null;
-        /** Variable macro parameters */
+        /**
+         * Variable macro parameters
+         */
         @Varargs(as = String.class, prefix = "arg_")
         public Map<String, String> instantiations = new HashMap<>();
     }

@@ -24,6 +24,8 @@ import de.uka.ilkd.key.speclang.BlockContract;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author christoph
@@ -48,7 +50,8 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener) {
         assert canApplyTo(proof, goals, posInOcc);
 
         final ProofOblInput poForProof =

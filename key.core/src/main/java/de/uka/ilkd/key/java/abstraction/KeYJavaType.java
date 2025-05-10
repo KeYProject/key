@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The KeY java type realises a tuple (sort, type) of a logic sort and the java type (for example a
@@ -22,12 +23,12 @@ import org.key_project.logic.sort.Sort;
 public class KeYJavaType implements Type {
 
     /** Special return "type" for void methods. */
-    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null, JavaDLTheory.ANY);
+    public static final KeYJavaType VOID_TYPE = new KeYJavaType(JavaDLTheory.ANY);
 
     /** the AST type */
-    private Type javaType = null;
+    private @Nullable Type javaType = null;
     /** the logic sort */
-    private Sort sort = null;
+    private @Nullable Sort sort = null;
 
     /** creates a new KeYJavaType */
     public KeYJavaType() {
@@ -40,28 +41,28 @@ public class KeYJavaType implements Type {
     }
 
     /** creates a new KeYJavaType */
-    public KeYJavaType(Sort sort) {
+    public KeYJavaType(@Nullable Sort sort) {
         this.sort = sort;
     }
 
     /** creates a new KeYJavaType */
-    public KeYJavaType(Type type) {
+    public KeYJavaType(@Nullable Type type) {
         this.javaType = type;
     }
 
-    public void setJavaType(Type type) {
+    public void setJavaType(@Nullable Type type) {
         javaType = type;
     }
 
-    public void setSort(Sort s) {
+    public void setSort(@Nullable Sort s) {
         sort = s;
     }
 
-    public Type getJavaType() {
+    public @Nullable Type getJavaType() {
         return javaType;
     }
 
-    public Sort getSort() {
+    public @Nullable Sort getSort() {
         return sort;
     }
 
@@ -89,17 +90,24 @@ public class KeYJavaType implements Type {
     }
 
     public String getFullName() {
-        return Optional.ofNullable(getJavaType()).map(Type::getFullName)
-                .orElse(getSort().name().toString());
+        Type type = getJavaType();
+        if (type != null) {
+            String fullName = type.getFullName();
+            if (fullName != null)
+                return fullName;
+        }
+        return getSort().name().toString();
     }
 
     public String getName() {
-        return Optional.ofNullable(getJavaType()).map(Type::getName)
-                .orElse(getSort().name().toString());
+        Type type = getJavaType();
+        if (type != null)
+            return type.getName();
+        return getSort().name().toString();
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

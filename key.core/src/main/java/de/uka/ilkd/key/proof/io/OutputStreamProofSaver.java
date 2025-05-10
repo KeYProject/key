@@ -52,6 +52,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -814,21 +815,21 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    public static String printTerm(Term t, Services serv) {
+    public static String printTerm(Term t, @Nullable Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static String printTerm(Term t, Services serv, boolean shortAttrNotation) {
+    public static String printTerm(Term t, @Nullable Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         logicPrinter.printTerm(t);
         return logicPrinter.result();
     }
 
-    public static String printAnything(Object val, Services services) {
+    public static @Nullable String printAnything(Object val, @Nullable Services services) {
         return printAnything(val, services, true);
     }
 
-    public static String printAnything(Object val, Services services,
+    public static @Nullable String printAnything(@Nullable Object val, @Nullable Services services,
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
@@ -849,13 +850,14 @@ public class OutputStreamProofSaver {
         }
     }
 
-    private static String printSequent(Sequent val, Services services) {
+    private static String printSequent(Sequent val, @Nullable Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.result();
     }
 
-    private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {
+    private static LogicPrinter createLogicPrinter(@Nullable Services serv,
+            boolean shortAttrNotation) {
 
         final NotationInfo ni = new NotationInfo();
 

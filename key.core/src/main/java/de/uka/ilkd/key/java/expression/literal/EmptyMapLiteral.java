@@ -20,7 +20,7 @@ public class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         return o == this;
     }
 

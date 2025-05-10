@@ -30,6 +30,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class encapsulates the registration of a proof for a given problem. It then starts a proof
  * attempt.
@@ -41,6 +43,59 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class ProofStarter {
 
+    public static class Builder {
+        private final boolean useAutoSaver;
+        private @Nullable ProverTaskListener ptl;
+
+        public Builder(boolean useAutoSaver) {
+            this.useAutoSaver = useAutoSaver;
+        }
+
+        public Builder(ProverTaskListener ptl, boolean useAutoSaver) {
+            this.ptl = ptl;
+            this.useAutoSaver = useAutoSaver;
+        }
+
+        /**
+         * creates a new proof object for formulaToProve and registers it in the given environment
+         *
+         * @throws ProofInputException if getPO fails
+         */
+        public ProofStarter build(Term formulaToProve, ProofEnvironment env)
+                throws ProofInputException {
+            final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
+            Proof proof = input.getPO().getFirstProof();
+            assert proof != null;
+            proof.setEnv(env);
+            return new ProofStarter(ptl, useAutoSaver, proof);
+        }
+
+        /**
+         * creates a new proof object for sequentToProve and registers it in the given environment
+         *
+         * @throws ProofInputException if getPO fails
+         */
+        public ProofStarter build(Sequent sequentToProve, ProofEnvironment env, String proofName)
+                throws ProofInputException {
+            final ProofOblInput input = new UserProvidedInput(sequentToProve, env, proofName);
+            Proof proof = input.getPO().getFirstProof();
+            assert proof != null;
+            proof.setEnv(env);
+            return new ProofStarter(ptl, useAutoSaver, proof);
+        }
+
+        /**
+         * creates a new proof object from the given proof
+         */
+        public ProofStarter build(Proof proof) {
+            ProofStarter result = new ProofStarter(ptl, useAutoSaver, proof);
+            result.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
+            result.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
+            result.setStrategy(proof.getActiveStrategy());
+            return result;
+        }
+    }
+
     /**
      * Proof obligation for a given formula or sequent
      */
@@ -49,13 +104,13 @@ public class ProofStarter {
         private static final String EMPTY_PROOF_HEADER = "";
         private final ProofEnvironment env;
         private final Sequent seq;
-        private final String proofName;
+        private final @Nullable String proofName;
 
         public UserProvidedInput(Sequent seq, ProofEnvironment env) {
             this(seq, env, null);
         }
 
-        public UserProvidedInput(Sequent seq, ProofEnvironment env, String proofName) {
+        public UserProvidedInput(Sequent seq, ProofEnvironment env, @Nullable String proofName) {
             this.seq = seq;
             this.env = env;
             this.proofName = proofName;
@@ -105,31 +160,22 @@ public class ProofStarter {
          * {@inheritDoc}
          */
         @Override
-        public KeYJavaType getContainerType() {
+        public @Nullable KeYJavaType getContainerType() {
             return null;
         }
     }
 
-    private Proof proof;
+    private final Proof proof;
 
     private int maxSteps = 2000;
 
     private long timeout = -1L;
 
-    private final ProverTaskListener ptl;
+    private final @Nullable ProverTaskListener ptl;
 
-    private AutoSaver autoSaver;
+    private @Nullable AutoSaver autoSaver;
 
-    private Strategy strategy;
-
-    /**
-     * creates an instance of the ProofStarter
-     *
-     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
-     */
-    public ProofStarter(boolean useAutoSaver) {
-        this(null, useAutoSaver);
-    }
+    private @Nullable Strategy strategy;
 
     /**
      * creates an instance of the ProofStarter
@@ -137,35 +183,15 @@ public class ProofStarter {
      * @param ptl the ProverTaskListener to be informed about certain events
      * @param useAutoSaver boolean indicating whether the proof shall be auto saved
      */
-    public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
+    public ProofStarter(@Nullable ProverTaskListener ptl, boolean useAutoSaver, Proof proof) {
         this.ptl = ptl;
+        this.proof = proof;
         if (useAutoSaver) {
             autoSaver = AutoSaver.getDefaultInstance();
         }
     }
 
-    /**
-     * creates a new proof object for formulaToProve and registers it in the given environment
-     *
-     * @throws ProofInputException
-     */
-    public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
-        final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
-        proof = input.getPO().getFirstProof();
-        proof.setEnv(env);
-    }
 
-    /**
-     * creates a new proof object for sequentToProve and registers it in the given environment
-     *
-     * @throws ProofInputException
-     */
-    public void init(Sequent sequentToProve, ProofEnvironment env, String proofName)
-            throws ProofInputException {
-        final ProofOblInput input = new UserProvidedInput(sequentToProve, env, proofName);
-        proof = input.getPO().getFirstProof();
-        proof.setEnv(env);
-    }
 
     /**
      * set timeout
@@ -222,12 +248,13 @@ public class ProofStarter {
     public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
             final Profile profile = proof.getInitConfig().getProfile();
+            Strategy strategy = this.strategy;
 
             if (strategy == null) {
                 StrategyFactory factory = profile.getDefaultStrategyFactory();
                 StrategyProperties sp = factory.getSettingsDefinition()
                         .getDefaultPropertiesFactory().createDefaultStrategyProperties();
-                strategy = factory.create(proof, sp);
+                this.strategy = strategy = factory.create(proof, sp);
             }
 
             proof.setActiveStrategy(strategy);
@@ -272,19 +299,12 @@ public class ProofStarter {
         }
     }
 
-    public void init(Proof proof) {
-        this.proof = proof;
-        this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
-        this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
-        this.setStrategy(proof.getActiveStrategy());
-    }
-
     /**
      * Returns the managed side {@link Proof}.
      *
      * @return The managed side {@link Proof}.
      */
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 }

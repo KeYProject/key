@@ -53,7 +53,8 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
     }
 
     /** equal if terms and constraints are equal */
-    public boolean equals(Object obj) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (this == obj) {
             return true;
         }

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -52,7 +53,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     @Override
     public void execute(Parameters args) throws ScriptException, InterruptedException {
 
-        Goal goal = state.getFirstOpenAutomaticGoal();
+        Goal goal = Objects.requireNonNull(state).getFirstOpenAutomaticGoal();
 
         Taclet hideLeft =
             state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
@@ -60,21 +61,24 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
             SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
+            app = app.addCheckedInstantiation(sv, s2.formula(), Objects.requireNonNull(service),
+                true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
-                service);
+                Objects.requireNonNull(service));
             goal.apply(app);
         }
 
         Taclet hideRight =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_RIGHT);
+            Objects.requireNonNull(state).getProof().getEnv().getInitConfigForEnvironment()
+                    .lookupActiveTaclet(HIDE_RIGHT);
         for (SequentFormula s : args.sequent.succedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
             SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
+            app = app.addCheckedInstantiation(sv, s2.formula(), Objects.requireNonNull(service),
+                true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
-                service);
+                Objects.requireNonNull(service));
             goal.apply(app);
         }
     }
@@ -93,6 +97,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
         return "hide";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public Sequent sequent;

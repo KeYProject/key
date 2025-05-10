@@ -54,6 +54,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
      * @throws InterruptedException
      */
     @Override
+    @SuppressWarnings("override.param.invalid")
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
@@ -65,6 +66,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public Term formula;

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -47,15 +48,18 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
     @Override
     public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
         Taclet cut =
-            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
+            Objects.requireNonNull(state).getProof().getEnv().getInitConfigForEnvironment()
+                    .lookupActiveTaclet(TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
+        app = app.addCheckedInstantiation(sv, parameter.formula,
+            Objects.requireNonNull(state).getProof().getServices(),
             true);
-        state.getFirstOpenAutomaticGoal().apply(app);
+        Objects.requireNonNull(state).getFirstOpenAutomaticGoal().apply(app);
     }
 
+    @SuppressWarnings("initialization")
     public static class FormulaParameter {
         @Option("#2")
         public Term formula;

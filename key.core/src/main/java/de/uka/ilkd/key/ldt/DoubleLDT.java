@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
+
 public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     public static final Name NAME = new Name("double");
@@ -154,7 +156,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public JFunction getFunctionFor(String op, Services services) {
+    public @Nullable JFunction getFunctionFor(String op, Services services) {
         return switch (op) {
         case "gt" -> getGreaterThan();
         case "geq" -> getGreaterOrEquals();
@@ -181,7 +183,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public @Nullable JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
             Services services,
             ExecutionContext ec) {
         if (op instanceof Negative) {
@@ -215,7 +217,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public @Nullable Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_DOUBLE;
         } else {

@@ -20,7 +20,10 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -62,7 +65,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             node -> getFirstSubtreeGoal(node, proof), proof);
     }
 
-    private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
+    private static @Nullable Goal getFirstSubtreeGoal(Node node, Proof proof) {
         Goal goal;
         if (node.leaf() && //
                 (goal = EngineState.getGoal(proof.openGoals(), node)) != null) {
@@ -147,6 +150,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return "select";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)

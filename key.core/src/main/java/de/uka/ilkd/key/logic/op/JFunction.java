@@ -15,6 +15,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Objects of this class represent function and predicate symbols in JavaDL. Note that program
@@ -33,7 +35,7 @@ public class JFunction extends Function implements Operator, Sorted {
     // -------------------------------------------------------------------------
 
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, isRigid, unique, isSkolemConstant);
 
@@ -44,22 +46,23 @@ public class JFunction extends Function implements Operator, Sorted {
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique) {
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false);
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique,
+            boolean isSkolemConstant) {
         this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
             boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
             boolean unique,
             boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<>(argSorts),

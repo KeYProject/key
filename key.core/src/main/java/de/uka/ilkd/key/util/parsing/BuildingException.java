@@ -21,25 +21,26 @@ import org.jspecify.annotations.Nullable;
 public class BuildingException extends RuntimeException implements HasLocation {
     private final @Nullable Token offendingSymbol;
 
-    public BuildingException(ParserRuleContext ctx, String format) {
+    public BuildingException(@Nullable ParserRuleContext ctx, String format) {
         this(ctx, format, null);
     }
 
-    public BuildingException(Throwable e) {
+    public BuildingException(@Nullable Throwable e) {
         super(e);
         offendingSymbol = null;
     }
 
-    public BuildingException(ParserRuleContext ctx, String message, Throwable e) {
+    public BuildingException(@Nullable ParserRuleContext ctx, String message,
+            @Nullable Throwable e) {
         this(ctx == null ? null : ctx.start, message, e);
     }
 
-    public BuildingException(@Nullable Token t, String message, Throwable e) {
+    public BuildingException(@Nullable Token t, @Nullable String message, @Nullable Throwable e) {
         super(message + " at " + getPosition(t), e);
         offendingSymbol = t;
     }
 
-    private static String getPosition(Token t) {
+    private static String getPosition(@Nullable Token t) {
         if (t != null) {
             var p = Position.fromToken(t);
             return t.getTokenSource().getSourceName() + ":" + p.line() + ":" + p.column();

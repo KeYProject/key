@@ -25,6 +25,8 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -133,7 +135,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
+    private @Nullable TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,

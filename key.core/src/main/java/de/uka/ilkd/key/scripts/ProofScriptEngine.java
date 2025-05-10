@@ -24,6 +24,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.checkerframework.checker.nullness.qual.KeyFor;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +46,7 @@ public class ProofScriptEngine {
     /**
      * The initially selected goal.
      */
-    private final Goal initiallySelectedGoal;
+    private final @Nullable Goal initiallySelectedGoal;
 
     /**
      * The engine state map.
@@ -72,6 +74,7 @@ public class ProofScriptEngine {
         this.initiallySelectedGoal = initiallySelectedGoal;
     }
 
+    @SuppressWarnings("dereference.of.nullable")
     private static Map<String, ProofScriptCommand<?>> loadCommands() {
         Map<String, ProofScriptCommand<?>> result = new HashMap<>();
         var loader = ServiceLoader.load(ProofScriptCommand.class);
@@ -131,7 +134,8 @@ public class ProofScriptEngine {
                 cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
-            final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
+            final Node firstNode =
+                Objects.requireNonNull(stateMap.getFirstOpenAutomaticGoal()).node();
             if (commandMonitor != null && stateMap.isEchoOn()) {
                 commandMonitor
                         .accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
@@ -150,7 +154,7 @@ public class ProofScriptEngine {
                     LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
                         firstNode.serialNr(), commandContext.start.getLine(), cmd);
                 }
-                command.execute(uiControl, o, stateMap);
+                command.execute(uiControl, Objects.requireNonNull(o), stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
                 throw ie;
@@ -167,9 +171,12 @@ public class ProofScriptEngine {
                             commandContext.getText(),
                             BuilderHelpers.getPosition(commandContext)));
                 } else {
+                    @SuppressWarnings("keyfor")
+                    @KeyFor("argMap")
+                    String key = ScriptLineParser.LITERAL_KEY;
                     LOGGER.info(
                         "Proof already closed at command \"{}\" at line {}, terminating",
-                        argMap.get(ScriptLineParser.LITERAL_KEY),
+                        argMap.get(key),
                         BuilderHelpers.getPosition(commandContext));
                     break;
                 }
@@ -234,7 +241,7 @@ public class ProofScriptEngine {
         this.commandMonitor = monitor;
     }
 
-    public static ProofScriptCommand<?> getCommand(String commandName) {
+    public static @Nullable ProofScriptCommand<?> getCommand(String commandName) {
         return COMMANDS.get(commandName);
     }
 

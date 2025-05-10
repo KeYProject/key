@@ -243,8 +243,7 @@ public class MergeRuleTests {
      * @param proof Proof to prove automatically.
      */
     public static void startAutomaticStrategy(final Proof proof) {
-        ProofStarter starter = new ProofStarter(false);
-        starter.init(proof);
+        ProofStarter starter = new ProofStarter.Builder(false).build(proof);
         starter.start();
     }
 

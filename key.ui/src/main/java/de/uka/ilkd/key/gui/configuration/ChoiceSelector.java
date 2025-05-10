@@ -28,6 +28,7 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -397,7 +398,7 @@ public class ChoiceSelector extends JDialog {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj instanceof ChoiceEntry other) {
                 return choice.equals(other.choice()) && incomplete == other.incomplete()
                         && unsound == other.unsound()

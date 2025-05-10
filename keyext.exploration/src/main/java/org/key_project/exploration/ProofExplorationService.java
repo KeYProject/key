@@ -7,7 +7,10 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
@@ -18,7 +21,6 @@ import de.uka.ilkd.key.rule.*;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -54,22 +56,20 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (20.08.19)
  */
 
-@SuppressWarnings("ClassCanBeRecord")
 public class ProofExplorationService {
-    private final @NonNull Proof proof;
-    private final @NonNull Services services;
+    private final Proof proof;
+    private final Services services;
 
-    public ProofExplorationService(@NonNull Proof proof, @NonNull Services services) {
+    public ProofExplorationService(Proof proof, Services services) {
         this.proof = proof;
         this.services = services;
     }
 
-    public static @NonNull ProofExplorationService get(KeYMediator mediator) {
-        return get(mediator.getSelectedProof());
+    public static ProofExplorationService get(KeYMediator mediator) {
+        return get(Objects.requireNonNull(mediator.getSelectedProof()));
     }
 
-    private static @NonNull ProofExplorationService get(Proof selectedProof) {
-        @Nullable
+    private static ProofExplorationService get(Proof selectedProof) {
         ProofExplorationService service = selectedProof.lookup(ProofExplorationService.class);
         if (service == null) {
             service = new ProofExplorationService(selectedProof, selectedProof.getServices());
@@ -90,7 +90,7 @@ public class ProofExplorationService {
     /**
      * Finds the `cut` taclet in the current proof environment.
      */
-    public @NonNull Taclet getCutTaclet() {
+    public Taclet getCutTaclet() {
         return Objects.requireNonNull(
             proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
     }
@@ -102,7 +102,7 @@ public class ProofExplorationService {
      * @param t Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
      */
-    public @NonNull Node soundAddition(@NonNull Goal g, @NonNull Term t, boolean antecedent) {
+    public Node soundAddition(Goal g, Term t, boolean antecedent) {
         Taclet cut =
             g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));
@@ -142,12 +142,10 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public Node applyChangeFormula(@NonNull Goal g, @NonNull PosInOccurrence pio,
-            @NonNull Term term, @NonNull Term newTerm) {
+    public @Nullable Node applyChangeFormula(Goal g, PosInOccurrence pio, Term term, Term newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         // taint goal with exploration
-        @NonNull
         ExplorationNodeData data = ExplorationNodeData.get(g.node());
         data.setExplorationAction(
             String.format("Edit %s to %s", LogicPrinter.quickPrintTerm(term, services),
@@ -174,7 +172,8 @@ public class ProofExplorationService {
         for (Goal goal : result) {
             if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
                 goal.apply(weakening);
-                goal.node().parent().register(new ExplorationNodeData(), ExplorationNodeData.class);
+                Objects.requireNonNull(goal.node().parent())
+                        .register(new ExplorationNodeData(), ExplorationNodeData.class);
                 toBeSelected = goal.node();
             } else {
                 goal.setEnabled(false);
@@ -183,8 +182,7 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    private TacletApp soundChange(@NonNull PosInOccurrence pio, @NonNull Term term,
-            @NonNull Term newTerm) {
+    private TacletApp soundChange(PosInOccurrence pio, Term term, Term newTerm) {
         Taclet cut = getCutTaclet();
         Semisequent semisequent = new Semisequent(new SequentFormula(newTerm));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
