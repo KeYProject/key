@@ -21,22 +21,23 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingSettingsProvider;
@@ -47,7 +48,7 @@ import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.slicing.util.ExecutionTime;
-import org.key_project.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.EqualsAndHashCodeDelegator;
 import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
@@ -442,7 +443,8 @@ public final class DependencyAnalyzer {
             }
             // groups proof steps that act upon this graph node by their rule app
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
-            Map<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> foundDupes = new HashMap<>();
+            Map<EqualsAndHashCodeDelegator<RuleApp>, Set<Node>> foundDupes =
+                new HashMap<>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
                 Node proofNode = t.fromNode();
 
@@ -471,13 +473,15 @@ public final class DependencyAnalyzer {
                 }
                 foundDupes
                         .computeIfAbsent(
-                            new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp()),
+                            new EqualsAndHashCodeDelegator<>(proofNode.getAppliedRuleApp(),
+                                EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy,
+                                EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
                             _a -> new LinkedHashSet<>())
                         .add(t.annotation().getProofStep());
             });
 
             // scan dupes, try to find a set of mergable rule applications
-            for (Map.Entry<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> entry : foundDupes
+            for (Map.Entry<EqualsAndHashCodeDelegator<RuleApp>, Set<Node>> entry : foundDupes
                     .entrySet()) {
                 if (mergedAnything) {
                     continue;

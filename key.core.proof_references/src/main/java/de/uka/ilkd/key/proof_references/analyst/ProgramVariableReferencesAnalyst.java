@@ -62,8 +62,7 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
      */
     protected void listReferences(Node node, ProgramElement pe, ProgramVariable arrayLength,
             LinkedHashSet<IProofReference<?>> toFill, boolean includeExpressionContainer) {
-        if (pe instanceof ProgramVariable) {
-            ProgramVariable pv = (ProgramVariable) pe;
+        if (pe instanceof ProgramVariable pv) {
             if (pv.isMember()) {
                 DefaultProofReference<ProgramVariable> reference =
                     new DefaultProofReference<>(IProofReference.ACCESS, node,

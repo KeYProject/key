@@ -42,7 +42,7 @@ interface Query {
 abstract class AbstractQuery implements Query {
     protected String result;
 
-    public AbstractQuery() {
+    protected AbstractQuery() {
         super();
         this.result = null;
     }

@@ -10,7 +10,12 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,8 +36,8 @@ public class TestPosInOcc {
     public void testIterator() {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
-        JFunction f = new JFunction(new Name("f"), sort1, sort1);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+        Function f = new JFunction(new Name("f"), sort1, sort1);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
 
         Term[] terms = new Term[3];
@@ -76,9 +81,9 @@ public class TestPosInOcc {
     public void testReplaceConstrainedFormula() {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
-        JFunction c = new JFunction(new Name("c"), sort1, new Sort[] {});
-        JFunction f = new JFunction(new Name("f"), sort1, sort1);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+        Function c = new JFunction(new Name("c"), sort1, new Sort[] {});
+        Function f = new JFunction(new Name("f"), sort1, sort1);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
         Term[] terms = new Term[3];
         terms[0] = TB.var(x);
@@ -93,15 +98,16 @@ public class TestPosInOcc {
         terms2[3] = TB.func(p, new Term[] { terms2[2] });
         SequentFormula cfma2 = new SequentFormula(terms2[3]);
 
-        final PosInOccurrence topPIO = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), true);
+        final PosInOccurrence topPIO =
+            new PosInOccurrence(cfma, PosInTerm.getTopLevel(), true);
 
 
         // Test without metavariables involved
         PosInOccurrence pio = topPIO.down(0);
         assertSame(pio.subTerm(), terms[1]);
-        PosInOccurrence pio2 = pio.replaceConstrainedFormula(cfma);
+        PosInOccurrence pio2 = pio.replaceSequentFormula(cfma);
         assertEquals(pio, pio2);
-        pio = pio.replaceConstrainedFormula(cfma2);
+        pio = pio.replaceSequentFormula(cfma2);
         assertSame(pio.subTerm(), terms2[2]);
     }
 }

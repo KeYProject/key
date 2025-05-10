@@ -7,9 +7,10 @@ import java.io.File;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -17,6 +18,9 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +61,9 @@ public class TestTacletBuild {
         RewriteTacletBuilder<RewriteTaclet> sb = new RewriteTacletBuilder<>();
         sb.setFind(t1);
         sb.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t2));
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
+                ImmutableSLList.nil(),
+                t2));
         boolean thrown = false;
         try {
             sb.getTaclet();
@@ -75,10 +81,11 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
+        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+            NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
-        Sequent seq = Sequent.createSuccSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1)).semisequent());
+        Sequent seq =
+            JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t1)));
         Term t2 = tb.ex((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
@@ -96,12 +103,13 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
+        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+            NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Term t2 = tb.ex((QuantifiableVariable) u, A);
-        Sequent seq = Sequent
-                .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1))
-                        .semisequent().insert(1, new SequentFormula(t2)).semisequent());
+        Sequent seq = JavaDLSequentKit
+                .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t2))
+                        .prepend(new SequentFormula(t1)));
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
         sb.setFind(A);
@@ -118,7 +126,8 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVsInFind() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
+        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+            NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setFind(tf.createTerm(Junctor.AND, t1, t1));

@@ -40,9 +40,9 @@ class SequentViewPanel extends JPanel {
         gbc.gridwidth = 2;
         add(sequentView, gbc);
 
-        if (sequentView instanceof InnerNodeView) {
+        if (sequentView instanceof InnerNodeView innerNodeView) {
             gbc.gridy = 2;
-            add(((InnerNodeView) sequentView).tacletInfo, gbc);
+            add(((InnerNodeView) sequentView).getTacletInfo(), gbc);
         }
 
         gbc.fill = GridBagConstraints.BOTH;

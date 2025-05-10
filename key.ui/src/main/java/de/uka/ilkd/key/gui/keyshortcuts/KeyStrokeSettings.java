@@ -177,7 +177,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
                     LOGGER.error("Could not read {}", SETTINGS_FILE_NEW, e);
                 }
             }
-            return INSTANCE = KeyStrokeSettings.loadFromConfig();
+            return INSTANCE = loadFromConfig();
         }
         return INSTANCE;
     }

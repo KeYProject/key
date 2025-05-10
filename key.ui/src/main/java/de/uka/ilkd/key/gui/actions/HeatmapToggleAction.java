@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
@@ -28,7 +27,7 @@ public class HeatmapToggleAction extends MainWindowAction {
         setName("Toggle Heatmap");
         setMenuPath("View.Heatmap");
         setEnabled(getMediator().getSelectedProof() != null);
-        putValue(Action.LONG_DESCRIPTION, "Enable or disable age heatmaps in the sequent view.");
+        putValue(LONG_DESCRIPTION, "Enable or disable age heatmaps in the sequent view.");
 
         setIcon();
         addPropertyChangeListener(evt -> {

@@ -3,25 +3,29 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
-import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -67,7 +71,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
      *        to all started {@link ApplyStrategy} instances.
      */
-    public AbstractProofControl(ProverTaskListener defaultProverTaskListener) {
+    protected AbstractProofControl(ProverTaskListener defaultProverTaskListener) {
         this(defaultProverTaskListener, null);
     }
 
@@ -78,7 +82,7 @@ public abstract class AbstractProofControl implements ProofControl {
      *        to all started {@link ApplyStrategy} instances.
      * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      */
-    public AbstractProofControl(ProverTaskListener defaultProverTaskListener,
+    protected AbstractProofControl(ProverTaskListener defaultProverTaskListener,
             RuleCompletionHandler ruleCompletionHandler) {
         this.ruleCompletionHandler = ruleCompletionHandler;
         this.defaultProverTaskListener = defaultProverTaskListener;
@@ -106,7 +110,8 @@ public abstract class AbstractProofControl implements ProofControl {
     public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
         ImmutableList<BuiltInRule> rules = ImmutableSLList.nil();
 
-        for (RuleApp ruleApp : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal, pos)) {
+        for (RuleApp ruleApp : focusedGoal.ruleAppIndex()
+                .getBuiltInRules(focusedGoal, pos)) {
             BuiltInRule r = (BuiltInRule) ruleApp.rule();
             if (!rules.contains(r)) {
                 rules = rules.prepend(r);
@@ -125,7 +130,8 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-    public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos) {
+    public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal,
+            PosInOccurrence pos) {
         if (pos != null && focusedGoal != null) {
             LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node {}",
                 focusedGoal.node().serialNr());
@@ -136,7 +142,8 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-    public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos) {
+    public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal,
+            PosInOccurrence pos) {
         if (pos != null) {
             return filterTaclet(focusedGoal,
                 focusedGoal.ruleAppIndex().getRewriteTaclet(TacletFilter.TRUE, pos), pos);
@@ -150,8 +157,9 @@ public abstract class AbstractProofControl implements ProofControl {
      * TacletApps
      */
     private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal,
-            ImmutableList<NoPosTacletApp> tacletInstances, PosInOccurrence pos) {
-        java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<>();
+            ImmutableList<NoPosTacletApp> tacletInstances,
+            PosInOccurrence pos) {
+        HashSet<Taclet> applicableRules = new HashSet<>();
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp app : tacletInstances) {
             if (isMinimizeInteraction()) {
@@ -162,9 +170,10 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
                 if (ifCandidates.size() == 1 && pos != null) {
                     TacletApp a = ifCandidates.head();
-                    ImmutableList<IfFormulaInstantiation> ifs = a.ifFormulaInstantiations();
+                    ImmutableList<AssumesFormulaInstantiation> ifs =
+                        a.assumesFormulaInstantiations();
                     if (ifs != null && ifs.size() == 1
-                            && ifs.head() instanceof IfFormulaInstSeq ifis) {
+                            && ifs.head() instanceof AssumesFormulaInstSeq ifis) {
                         if (ifis.toPosInOccurrence().equals(pos.topLevel())) {
                             continue; // skip app if find and if same formula
                         }
@@ -182,7 +191,8 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
+    public boolean selectedTaclet(Taclet taclet, Goal goal,
+            PosInOccurrence pos) {
         ImmutableSet<TacletApp> applics = getAppsForName(goal, taclet.name().toString(), pos);
         if (applics.size() == 0) {
             return false;
@@ -195,7 +205,7 @@ public abstract class AbstractProofControl implements ProofControl {
         Iterator<TacletApp> it = applics.iterator();
         if (applics.size() == 1) {
             TacletApp firstApp = it.next();
-            boolean ifSeqInteraction = !firstApp.taclet().ifSequent().isEmpty();
+            boolean ifSeqInteraction = !firstApp.taclet().assumesSequent().isEmpty();
             if (isMinimizeInteraction() && !firstApp.complete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(), services);
@@ -220,7 +230,7 @@ public abstract class AbstractProofControl implements ProofControl {
                 applyInteractive(firstApp, goal);
             }
         } else if (applics.size() > 1) {
-            java.util.List<TacletApp> appList = new java.util.LinkedList<>();
+            List<TacletApp> appList = new LinkedList<>();
 
             for (int i = 0; i < applics.size(); i++) {
                 TacletApp rapp = it.next();
@@ -243,8 +253,8 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
-        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-        var node = goal.node();
+        final Node node = goal.node();
+        node.getNodeInfo().setInteractiveRuleApplication(true);
         goal.apply(app);
         emitInteractiveRuleApplication(node, app);
     }
@@ -277,7 +287,8 @@ public abstract class AbstractProofControl implements ProofControl {
         interactionListeners.forEach((l) -> l.runPrune(node));
     }
 
-    protected void emitInteractiveRuleApplication(Node node, RuleApp app) {
+    protected void emitInteractiveRuleApplication(Node node,
+            RuleApp app) {
         interactionListeners.forEach((l) -> l.runRule(node, app));
     }
 
@@ -289,7 +300,8 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param pos the PosInOccurrence describing the position
      * @return a list of all found rule applications of the given rule at position pos
      */
-    protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name, PosInOccurrence pos) {
+    protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
+            PosInOccurrence pos) {
         return getAppsForName(goal, name, pos, TacletFilter.TRUE);
     }
 
@@ -304,7 +316,8 @@ public abstract class AbstractProofControl implements ProofControl {
      * @return a list of all found rule applications of the given rule at position <tt>pos</tt>
      *         passing the filter
      */
-    protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name, PosInOccurrence pos,
+    protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
+            PosInOccurrence pos,
             TacletFilter filter) {
         Services services = goal.proof().getServices();
         ImmutableSet<TacletApp> result = DefaultImmutableSet.nil();
@@ -328,7 +341,7 @@ public abstract class AbstractProofControl implements ProofControl {
         return result;
     }
 
-    public TacletInstantiationModel[] completeAndApplyApp(java.util.List<TacletApp> apps,
+    public TacletInstantiationModel[] completeAndApplyApp(List<TacletApp> apps,
             Goal goal) {
         TacletInstantiationModel[] origInstModels = new TacletInstantiationModel[apps.size()];
         LinkedList<TacletInstantiationModel> recentInstModels = new LinkedList<>();
@@ -602,18 +615,19 @@ public abstract class AbstractProofControl implements ProofControl {
      * that goal
      */
     @Override
-    public synchronized void startFocussedAutoMode(PosInOccurrence focus, Goal goal) {
+    public synchronized void startFocussedAutoMode(
+            PosInOccurrence focus, Goal goal) {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 
-            final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager();
+            final RuleApplicationManager realManager = goal.getRuleAppManager();
             goal.setRuleAppManager(null);
-            final AutomatedRuleApplicationManager focusManager =
+            final RuleApplicationManager focusManager =
                 new FocussedRuleApplicationManager(realManager, goal, focus);
             goal.setRuleAppManager(focusManager);
         }
 
-        startAutoMode(goal.proof(), ImmutableSLList.<Goal>nil().prepend(goal),
+        startAutoMode(goal.proof(), ImmutableSLList.singleton(goal),
             new FocussedAutoModeTaskListener(goal.proof()));
     }
 
@@ -640,13 +654,13 @@ public abstract class AbstractProofControl implements ProofControl {
             for (final Goal goal : proof.openGoals()) {
                 // remove any filtering rule app managers that are left in the
                 // proof goals
-                final AutomatedRuleApplicationManager ruleAppManager = goal.getRuleAppManager();
+                final RuleApplicationManager ruleAppManager = goal.getRuleAppManager();
                 if (ruleAppManager instanceof FocussedRuleApplicationManager
                         || ruleAppManager instanceof FocussedBreakpointRuleApplicationManager) {
-                    final DelegationBasedAutomatedRuleApplicationManager focusManager = //
-                        (DelegationBasedAutomatedRuleApplicationManager) ruleAppManager;
+                    final DelegationBasedRuleApplicationManager focusManager = //
+                        (DelegationBasedRuleApplicationManager) ruleAppManager;
                     goal.setRuleAppManager(null);
-                    final AutomatedRuleApplicationManager realManager = focusManager.getDelegate();
+                    final RuleApplicationManager realManager = focusManager.getDelegate();
                     realManager.clearCache();
                     goal.setRuleAppManager(realManager);
                 }

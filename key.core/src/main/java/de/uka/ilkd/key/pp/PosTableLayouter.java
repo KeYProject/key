@@ -276,7 +276,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     /**
      * A {@link de.uka.ilkd.key.util.pp.Backend} which puts its result in a StringBuffer and builds
      * a PositionTable. Position table construction is done using the
-     * {@link de.uka.ilkd.key.util.pp.Layouter#mark(Object)} facility of the layouter with the
+     * {@link Layouter#mark(Object)} facility of the layouter with the
      * various static <code>MARK_</code> objects.
      */
     private static class PosTableStringBackend extends StringBackend<Mark> {

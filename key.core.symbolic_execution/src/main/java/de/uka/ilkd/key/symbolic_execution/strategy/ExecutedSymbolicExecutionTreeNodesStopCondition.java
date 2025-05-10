@@ -10,12 +10,13 @@ import java.util.Map;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.engine.SingleRuleApplicationInfo;
+import org.key_project.prover.engine.StopCondition;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * <p>
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  *
  * @author Martin Hentschel
  */
-public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCondition {
+public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCondition<Goal> {
     /**
      * The default maximal number of steps to simulate a complete program execution.
      */
@@ -59,7 +60,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
 
     /**
      * Stores for each {@link Node} which is a symbolic execution tree node the computed result of
-     * {@link #isGoalAllowed(int, long, Proof, long, int, Goal)} to make sure that it is only
+     * {@link StopCondition#isGoalAllowed(org.key_project.prover.proof.ProofGoal, int, long, long, int)}
+     * to make sure that it is only
      * computed once and that the number of executed set statements is not increased multiple times
      * for the same {@link Node}.
      */
@@ -88,7 +90,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * {@inheritDoc}
      */
     @Override
-    public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
+    public int getMaximalWork(int maxApplications, long timeout) {
         executedNumberOfSetNodesPerGoal.clear(); // Reset number of already detected symbolic
                                                  // execution tree nodes for all goals.
         goalAllowedResultPerSetNode.clear(); // Remove no longer needed references.
@@ -100,8 +102,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * {@inheritDoc}
      */
     @Override
-    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public boolean isGoalAllowed(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
@@ -118,15 +120,15 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     // Check if limit of set nodes of the current goal is exceeded
                     if (executedNumberOfSetNodes
                             + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
-                        handleNodeLimitExceeded(maxApplications, timeout, proof, startTime,
-                            countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
+                        handleNodeLimitExceeded(node);
                         return false; // Limit of set nodes of this goal exceeded
                     } else {
                         // Increase number of set nodes on this goal and allow rule application
                         executedNumberOfSetNodes =
                             executedNumberOfSetNodes.intValue() + 1;
                         executedNumberOfSetNodesPerGoal.put(goal, executedNumberOfSetNodes);
-                        handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime,
+                        handleNodeLimitNotExceeded(maxApplications, timeout, goal.proof(),
+                            startTime,
                             countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
                         return true;
                     }
@@ -145,22 +147,9 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
     /**
      * Handles the state that the node limit is exceeded.
      *
-     * @param maxApplications The defined maximal number of rules to apply. Can be different to
-     *        {@link StrategySettings#getMaxSteps()} in side proofs.
-     * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to
-     *        {@link StrategySettings#getTimeout()} in side proofs.
-     * @param proof The current {@link Proof}.
-     * @param startTime The timestamp when the apply strategy has started, computed via
-     *        {@link System#nanoTime()}
-     * @param countApplied The number of already applied rules.
-     * @param goal The current {@link Goal} on which the next rule will be applied.
      * @param node The {@link Node} of the current {@link Goal}.
-     * @param ruleApp The current {@link RuleApp}.
-     * @param executedNumberOfSetNodes The executed number of SET nodes.
      */
-    protected void handleNodeLimitExceeded(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
-            Integer executedNumberOfSetNodes) {
+    protected void handleNodeLimitExceeded(Node node) {
         goalAllowedResultPerSetNode.put(node, Boolean.FALSE);
     }
 
@@ -181,7 +170,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * @param executedNumberOfSetNodes The executed number of SET nodes.
      */
     protected void handleNodeLimitNotExceeded(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
+            long startTime, int countApplied, Goal goal, Node node,
+            RuleApp ruleApp,
             Integer executedNumberOfSetNodes) {
         goalAllowedResultPerSetNode.put(node, Boolean.TRUE);
     }
@@ -190,8 +180,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * {@inheritDoc}
      */
     @Override
-    public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal) {
+    public String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
+            long startTime, int countApplied) {
         if (maximalNumberOfSetNodesToExecutePerGoal > 1) {
             return "Maximal limit of " + maximalNumberOfSetNodesToExecutePerGoal
                 + " symbolic execution tree nodes reached.";
@@ -204,7 +194,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * {@inheritDoc}
      */
     @Override
-    public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
+    public boolean shouldStop(int maxApplications, long timeout, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         // Check if a rule was applied
         if (singleRuleApplicationInfo != null) {
@@ -240,7 +230,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
+    public String getStopMessage(int maxApplications, long timeout, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return null;
     }

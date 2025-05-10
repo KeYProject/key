@@ -4,9 +4,6 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.LabelCollection;
@@ -19,10 +16,14 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
+
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * <p>
@@ -108,7 +109,8 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @return The required {@link RefactoringScope}.
      */
     RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm);
 
     /**
@@ -130,7 +132,8 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
     void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, LabelCollection labels);
 
     /**
@@ -146,7 +149,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
 
         /**
          * Refactor the child below the updates computed via
-         * {@link TermBuilder#goBelowUpdates(Term)}.
+         * {@link TermBuilder#goBelowUpdates(org.key_project.logic.Term)}.
          */
         APPLICATION_BELOW_UPDATES,
 

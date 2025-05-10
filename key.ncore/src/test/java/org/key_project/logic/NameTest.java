@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NameTest {
 
-    final String[] names = new String[] { "", "a", "1a", "AB_3$3", " ghIK", ":", ":a", "#1" };
+    final String[] names = { "", "a", "1a", "AB_3$3", " ghIK", ":", ":a", "#1" };
 
     @Test
     void testToString() {

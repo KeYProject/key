@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
@@ -29,9 +28,9 @@ public class CachingToggleAction extends MainWindowAction {
         setMenuPath("Options");
         setEnabled(true);
         setSelected(true);
-        putValue(Action.LONG_DESCRIPTION, DESCRIPTION);
+        putValue(LONG_DESCRIPTION, DESCRIPTION);
         // for main menu variant of action
-        putValue(KeyAction.CHECKBOX, true);
+        putValue(CHECKBOX, true);
         setTooltip(DESCRIPTION);
 
         setIcon(ICON);

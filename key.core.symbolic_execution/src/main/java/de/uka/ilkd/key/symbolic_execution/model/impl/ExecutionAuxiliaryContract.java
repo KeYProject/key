@@ -74,7 +74,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
     protected String lazyComputeName() throws ProofInputException {
         // Find self term
         Term self = null;
-        Term applicationTerm = getModalityPIO().subTerm();
+        var applicationTerm = getModalityPIO().subTerm();
         Term modalityTerm = TermBuilder.goBelowUpdates(applicationTerm);
         ExecutionContext ec =
             JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), getServices());
@@ -87,7 +87,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         Node usageNode = getProofNode().child(2);
         assert "Usage".equals(usageNode.getNodeInfo().getBranchLabel())
                 : "Block Contract Rule has changed.";
-        Term usagePrecondition = usageNode.sequent().antecedent()
+        Term usagePrecondition = (Term) usageNode.sequent().antecedent()
                 .get(usageNode.sequent().antecedent().size() - 1).formula();
         // Find remembrance heaps and local variables
         while (applicationTerm.op() == UpdateApplication.UPDATE_APPLICATION) {

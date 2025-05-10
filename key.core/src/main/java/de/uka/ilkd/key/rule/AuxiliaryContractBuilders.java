@@ -41,11 +41,17 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -312,15 +318,24 @@ public final class AuxiliaryContractBuilders {
         private final Services services;
 
         /**
-         *
          * @param goal If this is not null, all created variables are added to it. If it is null,
          *        the variables are instead added to the {@code services}' namespace.
          * @param placeholderVariables the placeholders from which to create the variables.
-         * @param services services.
          */
-        public VariablesCreatorAndRegistrar(final Goal goal,
-                final BlockContract.Variables placeholderVariables, final Services services) {
+        public VariablesCreatorAndRegistrar(final @NonNull Goal goal,
+                final Variables placeholderVariables) {
             this.goal = goal;
+            this.placeholderVariables = placeholderVariables;
+            this.services = goal.getOverlayServices();
+        }
+
+        /**
+         * @param services services.
+         * @param placeholderVariables the placeholders from which to create the variables.
+         */
+        public VariablesCreatorAndRegistrar(final @NonNull Services services,
+                final Variables placeholderVariables) {
+            this.goal = null;
             this.placeholderVariables = placeholderVariables;
             this.services = services;
         }
@@ -420,7 +435,7 @@ public final class AuxiliaryContractBuilders {
                 LocationVariable value = entry.getValue();
 
                 String newName =
-                    services.getTermBuilder().newName(value.name().toString() + suffix);
+                    services.getTermBuilder().newName(value.name() + suffix);
                 LocationVariable newValue =
                     new LocationVariable(new ProgramElementName(newName), value.getKeYJavaType());
 
@@ -597,7 +612,7 @@ public final class AuxiliaryContractBuilders {
          * @return an anonymization update for the specified modifiable clauses.
          */
         public Term buildAnonOutUpdate(
-                final Map<LocationVariable, JFunction> anonymisationHeaps,
+                final Map<LocationVariable, Function> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiableClauses) {
             return buildAnonOutUpdate(variables.remembranceLocalVariables.keySet(),
                 anonymisationHeaps, modifiableClauses, ANON_OUT_PREFIX);
@@ -612,7 +627,7 @@ public final class AuxiliaryContractBuilders {
          *         modified variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
-                final Map<LocationVariable, JFunction> anonymisationHeaps,
+                final Map<LocationVariable, Function> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiableClauses) {
             return buildAnonOutUpdate(el, anonymisationHeaps, modifiableClauses, ANON_OUT_PREFIX);
         }
@@ -627,12 +642,12 @@ public final class AuxiliaryContractBuilders {
          *         modified variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
-                final Map<LocationVariable, JFunction> anonymisationHeaps,
+                final Map<LocationVariable, Function> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiableClauses, final String prefix) {
             return buildAnonOutUpdate(
                 MiscTools.getLocalOuts(el, services).stream()
                         .filter(LocationVariable.class::isInstance)
-                        .map(LocationVariable.class::cast).collect(Collectors.toSet()),
+                        .map(locationVariable -> locationVariable).collect(Collectors.toSet()),
                 anonymisationHeaps, modifiableClauses, prefix);
         }
 
@@ -646,10 +661,10 @@ public final class AuxiliaryContractBuilders {
          *         variable in the specified set.
          */
         public Term buildAnonOutUpdate(final Set<LocationVariable> vars,
-                final Map<LocationVariable, JFunction> anonymisationHeaps,
+                final Map<LocationVariable, Function> anonymisationHeaps,
                 final Map<LocationVariable, Term> modifiableClauses, final String prefix) {
             Term result = buildLocalVariablesAnonUpdate(vars, prefix);
-            for (Map.Entry<LocationVariable, JFunction> anonymisationHeap : anonymisationHeaps
+            for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiableClause = modifiableClauses.get(anonymisationHeap.getKey());
@@ -671,11 +686,11 @@ public final class AuxiliaryContractBuilders {
          * @return an anonymization update for all heap locations.
          */
         public Term buildAnonInUpdate(
-                final Map<LocationVariable, JFunction> anonymisationHeaps) {
+                final Map<LocationVariable, Function> anonymisationHeaps) {
             Term result = buildLocalVariablesAnonUpdate(
                 variables.outerRemembranceVariables.keySet(), ANON_IN_PREFIX);
 
-            for (Map.Entry<LocationVariable, JFunction> anonymisationHeap : anonymisationHeaps
+            for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
                 Term anonymisationUpdate = skip();
 
@@ -702,7 +717,7 @@ public final class AuxiliaryContractBuilders {
 
             for (LocationVariable variable : vars) {
                 final String anonymisationName = newName(prefix + variable.name());
-                final JFunction anonymisationFunction =
+                final Function anonymisationFunction =
                     new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
@@ -993,9 +1008,9 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that all anonymisation heaps are well-formed.
          */
         public Term buildWellFormedAnonymisationHeapsCondition(
-                final Map<LocationVariable, JFunction> anonymisationHeaps) {
+                final Map<LocationVariable, Function> anonymisationHeaps) {
             Term result = tt();
-            for (JFunction anonymisationFunction : anonymisationHeaps.values()) {
+            for (Function anonymisationFunction : anonymisationHeaps.values()) {
                 result = and(result,
                     wellFormed(services.getTermBuilder().label(
                         services.getTermBuilder().func(anonymisationFunction),
@@ -1152,7 +1167,8 @@ public final class AuxiliaryContractBuilders {
         public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
                 final TermLabelState termLabelState, final Instantiation instantiation,
                 final List<Label> labels, final AuxiliaryContract.Variables variables,
-                final PosInOccurrence occurrence, final Services services,
+                final PosInOccurrence occurrence,
+                final Services services,
                 final AbstractAuxiliaryContractRule rule) {
             this.application = application;
             this.termLabelState = termLabelState;
@@ -1194,7 +1210,7 @@ public final class AuxiliaryContractBuilders {
             LocationVariable continuedLoopVariable =
                 AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
                     services.getJavaInfo().getKeYJavaType("boolean"), services);
-            final LocationVariable[] loopVariables = new LocationVariable[] { conditionVariable,
+            final LocationVariable[] loopVariables = { conditionVariable,
                 brokeLoopVariable, continuedLoopVariable };
             return loopVariables;
         }
@@ -1346,7 +1362,7 @@ public final class AuxiliaryContractBuilders {
          * @return the well-definedness formula.
          */
         public Term setUpWdGoal(final Goal goal, final BlockContract contract, final Term update,
-                final Term anonUpdate, final LocationVariable heap, final JFunction anonHeap,
+                final Term anonUpdate, final LocationVariable heap, final Function anonHeap,
                 final ImmutableSet<LocationVariable> localIns) {
             // FIXME: Handling of \old-references needs to be investigated,
             // however only completeness is lost, soundness is guaranteed
@@ -1355,7 +1371,8 @@ public final class AuxiliaryContractBuilders {
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
-            final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
+            final SequentFormula wdBlock = bwd.generateSequent(
+                variables.self, variables.exception,
                 variables.result, heap, heapAtPre, anon, localIns, update, anonUpdate, services);
 
             if (goal != null) {
@@ -1363,7 +1380,7 @@ public final class AuxiliaryContractBuilders {
                 goal.changeFormula(wdBlock, occurrence);
             }
 
-            return wdBlock.formula();
+            return (Term) wdBlock.formula();
         }
 
         /**
@@ -1443,7 +1460,7 @@ public final class AuxiliaryContractBuilders {
          */
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
                 final Term context, final Term remember, final Term rememberNext,
-                final Map<LocationVariable, JFunction> anonOutHeaps,
+                final Map<LocationVariable, Function> anonOutHeaps,
                 final Map<LocationVariable, Term> modifiableClauses,
                 final Map<LocationVariable, Term> freeModifiableClauses,
                 final Term[] assumptions,
@@ -1479,11 +1496,11 @@ public final class AuxiliaryContractBuilders {
             Term anonOut = new UpdatesBuilder(variables, services)
                     .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiableClauses);
 
-            Map<LocationVariable, JFunction> anonOutHeaps2 = new HashMap<>();
+            Map<LocationVariable, Function> anonOutHeaps2 = new HashMap<>();
             for (LocationVariable heap : anonOutHeaps.keySet()) {
                 final String anonymisationName =
                     tb.newName("init_" + ANON_OUT_PREFIX + heap.name());
-                final JFunction anonymisationFunction =
+                final Function anonymisationFunction =
                     new JFunction(new Name(anonymisationName), heap.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps2.put(heap, anonymisationFunction);
@@ -1715,7 +1732,7 @@ public final class AuxiliaryContractBuilders {
                 terms.exception);
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,
                 goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
-            final Term[] posts = new Term[] { post, postNext };
+            final Term[] posts = { post, postNext };
             return posts;
         }
     }

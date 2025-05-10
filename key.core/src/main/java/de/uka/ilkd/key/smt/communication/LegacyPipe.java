@@ -87,7 +87,7 @@ class LegacyPipe implements Pipe {
             try {
 
                 while (true) {
-                    if (Thread.interrupted()) {
+                    if (interrupted()) {
                         break;
                     }
                     // this call blocks the thread and waits until there is a message.

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**
@@ -34,6 +35,7 @@ public class InnerVariableNamer extends VariableNamer {
         return (Math.max(maxInGlobals, maxInProgram));
     }
 
+    @Override
     public LocationVariable rename(LocationVariable var, Goal goal, PosInOccurrence posOfFind) {
         ProgramElementName name = var.getProgramElementName();
         BasenameAndIndex bai = getBasenameAndIndex(name);
