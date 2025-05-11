@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings.DISPOSE_COPY;
 import static de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings.DISPOSE_REOPEN;
@@ -51,15 +52,15 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
     /**
      * Checkbox for first option.
      */
-    private final JCheckBox strategySearch;
+    private final @NonNull JCheckBox strategySearch;
     /**
      * Combobox for second option (dispose behaviour).
      */
-    private final JComboBox<String> disposeOption;
+    private final @NonNull JComboBox<String> disposeOption;
     /**
      * Combobox for third option (prune behaviour).
      */
-    private final JComboBox<String> pruneOption;
+    private final @NonNull JComboBox<String> pruneOption;
 
     /**
      * Construct a new settings provider.
@@ -84,20 +85,20 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Proof Caching";
     }
 
     /**
      * @return the settings managed by this provider
      */
-    public static ProofCachingSettings getCachingSettings() {
+    public static @NonNull ProofCachingSettings getCachingSettings() {
         ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(CACHING_SETTINGS);
         return CACHING_SETTINGS;
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         ProofCachingSettings ss = getCachingSettings();
         strategySearch.setSelected(ss.getEnabled());
         disposeOption.setSelectedItem(ss.getDispose());

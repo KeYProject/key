@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.notification;
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.ProofClosedJTextPaneDisplay;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The proof closed notification notifies the user about a successful attempt closing a proof.
@@ -39,7 +40,7 @@ public class ProofClosedNotification extends NotificationTask {
      * @return the event if of this task
      */
     @Override
-    public NotificationEventID getEventID() {
+    public @NonNull NotificationEventID getEventID() {
         return NotificationEventID.PROOF_CLOSED;
     }
 }

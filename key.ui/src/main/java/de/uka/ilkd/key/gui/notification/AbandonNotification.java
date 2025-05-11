@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.notification;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Notifies the user when a proof task is abandoned.
  *
@@ -16,7 +18,7 @@ public class AbandonNotification extends NotificationTask {
      * @see de.uka.ilkd.key.gui.notification.NotificationTask#getEventID()
      */
     @Override
-    public NotificationEventID getEventID() {
+    public @NonNull NotificationEventID getEventID() {
         return NotificationEventID.TASK_ABANDONED;
     }
 

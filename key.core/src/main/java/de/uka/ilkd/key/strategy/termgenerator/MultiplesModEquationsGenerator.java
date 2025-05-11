@@ -84,8 +84,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * <p>
      * This method will change the object <code>cofactorPolys</code>.
      */
-    private ImmutableList<Term> computeMultiples(@NonNull Monomial sourceM, Monomial targetM,
-                                                 @NonNull List<CofactorPolynomial> cofactorPolys, @NonNull Services services) {
+    private @NonNull ImmutableList<Term> computeMultiples(@NonNull Monomial sourceM, Monomial targetM,
+                                                          @NonNull List<CofactorPolynomial> cofactorPolys, @NonNull Services services) {
         ImmutableList<Term> res = ImmutableSLList.nil();
 
         final List<CofactorItem> cofactorMonos = new ArrayList<>();
@@ -118,8 +118,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return res;
     }
 
-    private ImmutableList<Term> addRes(@NonNull CofactorMonomial newMono, @NonNull Monomial sourceM,
-                                       @NonNull ImmutableList<Term> res, @NonNull Services services) {
+    private @NonNull ImmutableList<Term> addRes(@NonNull CofactorMonomial newMono, @NonNull Monomial sourceM,
+                                                @NonNull ImmutableList<Term> res, @NonNull Services services) {
         final Monomial mono = newMono.mono;
         final Polynomial cofactor = newMono.cofactor;
 

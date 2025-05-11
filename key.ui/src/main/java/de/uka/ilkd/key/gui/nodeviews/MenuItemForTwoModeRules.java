@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 
 import de.uka.ilkd.key.rule.BuiltInRule;
+import org.jspecify.annotations.Nullable;
 
 
 public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuItem {
@@ -23,7 +24,7 @@ public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuIte
     private final BuiltInRule rule;
     private boolean forcedMode = DEFAULT_FORCE;
     // we support only one listener
-    private ActionListener listener;
+    private @Nullable ActionListener listener;
 
     public MenuItemForTwoModeRules(String mainName, String actionTextForForcedMode,
             String tooltipForcedMode, String actionTextForInteractiveMode,

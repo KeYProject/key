@@ -94,8 +94,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         return d.tb.and(eqAtLocs);
     }
 
-    private Term buildOutputRelation(@NonNull BasicSnippetData d, @NonNull ProofObligationVars vs1,
-                                     @NonNull ProofObligationVars vs2, @NonNull InfFlowSpec infFlowSpec1, @NonNull InfFlowSpec infFlowSpec2) {
+    private @NonNull Term buildOutputRelation(@NonNull BasicSnippetData d, @NonNull ProofObligationVars vs1,
+                                              @NonNull ProofObligationVars vs2, @NonNull InfFlowSpec infFlowSpec1, @NonNull InfFlowSpec infFlowSpec2) {
         // build equalities for post expressions
         ImmutableList<Term> eqAtLocs = ImmutableSLList.nil();
 

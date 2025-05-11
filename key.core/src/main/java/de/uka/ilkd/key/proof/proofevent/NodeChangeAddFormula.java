@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -15,7 +16,7 @@ public class NodeChangeAddFormula extends NodeChangeARFormula {
         super(p_pos);
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return "Formula added: " + getPos();
     }
 }

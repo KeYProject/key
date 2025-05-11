@@ -8,6 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public final class IconFontSwing {
      * @param size the size.
      * @return the image.
      */
-    public static Image buildImage(IconFont iconCode, float size) {
+    public static @NonNull Image buildImage(@NonNull IconFont iconCode, float size) {
         return buildImage(iconCode, size, Color.BLACK);
     }
 
@@ -33,7 +34,7 @@ public final class IconFontSwing {
      * @param color the size.
      * @return the image.
      */
-    public static Image buildImage(IconFont iconCode, float size, Color color) {
+    public static @NonNull Image buildImage(@NonNull IconFont iconCode, float size, Color color) {
         Font font = buildFont(iconCode, size);
         String text = Character.toString(iconCode.getUnicode());
         return buildImage(text, font, color);
@@ -46,7 +47,7 @@ public final class IconFontSwing {
      * @param color
      * @return
      */
-    public static Image buildImage(IconFont iconCode, float size, Color color, double rotation) {
+    public static @NonNull Image buildImage(@NonNull IconFont iconCode, float size, Color color, double rotation) {
         Image img = buildImage(iconCode, size, color);
         BufferedImage newImage =
             new BufferedImage((int) size, (int) size, BufferedImage.TYPE_INT_RGB);
@@ -64,7 +65,7 @@ public final class IconFontSwing {
      * @param size the size.
      * @return the icon.
      */
-    public static Icon buildIcon(IconFont iconCode, float size) {
+    public static @NonNull Icon buildIcon(@NonNull IconFont iconCode, float size) {
         return buildIcon(iconCode, size, Color.BLACK);
     }
 
@@ -76,11 +77,11 @@ public final class IconFontSwing {
      * @param color the size.
      * @return the icon.
      */
-    public static Icon buildIcon(IconFont iconCode, float size, Color color) {
+    public static @NonNull Icon buildIcon(@NonNull IconFont iconCode, float size, Color color) {
         return new ImageIcon(buildImage(iconCode, size, color));
     }
 
-    private static BufferedImage buildImage(String text, Font font, Color color) {
+    private static @NonNull BufferedImage buildImage(String text, Font font, Color color) {
         JLabel label = new JLabel(text);
         label.setForeground(color);
         label.setFont(font);
@@ -99,7 +100,7 @@ public final class IconFontSwing {
         return bufImage;
     }
 
-    private static Font buildFont(IconFont iconCode, float size) {
+    private static @NonNull Font buildFont(@NonNull IconFont iconCode, float size) {
         try {
             Font f = iconCode.getFont();
             return f.deriveFont(size);

@@ -149,7 +149,7 @@ public class SLExceptionFactory {
     /**
      * Creates an SLTranslationException with current absolute position information.
      */
-    public @NonNull SLTranslationException createException(String message) {
+    public @NonNull SLTranslationException createException(@NonNull String message) {
         return new SLTranslationException(message, createAbsolutePosition(this.line, this.column));
     }
 
@@ -157,7 +157,7 @@ public class SLExceptionFactory {
     /**
      * Creates an SLTranslationException with the position information of the passed token.
      */
-    public @NonNull SLTranslationException createException(String message, @NonNull Token t) {
+    public @NonNull SLTranslationException createException(@NonNull String message, @NonNull Token t) {
         return new SLTranslationException(message,
             createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
@@ -165,25 +165,25 @@ public class SLExceptionFactory {
     /**
      * Creates an SLTranslationException with current absolute position information.
      */
-    public @NonNull SLTranslationException createException(String message, Throwable cause) {
+    public @NonNull SLTranslationException createException(@NonNull String message, Throwable cause) {
         SLTranslationException result = createException(message);
         result.initCause(cause);
         return result;
     }
 
-    public @NonNull RuntimeException createException0(String s) {
+    public @NonNull RuntimeException createException0(@NonNull String s) {
         return new RuntimeException(createException(s));
     }
 
-    public @NonNull RuntimeException createException0(String s, Throwable t) {
+    public @NonNull RuntimeException createException0(@NonNull String s, Throwable t) {
         return new RuntimeException(createException(s, t));
     }
 
-    public @NonNull RuntimeException createException0(String s, @NonNull Token t) {
+    public @NonNull RuntimeException createException0(@NonNull String s, @NonNull Token t) {
         return new RuntimeException(createException(s, t));
     }
 
-    public @NonNull RuntimeException createException0(String s, @NonNull Token t, Throwable cause) {
+    public @NonNull RuntimeException createException0(@NonNull String s, @NonNull Token t, Throwable cause) {
         return new RuntimeException(createException(s, t, cause));
     }
 
@@ -192,7 +192,7 @@ public class SLExceptionFactory {
      *
      * @param cause the exception which causes the new exception to be created.
      */
-    public @NonNull SLTranslationException createException(String message, @NonNull Token t, Throwable cause) {
+    public @NonNull SLTranslationException createException(@NonNull String message, @NonNull Token t, Throwable cause) {
         SLTranslationException result = createException(message, t);
         result.initCause(cause);
         return result;

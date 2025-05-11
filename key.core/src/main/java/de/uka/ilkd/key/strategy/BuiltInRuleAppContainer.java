@@ -28,7 +28,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * was created
      */
     private final @Nullable FormulaTag positionTag;
-    private final PosInOccurrence applicationPosition;
+    private final @Nullable PosInOccurrence applicationPosition;
 
     private final IBuiltInRuleApp bir;
 

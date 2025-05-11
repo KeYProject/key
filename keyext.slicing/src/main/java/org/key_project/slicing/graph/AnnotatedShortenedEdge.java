@@ -5,6 +5,7 @@ package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
+import org.jspecify.annotations.NonNull;
 
 /**
  * An annotated edge representing a chain of real proof nodes.
@@ -40,7 +41,7 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
      *
      * @return label for this edge (to use in DOT export)
      */
-    public String getEdgeLabel() {
+    public @NonNull String getEdgeLabel() {
         var sb = new StringBuilder();
         RuleApp ruleApp1 = initial.getAppliedRuleApp();
         if (ruleApp1 != null) {

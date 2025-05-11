@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Defines the basic methods and properties each element in an symbolic object model has to have.
  *
@@ -14,5 +16,6 @@ public interface ISymbolicElement {
      *
      * @return The {@link IModelSettings} to use.
      */
+    @Nullable
     IModelSettings getSettings();
 }

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import java.awt.*;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
@@ -20,7 +23,7 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     private final Color highlightColor;
 
     /** the stroke of the highlights to paint (for the line width) */
-    private final Stroke stroke;
+    private final @NonNull Stroke stroke;
 
     /** the size, i.e., radius, of a single squiggle */
     private final int squiggleSize;
@@ -39,7 +42,7 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     }
 
     @Override
-    public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
+    public void paint(@NonNull Graphics g, int offs0, int offs1, @Nullable Shape bounds, @NonNull JTextComponent c) {
         // don't render if empty
         if (offs0 == offs1) {
             return;

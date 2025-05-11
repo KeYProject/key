@@ -25,6 +25,7 @@ import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -127,8 +128,8 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         } while (btManager.backtrack());
     }
 
-    protected abstract RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            MutableState mState);
+    protected abstract @Nullable RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+                                                            MutableState mState);
 
     protected @NonNull Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
         return ForEachCP.create(x, gen, body);
@@ -138,7 +139,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         return OneOfCP.create(features);
     }
 
-    protected Feature oneOf(Feature feature0, Feature feature1) {
+    protected @NonNull Feature oneOf(Feature feature0, Feature feature1) {
         return oneOf(new Feature[] { feature0, feature1 });
     }
 
@@ -172,7 +173,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         }
     }
 
-    protected Feature instantiate(@NonNull String sv, ProjectionToTerm value) {
+    protected @NonNull Feature instantiate(@NonNull String sv, ProjectionToTerm value) {
         return instantiate(new Name(sv), value);
     }
 

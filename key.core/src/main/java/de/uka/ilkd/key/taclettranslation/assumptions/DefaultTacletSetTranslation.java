@@ -87,7 +87,7 @@ public final class DefaultTacletSetTranslation
 
 
     @Override
-    public ImmutableList<TacletFormula> getTranslation(@Nullable ImmutableSet<Sort> sorts) {
+    public @NonNull ImmutableList<TacletFormula> getTranslation(@Nullable ImmutableSet<Sort> sorts) {
 
         // only translate once.
         if (!translate) {
@@ -132,7 +132,7 @@ public final class DefaultTacletSetTranslation
 
 
 
-    public ImmutableList<TacletFormula> getNotTranslated() {
+    public @NonNull ImmutableList<TacletFormula> getNotTranslated() {
 
         return notTranslated;
     }

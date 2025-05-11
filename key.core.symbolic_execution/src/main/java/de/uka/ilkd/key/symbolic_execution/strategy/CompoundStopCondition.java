@@ -12,6 +12,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This {@link StopCondition} contains other {@link StopCondition} as children and stops the auto
@@ -31,13 +33,13 @@ public class CompoundStopCondition implements StopCondition {
      * will provide the reason via
      * {@link #getGoalNotAllowedMessage}.
      */
-    private StopCondition lastGoalAllowedChild;
+    private @Nullable StopCondition lastGoalAllowedChild;
 
     /**
      * The last {@link StopCondition} treated in {@link #shouldStop},
      * which will provide the reason via {@link #getStopMessage}.
      */
-    private StopCondition lastShouldStopChild;
+    private @Nullable StopCondition lastShouldStopChild;
 
     /**
      * Constructor.
@@ -122,15 +124,15 @@ public class CompoundStopCondition implements StopCondition {
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+    public @Nullable String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
+                                           int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return lastShouldStopChild != null
                 ? lastShouldStopChild.getStopMessage(maxApplications, timeout, proof, startTime,
                     countApplied, singleRuleApplicationInfo)
                 : null;
     }
 
-    public List<StopCondition> getChildren() {
+    public @NonNull List<StopCondition> getChildren() {
         return children;
     }
 }

@@ -8,6 +8,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.njml.*;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.Token;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestJMLPreTranslator {
-    private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) {
+    private ImmutableList<TextualJMLConstruct> parseMethodSpec(@NonNull String ms) {
         return new PreParser(true).parseClassLevel(ms);
     }
 
@@ -115,7 +116,7 @@ public class TestJMLPreTranslator {
         // currently "key" is ignored
     }
 
-    private void lex(String in, int... expected) {
+    private void lex(@NonNull String in, int @NonNull ... expected) {
         JmlLexer lexer = JmlFacade.createLexer(in);
         Token t;
         int idx = 0;

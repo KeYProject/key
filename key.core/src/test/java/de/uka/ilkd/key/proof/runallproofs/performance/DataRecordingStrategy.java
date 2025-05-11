@@ -13,6 +13,7 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Modification of {@link JavaCardDLStrategy} so that profiling data gets collected during strategy
@@ -20,12 +21,12 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
  */
 class DataRecordingStrategy extends JavaCardDLStrategy {
 
-    final FunctionPerformanceData computeCostData;
-    final FunctionPerformanceData instantiateAppData;
+    final @NonNull FunctionPerformanceData computeCostData;
+    final @NonNull FunctionPerformanceData instantiateAppData;
 
-    final DataRecordingTestFile dataRecordingTestFile;
+    final @NonNull DataRecordingTestFile dataRecordingTestFile;
 
-    DataRecordingStrategy(Proof proof, DataRecordingTestFile dataRecordingTestFile) {
+    DataRecordingStrategy(@NonNull Proof proof, @NonNull DataRecordingTestFile dataRecordingTestFile) {
         super(proof, proof.getInitConfig().getSettings().getStrategySettings()
                 .getActiveStrategyProperties());
         this.dataRecordingTestFile = dataRecordingTestFile;
@@ -40,8 +41,8 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(@NonNull RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
+                                   MutableState mState) {
         long begin = System.nanoTime();
         RuleAppCost result = super.computeCost(app, pio, goal, mState);
         long end = System.nanoTime();
@@ -50,8 +51,8 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            RuleAppCostCollector collector) {
+    public void instantiateApp(@NonNull RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
+                               @NonNull RuleAppCostCollector collector) {
         long begin = System.nanoTime();
         super.instantiateApp(app, pio, goal, collector);
         long end = System.nanoTime();

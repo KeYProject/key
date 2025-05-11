@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -27,7 +28,7 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
     /**
      * @return The default completion (identity mapping).
      */
-    public static <T extends MergeProcedure> MergeProcedureCompletion<T> defaultCompletion() {
+    public static <T extends MergeProcedure> @NonNull MergeProcedureCompletion<T> defaultCompletion() {
         return create(proc -> proc);
     }
 
@@ -37,8 +38,8 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
     protected MergeProcedureCompletion() {
     }
 
-    public static <T extends MergeProcedure> MergeProcedureCompletion<T> create(
-            final Function<T, T> completion) {
+    public static <T extends MergeProcedure> @NonNull MergeProcedureCompletion<T> create(
+            final @NonNull Function<T, T> completion) {
         return new MergeProcedureCompletion<>() {
             @Override
             public T complete(
@@ -66,8 +67,8 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
      *
      * @return The requested completion.
      */
-    public static MergeProcedureCompletion<? extends MergeProcedure> getCompletionForClass(
-            Class<? extends MergeProcedure> cls) {
+    public static @NonNull MergeProcedureCompletion<? extends MergeProcedure> getCompletionForClass(
+            @NonNull Class<? extends MergeProcedure> cls) {
         if (cls.equals(MergeWithPredicateAbstractionFactory.class)) {
             return new PredicateAbstractionCompletion();
         } else {

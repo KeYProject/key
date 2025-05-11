@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.notification;
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This notification task is used to inform the user about a non-error situation (e.g. statistics
@@ -24,7 +25,7 @@ public class GeneralInformationNotification extends NotificationTask {
      * @see NotificationEventID
      */
     @Override
-    public NotificationEventID getEventID() {
+    public @NonNull NotificationEventID getEventID() {
         return NotificationEventID.GENERAL_INFORMATION;
     }
 

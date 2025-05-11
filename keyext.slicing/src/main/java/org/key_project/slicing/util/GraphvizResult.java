@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.util;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.image.BufferedImage;
 
 /**
@@ -24,7 +26,7 @@ public record GraphvizResult(BufferedImage image, String error) {
      * @param image rendered image
      * @return new result object with that image attached
      */
-    public static GraphvizResult makeImage(BufferedImage image) {
+    public static @NonNull GraphvizResult makeImage(BufferedImage image) {
         return new GraphvizResult(image, null);
     }
 
@@ -32,7 +34,7 @@ public record GraphvizResult(BufferedImage image, String error) {
      * @param error error text
      * @return new result object with that error attached
      */
-    public static GraphvizResult makeError(String error) {
+    public static @NonNull GraphvizResult makeError(String error) {
         return new GraphvizResult(null, error);
     }
 

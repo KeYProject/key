@@ -14,6 +14,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -45,7 +46,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mouseClicked(MouseEvent me) {
+    public void mouseClicked(@NonNull MouseEvent me) {
         if (!modalDragNDropEnabled()) {
             if (Math.abs(System.currentTimeMillis() - getLastPopupCloseTime()) >= POPUP_DELAY) {
                 PosInSequent mousePos = getSequentView().getPosInSequent(me.getPoint());
@@ -98,7 +99,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mouseReleased(MouseEvent me) {
+    public void mouseReleased(@NonNull MouseEvent me) {
         if (!modalDragNDropEnabled() && menu.isPopupMenuVisible() && !menu.getPopupMenu()
                 .contains(me.getX() - menu.getX(), me.getY() - menu.getY())) {
             hideMenu(menu);
@@ -118,7 +119,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void dragGestureRecognized(DragGestureEvent dgEvent) {
+    public void dragGestureRecognized(@NonNull DragGestureEvent dgEvent) {
         final Object oldHighlight = getSequentView().getCurrentHighlight();
         Object dndHighlight =
             getSequentView().createColorHighlight(SequentView.DND_HIGHLIGHT_COLOR.get());

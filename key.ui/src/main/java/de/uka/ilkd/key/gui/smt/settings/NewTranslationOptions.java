@@ -22,6 +22,8 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerPropertyVisitor;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -64,12 +66,12 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "SMT Translation";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(@NonNull MainWindow window) {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         SetVisitor visitor = new SetVisitor();
         for (JComponent component : components) {
@@ -85,7 +87,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public void applySettings(MainWindow window) {
+    public void applySettings(@NonNull MainWindow window) {
         NewSMTTranslationSettings newSMTSettings = SettingsManager.getNewSmtSettings(window);
         ApplyVisitor visitor = new ApplyVisitor(newSMTSettings);
         for (JComponent component : components) {
@@ -97,24 +99,24 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
     private class ComCreationVisitor implements SMTHandlerPropertyVisitor<Void, JComponent> {
         @Override
-        public JComponent visit(EnumProperty<?> eprop, Void unit) {
+        public @NonNull JComponent visit(@NonNull EnumProperty<?> eprop, Void unit) {
             return addComboBox(eprop.getLabel(), eprop.getDescription(), 0, null,
                 eprop.getEnumType().getEnumConstants());
         }
 
         @Override
-        public JComponent visit(IntegerProperty iprop, Void unit) {
+        public @NonNull JComponent visit(@NonNull IntegerProperty iprop, Void unit) {
             return addNumberField(iprop.getLabel(), iprop.getMinimum(), iprop.getMaximum(), 1,
                 iprop.getDescription(), emptyValidator());
         }
 
         @Override
-        public JComponent visit(BooleanProperty bprop, Void unit) {
+        public @NonNull JComponent visit(@NonNull BooleanProperty bprop, Void unit) {
             return addCheckBox(bprop.getLabel(), bprop.getDescription(), false, emptyValidator());
         }
 
         @Override
-        public JComponent visit(StringProperty sprop, Void unit) {
+        public @NonNull JComponent visit(@NonNull StringProperty sprop, Void unit) {
             return addTextField(sprop.getLabel(), sprop.getDescription(), "", emptyValidator());
         }
     }
@@ -123,28 +125,28 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
             implements SMTHandlerPropertyVisitor<Pair<String, JComponent>, Void> {
 
         @Override
-        public Void visit(EnumProperty<?> enumProp, Pair<String, JComponent> arg) {
+        public @Nullable Void visit(EnumProperty<?> enumProp, @NonNull Pair<String, JComponent> arg) {
             JComboBox<?> box = (JComboBox<?>) arg.second;
             box.setSelectedItem(arg.first);
             return null;
         }
 
         @Override
-        public Void visit(IntegerProperty integerProp, Pair<String, JComponent> arg) {
+        public @Nullable Void visit(IntegerProperty integerProp, @NonNull Pair<String, JComponent> arg) {
             JTextField field = (JTextField) arg.second;
             field.setText(arg.first);
             return null;
         }
 
         @Override
-        public Void visit(BooleanProperty booleanProp, Pair<String, JComponent> arg) {
+        public @Nullable Void visit(BooleanProperty booleanProp, @NonNull Pair<String, JComponent> arg) {
             JCheckBox box = (JCheckBox) arg.second;
             box.setSelected(Boolean.parseBoolean(arg.first));
             return null;
         }
 
         @Override
-        public Void visit(StringProperty stringProp, Pair<String, JComponent> arg) {
+        public @Nullable Void visit(StringProperty stringProp, @NonNull Pair<String, JComponent> arg) {
             JTextField field = (JTextField) arg.second;
             field.setText(arg.first);
             return null;
@@ -159,28 +161,28 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         }
 
         @Override
-        public Void visit(EnumProperty<?> enumProp, JComponent arg) {
+        public @Nullable Void visit(@NonNull EnumProperty<?> enumProp, @NonNull JComponent arg) {
             String val = ((JComboBox<?>) arg).getSelectedItem().toString();
             settings.put(enumProp.getIdentifier(), val);
             return null;
         }
 
         @Override
-        public Void visit(IntegerProperty integerProp, JComponent arg) {
+        public @Nullable Void visit(@NonNull IntegerProperty integerProp, @NonNull JComponent arg) {
             String val = ((JTextField) arg).getText();
             settings.put(integerProp.getIdentifier(), val);
             return null;
         }
 
         @Override
-        public Void visit(BooleanProperty booleanProp, JComponent arg) {
+        public @Nullable Void visit(@NonNull BooleanProperty booleanProp, @NonNull JComponent arg) {
             String val = ((JCheckBox) arg).isSelected() ? "true" : "false";
             settings.put(booleanProp.getIdentifier(), val);
             return null;
         }
 
         @Override
-        public Void visit(StringProperty stringProp, JComponent arg) {
+        public @Nullable Void visit(@NonNull StringProperty stringProp, @NonNull JComponent arg) {
             String val = ((JTextField) arg).getText();
             settings.put(stringProp.getIdentifier(), val);
             return null;

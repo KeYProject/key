@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.HeatmapOptionsDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Action for invoking the heatmap options dialog.
@@ -27,7 +28,7 @@ public class HeatmapSettingsAction extends MainWindowAction {
      *
      * @param mainWindow the main window of the options dialog
      */
-    public HeatmapSettingsAction(MainWindow mainWindow) {
+    public HeatmapSettingsAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Heatmap Options");
         setMenuPath("View.Heatmap");
@@ -54,7 +55,7 @@ public class HeatmapSettingsAction extends MainWindowAction {
         getDialog().setVisible(true);
     }
 
-    private HeatmapOptionsDialog getDialog() {
+    private @NonNull HeatmapOptionsDialog getDialog() {
         if (dialog == null) {
             dialog = new HeatmapOptionsDialog();
         }

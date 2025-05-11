@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -28,6 +29,7 @@ public interface IExecutionLoopInvariant extends IExecutionNode<SourceElement> {
      *
      * @return The used {@link LoopSpecification}.
      */
+    @Nullable
     LoopSpecification getLoopInvariant();
 
     /**
@@ -35,6 +37,7 @@ public interface IExecutionLoopInvariant extends IExecutionNode<SourceElement> {
      *
      * @return The loop statement which is simulated by its loop invariant.
      */
+    @Nullable
     While getLoopStatement();
 
     /**

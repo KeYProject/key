@@ -14,6 +14,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SimplifyTermStrategy;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -58,7 +59,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+    protected @NonNull ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
         ImmutableList<TermLabelPolicy> symExcPolicies =
             ImmutableSLList.<TermLabelPolicy>nil()
@@ -75,7 +76,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableSet<StrategyFactory> getStrategyFactories() {
+    protected @NonNull ImmutableSet<StrategyFactory> getStrategyFactories() {
         return DefaultImmutableSet.<StrategyFactory>nil().add(SIDE_PROOF_FACTORY);
     }
 
@@ -83,7 +84,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    public StrategyFactory getDefaultStrategyFactory() {
+    public @NonNull StrategyFactory getDefaultStrategyFactory() {
         return SIDE_PROOF_FACTORY;
     }
 
@@ -91,7 +92,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    public String name() {
+    public @NonNull String name() {
         return NAME;
     }
 
@@ -107,7 +108,7 @@ public class SimplifyTermProfile extends JavaProfile {
      *
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
-    public static synchronized SimplifyTermProfile getDefaultInstance() {
+    public static synchronized @NonNull SimplifyTermProfile getDefaultInstance() {
         if (defaultInstance == null) {
             defaultInstance = new SimplifyTermProfile();
         }

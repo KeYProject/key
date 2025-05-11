@@ -61,7 +61,7 @@ public abstract class TextualJMLConstruct {
         this.loopContract = loopContract;
     }
 
-    public final ImmutableList<JMLModifier> getModifiers() {
+    public final @NonNull ImmutableList<JMLModifier> getModifiers() {
         return modifiers;
     }
 
@@ -70,7 +70,7 @@ public abstract class TextualJMLConstruct {
      * specification line parsed first. Implementations can set it using <code>setPosition</code> or
      * <code>addGeneric</code>.
      */
-    public Location getLocation() {
+    public @NonNull Location getLocation() {
         return location;
     }
 

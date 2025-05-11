@@ -36,7 +36,7 @@ public class PredictCostProver {
     /** clauses from <code>instance</code> of CNF */
     private @NonNull Set<Clause> clauses = new LinkedHashSet<>();
 
-    private final Services services;
+    private final @NonNull Services services;
 
     private PredictCostProver(@NonNull Term instance, ImmutableSet<Term> assertList, @NonNull Services services) {
         this.assertLiterals = assertList;
@@ -96,7 +96,7 @@ public class PredictCostProver {
      * If the given <code>problem</code>'s operation is equal,or mathmetic operation(=,>=, <=), this
      * method will try to prove it by finding the relation between its two subterms.
      */
-    private Term provedBySelf(Term problem) {
+    private @NonNull Term provedBySelf(@NonNull Term problem) {
         boolean negated = false;
         Term pro = problem;
         Operator op = pro.op();
@@ -122,7 +122,7 @@ public class PredictCostProver {
      * @return trueT if problem is equal axiom, false if problem's negation is equal axiom.
      *         Otherwise retrun problem.
      */
-    private Term directConsequenceOrContradictionOfAxiom(Term problem, Term axiom) {
+    private @NonNull Term directConsequenceOrContradictionOfAxiom(@NonNull Term problem, Term axiom) {
         boolean negated = false;
         Term pro = problem;
         while (pro.op() == Junctor.NOT) {
@@ -147,7 +147,7 @@ public class PredictCostProver {
      * @return if axiom conduct problem then return trueT. If axiom conduct negation of problem
      *         return fastT. Otherwise, return problem
      */
-    private Term provedByAnother(@NonNull Term problem, Term axiom) {
+    private @NonNull Term provedByAnother(@NonNull Term problem, Term axiom) {
         Term res = directConsequenceOrContradictionOfAxiom(problem, axiom);
         if (TriggerUtils.isTrueOrFalse(res)) {
             return res;
@@ -164,7 +164,7 @@ public class PredictCostProver {
      * @return return <code>trueT</code> if if formu is proved to true, <code> falseT</code> if
      *         false, and <code>atom</code> if it cann't be proved.
      */
-    private Term proveLiteral(@NonNull Term problem, @NonNull Iterable<? extends Term> assertLits) {
+    private @NonNull Term proveLiteral(@NonNull Term problem, @NonNull Iterable<? extends Term> assertLits) {
         Term res;
         /*
          * res = provedFromCache(problem, cache); if (res.equals(trueT) || res.equals(falseT)) {

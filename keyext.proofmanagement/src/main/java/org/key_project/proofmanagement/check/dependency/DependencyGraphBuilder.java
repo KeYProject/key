@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.io.Logger;
 
@@ -28,8 +29,8 @@ public abstract class DependencyGraphBuilder {
      * @param logger the logger to print out error messages generated during graph creation
      * @return the newly created DependencyGraph
      */
-    public static DependencyGraph buildGraph(List<CheckerData.ProofEntry> proofEntries,
-            Logger logger) {
+    public static @NonNull DependencyGraph buildGraph(@NonNull List<CheckerData.ProofEntry> proofEntries,
+                                                      Logger logger) {
 
         DependencyGraph graph = new DependencyGraph();
 

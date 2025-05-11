@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class ExitKeYNotification extends NotificationTask {
      * @param event the NotificationEvent triggering this task
      */
     @Override
-    public void execute(NotificationEvent event, NotificationManager manager) {
+    public void execute(NotificationEvent event, @NonNull NotificationManager manager) {
         // if we are in automode execute task only if it is
         // automode enabled
         if (manager.inAutoMode() && !automodeEnabledTask()) {
@@ -54,7 +55,7 @@ public class ExitKeYNotification extends NotificationTask {
      * @see de.uka.ilkd.key.gui.notification.NotificationTask#getEventID()
      */
     @Override
-    public NotificationEventID getEventID() {
+    public @NonNull NotificationEventID getEventID() {
         return NotificationEventID.EXIT_KEY;
     }
 

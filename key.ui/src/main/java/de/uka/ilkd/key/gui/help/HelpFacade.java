@@ -14,6 +14,8 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -56,7 +58,7 @@ public class HelpFacade {
         }
     }
 
-    private static void openHelpInBrowser(String url) {
+    private static void openHelpInBrowser(@NonNull String url) {
         try {
             SwingUtil.browse(new URI(url));
         } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
@@ -76,7 +78,7 @@ public class HelpFacade {
      *
      * @param path a valid suffix to the current URI
      */
-    public static void openHelp(String path) {
+    public static void openHelp(@NonNull String path) {
         if (path.startsWith("https://")) {
             openHelpInBrowser(path);
             return;
@@ -95,7 +97,7 @@ public class HelpFacade {
      *
      * @param path
      */
-    public static void openHelp(Component path) {
+    public static void openHelp(@Nullable Component path) {
         while (path != null) {
             if (openHelpOfClass(path.getClass())) {
                 break;
@@ -113,7 +115,7 @@ public class HelpFacade {
      *
      * @param clazz non-null class instance.
      */
-    public static boolean openHelpOfClass(Class<?> clazz) {
+    public static boolean openHelpOfClass(@NonNull Class<?> clazz) {
         HelpInfo help = clazz.getAnnotation(HelpInfo.class);
         if (help != null) {
             openHelpInBrowser(HELP_BASE_URL + help.path());
@@ -129,13 +131,13 @@ public class HelpFacade {
      * @param s path to help page
      * @return
      */
-    public static CAction createHelpButton(String s) {
+    public static @NonNull CAction createHelpButton(@NonNull String s) {
         CButton btn = new CButton("Open online help...", IconFactory.HELP.get());
         btn.addActionListener(e -> openHelp(s));
         return btn;
     }
 
-    public static KeyAction createHelpAction(String path) {
+    public static @NonNull KeyAction createHelpAction(@NonNull String path) {
         class HelpAction extends KeyAction {
             private HelpAction() {
                 setName("");
@@ -165,7 +167,7 @@ public class HelpFacade {
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(@Nullable ActionEvent e) {
             if (e != null && e.getSource() != null) {
                 HelpFacade.openHelp((JComponent) e.getSource());
             }

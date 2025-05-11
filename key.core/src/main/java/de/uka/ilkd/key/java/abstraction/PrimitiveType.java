@@ -198,7 +198,7 @@ public final class PrimitiveType implements Type {
      *
      * @return may be null if no name set
      */
-    public Name getCorrespondingLDTName() {
+    public @Nullable Name getCorrespondingLDTName() {
         return ldtName;
     }
 

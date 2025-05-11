@@ -13,6 +13,8 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Instances of this class are used to collect and access all relevant information for symbolic
@@ -33,8 +35,8 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
      * @param environment The parent {@link KeYEnvironment}.
      * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
      */
-    public SymbolicExecutionEnvironment(KeYEnvironment<U> environment,
-            SymbolicExecutionTreeBuilder builder) {
+    public SymbolicExecutionEnvironment(@NonNull KeYEnvironment<U> environment,
+                                        SymbolicExecutionTreeBuilder builder) {
         this(environment.getUi(), environment.getInitConfig(), builder);
     }
 
@@ -45,8 +47,8 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
      * @param initConfig The loaded project.
      * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
      */
-    public SymbolicExecutionEnvironment(U ui, InitConfig initConfig,
-            SymbolicExecutionTreeBuilder builder) {
+    public SymbolicExecutionEnvironment(@NonNull U ui, @NonNull InitConfig initConfig,
+                                        SymbolicExecutionTreeBuilder builder) {
         super(ui, initConfig);
         this.builder = builder;
     }
@@ -110,10 +112,10 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
      *        side proofs, {@code false} do not hide execution branch labels.
      * @param aliasChecks Do alias checks?
      */
-    public static void configureProofForSymbolicExecution(Proof proof,
-            int maximalNumberOfNodesPerBranch, boolean methodTreatmentContract,
-            boolean loopTreatmentInvariant, boolean blockTreatmentContract,
-            boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
+    public static void configureProofForSymbolicExecution(@Nullable Proof proof,
+                                                          int maximalNumberOfNodesPerBranch, boolean methodTreatmentContract,
+                                                          boolean loopTreatmentInvariant, boolean blockTreatmentContract,
+                                                          boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
         if (proof != null) {
             StrategyProperties strategyProperties =
                 SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true,

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -32,6 +33,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return The applied {@link Contract}.
      */
+    @Nullable
     Contract getContract();
 
     /**
@@ -39,6 +41,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *
      * @return The {@link IProgramMethod} of the applied {@link Contract}.
      */
+    @Nullable
     IProgramMethod getContractProgramMethod();
 
     /**
@@ -71,6 +74,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *         stored.
      * @throws ProofInputException Occurred Exception.
      */
+    @Nullable
     Term getResultTerm() throws ProofInputException;
 
     /**
@@ -81,6 +85,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      *         {@link Exception} is stored.
      * @throws ProofInputException Occurred Exception.
      */
+    @Nullable
     Term getExceptionTerm() throws ProofInputException;
 
     /**
@@ -89,6 +94,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * @return The self {@link Term} or {@code null} if not available.
      * @throws ProofInputException Occurred Exception.
      */
+    @Nullable
     Term getSelfTerm() throws ProofInputException;
 
     /**
@@ -97,6 +103,7 @@ public interface IExecutionOperationContract extends IExecutionNode<SourceElemen
      * @return The parameters of the called method for which a {@link Contract} is applied.
      * @throws ProofInputException Occurred Exception.
      */
+    @Nullable
     ImmutableList<Term> getContractParams() throws ProofInputException;
 
     /**

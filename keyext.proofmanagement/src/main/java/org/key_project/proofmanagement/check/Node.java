@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -41,7 +43,7 @@ public class Node<T extends Comparable<T>> implements Comparable<Node<T>> {
         return parent;
     }
 
-    public SortedSet<Node<T>> getChildren() {
+    public @NonNull SortedSet<Node<T>> getChildren() {
         return children;
     }
 
@@ -55,7 +57,7 @@ public class Node<T extends Comparable<T>> implements Comparable<Node<T>> {
     }
 
     @Override
-    public int compareTo(Node<T> o) {
+    public int compareTo(@NonNull Node<T> o) {
         return content.compareTo(o.content);
     }
 }

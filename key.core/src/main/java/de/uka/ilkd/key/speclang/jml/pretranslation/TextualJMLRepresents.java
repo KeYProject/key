@@ -30,7 +30,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
         this.name = name;
     }
 
-    public LabeledParserRuleContext getRepresents() {
+    public @NonNull LabeledParserRuleContext getRepresents() {
         return represents;
     }
 

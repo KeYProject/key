@@ -13,6 +13,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -31,7 +33,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
     /**
      * The {@link Sort} of the uncaught exception.
      */
-    private Sort exceptionSort;
+    private @Nullable Sort exceptionSort;
 
     /**
      * The {@link TerminationKind}.
@@ -49,8 +51,8 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
      * @param terminationKind The {@link TerminationKind} or {@code null} to compute it when it is
      *        requested the first time (normal or exceptional termination only).
      */
-    public ExecutionTermination(ITreeSettings settings, Node proofNode,
-            IProgramVariable exceptionVariable, TerminationKind terminationKind) {
+    public ExecutionTermination(@NonNull ITreeSettings settings, @NonNull Node proofNode,
+                                IProgramVariable exceptionVariable, TerminationKind terminationKind) {
         super(settings, proofNode);
         this.exceptionVariable = exceptionVariable;
         this.terminationKind = terminationKind;
@@ -60,7 +62,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() {
+    protected @NonNull String lazyComputeName() {
         return switch (getTerminationKind()) {
         case EXCEPTIONAL -> INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort
             + INTERNAL_NODE_NAME_END;
@@ -86,7 +88,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public TerminationKind getTerminationKind() {
+    public @NonNull TerminationKind getTerminationKind() {
         if (terminationKind == null) {
             if (isBlockContractTermination()) {
                 terminationKind =
@@ -135,7 +137,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -143,7 +145,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return switch (getTerminationKind()) {
         case EXCEPTIONAL -> "Exceptional Termination";
         case LOOP_BODY -> "Loop Body Termination";

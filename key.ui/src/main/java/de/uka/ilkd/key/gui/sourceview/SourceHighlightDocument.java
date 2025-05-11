@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.*;
 import java.util.List;
 import java.util.Timer;
@@ -35,7 +37,7 @@ public class SourceHighlightDocument extends DefaultStyledDocument {
     /**
      * The timer that triggers the re-parsing of the text.
      */
-    private Timer refreshTimer = new Timer();
+    private @NonNull Timer refreshTimer = new Timer();
 
     /**
      * The listener that triggers the re-parsing of the text.
@@ -87,7 +89,7 @@ public class SourceHighlightDocument extends DefaultStyledDocument {
      */
     public static final EditorLexer TRIVIAL_LEXER = new EditorLexer() {
         @Override
-        public List<Token> applyTo(String text) {
+        public @NonNull List<Token> applyTo(@NonNull String text) {
             return List.of(new Token(text.length(), new SimpleAttributeSet()));
         }
     };

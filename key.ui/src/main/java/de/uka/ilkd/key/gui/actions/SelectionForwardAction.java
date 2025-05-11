@@ -9,6 +9,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SelectionHistory;
 import de.uka.ilkd.key.gui.SelectionHistoryChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Action to navigate forward in proof node selection history.
@@ -29,7 +30,7 @@ public class SelectionForwardAction extends MainWindowAction
      * @param mainWindow the main window
      * @param history selection history
      */
-    public SelectionForwardAction(MainWindow mainWindow, SelectionHistory history) {
+    public SelectionForwardAction(@NonNull MainWindow mainWindow, SelectionHistory history) {
         super(mainWindow);
         this.history = history;
         setName("Forward");

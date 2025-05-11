@@ -19,6 +19,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
@@ -104,16 +105,16 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private static final FeatureSettings.Feature FEATURE_SMT_TRANSLATION_OPTIONS =
         createFeature("SMT_TRANS_OPTIONS");
 
-    private final JTextField saveToFilePanel;
-    private final JComboBox<String> progressModeBox;
-    private final JSpinner maxProcesses;
-    private final JSpinner timeoutField;
-    private final JSpinner intBoundField;
-    private final JSpinner seqBoundField;
-    private final JSpinner objectBoundField;
-    private final JSpinner locsetBoundField;
-    private final JCheckBox solverSupportCheck;
-    private final JCheckBox enableOnLoad;
+    private final @NonNull JTextField saveToFilePanel;
+    private final @NonNull JComboBox<String> progressModeBox;
+    private final @NonNull JSpinner maxProcesses;
+    private final @NonNull JSpinner timeoutField;
+    private final @NonNull JSpinner intBoundField;
+    private final @NonNull JSpinner seqBoundField;
+    private final @NonNull JSpinner objectBoundField;
+    private final @NonNull JSpinner locsetBoundField;
+    private final @NonNull JCheckBox solverSupportCheck;
+    private final @NonNull JCheckBox enableOnLoad;
 
     private transient ProofIndependentSMTSettings settings;
     private final transient List<SettingsProvider> children = new ArrayList<>();
@@ -163,12 +164,12 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "SMT";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         setSmtSettings(pi.clone());
         return this;
@@ -181,18 +182,18 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         setSmtSettings(pi.clone());
     }
 
-    private JSpinner createLocSetBoundField() {
+    private @NonNull JSpinner createLocSetBoundField() {
         return addNumberField("LocSet bound:", 0L, (long) Integer.MAX_VALUE, 1,
             INFO_BOUND, e -> settings.setLocsetBound(e.longValue()));
     }
 
-    private JSpinner createMaxProcesses() {
+    private @NonNull JSpinner createMaxProcesses() {
         return addNumberField("Concurrent processes:", 0, Integer.MAX_VALUE, 1,
             INFO_MAX_PROCESSES,
             e -> settings.setMaxConcurrentProcesses(e.intValue()));
     }
 
-    private JSpinner createTimeoutField() {
+    private @NonNull JSpinner createTimeoutField() {
         // Use doubles so that the formatter doesn't make every entered String into integers.
         // [see NumberFormatter#stringToValue()].
         JSpinner timeoutSpinner = addNumberField("Timeout:", 0.0, (double) Long.MAX_VALUE, 1,
@@ -206,47 +207,47 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         return timeoutSpinner;
     }
 
-    private JSpinner createIntBoundField() {
+    private @NonNull JSpinner createIntBoundField() {
         return addNumberField("Integer bound:", 0L, (long) Integer.MAX_VALUE, 1,
             INFO_BOUND, e -> settings.setIntBound(e.longValue()));
     }
 
-    private JSpinner createSeqBoundField() {
+    private @NonNull JSpinner createSeqBoundField() {
         return addNumberField("Seq bound:", 0L, (long) Integer.MAX_VALUE, 1,
             INFO_BOUND, e -> settings.setSeqBound(e.longValue()));
     }
 
-    private JSpinner createObjectBoundField() {
+    private @NonNull JSpinner createObjectBoundField() {
         return addNumberField("Object bound:", 0L, (long) Integer.MAX_VALUE, 1,
             INFO_BOUND, e -> settings.setObjectBound(e.longValue()));
     }
 
-    private JComboBox<String> getProgressModeBox() {
+    private @NonNull JComboBox<String> getProgressModeBox() {
         return addComboBox("", INFO_PROGRESS_MODE_BOX, 0,
             e -> settings.setModeOfProgressDialog(
                 ProgressMode.values()[progressModeBox.getSelectedIndex()]),
             getProgressMode(ProgressMode.USER), getProgressMode(ProgressMode.CLOSE));
     }
 
-    private JCheckBox createSolverSupportCheck() {
+    private @NonNull JCheckBox createSolverSupportCheck() {
         return addCheckBox("Check for support when a solver is started",
             INFO_CHECK_FOR_SUPPORT, false,
             e -> settings.setCheckForSupport(solverSupportCheck.isSelected()));
     }
 
-    private JCheckBox createEnableOnLoad() {
+    private @NonNull JCheckBox createEnableOnLoad() {
         return addCheckBox("Enable SMT solvers when loading proofs",
             "", true,
             e -> settings.setEnableOnLoad(enableOnLoad.isSelected()));
     }
 
-    private JTextField getSaveToFilePanel() {
+    private @NonNull JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:", "",
             INFO_SAVE_TO_FILE_PANEL, true,
             e -> settings.setPathForSMTTranslation(saveToFilePanel.getText()));
     }
 
-    private String getProgressMode(ProgressMode index) {
+    private @NonNull String getProgressMode(@NonNull ProgressMode index) {
         return switch (index) {
         case USER -> PROGRESS_MODE_USER;
         case CLOSE -> PROGRESS_MODE_CLOSE;

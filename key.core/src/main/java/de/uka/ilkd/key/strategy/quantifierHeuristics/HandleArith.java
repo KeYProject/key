@@ -35,7 +35,7 @@ public class HandleArith {
      * @return <code>trueT</code> if if formu is proved to true, <code>falseT</code> if false, and
      *         <code>problem</code> if it cann't be proved.
      */
-    public static Term provedByArith(@NonNull Term problem, @NonNull Services services) {
+    public static @NonNull Term provedByArith(@NonNull Term problem, @NonNull Services services) {
         final LRUCache<Term, Term> provedByArithCache =
             services.getCaches().getProvedByArithFstCache();
         Term result;
@@ -126,7 +126,7 @@ public class HandleArith {
      * @param axiom
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
-    public static Term provedByArith(@NonNull Term problem, Term axiom, @NonNull Services services) {
+    public static @NonNull Term provedByArith(@NonNull Term problem, Term axiom, @NonNull Services services) {
         final Pair<Term, Term> key = new Pair<>(problem, axiom);
         final LRUCache<Pair<Term, Term>, Term> provedByArithCache =
             services.getCaches().getProvedByArithSndCache();

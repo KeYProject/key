@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -30,6 +31,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      *
      * @return The {@link MethodReference} of the called method.
      */
+    @Nullable
     MethodReference getMethodReference();
 
     /**
@@ -37,6 +39,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      *
      * @return The called {@link IProgramMethod}.
      */
+    @Nullable
     IProgramMethod getProgramMethod();
 
     /**
@@ -54,6 +57,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      * @return The {@link MethodReference} to the explicit constructor or {@code null} if no
      *         constructor is called.
      */
+    @Nullable
     MethodReference getExplicitConstructorMethodReference();
 
     /**
@@ -61,6 +65,7 @@ public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement
      *
      * @return The explicit constructor or {@code null} if no constructor is called.
      */
+    @Nullable
     IProgramMethod getExplicitConstructorProgramMethod();
 
     /**

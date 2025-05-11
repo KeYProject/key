@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.runallproofs.ProveTest;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.IOUtil;
 
 import org.junit.jupiter.api.AfterAll;
@@ -166,7 +167,7 @@ public class TestProofBundleIO {
      * @return the loaded proof (currently, only a single proof is supported)
      * @throws ProblemLoaderException if loading fails
      */
-    private Proof loadBundle(Path p) throws ProblemLoaderException {
+    private @NonNull Proof loadBundle(@NonNull Path p) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p.toFile());
         AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
         if (replayResult.hasErrors()) {
@@ -195,7 +196,7 @@ public class TestProofBundleIO {
      * @param expectedSize the minimal size (in bytes) the generated bundle should have
      * @throws Exception on errors (should not happen)
      */
-    private Path testBundleGeneration(String dirName, long expectedSize) throws Exception {
+    private @NonNull Path testBundleGeneration(@NonNull String dirName, long expectedSize) throws Exception {
         // we test DiskFileRepo here!
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
                 .setEnsureSourceConsistency(true);

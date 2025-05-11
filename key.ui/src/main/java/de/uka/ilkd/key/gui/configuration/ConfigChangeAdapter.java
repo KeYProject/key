@@ -3,14 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.configuration;
 
+import org.jspecify.annotations.NonNull;
+
 import javax.swing.JComponent;
 
 
 public class ConfigChangeAdapter implements ConfigChangeListener {
 
-    private final JComponent compRef;
+    private final @NonNull JComponent compRef;
 
-    public ConfigChangeAdapter(JComponent comp) {
+    public ConfigChangeAdapter(@NonNull JComponent comp) {
         assert comp != null;
         compRef = comp;
     }

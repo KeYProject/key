@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
+import org.jspecify.annotations.NonNull;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
@@ -17,12 +18,12 @@ import recoder.java.CompilationUnit;
 public class PreviewGenericRemover extends AbstractGenericRemover {
     private final Map<File, String> resultMap = new HashMap<>();
 
-    public PreviewGenericRemover(GenericRemoverMonitor monitor) {
+    public PreviewGenericRemover(@NonNull GenericRemoverMonitor monitor) {
         super(monitor);
     }
 
     @Override
-    protected void saveModifiedCompilationUnit(CompilationUnit cu, String filename)
+    protected void saveModifiedCompilationUnit(@NonNull CompilationUnit cu, String filename)
             throws IOException {
         DataLocation location = cu.getDataLocation();
         assert location instanceof DataFileLocation;
@@ -30,7 +31,7 @@ public class PreviewGenericRemover extends AbstractGenericRemover {
         resultMap.put(fileLocation.getFile(), cu.toSource());
     }
 
-    public Map<File, String> getResultMap() {
+    public @NonNull Map<File, String> getResultMap() {
         return resultMap;
     }
 }

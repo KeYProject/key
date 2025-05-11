@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.util.collection.ImmutableSet;
@@ -60,7 +61,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
     private Logger logger;
 
     /** the contracts (by name) as found by this collector as well as the termination type */
-    private Map<String, DependencyGraph.EdgeType> result = new HashMap<>();
+    private @NonNull Map<String, DependencyGraph.EdgeType> result = new HashMap<>();
 
     /**
      * Creates a new collector for the given proof, starting at given root node.
@@ -75,7 +76,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         this.logger = logger;
     }
 
-    public Map<String, DependencyGraph.EdgeType> getResult() {
+    public @NonNull Map<String, DependencyGraph.EdgeType> getResult() {
         return result;
     }
 
@@ -105,7 +106,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
      *
      * @param tacletApp the Taclet node to extract the contract from
      */
-    private void extractContractFromContractTaclet(TacletAppIntermediate tacletApp) {
+    private void extractContractFromContractTaclet(@NonNull TacletAppIntermediate tacletApp) {
         /*
          * With the current implementation in KeY, the name of the rule is always
          * Contract_axiom_for_m_in_C
@@ -183,7 +184,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
      *
      * @param biApp the builtin rule node to extract the contracts from
      */
-    private void extractContractsFromBuiltin(BuiltInAppIntermediate biApp) {
+    private void extractContractsFromBuiltin(@NonNull BuiltInAppIntermediate biApp) {
         // The string may still contain multiple contracts, syntax: contract1#contract2#...
         // split and add all
         SpecificationRepository specRepo = proof.getServices().getSpecificationRepository();

@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.IOUtil;
 
 import org.jspecify.annotations.Nullable;
@@ -68,7 +69,7 @@ public class EditSourceFileAction extends KeyAction {
     /**
      * The exception.
      */
-    private final Throwable exception;
+    private final @Nullable Throwable exception;
 
     /**
      * Instantiates a new edits the source file action.
@@ -76,7 +77,7 @@ public class EditSourceFileAction extends KeyAction {
      * @param parent the parent
      * @param exception the exception
      */
-    public EditSourceFileAction(final Window parent, final Throwable exception) {
+    public EditSourceFileAction(final Window parent, final @Nullable Throwable exception) {
         setName("Edit File");
         setIcon(IconFactory.editFile(16));
         this.parent = parent;
@@ -88,7 +89,7 @@ public class EditSourceFileAction extends KeyAction {
      * Moves the caret in a {@link JTextArea} to the specified position. Assumes the first position
      * in the textarea is in line 1 column 1.
      */
-    private static void textAreaGoto(JTextComponent textArea, Position position) {
+    private static void textAreaGoto(@NonNull JTextComponent textArea, @NonNull Position position) {
         int line = position.line();
         int col = position.column();
         String text = textArea.getText();
@@ -106,8 +107,8 @@ public class EditSourceFileAction extends KeyAction {
         textArea.setCaretPosition(i);
     }
 
-    private static JScrollPane createParserMessageScrollPane(final Throwable exception,
-            final int columnNumber) {
+    private static @NonNull JScrollPane createParserMessageScrollPane(final @NonNull Throwable exception,
+                                                                      final int columnNumber) {
         JTextArea parserMessage = new JTextArea();
         String message = exception.getMessage();
         message = message == null ? "" : message;
@@ -127,7 +128,7 @@ public class EditSourceFileAction extends KeyAction {
         return parserMessageScrollPane;
     }
 
-    private JTextPane createSrcTextPane(final Location location) throws IOException {
+    private @NonNull JTextPane createSrcTextPane(final @NonNull Location location) throws IOException {
         final JTextPane textPane = new JTextPane() {
             @Override
             public void addNotify() {
@@ -184,8 +185,8 @@ public class EditSourceFileAction extends KeyAction {
         return sourceFile;
     }
 
-    private JPanel createButtonPanel(final URI sourceURI, final JTextPane textPane,
-            final JDialog dialog) {
+    private @NonNull JPanel createButtonPanel(final URI sourceURI, final @NonNull JTextPane textPane,
+                                              final @NonNull JDialog dialog) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         JButton saveButton = new JButton("Save");
@@ -234,7 +235,7 @@ public class EditSourceFileAction extends KeyAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent arg0) {
+    public void actionPerformed(@NonNull ActionEvent arg0) {
         if (exception == null) {
             JOptionPane.showMessageDialog(
                 SwingUtilities.windowForComponent((Component) arg0.getSource()),

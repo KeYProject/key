@@ -6,6 +6,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -25,6 +26,7 @@ public interface ISymbolicObject extends ISymbolicAssociationValueContainer {
      *
      * @return The name of this object.
      */
+    @Nullable
     Term getName();
 
     /**
@@ -39,6 +41,7 @@ public interface ISymbolicObject extends ISymbolicAssociationValueContainer {
      *
      * @return The type of this object.
      */
+    @Nullable
     Sort getType();
 
     /**

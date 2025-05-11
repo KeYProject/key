@@ -10,6 +10,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -36,7 +38,7 @@ public class StdDialog extends JDialog {
         this(title, null, strut, helpButton);
     }
 
-    public StdDialog(String title, JComponent content, int strut, boolean helpButton) {
+    public StdDialog(String title, @Nullable JComponent content, int strut, boolean helpButton) {
         this.setTitle(title);
         this.setModal(true);
         // content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
@@ -81,7 +83,7 @@ public class StdDialog extends JDialog {
         this.setLocationRelativeTo(MainWindow.getInstance());
     }
 
-    public void setContent(JComponent content) {
+    public void setContent(@NonNull JComponent content) {
         getContentBox().removeAll();
         getContentBox().add(content);
         content.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
@@ -98,7 +100,7 @@ public class StdDialog extends JDialog {
         return cancelButtonHasBeenPressed;
     }
 
-    public JButton getHelpButton() {
+    public @NonNull JButton getHelpButton() {
         if (helpButton == null) {
             helpButton = new JButton("Help");
         }

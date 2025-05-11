@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.settings.ProofSettings;
+import org.jspecify.annotations.NonNull;
 
 // This class is not used anymore as taclet options should be set through the general settings
 // dialog
@@ -21,7 +22,7 @@ public class TacletOptionsAction extends MainWindowAction {
      */
     private static final long serialVersionUID = -6813540362001480606L;
 
-    public TacletOptionsAction(MainWindow mainWindow) {
+    public TacletOptionsAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Show Taclet Options");
         setIcon(IconFactory.configure(16));

@@ -26,6 +26,8 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -42,10 +44,10 @@ import org.slf4j.LoggerFactory;
 public class MediatorProofControl extends AbstractProofControl {
     private static final Logger LOGGER = LoggerFactory.getLogger(MediatorProofControl.class);
 
-    private final AbstractMediatorUserInterfaceControl ui;
-    private AutoModeWorker worker;
+    private final @NonNull AbstractMediatorUserInterfaceControl ui;
+    private @Nullable AutoModeWorker worker;
 
-    public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
+    public MediatorProofControl(@NonNull AbstractMediatorUserInterfaceControl ui) {
         super(ui, ui);
         this.ui = ui;
     }
@@ -76,7 +78,7 @@ public class MediatorProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
+    public void startAutoMode(Proof proof, @NonNull ImmutableList<Goal> goals, ProverTaskListener ptl) {
         if (goals.isEmpty()) {
             ui.notify(new GeneralInformationEvent("No enabled goals available."));
             return;
@@ -153,14 +155,14 @@ public class MediatorProofControl extends AbstractProofControl {
      * unfreezes the UI when it is finished. </p>
      */
     private class AutoModeWorker extends SwingWorker<ApplyStrategyInfo, Object> {
-        private final Proof proof;
-        private final List<Node> initialGoals;
-        private final ImmutableList<Goal> goals;
-        private final ApplyStrategy applyStrategy;
+        private final @NonNull Proof proof;
+        private final @NonNull List<Node> initialGoals;
+        private final @NonNull ImmutableList<Goal> goals;
+        private final @NonNull ApplyStrategy applyStrategy;
         private ApplyStrategyInfo info;
 
-        public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
-                ProverTaskListener ptl) {
+        public AutoModeWorker(final @NonNull Proof proof, final @NonNull ImmutableList<Goal> goals,
+                              @Nullable ProverTaskListener ptl) {
             this.proof = proof;
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
@@ -201,18 +203,18 @@ public class MediatorProofControl extends AbstractProofControl {
             }
         }
 
-        protected void emitInteractiveAutoMode(List<Node> initialGoals, Proof proof,
-                ApplyStrategyInfo info) {
+        protected void emitInteractiveAutoMode(@NonNull List<Node> initialGoals, @NonNull Proof proof,
+                                               @NonNull ApplyStrategyInfo info) {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
-        private void notifyException(final Throwable exception) {
+        private void notifyException(final @NonNull Throwable exception) {
             LOGGER.error("exception during strategy ", exception);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
         }
 
         @Override
-        protected ApplyStrategyInfo doInBackground() throws Exception {
+        protected @NonNull ApplyStrategyInfo doInBackground() throws Exception {
             boolean stopMode =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties()
                         .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)

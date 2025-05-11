@@ -23,6 +23,8 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -78,7 +80,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The up to know discovered completed {@link IExecutionBlockStartNode}s.
      */
-    private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
+    private @NonNull ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
 
     /**
      * The already computed block completion conditions.
@@ -95,12 +97,12 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The up to know discovered outgoing links.
      */
-    private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
+    private @NonNull ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
 
     /**
      * The up to know discovered incoming links.
      */
-    private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
+    private @NonNull ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
 
     /**
      * Constructor.
@@ -109,7 +111,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
+    public AbstractExecutionNode(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -134,7 +136,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public AbstractExecutionNode<?>[] getChildren() {
+    public AbstractExecutionNode<?> @NonNull [] getChildren() {
         return children.toArray(new AbstractExecutionNode[0]);
     }
 
@@ -143,7 +145,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      *
      * @param child A new child {@link AbstractExecutionNode}.
      */
-    public void addChild(AbstractExecutionNode<?> child) {
+    public void addChild(@Nullable AbstractExecutionNode<?> child) {
         if (child != null) {
             children.add(child);
         }
@@ -180,7 +182,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public String getFormatedPathCondition() throws ProofInputException {
+    public @Nullable String getFormatedPathCondition() throws ProofInputException {
         // Search path condition of the parent which is used by default.
         String result = null;
         AbstractExecutionNode<?> parent = getParent();
@@ -241,7 +243,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public S getActiveStatement() {
+    public @Nullable S getActiveStatement() {
         return (S) getProofNodeInfo().getActiveStatement();
     }
 
@@ -249,7 +251,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public PositionInfo getActivePositionInfo() {
+    public @NonNull PositionInfo getActivePositionInfo() {
         return getActiveStatement().getPositionInfo();
     }
 
@@ -324,7 +326,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @return The created {@link ExecutionNodeSymbolicLayoutExtractor}.
      * @throws ProofInputException Occurred Exception.
      */
-    protected ExecutionNodeSymbolicLayoutExtractor lazyComputeLayoutExtractor()
+    protected @NonNull ExecutionNodeSymbolicLayoutExtractor lazyComputeLayoutExtractor()
             throws ProofInputException {
         ExecutionNodeSymbolicLayoutExtractor result =
             new ExecutionNodeSymbolicLayoutExtractor(this);
@@ -408,7 +410,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      *
      * @param completedBlock The {@link IExecutionBlockStartNode} to register.
      */
-    public void addCompletedBlock(IExecutionBlockStartNode<?> completedBlock) {
+    public void addCompletedBlock(@Nullable IExecutionBlockStartNode<?> completedBlock) {
         if (completedBlock != null && !completedBlocks.contains(completedBlock)) {
             completedBlocks = completedBlocks.append(completedBlock);
         }
@@ -420,7 +422,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @param completedBlock The {@link IExecutionBlockStartNode} to be remove.
      * @author Anna Filighera
      */
-    public void removeCompletedBlock(IExecutionBlockStartNode<?> completedBlock) {
+    public void removeCompletedBlock(@Nullable IExecutionBlockStartNode<?> completedBlock) {
         if (completedBlock != null && completedBlocks.contains(completedBlock)) {
             completedBlocks = completedBlocks.removeAll(completedBlock);
             blockCompletionConditions.remove(completedBlock);
@@ -464,8 +466,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      *        {@link Term} is returned.
      * @throws ProofInputException Occurred Exception
      */
-    protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode,
-            boolean returnFormattedCondition) throws ProofInputException {
+    protected @Nullable Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode,
+                                                                   boolean returnFormattedCondition) throws ProofInputException {
         final InitConfig initConfig = getInitConfig();
         if (initConfig != null && // Otherwise Proof is disposed.
                 completedBlocks.contains(completedNode)) {
@@ -533,7 +535,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public IExecutionLink getOutgoingLink(final IExecutionNode<?> target) {
+    public @Nullable IExecutionLink getOutgoingLink(final IExecutionNode<?> target) {
         return CollectionUtil.search(outgoingLinks, element -> element.getTarget() == target);
     }
 
@@ -549,7 +551,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public IExecutionLink getIncomingLink(final IExecutionNode<?> source) {
+    public @Nullable IExecutionLink getIncomingLink(final IExecutionNode<?> source) {
         return CollectionUtil.search(incomingLinks, element -> element.getSource() == source);
     }
 

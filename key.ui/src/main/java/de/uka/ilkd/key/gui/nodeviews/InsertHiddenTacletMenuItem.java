@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -45,7 +46,7 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
      * @param t the Taclet
      * @return the sequent with the formulas to be added or null
      */
-    protected Sequent checkTaclet(Taclet t) {
+    protected @Nullable Sequent checkTaclet(Taclet t) {
         if (!(t instanceof NoFindTaclet) || !t.displayName().startsWith("insert_hidden")) {
             return null;
         }

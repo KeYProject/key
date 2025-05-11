@@ -292,7 +292,7 @@ public abstract class StaticFeatureCollection {
         return CompareCostsFeature.leq(a, b);
     }
 
-    protected static RuleAppCost c(long p) {
+    protected static @NonNull RuleAppCost c(long p) {
         return NumberRuleAppCost.create(p);
     }
 

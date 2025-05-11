@@ -12,6 +12,7 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class GUIAbstractTreeNode implements TreeNode {
 
@@ -19,7 +20,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     // made weak otherwise there are leaks in ExpansionState.map
     // and ProofTreeView.delegateView.lastPathComponent
-    private final WeakReference<Node> noderef;
+    private final @NonNull WeakReference<Node> noderef;
 
     protected GUIProofTreeModel getProofTreeModel() {
         return tree;
@@ -30,11 +31,11 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         this.noderef = new WeakReference<>(node);
     }
 
-    public abstract TreeNode getChildAt(int childIndex);
+    public abstract @Nullable TreeNode getChildAt(int childIndex);
 
     public abstract int getChildCount();
 
-    public abstract TreeNode getParent();
+    public abstract @Nullable TreeNode getParent();
 
     public abstract boolean isLeaf();
 
@@ -55,12 +56,12 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return !isLeaf();
     }
 
-    public Enumeration<TreeNode> children() {
+    public @NonNull Enumeration<TreeNode> children() {
         return new ChildEnumeration();
     }
 
 
-    public TreeNode[] getPath() {
+    public TreeNode @NonNull [] getPath() {
         LinkedList<TreeNode> path = new LinkedList<>();
         TreeNode n = this;
         path.addFirst(n);
@@ -70,7 +71,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return path.toArray(new TreeNode[0]);
     }
 
-    protected TreeNode findBranch(Node p_node) {
+    protected @NonNull TreeNode findBranch(@NonNull Node p_node) {
         TreeNode res = getProofTreeModel().findBranch(p_node);
         if (res != null) {
             return res;
@@ -81,7 +82,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return getProofTreeModel().getBranchNode(p_node, label);
     }
 
-    public static String ensureBranchLabelIsSet(Node p_node) { // TODO: This functionality should be
+    public static @NonNull String ensureBranchLabelIsSet(@NonNull Node p_node) { // TODO: This functionality should be
         // hidden somewhere in NodeInfo
         // without the need to call it explicitly.
         var nodeInfo = p_node.getNodeInfo();
@@ -109,17 +110,17 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
             return current < getChildCount();
         }
 
-        public TreeNode nextElement() {
+        public @Nullable TreeNode nextElement() {
             return getChildAt(current++);
         }
 
     }
 
-    public Node getNode() {
+    public @Nullable Node getNode() {
         return noderef.get();
     }
 
-    protected Node findChild(Node n) {
+    protected @Nullable Node findChild(@NonNull Node n) {
         if (n.childrenCount() == 1) {
             return n.child(0);
         }

@@ -68,7 +68,7 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public AutomatedRuleApplicationManager copy() {
+    public @NonNull AutomatedRuleApplicationManager copy() {
         return (AutomatedRuleApplicationManager) clone();
     }
 

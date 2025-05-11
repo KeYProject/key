@@ -25,7 +25,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     }
 
 
-    public JmlParser.Field_declarationContext getDecl() {
+    public JmlParser.@NonNull Field_declarationContext getDecl() {
         return decl;
     }
 

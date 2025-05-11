@@ -20,6 +20,8 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -29,16 +31,16 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public final class KeYGuiExtensionFacade {
     private static final Set<String> forbiddenPlugins = new HashSet<>();
-    private static List<Extension<?>> extensions = new LinkedList<>();
+    private static @NonNull List<Extension<?>> extensions = new LinkedList<>();
     // private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
 
     // region panel extension
-    public static Stream<TabPanel> getAllPanels(MainWindow window) {
+    public static Stream<TabPanel> getAllPanels(@NonNull MainWindow window) {
         return getLeftPanel().stream()
                 .flatMap(it -> it.getPanels(window, window.getMediator()).stream());
     }
 
-    public static List<KeYGuiExtension.LeftPanel> getLeftPanel() {
+    public static @NonNull List<KeYGuiExtension.LeftPanel> getLeftPanel() {
         return getExtensionInstances(KeYGuiExtension.LeftPanel.class);
     }
     // endregion
@@ -50,11 +52,11 @@ public final class KeYGuiExtensionFacade {
      *
      * @return a list
      */
-    public static List<KeYGuiExtension.MainMenu> getMainMenuExtensions() {
+    public static @NonNull List<KeYGuiExtension.MainMenu> getMainMenuExtensions() {
         return getExtensionInstances(KeYGuiExtension.MainMenu.class);
     }
 
-    public static Stream<Action> getMainMenuActions(MainWindow mainWindow) {
+    public static Stream<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         ToIntFunction<Action> func = (Action a) -> {
             Integer i = (Integer) a.getValue(KeyAction.PRIORITY);
             if (i == null) {
@@ -72,7 +74,7 @@ public final class KeYGuiExtensionFacade {
     /**
      * Adds all registered and activated {@link KeYGuiExtension.MainMenu} to the given menuBar.
      */
-    public static void addExtensionsToMainMenu(MainWindow mainWindow, JMenuBar menuBar) {
+    public static void addExtensionsToMainMenu(@NonNull MainWindow mainWindow, @NonNull JMenuBar menuBar) {
         JMenu menu = new JMenu("Extensions");
         getMainMenuActions(mainWindow).forEach(it -> sortActionIntoMenu(it, menuBar, menu));
 
@@ -84,7 +86,7 @@ public final class KeYGuiExtensionFacade {
 
     // region Menu Helper
 
-    private static Iterator<String> getMenuPath(Action act) {
+    private static @NonNull Iterator<String> getMenuPath(@NonNull Action act) {
         Object path = act.getValue(KeyAction.PATH);
         String spath;
         if (path == null) {
@@ -95,7 +97,7 @@ public final class KeYGuiExtensionFacade {
         return Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
     }
 
-    private static void sortActionIntoMenu(Action act, JMenu menu) {
+    private static void sortActionIntoMenu(@NonNull Action act, @NonNull JMenu menu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menu, mpath);
 
@@ -106,7 +108,7 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static void sortActionIntoMenu(Action act, JPopupMenu menu) {
+    private static void sortActionIntoMenu(@NonNull Action act, @NonNull JPopupMenu menu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menu, mpath);
 
@@ -125,7 +127,7 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static void sortActionIntoMenu(Action act, JMenuBar menuBar, JMenu defaultMenu) {
+    private static void sortActionIntoMenu(@NonNull Action act, @NonNull JMenuBar menuBar, JMenu defaultMenu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menuBar, mpath, defaultMenu);
 
@@ -136,7 +138,7 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static JMenu findMenu(JMenuBar menuBar, Iterator<String> mpath, JMenu defaultMenu) {
+    private static JMenu findMenu(@NonNull JMenuBar menuBar, @NonNull Iterator<String> mpath, JMenu defaultMenu) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             for (int i = 0; i < menuBar.getMenuCount(); i++) {
@@ -153,7 +155,7 @@ public final class KeYGuiExtensionFacade {
         return defaultMenu;
     }
 
-    private static JMenu findMenu(JPopupMenu menu, Iterator<String> mpath) {
+    private static @Nullable JMenu findMenu(@NonNull JPopupMenu menu, @NonNull Iterator<String> mpath) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             Component[] children = menu.getComponents();
@@ -172,7 +174,7 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static JMenu findMenu(JMenu menu, Iterator<String> mpath) {
+    private static JMenu findMenu(@NonNull JMenu menu, @NonNull Iterator<String> mpath) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             Component[] children = menu.getMenuComponents();
@@ -197,7 +199,7 @@ public final class KeYGuiExtensionFacade {
      *
      * @return a list
      */
-    public static List<KeYGuiExtension.Toolbar> getToolbarExtensions() {
+    public static @NonNull List<KeYGuiExtension.Toolbar> getToolbarExtensions() {
         return getExtensionInstances(KeYGuiExtension.Toolbar.class);
     }
     // endregion
@@ -208,7 +210,7 @@ public final class KeYGuiExtensionFacade {
      * @param mainWindow non-null
      * @return
      */
-    public static List<JToolBar> createToolbars(MainWindow mainWindow) {
+    public static @NonNull List<JToolBar> createToolbars(MainWindow mainWindow) {
         return getToolbarExtensions().stream().map(it -> it.getToolbar(mainWindow))
                 .peek(x -> x.setFloatable(false))
                 .collect(Collectors.toList());
@@ -219,7 +221,7 @@ public final class KeYGuiExtensionFacade {
      *
      * @return a list
      */
-    public static List<KeYGuiExtension.ContextMenu> getContextMenuExtensions() {
+    public static @NonNull List<KeYGuiExtension.ContextMenu> getContextMenuExtensions() {
         return getExtensionInstances(KeYGuiExtension.ContextMenu.class);
     }
 
@@ -235,8 +237,8 @@ public final class KeYGuiExtensionFacade {
      * @param mediator the KeY mediator
      * @return populated context menu
      */
-    public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
-            KeYMediator mediator) {
+    public static @NonNull JPopupMenu createContextMenu(@NonNull ContextMenuKind kind, Object underlyingObject,
+                                                        @NonNull KeYMediator mediator) {
         JPopupMenu menu = new JPopupMenu();
         if (underlyingObject instanceof Proof proof) {
             for (Component comp : MainWindow.getInstance().createProofMenu(proof)
@@ -249,14 +251,14 @@ public final class KeYGuiExtensionFacade {
         return menu;
     }
 
-    public static void addContextMenuItems(ContextMenuKind kind, JPopupMenu menu,
-            Object underlyingObject, KeYMediator mediator) {
+    public static void addContextMenuItems(@NonNull ContextMenuKind kind, @NonNull JPopupMenu menu,
+                                           @NonNull Object underlyingObject, @NonNull KeYMediator mediator) {
         getContextMenuItems(kind, underlyingObject, mediator)
                 .forEach(it -> sortActionIntoMenu(it, menu));
     }
 
-    public static List<Action> getContextMenuItems(ContextMenuKind kind, Object underlyingObject,
-            KeYMediator mediator) {
+    public static @NonNull List<Action> getContextMenuItems(@NonNull ContextMenuKind kind, @NonNull Object underlyingObject,
+                                                            @NonNull KeYMediator mediator) {
         if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) {
             throw new IllegalArgumentException();
         }
@@ -266,8 +268,8 @@ public final class KeYGuiExtensionFacade {
                 .collect(Collectors.toList());
     }
 
-    public static JMenu createTermMenu(ContextMenuKind kind, Object underlyingObject,
-            KeYMediator mediator) {
+    public static @NonNull JMenu createTermMenu(@NonNull ContextMenuKind kind, @NonNull Object underlyingObject,
+                                                @NonNull KeYMediator mediator) {
         JMenu menu = new JMenu("Extensions");
         getContextMenuItems(kind, underlyingObject, mediator)
                 .forEach(it -> sortActionIntoMenu(it, menu));
@@ -286,12 +288,12 @@ public final class KeYGuiExtensionFacade {
      * @return a list of all found and enabled service implementations
      */
     @SuppressWarnings("unchecked")
-    private static <T> Stream<Extension<T>> getExtensionsStream(Class<T> clazz) {
+    private static <T> Stream<Extension<T>> getExtensionsStream(@NonNull Class<T> clazz) {
         return getExtensions().stream().filter(it -> !it.isDisabled())
                 .filter(it -> clazz.isAssignableFrom(it.getType())).map(it -> (Extension<T>) it);
     }
 
-    private static <T> List<T> getExtensionInstances(Class<T> c) {
+    private static <T> @NonNull List<T> getExtensionInstances(@NonNull Class<T> c) {
         return getExtensionsStream(c).map(Extension::getInstance).collect(Collectors.toList());
     }
 
@@ -304,7 +306,7 @@ public final class KeYGuiExtensionFacade {
      * @param a an instance of a plugin, non-null
      * @return
      */
-    private static <T> boolean isNotForbidden(Class<T> a) {
+    private static <T> boolean isNotForbidden(@NonNull Class<T> a) {
         if (forbiddenPlugins.contains(a.getName())) {
             return false;
         }
@@ -313,34 +315,34 @@ public final class KeYGuiExtensionFacade {
     }
     // endregion
 
-    public static List<Extension<?>> getExtensions() {
+    public static @NonNull List<Extension<?>> getExtensions() {
         if (extensions.isEmpty()) {
             loadExtensions();
         }
         return extensions;
     }
 
-    public static List<JComponent> getStatusLineComponents() {
+    public static @NonNull List<JComponent> getStatusLineComponents() {
         return getStatusLineExtensions().stream()
                 .flatMap(it -> it.getStatusLineComponents().stream()).collect(Collectors.toList());
 
     }
 
-    public static List<KeYGuiExtension.StatusLine> getStatusLineExtensions() {
+    public static @NonNull List<KeYGuiExtension.StatusLine> getStatusLineExtensions() {
         return getExtensionInstances(KeYGuiExtension.StatusLine.class);
     }
 
-    public static Collection<KeYGuiExtension.Settings> getSettingsProvider() {
+    public static @NonNull Collection<KeYGuiExtension.Settings> getSettingsProvider() {
         return getExtensionInstances(KeYGuiExtension.Settings.class);
     }
 
-    public static List<KeYGuiExtension.Startup> getStartupExtensions() {
+    public static @NonNull List<KeYGuiExtension.Startup> getStartupExtensions() {
         return getExtensionInstances(KeYGuiExtension.Startup.class);
     }
 
 
     // region keyboard shortcuts
-    public static List<KeYGuiExtension.KeyboardShortcuts> getKeyboardShortcutsExtensions() {
+    public static @NonNull List<KeYGuiExtension.KeyboardShortcuts> getKeyboardShortcutsExtensions() {
         return getExtensionInstances(KeYGuiExtension.KeyboardShortcuts.class);
     }
 
@@ -356,8 +358,8 @@ public final class KeYGuiExtensionFacade {
      * @param component
      * @param componentId
      */
-    public static void installKeyboardShortcuts(KeYMediator mediator, JComponent component,
-            String componentId) {
+    public static void installKeyboardShortcuts(KeYMediator mediator, @NonNull JComponent component,
+                                                String componentId) {
         Stream<Action> provider = getKeyboardShortcuts(mediator, componentId, component);
         provider.forEach(it -> {
             int condition = it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION) != null
@@ -380,7 +382,7 @@ public final class KeYGuiExtensionFacade {
      *
      * @return all known implementations of the {@link KeYGuiExtension.Tooltip}.
      */
-    public static List<KeYGuiExtension.Tooltip> getTooltipExtensions() {
+    public static @NonNull List<KeYGuiExtension.Tooltip> getTooltipExtensions() {
         return getExtensionInstances(KeYGuiExtension.Tooltip.class);
     }
 
@@ -390,7 +392,7 @@ public final class KeYGuiExtensionFacade {
      * @param pos the position the user selected.
      * @return every term info string from every loaded extension.
      */
-    public static List<String> getTooltipStrings(MainWindow window, PosInSequent pos) {
+    public static @NonNull List<String> getTooltipStrings(MainWindow window, PosInSequent pos) {
         return getTooltipExtensions().stream()
                 .flatMap(it -> it.getTooltipStrings(window, pos).stream())
                 .collect(Collectors.toList());
@@ -398,7 +400,7 @@ public final class KeYGuiExtensionFacade {
     // endregion
 
 
-    public static Stream<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent mousePos) {
+    public static Stream<String> getTermInfoStrings(@NonNull MainWindow mainWindow, @NonNull PosInSequent mousePos) {
         return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream()
                 .flatMap(it -> it.getTermInfoStrings(mainWindow, mousePos).stream());
     }
@@ -431,13 +433,13 @@ public final class KeYGuiExtensionFacade {
 
     private static class ActionPriorityComparator implements Comparator<Action> {
         @Override
-        public int compare(Action o1, Action o2) {
+        public int compare(@NonNull Action o1, @NonNull Action o2) {
             int a = getPriority(o1);
             int b = getPriority(o2);
             return a - b;
         }
 
-        private int getPriority(Action action) {
+        private int getPriority(@NonNull Action action) {
             if (action.getValue(KeyAction.PRIORITY) != null) {
                 return (int) action.getValue(KeyAction.PRIORITY);
             }

@@ -49,7 +49,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * Create a <code>RuleApp</code> that is suitable to be applied or <code>null</code>.
      */
-    public abstract RuleApp completeRuleApp(Goal p_goal);
+    public abstract @Nullable RuleApp completeRuleApp(Goal p_goal);
 
     protected final RuleApp getRuleApp() {
         return ruleApp;

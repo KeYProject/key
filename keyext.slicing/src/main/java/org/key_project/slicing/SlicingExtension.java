@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
@@ -62,7 +63,7 @@ public class SlicingExtension implements KeYGuiExtension,
     /**
      * The left panel inserted into the GUI.
      */
-    private SlicingLeftPanel leftPanel = null;
+    private @Nullable SlicingLeftPanel leftPanel = null;
     /**
      * If set to true, the rule application de-duplication algorithm is automatically limited to
      * the "safe mode" for the next loaded proof.
@@ -74,8 +75,8 @@ public class SlicingExtension implements KeYGuiExtension,
      */
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(
-                KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
+        public @NonNull List<Action> getContextActions(
+                @NonNull KeYMediator mediator, ContextMenuKind kind, @Nullable PosInSequent pos) {
 
             DependencyTracker tracker = trackers.get(mediator.getSelectedProof());
             if (tracker == null
@@ -114,12 +115,12 @@ public class SlicingExtension implements KeYGuiExtension,
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
         createTrackerForProof(e.getSource().getSelectedProof());
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
+    public void init(MainWindow window, @NonNull KeYMediator mediator) {
         mediator.addKeYSelectionListener(this);
         mediator.registerProofLoadListener(this::createTrackerForProof);
     }
@@ -155,7 +156,7 @@ public class SlicingExtension implements KeYGuiExtension,
     }
 
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
+    public void proofDisposing(@NonNull ProofDisposedEvent e) {
         trackers.put(e.getSource(), null);
         trackers.remove(e.getSource());
         if (leftPanel != null) {
@@ -169,7 +170,7 @@ public class SlicingExtension implements KeYGuiExtension,
     }
 
     @Override
-    public SettingsProvider getSettings() {
+    public @NonNull SettingsProvider getSettings() {
         return new SlicingSettingsProvider();
     }
 

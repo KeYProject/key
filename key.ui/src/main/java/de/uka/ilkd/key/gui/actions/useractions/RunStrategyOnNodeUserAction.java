@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -30,13 +31,13 @@ public class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
      * @param proof the proof
      * @param invokedNode the node to start auto mode on
      */
-    public RunStrategyOnNodeUserAction(KeYMediator mediator, Proof proof, Node invokedNode) {
+    public RunStrategyOnNodeUserAction(@NonNull KeYMediator mediator, @NonNull Proof proof, Node invokedNode) {
         super(mediator, proof);
         this.invokedNode = invokedNode;
     }
 
     @Override
-    public String name() {
+    public @NonNull String name() {
         return "Strategy: Auto Mode";
     }
 

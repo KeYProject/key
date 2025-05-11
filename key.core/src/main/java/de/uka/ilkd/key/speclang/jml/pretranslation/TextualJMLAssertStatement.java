@@ -60,7 +60,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
          */
     }
 
-    public Kind getKind() {
+    public @NonNull Kind getKind() {
         return kind;
     }
 

@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
+import org.jspecify.annotations.NonNull;
 import recoder.java.CompilationUnit;
 import recoder.java.PackageSpecification;
 import recoder.java.reference.PackageReference;
@@ -18,7 +19,7 @@ import recoder.java.reference.PackageReference;
 public class GenericRemover extends AbstractGenericRemover {
     private File outDir = new File(".");
 
-    public GenericRemover(GenericRemoverMonitor monitor) {
+    public GenericRemover(@NonNull GenericRemoverMonitor monitor) {
         super(monitor);
     }
 
@@ -31,7 +32,7 @@ public class GenericRemover extends AbstractGenericRemover {
     }
 
     @Override
-    protected void saveModifiedCompilationUnit(CompilationUnit cu, String filename)
+    protected void saveModifiedCompilationUnit(@NonNull CompilationUnit cu, @NonNull String filename)
             throws IOException {
         // determine target subdirectory with trailing '/'
         File targetdir;
@@ -65,7 +66,7 @@ public class GenericRemover extends AbstractGenericRemover {
      * @param packageReference reference to make string of, not null
      * @return a string, possibly with dots.
      */
-    private String toString(PackageReference packageReference) {
+    private @NonNull String toString(@NonNull PackageReference packageReference) {
 
         StringBuilder ret = new StringBuilder(packageReference.getIdentifier().getText());
         packageReference = packageReference.getPackageReference();

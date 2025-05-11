@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.*;
 import javax.swing.*;
 
@@ -20,11 +22,13 @@ public class IconFontProvider extends IconProvider {
     }
 
     @Override
+    @NonNull
     Icon load(float size) {
         return IconFontSwing.buildIcon(iconCode, size, color);
     }
 
     @Override
+    @NonNull
     String getKey(float size) {
         return iconCode.toString() + color + size;
     }

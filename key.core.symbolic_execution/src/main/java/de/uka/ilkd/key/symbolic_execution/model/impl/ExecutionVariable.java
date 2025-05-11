@@ -31,6 +31,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -42,17 +44,17 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     /**
      * The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
      */
-    private final IExecutionNode<?> parentNode;
+    private final @NonNull IExecutionNode<?> parentNode;
 
     /**
      * The {@link ExecutionValue} from which the array length was computed.
      */
-    private final ExecutionValue lengthValue;
+    private final @Nullable ExecutionValue lengthValue;
 
     /**
      * The possible values of this {@link IExecutionValue}.
      */
-    private ExecutionValue[] values;
+    private ExecutionValue @Nullable [] values;
 
     /**
      * Constructor for a "normal" value.
@@ -62,9 +64,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param programVariable The represented {@link IProgramVariable} which value is shown.
      * @param additionalCondition An optional additional condition to consider.
      */
-    public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-            PosInOccurrence modalityPIO, IProgramVariable programVariable,
-            Term additionalCondition) {
+    public ExecutionVariable(@NonNull IExecutionNode<?> parentNode, @NonNull Node proofNode,
+                             @NonNull PosInOccurrence modalityPIO, @NonNull IProgramVariable programVariable,
+                             Term additionalCondition) {
         this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
     }
 
@@ -77,9 +79,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param programVariable The represented {@link IProgramVariable} which value is shown.
      * @param additionalCondition An optional additional condition to consider.
      */
-    public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-            PosInOccurrence modalityPIO, ExecutionValue parentValue,
-            IProgramVariable programVariable, Term additionalCondition) {
+    public ExecutionVariable(@NonNull IExecutionNode<?> parentNode, @NonNull Node proofNode,
+                             @NonNull PosInOccurrence modalityPIO, ExecutionValue parentValue,
+                             @NonNull IProgramVariable programVariable, Term additionalCondition) {
         super(parentNode.getSettings(), proofNode, programVariable, parentValue, null,
             additionalCondition, modalityPIO);
         assert programVariable != null;
@@ -98,9 +100,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param lengthValue The {@link ExecutionValue} from which the array length was computed.
      * @param additionalCondition An optional additional condition to consider.
      */
-    public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-            PosInOccurrence modalityPIO, ExecutionValue parentValue, Term arrayIndex,
-            ExecutionValue lengthValue, Term additionalCondition) {
+    public ExecutionVariable(@NonNull IExecutionNode<?> parentNode, @NonNull Node proofNode,
+                             @NonNull PosInOccurrence modalityPIO, ExecutionValue parentValue, Term arrayIndex,
+                             ExecutionValue lengthValue, Term additionalCondition) {
         super(parentNode.getSettings(), proofNode, null, parentValue, arrayIndex,
             additionalCondition, modalityPIO);
         assert modalityPIO != null;
@@ -126,7 +128,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      *
      * @throws ProofInputException Occurred Exception.
      */
-    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
+    protected ExecutionValue @Nullable [] lazyComputeValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
         if (initConfig != null) { // Otherwise proof is disposed.
             // New OneStepSimplifier is required because it has an internal state and the default
@@ -191,9 +193,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @return The created {@link ExecutionValue} instances.
      * @throws ProofInputException Occurred Exception.
      */
-    protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
-            Services services, TermBuilder tb, ApplyStrategyInfo info, Operator resultOperator,
-            Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
+    protected ExecutionValue @NonNull [] instantiateValuesFromSideProof(@NonNull InitConfig initConfig,
+                                                                        @NonNull Services services, @NonNull TermBuilder tb, @NonNull ApplyStrategyInfo info, Operator resultOperator,
+                                                                        Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
             new ArrayList<>(info.getProof().openGoals().size());
         // Group values of the branches
@@ -253,9 +255,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param operator The {@link Operator} of the {@link Term} which provides the value.
      * @param services The {@link Services} to use.
      */
-    protected void groupGoalsByValue(ImmutableList<Goal> goals, Operator operator,
-            Term siteProofSelectTerm, Term siteProofCondition, Map<Term, List<Goal>> valueMap,
-            List<Goal> unknownValues, Services services) throws ProofInputException {
+    protected void groupGoalsByValue(@NonNull ImmutableList<Goal> goals, Operator operator,
+                                     @Nullable Term siteProofSelectTerm, Term siteProofCondition, @NonNull Map<Term, List<Goal>> valueMap,
+                                     @NonNull List<Goal> unknownValues, @NonNull Services services) throws ProofInputException {
         for (Goal goal : goals) {
             // Extract value
             Term value = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, operator);
@@ -296,8 +298,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @return The combined path condition.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals,
-            InitConfig initConfig) throws ProofInputException {
+    protected @Nullable Term computeValueCondition(@NonNull TermBuilder tb, @NonNull List<Goal> valueGoals,
+                                                   @NonNull InitConfig initConfig) throws ProofInputException {
         if (!valueGoals.isEmpty()) {
             List<Term> pathConditions = new LinkedList<>();
             Proof proof = null;

@@ -67,12 +67,12 @@ public class TacletSoundnessPOLoader {
 
 
     static public class TacletInfo {
-        private final Taclet taclet;
+        private final @NonNull Taclet taclet;
         private final boolean alreadyInUse;
         private final boolean notSupported;
         private final @NonNull String nameLowerCase;
 
-        public Taclet getTaclet() {
+        public @NonNull Taclet getTaclet() {
             return taclet;
         }
 
@@ -80,7 +80,7 @@ public class TacletSoundnessPOLoader {
             return alreadyInUse;
         }
 
-        public String getNameLowerCase() {
+        public @NonNull String getNameLowerCase() {
             return nameLowerCase;
         }
 
@@ -158,7 +158,7 @@ public class TacletSoundnessPOLoader {
 
     }
 
-    public ImmutableSet<Taclet> getResultingTacletsForOriginalProof() {
+    public @NonNull ImmutableSet<Taclet> getResultingTacletsForOriginalProof() {
         return resultingTacletsForOriginalProof;
     }
 

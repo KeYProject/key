@@ -14,6 +14,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This action is responsible for the invocation of an SMT solver For example the toolbar button is
@@ -26,12 +27,12 @@ public class SMTInvokeAction extends MainWindowAction {
 
     private static final long serialVersionUID = -8176122007799747342L;
 
-    protected final transient KeYMediator mediator;
+    protected final transient @NonNull KeYMediator mediator;
 
     /**
      * The solver types to be run by this action.
      */
-    private final transient SolverTypeCollection solverUnion;
+    private final transient @NonNull SolverTypeCollection solverUnion;
 
     /**
      * Create a new SMTInvokeAction belonging to the given MainWindow. The resulting action starts
@@ -40,7 +41,7 @@ public class SMTInvokeAction extends MainWindowAction {
      * @param solverUnion the solvers/solver types to be started by this action
      * @param mainWindow the main window this action belongs to
      */
-    public SMTInvokeAction(SolverTypeCollection solverUnion, MainWindow mainWindow) {
+    public SMTInvokeAction(@NonNull SolverTypeCollection solverUnion, @NonNull MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
         this.solverUnion = solverUnion;
@@ -49,7 +50,7 @@ public class SMTInvokeAction extends MainWindowAction {
         }
     }
 
-    public SolverTypeCollection getSolverUnion() {
+    public @NonNull SolverTypeCollection getSolverUnion() {
         return solverUnion;
     }
 
@@ -85,7 +86,7 @@ public class SMTInvokeAction extends MainWindowAction {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return solverUnion.toString();
     }
 

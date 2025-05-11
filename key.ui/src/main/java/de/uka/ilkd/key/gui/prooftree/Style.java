@@ -12,6 +12,7 @@ import javax.swing.Icon;
 import de.uka.ilkd.key.pp.LogicPrinter;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -31,10 +32,10 @@ public class Style {
     public Color background;
 
     /** border color of the node */
-    public Color border;
+    public @Nullable Color border;
 
     /** icon of the node */
-    public Icon icon;
+    public @Nullable Icon icon;
 
     /** Wrapper class for the tooltip */
     public static class Tooltip {
@@ -101,7 +102,7 @@ public class Style {
         /**
          * @return list of all additional infos, immutable
          */
-        public List<Fragment> getAdditionalInfos() {
+        public @NonNull List<Fragment> getAdditionalInfos() {
             return Collections.unmodifiableList(additionalInfo);
         }
 

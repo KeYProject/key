@@ -168,7 +168,7 @@ public class TriggeredInstantiations implements TermGenerator {
     }
 
     private boolean isAvoidConditionProvable(Term cond, ImmutableSet<Term> axioms,
-            Services services) {
+                                             @NonNull Services services) {
 
         long cost = PredictCostProver.computerInstanceCost(
             new Substitution(DefaultImmutableMap.nilMap()), cond,

@@ -13,6 +13,8 @@ import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,7 @@ class CheckConfigDialog extends JDialog {
 
     private class ProofManagementCheckWorker extends SwingWorker<Void, Void> {
         @Override
-        protected Void doInBackground() throws Exception {
+        protected @Nullable Void doInBackground() throws Exception {
             Path reportPath = null;
             if (reportCheck.isSelected()) {
                 reportPath = Paths.get(reportFileField.getText());
@@ -92,7 +94,7 @@ class CheckConfigDialog extends JDialog {
         BlockingGlassPane() {
             addMouseListener(new MouseInputAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mouseClicked(@NonNull MouseEvent e) {
                     // This is not optimal, e.g., it does not update the GUI (i.e. pressed state of
                     // the button). A proper forwarding of the events to the underlying stop button
                     // would be nice, but this is much more difficult to implement correctly.
@@ -113,53 +115,53 @@ class CheckConfigDialog extends JDialog {
                 }
 
                 @Override
-                public void mousePressed(MouseEvent e) {
+                public void mousePressed(@NonNull MouseEvent e) {
                     e.consume();
                 }
 
                 @Override
-                public void mouseReleased(MouseEvent e) {
+                public void mouseReleased(@NonNull MouseEvent e) {
                     e.consume();
                 }
 
                 @Override
-                public void mouseEntered(MouseEvent e) {
+                public void mouseEntered(@NonNull MouseEvent e) {
                     e.consume();
                 }
 
                 @Override
-                public void mouseExited(MouseEvent e) {
+                public void mouseExited(@NonNull MouseEvent e) {
                     e.consume();
                 }
 
                 @Override
-                public void mouseWheelMoved(MouseWheelEvent e) {
+                public void mouseWheelMoved(@NonNull MouseWheelEvent e) {
                     e.consume();
                 }
 
                 @Override
-                public void mouseDragged(MouseEvent e) {
+                public void mouseDragged(@NonNull MouseEvent e) {
                     e.consume();
                 }
 
                 @Override
-                public void mouseMoved(MouseEvent e) {
+                public void mouseMoved(@NonNull MouseEvent e) {
                     e.consume();
                 }
             });
             addKeyListener(new KeyListener() {
                 @Override
-                public void keyPressed(KeyEvent e) {
+                public void keyPressed(@NonNull KeyEvent e) {
                     e.consume();
                 }
 
                 @Override
-                public void keyReleased(KeyEvent e) {
+                public void keyReleased(@NonNull KeyEvent e) {
                     e.consume();
                 }
 
                 @Override
-                public void keyTyped(KeyEvent e) {
+                public void keyTyped(@NonNull KeyEvent e) {
                     e.consume();
                 }
             });

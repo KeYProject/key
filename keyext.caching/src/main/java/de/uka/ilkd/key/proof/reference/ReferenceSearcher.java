@@ -16,6 +16,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 
@@ -36,7 +38,7 @@ public final class ReferenceSearcher {
      * @param newNode new node (must be an open goal)
      * @return a reference (or null, if none found)
      */
-    public static ClosedBy findPreviousProof(List<Proof> previousProofs, Node newNode) {
+    public static @Nullable ClosedBy findPreviousProof(@NonNull List<Proof> previousProofs, @NonNull Node newNode) {
         // first verify that the new node does not contain any terms that depend on external
         // influences
         if (!suitableForCloseByReference(newNode)) {
@@ -145,7 +147,7 @@ public final class ReferenceSearcher {
      * @param subset Semisequent supposed to be in {@code superset}
      * @return whether all formulas are present
      */
-    private static boolean containedIn(Semisequent superset, Semisequent subset) {
+    private static boolean containedIn(@NonNull Semisequent superset, @NonNull Semisequent subset) {
         for (SequentFormula sf : subset) {
             boolean found = false;
             for (SequentFormula sf2 : superset) {
@@ -169,7 +171,7 @@ public final class ReferenceSearcher {
      * @param node the node to check
      * @return whether it can be closed by reference
      */
-    public static boolean suitableForCloseByReference(Node node) {
+    public static boolean suitableForCloseByReference(@NonNull Node node) {
         ProgramMethodFinder f = new ProgramMethodFinder();
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {

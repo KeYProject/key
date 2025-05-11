@@ -34,6 +34,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.Terminatio
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -61,7 +63,7 @@ public class ExecutionNodeReader {
      * @throws SAXException Occurred Exception.
      * @throws IOException Occurred Exception.
      */
-    public IExecutionNode<?> read(File file)
+    public IExecutionNode<?> read(@NonNull File file)
             throws ParserConfigurationException, SAXException, IOException {
         return read(new FileInputStream(file));
     }
@@ -75,7 +77,7 @@ public class ExecutionNodeReader {
      * @throws SAXException Occurred Exception.
      * @throws IOException Occurred Exception.
      */
-    public IExecutionNode<?> read(InputStream in)
+    public @Nullable IExecutionNode<?> read(@Nullable InputStream in)
             throws ParserConfigurationException, SAXException, IOException {
         if (in != null) {
             try (in) {
@@ -197,7 +199,7 @@ public class ExecutionNodeReader {
      * @return The found {@link IExecutionNode}.
      * @throws SAXException If it was not possible to find the node.
      */
-    protected IExecutionNode<?> findNode(IExecutionNode<?> root, String path) throws SAXException {
+    protected IExecutionNode<?> findNode(@NonNull IExecutionNode<?> root, @Nullable String path) throws SAXException {
         if (path != null && !path.isEmpty()) {
             StringTokenizer tokenizer =
                 new StringTokenizer(path, ExecutionNodeWriter.PATH_SEPARATOR + "");
@@ -290,7 +292,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes)
+        public void startElement(String uri, String localName, String qName, @NonNull Attributes attributes)
                 throws SAXException {
             AbstractKeYlessExecutionNode<?> parent = parentNodeStack.peekFirst();
             if (isConstraint(uri, localName, qName)) {
@@ -450,7 +452,7 @@ public class ExecutionNodeReader {
          *
          * @return The mapping of an {@link AbstractKeYlessExecutionNode} to its call stack entries.
          */
-        public Map<AbstractKeYlessExecutionNode<?>, List<String>> getCallStackPathEntries() {
+        public @NonNull Map<AbstractKeYlessExecutionNode<?>, List<String>> getCallStackPathEntries() {
             return callStackPathEntries;
         }
 
@@ -459,7 +461,7 @@ public class ExecutionNodeReader {
          *
          * @return The mapping of a {@link KeYlessMethodCall} to its method return entries.
          */
-        public Map<KeYlessMethodCall, List<String>> getMethodReturnPathEntries() {
+        public @NonNull Map<KeYlessMethodCall, List<String>> getMethodReturnPathEntries() {
             return methodReturnPathEntries;
         }
 
@@ -470,7 +472,7 @@ public class ExecutionNodeReader {
          * @return The mapping of {@link AbstractKeYlessExecutionNode} to its completed block
          *         entries.
          */
-        public Map<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> getCompletedBlockEntries() {
+        public @NonNull Map<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> getCompletedBlockEntries() {
             return completedBlockEntries;
         }
 
@@ -481,7 +483,7 @@ public class ExecutionNodeReader {
          * @return The mapping of an {@link AbstractKeYlessExecutionBlockStartNode} to its block
          *         completion entries.
          */
-        public Map<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> getBlockCompletionEntries() {
+        public @NonNull Map<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> getBlockCompletionEntries() {
             return blockCompletionEntries;
         }
 
@@ -490,7 +492,7 @@ public class ExecutionNodeReader {
          *
          * @return The mapping of a {@link KeYlessStart} to its termination entries.
          */
-        public Map<KeYlessStart, List<String>> getTerminationPathEntries() {
+        public @NonNull Map<KeYlessStart, List<String>> getTerminationPathEntries() {
             return terminationPathEntries;
         }
 
@@ -499,7 +501,7 @@ public class ExecutionNodeReader {
          *
          * @return The mapping of an {@link AbstractKeYlessExecutionNode} to its outgoing links.
          */
-        public Map<AbstractKeYlessExecutionNode<?>, List<String>> getOutgoingLinks() {
+        public @NonNull Map<AbstractKeYlessExecutionNode<?>, List<String>> getOutgoingLinks() {
             return outgoingLinks;
         }
     }
@@ -656,8 +658,8 @@ public class ExecutionNodeReader {
      * @param attributes The attributes.
      * @return The created {@link IExecutionVariable}.
      */
-    protected KeYlessVariable createVariable(IExecutionValue parentValue, String uri,
-            String localName, String qName, Attributes attributes) {
+    protected @NonNull KeYlessVariable createVariable(IExecutionValue parentValue, String uri,
+                                                      String localName, String qName, @NonNull Attributes attributes) {
         return new KeYlessVariable(parentValue, isArrayIndex(attributes),
             getArrayIndexString(attributes), getName(attributes));
     }
@@ -671,8 +673,8 @@ public class ExecutionNodeReader {
      * @param attributes The attributes.
      * @return The created {@link IExecutionMethodReturnValue}.
      */
-    public KeYlessMethodReturnValue createMethodReturnValue(String uri, String localName,
-            String qName, Attributes attributes) {
+    public @NonNull KeYlessMethodReturnValue createMethodReturnValue(String uri, String localName,
+                                                                     String qName, @NonNull Attributes attributes) {
         return new KeYlessMethodReturnValue(getName(attributes), getReturnValueString(attributes),
             getHasCondition(attributes), getConditionString(attributes));
     }
@@ -687,8 +689,8 @@ public class ExecutionNodeReader {
      * @param attributes The attributes.
      * @return The created {@link IExecutionValue}.
      */
-    protected KeYlessValue createValue(IExecutionVariable parentVariable, String uri,
-            String localName, String qName, Attributes attributes) {
+    protected @NonNull KeYlessValue createValue(IExecutionVariable parentVariable, String uri,
+                                                String localName, String qName, @NonNull Attributes attributes) {
         return new KeYlessValue(parentVariable, getTypeString(attributes),
             getValueString(attributes), getName(attributes), isValueUnknown(attributes),
             isValueAnObject(attributes), getConditionString(attributes));
@@ -705,8 +707,8 @@ public class ExecutionNodeReader {
      * @return The created {@link IExecutionNode}.
      * @throws SAXException Occurred Exception.
      */
-    protected AbstractKeYlessExecutionNode<?> createExecutionNode(IExecutionNode<?> parent,
-            String uri, String localName, String qName, Attributes attributes) throws SAXException {
+    protected @NonNull AbstractKeYlessExecutionNode<?> createExecutionNode(IExecutionNode<?> parent,
+                                                                           String uri, String localName, String qName, @NonNull Attributes attributes) throws SAXException {
         if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
             return new KeYlessBranchCondition(parent, getName(attributes),
                 getPathCondition(attributes), isPathConditionChanged(attributes),
@@ -776,7 +778,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getAdditionalBranchLabel(Attributes attributes) {
+    protected String getAdditionalBranchLabel(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ADDITIONAL_BRANCH_LABEL);
     }
 
@@ -786,7 +788,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getPathInTree(Attributes attributes) {
+    protected String getPathInTree(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_IN_TREE);
     }
 
@@ -796,7 +798,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getName(Attributes attributes) {
+    protected String getName(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_NAME);
     }
 
@@ -806,7 +808,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getNameIncludingReturnValue(Attributes attributes) {
+    protected String getNameIncludingReturnValue(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE);
     }
 
@@ -816,7 +818,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getSignature(Attributes attributes) {
+    protected String getSignature(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SIGNATURE);
     }
 
@@ -826,7 +828,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getSignatureIncludingReturnValue(Attributes attributes) {
+    protected String getSignatureIncludingReturnValue(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE);
     }
 
@@ -836,7 +838,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected TerminationKind getTerminationKind(Attributes attributes) {
+    protected @NonNull TerminationKind getTerminationKind(@NonNull Attributes attributes) {
         return TerminationKind
                 .valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_TERMINATION_KIND));
     }
@@ -847,7 +849,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isPreconditionComplied(Attributes attributes) {
+    protected boolean isPreconditionComplied(@NonNull Attributes attributes) {
         return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PRECONDITION_COMPLIED));
     }
@@ -858,7 +860,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isHasNotNullCheck(Attributes attributes) {
+    protected boolean isHasNotNullCheck(@NonNull Attributes attributes) {
         return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
     }
@@ -869,7 +871,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isBlockOpened(Attributes attributes) {
+    protected boolean isBlockOpened(@NonNull Attributes attributes) {
         return Boolean
                 .parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BLOCK_OPENED));
     }
@@ -880,7 +882,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isReturnValueComputed(Attributes attributes) {
+    protected boolean isReturnValueComputed(@NonNull Attributes attributes) {
         return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_COMPUTED));
     }
@@ -891,7 +893,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isBranchConditionComputed(Attributes attributes) {
+    protected boolean isBranchConditionComputed(@NonNull Attributes attributes) {
         return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_CONDITION_COMPUTED));
     }
@@ -902,7 +904,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isNotNullCheckComplied(Attributes attributes) {
+    protected boolean isNotNullCheckComplied(@NonNull Attributes attributes) {
         return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_NOT_NULL_CHECK_COMPLIED));
     }
@@ -913,7 +915,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isInitiallyValid(Attributes attributes) {
+    protected boolean isInitiallyValid(@NonNull Attributes attributes) {
         return Boolean
                 .parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_INITIALLY_VALID));
     }
@@ -924,7 +926,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isValueAnObject(Attributes attributes) {
+    protected boolean isValueAnObject(@NonNull Attributes attributes) {
         return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_AN_OBJECT));
     }
@@ -935,7 +937,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isWeakeningVerified(Attributes attributes) {
+    protected boolean isWeakeningVerified(@NonNull Attributes attributes) {
         return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_WEAKENING_VERIFIED));
     }
@@ -946,7 +948,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isValueUnknown(Attributes attributes) {
+    protected boolean isValueUnknown(@NonNull Attributes attributes) {
         return Boolean
                 .parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_UNKNOWN));
     }
@@ -957,7 +959,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getValueString(Attributes attributes) {
+    protected String getValueString(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_VALUE_STRING);
     }
 
@@ -967,7 +969,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getConditionString(Attributes attributes) {
+    protected String getConditionString(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_CONDITION_STRING);
     }
 
@@ -977,7 +979,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean getHasCondition(Attributes attributes) {
+    protected boolean getHasCondition(@NonNull Attributes attributes) {
         return Boolean
                 .parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_CONDITION));
     }
@@ -988,7 +990,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean getBranchVerified(Attributes attributes) {
+    protected boolean getBranchVerified(@NonNull Attributes attributes) {
         return Boolean
                 .parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_VERIFIED));
     }
@@ -999,7 +1001,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getReturnValueString(Attributes attributes) {
+    protected String getReturnValueString(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_STRING);
     }
 
@@ -1009,7 +1011,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getTypeString(Attributes attributes) {
+    protected String getTypeString(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_TYPE_STRING);
     }
 
@@ -1019,7 +1021,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getExceptionTerm(Attributes attributes) {
+    protected String getExceptionTerm(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTION_TERM);
     }
 
@@ -1029,7 +1031,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getResultTerm(Attributes attributes) {
+    protected String getResultTerm(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RESULT_TERM);
     }
 
@@ -1039,7 +1041,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getSelfTerm(Attributes attributes) {
+    protected String getSelfTerm(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SELF_TERM);
     }
 
@@ -1049,7 +1051,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getContractParameters(Attributes attributes) {
+    protected String getContractParameters(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_CONTRACT_PARAMETERS);
     }
 
@@ -1059,7 +1061,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getArrayIndexString(Attributes attributes) {
+    protected String getArrayIndexString(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ARRAY_INDEX);
     }
 
@@ -1069,7 +1071,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isArrayIndex(Attributes attributes) {
+    protected boolean isArrayIndex(@NonNull Attributes attributes) {
         return Boolean
                 .parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_ARRAY_INDEX));
     }
@@ -1080,7 +1082,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getBranchCondition(Attributes attributes) {
+    protected String getBranchCondition(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_CONDITION);
     }
 
@@ -1090,7 +1092,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getPathCondition(Attributes attributes) {
+    protected String getPathCondition(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION);
     }
 
@@ -1100,7 +1102,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getMethodReturnCondition(Attributes attributes) {
+    protected String getMethodReturnCondition(@NonNull Attributes attributes) {
         return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_METHOD_RETURN_CONDITION);
     }
 
@@ -1110,7 +1112,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isPathConditionChanged(Attributes attributes) {
+    protected boolean isPathConditionChanged(@NonNull Attributes attributes) {
         return Boolean
                 .parseBoolean(
                     attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION_CHANGED));
@@ -1122,7 +1124,7 @@ public class ExecutionNodeReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isMergedBranchCondition(Attributes attributes) {
+    protected boolean isMergedBranchCondition(@NonNull Attributes attributes) {
         return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_MERGED_BRANCH_CONDITION));
     }
@@ -1152,7 +1154,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Services getServices() {
+        public @Nullable Services getServices() {
             return null;
         }
 
@@ -1160,7 +1162,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public InitConfig getInitConfig() {
+        public @Nullable InitConfig getInitConfig() {
             return null;
         }
 
@@ -1168,7 +1170,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Proof getProof() {
+        public @Nullable Proof getProof() {
             return null;
         }
 
@@ -1176,7 +1178,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public RuleApp getAppliedRuleApp() {
+        public @Nullable RuleApp getAppliedRuleApp() {
             return null;
         }
 
@@ -1184,7 +1186,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Node getProofNode() {
+        public @Nullable Node getProofNode() {
             return null;
         }
 
@@ -1192,7 +1194,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public NodeInfo getProofNodeInfo() {
+        public @Nullable NodeInfo getProofNodeInfo() {
             return null;
         }
 
@@ -1208,7 +1210,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return getElementType() + " " + getName();
         }
 
@@ -1224,7 +1226,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public ITreeSettings getSettings() {
+        public @Nullable ITreeSettings getSettings() {
             return null;
         }
     }
@@ -1276,7 +1278,7 @@ public class ExecutionNodeReader {
         /**
          * The completed blocks.
          */
-        private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
+        private @NonNull ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
 
         /**
          * The formated conditions under which a block is completed.
@@ -1287,12 +1289,12 @@ public class ExecutionNodeReader {
         /**
          * The contained outgoing links.
          */
-        private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
+        private @NonNull ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
 
         /**
          * The contained incoming links.
          */
-        private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
+        private @NonNull ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
 
         /**
          * Constructor.
@@ -1331,7 +1333,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionNode<?>[] getChildren() {
+        public IExecutionNode<?> @NonNull [] getChildren() {
             return children.toArray(new IExecutionNode[0]);
         }
 
@@ -1339,7 +1341,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getPathCondition() throws ProofInputException {
+        public @Nullable Term getPathCondition() throws ProofInputException {
             return null;
         }
 
@@ -1372,7 +1374,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionNode<?>[] getCallStack() {
+        public IExecutionNode<?> @Nullable [] getCallStack() {
             return callStack.isEmpty() ? null
                     : callStack.toArray(new IExecutionNode[0]);
         }
@@ -1390,7 +1392,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionConstraint[] getConstraints() {
+        public IExecutionConstraint @NonNull [] getConstraints() {
             return constraints.toArray(new IExecutionConstraint[0]);
         }
 
@@ -1407,7 +1409,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public S getActiveStatement() {
+        public @Nullable S getActiveStatement() {
             return null;
         }
 
@@ -1415,7 +1417,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PositionInfo getActivePositionInfo() {
+        public @Nullable PositionInfo getActivePositionInfo() {
             return null;
         }
 
@@ -1423,7 +1425,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionVariable[] getVariables() {
+        public IExecutionVariable @NonNull [] getVariables() {
             return variables.toArray(new IExecutionVariable[0]);
         }
 
@@ -1431,7 +1433,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionVariable[] getVariables(Term condition) {
+        public IExecutionVariable @Nullable [] getVariables(Term condition) {
             return null;
         }
 
@@ -1447,7 +1449,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public ISymbolicLayout getInitialLayout(int configurationIndex) throws ProofInputException {
+        public @Nullable ISymbolicLayout getInitialLayout(int configurationIndex) throws ProofInputException {
             return null;
         }
 
@@ -1455,7 +1457,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public ISymbolicLayout getCurrentLayout(int configurationIndex) throws ProofInputException {
+        public @Nullable ISymbolicLayout getCurrentLayout(int configurationIndex) throws ProofInputException {
             return null;
         }
 
@@ -1463,7 +1465,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(
+        public @Nullable ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(
                 int configurationIndex) throws ProofInputException {
             return null;
         }
@@ -1472,7 +1474,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public @Nullable PosInOccurrence getModalityPIO() {
             return null;
         }
 
@@ -1488,7 +1490,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
+        public @Nullable Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
                 throws ProofInputException {
             return null;
         }
@@ -1508,8 +1510,8 @@ public class ExecutionNodeReader {
          * @param completedBlock The completed block.
          * @param formatedCondition The formated condition under which the block is completed.
          */
-        public void addCompletedBlock(IExecutionBlockStartNode<?> completedBlock,
-                String formatedCondition) {
+        public void addCompletedBlock(@Nullable IExecutionBlockStartNode<?> completedBlock,
+                                      String formatedCondition) {
             if (completedBlock != null) {
                 completedBlocks = completedBlocks.append(completedBlock);
                 formatedCompletedBlockConditions.put(completedBlock, formatedCondition);
@@ -1520,7 +1522,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionLink getOutgoingLink(final IExecutionNode<?> target) {
+        public @Nullable IExecutionLink getOutgoingLink(final IExecutionNode<?> target) {
             return CollectionUtil.search(outgoingLinks, element -> element.getTarget() == target);
         }
 
@@ -1554,7 +1556,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionLink getIncomingLink(final IExecutionNode<?> source) {
+        public @Nullable IExecutionLink getIncomingLink(final IExecutionNode<?> source) {
             return CollectionUtil.search(incomingLinks, element -> element.getSource() == source);
         }
 
@@ -1578,7 +1580,7 @@ public class ExecutionNodeReader {
         /**
          * The block completions.
          */
-        private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
+        private @NonNull ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
 
         /**
          * Is a block opened?
@@ -1614,7 +1616,7 @@ public class ExecutionNodeReader {
          *
          * @param blockCompletion The block completion to add.
          */
-        public void addBlockCompletion(IExecutionNode<?> blockCompletion) {
+        public void addBlockCompletion(@Nullable IExecutionNode<?> blockCompletion) {
             if (blockCompletion != null) {
                 blockCompletions = blockCompletions.append(blockCompletion);
             }
@@ -1684,7 +1686,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Branch Condition";
         }
 
@@ -1692,7 +1694,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getBranchCondition() {
+        public @Nullable Term getBranchCondition() {
             return null;
         }
 
@@ -1716,7 +1718,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Node[] getMergedProofNodes() {
+        public Node @Nullable [] getMergedProofNodes() {
             return null;
         }
 
@@ -1724,7 +1726,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term[] getMergedBranchCondtions() throws ProofInputException {
+        public Term @Nullable [] getMergedBranchCondtions() throws ProofInputException {
             return null;
         }
 
@@ -1756,7 +1758,7 @@ public class ExecutionNodeReader {
         /**
          * The up to now discovered {@link IExecutionTermination}s.
          */
-        private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+        private @NonNull ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
 
         /**
          * Constructor.
@@ -1774,7 +1776,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Start";
         }
 
@@ -1783,7 +1785,7 @@ public class ExecutionNodeReader {
          *
          * @param termination The {@link IExecutionTermination} to add.
          */
-        public void addTermination(IExecutionTermination termination) {
+        public void addTermination(@Nullable IExecutionTermination termination) {
             if (termination != null) {
                 terminations = terminations.prepend(termination);
             }
@@ -1838,7 +1840,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IProgramVariable getExceptionVariable() {
+        public @Nullable IProgramVariable getExceptionVariable() {
             return null;
         }
 
@@ -1846,7 +1848,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Sort getExceptionSort() {
+        public @Nullable Sort getExceptionSort() {
             return null;
         }
 
@@ -1854,7 +1856,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             switch (getTerminationKind()) {
             case EXCEPTIONAL:
                 return "Exceptional Termination";
@@ -1914,7 +1916,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Branch Statement";
         }
     }
@@ -1947,7 +1949,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Expression getGuardExpression() {
+        public @Nullable Expression getGuardExpression() {
             return null;
         }
 
@@ -1955,7 +1957,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PositionInfo getGuardExpressionPositionInfo() {
+        public @Nullable PositionInfo getGuardExpressionPositionInfo() {
             return null;
         }
 
@@ -1963,7 +1965,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Loop Condition";
         }
     }
@@ -1996,7 +1998,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Loop Statement";
         }
     }
@@ -2012,7 +2014,7 @@ public class ExecutionNodeReader {
         /**
          * The up to now discovered {@link IExecutionBaseMethodReturn<?>}s.
          */
-        private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+        private @NonNull ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
 
         /**
          * Constructor.
@@ -2031,7 +2033,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public MethodReference getMethodReference() {
+        public @Nullable MethodReference getMethodReference() {
             return null;
         }
 
@@ -2039,7 +2041,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IProgramMethod getProgramMethod() {
+        public @Nullable IProgramMethod getProgramMethod() {
             return null;
         }
 
@@ -2047,7 +2049,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Method Call";
         }
 
@@ -2063,7 +2065,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public MethodReference getExplicitConstructorMethodReference() {
+        public @Nullable MethodReference getExplicitConstructorMethodReference() {
             return null;
         }
 
@@ -2071,7 +2073,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IProgramMethod getExplicitConstructorProgramMethod() {
+        public @Nullable IProgramMethod getExplicitConstructorProgramMethod() {
             return null;
         }
 
@@ -2088,7 +2090,7 @@ public class ExecutionNodeReader {
          *
          * @param methodReturn The {@link IExecutionBaseMethodReturn<?>} to add.
          */
-        public void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
+        public void addMethodReturn(@Nullable IExecutionBaseMethodReturn<?> methodReturn) {
             if (methodReturn != null) {
                 methodReturns = methodReturns.prepend(methodReturn);
             }
@@ -2141,7 +2143,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionVariable[] getCallStateVariables() {
+        public IExecutionVariable @NonNull [] getCallStateVariables() {
             return callStateVariables.toArray(new IExecutionVariable[0]);
         }
 
@@ -2158,7 +2160,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionMethodCall getMethodCall() {
+        public @Nullable IExecutionMethodCall getMethodCall() {
             return null;
         }
 
@@ -2174,7 +2176,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getMethodReturnCondition() throws ProofInputException {
+        public @Nullable Term getMethodReturnCondition() throws ProofInputException {
             return null;
         }
 
@@ -2216,7 +2218,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Exceptional Method Return";
         }
     }
@@ -2295,7 +2297,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Method Return";
         }
 
@@ -2311,7 +2313,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException {
+        public IExecutionMethodReturnValue @NonNull [] getReturnValues() throws ProofInputException {
             return returnValues.toArray(new IExecutionMethodReturnValue[0]);
         }
 
@@ -2368,7 +2370,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Return Value";
         }
 
@@ -2376,7 +2378,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getReturnValue() throws ProofInputException {
+        public @Nullable Term getReturnValue() throws ProofInputException {
             return null;
         }
 
@@ -2400,7 +2402,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() throws ProofInputException {
+        public @Nullable Term getCondition() throws ProofInputException {
             return null;
         }
 
@@ -2416,7 +2418,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public @Nullable PosInOccurrence getModalityPIO() {
             return null;
         }
     }
@@ -2446,7 +2448,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Statement";
         }
     }
@@ -2483,7 +2485,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Join";
         }
 
@@ -2581,7 +2583,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Operation Contract";
         }
 
@@ -2589,7 +2591,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Contract getContract() {
+        public @Nullable Contract getContract() {
             return null;
         }
 
@@ -2597,7 +2599,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IProgramMethod getContractProgramMethod() {
+        public @Nullable IProgramMethod getContractProgramMethod() {
             return null;
         }
 
@@ -2629,7 +2631,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getResultTerm() throws ProofInputException {
+        public @Nullable Term getResultTerm() throws ProofInputException {
             return null;
         }
 
@@ -2637,7 +2639,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getExceptionTerm() throws ProofInputException {
+        public @Nullable Term getExceptionTerm() throws ProofInputException {
             return null;
         }
 
@@ -2661,7 +2663,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getSelfTerm() throws ProofInputException {
+        public @Nullable Term getSelfTerm() throws ProofInputException {
             return null;
         }
 
@@ -2669,7 +2671,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public ImmutableList<Term> getContractParams() throws ProofInputException {
+        public @Nullable ImmutableList<Term> getContractParams() throws ProofInputException {
             return null;
         }
 
@@ -2723,7 +2725,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Loop Invariant";
         }
 
@@ -2731,7 +2733,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public LoopSpecification getLoopInvariant() {
+        public @Nullable LoopSpecification getLoopInvariant() {
             return null;
         }
 
@@ -2739,7 +2741,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public While getLoopStatement() {
+        public @Nullable While getLoopStatement() {
             return null;
         }
 
@@ -2785,7 +2787,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Block Contract";
         }
 
@@ -2793,7 +2795,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public BlockContract getContract() {
+        public @Nullable BlockContract getContract() {
             return null;
         }
 
@@ -2801,7 +2803,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public StatementBlock getBlock() {
+        public @Nullable StatementBlock getBlock() {
             return null;
         }
 
@@ -2835,7 +2837,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Constraint";
         }
 
@@ -2843,7 +2845,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getTerm() {
+        public @Nullable Term getTerm() {
             return null;
         }
 
@@ -2851,7 +2853,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public @Nullable PosInOccurrence getModalityPIO() {
             return null;
         }
     }
@@ -2921,7 +2923,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionValue[] getValues() {
+        public IExecutionValue @NonNull [] getValues() {
             return values.toArray(new IExecutionValue[0]);
         }
 
@@ -2929,7 +2931,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public @Nullable Term getArrayIndex() {
             return null;
         }
 
@@ -2953,7 +2955,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IProgramVariable getProgramVariable() {
+        public @Nullable IProgramVariable getProgramVariable() {
             return null;
         }
 
@@ -2961,7 +2963,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Variable";
         }
 
@@ -2969,7 +2971,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getAdditionalCondition() {
+        public @Nullable Term getAdditionalCondition() {
             return null;
         }
 
@@ -2977,7 +2979,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public @Nullable PosInOccurrence getModalityPIO() {
             return null;
         }
 
@@ -2985,7 +2987,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term createSelectTerm() {
+        public @Nullable Term createSelectTerm() {
             return null;
         }
     }
@@ -3159,7 +3161,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionVariable[] getChildVariables() {
+        public IExecutionVariable @NonNull [] getChildVariables() {
             return childVariables.toArray(new IExecutionVariable[0]);
         }
 
@@ -3183,7 +3185,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getValue() throws ProofInputException {
+        public @Nullable Term getValue() throws ProofInputException {
             return null;
         }
 
@@ -3191,7 +3193,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public String getElementType() {
+        public @NonNull String getElementType() {
             return "Value";
         }
 
@@ -3199,7 +3201,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() throws ProofInputException {
+        public @Nullable Term getCondition() throws ProofInputException {
             return null;
         }
 
@@ -3216,7 +3218,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionConstraint[] getConstraints() {
+        public IExecutionConstraint @NonNull [] getConstraints() {
             return constraints.toArray(new IExecutionConstraint[0]);
         }
 
@@ -3224,7 +3226,7 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public PosInOccurrence getModalityPIO() {
+        public @Nullable PosInOccurrence getModalityPIO() {
             return null;
         }
     }

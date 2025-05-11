@@ -9,6 +9,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
+import org.jspecify.annotations.NonNull;
 
 /*
  * Menu option for showing the sequent search bar. Keyboard shortcut: STRG+F.
@@ -19,7 +20,7 @@ public class SearchInSequentAction extends MainWindowAction {
 
     private final SequentViewSearchBar searchBar;
 
-    public SearchInSequentAction(MainWindow mainWindow, SequentViewSearchBar searchBar) {
+    public SearchInSequentAction(@NonNull MainWindow mainWindow, SequentViewSearchBar searchBar) {
         super(mainWindow);
         this.searchBar = searchBar;
         setName("Search in Sequent View");

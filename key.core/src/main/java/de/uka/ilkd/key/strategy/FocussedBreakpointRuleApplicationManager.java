@@ -53,7 +53,7 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public AutomatedRuleApplicationManager copy() {
+    public @NonNull AutomatedRuleApplicationManager copy() {
         return (AutomatedRuleApplicationManager) clone();
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A notification task maps a {@link de.uka.ilkd.key.gui.notification.events.NotificationEvent} to a
@@ -26,7 +27,7 @@ public abstract class NotificationTask {
     /**
      * @return returns the notification actions belonging to this task
      */
-    public List<NotificationAction> getNotificationActions() {
+    public @NonNull List<NotificationAction> getNotificationActions() {
         return notificationActions;
     }
 
@@ -47,7 +48,7 @@ public abstract class NotificationTask {
      * @param event the NotificationEvent triggering this task
      * @param manager the NotificationManager to which this tasks belongs to
      */
-    public void execute(NotificationEvent event, NotificationManager manager) {
+    public void execute(NotificationEvent event, @NonNull NotificationManager manager) {
         // if we are in automode execute task only if it is
         // automode enabled
         if (manager.inAutoMode() && !automodeEnabledTask()) {

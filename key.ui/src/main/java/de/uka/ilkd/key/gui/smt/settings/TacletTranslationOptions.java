@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import org.jspecify.annotations.NonNull;
 
 public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 5273966151509876358L;
@@ -36,8 +37,8 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
                 Be aware of the fact that too many different generic sorts can overwhelm the external solvers. On the other side there are taclets that use a certain amount of different generic sorts (see: taclet selection).
 
                 Rule of thumb: Most of the taclets can be translated by using 2-3 different generic sorts.""";
-    private final JTextField fileChooserPanel;
-    private final JSpinner maxNumberOfGenerics;
+    private final @NonNull JTextField fileChooserPanel;
+    private final @NonNull JSpinner maxNumberOfGenerics;
 
 
     public TacletTranslationOptions() {
@@ -46,24 +47,24 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
         maxNumberOfGenerics = createMaxNumberOfGenerics();
     }
 
-    protected JSpinner createMaxNumberOfGenerics() {
+    protected @NonNull JSpinner createMaxNumberOfGenerics() {
         return addNumberField("Maximum number of generic sorts.", 0, Integer.MAX_VALUE, 1,
             infoMaxNumberOfGenerics, emptyValidator());
     }
 
-    protected JTextField createFileChooserPanel() {
+    protected @NonNull JTextField createFileChooserPanel() {
         return addFileChooserPanel("Store taclet translation to file:", "", infoFileChooserPanel,
             true, e -> {
             });
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Taclet Translation";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(@NonNull MainWindow window) {
         ProofDependentSMTSettings pdSettings = SettingsManager.getSmtPdSettings(window).clone();
         ProofIndependentSMTSettings piSettings = SettingsManager.getSmtPiSettings().clone();
         maxNumberOfGenerics.setValue(pdSettings.getMaxGenericSorts());
@@ -73,7 +74,7 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
     }
 
     @Override
-    public void applySettings(MainWindow window) {
+    public void applySettings(@NonNull MainWindow window) {
         ProofDependentSMTSettings currentPd = SettingsManager.getSmtPdSettings(window);
         ProofIndependentSMTSettings currentPi = SettingsManager.getSmtPiSettings();
 

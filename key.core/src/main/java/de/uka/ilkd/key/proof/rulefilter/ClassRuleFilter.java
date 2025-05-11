@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.rulefilter;
 
 
 import de.uka.ilkd.key.rule.Rule;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Rule filter that selects taclets which are of a specific class
@@ -18,7 +19,7 @@ public class ClassRuleFilter implements RuleFilter {
     }
 
 
-    public boolean filter(Rule rule) {
+    public boolean filter(@NonNull Rule rule) {
         return c.isAssignableFrom(rule.getClass());
     }
 }

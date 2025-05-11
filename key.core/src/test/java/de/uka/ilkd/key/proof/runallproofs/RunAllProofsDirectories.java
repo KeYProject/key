@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.runallproofs;
 import java.io.File;
 import java.io.Serializable;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.helper.FindResources;
 
 /**
@@ -24,8 +25,8 @@ import org.key_project.util.helper.FindResources;
  */
 @SuppressWarnings("serial")
 public class RunAllProofsDirectories implements Serializable {
-    public static final File EXAMPLE_DIR = FindResources.getExampleDirectory();
-    public static final File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
+    public static final @Nullable File EXAMPLE_DIR = FindResources.getExampleDirectory();
+    public static final @Nullable File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
 
     public RunAllProofsDirectories() {
         init();

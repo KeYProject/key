@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -43,6 +44,7 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      * @return The found {@link ISymbolicAssociation} or {@code null} if no
      *         {@link ISymbolicAssociation} is available with the given {@link IProgramVariable}.
      */
+    @Nullable
     ISymbolicAssociation getAssociation(IProgramVariable programVariable,
             boolean isArrayIndex, Term arrayIndex, Term condition);
 
@@ -64,6 +66,7 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      * @return The found {@link ISymbolicValue} or {@code null} if no {@link ISymbolicValue} is
      *         available with the given {@link IProgramVariable}.
      */
+    @Nullable
     ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
             Term arrayIndex, Term condition);
 }

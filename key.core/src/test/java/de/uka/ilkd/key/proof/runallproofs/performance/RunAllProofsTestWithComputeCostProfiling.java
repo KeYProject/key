@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.strategy.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.*;
 
 /**
@@ -64,7 +65,7 @@ public class RunAllProofsTestWithComputeCostProfiling {
         createPlots(directories.instantiateAppDataDir);
     }
 
-    public static void createPlots(File dataDir) throws IOException {
+    public static void createPlots(@NonNull File dataDir) throws IOException {
         for (File ruleData : Objects.requireNonNull(dataDir.listFiles())) {
             String ruleName = ruleData.getAbsolutePath();
             // /.../rulename.data -> /.../rulename [remove file ending]

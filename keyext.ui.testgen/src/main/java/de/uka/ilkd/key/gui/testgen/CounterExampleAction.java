@@ -27,6 +27,8 @@ import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
     private static final String TOOLTIP_EXTRA = ". Install Z3 to enable this functionality!";
     private boolean haveZ3CE = false;
 
-    public CounterExampleAction(MainWindow mainWindow) {
+    public CounterExampleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOLTIP);
@@ -148,8 +150,8 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
          * {@inheritDoc}
          */
         @Override
-        protected SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
-                Proof proof) {
+        protected @NonNull SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
+                                                                       Proof proof) {
             return new SolverListener(settings, proof);
         }
     }
@@ -174,7 +176,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         }
 
         @Override
-        protected Void doInBackground() throws Exception {
+        protected @Nullable Void doInBackground() throws Exception {
             final NoMainWindowCounterExampleGenerator generator =
                 new NoMainWindowCounterExampleGenerator();
             generator.searchCounterExample(getMediator().getUI(), oldProof, oldSequent);

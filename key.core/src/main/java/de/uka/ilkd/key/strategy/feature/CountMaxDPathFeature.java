@@ -22,7 +22,7 @@ public class CountMaxDPathFeature extends AbstractBetaFeature {
     private CountMaxDPathFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(@NonNull PosInOccurrence pos, @NonNull Term findTerm, @NonNull ServiceCaches caches) {
+    protected @NonNull RuleAppCost doComputation(@NonNull PosInOccurrence pos, @NonNull Term findTerm, @NonNull ServiceCaches caches) {
         return NumberRuleAppCost.create(maxDPath(findTerm, !pos.isInAntec(), caches));
     }
 

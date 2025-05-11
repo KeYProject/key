@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,21 +160,21 @@ public final class IconFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
-    private static final Image keyHole = getImage("images/ekey-mono.gif");
-    private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    private static final Image keyCachedClosed = getImage("images/closed-cached.png");
-    private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-    private static final Image keyHoleLinked = getImage("images/keylinked.gif");
-    private static final Image keyLogo = getImage("images/key-color.png");
-    private static final Image keyLogoShadow = getImage("images/key-shadow.png");
+    private static final @Nullable Image keyHole = getImage("images/ekey-mono.gif");
+    private static final @Nullable Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static final @Nullable Image keyCachedClosed = getImage("images/closed-cached.png");
+    private static final @Nullable Image keyHoleInteractive = getImage("images/keyinteractive.gif");
+    private static final @Nullable Image keyHoleLinked = getImage("images/keylinked.gif");
+    private static final @Nullable Image keyLogo = getImage("images/key-color.png");
+    private static final @Nullable Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    private static final Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
-    private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
-    private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
+    private static final @Nullable Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
+    private static final @Nullable Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
+    private static final @Nullable Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
-    private static final Image junit = getImage("images/toolbar/junit_logo.png");
-    private static final Image jml = getImage("images/toolbar/jml.png");
-    private static final Image uml = getImage("images/toolbar/uml.png");
+    private static final @Nullable Image junit = getImage("images/toolbar/junit_logo.png");
+    private static final @Nullable Image jml = getImage("images/toolbar/jml.png");
+    private static final @Nullable Image uml = getImage("images/toolbar/uml.png");
 
     // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
     // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
@@ -185,7 +187,7 @@ public final class IconFactory {
     private IconFactory() {
     }
 
-    public static Image getImage(String s) {
+    public static @Nullable Image getImage(String s) {
         ImageIcon ii = createImageIcon(s);
         return ii != null ? ii.getImage() : null;
     }
@@ -197,7 +199,7 @@ public final class IconFactory {
      *        this class)
      * @return the newly created image
      */
-    private static ImageIcon createImageIcon(String filename) {
+    private static @Nullable ImageIcon createImageIcon(String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
         URL iconURL = IconFactory.class.getResource(filename);
         if (iconURL == null) {
@@ -210,7 +212,7 @@ public final class IconFactory {
         }
     }
 
-    private static ImageIcon scaleIcon(Image im, int x, int y) {
+    private static @NonNull ImageIcon scaleIcon(@NonNull Image im, int x, int y) {
         if (im.getWidth(null) == x && im.getHeight(null) == y) {
             return new ImageIcon(im);
         }
@@ -218,158 +220,158 @@ public final class IconFactory {
         return new ImageIcon(scaledim);
     }
 
-    public static Icon abandon(int x) {
+    public static @NonNull Icon abandon(int x) {
         return ABANDON.load(x);
     }
 
-    public static Icon configure(int x) {
+    public static @NonNull Icon configure(int x) {
         return CONFIGURE.load(x);
     }
 
-    public static Icon help(int x) {
+    public static @NonNull Icon help(int x) {
         // return scaleIcon(help ,x,x);
         return HELP.load(x);
     }
 
-    public static Icon proofMgt(int x) {
+    public static @NonNull Icon proofMgt(int x) {
         // return scaleIcon(proofMgt ,x,x);
         return PROOF_MANAGEMENT.load(x);
     }
 
-    public static Icon properties(int x) {
+    public static @NonNull Icon properties(int x) {
         // return IconFontSwing.buildIcon(FontAwesomeSolid.).load(x);
         // return scaleIcon(properties ,x,x);
         return PROPERTIES.load(x);
     }
 
-    public static Icon quit(int x) {
+    public static @NonNull Icon quit(int x) {
         return QUIT.load(x);
     }
 
-    public static Icon recentFiles(int x) {
+    public static @NonNull Icon recentFiles(int x) {
         return RECENT_FILES.load(x);
         // return scaleIcon(recentFiles ,x,x);
     }
 
-    public static Icon search(int x) {
+    public static @NonNull Icon search(int x) {
         return SEARCH.load(x);
         // return scaleIcon(search ,x,x);
     }
 
-    public static Icon search2(int x) {
+    public static @NonNull Icon search2(int x) {
         return SEARCH2.load(x);
         // return scaleIcon(search2 ,x,x);
     }
 
-    public static Icon statistics(int x) {
+    public static @NonNull Icon statistics(int x) {
         return STATISTICS.load(x);
         // return scaleIcon(statistics,x,x);
     }
 
-    public static Icon toolbox(int x) {
+    public static @NonNull Icon toolbox(int x) {
         return TOOLBOX.load(x);
         // return scaleIcon(toolbox,x,x);
     }
 
-    public static Icon plus(int x) {
+    public static @NonNull Icon plus(int x) {
         return PLUS.load(x);
         // return scaleIcon(plus,x,x);
     }
 
-    public static Icon minus(int x) {
+    public static @NonNull Icon minus(int x) {
         return MINUS.load(x);
         // return scaleIcon(minus,x,x);
     }
 
-    public static Icon expandGoals(int x) {
+    public static @NonNull Icon expandGoals(int x) {
         return EXPAND_GOALS.load(x);
     }
 
-    public static Icon next(int x) {
+    public static @NonNull Icon next(int x) {
         return NEXT.load(x);
         // return scaleIcon(next,x,x);
     }
 
-    public static Icon previous(int x) {
+    public static @NonNull Icon previous(int x) {
         return PREVIOUS.load(x);
         // return scaleIcon(previous,x,x);
     }
 
-    public static Icon stop(int x) {
+    public static @NonNull Icon stop(int x) {
         return STOP.load(x);
         // return scaleIcon(stop,x,x);
     }
 
-    public static Icon close(int x) {
+    public static @NonNull Icon close(int x) {
         return CLOSE.load(x);
         // return scaleIcon(cross,x,x);
     }
 
-    public static ImageIcon keyHole(int x, int y) {
+    public static @NonNull ImageIcon keyHole(int x, int y) {
         return scaleIcon(keyHole, x, y);
     }
 
-    public static Icon keyHoleClosed(int height) {
+    public static @NonNull Icon keyHoleClosed(int height) {
         return GOAL_CLOSED.load(height);
         // return scaleIcon(GOAL_CLOSED, x, y);
     }
 
-    public static Icon selectGoalAbove(int size) {
+    public static @NonNull Icon selectGoalAbove(int size) {
         return SELECT_GOAL_ABOVE.load(size);
     }
 
-    public static Icon selectGoalBelow(int size) {
+    public static @NonNull Icon selectGoalBelow(int size) {
         return SELECT_GOAL_BELOW.load(size);
     }
 
-    public static ImageIcon keyHoleAlmostClosed(int x, int y) {
+    public static @NonNull ImageIcon keyHoleAlmostClosed(int x, int y) {
         return scaleIcon(keyHoleAlmostClosed, x, y);
     }
 
-    public static ImageIcon keyCachedClosed(int x, int y) {
+    public static @NonNull ImageIcon keyCachedClosed(int x, int y) {
         return scaleIcon(keyCachedClosed, x, y);
     }
 
-    public static ImageIcon keyHoleInteractive(int x, int y) {
+    public static @NonNull ImageIcon keyHoleInteractive(int x, int y) {
         return scaleIcon(keyHoleInteractive, x, y);
     }
 
-    public static ImageIcon keyHoleLinked(int x, int y) {
+    public static @NonNull ImageIcon keyHoleLinked(int x, int y) {
         return scaleIcon(keyHoleLinked, x, y);
     }
 
-    public static ImageIcon keyLogo(int x, int y) {
+    public static @NonNull ImageIcon keyLogo(int x, int y) {
         return scaleIcon(keyLogo, x, y);
     }
 
-    public static Icon keyVersionLogo() {
+    public static @NonNull Icon keyVersionLogo() {
         return new ImageIcon(keyVersionLogo);
     }
 
-    public static Icon keyVersionLogo(int x, int y) {
+    public static @NonNull Icon keyVersionLogo(int x, int y) {
         return scaleIcon(keyVersionLogo, x, y);
     }
 
-    public static Icon autoModeStartLogo(int size) {
+    public static @NonNull Icon autoModeStartLogo(int size) {
         // return scaleIcon(autoModeStart, size, size);
         return AUTO_MODE_START.load(size);
     }
 
-    public static Icon strategyStartLogo(int size) {
+    public static @NonNull Icon strategyStartLogo(int size) {
         return START.load(size);
     }
 
-    public static Icon autoModeStopLogo(int size) {
+    public static @NonNull Icon autoModeStopLogo(int size) {
         // return scaleIcon(autoModeStop, size, size);
         return AUTO_MODE_STOP.load(size);
     }
 
-    public static Icon selectDecProcArrow(int size) {
+    public static @NonNull Icon selectDecProcArrow(int size) {
         // return scaleIcon(decisionProcedureConfigArrow, size / 2, size);
         return CONFIGURE_MENU.load(size);
     }
 
-    public static Icon oneStepSimplifier(int size) {
+    public static @NonNull Icon oneStepSimplifier(int size) {
         return scaleIcon(oneStepSimplifier, size, size);
     }
 
@@ -381,11 +383,11 @@ public final class IconFactory {
         return COUNTER_EXAMPLE.get(size);// scaleIcon(counterexampleImage, size, size);
     }
 
-    public static Icon junitLogo(int size) {
+    public static @NonNull Icon junitLogo(int size) {
         return scaleIcon(junit, size, size);
     }
 
-    public static Icon jmlLogo(int size) {
+    public static @NonNull Icon jmlLogo(int size) {
         return scaleIcon(jml, size, size);
     }
 
@@ -393,26 +395,26 @@ public final class IconFactory {
      * public static Icon umlLogo(int size) { return scaleIcon(uml, size, size); }
      */
 
-    public static Icon pruneLogo(int size) {
+    public static @NonNull Icon pruneLogo(int size) {
         // return scaleIcon(prune, size, size);
         return PRUNE.load(size);
     }
 
-    public static Icon goalBackLogo(int size) {
+    public static @NonNull Icon goalBackLogo(int size) {
         // return scaleIcon(goalBack, size, size);
         // alternative UNDO
         return GOAL_BACK.load(size);
     }
 
-    public static Icon provedFolderIcon(int height) {
+    public static @NonNull Icon provedFolderIcon(int height) {
         return PROVED_FOLDER_ICON.load(height);
     }
 
-    public static Icon linkedFolderIcon(int height) {
+    public static @NonNull Icon linkedFolderIcon(int height) {
         return LINKED_FOLDER_ICON.load(height);
     }
 
-    public static Icon closableFolderIcon(int height) {
+    public static @NonNull Icon closableFolderIcon(int height) {
         return CLOSABLE_FOLDER_ICON.load(height);
     }
 
@@ -424,36 +426,36 @@ public final class IconFactory {
         return TREE_NODE_RETRACTED.load(height);
     }
 
-    public static Image keyLogo() {
+    public static @Nullable Image keyLogo() {
         return keyLogoSmall;
     }
 
-    public static Icon openMostRecent(int size) {
+    public static @NonNull Icon openMostRecent(int size) {
         return OPEN_MOST_RECENT.load(size);
         // return scaleIcon(openMostRecentKeYFile, size, size);
     }
 
-    public static Icon openExamples(int size) {
+    public static @NonNull Icon openExamples(int size) {
         return OPEN_EXAMPLES.load(size);
         // return scaleIcon(openExamples, size, size);
     }
 
-    public static Icon openKeYFile(int size) {
+    public static @NonNull Icon openKeYFile(int size) {
         return OPEN_KEY_FILE.load(size);
         // return scaleIcon(openKeYFile, size, size);
     }
 
-    public static Icon saveFile(int size) {
+    public static @NonNull Icon saveFile(int size) {
         return SAVE_FILE.load(size);
         // return scaleIcon(saveFile, size, size);
     }
 
-    public static Icon saveBundle(int size) {
+    public static @NonNull Icon saveBundle(int size) {
         return SAVE_BUNDLE.load(size);
         // return scaleIcon(saveBundle, size, size);
     }
 
-    public static Icon editFile(int size) {
+    public static @NonNull Icon editFile(int size) {
         return EDIT.load(size);
         // return scaleIcon(editFile, size, size);
     }
@@ -462,21 +464,21 @@ public final class IconFactory {
      * @param size desired icon size
      * @return the icon to use for useless proof steps
      */
-    public static Icon uselessAppLogo(int size) {
+    public static @NonNull Icon uselessAppLogo(int size) {
         return USELESS_APP_ICON.load(size);
     }
 
-    public static Icon interactiveAppLogo(int size) {
+    public static @NonNull Icon interactiveAppLogo(int size) {
         return INTERACTIVE.load(size);
         // return scaleIcon(interactiveAppLogo, size, size);
     }
 
-    public static Icon scriptAppLogo(int size) {
+    public static @NonNull Icon scriptAppLogo(int size) {
         return SCRIPT.load(size);
         // return scaleIcon(interactiveAppLogo, size, size);
     }
 
-    public static Icon get(IconProvider provider, float size) {
+    public static Icon get(@NonNull IconProvider provider, float size) {
         return cache.computeIfAbsent(provider.getKey(size), d -> provider.load(size));
     }
 
@@ -484,7 +486,7 @@ public final class IconFactory {
      * Returns a list of the application logo (used in Frame, Taskbar, etc) in various predefined
      * sizes.
      */
-    public static List<? extends Image> applicationLogos() {
+    public static @NonNull List<? extends Image> applicationLogos() {
         // https://stackoverflow.com/questions/18224184/sizes-of-frame-icons-used-in-swing
         Image original = keyLogo();
         int[] sizes = new int[] { 16, 20, 32, 40, 64, 128 };
@@ -526,7 +528,7 @@ class DuneColorScheme {
     public static final Color violet = base0e;
     public static final Color magenta = base0f;
 
-    private static Color hex(String s) {
+    private static @NonNull Color hex(@NonNull String s) {
         return Color.decode(s);
     }
 }

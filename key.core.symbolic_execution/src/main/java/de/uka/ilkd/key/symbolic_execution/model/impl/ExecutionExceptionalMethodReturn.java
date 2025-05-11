@@ -16,6 +16,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -34,7 +35,7 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
     public ExecutionExceptionalMethodReturn(ITreeSettings settings, Node proofNode,
-            ExecutionMethodCall methodCall) {
+                                            @NonNull ExecutionMethodCall methodCall) {
         super(settings, proofNode, methodCall);
     }
 
@@ -42,7 +43,7 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() {
+    protected @NonNull String lazyComputeName() {
         String exceptionType;
         Expression expression = getActiveStatement().getExpression();
         if (expression instanceof ProgramVariable) {
@@ -58,7 +59,7 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -66,7 +67,7 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeSignature() throws ProofInputException {
+    protected @NonNull String lazyComputeSignature() throws ProofInputException {
         String methodName = getMethodCall().getName();
         return INTERNAL_NODE_NAME_START + "exceptional return"
             + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
@@ -77,7 +78,7 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Exceptional Method Return";
     }
 }

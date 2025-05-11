@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.StringUtil;
 
 import org.jspecify.annotations.Nullable;
@@ -75,21 +76,21 @@ public class SimpleSettingsPanel extends JPanel {
         lblSubhead.setText(text);
     }
 
-    protected void demarkComponentAsErrornous(JComponent component) {
+    protected void demarkComponentAsErrornous(@NonNull JComponent component) {
         Object col = component.getClientProperty("saved_background_color");
         if (col instanceof Color) {
             component.setBackground((Color) col);
         }
     }
 
-    protected void markComponentAsErrornous(JComponent component, String error) {
+    protected void markComponentAsErrornous(@NonNull JComponent component, String error) {
         component.putClientProperty("saved_background_color", component.getBackground());
         component.setBackground(COLOR_ERROR.get());
         component.setToolTipText(error);
     }
 
-    protected JCheckBox createCheckBox(String title, boolean value,
-            final @Nullable Validator<Boolean> validator) {
+    protected @NonNull JCheckBox createCheckBox(String title, boolean value,
+                                                final @Nullable Validator<Boolean> validator) {
         JCheckBox checkBox = new JCheckBox(title, value);
         checkBox.addActionListener(e -> {
             try {
@@ -104,14 +105,14 @@ public class SimpleSettingsPanel extends JPanel {
         return checkBox;
     }
 
-    protected JScrollPane createTextArea(String text, Validator<String> validator) {
+    protected @NonNull JScrollPane createTextArea(String text, Validator<String> validator) {
         JTextArea area = new JTextArea(text);
         area.setRows(5);
         area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
         return new JScrollPane(area);
     }
 
-    protected JTextArea createTextAreaWithoutScroll(String text, Validator<String> validator) {
+    protected @NonNull JTextArea createTextAreaWithoutScroll(String text, Validator<String> validator) {
         JTextArea area = new JTextArea(text);
         area.setRows(5);
         area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
@@ -119,14 +120,14 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
 
-    protected JTextField createTextField(String text, final @Nullable Validator<String> validator) {
+    protected @NonNull JTextField createTextField(String text, final @Nullable Validator<String> validator) {
         JTextField field = new JTextField(text);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
     }
 
-    protected JFormattedTextField createNumberFormattedTextField(Format format,
-            final @Nullable Validator<String> validator) {
+    protected @NonNull JFormattedTextField createNumberFormattedTextField(Format format,
+                                                                          final @Nullable Validator<String> validator) {
         JFormattedTextField field = new JFormattedTextField(format);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
@@ -148,14 +149,14 @@ public class SimpleSettingsPanel extends JPanel {
      * @return the created JSpinner
      * @param <T> the class of the minimum value
      */
-    protected <T extends Number & Comparable<T>> JSpinner createNumberTextField(T min,
-            Comparable<T> max, Number step, final @Nullable Validator<Number> validator) {
+    protected <T extends Number & Comparable<T>> @NonNull JSpinner createNumberTextField(@NonNull T min,
+                                                                                         Comparable<T> max, @NonNull Number step, final @Nullable Validator<Number> validator) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
         return createNumberTextField(spinnerModel, validator);
     }
 
-    protected JSpinner createNumberTextField(SpinnerModel model,
-            final @Nullable Validator<Number> validator) {
+    protected @NonNull JSpinner createNumberTextField(@NonNull SpinnerModel model,
+                                                      final @Nullable Validator<Number> validator) {
         // create a new spinner that delegates background color changes/requests to its TextField
         JSpinner spinner = new JSpinner(model) {
             @Override
@@ -175,7 +176,7 @@ public class SimpleSettingsPanel extends JPanel {
         return spinner;
     }
 
-    public static JLabel createHelpLabel(String s) {
+    public static @NonNull JLabel createHelpLabel(@Nullable String s) {
         if (s == null || s.isEmpty()) {
             s = "";
         } else {
@@ -190,7 +191,7 @@ public class SimpleSettingsPanel extends JPanel {
         return infoButton;
     }
 
-    public static JLabel createHelpTextLabel(String s) {
+    public static @NonNull JLabel createHelpTextLabel(@Nullable String s) {
         if (s == null || s.isEmpty()) {
             s = "";
         }
@@ -204,7 +205,7 @@ public class SimpleSettingsPanel extends JPanel {
         return infoButton;
     }
 
-    public static JButton createHelpButton(Runnable callback) {
+    public static @NonNull JButton createHelpButton(@NonNull Runnable callback) {
         var infoButton =
             new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
         infoButton.setToolTipText("Open online help...");

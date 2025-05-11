@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JMenu;
@@ -51,7 +53,7 @@ abstract class SequentViewListener<T extends SequentView> implements MouseListen
      *
      * @param menu the menu to hide.
      */
-    void hideMenu(JMenu menu) {
+    void hideMenu(@NonNull JMenu menu) {
         menu.setPopupMenuVisible(false);
     }
 
@@ -70,7 +72,7 @@ abstract class SequentViewListener<T extends SequentView> implements MouseListen
      * @param me a mouse event.
      * @param menu the menu to show.
      */
-    void showPopup(MouseEvent me, JMenu menu) {
+    void showPopup(@NonNull MouseEvent me, @NonNull JMenu menu) {
         sequentView.refreshHighlightning = false;
 
         final JPopupMenu popup = menu.getPopupMenu();

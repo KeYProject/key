@@ -12,6 +12,8 @@ import de.uka.ilkd.key.scripts.AbstractCommand;
 import de.uka.ilkd.key.scripts.EngineState;
 import de.uka.ilkd.key.scripts.ScriptException;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -93,7 +95,7 @@ public class ValueInjectorTest {
         }
 
         @Override
-        public PP evaluateArguments(EngineState state, Map<String, Object> arguments) {
+        public @Nullable PP evaluateArguments(EngineState state, Map<String, Object> arguments) {
             return null;
         }
 
@@ -103,7 +105,7 @@ public class ValueInjectorTest {
         }
 
         @Override
-        public String getName() {
+        public @NonNull String getName() {
             return "pp";
         }
     }

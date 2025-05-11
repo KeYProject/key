@@ -11,6 +11,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The default implementation of {@link IExecutionLoopStatement}.
@@ -34,7 +35,7 @@ public class ExecutionLoopStatement extends AbstractExecutionBlockStartNode<Loop
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() {
+    protected @NonNull String lazyComputeName() {
         LoopStatement ls = getActiveStatement();
         if (ls.getGuardExpression() != null) {
             if (ls instanceof While) {
@@ -65,7 +66,7 @@ public class ExecutionLoopStatement extends AbstractExecutionBlockStartNode<Loop
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -73,7 +74,7 @@ public class ExecutionLoopStatement extends AbstractExecutionBlockStartNode<Loop
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Loop Statement";
     }
 }

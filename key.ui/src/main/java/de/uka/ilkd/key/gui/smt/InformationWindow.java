@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -67,8 +68,8 @@ public class InformationWindow extends JDialog {
     private JTabbedPane tabbedPane;
     private Model model;
 
-    public InformationWindow(Dialog parent, SMTSolver solver, Collection<Information> information,
-            String title) {
+    public InformationWindow(Dialog parent, @NonNull SMTSolver solver, @NonNull Collection<Information> information,
+                             String title) {
         super(parent);
         this.setTitle(title);
         initModel(solver);
@@ -84,7 +85,7 @@ public class InformationWindow extends JDialog {
         this.setVisible(true);
     }
 
-    private void initModel(SMTSolver solver) {
+    private void initModel(@NonNull SMTSolver solver) {
         if (solver.getType() != SolverTypes.Z3_CE_SOLVER) {
             return;
         }
@@ -109,7 +110,7 @@ public class InformationWindow extends JDialog {
         getTabbedPane().addTab("Help", pane);
     }
 
-    private Component createModelTab() {
+    private @NonNull Component createModelTab() {
 
         CETree tree = new CETree(model);
         JScrollPane pane = new JScrollPane();
@@ -120,7 +121,7 @@ public class InformationWindow extends JDialog {
 
     }
 
-    private Component newTab(Information information) {
+    private @NonNull Component newTab(@NonNull Information information) {
         final JTextPane content = new JTextPane();
         Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         content.setFont(font);
@@ -139,7 +140,7 @@ public class InformationWindow extends JDialog {
     }
 
 
-    private JTabbedPane getTabbedPane() {
+    private @NonNull JTabbedPane getTabbedPane() {
         if (tabbedPane == null) {
             tabbedPane = new JTabbedPane();
         }

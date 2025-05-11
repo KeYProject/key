@@ -8,6 +8,7 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Settings for the proof slicing extension.
@@ -98,7 +99,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
     /**
      * @return path to the dot executable
      */
-    public String getDotExecutable() {
+    public @NonNull String getDotExecutable() {
         String path = dotExecutable.get();
         if (path != null) {
             return path;
@@ -114,7 +115,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      *
      * @param path dot executable
      */
-    public void setDotExecutable(String path) {
+    public void setDotExecutable(@NonNull String path) {
         dotExecutable.set(path);
     }
 }

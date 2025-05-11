@@ -28,6 +28,8 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -53,7 +55,7 @@ public class SymbolicLayoutReader {
      * @throws SAXException Occurred Exception.
      * @throws IOException Occurred Exception.
      */
-    public ISymbolicLayout read(File file)
+    public ISymbolicLayout read(@NonNull File file)
             throws ParserConfigurationException, SAXException, IOException {
         return read(new FileInputStream(file));
     }
@@ -67,7 +69,7 @@ public class SymbolicLayoutReader {
      * @throws SAXException Occurred Exception.
      * @throws IOException Occurred Exception.
      */
-    public ISymbolicLayout read(InputStream in)
+    public @Nullable ISymbolicLayout read(@Nullable InputStream in)
             throws ParserConfigurationException, SAXException, IOException {
         if (in != null) {
             try (in) {
@@ -119,7 +121,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes)
+        public void startElement(String uri, String localName, String qName, @NonNull Attributes attributes)
                 throws SAXException {
             Object parent = parentStack.peekFirst();
             if (isModel(uri, localName, qName)) {
@@ -314,7 +316,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getValueString(Attributes attributes) {
+    protected String getValueString(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_VALUE);
     }
 
@@ -324,7 +326,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getConditionString(Attributes attributes) {
+    protected String getConditionString(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_CONDITION);
     }
 
@@ -334,7 +336,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getTypeString(Attributes attributes) {
+    protected String getTypeString(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_TYPE);
     }
 
@@ -344,7 +346,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getProgramVariableString(Attributes attributes) {
+    protected String getProgramVariableString(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_PROGRAM_VARIABLE);
     }
 
@@ -354,7 +356,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getName(Attributes attributes) {
+    protected String getName(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_NAME);
     }
 
@@ -364,7 +366,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getArrayIndexString(Attributes attributes) {
+    protected String getArrayIndexString(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_ARRAY_INDEX);
     }
 
@@ -374,7 +376,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected boolean isArrayIndex(Attributes attributes) {
+    protected boolean isArrayIndex(@NonNull Attributes attributes) {
         return Boolean
                 .parseBoolean(attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_IS_ARRAY_INDEX));
     }
@@ -385,7 +387,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getId(Attributes attributes) {
+    protected String getId(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_XML_ID);
     }
 
@@ -395,7 +397,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getTarget(Attributes attributes) {
+    protected String getTarget(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_TARGET);
     }
 
@@ -405,7 +407,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getRepresentativeTerm(Attributes attributes) {
+    protected String getRepresentativeTerm(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_REPRESENTATIVE);
     }
 
@@ -415,7 +417,7 @@ public class SymbolicLayoutReader {
      * @param attributes The {@link Attributes} which provides the content.
      * @return The value.
      */
-    protected String getTerm(Attributes attributes) {
+    protected String getTerm(@NonNull Attributes attributes) {
         return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_TERM);
     }
 
@@ -431,7 +433,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public IModelSettings getSettings() {
+        public @Nullable IModelSettings getSettings() {
             return null;
         }
     }
@@ -451,12 +453,12 @@ public class SymbolicLayoutReader {
         /**
          * The objects.
          */
-        private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
+        private @NonNull ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
 
         /**
          * The symbolic equivalence classes.
          */
-        private ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses = ImmutableSLList.nil();
+        private @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses = ImmutableSLList.nil();
 
         /**
          * {@inheritDoc}
@@ -522,12 +524,12 @@ public class SymbolicLayoutReader {
         /**
          * The associations.
          */
-        private ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
+        private @NonNull ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
 
         /**
          * The values.
          */
-        private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+        private @NonNull ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
 
         /**
          * {@inheritDoc}
@@ -599,8 +601,8 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                boolean isArrayIndex, Term arrayIndex, Term condition) {
+        public @Nullable ISymbolicAssociation getAssociation(IProgramVariable programVariable,
+                                                             boolean isArrayIndex, Term arrayIndex, Term condition) {
             return null;
         }
 
@@ -608,8 +610,8 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                Term arrayIndex, Term condition) {
+        public @Nullable ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
+                                                 Term arrayIndex, Term condition) {
             return null;
         }
     }
@@ -648,7 +650,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "Object " + getNameString();
         }
 
@@ -656,7 +658,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getName() {
+        public @Nullable Term getName() {
             return null;
         }
 
@@ -672,7 +674,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Sort getType() {
+        public @Nullable Sort getType() {
             return null;
         }
 
@@ -688,8 +690,8 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                boolean isArrayIndex, Term arrayIndex, Term condition) {
+        public @Nullable ISymbolicAssociation getAssociation(IProgramVariable programVariable,
+                                                             boolean isArrayIndex, Term arrayIndex, Term condition) {
             return null;
         }
 
@@ -697,8 +699,8 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                Term arrayIndex, Term condition) {
+        public @Nullable ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
+                                                 Term arrayIndex, Term condition) {
             return null;
         }
     }
@@ -773,7 +775,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "Value of " + getName() + " is " + getValueString();
         }
 
@@ -781,7 +783,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public IProgramVariable getProgramVariable() {
+        public @Nullable IProgramVariable getProgramVariable() {
             return null;
         }
 
@@ -797,7 +799,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getValue() {
+        public @Nullable Term getValue() {
             return null;
         }
 
@@ -813,7 +815,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Sort getType() {
+        public @Nullable Sort getType() {
             return null;
         }
 
@@ -845,7 +847,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public @Nullable Term getArrayIndex() {
             return null;
         }
 
@@ -861,7 +863,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() {
+        public @Nullable Term getCondition() {
             return null;
         }
 
@@ -952,7 +954,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "Association " + getName() + " to " + getTarget();
         }
 
@@ -960,7 +962,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public IProgramVariable getProgramVariable() {
+        public @Nullable IProgramVariable getProgramVariable() {
             return null;
         }
 
@@ -1009,7 +1011,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getArrayIndex() {
+        public @Nullable Term getArrayIndex() {
             return null;
         }
 
@@ -1025,7 +1027,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getCondition() {
+        public @Nullable Term getCondition() {
             return null;
         }
 
@@ -1081,7 +1083,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public ImmutableList<Term> getTerms() {
+        public @Nullable ImmutableList<Term> getTerms() {
             return null;
         }
 
@@ -1106,7 +1108,7 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public Term getRepresentative() {
+        public @Nullable Term getRepresentative() {
             return null;
         }
 

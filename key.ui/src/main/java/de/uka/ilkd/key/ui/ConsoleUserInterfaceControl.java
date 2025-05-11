@@ -41,6 +41,8 @@ import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -58,9 +60,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     private static final String PROGRESS_MARK = ">";
 
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
+    @NonNull
     ImmutableList<Proof> proofStack = ImmutableSLList.nil();
 
-    final KeYMediator mediator;
+    final @NonNull KeYMediator mediator;
 
     // for a progress bar
     int progressMax = 0;
@@ -74,7 +77,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Current key problem file that is attempted to be proven.
      */
-    private File keyProblemFile = null;
+    private @Nullable File keyProblemFile = null;
 
     /**
      * We want to record whether there was a proof that could not be proven. {@link Main} calls
@@ -89,7 +92,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         this.loadOnly = loadOnly;
     }
 
-    private void printResults(final int openGoals, TaskFinishedInfo info, final Object result2) {
+    private void printResults(final int openGoals, @NonNull TaskFinishedInfo info, final Object result2) {
         LOGGER.info("]"); // end progress bar
         LOGGER.info("[ DONE  ... rule application ]");
         if (LOGGER.isDebugEnabled()) {
@@ -197,7 +200,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public void loadProblem(File file) {
+    public void loadProblem(@NonNull File file) {
         /*
          * Current file is stored in a private field. It will be used in method printResults() to
          * determine file names, in which proofs will be written.
@@ -214,15 +217,15 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param bootClassPath the boot class path to use.
      * @param includes the included files to use
      */
-    public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
+    public void loadProblem(@NonNull File file, @NonNull List<File> classPath, @NonNull File bootClassPath,
+                            @NonNull List<File> includes) {
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
-    public void loadProofFromBundle(File proofBundle, File proofFilename) {
+    public void loadProofFromBundle(@NonNull File proofBundle, @NonNull File proofFilename) {
         ProblemLoader problemLoader =
             getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
@@ -230,13 +233,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public void registerProofAggregate(ProofAggregate pa) {
+    public void registerProofAggregate(@NonNull ProofAggregate pa) {
         super.registerProofAggregate(pa);
         mediator.getSelectionModel().setSelectedProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
 
-    void finish(Proof proof) {
+    void finish(@NonNull Proof proof) {
         // setInteractive(false) has to be called because the ruleAppIndex
         // has to be notified that we work in auto mode (CS)
         mediator.setInteractive(false);
@@ -306,7 +309,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public final ProblemInitializer createProblemInitializer(Profile profile) {
+    public final @NonNull ProblemInitializer createProblemInitializer(Profile profile) {
         return new ProblemInitializer(this, new Services(profile), this);
     }
 
@@ -314,7 +317,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * {@inheritDoc}
      */
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
+    public void proofDisposing(@NonNull ProofDisposedEvent e) {
         super.proofDisposing(e);
         if (!proofStack.isEmpty()) {
             Proof p = proofStack.head();
@@ -338,7 +341,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * {@inheritDoc}
      */
     @Override
-    public KeYMediator getMediator() {
+    public @NonNull KeYMediator getMediator() {
         return mediator;
     }
 
@@ -348,7 +351,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @NonNull IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
         return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
     }
 
@@ -356,7 +359,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * {@inheritDoc}
      */
     @Override
-    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
+    public void reportWarnings(@NonNull ImmutableSet<PositionedString> warnings) {
         warnings.forEach(it -> LOGGER.info("{}", it));
     }
 
@@ -368,7 +371,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param keyProblemFile the key problem file
      * @return true, if successful
      */
-    public static boolean saveProof(Object result, Proof proof, File keyProblemFile) {
+    public static boolean saveProof(Object result, @NonNull Proof proof, @NonNull File keyProblemFile) {
         if (result instanceof Throwable) {
             throw new RuntimeException("Error in batchmode.", (Throwable) result);
         }
@@ -411,7 +414,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+    public @NonNull TermLabelVisibilityManager getTermLabelVisibilityManager() {
         return null;
     }
 }

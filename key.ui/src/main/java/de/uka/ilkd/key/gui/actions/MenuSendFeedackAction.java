@@ -7,12 +7,13 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import org.jspecify.annotations.NonNull;
 
 public class MenuSendFeedackAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1L;
 
-    public MenuSendFeedackAction(MainWindow mainWindow) {
+    public MenuSendFeedackAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Send Feedback...");
     }

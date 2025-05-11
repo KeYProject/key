@@ -21,8 +21,8 @@ import org.jspecify.annotations.NonNull;
  */
 public class TermConstructionProjection implements ProjectionToTerm {
 
-    private final Operator op;
-    private final ProjectionToTerm[] subTerms;
+    private final @NonNull Operator op;
+    private final ProjectionToTerm @NonNull [] subTerms;
 
 
     private TermConstructionProjection(@NonNull Operator op, ProjectionToTerm @NonNull [] subTerms) {

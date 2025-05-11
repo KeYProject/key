@@ -31,6 +31,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +99,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     }
 
     @Override
-    public void mouseMoved(MouseEvent me) {
+    public void mouseMoved(@NonNull MouseEvent me) {
         showTermInfo(me.getPoint());
         if (sequentView.refreshHighlightning && refresh
                 && sequentView.getDocument().getLength() > 0) {
@@ -122,7 +123,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(@NonNull MouseEvent e) {
         if (!sequentView.isMainSequentView()) {
             return;
         }

@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
  */
 public final class JMLResolverManager extends SLResolverManager {
 
-    public JMLResolverManager(@NonNull JavaInfo javaInfo, KeYJavaType specInClass, LocationVariable selfVar,
+    public JMLResolverManager(@NonNull JavaInfo javaInfo, @NonNull KeYJavaType specInClass, LocationVariable selfVar,
                               SLExceptionFactory eManager) {
         super(eManager, specInClass, selfVar, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));

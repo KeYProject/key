@@ -10,6 +10,7 @@ import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.settings.ViewSettings.SYNTAX_HIGHLIGHTING;
 
@@ -22,7 +23,7 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
     private final PropertyChangeListener syntaxHighlightingListener =
         this::handleViewSettingsChanged;
 
-    public SyntaxHighlightingToggleAction(MainWindow window) {
+    public SyntaxHighlightingToggleAction(@NonNull MainWindow window) {
         super(window);
         setName("Use Syntax Highlighting");
         setTooltip("Uses regular expressions-based syntax highlighting. "
@@ -39,7 +40,7 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NonNull ActionEvent e) {
         boolean useSyntaxHighlighting = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .setUseSyntaxHighlighting(useSyntaxHighlighting);

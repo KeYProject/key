@@ -191,7 +191,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
+    public @Nullable Object visitMeasured_by_clause(JmlParser.@NonNull Measured_by_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(MEASURED_BY,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -206,7 +206,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitDiverges_clause(JmlParser.Diverges_clauseContext ctx) {
+    public @Nullable Object visitDiverges_clause(JmlParser.@NonNull Diverges_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(DIVERGES, ctx);
         return null;
@@ -298,7 +298,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
+    public @Nullable Object visitVariant_function(JmlParser.@NonNull Variant_functionContext ctx) {
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.DECREASES, attachOriginLabel);
@@ -312,7 +312,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
+    public @Nullable Object visitInitially_clause(JmlParser.@NonNull Initially_clauseContext ctx) {
         TextualJMLInitially initially =
             new TextualJMLInitially(mods, new LabeledParserRuleContext(ctx));
         constructs = constructs.append(initially);
@@ -320,7 +320,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
+    public Object visitRepresents_clause(JmlParser.@NonNull Represents_clauseContext ctx) {
         TextualJMLRepresents represents =
             new TextualJMLRepresents(mods, new LabeledParserRuleContext(ctx));
         constructs = constructs.append(represents);
@@ -328,14 +328,14 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitSeparates_clause(JmlParser.Separates_clauseContext ctx) {
+    public @Nullable Object visitSeparates_clause(JmlParser.@NonNull Separates_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(INFORMATION_FLOW, ctx);
         return null;
     }
 
     @Override
-    public @Nullable Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
+    public @Nullable Object visitLoop_separates_clause(JmlParser.@NonNull Loop_separates_clauseContext ctx) {
         assert loopContract != null;
         loopContract.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
             new LabeledParserRuleContext(ctx));
@@ -343,7 +343,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
+    public @Nullable Object visitDetermines_clause(JmlParser.@NonNull Determines_clauseContext ctx) {
         if (methodContract != null) {
             methodContract.addClause(INFORMATION_FLOW, ctx);
         } else if (loopContract != null) {
@@ -360,7 +360,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @NonNull Object visitSignals_clause(JmlParser.Signals_clauseContext ctx) {
+    public @NonNull Object visitSignals_clause(JmlParser.@NonNull Signals_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(SIGNALS,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -369,7 +369,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
+    public @Nullable Object visitSignals_only_clause(JmlParser.@NonNull Signals_only_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(SIGNALS_ONLY,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -378,7 +378,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
+    public @Nullable Object visitBreaks_clause(JmlParser.@NonNull Breaks_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(BREAKS,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -387,7 +387,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
+    public @Nullable Object visitContinues_clause(JmlParser.@NonNull Continues_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(CONTINUES,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -396,7 +396,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
+    public @Nullable Object visitReturns_clause(JmlParser.@NonNull Returns_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(RETURNS,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -444,7 +444,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public @Nullable Object visitClass_axiom(JmlParser.Class_axiomContext ctx) {
+    public @Nullable Object visitClass_axiom(JmlParser.@NonNull Class_axiomContext ctx) {
         TextualJMLClassAxiom inv =
             new TextualJMLClassAxiom(mods, new LabeledParserRuleContext(ctx));
         constructs = constructs.append(inv);

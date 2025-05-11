@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.reference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Visitor;
 
 /**
@@ -27,7 +28,7 @@ public class ProgramMethodFinder implements Visitor<Term> {
     }
 
     @Override
-    public void visit(Term visited) {
+    public void visit(@NonNull Term visited) {
         if (visited.op() instanceof ProgramMethod pm) {
             if (!pm.isModel()) {
                 foundProgramMethod = true;

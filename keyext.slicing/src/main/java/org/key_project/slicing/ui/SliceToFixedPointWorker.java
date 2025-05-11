@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.analysis.AnalysisResults;
 
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground() {
+    protected @Nullable Void doInBackground() {
         LOGGER.info("analyzing proof {} (ID: {})", proof.name(), System.identityHashCode(proof));
         if (isCancelled()) {
             doneCallback.run();

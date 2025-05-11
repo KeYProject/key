@@ -16,6 +16,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The menu item for the state merging rule.
@@ -34,8 +36,8 @@ public class MergeRuleMenuItem extends JMenuItem {
      *        formula).
      * @param mediator The KeY mediator.
      */
-    public MergeRuleMenuItem(final Goal goal, final PosInOccurrence pio,
-            final KeYMediator mediator) {
+    public MergeRuleMenuItem(final @NonNull Goal goal, final @NonNull PosInOccurrence pio,
+                             final @NonNull KeYMediator mediator) {
         final Services services = goal.proof().getServices();
 
         this.setText(toString());
@@ -72,7 +74,7 @@ public class MergeRuleMenuItem extends JMenuItem {
                             private long duration;
 
                             @Override
-                            protected Void doInBackground() throws Exception {
+                            protected @Nullable Void doInBackground() throws Exception {
                                 long time = System.currentTimeMillis();
                                 mediator.getUI().getProofControl().applyInteractive(completedApp,
                                     goal);
@@ -99,13 +101,13 @@ public class MergeRuleMenuItem extends JMenuItem {
         });
     }
 
-    private void signalError(final Throwable e, final KeYMediator mediator) {
+    private void signalError(final @NonNull Throwable e, final @NonNull KeYMediator mediator) {
         SwingUtilities
                 .invokeLater(() -> mediator.notify(new ExceptionFailureEvent(e.getMessage(), e)));
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "State Merging Rule";
     }
 }

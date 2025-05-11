@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Toggles the tooltips on the sequent view.
@@ -37,7 +38,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public ToggleSequentViewTooltipAction(MainWindow mainWindow) {
+    public ToggleSequentViewTooltipAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOL_TIP);
@@ -57,7 +58,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NonNull ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .setShowSequentViewTooltips(selected);

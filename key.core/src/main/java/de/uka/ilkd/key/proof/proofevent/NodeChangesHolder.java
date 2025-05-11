@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -24,7 +25,7 @@ public class NodeChangesHolder {
         scis = scis.prepend(p_sci);
     }
 
-    public Object clone() {
+    public @NonNull Object clone() {
         return new NodeChangesHolder(scis);
     }
 }

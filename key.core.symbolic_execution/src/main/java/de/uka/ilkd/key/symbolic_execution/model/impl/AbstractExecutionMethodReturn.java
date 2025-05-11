@@ -22,6 +22,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The default implementation of {@link IExecutionBaseMethodReturn}.
@@ -33,7 +35,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
     /**
      * The {@link IExecutionMethodCall} which is now returned.
      */
-    private final ExecutionMethodCall methodCall;
+    private final @NonNull ExecutionMethodCall methodCall;
 
     /**
      * The signature.
@@ -49,7 +51,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * The human-readable method return condition to reach this node from its calling
      * {@link IExecutionMethodCall}.
      */
-    private String formattedMethodReturnCondition;
+    private @Nullable String formattedMethodReturnCondition;
 
     /**
      * The variable value pairs of the state when the method has been called.
@@ -65,7 +67,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
     public AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
-            ExecutionMethodCall methodCall) {
+                                         @NonNull ExecutionMethodCall methodCall) {
         super(settings, proofNode);
         assert methodCall != null;
         this.methodCall = methodCall;

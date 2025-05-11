@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class can be used for adding Checkboxes to the menu.
@@ -19,16 +20,16 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
      *
      */
     private static final long serialVersionUID = -4156054085757784178L;
-    protected final MainWindowAction mainWindowAction;
+    protected final @NonNull MainWindowAction mainWindowAction;
 
     /*
      * If this constructor is used, default selected state for the CheckBox is false.
      */
-    KeYMenuCheckBox(MainWindow mainWindow, String label) {
+    KeYMenuCheckBox(@NonNull MainWindow mainWindow, String label) {
         this(mainWindow, label, false);
     }
 
-    KeYMenuCheckBox(MainWindow mainWindow, String label, boolean selectedState) {
+    KeYMenuCheckBox(@NonNull MainWindow mainWindow, String label, boolean selectedState) {
         super("", selectedState);
         final KeYMenuCheckBox checkBox = this;
         mainWindowAction = new MainWindowAction(mainWindow) {

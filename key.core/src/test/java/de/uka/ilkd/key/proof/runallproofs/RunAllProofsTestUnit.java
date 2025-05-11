@@ -13,6 +13,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.*;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +66,7 @@ public final class RunAllProofsTestUnit implements Serializable {
      * @return either a single test result or an aggregated test result, not <code>null</code>.
      * @param xml
      */
-    public TestResult runTest(JunitXmlWriter xml) throws Exception {
+    public TestResult runTest(@NonNull JunitXmlWriter xml) throws Exception {
         /*
          * List of test results containing one test result for each test file contained in this
          * group.
@@ -151,7 +153,7 @@ public final class RunAllProofsTestUnit implements Serializable {
      * Temporary directory used by this test unit to store serialized data when running in fork
      * mode.
      */
-    private Path tempDir = null;
+    private @Nullable Path tempDir = null;
 
     public Path getTempDir() throws IOException {
         File runAllProofsTempDir = settings.getTempDir();

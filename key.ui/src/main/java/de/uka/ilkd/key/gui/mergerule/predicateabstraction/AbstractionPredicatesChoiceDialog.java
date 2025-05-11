@@ -35,6 +35,8 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
@@ -61,13 +63,13 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractionPredicatesChoiceDialog.class);
 
-    private Goal goal = null;
+    private @Nullable Goal goal = null;
 
-    private ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
-    private ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
+    private @Nullable ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
+    private @Nullable ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
     private final ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
 
-    private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
+    private @NonNull Class<? extends AbstractPredicateAbstractionLattice> latticeType =
         SimplePredicateAbstractionLattice.class;
 
     private final ObservableArrayList<String> placeholdersProblemsListData =
@@ -78,7 +80,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     /**
      * @return The abstraction predicates set by the user. Is null iff the user pressed cancel.
      */
-    private ArrayList<AbstractionPredicate> getRegisteredPredicates() {
+    private @Nullable ArrayList<AbstractionPredicate> getRegisteredPredicates() {
         return registeredPredicates;
     }
 
@@ -86,14 +88,14 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return The chosen lattice type (class object for class that is an instance of
      *         {@link AbstractPredicateAbstractionLattice}).
      */
-    private Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
+    private @NonNull Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
         return latticeType;
     }
 
     /**
      * @return The resulting input supplied by the user.
      */
-    public Result getResult() {
+    public @NonNull Result getResult() {
         return new Result(getRegisteredPredicates(), getLatticeType(), abstrPredicateChoices);
     }
 
@@ -105,7 +107,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param differingLocVars Location variables the values of which differ in the merge partner
      *        states.
      */
-    public AbstractionPredicatesChoiceDialog(Goal goal, List<LocationVariable> differingLocVars) {
+    public AbstractionPredicatesChoiceDialog(Goal goal, @NonNull List<LocationVariable> differingLocVars) {
         this();
         this.goal = goal;
         differingLocVars.forEach(
@@ -184,7 +186,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         getContentPane().add(rootPane);
     }
 
-    private JPanel createChoiceAbstrPredsPanel() {
+    private @NonNull JPanel createChoiceAbstrPredsPanel() {
         final JPanel result = new JPanel(new BorderLayout());
 
         final ChoiceTableModel model = new ChoiceTableModel();
@@ -196,7 +198,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         return result;
     }
 
-    private JPanel createProblemsLabelContainer() {
+    private @NonNull JPanel createProblemsLabelContainer() {
         final JPanel result = new JPanel(new BorderLayout());
 
         final String resourcePath = "/de/uka/ilkd/key/gui/";
@@ -251,7 +253,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         return result;
     }
 
-    private JPanel createPlaceholderVariablesPanel() {
+    private @NonNull JPanel createPlaceholderVariablesPanel() {
         final JPanel result = new JPanel(new BorderLayout());
 
         final JTextField txtPlaceholderInput = new JTextField();
@@ -308,7 +310,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         lstPlaceholders.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyReleased(KeyEvent e) {
+            public void keyReleased(@NonNull KeyEvent e) {
                 final int selectedIndex = lstPlaceholders.getSelectedIndex();
                 if (e.getKeyCode() == KeyEvent.VK_DELETE && !placeholdersLstModel.isEmpty()
                         && selectedIndex >= 0) {
@@ -325,7 +327,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         return result;
     }
 
-    private JPanel createAbstractionPredicatesPanel() {
+    private @NonNull JPanel createAbstractionPredicatesPanel() {
         final JPanel result = new JPanel(new BorderLayout());
 
         final JTextField txtAbstrPredInput = new JTextField();
@@ -400,7 +402,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         lstAbstrPreds.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyReleased(KeyEvent e) {
+            public void keyReleased(@NonNull KeyEvent e) {
                 final int selectedIndex = lstAbstrPreds.getSelectedIndex();
                 if (e.getKeyCode() == KeyEvent.VK_DELETE && !abstrPredListModel.isEmpty()
                         && selectedIndex >= 0) {
@@ -413,7 +415,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         return result;
     }
 
-    private JPanel createLatticeTypePanel() {
+    private @NonNull JPanel createLatticeTypePanel() {
         final JRadioButton simplePredLatticeBtn = new JRadioButton("Simple Predicates Lattice");
         simplePredLatticeBtn
                 .addActionListener(e -> latticeType = SimplePredicateAbstractionLattice.class);
@@ -440,7 +442,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         return result;
     }
 
-    private JPanel createInfoPanel() {
+    private @NonNull JPanel createInfoPanel() {
         final String resourcePath = "/de/uka/ilkd/key/gui/";
         final String infoHTML =
             readFromResourceFile(resourcePath + "help/abstrPredsMergeDialogInfo.html");
@@ -475,7 +477,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param input The input to parse.
      * @return The parsed placeholder (sort and name).
      */
-    private Pair<Sort, Name> parsePlaceholder(String input) {
+    private @NonNull Pair<Sort, Name> parsePlaceholder(@NonNull String input) {
         return MergeRuleUtils.parsePlaceholder(input, goal.proof().getServices());
     }
 
@@ -488,7 +490,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return The parsed abstraction predicate.
      * @throws ParserException If there is a mistake in the input.
      */
-    private AbstractionPredicate parsePredicate(String input, NamespaceSet localNamespaces)
+    private @NonNull AbstractionPredicate parsePredicate(@NonNull String input, @NonNull NamespaceSet localNamespaces)
             throws ParserException {
         return MergeRuleUtils.parsePredicate(input, registeredPlaceholders, localNamespaces,
             goal.proof().getServices());
@@ -501,8 +503,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param domElem The abstraction predicate to convert into a String representation.
      * @return A String representation of the given abstraction predicate.
      */
-    private String abstrPredToStringRepr(
-            Optional<AbstractPredicateAbstractionDomainElement> domElem) {
+    private @NonNull String abstrPredToStringRepr(
+            @Nullable Optional<AbstractPredicateAbstractionDomainElement> domElem) {
         if (domElem == null) {
             return "";
         }
@@ -539,7 +541,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param pred Predicate to compute a String representation for.
      * @return A String representation of an abstraction predicate.
      */
-    private String abstrPredToString(AbstractionPredicate pred) {
+    private @NonNull String abstrPredToString(@NonNull AbstractionPredicate pred) {
         final Services services = MainWindow.getInstance().getMediator().getServices();
         final Pair<LocationVariable, Term> predFormWithPh = pred.getPredicateFormWithPlaceholder();
 
@@ -551,7 +553,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     // /////// STATIC METHODS ////// //
     // ///////////////////////////// //
 
-    private static URL getURLForResourceFile(Class<?> cl, String filename) {
+    private static @Nullable URL getURLForResourceFile(@NonNull Class<?> cl, @NonNull String filename) {
         URL url = cl.getResource(filename);
         LOGGER.debug("Load Resource:" + filename + " of class " + cl);
         if (url == null && cl.getSuperclass() != null) {
@@ -566,7 +568,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         }
     }
 
-    private static String readFromURL(URL url) {
+    private static @Nullable String readFromURL(@NonNull URL url) {
         try (final InputStream is = url.openStream();
                 final Scanner s = new Scanner(is, StandardCharsets.UTF_8)) {
             return s.useDelimiter("\\A").next();
@@ -575,7 +577,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         }
     }
 
-    private static String readFromResourceFile(String filename) {
+    private static @Nullable String readFromResourceFile(@NonNull String filename) {
         return readFromURL(
             getURLForResourceFile(AbstractionPredicatesChoiceDialog.class, filename));
     }
@@ -592,8 +594,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             new LinkedHashMap<>();
 
         public Result(ArrayList<AbstractionPredicate> registeredPredicates,
-                Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-                List<AbstractDomainElemChoice> userChoices) {
+                      Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+                      @NonNull List<AbstractDomainElemChoice> userChoices) {
             this.registeredPredicates = registeredPredicates;
             this.latticeType = latticeType;
 
@@ -623,7 +625,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         /**
          * @return Manually chosen lattice elements for program variables.
          */
-        public LinkedHashMap<ProgramVariable, AbstractDomainElement> getAbstractDomElemUserChoices() {
+        public @NonNull LinkedHashMap<ProgramVariable, AbstractDomainElement> getAbstractDomElemUserChoices() {
             return abstractDomElemUserChoices;
         }
     }
@@ -657,8 +659,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
                 @SuppressWarnings("unchecked")
                 @Override
-                public Component getListCellRendererComponent(JList<?> list, Object value,
-                        int index, boolean isSelected, boolean cellHasFocus) {
+                public @NonNull Component getListCellRendererComponent(JList<?> list, Object value,
+                                                                       int index, boolean isSelected, boolean cellHasFocus) {
                     final DefaultListCellRenderer result = //
                         (DefaultListCellRenderer) super.getListCellRendererComponent(list, value,
                             index, isSelected, cellHasFocus);
@@ -691,8 +693,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public Component getTableCellRendererComponent(JTable table, Object value,
-                        boolean isSelected, boolean hasFocus, int row, int column) {
+                public @NonNull Component getTableCellRendererComponent(JTable table, Object value,
+                                                                        boolean isSelected, boolean hasFocus, int row, int column) {
                     final DefaultTableCellRenderer result = //
                         (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value,
                             isSelected, hasFocus, row, column);
@@ -720,7 +722,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         }
 
         @Override
-        public String getColumnName(int column) {
+        public @NonNull String getColumnName(int column) {
             if (column == 0) {
                 return "Program Variable";
             } else if (column == 1) {
@@ -781,7 +783,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {
+    static de.uka.ilkd.key.proof.@Nullable Proof loadProof(String proofFileName) {
         java.io.File proofFile = new java.io.File("examples/" + proofFileName);
 
         try {

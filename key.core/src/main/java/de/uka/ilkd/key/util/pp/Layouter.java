@@ -258,7 +258,7 @@ public class Layouter<M> {
         return out.backend();
     }
 
-    public String result() {
+    public @NonNull String result() {
         return out.result();
     }
 
@@ -423,7 +423,7 @@ public class Layouter<M> {
      * @param indent increment to indentation level
      * @return this
      */
-    public Layouter<M> begin(boolean consistent, int indent) {
+    public @NonNull Layouter<M> begin(boolean consistent, int indent) {
         return begin(consistent, false, indent);
     }
 
@@ -436,7 +436,7 @@ public class Layouter<M> {
      * @param indent increment to indentation level
      * @return this
      */
-    public Layouter<M> beginRelative(boolean consistent, int indent) {
+    public @NonNull Layouter<M> beginRelative(boolean consistent, int indent) {
         return begin(consistent, true, indent);
     }
 
@@ -447,7 +447,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public Layouter<M> beginRelativeI() {
+    public @NonNull Layouter<M> beginRelativeI() {
         return beginRelative(false, defaultIndent);
     }
 
@@ -458,7 +458,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public Layouter<M> beginRelativeC() {
+    public @NonNull Layouter<M> beginRelativeC() {
         return beginRelative(true, defaultIndent);
     }
 
@@ -470,7 +470,7 @@ public class Layouter<M> {
      * @param indent the indentation for this block
      * @return this
      */
-    public Layouter<M> beginRelativeC(int indent) {
+    public @NonNull Layouter<M> beginRelativeC(int indent) {
         return beginRelative(true, indent);
     }
 
@@ -480,7 +480,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public Layouter<M> beginI() {
+    public @NonNull Layouter<M> beginI() {
         return begin(false, defaultIndent);
     }
 
@@ -489,7 +489,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public Layouter<M> beginC() {
+    public @NonNull Layouter<M> beginC() {
         return begin(true, defaultIndent);
     }
 
@@ -499,7 +499,7 @@ public class Layouter<M> {
      * @param indent the indentation for this block
      * @return this
      */
-    public Layouter<M> beginI(int indent) {
+    public @NonNull Layouter<M> beginI(int indent) {
         return begin(false, indent);
     }
 
@@ -509,7 +509,7 @@ public class Layouter<M> {
      * @param indent the indentation for this block
      * @return this
      */
-    public Layouter<M> beginC(int indent) {
+    public @NonNull Layouter<M> beginC(int indent) {
         return begin(true, indent);
     }
 
@@ -520,7 +520,7 @@ public class Layouter<M> {
      * @param consistent <code>true</code> for consistent block
      * @return this
      */
-    public Layouter<M> begin(boolean consistent) {
+    public @NonNull Layouter<M> begin(boolean consistent) {
         return begin(consistent, defaultIndent);
     }
 
@@ -531,7 +531,7 @@ public class Layouter<M> {
      * @param width space to insert if not broken
      * @return this
      */
-    public Layouter<M> brk(int width) {
+    public @NonNull Layouter<M> brk(int width) {
         return brk(width, 0);
     }
 
@@ -540,7 +540,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public Layouter<M> brk() {
+    public @NonNull Layouter<M> brk() {
         return brk(1);
     }
 
@@ -550,7 +550,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public Layouter<M> nl() {
+    public @NonNull Layouter<M> nl() {
         return brk(largeSize);
     }
 
@@ -560,7 +560,7 @@ public class Layouter<M> {
      *
      * @return this
      */
-    public Layouter<M> ind() {
+    public @NonNull Layouter<M> ind() {
         return this.ind(0, 0);
     }
 

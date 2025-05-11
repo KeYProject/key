@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.proofevent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -64,7 +65,7 @@ public class RuleAppInfo {
     }
 
 
-    public String toString() {
+    public @NonNull String toString() {
         return "RuleApp: " + getRuleApp() + "\nNode: " + getOriginalNode() + "\nResulting nodes: "
             + newNodes;
     }

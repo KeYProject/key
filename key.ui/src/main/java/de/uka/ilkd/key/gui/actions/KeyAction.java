@@ -8,6 +8,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
 import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
@@ -89,7 +90,7 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     protected void lookupAcceleratorKey(@UnderInitialization KeyAction this,
-            KeyStroke defaultValue) {
+                                        @NonNull KeyStroke defaultValue) {
         KeyStrokeManager.lookupAndOverride(this, defaultValue.toString());
     }
 

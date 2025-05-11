@@ -28,10 +28,10 @@ import org.key_project.util.collection.ImmutableSet;
  */
 class TwoSidedMatching {
 
-    private final UniTrigger trigger;
+    private final @NonNull UniTrigger trigger;
     private final @Nullable Term triggerWithMVs;
     private final @NonNull Substitution targetSubstWithMVs;
-    private final Substitution triggerSubstWithMVs;
+    private final @NonNull Substitution triggerSubstWithMVs;
     private final @Nullable Term targetWithMVs;
 
     /**
@@ -66,6 +66,7 @@ class TwoSidedMatching {
      * @param services the Services
      * @return the found matchings
      */
+    @NonNull
     ImmutableSet<Substitution> getSubstitutions(Services services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet

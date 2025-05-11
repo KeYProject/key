@@ -15,6 +15,8 @@ import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -57,7 +59,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
     /**
      * The optional custom stop condition used in the current proof.
      */
-    private StopCondition stopCondition;
+    private @Nullable StopCondition stopCondition;
 
     /**
      * {@inheritDoc}
@@ -137,7 +139,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@inheritDoc}
      */
     @Override
-    public void init(Proof p_proof, ImmutableList<Goal> p_goals) {
+    public void init(@Nullable Proof p_proof, ImmutableList<Goal> p_goals) {
         // Clear preferred set to make sure that it is refilled when the first Goal should be
         // selected and no old state is used.
         goalsToPrefer.clear();
@@ -164,7 +166,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@inheritDoc}
      */
     @Override
-    public void updateGoalList(Node node, ImmutableList<Goal> newGoals) {
+    public void updateGoalList(Node node, @NonNull ImmutableList<Goal> newGoals) {
         // Update available goals in super class
         super.updateGoalList(node, newGoals);
         // Remove no longer relevant goals from preferred set

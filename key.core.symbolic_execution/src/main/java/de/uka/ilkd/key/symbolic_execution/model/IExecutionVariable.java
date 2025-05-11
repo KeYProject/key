@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -31,6 +32,7 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The {@link IProgramVariable} which contains the represented value.
      */
+    @Nullable
     IProgramVariable getProgramVariable();
 
     /**
@@ -38,6 +40,7 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The index in the parent array or {@code null} if no array cell value is represented.
      */
+    @Nullable
     Term getArrayIndex();
 
     /**
@@ -60,6 +63,7 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The optional additional condition considered during value computation.
      */
+    @Nullable
     Term getAdditionalCondition();
 
     /**
@@ -82,5 +86,6 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The created term.
      */
+    @Nullable
     Term createSelectTerm();
 }

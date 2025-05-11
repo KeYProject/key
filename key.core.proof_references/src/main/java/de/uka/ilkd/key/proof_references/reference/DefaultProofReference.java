@@ -10,6 +10,7 @@ import java.util.Objects;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.Strings;
 
 /**
@@ -26,7 +27,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
     /**
      * The source {@link Proof}.
      */
-    private final Proof source;
+    private final @Nullable Proof source;
 
     /**
      * The target source member.
@@ -45,7 +46,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
      * @param node Node to access the source {@link Proof} (or null).
      * @param target The target source member.
      */
-    public DefaultProofReference(String kind, Node node, T target) {
+    public DefaultProofReference(String kind, @Nullable Node node, T target) {
         this.kind = kind;
         this.source = node != null ? node.proof() : null;
         this.target = target;
@@ -88,7 +89,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
      * {@inheritDoc}
      */
     @Override
-    public Proof getSource() {
+    public @Nullable Proof getSource() {
         return source;
     }
 

@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Data structure for proof jobs. Method
@@ -41,7 +42,7 @@ public final class ProofCollection {
      *         {@link IOException} may be
      *         thrown.
      */
-    public List<RunAllProofsTestUnit> createRunAllProofsTestUnits() throws IOException {
+    public @NonNull List<RunAllProofsTestUnit> createRunAllProofsTestUnits() throws IOException {
 
         List<String> activeGroups = settings.getRunOnlyOn();
 
@@ -78,7 +79,7 @@ public final class ProofCollection {
         return settings;
     }
 
-    public GroupedProofCollectionUnit group(String name) {
+    public @NonNull GroupedProofCollectionUnit group(String name) {
         var settings = new ProofCollectionSettings(this.settings);
         var unit = new GroupedProofCollectionUnit(name, settings);
         units.add(unit);
@@ -90,7 +91,7 @@ public final class ProofCollection {
      *
      * @param groupNames a list of groups to be kept
      */
-    public void keep(String... groupNames) {
+    public void keep(String @NonNull ... groupNames) {
         Arrays.sort(groupNames);
         Predicate<String> toBeKept = (String s) -> Arrays.binarySearch(groupNames, s) >= 0;
         Predicate<? super ProofCollectionUnit> pred =

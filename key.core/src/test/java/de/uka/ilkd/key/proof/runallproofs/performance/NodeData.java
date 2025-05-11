@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class NodeData {
 
@@ -19,7 +21,7 @@ public class NodeData {
     final int proofTreeDepth;
     final int astDepth;
 
-    private static int getDepth(Node node) {
+    private static int getDepth(@Nullable Node node) {
         int depth = -1;
         while (node != null) {
             node = node.parent();
@@ -28,18 +30,18 @@ public class NodeData {
         return depth;
     }
 
-    NodeData(Goal goal) {
+    NodeData(@NonNull Goal goal) {
         Node node = goal.node();
         id = node.serialNr();
         proofTreeDepth = getDepth(node);
         astDepth = countAST(node);
     }
 
-    private static int countAST(Node n) {
+    private static int countAST(@NonNull Node n) {
         return countAST(n.sequent());
     }
 
-    private static int countAST(Sequent sequent) {
+    private static int countAST(@NonNull Sequent sequent) {
         int sum = 0;
         for (SequentFormula f : sequent.antecedent().asList()) {
             sum += countAST(f.formula());
@@ -50,7 +52,7 @@ public class NodeData {
         return sum;
     }
 
-    private static int countAST(Term term) {
+    private static int countAST(@NonNull Term term) {
         int sum = 0;
         for (Term t : term.subs()) {
             sum += countAST(t);

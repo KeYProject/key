@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This{@link FieldWatchpoint} represents a Java watchpoint and is responsible to tell the debugger
@@ -27,7 +28,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
 
     private boolean isModification;
 
-    private final String fullFieldName;
+    private final @NonNull String fullFieldName;
 
     /**
      * Creates a new {@link FieldWatchpoint}.
@@ -41,7 +42,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
      * @param proof the {@link Proof} that will be executed and should stop
      */
     public FieldWatchpoint(boolean enabled, int hitCount, String fieldName, boolean isAcces,
-            boolean isModification, KeYJavaType containerKJT, Proof proof) {
+                           boolean isModification, @NonNull KeYJavaType containerKJT, Proof proof) {
         super(hitCount, proof, enabled);
         this.isAccess = isAcces;
         this.isModification = isModification;
@@ -52,8 +53,8 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, @NonNull RuleApp ruleApp, Proof proof,
+                                   @NonNull Node node) {
         if (activeStatement instanceof Assignment assignment) {
             SourceElement firstElement = assignment.getChildAt(0);
             if (firstElement instanceof FieldReference) {

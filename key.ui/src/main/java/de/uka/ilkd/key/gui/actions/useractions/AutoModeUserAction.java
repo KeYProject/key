@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
 
 /**
  * User action to start auto mode (automatic proof search).
@@ -19,12 +20,12 @@ public class AutoModeUserAction extends ProofModifyingUserAction {
      * @param mediator mediator
      * @param proof selected proof
      */
-    public AutoModeUserAction(KeYMediator mediator, Proof proof) {
+    public AutoModeUserAction(@NonNull KeYMediator mediator, @NonNull Proof proof) {
         super(mediator, proof);
     }
 
     @Override
-    public String name() {
+    public @NonNull String name() {
         return "Strategy: Auto Mode";
     }
 

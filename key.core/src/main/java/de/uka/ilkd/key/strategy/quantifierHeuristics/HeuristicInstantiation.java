@@ -49,7 +49,7 @@ public class HeuristicInstantiation implements TermGenerator {
         private final @NonNull JFunction quantifiedVarSortCast;
 
         private @Nullable Term nextInst = null;
-        private final TermServices services;
+        private final @NonNull TermServices services;
 
         private HIIterator(Iterator<Term> it, QuantifiableVariable var, @NonNull Services services) {
             this.instances = it;
@@ -78,7 +78,7 @@ public class HeuristicInstantiation implements TermGenerator {
             return nextInst != null;
         }
 
-        public Term next() {
+        public @Nullable Term next() {
             final Term res = nextInst;
             nextInst = null;
             findNextInst();

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Model class for the manual choice of an abstract domain element by the user.
@@ -43,7 +44,7 @@ public class AbstractDomainElemChoice {
         return abstrDomElem;
     }
 
-    public void setAbstrDomElem(AbstractPredicateAbstractionDomainElement abstrDomElem) {
+    public void setAbstrDomElem(@NonNull AbstractPredicateAbstractionDomainElement abstrDomElem) {
         this.abstrDomElem = Optional.of(abstrDomElem);
     }
 
@@ -58,7 +59,7 @@ public class AbstractDomainElemChoice {
         return abstrDomElem.isPresent();
     }
 
-    public String choiceToString() {
+    public @NonNull String choiceToString() {
         return abstrDomElem.isPresent() ? abstrDomElem.toString() : "(no choice)";
     }
 }

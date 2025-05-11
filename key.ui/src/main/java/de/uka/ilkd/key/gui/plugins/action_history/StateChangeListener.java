@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Listener object to record various user actions (currently only rule applications)
@@ -29,14 +30,14 @@ public class StateChangeListener implements InteractionListener {
     /**
      * The KeY mediator.
      */
-    private final KeYMediator mediator;
+    private final @NonNull KeYMediator mediator;
 
     /**
      * Construct and register a new state change listener.
      *
      * @param mediator mediator
      */
-    StateChangeListener(KeYMediator mediator) {
+    StateChangeListener(@NonNull KeYMediator mediator) {
         this.mediator = mediator;
         mediator.getUI().getProofControl().addInteractionListener(this);
     }
@@ -69,7 +70,7 @@ public class StateChangeListener implements InteractionListener {
     }
 
     @Override
-    public void runRule(Node goal, RuleApp app) {
+    public void runRule(Node goal, @NonNull RuleApp app) {
         new ProofRuleUserAction(mediator, goal.proof(),
             goal, app.rule().displayName()).actionPerformed(null);
     }

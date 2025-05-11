@@ -61,6 +61,7 @@ class Printer<M> {
     }
 
     /** Accumulated result */
+    @NonNull
     String result() {
         return back.result();
     }

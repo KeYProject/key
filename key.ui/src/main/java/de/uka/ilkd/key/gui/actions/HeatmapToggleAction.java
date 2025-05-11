@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import org.jspecify.annotations.NonNull;
 
 public class HeatmapToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 1L;
@@ -23,7 +24,7 @@ public class HeatmapToggleAction extends MainWindowAction {
     public static final Icon ICON_SELECTED = IconFactory.HEATMAP_DEACTIVATE.get();
     public static final Icon ICON_NOT_SELECTED = IconFactory.HEATMAP_ACTIVATE.get();
 
-    public HeatmapToggleAction(MainWindow mainWindow) {
+    public HeatmapToggleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Toggle Heatmap");
         setMenuPath("View.Heatmap");

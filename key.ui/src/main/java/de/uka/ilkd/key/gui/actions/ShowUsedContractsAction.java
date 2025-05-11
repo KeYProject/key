@@ -9,6 +9,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
 
 public class ShowUsedContractsAction extends MainWindowAction {
 
@@ -19,7 +20,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
 
     private final Proof proof;
 
-    public ShowUsedContractsAction(MainWindow mainWindow, Proof proof) {
+    public ShowUsedContractsAction(@NonNull MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Show Used Contracts");
 

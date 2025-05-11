@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.graph.DependencyGraph.Edge;
@@ -50,7 +51,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
      * @param tracker dependency tracker
      * @param node node to show info on
      */
-    public ShowNodeInfoAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
+    public ShowNodeInfoAction(@NonNull MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
         setName("Show dependency graph info");
         this.tracker = tracker;
@@ -131,7 +132,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
             });
     }
 
-    private void showDialogForStep(Window parentWindow, Node proofStep) {
+    private void showDialogForStep(Window parentWindow, @NonNull Node proofStep) {
         var graphNodes = new ArrayList<GraphNode>();
         var analysisResults = tracker.getAnalysisResults();
         var idxFactory = new IndexFactory();

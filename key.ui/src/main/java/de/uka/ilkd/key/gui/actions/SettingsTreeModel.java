@@ -17,6 +17,7 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.Settings;
+import org.jspecify.annotations.NonNull;
 
 /**
  *
@@ -90,12 +91,12 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
 
 
-    public JComponent getStartComponent() {
+    public @NonNull JComponent getStartComponent() {
         return generateScrollPane("Here are all settings.");
     }
 
 
-    private Properties getChoicesAsProperties(ChoiceSettings settings) {
+    private @NonNull Properties getChoicesAsProperties(@NonNull ChoiceSettings settings) {
         Properties prop = new Properties();
 
         for (Choice choice : settings.getDefaultChoicesAsSet()) {
@@ -105,7 +106,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         return prop;
     }
 
-    private OptionContentNode generateTableNode(String title, Settings settings) {
+    private @NonNull OptionContentNode generateTableNode(String title, @NonNull Settings settings) {
 
         Properties props = new Properties();
         settings.writeSettings(props);
@@ -114,14 +115,14 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
     }
 
-    private OptionContentNode generateTableNode(String title, ChoiceSettings settings) {
+    private @NonNull OptionContentNode generateTableNode(String title, @NonNull ChoiceSettings settings) {
         Properties props = getChoicesAsProperties(settings);
         return new OptionContentNode(title, generateJTable(props));
 
     }
 
 
-    private JComponent generateScrollPane(String text) {
+    private @NonNull JComponent generateScrollPane(String text) {
         JTextArea ta = new JTextArea(5, 20);
         ta.append(text);
         ta.setEditable(false);
@@ -130,7 +131,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         return scrollpane;
     }
 
-    private JComponent generateJTable(Properties properties) {
+    private @NonNull JComponent generateJTable(@NonNull Properties properties) {
         String[] columnNames = { "Name", "Value" };
         Object[][] data = new Object[properties.entrySet().size()][2];
 
@@ -165,7 +166,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
 
 
-    private OptionContentNode generateOptionContentNode(String title, String text) {
+    private @NonNull OptionContentNode generateOptionContentNode(String title, String text) {
         return new OptionContentNode(title, generateScrollPane(text));
     }
 

@@ -19,6 +19,7 @@ import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class Log {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Log.class);
 
-    public static Path getCurrentLogFile() {
+    public static @NonNull Path getCurrentLogFile() {
         ch.qos.logback.classic.Logger root =
             (ch.qos.logback.classic.Logger) LoggerFactory
                     .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);

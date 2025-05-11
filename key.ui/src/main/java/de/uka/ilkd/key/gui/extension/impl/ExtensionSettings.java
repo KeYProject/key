@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import org.jspecify.annotations.NonNull;
 
 public class ExtensionSettings extends AbstractPropertiesSettings {
     private static final String NAME = "Extensions";
@@ -22,20 +23,20 @@ public class ExtensionSettings extends AbstractPropertiesSettings {
         super(NAME);
     }
 
-    public Collection<String> getForbiddenClasses() {
+    public @NonNull Collection<String> getForbiddenClasses() {
         return forbiddenClasses.get();
     }
 
-    public void setForbiddenClasses(Collection<String> seq) {
+    public void setForbiddenClasses(@NonNull Collection<String> seq) {
         forbiddenClasses.set(new TreeSet<>(seq));
     }
 
-    public PropertyEntry<Set<String>> forbiddenClasses() {
+    public @NonNull PropertyEntry<Set<String>> forbiddenClasses() {
         return forbiddenClasses;
     }
 
 
-    public void setForbiddenClass(Class<?> type, boolean activated) {
+    public void setForbiddenClass(@NonNull Class<?> type, boolean activated) {
         String text = type.getName();
         Collection<String> classes = getForbiddenClasses();
         if (activated) {

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.*;
 import javax.swing.*;
 
@@ -54,7 +56,7 @@ public class WrapLayout extends FlowLayout {
      * @return the preferred dimensions to lay out the subcomponents of the specified container
      */
     @Override
-    public Dimension preferredLayoutSize(Container target) {
+    public @NonNull Dimension preferredLayoutSize(@NonNull Container target) {
         return layoutSize(target, true);
     }
 
@@ -66,7 +68,7 @@ public class WrapLayout extends FlowLayout {
      * @return the minimum dimensions to lay out the subcomponents of the specified container
      */
     @Override
-    public Dimension minimumLayoutSize(Container target) {
+    public @NonNull Dimension minimumLayoutSize(@NonNull Container target) {
         Dimension minimum = layoutSize(target, false);
         minimum.width -= (getHgap() + 1);
         return minimum;
@@ -79,7 +81,7 @@ public class WrapLayout extends FlowLayout {
      * @param preferred should preferred size be calculated
      * @return the dimension to layout the target container
      */
-    private Dimension layoutSize(Container target, boolean preferred) {
+    private @NonNull Dimension layoutSize(@NonNull Container target, boolean preferred) {
         synchronized (target.getTreeLock()) {
             // Each row must fit with the width allocated to the containter.
             // When the container width = 0, the preferred width of the container
@@ -160,7 +162,7 @@ public class WrapLayout extends FlowLayout {
      *
      * @param rowHeight the height of the row to add
      */
-    private void addRow(Dimension dim, int rowWidth, int rowHeight) {
+    private void addRow(@NonNull Dimension dim, int rowWidth, int rowHeight) {
         dim.width = Math.max(dim.width, rowWidth);
 
         if (dim.height > 0) {

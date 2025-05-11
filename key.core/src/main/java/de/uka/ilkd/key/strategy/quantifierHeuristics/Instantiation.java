@@ -61,7 +61,7 @@ class Instantiation {
     private static @Nullable Sequent lastSequent = null;
     private static @Nullable Instantiation lastResult = null;
 
-    static Instantiation create(@NonNull Term qf, @NonNull Sequent seq, @NonNull Services services) {
+    static @Nullable Instantiation create(@NonNull Term qf, @NonNull Sequent seq, @NonNull Services services) {
         synchronized (Instantiation.class) {
             if (qf == lastQuantifiedFormula && seq == lastSequent) {
                 return lastResult;
@@ -90,7 +90,7 @@ class Instantiation {
      *        compute their cost and store the pair of instance (Term) and cost(Long) in
      *        <code>instancesCostCache</code>
      */
-    private void addInstances(ImmutableSet<Term> terms, Services services) {
+    private void addInstances(ImmutableSet<Term> terms, @NonNull Services services) {
         for (final Trigger t : triggersSet.getAllTriggers()) {
             for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services)) {
                 addInstance(sub, services);
@@ -119,7 +119,7 @@ class Instantiation {
             services.getTermBuilder().zero());
     }
 
-    private void addInstance(@NonNull Substitution sub, Services services) {
+    private void addInstance(@NonNull Substitution sub, @NonNull Services services) {
         final long cost =
             PredictCostProver.computerInstanceCost(sub, getMatrix(), assumedLiterals, services);
         if (cost != -1) {
@@ -174,7 +174,7 @@ class Instantiation {
         return Instantiation.create(form, seq, services).computeCostHelp(inst);
     }
 
-    private RuleAppCost computeCostHelp(@NonNull Term inst) {
+    private @NonNull RuleAppCost computeCostHelp(@NonNull Term inst) {
         Long cost = instancesWithCosts.get(inst);
         if (cost == null && (inst.op() instanceof SortDependingFunction
                 && ((SortDependingFunction) inst.op()).getKind().equals(JavaDLTheory.CAST_NAME))) {
@@ -202,7 +202,7 @@ class Instantiation {
         return res;
     }
 
-    private Term getMatrix() {
+    private @NonNull Term getMatrix() {
         return matrix;
     }
 

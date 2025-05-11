@@ -10,6 +10,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
@@ -178,8 +179,8 @@ public class TestGenericSortInstantiations {
         }
     }
 
-    public static ImmutableList<GenericSort> sorts(
-            ImmutableList<GenericSortCondition> p_conditions) {
+    public static @NonNull ImmutableList<GenericSort> sorts(
+            @NonNull ImmutableList<GenericSortCondition> p_conditions) {
         Iterator<GenericSortCondition> it = p_conditions.iterator();
         ImmutableList<GenericSort> res = ImmutableSLList.nil();
 

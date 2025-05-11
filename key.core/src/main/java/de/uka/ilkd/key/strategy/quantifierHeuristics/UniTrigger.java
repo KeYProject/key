@@ -42,7 +42,7 @@ class UniTrigger implements Trigger {
     }
 
     public @NonNull ImmutableSet<Substitution> getSubstitutionsFromTerms(@NonNull ImmutableSet<Term> targetTerm,
-                                                                         Services services) {
+                                                                         @NonNull Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         for (Term aTargetTerm : targetTerm) {
             allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
@@ -50,7 +50,7 @@ class UniTrigger implements Trigger {
         return allsubs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTerm(@NonNull Term t, Services services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTerm(@NonNull Term t, @NonNull Services services) {
         ImmutableSet<Substitution> res = matchResults.get(t);
         if (res == null) {
             res = getSubstitutionsFromTermHelp(t, services);
@@ -59,7 +59,7 @@ class UniTrigger implements Trigger {
         return res;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(@NonNull Term t, Services services) {
+    private @NonNull ImmutableSet<Substitution> getSubstitutionsFromTermHelp(@NonNull Term t, @NonNull Services services) {
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.nil();
         if (t.freeVars().size() > 0 || t.op() instanceof Quantifier) {
             newSubs = Matching.twoSidedMatching(this, t, services);
@@ -106,7 +106,7 @@ class UniTrigger implements Trigger {
      * @param candidate
      * @param searchTerm
      */
-    public static boolean passedLoopTest(Term candidate, @NonNull Term searchTerm) {
+    public static boolean passedLoopTest(@NonNull Term candidate, @NonNull Term searchTerm) {
         final ImmutableSet<Substitution> substs =
             BasicMatching.getSubstitutions(candidate, searchTerm);
 

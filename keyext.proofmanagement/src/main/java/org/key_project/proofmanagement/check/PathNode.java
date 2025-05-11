@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
+import org.jspecify.annotations.NonNull;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -29,12 +31,12 @@ public class PathNode extends Node<Path> {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return getContent().getFileName().toString();
     }
 
     @Override
-    public int compareTo(Node<Path> o) {
+    public int compareTo(@NonNull Node<Path> o) {
         Path myPath = getContent();
         Path otherPath = o.getContent();
 

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
 
@@ -63,7 +64,7 @@ public class SendFeedbackAction extends AbstractAction {
      */
     private static final String REPORT_URL = "https://formal.kastel.kit.edu/key/key-report.php";
 
-    private static String serializeStackTrace(Throwable t) {
+    private static String serializeStackTrace(@NonNull Throwable t) {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
         return sw.toString();
@@ -90,7 +91,7 @@ public class SendFeedbackAction extends AbstractAction {
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(@NonNull ActionEvent e) {
             selected = ((JCheckBox) e.getSource()).isSelected();
         }
 
@@ -109,7 +110,7 @@ public class SendFeedbackAction extends AbstractAction {
         abstract byte[] retrieveFileData() throws Exception;
 
         @Override
-        void appendDataToZipOutputStream(ZipOutputStream stream) throws IOException {
+        void appendDataToZipOutputStream(@NonNull ZipOutputStream stream) throws IOException {
             byte[] data;
             String zipEntryFileName = fileName;
             try {
@@ -309,7 +310,7 @@ public class SendFeedbackAction extends AbstractAction {
             }
         }
 
-        private void getJavaFilesRecursively(File directory, List<File> list) {
+        private void getJavaFilesRecursively(@NonNull File directory, @NonNull List<File> list) {
             for (File f : directory.listFiles()) {
                 if (f.isDirectory()) {
                     getJavaFilesRecursively(f, list);
@@ -320,7 +321,7 @@ public class SendFeedbackAction extends AbstractAction {
         }
 
         @Override
-        void appendDataToZipOutputStream(ZipOutputStream stream) throws IOException {
+        void appendDataToZipOutputStream(@NonNull ZipOutputStream stream) throws IOException {
             Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
             File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
             List<File> javaFiles = new LinkedList<>();
@@ -335,17 +336,17 @@ public class SendFeedbackAction extends AbstractAction {
     }
 
 
-    private void saveZIP(String message) {
+    private void saveZIP(@NonNull String message) {
         try {
             JFileChooser jfc = new JFileChooser();
             jfc.addChoosableFileFilter(new FileFilter() {
                 @Override
-                public boolean accept(File f) {
+                public boolean accept(@NonNull File f) {
                     return f.getName().toLowerCase().endsWith(".zip");
                 }
 
                 @Override
-                public String getDescription() {
+                public @NonNull String getDescription() {
                     return "ZIP archives";
                 }
             });
@@ -363,7 +364,7 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-    private void sendReport(String message) {
+    private void sendReport(@NonNull String message) {
 
         String[] msgs = {
             // tp.setEditable(false);
@@ -408,13 +409,13 @@ public class SendFeedbackAction extends AbstractAction {
     }
 
 
-    private void saveMetaDataToFile(File zipFile, String message) throws IOException {
+    private void saveMetaDataToFile(@NonNull File zipFile, @NonNull String message) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(zipFile)) {
             saveMetaData(fos, message);
         }
     }
 
-    private void saveMetaData(OutputStream os, String message) throws IOException {
+    private void saveMetaData(@NonNull OutputStream os, @NonNull String message) throws IOException {
         try (ZipOutputStream stream = new ZipOutputStream(new BufferedOutputStream(os))) {
             for (SendFeedbackItem item : items) {
                 if (item.isSelected() && item.isEnabled()) {
@@ -446,7 +447,7 @@ public class SendFeedbackAction extends AbstractAction {
         this.throwable = exception;
     }
 
-    private JDialog makeDialog() {
+    private @NonNull JDialog makeDialog() {
 
         final JDialog dialog = new JDialog(parent, "Report an error to KeY developers",
             Dialog.ModalityType.DOCUMENT_MODAL);

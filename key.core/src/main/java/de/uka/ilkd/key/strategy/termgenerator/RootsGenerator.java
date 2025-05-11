@@ -52,8 +52,8 @@ public class RootsGenerator implements TermGenerator {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                   MutableState mState) {
+    public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+                                            MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
@@ -184,7 +184,7 @@ public class RootsGenerator implements TermGenerator {
     /**
      * @return a number <tt>res</tt> with the property <tt>prod in ((res-1)^exp, res^exp]</tt>
      */
-    private BigInteger rootRoundingUpwards(@NonNull BigInteger prod, int exp) {
+    private @NonNull BigInteger rootRoundingUpwards(@NonNull BigInteger prod, int exp) {
         final BigInteger res = root(prod, exp);
         if (power(res, exp).compareTo(prod) < 0) {
             return res.add(one);
@@ -195,7 +195,7 @@ public class RootsGenerator implements TermGenerator {
     /**
      * @return a number <tt>res</tt> with the property <tt>prod in [res^exp, (res+1)^exp)</tt>
      */
-    private BigInteger root(@NonNull BigInteger prod, int exp) {
+    private @NonNull BigInteger root(@NonNull BigInteger prod, int exp) {
         assert exp > 0;
 
         if (prod.signum() >= 0) {

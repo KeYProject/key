@@ -23,6 +23,7 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +60,8 @@ public class JavaCompilerCheckFacade {
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
-            ProblemInitializer.ProblemInitializerListener listener,
-            File bootClassPath, List<File> classPath, File javaPath) {
+            ProblemInitializer.@NonNull ProblemInitializerListener listener,
+            @Nullable File bootClassPath, @Nullable List<File> classPath, @NonNull File javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -268,7 +269,7 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
 
     @Override
     public JavaFileObject getJavaFileForOutput(Location location, String className,
-            JavaFileObject.Kind kind, FileObject sibling) throws IOException {
+                                               JavaFileObject.@NonNull Kind kind, FileObject sibling) throws IOException {
         if (kind == JavaFileObject.Kind.CLASS && location == StandardLocation.CLASS_OUTPUT) {
             // do not save compiled .class files on disk
             try {
@@ -348,13 +349,13 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
  * @author Alexander Weigl
  */
 class IgnoreOutputJavaFileObject extends SimpleJavaFileObject {
-    public IgnoreOutputJavaFileObject(final String name, Kind kind) throws URISyntaxException {
+    public IgnoreOutputJavaFileObject(final String name, @NonNull Kind kind) throws URISyntaxException {
         super(new URI("memory://" + name + ".class"), kind);
     }
 
     // ignore written class output
     @Override
-    public OutputStream openOutputStream() {
+    public @NonNull OutputStream openOutputStream() {
         return OutputStream.nullOutputStream();
     }
 }

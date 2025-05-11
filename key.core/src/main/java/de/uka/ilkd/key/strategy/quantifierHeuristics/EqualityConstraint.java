@@ -186,7 +186,7 @@ public class EqualityConstraint implements Constraint {
      * @param p the Term p to be instantiated
      * @return the instantiated term
      */
-    private @NonNull Term instantiate(@NonNull Term p, Services services) {
+    private @NonNull Term instantiate(@NonNull Term p, @NonNull Services services) {
         ConstraintAwareSyntacticalReplaceVisitor srVisitor =
             new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(), services, this, null,
                 null, null, null, null);
@@ -204,7 +204,7 @@ public class EqualityConstraint implements Constraint {
      *        introducing intersection sorts)
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
-    public Constraint unify(@NonNull Term t1, @NonNull Term t2, @NonNull Services services) {
+    public @NonNull Constraint unify(@NonNull Term t1, @NonNull Term t2, @NonNull Services services) {
         return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
 
@@ -851,7 +851,7 @@ public class EqualityConstraint implements Constraint {
     // the methods using these caches seem not to be used anymore otherwise refactor and move it
     // into ServiceCaches
     private static @NonNull Map<ECPair, Constraint> joinCache = new LRUCache<>(0);
-    private static Map<ECPair, Constraint> joinCacheOld = new LRUCache<>(0);
+    private static @NonNull Map<ECPair, Constraint> joinCacheOld = new LRUCache<>(0);
 
     private static final ECPair ecPair0 = new ECPair(null, null, 0);
 

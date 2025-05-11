@@ -26,7 +26,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public LabeledParserRuleContext getInv() {
+    public @NonNull LabeledParserRuleContext getInv() {
         return inv;
     }
 

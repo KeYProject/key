@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
  */
 public final class SLTypeResolver extends SLExpressionResolver {
 
-    public SLTypeResolver(@NonNull JavaInfo javaInfo, SLResolverManager manager, KeYJavaType specInClass) {
+    public SLTypeResolver(@NonNull JavaInfo javaInfo, @NonNull SLResolverManager manager, @NonNull KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
     }
 

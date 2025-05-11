@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 /**
@@ -13,7 +14,7 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
 public class ReplayChecker implements Checker {
 
     @Override
-    public void check(ProofBundleHandler pbh, CheckerData data) throws ProofManagementException {
+    public void check(ProofBundleHandler pbh, @NonNull CheckerData data) throws ProofManagementException {
         data.addCheck("replay");
         data.print("Running replay checker ...");
         KeYFacade.ensureProofsReplayed(data);

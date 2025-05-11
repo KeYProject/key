@@ -26,6 +26,8 @@ import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
 /**
@@ -50,7 +52,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * @param proof The proof.
      * @param sp The {@link StrategyProperties} to use.
      */
-    private SymbolicExecutionStrategy(Proof proof, StrategyProperties sp) {
+    private SymbolicExecutionStrategy(Proof proof, @NonNull StrategyProperties sp) {
         super(proof, sp);
         // Update cost dispatcher
         RuleSetDispatchFeature costRsd = getCostComputationDispatcher();
@@ -118,8 +120,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         // body branches)
         globalF = add(globalF, ifZero(not(new BinaryFeature() {
             @Override
-            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
-                    MutableState mState) {
+            protected boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
+                                     MutableState mState) {
                 return pos != null
                         && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
             }
@@ -139,7 +141,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      *
      * @return The cost {@link Feature} for the {@link ModalitySideProofRule}.
      */
-    protected Feature modalitySideProofFeature() {
+    protected @NonNull Feature modalitySideProofFeature() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(ModalitySideProofRule.INSTANCE);
         if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(
@@ -156,7 +158,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      *
      * @return The cost {@link Feature} for the {@link QuerySideProofRule}.
      */
-    protected Feature querySideProofFeature() {
+    protected @NonNull Feature querySideProofFeature() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(QuerySideProofRule.INSTANCE);
         if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(
@@ -178,7 +180,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 
@@ -194,7 +196,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * @param aliasChecks Do alias checks?
      * @return The default {@link StrategyProperties} for symbolic execution.
      */
-    public static StrategyProperties getSymbolicExecutionStrategyProperties(
+    public static @NonNull StrategyProperties getSymbolicExecutionStrategyProperties(
             boolean quantifierInstantiationWithSplitting, boolean methodTreatmentContract,
             boolean loopTreatmentInvariant, boolean blockTreatmentContract,
             boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
@@ -265,7 +267,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public Strategy create(Proof proof, StrategyProperties sp) {
+        public @NonNull Strategy create(Proof proof, @NonNull StrategyProperties sp) {
             return new SymbolicExecutionStrategy(proof, sp);
         }
 
@@ -273,7 +275,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return name;
         }
 

@@ -179,7 +179,7 @@ public abstract class SLResolverManager {
      * @param parameters actual parameters of the property call, or null
      * @return corresponding term, type or collection if successful, null otherwise
      */
-    public SLExpression resolve(SLExpression receiver, @NonNull String name, SLParameters parameters)
+    public @Nullable SLExpression resolve(SLExpression receiver, @NonNull String name, SLParameters parameters)
             throws SLTranslationException {
         String shortName = name;
 

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -69,7 +71,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      *
      * @param term The new {@link Term} to add.
      */
-    public void addTerm(Term term) {
+    public void addTerm(@NonNull Term term) {
         terms = terms.append(OriginTermLabel.removeOriginLabels(term, services));
     }
 
@@ -77,7 +79,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      * {@inheritDoc}
      */
     @Override
-    public boolean containsTerm(Term term) {
+    public boolean containsTerm(@NonNull Term term) {
         return terms.contains(OriginTermLabel.removeOriginLabels(term, services));
     }
 
@@ -85,7 +87,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      * {@inheritDoc}
      */
     @Override
-    public ImmutableList<String> getTermStrings() {
+    public @NonNull ImmutableList<String> getTermStrings() {
         ImmutableList<String> strings = ImmutableSLList.nil();
         for (Term term : terms) {
             strings = strings.append(formatTerm(term, services));
@@ -97,7 +99,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      * {@inheritDoc}
      */
     @Override
-    public Term getRepresentative() {
+    public @Nullable Term getRepresentative() {
         // Prefer null if contained in equivalence class
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Term nullTerm = CollectionUtil.search(terms, element -> element.op() == heapLDT.getNull());
@@ -116,7 +118,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      * {@inheritDoc}
      */
     @Override
-    public String getRepresentativeString() {
+    public @Nullable String getRepresentativeString() {
         Term representative = getRepresentative();
         if (representative != null) {
             return formatTerm(representative, services);
@@ -129,7 +131,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "Equivalence Class " + getTermStrings();
     }
 }

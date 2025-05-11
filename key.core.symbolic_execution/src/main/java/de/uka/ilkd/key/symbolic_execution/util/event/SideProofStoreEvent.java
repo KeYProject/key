@@ -7,6 +7,7 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
+import org.jspecify.annotations.NonNull;
 
 /**
  * An event thrown by a {@link SideProofStore} and observed via an {@link ISideProofStoreListener}.
@@ -30,7 +31,7 @@ public class SideProofStoreEvent extends EventObject {
      * @param source The source.
      * @param entries The added or removed {@link Entry}s.
      */
-    public SideProofStoreEvent(SideProofStore source, Entry[] entries) {
+    public SideProofStoreEvent(@NonNull SideProofStore source, Entry[] entries) {
         super(source);
         this.entries = entries;
     }

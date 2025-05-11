@@ -194,8 +194,8 @@ public class ClausesGraph {
     /**
      * @return a set of quantifiableVariable which are belonged to both set0 and set1 have
      */
-    private ImmutableSet<QuantifiableVariable> intersectQV(@NonNull ImmutableSet<QuantifiableVariable> set0,
-                                                           ImmutableSet<QuantifiableVariable> set1) {
+    private @NonNull ImmutableSet<QuantifiableVariable> intersectQV(@NonNull ImmutableSet<QuantifiableVariable> set0,
+                                                                    @NonNull ImmutableSet<QuantifiableVariable> set1) {
         return TriggerUtils.intersect(set0, set1);
     }
 

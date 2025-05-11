@@ -124,6 +124,7 @@ public interface StopCondition {
      * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
      * @return The human-readable message which explains the stop reason.
      */
+    @Nullable
     String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
 }

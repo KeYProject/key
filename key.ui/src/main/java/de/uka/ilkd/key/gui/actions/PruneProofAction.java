@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This action is one part of the previous UndoLastStepAction: It prunes the proof tree below the
@@ -37,7 +38,7 @@ public final class PruneProofAction extends MainWindowAction {
      * @param mainWindow the MainWindow this action belongs to (needed for shortcut and icon
      *        settings)
      */
-    public PruneProofAction(MainWindow mainWindow) {
+    public PruneProofAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         init();
         putValue(NAME, "Prune Proof");

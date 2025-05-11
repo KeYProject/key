@@ -12,6 +12,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 
 /**
@@ -29,7 +30,7 @@ public interface Strategy extends Named, Feature {
      *         indicates that the rule shall not be applied at all (it is discarded by
      *         the strategy).
      */
-    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    default @Nullable RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         return computeCost(app, pos, goal, new MutableState());
     }
 

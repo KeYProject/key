@@ -58,7 +58,7 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
             terms = terms.prepend(mon);
         }
 
-        public ImmutableList<Term> getResult() {
+        public @NonNull ImmutableList<Term> getResult() {
             return terms;
         }
 

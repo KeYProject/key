@@ -8,6 +8,7 @@ import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.jspecify.annotations.NonNull;
 
 public class ToggleConfirmExitAction extends MainWindowAction {
 
@@ -16,7 +17,7 @@ public class ToggleConfirmExitAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 3453843972242689758L;
 
-    public ToggleConfirmExitAction(MainWindow mainWindow) {
+    public ToggleConfirmExitAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Ask for extra confirmation when trying to exit the prover");
         setName("Confirm Exit");
@@ -24,7 +25,7 @@ public class ToggleConfirmExitAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NonNull ActionEvent e) {
         boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setConfirmExit(b);
     }
