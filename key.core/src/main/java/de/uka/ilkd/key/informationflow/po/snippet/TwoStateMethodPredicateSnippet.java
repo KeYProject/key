@@ -151,9 +151,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
         // the result and possible exceptions are relevant only in the post
         // state
-        if (poVars.post.result != null) {
+        if (poVars.post.resultTerm != null) {
             // method is not void
-            relevantPostVars = relevantPostVars.append(poVars.post.result);
+            relevantPostVars = relevantPostVars.append(poVars.post.resultTerm);
         }
         if (poVars.post.exception != null) {
             // TODO: only null for loop invariants?

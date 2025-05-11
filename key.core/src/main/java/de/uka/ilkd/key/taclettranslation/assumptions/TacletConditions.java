@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
@@ -18,32 +17,23 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+
+import static org.key_project.util.collection.ImmutableSLList.nil;
 
 /**
  * This class is used for wrapping all variable conditions of a taclet in one object.
  */
-class TacletConditions {
-
-    //
-    private @NonNull ImmutableList<TypeComparisonCondition> comparisionCondition = ImmutableSLList.nil();
-    private @NonNull ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
-    private @NonNull ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition =
-        ImmutableSLList.nil();
-    private @NonNull ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition =
-        ImmutableSLList.nil();
-
-
-
+public class TacletConditions {
     public final static int FALSE = 0;
     public final static int NULL_LEGAL = 1;
     public final static int NULL_ILLEGAL = 2;
 
+    private ImmutableList<TypeComparisonCondition> comparisionCondition = nil();
+    private ImmutableList<TypeCondition> typeCondition = nil();
+    private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition = nil();
+    private ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition = nil();
 
-
-    public TacletConditions(@NonNull Taclet t) throws IllegalTacletException {
-
-
+    public TacletConditions(Taclet t) throws IllegalTacletException {
         for (final VariableCondition cond : t.getVariableConditions()) {
             boolean supported = false;
 
@@ -71,18 +61,6 @@ class TacletConditions {
             }
         }
 
-    }
-
-    public boolean containsIsReferenceArray(Term t) {
-
-        for (ArrayComponentTypeCondition cond : arrayComponentCondition) {
-
-            if (cond.isCheckReferenceType()) {
-                return true;
-            }
-
-        }
-        return false;
     }
 
     /**

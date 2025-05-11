@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import org.jspecify.annotations.Nullable;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +48,7 @@ public class LineProperties {
             if (line.startsWith("###")) {
                 if (lastKey != null) {
                     String str = sb.toString().trim();
-                    if (str.length() > 0) {
+                    if (!str.isEmpty()) {
                         map.put(lastKey, str);
                     }
                 }
@@ -63,14 +65,14 @@ public class LineProperties {
 
         if (lastKey != null) {
             String str = sb.toString().trim();
-            if (str.length() > 0) {
+            if (!str.isEmpty()) {
                 map.put(lastKey, str);
             }
         }
 
     }
 
-    public String get(String key) {
+    public @Nullable String get(String key) {
         return map.get(key);
     }
 

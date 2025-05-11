@@ -80,7 +80,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         for (int i = 0; i < infFlowSpec1.preExpressions.size(); i++) {
             Term preExp1Term = preExp1It.next();
             Term preExp2Term = preExp2It.next();
-            SearchVisitor search = new SearchVisitor(vs1.pre.result, vs1.post.result);
+            SearchVisitor search = new SearchVisitor(vs1.pre.resultTerm, vs1.post.resultTerm);
             preExp1Term.execPreOrder(search);
             if (!search.termFound) {
                 eqAtLocs[i] = d.tb.equals(preExp1Term, preExp2Term);

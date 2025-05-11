@@ -20,6 +20,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -37,7 +38,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     protected final Collection<TranslationListener> listener = new LinkedList<>();
 
-    protected TacletConditions conditions;
+    protected @Nullable TacletConditions conditions;
     private final Services services;
 
     private final GenericTranslator genericTranslator = new GenericTranslator(this);
@@ -216,8 +217,10 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * Checks the referenceTable whether there are rows that are not allowed. For example: the
      * notSame-Condition is hurted.
      */
-    public static void checkTable(byte[] @NonNull @NonNull @NonNull [] referenceTable, Sort[] instTable, Sort[] genericTable,
-                                  @NonNull TacletConditions conditions, @NonNull Services services) {
+    public static void checkTable(byte[][] referenceTable,
+                                  Sort[] instTable,
+                                  Sort[] genericTable,
+                                  TacletConditions conditions, Services services) {
 
         for (int r = 0; r < referenceTable.length; r++) {
             for (int c = 0; c < referenceTable[r].length; c++) {

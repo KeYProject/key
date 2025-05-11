@@ -32,10 +32,12 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * This class encapsulates the registration of a proof for a given problem. It then starts a proof
  * attempt.
- *
+ * <p>
  * After the proof attempt stops (successfully or not) the side proof is by default unregistered,
  * but can be accessed via this class.
  *
@@ -252,8 +254,9 @@ public class ProofStarter {
 
             if (strategy == null) {
                 StrategyFactory factory = profile.getDefaultStrategyFactory();
-                StrategyProperties sp = factory.getSettingsDefinition()
-                        .getDefaultPropertiesFactory().createDefaultStrategyProperties();
+                StrategyProperties sp =
+                        Objects.requireNonNull(factory.getSettingsDefinition())
+                                .getDefaultPropertiesFactory().createDefaultStrategyProperties();
                 this.strategy = strategy = factory.create(proof, sp);
             }
 

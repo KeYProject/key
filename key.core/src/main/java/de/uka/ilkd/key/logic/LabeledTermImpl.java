@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
@@ -58,10 +59,9 @@ class LabeledTermImpl extends TermImpl {
      * @param origin a String with origin information
      */
     public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
+           @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+                           ImmutableArray<TermLabel> labels, String origin) {
         super(op, subs, boundVars, origin);
-        assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
     }
