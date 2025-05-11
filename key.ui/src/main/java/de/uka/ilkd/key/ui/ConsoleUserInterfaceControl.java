@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -19,8 +20,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -38,6 +37,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -161,10 +161,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             ProblemLoader problemLoader = (ProblemLoader) info.getSource();
             if (problemLoader.hasProofScript()) {
                 try {
-                    ProofScriptEntry script = problemLoader.getProofScript();
+                    var script = problemLoader.getProofScript();
                     if (script != null) {
                         ProofScriptEngine pse =
-                            new ProofScriptEngine(script.script(), script.location());
+                            new ProofScriptEngine(script);
                         this.taskStarted(
                             new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
                         pse.execute(this, proof);

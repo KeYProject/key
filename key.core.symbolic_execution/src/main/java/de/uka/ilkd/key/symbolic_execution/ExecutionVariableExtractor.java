@@ -317,66 +317,68 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Utility class representing a parent definition.
      *
-     * @param parent   The parent.
+     * @param parent The parent.
      * @param goalNode The {@link Node} on which this result is based on.
      * @author Martin Hentschel
      */
-        private record ParentDef(Term parent, Node goalNode) {
+    private record ParentDef(Term parent, Node goalNode) {
         /**
          * Constructor.
          *
-         * @param parent   The parent.
+         * @param parent The parent.
          * @param goalNode The {@link Node} on which this result is based on.
          */
         private ParentDef {
         }
 
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof ParentDef other) {
-                    return Objects.equals(parent, other.parent)
-                            && Objects.equals(goalNode, other.goalNode);
-                } else {
-                    return false;
-                }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof ParentDef other) {
+                return Objects.equals(parent, other.parent)
+                        && Objects.equals(goalNode, other.goalNode);
+            } else {
+                return false;
             }
+        }
 
     }
 
     /**
      * Utility class representing a location.
      *
-     * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is used instead.
-     * @param arrayIndex      The array index or {@code null} if a {@link ProgramVariable} is used instead.
+     * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is used
+     *        instead.
+     * @param arrayIndex The array index or {@code null} if a {@link ProgramVariable} is used
+     *        instead.
      * @author Martin Hentschel
      */
-        private record LocationDef(ProgramVariable programVariable, Term arrayIndex) {
+    private record LocationDef(ProgramVariable programVariable, Term arrayIndex) {
         /**
          * Constructor.
          *
          * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is
-         *                        used instead.
-         * @param arrayIndex      The array index or <code>null</code>, if a {@link ProgramVariable} is
-         *                        used instead.
+         *        used instead.
+         * @param arrayIndex The array index or <code>null</code>, if a {@link ProgramVariable} is
+         *        used instead.
          */
         private LocationDef {
         }
 
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public boolean equals(Object obj) {
-                if (obj instanceof LocationDef other) {
-                    return programVariable == other.programVariable
-                            && Objects.equals(arrayIndex, other.arrayIndex);
-                } else {
-                    return false;
-                }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof LocationDef other) {
+                return programVariable == other.programVariable
+                        && Objects.equals(arrayIndex, other.arrayIndex);
+            } else {
+                return false;
             }
+        }
 
     }
 

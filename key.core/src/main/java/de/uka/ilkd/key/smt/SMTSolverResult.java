@@ -9,23 +9,30 @@ package de.uka.ilkd.key.smt;
 public class SMTSolverResult {
 
     /**
-     * In the context of proving nodes/sequents these values mean the following: TRUE iff negation
-     * of the sequent is unsatisfiable, FALSIFIABLE iff negation of the sequent is satisfiable (i.e.
-     * it has a counterexample), UNKNOWN otherwise (I'm not sure if this holds if an error occurs)
-     * Note: Currently (1.12.'09) the SMT Solvers do not check if a node is FALSE.
+     * This enum represents the three possible outcomes of an external SMT solver call.
      */
     public enum ThreeValuedTruth {
+        /**
+         * The sequent is valid, i.e. the negation of the sequent is unsatisfiable.
+         */
         VALID {
             @Override
             public String toString() {
                 return "valid";
             }
         },
+        /**
+         * The sequent is falsifiable, i.e. the negation of the sequent is satisfiable (it has a
+         * counterexample).
+         */
         FALSIFIABLE {
             public String toString() {
                 return "there is a counter example";
             }
         },
+        /**
+         * The solver could not determine the validity of the sequent.
+         */
         UNKNOWN {
             public String toString() {
                 return "unknown";
@@ -36,21 +43,24 @@ public class SMTSolverResult {
     // We should get rid of this constant because it does not track the source (the solver) of the
     // result.
     public static final SMTSolverResult NO_IDEA =
-        new SMTSolverResult(ThreeValuedTruth.UNKNOWN, "?");
-
-
+        new SMTSolverResult(ThreeValuedTruth.UNKNOWN, "?", false);
 
     private final ThreeValuedTruth isValid;
     private static int idCounter = 0;
     private final int id = ++idCounter;
 
     /** This is to identify where the result comes from. E.g. for user feedback. */
-    public final String solverName;
+    private final String solverName;
 
-    private SMTSolverResult(ThreeValuedTruth isValid, String solverName) {
+    /**
+     * Indicates that the solver timed out. Should only be used in combination with unknown result.
+     */
+    private final boolean timeout;
+
+    private SMTSolverResult(ThreeValuedTruth isValid, String solverName, boolean timeout) {
         this.solverName = solverName;
-
         this.isValid = isValid;
+        this.timeout = timeout;
     }
 
     public int getID() {
@@ -59,20 +69,18 @@ public class SMTSolverResult {
 
 
     public static SMTSolverResult createValidResult(String name) {
-        return new SMTSolverResult(ThreeValuedTruth.VALID, name);
+        return new SMTSolverResult(ThreeValuedTruth.VALID, name, false);
     }
 
 
     public static SMTSolverResult createInvalidResult(String name) {
-        return new SMTSolverResult(ThreeValuedTruth.FALSIFIABLE, name);
+        return new SMTSolverResult(ThreeValuedTruth.FALSIFIABLE, name, false);
     }
 
 
-    public static SMTSolverResult createUnknownResult(String name) {
-        return new SMTSolverResult(ThreeValuedTruth.UNKNOWN, name);
+    public static SMTSolverResult createUnknownResult(String name, boolean timeout) {
+        return new SMTSolverResult(ThreeValuedTruth.UNKNOWN, name, timeout);
     }
-
-
 
     public ThreeValuedTruth isValid() {
         return isValid;

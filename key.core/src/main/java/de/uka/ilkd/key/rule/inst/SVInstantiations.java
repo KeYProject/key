@@ -450,7 +450,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
         @Override
         public int hashCode() {
-            return update.hashCode() + 13*updateApplicationlabels.hashCode();
+            return update.hashCode() + 13 * updateApplicationlabels.hashCode();
         }
     }
 

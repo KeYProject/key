@@ -1428,24 +1428,26 @@ public class TermLabelManager {
      * Utility class used by
      * {@link TermLabelManager#computeRefactorings(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term)}
      *
-     * @param sequentRefactorings                      The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
-     * @param belowUpdatesRefactorings                 The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
-     * @param childAndGrandchildRefactorings           The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
+     * @param sequentRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#SEQUENT}.
+     * @param belowUpdatesRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
+     * @param childAndGrandchildRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
      * @param childAndGrandchildRefactoringsAndParents The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
-     * @param directChildRefactorings                  The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
+     *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
+     * @param directChildRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
      * @author Martin Hentschel
      */
     protected record RefactoringsContainer(Set<TermLabelRefactoring> sequentRefactorings,
-                                           Set<TermLabelRefactoring> belowUpdatesRefactorings,
-                                           Set<TermLabelRefactoring> childAndGrandchildRefactorings,
-                                           Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
-                                           Set<TermLabelRefactoring> directChildRefactorings) {
+            Set<TermLabelRefactoring> belowUpdatesRefactorings,
+            Set<TermLabelRefactoring> childAndGrandchildRefactorings,
+            Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
+            Set<TermLabelRefactoring> directChildRefactorings) {
         public RefactoringsContainer() {
             this(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(),
-                    new LinkedHashSet<>(), new LinkedHashSet<>());
+                new LinkedHashSet<>(), new LinkedHashSet<>());
         }
 
         /**
@@ -1457,7 +1459,7 @@ public class TermLabelManager {
          */
         public Set<TermLabelRefactoring> getAllApplicationChildAndGrandchildRefactorings() {
             final LinkedHashSet<TermLabelRefactoring> result =
-                    new LinkedHashSet<>(childAndGrandchildRefactorings);
+                new LinkedHashSet<>(childAndGrandchildRefactorings);
             result.addAll(childAndGrandchildRefactoringsAndParents);
             return result;
         }

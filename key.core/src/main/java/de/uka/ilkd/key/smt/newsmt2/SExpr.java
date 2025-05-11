@@ -24,32 +24,33 @@ import java.util.stream.Collectors;
 public class SExpr implements Writable {
 
     /**
-         * An enumeration of the types that an {@link SExpr} can assume.
-         */
-        public record Type(String name, String injection, String projection) {
-            /**
-             * to indicate that this expression holds a value of type U
-             */
-            public static final Type UNIVERSE = new Type("Universe", null, null);
-            /**
-             * to indicate that this expression has other or unknown type
-             */
-            public static final Type NONE = new Type("None", null, null);
-            /**
-             * to indicate that this element needs no escaping despite its name
-             */
-            public static final Type VERBATIM = new Type("Verbatim", null, null);
+     * An enumeration of the types that an {@link SExpr} can assume.
+     */
+    public record Type(String name, String injection, String projection) {
 
-            /**
-             * to indicate that an expression holds a value of type Bool
-             */
-            public static final Type BOOL = new Type("Bool", "b2u", "u2b");
+        /**
+         * to indicate that this expression holds a value of type U
+         */
+        public static final Type UNIVERSE = new Type("Universe", null, null);
+        /**
+         * to indicate that this expression has other or unknown type
+         */
+        public static final Type NONE = new Type("None", null, null);
+        /**
+         * to indicate that this element needs no escaping despite its name
+         */
+        public static final Type VERBATIM = new Type("Verbatim", null, null);
+
+        /**
+         * to indicate that an expression holds a value of type Bool
+         */
+        public static final Type BOOL = new Type("Bool", "b2u", "u2b");
 
         @Override
-            public String toString() {
-                return name;
-            }
+        public String toString() {
+            return name;
         }
+    }
 
     /** The regular expression used to check if |...| escapes are needed. */
     private static final Pattern EXTRACHAR_PATTERN =

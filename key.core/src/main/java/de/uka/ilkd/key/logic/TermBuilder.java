@@ -1657,6 +1657,54 @@ public class TermBuilder {
         return f.sort() == fieldSort ? staticDot(asSort, func(f)) : func(f, getBaseHeap());
     }
 
+    /**
+     * Get a term for accessing a final field.
+     * This can be used for ordinary fields and model fields.
+     * The results are quite different!
+     *
+     * @param sort the sort of the result.
+     * @param o the object to access
+     * @param f the field to access
+     * @return the term representing the access "o.f"
+     * @see #finalDot(Sort, Term, Term) for accessing final Java or ghost fields
+     * @see #dot(Sort, Term, JFunction) for accessing final model fields
+     */
+    public Term finalDot(Sort sort, Term o, JFunction f) {
+        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        return f.sort() == fieldSort ? finalDot(sort, o, func(f))
+                : func(f, getBaseHeap(), o);
+    }
+
+    /**
+     * Get a term for accessing a static final field.
+     * This can be used for ordinary fields.
+     *
+     * @param sort the sort of the result.
+     * @param f the field to access
+     * @return the term representing the static access "C.f"
+     * @see #finalDot(Sort, Term, Term) for accessing final Java or ghost fields
+     * @see #dot(Sort, Term, JFunction) for accessing final model fields
+     */
+    public Term staticFinalDot(Sort sort, JFunction f) {
+        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        return f.sort() == fieldSort ? finalDot(sort, NULL(), func(f))
+                : func(f, getBaseHeap(), NULL());
+    }
+
+    /**
+     * Final fields can be treated differently outside the heap.
+     * This methods creates a heap-independent read access to final field.
+     *
+     * @param asSort the sort of the result.
+     * @param o the object to access
+     * @param f the field to access
+     * @return the term representing the access "o.f"
+     */
+    public Term finalDot(Sort asSort, Term o, Term f) {
+        return func(services.getTypeConverter().getHeapLDT().getFinal(asSort, services),
+            o, f);
+    }
+
     public Term arr(Term idx) {
         return func(services.getNamespaces().functions().lookup("arr"), idx);
         // return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
