@@ -10,6 +10,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
@@ -24,12 +25,12 @@ public class FeatureSettingsPanel extends SettingsPanel implements SettingsProvi
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Feature Flags";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         pCenter.removeAll(); // start fresh
         checkboxes.clear();
         var fs = ProofIndependentSettings.DEFAULT_INSTANCE.getFeatureSettings();

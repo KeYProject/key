@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Action to show a dialog with the taclet options valid for the currently
@@ -18,7 +19,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
     private static final long serialVersionUID = -7012564698194718532L;
     private final ShowActiveSettingsAction action;
 
-    public ShowActiveTactletOptionsAction(MainWindow mainWindow, ShowActiveSettingsAction action) {
+    public ShowActiveTactletOptionsAction(@NonNull MainWindow mainWindow, ShowActiveSettingsAction action) {
         super(mainWindow);
         setName("Show Active Taclet Options");
         this.action = action;

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.nparser.ParsingFacade;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The Class ProofScriptInputAction.
@@ -52,7 +53,7 @@ public class ProofScriptInputAction extends AbstractAction {
 
         private static final long serialVersionUID = -6219149431583804843L;
 
-        private Window(MainWindow mainWindow, KeYMediator mediator) {
+        private Window(@NonNull MainWindow mainWindow, @NonNull KeYMediator mediator) {
             super(mainWindow, "Enter proof script");
 
             JTextArea textArea = new JTextArea();

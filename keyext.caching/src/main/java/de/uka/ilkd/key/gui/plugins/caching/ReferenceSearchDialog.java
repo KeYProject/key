@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * The table of reference search results.
      */
-    private final ReferenceSearchTable table;
+    private final @NonNull ReferenceSearchTable table;
     /**
      * Button to copy the relevant proof steps.
      */
@@ -45,7 +46,7 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * Overall progress of the search / copy.
      */
-    private final JProgressBar progressBar;
+    private final @NonNull JProgressBar progressBar;
     /**
      * Listener used to react to user inputs.
      */
@@ -57,7 +58,7 @@ public class ReferenceSearchDialog extends JDialog {
      * @param proof the proof
      * @param listener control listener
      */
-    public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
+    public ReferenceSearchDialog(@NonNull Proof proof, ReferenceSearchDialogListener listener) {
         super(MainWindow.getInstance());
         table = new ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
         table.getTableHeader().setReorderingAllowed(false);
@@ -127,7 +128,7 @@ public class ReferenceSearchDialog extends JDialog {
         getApplyButton().doClick();
     }
 
-    private JScrollPane getScrollPane() {
+    private @NonNull JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = SwingUtil.createScrollPane(table);
         }

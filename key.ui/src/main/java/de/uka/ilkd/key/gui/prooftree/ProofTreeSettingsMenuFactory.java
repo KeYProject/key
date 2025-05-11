@@ -16,13 +16,14 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.action.CMenu;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 
 public class ProofTreeSettingsMenuFactory {
     private ProofTreeSettingsMenuFactory() {}
 
-    public static CAction create(ProofTreeView view) {
+    public static @NonNull CAction create(@NonNull ProofTreeView view) {
         Supplier<CMenu> supplier = () -> {
             CMenu menu = new CMenu();
 
@@ -49,7 +50,7 @@ public class ProofTreeSettingsMenuFactory {
             IconFactory.properties(MainWindow.TOOLBAR_ICON_SIZE), supplier);
     }
 
-    private static CButton createExpandAll(ProofTreeView view) {
+    private static @NonNull CButton createExpandAll(@NonNull ProofTreeView view) {
         CButton button = new CButton();
         button.setText("Expand All");
         button.setIcon(IconFactory.plus(ICON_SIZE));
@@ -58,7 +59,7 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
-    private static CCheckBox createFilter(ProofTreeView view, ProofTreeViewFilter filter) {
+    private static @NonNull CCheckBox createFilter(@NonNull ProofTreeView view, @NonNull ProofTreeViewFilter filter) {
         CCheckBox check = new ProofTreeSettingsCheckBox();
         check.setText(filter.name());
         check.setEnabled(view.getDelegateModel() != null);
@@ -70,7 +71,7 @@ public class ProofTreeSettingsMenuFactory {
         return check;
     }
 
-    private static CButton createSearch(ProofTreeView view) {
+    private static @NonNull CButton createSearch(@NonNull ProofTreeView view) {
         CButton button = new CButton();
         button.setText("Search");
         button.setIcon(IconFactory.search2(ICON_SIZE));
@@ -79,7 +80,7 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
-    private static CButton createCollapseAll(ProofTreeView view) {
+    private static @NonNull CButton createCollapseAll(@NonNull ProofTreeView view) {
         CButton button = new CButton();
         button.setText("Collapse All");
         button.setIcon(IconFactory.minus(ICON_SIZE));
@@ -90,7 +91,7 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
-    private static CButton createExpandGoals(ProofTreeView view) {
+    private static @NonNull CButton createExpandGoals(@NonNull ProofTreeView view) {
         CButton button = new CButton();
         button.setText("Expand Goals Only");
         button.setIcon(IconFactory.expandGoals(ICON_SIZE));
@@ -110,7 +111,7 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
-    private static CCheckBox createExpandOSSToggle(ProofTreeView view) {
+    private static @NonNull CCheckBox createExpandOSSToggle(@NonNull ProofTreeView view) {
         CCheckBox check = new CCheckBox() {
             @Override
             protected void changed() {
@@ -123,7 +124,7 @@ public class ProofTreeSettingsMenuFactory {
         return check;
     }
 
-    private static CCheckBox createTacletInfoToggle() {
+    private static @NonNull CCheckBox createTacletInfoToggle() {
         CCheckBox check = new CCheckBox() {
             @Override
             protected void changed() {
@@ -136,7 +137,7 @@ public class ProofTreeSettingsMenuFactory {
         return check;
     }
 
-    private static CCheckBox createTooltipToggle() {
+    private static @NonNull CCheckBox createTooltipToggle() {
         CCheckBox check = new CCheckBox() {
             @Override
             protected void changed() {

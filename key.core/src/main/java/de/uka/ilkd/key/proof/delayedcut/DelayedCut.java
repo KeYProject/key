@@ -87,15 +87,15 @@ public class DelayedCut {
         this.remainingGoal = remainingGoal;
     }
 
-    public Goal getRemainingGoal() {
+    public @Nullable Goal getRemainingGoal() {
         return remainingGoal;
     }
 
-    public ImmutableList<NodeGoalPair> getGoalsAfterUncovering() {
+    public @Nullable ImmutableList<NodeGoalPair> getGoalsAfterUncovering() {
         return goalsAfterUncovering;
     }
 
-    public NoPosTacletApp getHideApp() {
+    public @Nullable NoPosTacletApp getHideApp() {
         return hideApp;
     }
 

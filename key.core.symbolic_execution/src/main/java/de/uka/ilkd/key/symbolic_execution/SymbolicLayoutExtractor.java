@@ -25,6 +25,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -138,7 +140,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * The used {@link IModelSettings}.
      */
-    private final IModelSettings settings;
+    private final @NonNull IModelSettings settings;
 
     /**
      * Contains the applied cuts of each possible memory layout. An applied cut is represented as
@@ -180,7 +182,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * The updates to consider.
      */
-    private ImmutableList<Term> updates;
+    private @Nullable ImmutableList<Term> updates;
 
     /**
      * Constructor.
@@ -194,8 +196,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      */
-    public SymbolicLayoutExtractor(Node node, PosInOccurrence modalityPio, boolean useUnicode,
-            boolean usePrettyPrinting, boolean simplifyConditions) {
+    public SymbolicLayoutExtractor(@NonNull Node node, @NonNull PosInOccurrence modalityPio, boolean useUnicode,
+                                   boolean usePrettyPrinting, boolean simplifyConditions) {
         super(node, modalityPio);
         this.settings = new ModelSettings(useUnicode, usePrettyPrinting, simplifyConditions);
     }
@@ -305,7 +307,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      *
      * @return The initial updates to consider.
      */
-    protected ImmutableList<Term> extractInitialUpdates() {
+    protected @Nullable ImmutableList<Term> extractInitialUpdates() {
         Sequent sequent = getRoot().sequent();
         assert sequent.antecedent().isEmpty();
         assert sequent.succedent().size() == 1;
@@ -321,7 +323,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param terms The {@link Term}s to sort.
      * @return The sorted {@link Term}s.
      */
-    protected Set<Term> sortTerms(Set<Term> terms) {
+    protected @NonNull Set<Term> sortTerms(@NonNull Set<Term> terms) {
         List<Term> list = new LinkedList<>(terms);
         list.sort((o1, o2) -> {
             String o1s = o1.toString();
@@ -340,8 +342,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      *         contained in the second {@link Set}.
      * @throws ProofInputException
      */
-    protected Set<Term> filterOutObjectsToIgnore(Set<Term> objectsToFilter,
-            Set<Term> objectsToIgnore) throws ProofInputException {
+    protected @NonNull Set<Term> filterOutObjectsToIgnore(@NonNull Set<Term> objectsToFilter,
+                                                          @NonNull Set<Term> objectsToIgnore) throws ProofInputException {
         Set<Term> result = new LinkedHashSet<>();
         for (Term symbolicObject : objectsToFilter) {
             if (!objectsToIgnore.contains(symbolicObject)) {
@@ -379,8 +381,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param symbolicObjects The symbolic objects to compute equivalence classes for.
      * @param updates The updates to consider.
      */
-    protected void applyCutRules(ProofStarter starter, Set<Term> symbolicObjects,
-            ImmutableList<Term> updates) {
+    protected void applyCutRules(@NonNull ProofStarter starter, @NonNull Set<Term> symbolicObjects,
+                                 @NonNull ImmutableList<Term> updates) {
         final TermBuilder tb = getServices().getTermBuilder();
         List<Term> objectsCopy = new ArrayList<>(symbolicObjects);
         int maxProofSteps = 8000;
@@ -402,7 +404,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param term The {@link Term} to cut out.
      * @param maxProofSteps The maximal number of proof steps applied after cut via auto mode.
      */
-    protected void applyCut(ProofStarter starter, Term term, int maxProofSteps) {
+    protected void applyCut(@NonNull ProofStarter starter, @NonNull Term term, int maxProofSteps) {
         ImmutableList<Goal> goals = starter.getProof().openEnabledGoals();
         if (!goals.isEmpty()) {
             int proofSteps = maxProofSteps / goals.size();
@@ -443,7 +445,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      *         form {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}.
      * @throws ProofInputException Occurred Exception.
      */
-    protected List<ImmutableSet<Term>> extractAppliedCutsFromGoals(Proof proof)
+    protected @NonNull List<ImmutableSet<Term>> extractAppliedCutsFromGoals(@NonNull Proof proof)
             throws ProofInputException {
         Set<ImmutableSet<Term>> resultSet = new LinkedHashSet<>();
         Node root = proof.root();
@@ -462,7 +464,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The applied cut rules.
      * @throws ProofInputException Occurred Exception.
      */
-    protected ImmutableSet<Term> extractAppliedCutsSet(Node goalnode, Node root)
+    protected @NonNull ImmutableSet<Term> extractAppliedCutsSet(@NonNull Node goalnode, @NonNull Node root)
             throws ProofInputException {
         ImmutableSet<Term> result = DefaultImmutableSet.nil();
         if (!root.find(goalnode)) {
@@ -580,9 +582,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The lazily computed memory layout.
      * @throws ProofInputException Occurred Exception.
      */
-    protected ISymbolicLayout getLayout(Map<Integer, ISymbolicLayout> confiurationsMap,
-            int layoutIndex, Set<ExtractLocationParameter> locations, String stateName,
-            boolean currentLayout) throws ProofInputException {
+    protected ISymbolicLayout getLayout(@NonNull Map<Integer, ISymbolicLayout> confiurationsMap,
+                                        int layoutIndex, @NonNull Set<ExtractLocationParameter> locations, String stateName,
+                                        boolean currentLayout) throws ProofInputException {
         synchronized (this) {
             assert layoutIndex >= 0;
             assert layoutIndex < appliedCutsPerLayout.size();
@@ -619,10 +621,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The created memory layout.
      * @throws ProofInputException Occurred Exception.
      */
-    protected ISymbolicLayout lazyComputeLayout(ImmutableSet<Term> layout,
-            Set<ExtractLocationParameter> locations,
-            ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, String stateName,
-            boolean currentLayout) throws ProofInputException {
+    protected ISymbolicLayout lazyComputeLayout(@NonNull ImmutableSet<Term> layout,
+                                                @NonNull Set<ExtractLocationParameter> locations,
+                                                @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, String stateName,
+                                                boolean currentLayout) throws ProofInputException {
         if (!locations.isEmpty()) {
             final TermBuilder tb = getServices().getTermBuilder();
             List<Term> updateConditions = new ArrayList<>(layout.size());
@@ -652,9 +654,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param equivalentClasses The available {@link ISymbolicEquivalenceClass}es.
      * @return The updated {@link ExtractLocationParameter}s.
      */
-    protected Set<ExtractLocationParameter> updateLocationsAccordingtoEquivalentClass(
-            Set<ExtractLocationParameter> locations,
-            ImmutableList<ISymbolicEquivalenceClass> equivalentClasses) {
+    protected @NonNull Set<ExtractLocationParameter> updateLocationsAccordingtoEquivalentClass(
+            @NonNull Set<ExtractLocationParameter> locations,
+            @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses) {
         Set<ExtractLocationParameter> newLocations =
             new LinkedHashSet<>(locations.size());
         for (ExtractLocationParameter location : locations) {
@@ -677,7 +679,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The found objects.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Set<Term> collectObjectsFromSequent(Sequent sequent, Set<Term> objectsToIgnore)
+    protected @NonNull Set<Term> collectObjectsFromSequent(@NonNull Sequent sequent, @NonNull Set<Term> objectsToIgnore)
             throws ProofInputException {
         Set<Term> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
@@ -696,7 +698,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The found objects.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Set<Term> collectSymbolicObjectsFromTerm(Term term, final Set<Term> objectsToIgnore)
+    protected @NonNull Set<Term> collectSymbolicObjectsFromTerm(@NonNull Term term, final @NonNull Set<Term> objectsToIgnore)
             throws ProofInputException {
         final Set<Term> result = new LinkedHashSet<>();
         term.execPreOrder(new DefaultVisitor() {
@@ -756,8 +758,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param appliedCuts The applied cut rules.
      * @return The created {@link ISymbolicEquivalenceClass} instances.
      */
-    protected ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenceClasses(
-            ImmutableSet<Term> appliedCuts) {
+    protected @NonNull ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenceClasses(
+            @NonNull ImmutableSet<Term> appliedCuts) {
         ImmutableList<ISymbolicEquivalenceClass> result = ImmutableSLList.nil();
         for (Term term : appliedCuts) {
             if (Junctor.NOT != term.op()) {
@@ -791,8 +793,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The found {@link ISymbolicEquivalenceClass} which contains the given {@link Term} or
      *         {@code null} if no one was found.
      */
-    protected ISymbolicEquivalenceClass findEquivalentClass(
-            ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, final Term term) {
+    protected @Nullable ISymbolicEquivalenceClass findEquivalentClass(
+            @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, final Term term) {
         return CollectionUtil.search(equivalentClasses, element -> element.containsTerm(term));
     }
 
@@ -808,9 +810,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The created {@link ISymbolicLayout} with the given content.
      * @throws ProofInputException Occurred Exception.
      */
-    protected ISymbolicLayout createLayoutFromExecutionVariableValuePairs(
-            ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
-            Set<ExecutionVariableValuePair> pairs, String stateName) throws ProofInputException {
+    protected @NonNull ISymbolicLayout createLayoutFromExecutionVariableValuePairs(
+            @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
+            @NonNull Set<ExecutionVariableValuePair> pairs, String stateName) throws ProofInputException {
         SymbolicLayout result = new SymbolicLayout(settings, equivalentClasses);
         // Create state
         SymbolicState state = new SymbolicState(stateName, settings);
@@ -921,9 +923,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param objectTerm The {@link Term} which represents the {@link Object} a
      *        {@link SymbolicObject} should be created for.
      */
-    protected void createObjectForTerm(Map<Term, SymbolicObject> objects,
-            ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, SymbolicLayout result,
-            Term objectTerm) {
+    protected void createObjectForTerm(@NonNull Map<Term, SymbolicObject> objects,
+                                       @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, @NonNull SymbolicLayout result,
+                                       @Nullable Term objectTerm) {
         if (objectTerm != null
                 && SymbolicExecutionUtil.hasReferenceSort(getServices(), objectTerm)) {
             ISymbolicEquivalenceClass equivalentClass =

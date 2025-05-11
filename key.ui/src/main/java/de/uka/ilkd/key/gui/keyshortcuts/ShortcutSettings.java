@@ -17,6 +17,7 @@ import javax.swing.table.TableRowSorter;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
+import org.jspecify.annotations.NonNull;
 
 /**
  * UI for configuring the {@link KeyStroke}s inside KeY.
@@ -39,12 +40,12 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Keyboard Shortcuts";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         KeyStrokeSettings settings = KeyStrokeManager.getSettings();
         Properties p = new Properties();
         settings.writeSettings(p);
@@ -80,7 +81,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
             }
 
             @Override
-            public void keyPressed(KeyEvent e) {
+            public void keyPressed(@NonNull KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_UNDEFINED) {
                     e.consume();
                     return;
@@ -174,7 +175,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         }
 
         @Override
-        public String getColumnName(int column) {
+        public @NonNull String getColumnName(int column) {
             return COLUMNS[column];
         }
 
@@ -202,7 +203,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         }
 
         @Override
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        public void setValueAt(@NonNull Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 2) {
                 shortcut.set(rowIndex, aValue.toString());
             } else {

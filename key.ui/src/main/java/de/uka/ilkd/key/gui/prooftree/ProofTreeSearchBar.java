@@ -12,6 +12,7 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
@@ -60,7 +61,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         return search(searchString, Position.Bias.Forward);
     }
 
-    private synchronized boolean search(String searchString, Position.Bias direction) {
+    private synchronized boolean search(@NonNull String searchString, Position.Bias direction) {
         if (searchString.isEmpty()) {
             startRow = 0;
         }
@@ -97,13 +98,13 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         reset();
     }
 
-    private List<Pair<GUIAbstractTreeNode, String>> cache;
+    private @Nullable List<Pair<GUIAbstractTreeNode, String>> cache;
 
     public synchronized void reset() {
         cache = null;
     }
 
-    private void addNodeToCache(GUIAbstractTreeNode node) {
+    private void addNodeToCache(@NonNull GUIAbstractTreeNode node) {
         cache.add(new Pair<>(node, node.getSearchString().toLowerCase()));
     }
 
@@ -119,7 +120,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         }
     }
 
-    private void fillCacheHelp(GUIBranchNode branch) {
+    private void fillCacheHelp(@Nullable GUIBranchNode branch) {
         if (branch == null) {
             return;
         }

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import org.jspecify.annotations.NonNull;
 
 public class PrettyPrintToggleAction extends MainWindowAction {
     public static final String NAME = "Use Pretty Syntax";
@@ -29,7 +30,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
      */
     private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
-    public PrettyPrintToggleAction(MainWindow mainWindow) {
+    public PrettyPrintToggleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOL_TIP);
@@ -49,7 +50,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NonNull ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         // Needs to be executed before the// ViewSettings are modified, because the UI
         // will react on the settings change event!

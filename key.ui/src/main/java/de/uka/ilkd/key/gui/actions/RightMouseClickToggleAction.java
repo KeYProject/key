@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.jspecify.annotations.NonNull;
 
 public class RightMouseClickToggleAction extends MainWindowAction {
 
@@ -15,7 +16,7 @@ public class RightMouseClickToggleAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 1299838459448346807L;
 
-    public RightMouseClickToggleAction(MainWindow mainWindow) {
+    public RightMouseClickToggleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Right Click for Proof Macros");
         setTooltip("If ticked, a right click on the sequent opens the strategy macro context menu");

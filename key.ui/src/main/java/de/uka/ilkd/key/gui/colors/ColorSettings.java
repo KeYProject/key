@@ -17,6 +17,7 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +36,13 @@ public class ColorSettings extends AbstractPropertiesSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
-    public ColorSettings(Configuration load) {
+    public ColorSettings(@NonNull Configuration load) {
         super("");
         readSettings(load);
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
-    public static ColorSettings getInstance() {
+    public static @NonNull ColorSettings getInstance() {
         if (INSTANCE == null) {
             if (SETTINGS_FILE_NEW.exists()) {
                 try {
@@ -58,11 +59,11 @@ public class ColorSettings extends AbstractPropertiesSettings {
         return INSTANCE;
     }
 
-    public static ColorProperty define(String key, String desc, Color color) {
+    public static @NonNull ColorProperty define(String key, String desc, @NonNull Color color) {
         return getInstance().createColorProperty(key, desc, color);
     }
 
-    public static String toHex(Color c) {
+    public static @NonNull String toHex(@NonNull Color c) {
         int a = c.getAlpha();
         int r = c.getRed();
         int g = c.getGreen();
@@ -70,13 +71,13 @@ public class ColorSettings extends AbstractPropertiesSettings {
         return String.format("#%02X%02X%02X%02X", a, r, g, b);
     }
 
-    public static Color fromHex(String s) {
+    public static @NonNull Color fromHex(@NonNull String s) {
         long i = Long.decode(s);
         return new Color((int) ((i >> 16) & 0xFF), (int) ((i >> 8) & 0xFF), (int) (i & 0xFF),
             (int) ((i >> 24) & 0xFF));
     }
 
-    public static Color invert(Color c) {
+    public static @NonNull Color invert(@NonNull Color c) {
         return new Color(255 - c.getRed(), 255 - c.getGreen(), 255 - c.getBlue());
     }
 
@@ -96,7 +97,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
     }
 
-    private ColorProperty createColorProperty(String key, String description, Color defaultValue) {
+    private @NonNull ColorProperty createColorProperty(String key, String description, @NonNull Color defaultValue) {
         Optional<ColorProperty> item =
             getProperties().filter(it -> it.getKey().equals(key)).findFirst();
         if (item.isPresent()) {
@@ -120,7 +121,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
         private final String description;
         private Color currentValue;
 
-        public ColorProperty(String key, String description, Color defaultValue) {
+        public ColorProperty(String key, String description, @NonNull Color defaultValue) {
             this.key = key;
             this.description = description;
             if (!properties.containsKey(key)) {
@@ -129,7 +130,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
 
         @Override
-        public String value() {
+        public @NonNull String value() {
             if (currentValue != null) {
                 return toHex(currentValue);
             }
@@ -144,7 +145,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
 
         @Override
-        public Color fromObject(@Nullable Object o) {
+        public @NonNull Color fromObject(@Nullable Object o) {
             return fromHex(o.toString());
         }
 
@@ -159,12 +160,12 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
 
         @Override
-        public String getKey() {
+        public @NonNull String getKey() {
             return key;
         }
 
         @Override
-        public void set(Color value) {
+        public void set(@NonNull Color value) {
             if (currentValue != value) {
                 var old = currentValue;
                 currentValue = value;
@@ -174,7 +175,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
 
         @Override
-        public Color get() {
+        public @NonNull Color get() {
             if (currentValue != null) {
                 return currentValue;
             }
@@ -195,7 +196,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
     }
 
     @Override
-    public void readSettings(Properties props) {
+    public void readSettings(@NonNull Properties props) {
         props.forEach((k, v) -> this.properties.put(k.toString(), v));
     }
 }

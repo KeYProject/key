@@ -16,6 +16,8 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -66,9 +68,9 @@ public class LoadUserTacletsDialog extends JPanel {
         private File chosenFile;
         private JButton chooseFileButton;
         private JTextField fileField;
-        private final String title;
+        private final @Nullable String title;
 
-        public UserTacletFileBox(String title) {
+        public UserTacletFileBox(@Nullable String title) {
 
             super(BoxLayout.Y_AXIS);
             this.title = title;
@@ -177,7 +179,7 @@ public class LoadUserTacletsDialog extends JPanel {
         this.add(Box.createVerticalStrut(5));
     }
 
-    public List<File> getFilesForAxioms() {
+    public @NonNull List<File> getFilesForAxioms() {
         List<File> files = new LinkedList<>();
         Object[] objects = listModel.toArray();
         if (objects != null) {
@@ -283,7 +285,7 @@ public class LoadUserTacletsDialog extends JPanel {
         return scrollPane;
     }
 
-    private File chooseFiles(String title) {
+    private @Nullable File chooseFiles(@NonNull String title) {
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(title);
         fileChooser.setFileFilter(KeYFileChooser.KEY_FILTER);
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -295,7 +297,7 @@ public class LoadUserTacletsDialog extends JPanel {
         }
     }
 
-    private UserTacletFileBox getUserTacletFileBox() {
+    private @NonNull UserTacletFileBox getUserTacletFileBox() {
         if (userTacletFileBox == null) {
             userTacletFileBox = new UserTacletFileBox("File with user-defined taclets");
         }
@@ -393,7 +395,7 @@ public class LoadUserTacletsDialog extends JPanel {
         return cardPanel;
     }
 
-    private JLabel redLabel(String label) {
+    private @NonNull JLabel redLabel(String label) {
         JLabel w = new JLabel(label);
         w.setForeground(Color.red);
         return w;
@@ -412,13 +414,13 @@ public class LoadUserTacletsDialog extends JPanel {
         return buttonPanel;
     }
 
-    private void setMaximumHeight(JComponent comp, int value) {
+    private void setMaximumHeight(@NonNull JComponent comp, int value) {
         Dimension dim = comp.getMaximumSize();
         dim.height = value;
         comp.setMaximumSize(dim);
     }
 
-    private void setMaximumWidth(JComponent comp, int value) {
+    private void setMaximumWidth(@NonNull JComponent comp, int value) {
         Dimension dim = comp.getMaximumSize();
         dim.width = value;
         comp.setMaximumSize(dim);

@@ -59,8 +59,8 @@ public class ValueInjector {
      * @throws NoSpecifiedConverterException unknown type for the current converter map
      * @throws ConversionException an converter could not translate the given value in arguments
      */
-    public static <T> T injection(ProofScriptCommand<T> command, @NonNull T obj,
-                                  @NonNull Map<String, Object> arguments) throws ArgumentRequiredException,
+    public static <T> @NonNull T injection(ProofScriptCommand<T> command, @NonNull T obj,
+                                           @NonNull Map<String, Object> arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
     }

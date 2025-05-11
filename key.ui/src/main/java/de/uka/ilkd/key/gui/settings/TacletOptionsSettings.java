@@ -28,6 +28,7 @@ import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     // to make the "No Proof Loaded" header invisible when a proof is loaded
     private JLabel noProofLoadedHeader;
 
-    private Proof loadedProof = null;
+    private @Nullable Proof loadedProof = null;
 
 
     public TacletOptionsSettings() {
@@ -71,7 +72,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param category The category for which the explanation is requested.
      * @return The explanation for the given category.
      */
-    public static String getExplanation(String category) {
+    public static @NonNull String getExplanation(String category) {
         synchronized (TacletOptionsSettings.class) {
             if (explanationMap == null) {
                 explanationMap = new Properties();
@@ -130,7 +131,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choice The choice to check.
      * @return The additional information or {@code null} if no information are available.
      */
-    public static String getInformation(String choice) {
+    public static @Nullable String getInformation(String choice) {
         if ("JavaCard:on".equals(choice)) {
             return "Sound if a JavaCard program is proven.";
         } else if ("JavaCard:off".equals(choice)) {
@@ -151,7 +152,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
-    public static ChoiceEntry findChoice(List<ChoiceEntry> choices, final String choice) {
+    public static @Nullable ChoiceEntry findChoice(@NonNull List<ChoiceEntry> choices, final String choice) {
         return choices.stream().filter(it -> it.getChoice().equals(choice)).findAny().orElse(null);
     }
 
@@ -161,7 +162,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
-    public static List<ChoiceEntry> createChoiceEntries(Collection<String> choices) {
+    public static @NonNull List<ChoiceEntry> createChoiceEntries(@Nullable Collection<String> choices) {
         if (choices == null) {
             return Collections.emptyList();
         }
@@ -175,7 +176,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choice The choice.
      * @return The created {@link ChoiceEntry}.
      */
-    public static ChoiceEntry createChoiceEntry(String choice) {
+    public static @NonNull ChoiceEntry createChoiceEntry(@NonNull String choice) {
         return new ChoiceEntry(choice, isUnsound(choice), isIncomplete(choice),
             getInformation(choice));
     }
@@ -198,7 +199,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                 .forEach(this::addCategory);
     }
 
-    protected void addCategory(String cat) {
+    protected void addCategory(@NonNull String cat) {
         List<ChoiceEntry> choices = createChoiceEntries(category2Choices.get(cat));
         ChoiceEntry selectedChoice = findChoice(choices, category2Choice.get(cat));
         String explanation = getExplanation(cat);
@@ -223,7 +224,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         pCenter.add(catEntry, new CC().newline());
     }
 
-    protected JComponent mkExplanation(String explanation) {
+    protected @NonNull JComponent mkExplanation(@NonNull String explanation) {
         JTextArea explanationArea = new JTextArea() {
             @Override
             public void setBackground(Color bg) {
@@ -240,7 +241,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     @NonNull
-    private JPanel createCollapsableTitlePane(JComponent title, JComponent child) {
+    private JPanel createCollapsableTitlePane(@NonNull JComponent title, @NonNull JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
         JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel more = new JLabel(IconFactory.TREE_NODE_RETRACTED.get());
@@ -272,7 +273,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return p;
     }
 
-    private JRadioButton mkRadioButton(ChoiceEntry c, ButtonGroup btnGroup) {
+    private @NonNull JRadioButton mkRadioButton(@NonNull ChoiceEntry c, @NonNull ButtonGroup btnGroup) {
         Box b = new Box(BoxLayout.X_AXIS);
         JRadioButton button = new JRadioButton(c.choice);
         btnGroup.add(button);
@@ -295,7 +296,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return button;
     }
 
-    private JLabel createTitleRow(String cat, ChoiceEntry entry) {
+    private @NonNull JLabel createTitleRow(@NonNull String cat, ChoiceEntry entry) {
         JLabel lbl = new JLabel(createCatTitleText(cat, entry));
         lbl.setFont(lbl.getFont().deriveFont(14f));
 
@@ -305,7 +306,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return lbl;
     }
 
-    private String createCatTitleText(String cat, ChoiceEntry entry) {
+    private @NonNull String createCatTitleText(@NonNull String cat, @Nullable ChoiceEntry entry) {
         // if no proof is loaded, we do not want to display current settings
         if (warnNoProof) {
             return cat;
@@ -325,7 +326,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param cat The category of the choice
      * @param entry The current choice
      */
-    private void checkForDifferingOptions(JLabel lbl, String cat, ChoiceEntry entry) {
+    private void checkForDifferingOptions(@NonNull JLabel lbl, String cat, @Nullable ChoiceEntry entry) {
         if (loadedProof != null) {
             String choiceOfLoadedProof =
                 loadedProof.getSettings().getChoiceSettings().getDefaultChoices().get(cat);
@@ -346,12 +347,12 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Taclet Options";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(@NonNull MainWindow window) {
         loadedProof = window.getMediator().getSelectedProof();
         warnNoProof = loadedProof == null;
         // this makes the header invisible
@@ -391,7 +392,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         /**
          * The choice.
          */
-        private final String choice;
+        private final @NonNull String choice;
 
         /**
          * Is unsound?
@@ -416,7 +417,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          * @param incomplete Is incomplete?
          * @param information An optionally information.
          */
-        public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
+        public ChoiceEntry(@NonNull String choice, boolean unsound, boolean incomplete, String information) {
             assert choice != null;
             this.choice = choice;
             this.unsound = unsound;
@@ -429,7 +430,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          *
          * @return The choice.
          */
-        public String getChoice() {
+        public @NonNull String getChoice() {
             return choice;
         }
 
@@ -493,7 +494,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             if (unsound && incomplete) {
                 if (information != null) {
                     return format("%s (%s and %s, %s)", choice, UNSOUND_TEXT, INCOMPLETE_TEXT,

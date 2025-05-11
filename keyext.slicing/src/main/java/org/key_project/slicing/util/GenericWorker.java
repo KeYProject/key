@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.util;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import javax.swing.*;
@@ -43,7 +45,7 @@ public class GenericWorker<T> extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground() throws Exception {
+    protected @Nullable Void doInBackground() throws Exception {
         try {
             T result = backgroundTask.call();
             SwingUtilities.invokeLater(() -> callback.accept(result));

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extracts read and write access to fields ({@link IProgramVariable}) via assignments.
@@ -30,8 +31,8 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
      * {@inheritDoc}
      */
     @Override
-    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
-        if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
+    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+        if (node.getAppliedRuleApp() != null) {
             SourceElement statement = node.getNodeInfo().getActiveStatement();
             if (statement instanceof CopyAssignment) {
                 LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();

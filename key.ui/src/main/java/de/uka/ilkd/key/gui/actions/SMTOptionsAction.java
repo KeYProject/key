@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -16,7 +17,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 public class SMTOptionsAction extends MainWindowAction {
     private static final long serialVersionUID = 1L;
 
-    public SMTOptionsAction(MainWindow mainWindow) {
+    public SMTOptionsAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Show SMT Solver Options");
         setIcon(IconFactory.toolbox(16));

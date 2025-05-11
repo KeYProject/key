@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.rulefilter;
 
 import de.uka.ilkd.key.rule.Taclet;
+import org.jspecify.annotations.NonNull;
 
 public class TacletFilterCloseGoal extends TacletFilter {
 
@@ -12,7 +13,7 @@ public class TacletFilterCloseGoal extends TacletFilter {
     private TacletFilterCloseGoal() {
     }
 
-    protected boolean filter(Taclet taclet) {
+    protected boolean filter(@NonNull Taclet taclet) {
         return taclet.goalTemplates().size() == 0;
     }
 

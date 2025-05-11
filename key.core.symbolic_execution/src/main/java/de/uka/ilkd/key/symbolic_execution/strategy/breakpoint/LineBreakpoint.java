@@ -18,6 +18,8 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 
 public class LineBreakpoint extends AbstractConditionalBreakpoint {
@@ -57,9 +59,9 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      * @param methodEnd the line the containing method of this breakpoint ends at
      * @throws SLTranslationException if the condition could not be parsed to a valid Term
      */
-    public LineBreakpoint(String classPath, int lineNumber, int hitCount, IProgramMethod pm,
-            Proof proof, String condition, boolean enabled, boolean conditionEnabled,
-            int methodStart, int methodEnd) throws SLTranslationException {
+    public LineBreakpoint(String classPath, int lineNumber, int hitCount, @NonNull IProgramMethod pm,
+                          Proof proof, String condition, boolean enabled, boolean conditionEnabled,
+                          int methodStart, int methodEnd) throws SLTranslationException {
         super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd,
             pm.getContainerType());
         this.classPath = classPath;
@@ -80,7 +82,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      *         Breakpoint
      */
     @Override
-    protected StatementBlock getStatementBlock(StatementContainer statementContainer) {
+    protected @NonNull StatementBlock getStatementBlock(@NonNull StatementContainer statementContainer) {
         // list of all statements
         ExtList nextResult = new ExtList();
         for (int i = 0; i < statementContainer.getStatementCount(); i++) {
@@ -116,8 +118,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, @NonNull Proof proof,
+                                   @NonNull Node node) {
         if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
             activeStatement = ((LoopInvariantBuiltInRuleApp) ruleApp).getLoopStatement();
         }
@@ -125,7 +127,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
                 && super.isBreakpointHit(activeStatement, ruleApp, proof, node);
     }
 
-    private boolean isInLine(SourceElement activeStatement) {
+    private boolean isInLine(@Nullable SourceElement activeStatement) {
         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
             final String path =
                 Paths.get(activeStatement.getPositionInfo().getParentClassURI()).toString();

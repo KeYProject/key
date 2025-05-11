@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
@@ -47,7 +48,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created constant.
      */
-    protected JFunction createResultConstant(Services services, Sort sort) {
+    protected @NonNull JFunction createResultConstant(@NonNull Services services, @NonNull Sort sort) {
         String functionName = services.getTermBuilder().newName("QueryResult");
         JFunction function = new JFunction(new Name(functionName), sort);
         services.getNamespaces().functions().addSafely(function);
@@ -63,7 +64,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created result {@link JFunction}.
      */
-    protected JFunction createResultFunction(Services services, Sort sort) {
+    protected @NonNull JFunction createResultFunction(@NonNull Services services, Sort sort) {
         return new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
             JavaDLTheory.FORMULA, sort);
     }
@@ -84,9 +85,9 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    protected List<ResultsAndCondition> computeResultsAndConditions(Services services,
-            Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
-            JFunction newPredicate) throws ProofInputException {
+    protected @NonNull List<ResultsAndCondition> computeResultsAndConditions(Services services,
+                                                                             @NonNull Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
+                                                                             JFunction newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(services, goal.proof(),
             sideProofEnvironment, sequentToProve, newPredicate,
             "Side proof rule on node " + goal.node().serialNr() + ".",
@@ -102,7 +103,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param newTerm The new {@link Term}.
      * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
      */
-    protected static SequentFormula replace(PosInOccurrence pio, Term newTerm, Services services) {
+    protected static @NonNull SequentFormula replace(@NonNull PosInOccurrence pio, Term newTerm, @NonNull Services services) {
         // Iterate along the PosInOccurrence and collect the parents and indices
         Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<>();
         Term root = pio.sequentFormula().formula();

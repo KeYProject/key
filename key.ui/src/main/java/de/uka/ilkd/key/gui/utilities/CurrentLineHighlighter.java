@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
@@ -46,7 +48,7 @@ public class CurrentLineHighlighter implements Highlighter {
     }
 
     @Override
-    public void paint(Graphics graphics) {
+    public void paint(@NonNull Graphics graphics) {
         delegate.paint(graphics);
         if (component != null) {
             int caretPosition = component.getCaretPosition();

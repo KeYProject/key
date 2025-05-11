@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
 
 public class ShowKnownTypesAction extends MainWindowAction {
 
@@ -29,7 +30,7 @@ public class ShowKnownTypesAction extends MainWindowAction {
 
     private final Proof proof;
 
-    public ShowKnownTypesAction(MainWindow mainWindow, Proof proof) {
+    public ShowKnownTypesAction(@NonNull MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Show Known Types");
 

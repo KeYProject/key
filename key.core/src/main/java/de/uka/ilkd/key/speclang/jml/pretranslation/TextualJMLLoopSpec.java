@@ -32,7 +32,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         INFORMATION_FLOW, ASSIGNABLE, ASSIGNABLE_FREE, INVARIANT, INVARIANT_FREE
     }
 
-    public TextualJMLLoopSpec(ImmutableList<JMLModifier> modifiers) {
+    public TextualJMLLoopSpec(@NonNull ImmutableList<JMLModifier> modifiers) {
         super(modifiers);
     }
 
@@ -170,7 +170,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return getMap(ClauseHd.INVARIANT_FREE);
     }
 
-    public LabeledParserRuleContext getVariant() {
+    public @Nullable LabeledParserRuleContext getVariant() {
         return variant;
     }
 

@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents the partners of a join operation.
@@ -18,9 +20,9 @@ public class ProspectivePartner {
     private final Term commonFormula;
     private final SequentFormula[] formula = new SequentFormula[2];
     private final Node[] nodes = new Node[2];
-    private Term commonPredicate = null;
-    private Node commonParent = null;
-    private SequentFormula formulaForHiding = null;
+    private @Nullable Term commonPredicate = null;
+    private @Nullable Node commonParent = null;
+    private @Nullable SequentFormula formulaForHiding = null;
 
     /**
      * Constructs a new prospective partner object, i.e. a structure comprising the information
@@ -63,11 +65,11 @@ public class ProspectivePartner {
         this.commonPredicate = commonPredicate;
     }
 
-    public Term getCommonPredicate() {
+    public @Nullable Term getCommonPredicate() {
         return commonPredicate;
     }
 
-    public void setCommonParent(Node commonParent) {
+    public void setCommonParent(@NonNull Node commonParent) {
         this.commonParent = commonParent;
         if (commonParent.getAppliedRuleApp() != null
                 && commonParent.getAppliedRuleApp().posInOccurrence() != null) {
@@ -80,15 +82,15 @@ public class ProspectivePartner {
         this.formulaForHiding = formulaForHiding;
     }
 
-    public SequentFormula getFormulaForHiding() {
+    public @Nullable SequentFormula getFormulaForHiding() {
         return formulaForHiding;
     }
 
-    public Node getCommonParent() {
+    public @Nullable Node getCommonParent() {
         return commonParent;
     }
 
-    public Sequent getSequent(int index) {
+    public @NonNull Sequent getSequent(int index) {
         return getNode(index).sequent();
     }
 

@@ -26,7 +26,7 @@ public class POSnippetFactory {
     }
 
     public static @NonNull BasicPOSnippetFactory getBasicFactory(@NonNull LoopSpecification invariant,
-                                                                 ProofObligationVars vars, ExecutionContext context, Term guardTerm, @NonNull Services services) {
+                                                                 ProofObligationVars vars, ExecutionContext context, @NonNull Term guardTerm, @NonNull Services services) {
         return new BasicPOSnippetFactoryImpl(invariant, vars, context, guardTerm, services);
     }
 
@@ -47,7 +47,7 @@ public class POSnippetFactory {
 
     public static @NonNull InfFlowPOSnippetFactory getInfFlowFactory(@NonNull LoopSpecification invariant,
                                                                      @NonNull ProofObligationVars vars1, @NonNull ProofObligationVars vars2, ExecutionContext context,
-                                                                     Term guardTerm, @NonNull Services services) {
+                                                                     @NonNull Term guardTerm, @NonNull Services services) {
         return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, context, guardTerm,
             services);
     }

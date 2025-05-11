@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Action to enable/disable Proof Caching.
@@ -22,7 +23,7 @@ public class CachingToggleAction extends MainWindowAction {
     private static final String DESCRIPTION =
         "Enable or disable proof caching for currently open proofs.";
 
-    public CachingToggleAction(MainWindow mainWindow) {
+    public CachingToggleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
 
         setName("Proof Caching");

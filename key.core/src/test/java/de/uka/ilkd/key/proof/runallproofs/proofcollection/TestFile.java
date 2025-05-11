@@ -22,6 +22,8 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
@@ -55,7 +57,7 @@ public class TestFile implements Serializable {
      * @param pathName Path whose associated {@link File} object will be returned.
      * @return {@link File} object pointing to given path name relative to given base directory.
      */
-    static File getAbsoluteFile(File baseDirectory, String pathName) {
+    static @NonNull File getAbsoluteFile(@NonNull File baseDirectory, @NonNull String pathName) {
 
         /*
          * Caller of this method must provide an absolute path as base directory.
@@ -91,8 +93,8 @@ public class TestFile implements Serializable {
         getKeYFile();
     }
 
-    public static TestFile createInstance(TestProperty testProperty, String path,
-            ProofCollectionSettings settings) throws IOException {
+    public static @NonNull TestFile createInstance(TestProperty testProperty, String path,
+                                                   ProofCollectionSettings settings) throws IOException {
         return new TestFile(testProperty, path, settings);
     }
 
@@ -101,7 +103,7 @@ public class TestFile implements Serializable {
      *
      * @throws IOException Is thrown in case given .key-file is not a directory or does not exist.
      */
-    public File getKeYFile() throws IOException {
+    public @NonNull File getKeYFile() throws IOException {
         File baseDirectory = settings.getGroupDirectory();
         File keyFile = getAbsoluteFile(baseDirectory, path);
 
@@ -119,7 +121,7 @@ public class TestFile implements Serializable {
         return keyFile;
     }
 
-    private TestResult getRunAllProofsTestResult(OutputCatcher catcher, boolean success)
+    private @NonNull TestResult getRunAllProofsTestResult(@NonNull OutputCatcher catcher, boolean success)
             throws IOException {
         String closing = String.format("%s: Verifying property \"%s\"%sfor file: %s",
             success ? "pass" : "FAIL", testProperty.toString().toLowerCase(),
@@ -137,7 +139,7 @@ public class TestFile implements Serializable {
      * @throws Exception Any exception that may occur during KeY execution will be converted into an
      *         {@link Exception} object with original exception as cause.
      */
-    public TestResult runKey() throws Exception {
+    public @NonNull TestResult runKey() throws Exception {
         try (var catched = new OutputCatcher()) { // now everything System.out stuff will be also
                                                   // caught
             boolean verbose = settings.getVerboseOutput();
@@ -245,7 +247,7 @@ public class TestFile implements Serializable {
     /**
      * Override this method in order to change reload behaviour.
      */
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success)
+    protected void reload(boolean verbose, @NonNull File proofFile, @NonNull Proof loadedProof, boolean success)
             throws Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
@@ -261,8 +263,8 @@ public class TestFile implements Serializable {
      * By overriding this method we can change the way how we invoke automode, for instance if we
      * want to use a different strategy.
      */
-    protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            KeyAst.ProofScript script) throws Exception {
+    protected void autoMode(@NonNull KeYEnvironment<DefaultUserInterfaceControl> env, @NonNull Proof loadedProof,
+                            KeyAst.@Nullable ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -277,7 +279,7 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(File keyFile)
+    private @NonNull Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(@NonNull File keyFile)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
@@ -289,7 +291,7 @@ public class TestFile implements Serializable {
      *
      * @param proofFile File that contains the proof that will be (re-)loaded.
      */
-    private void reloadProof(File proofFile) throws Exception {
+    private void reloadProof(@NonNull File proofFile) throws Exception {
         /*
          * Reload proof and dispose corresponding KeY environment immediately afterwards. If no
          * exception is thrown it is assumed that loading works properly.
@@ -382,7 +384,7 @@ public class TestFile implements Serializable {
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
+        public void write(byte @NonNull [] b, int off, int len) throws IOException {
             a.write(b, off, len);
             c.write(b, off, len);
         }

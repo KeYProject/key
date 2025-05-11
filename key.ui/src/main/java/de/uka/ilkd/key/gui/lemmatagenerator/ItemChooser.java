@@ -17,6 +17,7 @@ import javax.swing.table.TableRowSorter;
 import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
 import de.uka.ilkd.key.gui.lemmatagenerator.SelectionPanel.Side;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -39,7 +40,7 @@ class ItemChooser<T> extends JPanel {
     private JPanel contentPanel;
     private JButton leftButton;
     private JButton rightButton;
-    private List<TableItem<T>> items = new LinkedList<>();
+    private @NonNull List<TableItem<T>> items = new LinkedList<>();
     private final List<ItemFilter<T>> filtersForMovingItems =
         new LinkedList<>();
     private final String searchTitle;
@@ -120,7 +121,7 @@ class ItemChooser<T> extends JPanel {
 
 
 
-    private void cut(SelectionPanel<T> srcList, SelectionPanel<T> destList) {
+    private void cut(@NonNull SelectionPanel<T> srcList, @NonNull SelectionPanel<T> destList) {
         List<TableItem<T>> tableItems = srcList.getSelectedItems();
         for (TableItem<T> item : tableItems) {
             boolean move = true;
@@ -142,14 +143,14 @@ class ItemChooser<T> extends JPanel {
 
 
 
-    private SelectionPanel<T> getSuppliedList() {
+    private @NonNull SelectionPanel<T> getSuppliedList() {
         if (suppliedList == null) {
             suppliedList = new SelectionPanel<>("Choice", searchTitle, Side.LEFT, userFilter);
         }
         return suppliedList;
     }
 
-    private SelectionPanel<T> getSelectedList() {
+    private @NonNull SelectionPanel<T> getSelectedList() {
         if (selectedList == null) {
             selectedList = new SelectionPanel<>("Selection", searchTitle, Side.RIGHT, userFilter);
         }
@@ -157,7 +158,7 @@ class ItemChooser<T> extends JPanel {
     }
 
 
-    public void setItems(List<T> dataForItems, String columnName) {
+    public void setItems(@NonNull List<T> dataForItems, String columnName) {
 
         items = new LinkedList<>();
 
@@ -180,7 +181,7 @@ class ItemChooser<T> extends JPanel {
 
 
 
-    public List<T> getDataOfSelectedItems() {
+    public @NonNull List<T> getDataOfSelectedItems() {
 
         List<T> list = new LinkedList<>();
         for (TableItem<T> item : items) {
@@ -248,7 +249,7 @@ class SelectionPanel<T> extends JPanel {
     private final Side side;
     private RowFilter<ItemModel, Integer> filter;
 
-    private String findPattern = "";
+    private @NonNull String findPattern = "";
     private final List<ItemFilter<T>> userFilters;
 
 
@@ -309,7 +310,7 @@ class SelectionPanel<T> extends JPanel {
 
 
 
-    void addItems(List<TacletInfo> infoList) {
+    void addItems(@NonNull List<TacletInfo> infoList) {
         for (TacletInfo info : infoList) {
             getModel().addRow(new Object[] { info });
         }
@@ -345,6 +346,7 @@ class SelectionPanel<T> extends JPanel {
     }
 
 
+    @NonNull
     List<T> getSelectedValues() {
 
         LinkedList<T> infoList = new LinkedList<>();
@@ -356,6 +358,7 @@ class SelectionPanel<T> extends JPanel {
         return infoList;
     }
 
+    @NonNull
     List<TableItem<T>> getSelectedItems() {
 
         LinkedList<TableItem<T>> infoList = new LinkedList<>();
@@ -377,7 +380,7 @@ class SelectionPanel<T> extends JPanel {
 
             @Override
             public boolean include(
-                    javax.swing.RowFilter.Entry<? extends ItemModel, ? extends Integer> entry) {
+                    javax.swing.RowFilter.@NonNull Entry<? extends ItemModel, ? extends Integer> entry) {
                 @SuppressWarnings("unchecked")
                 TableItem<T> item =
                     (TableItem<T>) entry.getModel().getValueAt(entry.getIdentifier(), 0);
@@ -402,7 +405,7 @@ class SelectionPanel<T> extends JPanel {
     }
 
 
-    void setModel(ItemModel model) {
+    void setModel(@NonNull ItemModel model) {
 
 
         getList().setSelectionModel(new DefaultListSelectionModel());
@@ -451,7 +454,7 @@ class ItemModel extends DefaultTableModel {
     }
 
     @Override
-    public Class<?> getColumnClass(int columnIndex) {
+    public @NonNull Class<?> getColumnClass(int columnIndex) {
         return columnIndex == 0 ? TacletInfo.class : Boolean.class;
     }
 }
@@ -460,18 +463,18 @@ class ItemModel extends DefaultTableModel {
 
 class TableItem<T> {
 
-    private final T data;
+    private final @NonNull T data;
     private Side side;
-    private final String lowerCaseName;
+    private final @NonNull String lowerCaseName;
 
-    public TableItem(T data, Side side) {
+    public TableItem(@NonNull T data, Side side) {
         super();
         this.data = data;
         this.side = side;
         this.lowerCaseName = data.toString().toLowerCase();
     }
 
-    public T getData() {
+    public @NonNull T getData() {
         return data;
     }
 
@@ -483,7 +486,7 @@ class TableItem<T> {
         this.side = side;
     }
 
-    public String getNameLowerCase() {
+    public @NonNull String getNameLowerCase() {
         return lowerCaseName;
     }
 

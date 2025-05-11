@@ -105,7 +105,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         return false;
     }
 
-    protected ImmutableList<Term> collectAtoms(@NonNull Term t) {
+    protected @NonNull ImmutableList<Term> collectAtoms(@NonNull Term t) {
         final AtomCollector m = new AtomCollector();
         m.collect(t);
         return m.getResult();

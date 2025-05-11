@@ -214,7 +214,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
             return nextMonomial != null;
         }
 
-        public Term next() {
+        public @Nullable Term next() {
             final Term res = nextMonomial;
             nextMonomial = null;
             findNextMonomial();

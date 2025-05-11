@@ -121,7 +121,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         return term;
     }
 
-    public LogicVariable getInstantiationOfLogicVar(@NonNull Sort instantiation, @NonNull LogicVariable lv) {
+    public @NonNull LogicVariable getInstantiationOfLogicVar(@NonNull Sort instantiation, @NonNull LogicVariable lv) {
         LogicVariable res = getLogicVariable(
             new Name(instantiation.name().toString() + "__" + lv.name().toString()), instantiation);
         for (TranslationListener l : listener) {
@@ -216,7 +216,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * Checks the referenceTable whether there are rows that are not allowed. For example: the
      * notSame-Condition is hurted.
      */
-    public static void checkTable(byte[] @NonNull [] referenceTable, Sort[] instTable, Sort[] genericTable,
+    public static void checkTable(byte[] @NonNull @NonNull @NonNull [] referenceTable, Sort[] instTable, Sort[] genericTable,
                                   @NonNull TacletConditions conditions, @NonNull Services services) {
 
         for (int r = 0; r < referenceTable.length; r++) {
@@ -350,8 +350,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         return toReturn.toString();
     }
 
-    private static StringBuilder removeIllegalChars(@NonNull StringBuilder template,
-                                                    @NonNull ArrayList<String> toReplace, @NonNull ArrayList<String> replacement) {
+    private static @NonNull StringBuilder removeIllegalChars(@NonNull StringBuilder template,
+                                                             @NonNull ArrayList<String> toReplace, @NonNull ArrayList<String> replacement) {
         // replace one String
         for (int i = 0; i < toReplace.size(); i++) {
             String toRep = toReplace.get(i);

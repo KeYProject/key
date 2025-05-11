@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -39,9 +40,9 @@ public class LoopBodyTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public void updateLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
-            Set<TermLabel> labels) {
+                             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+                             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+                             @NonNull Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint)
                 && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
             labels.add(SymbolicExecutionUtil.LOOP_BODY_LABEL);

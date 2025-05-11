@@ -32,6 +32,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -71,7 +73,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * A list of variables KeY has to hold to evaluate the condition
      */
-    private final Set<LocationVariable> toKeep;
+    private final @NonNull Set<LocationVariable> toKeep;
 
     /**
      * A {@link Map} mapping from relevant variables for the condition to their runtime equivalent
@@ -82,7 +84,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The list of parameter variables of the method that contains the associated breakpoint
      */
-    private final Set<LocationVariable> paramVars;
+    private final @NonNull Set<LocationVariable> paramVars;
 
     /**
      * A {@link LocationVariable} representing the instance the class KeY is working on
@@ -125,7 +127,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     @Override
     public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+                            int countApplied, @Nullable Goal goal) {
         super.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
         if (goal != null) {
             Node node = goal.node();
@@ -144,8 +146,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param node
      * @param inScope
      */
-    private void putValuesFromGlobalVars(ProgramVariable varForCondition, Node node,
-            boolean inScope) {
+    private void putValuesFromGlobalVars(@NonNull ProgramVariable varForCondition, @NonNull Node node,
+                                         boolean inScope) {
         for (IProgramVariable progVar : node.getLocalProgVars()) {
             if (inScope && varForCondition.name().equals(progVar.name())
                     && (getVariableNamingMap().get(varForCondition) == null
@@ -163,7 +165,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *
      * @return the cloned map
      */
-    private Map<SyntaxElement, SyntaxElement> getOldMap() {
+    private @NonNull Map<SyntaxElement, SyntaxElement> getOldMap() {
         Map<SyntaxElement, SyntaxElement> oldMap = new HashMap<>();
         for (Entry<SyntaxElement, SyntaxElement> svSubstituteSVSubstituteEntry : getVariableNamingMap()
                 .entrySet()) {
@@ -200,8 +202,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *        breakpoint
      * @param oldMap the oldMap variableNamings
      */
-    private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope,
-            Map<SyntaxElement, SyntaxElement> oldMap, RuleApp ruleApp) {
+    private void putValuesFromRenamings(@NonNull ProgramVariable varForCondition, @NonNull Node node, boolean inScope,
+                                        @NonNull Map<SyntaxElement, SyntaxElement> oldMap, RuleApp ruleApp) {
         // look for renamings KeY did
         boolean found = false;
         // get current renaming tables
@@ -261,7 +263,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param ruleApp the applied rule app
      * @param node the current node
      */
-    protected void refreshVarMaps(RuleApp ruleApp, Node node) {
+    protected void refreshVarMaps(RuleApp ruleApp, @NonNull Node node) {
         boolean inScope = isInScope(node);
         // collect old values
         Map<SyntaxElement, SyntaxElement> oldMap = getOldMap();
@@ -284,7 +286,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param condition the condition given by the user
      * @return the {@link Term} that represents the condition
      */
-    private Term computeTermForCondition(String condition) {
+    private @NonNull Term computeTermForCondition(@Nullable String condition) {
         if (condition == null) {
             return getProof().getServices().getTermBuilder().tt();
         }
@@ -349,7 +351,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param node the current {@link Node}
      * @return true if the condition evaluates to true
      */
-    protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+    protected boolean conditionMet(@NonNull RuleApp ruleApp, @NonNull Proof proof, @NonNull Node node) {
         ApplyStrategyInfo info = null;
         try {
             // initialize values
@@ -392,8 +394,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, @NonNull RuleApp ruleApp, @NonNull Proof proof,
+                                   @NonNull Node node) {
         return (!conditionEnabled || conditionMet(ruleApp, proof, node))
                 && super.isBreakpointHit(activeStatement, ruleApp, proof, node);
     }
@@ -424,8 +426,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     protected abstract boolean isInScopeForCondition(Node node);
 
-    private ImmutableList<LocationVariable> saveAddVariable(LocationVariable x,
-            ImmutableList<LocationVariable> varsForCondition) {
+    private @NonNull ImmutableList<LocationVariable> saveAddVariable(@NonNull LocationVariable x,
+                                                                     @NonNull ImmutableList<LocationVariable> varsForCondition) {
         boolean contains = false;
         for (var paramVar : varsForCondition) {
             if (paramVar.toString().equals(x.toString())) {

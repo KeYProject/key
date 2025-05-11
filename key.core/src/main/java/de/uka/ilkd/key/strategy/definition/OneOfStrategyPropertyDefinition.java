@@ -91,7 +91,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
      *
      * @return The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
-    public ImmutableArray<StrategyPropertyValueDefinition> getValues() {
+    public @NonNull ImmutableArray<StrategyPropertyValueDefinition> getValues() {
         return values;
     }
 

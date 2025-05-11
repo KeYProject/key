@@ -4,6 +4,7 @@
 package org.key_project.proofmanagement.check.dependency;
 
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Walks an intermediate proof representation tree as created when loading a *.proof file.
@@ -34,7 +35,7 @@ public abstract class NodeIntermediateWalker {
      *
      * @param node the current position of the walker in tree
      */
-    protected void walk(NodeIntermediate node) {
+    protected void walk(@NonNull NodeIntermediate node) {
         doAction(node);
 
         for (NodeIntermediate child : node.getChildren()) {

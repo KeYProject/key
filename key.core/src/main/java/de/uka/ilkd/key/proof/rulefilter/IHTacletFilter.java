@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -36,7 +37,7 @@ public class IHTacletFilter extends TacletFilter {
     /**
      * @return true iff <code>taclet</code> should be included in the result
      */
-    public boolean filter(Taclet taclet) {
+    public boolean filter(@NonNull Taclet taclet) {
         if (!interactive) {
             Boolean b = filterCache.get(taclet);
             if (b == null) {

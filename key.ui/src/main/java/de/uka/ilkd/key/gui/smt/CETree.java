@@ -14,6 +14,7 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.smt.model.*;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
 
 public class CETree {
@@ -34,11 +35,11 @@ public class CETree {
     /**
      * The SMT model.
      */
-    private final Model model;
+    private final @NonNull Model model;
 
 
 
-    public CETree(Model model) {
+    public CETree(@NonNull Model model) {
         super();
         this.model = model;
         model.removeUnnecessaryObjects();
@@ -62,7 +63,7 @@ public class CETree {
     }
 
 
-    private DefaultMutableTreeNode constructTree() {
+    private @NonNull DefaultMutableTreeNode constructTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Model");
 
         DefaultMutableTreeNode constants = new DefaultMutableTreeNode("Constants");
@@ -80,7 +81,7 @@ public class CETree {
         return root;
     }
 
-    private void fillHeaps(DefaultMutableTreeNode heaps) {
+    private void fillHeaps(@NonNull DefaultMutableTreeNode heaps) {
 
         for (Heap h : model.getHeaps()) {
             DefaultMutableTreeNode heap = new DefaultMutableTreeNode(h.getName());
@@ -98,7 +99,7 @@ public class CETree {
      * @param ov
      * @param object
      */
-    private void addObjectProperties(ObjectVal ov, DefaultMutableTreeNode object) {
+    private void addObjectProperties(@NonNull ObjectVal ov, @NonNull DefaultMutableTreeNode object) {
         String sortName = computeSortName(ov);
         // General properties
         List<Pair<String, String>> objectProperties = computeObjectProperties(ov, sortName);
@@ -140,7 +141,7 @@ public class CETree {
         }
     }
 
-    public static List<Pair<String, String>> computeFunctions(ObjectVal ov) {
+    public static @NonNull List<Pair<String, String>> computeFunctions(@NonNull ObjectVal ov) {
         List<Pair<String, String>> result = new LinkedList<>();
         for (Entry<String, String> e : ov.getFunValues().entrySet()) {
             result.add(new Pair<>(Model.removePipes(e.getKey()), e.getValue()));
@@ -148,7 +149,7 @@ public class CETree {
         return result;
     }
 
-    public static List<String> computeArrayFields(ObjectVal ov) {
+    public static @NonNull List<String> computeArrayFields(@NonNull ObjectVal ov) {
         List<String> result = new LinkedList<>();
         for (int i = 0; i < ov.getLength(); ++i) {
             result.add("[" + i + "]=" + ov.getArrayValue(i));
@@ -156,16 +157,16 @@ public class CETree {
         return result;
     }
 
-    public static boolean hasArrayFields(String sortName) {
+    public static boolean hasArrayFields(@NonNull String sortName) {
         return sortName.endsWith("[]");
     }
 
-    public static String computeSortName(ObjectVal ov) {
+    public static @NonNull String computeSortName(@NonNull ObjectVal ov) {
         return ov.getSort() == null ? "java.lang.Object" : ov.getSort().name().toString();
     }
 
-    public static List<Pair<String, String>> computeObjectProperties(ObjectVal ov,
-            String sortName) {
+    public static @NonNull List<Pair<String, String>> computeObjectProperties(@NonNull ObjectVal ov,
+                                                                              String sortName) {
         List<Pair<String, String>> result = new LinkedList<>();
         // Type
         sortName = Model.removePipes(sortName);
@@ -181,7 +182,7 @@ public class CETree {
         return result;
     }
 
-    public static List<Pair<String, String>> computeFields(ObjectVal ov) {
+    public static @NonNull List<Pair<String, String>> computeFields(@NonNull ObjectVal ov) {
         List<Pair<String, String>> labels = new ArrayList<>();
 
         for (Entry<String, String> e : ov.getFieldvalues().entrySet()) {
@@ -193,7 +194,7 @@ public class CETree {
         return labels;
     }
 
-    private void fillLocsets(DefaultMutableTreeNode locsets) {
+    private void fillLocsets(@NonNull DefaultMutableTreeNode locsets) {
         for (LocationSet ls : model.getLocsets()) {
             DefaultMutableTreeNode locset = new DefaultMutableTreeNode(computeLocationSetName(ls));
             locsets.add(locset);
@@ -201,7 +202,7 @@ public class CETree {
         }
     }
 
-    public static String computeLocationSetName(LocationSet ls) {
+    public static @NonNull String computeLocationSetName(@NonNull LocationSet ls) {
         return Model.removePipes(ls.getName());
     }
 
@@ -209,7 +210,7 @@ public class CETree {
      * @param ls
      * @param locset
      */
-    private void addLocSetProperties(LocationSet ls, DefaultMutableTreeNode locset) {
+    private void addLocSetProperties(@NonNull LocationSet ls, @NonNull DefaultMutableTreeNode locset) {
         List<String> locationNames = computeLocationSetProperties(ls);
         for (String locationName : locationNames) {
             DefaultMutableTreeNode locationNode = new DefaultMutableTreeNode(locationName);
@@ -217,7 +218,7 @@ public class CETree {
         }
     }
 
-    public static List<String> computeLocationSetProperties(LocationSet ls) {
+    public static @NonNull List<String> computeLocationSetProperties(@NonNull LocationSet ls) {
         List<String> result = new LinkedList<>();
         for (int i = 0; i < ls.size(); ++i) {
             Location l = ls.get(i);
@@ -228,7 +229,7 @@ public class CETree {
         return result;
     }
 
-    private void fillSequences(DefaultMutableTreeNode sequences) {
+    private void fillSequences(@NonNull DefaultMutableTreeNode sequences) {
 
         for (Sequence s : model.getSequences()) {
             DefaultMutableTreeNode sequence = new DefaultMutableTreeNode(computeSequenceName(s));
@@ -239,7 +240,7 @@ public class CETree {
 
     }
 
-    public static String computeSequenceName(Sequence s) {
+    public static @NonNull String computeSequenceName(@NonNull Sequence s) {
         return Model.removePipes(s.getName());
     }
 
@@ -247,7 +248,7 @@ public class CETree {
      * @param s
      * @param sequence
      */
-    private void addSequenceProperties(Sequence s, DefaultMutableTreeNode sequence) {
+    private void addSequenceProperties(@NonNull Sequence s, @NonNull DefaultMutableTreeNode sequence) {
         List<String> labels = computeSequenceProperties(s);
         for (String label : labels) {
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
@@ -255,7 +256,7 @@ public class CETree {
         }
     }
 
-    public static List<String> computeSequenceProperties(Sequence s) {
+    public static @NonNull List<String> computeSequenceProperties(@NonNull Sequence s) {
         List<String> result = new LinkedList<>();
         result.add("Length=" + s.getLength());
 
@@ -265,7 +266,7 @@ public class CETree {
         return result;
     }
 
-    private void fillConstants(DefaultMutableTreeNode constants) {
+    private void fillConstants(@NonNull DefaultMutableTreeNode constants) {
         List<Pair<String, String>> labels = computeConstantLabels(model);
 
         for (Pair<String, String> label : labels) {
@@ -276,7 +277,7 @@ public class CETree {
 
     }
 
-    public static List<Pair<String, String>> computeConstantLabels(Model model) {
+    public static @NonNull List<Pair<String, String>> computeConstantLabels(@NonNull Model model) {
         Map<String, String> map = model.getConstants();
         List<Pair<String, String>> labels = new ArrayList<>();
 
@@ -301,7 +302,7 @@ public class CETree {
 
 
 
-        public void mousePressed(MouseEvent e) {
+        public void mousePressed(@NonNull MouseEvent e) {
             int selRow = tree.getRowForLocation(e.getX(), e.getY());
             TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
             if (selRow != -1) {

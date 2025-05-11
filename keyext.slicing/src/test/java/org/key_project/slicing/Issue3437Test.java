@@ -10,6 +10,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class Issue3437Test {
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final @Nullable File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
     void loadsAndSlicesCorrectly() throws Exception {

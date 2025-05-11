@@ -272,7 +272,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         ruleSets = rs;
     }
 
-    public Sequent ifSequent() {
+    public @NonNull Sequent ifSequent() {
         return ifseq;
     }
 

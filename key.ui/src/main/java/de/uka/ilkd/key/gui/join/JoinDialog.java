@@ -27,15 +27,17 @@ import de.uka.ilkd.key.proof.join.LateApplicationCheck;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.PredicateEstimator.Result;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class JoinDialog extends StdDialog {
     private static final Color GREEN = new Color(0, 128, 0);
 
     private static final long serialVersionUID = 1L;
-    private final ContentPanel content;
+    private final @NonNull ContentPanel content;
 
-    public JoinDialog(List<ProspectivePartner> partnerList, Proof proof,
-            PredicateEstimator estimator, Services services) {
+    public JoinDialog(@NonNull List<ProspectivePartner> partnerList, @NonNull Proof proof,
+                      PredicateEstimator estimator, @NonNull Services services) {
         super("Joining", 5, false);
         content = new ContentPanel(partnerList, proof, estimator,
             (input, valid, reason) -> getOkButton().setEnabled(valid), services);
@@ -61,19 +63,19 @@ public class JoinDialog extends StdDialog {
         private JLabel joinHeadline;
         private JLabel infoPredicate;
         private ClickableMessageBox infoBox;
-        private JScrollPane infoBoxPane = null;
+        private @Nullable JScrollPane infoBoxPane = null;
 
-        private final Proof proof;
+        private final @NonNull Proof proof;
         private final PredicateEstimator estimator;
 
         // private JTextPane inputPredicate;
 
         private static class ContentItem {
-            final ProspectivePartner partner;
-            final CheckedUserInputInspector inspector;
+            final @NonNull ProspectivePartner partner;
+            final @NonNull CheckedUserInputInspector inspector;
             final boolean applicable;
 
-            public ContentItem(ProspectivePartner partner, Services services, boolean applicable) {
+            public ContentItem(@NonNull ProspectivePartner partner, @NonNull Services services, boolean applicable) {
                 super();
                 this.partner = partner;
                 this.inspector = new InspectorForDecisionPredicates(services,
@@ -82,7 +84,7 @@ public class JoinDialog extends StdDialog {
                 this.applicable = applicable;
             }
 
-            public CheckedUserInputInspector getInspector() {
+            public @NonNull CheckedUserInputInspector getInspector() {
                 return inspector;
             }
 
@@ -92,21 +94,22 @@ public class JoinDialog extends StdDialog {
                 return applicable;
             }
 
+            @NonNull
             Sequent getSequent() {
                 return partner.getNode(1).sequent();
             }
 
             @Override
-            public String toString() {
+            public @NonNull String toString() {
                 return "Goal " + partner.getNode(1).serialNr();
             }
 
-            public String getPredicateInfo() {
+            public @NonNull String getPredicateInfo() {
                 return "Decision Formula (true for Goal " + partner.getNode(0).serialNr()
                     + ", false for Goal " + partner.getNode(1).serialNr() + ")";
             }
 
-            public String getPredicate(Proof proof) {
+            public @NonNull String getPredicate(@NonNull Proof proof) {
                 if (partner.getCommonPredicate() == null) {
                     return "";
                 }
@@ -118,9 +121,9 @@ public class JoinDialog extends StdDialog {
         }
 
 
-        public ContentPanel(List<ProspectivePartner> partnerList, final Proof proof,
-                PredicateEstimator estimator, final CheckedUserInputListener listener,
-                Services services) {
+        public ContentPanel(@NonNull List<ProspectivePartner> partnerList, final @NonNull Proof proof,
+                            PredicateEstimator estimator, final @NonNull CheckedUserInputListener listener,
+                            @NonNull Services services) {
             super(BoxLayout.Y_AXIS);
 
             this.proof = proof;
@@ -145,7 +148,7 @@ public class JoinDialog extends StdDialog {
 
         }
 
-        private void fill(List<ProspectivePartner> partnerList, Services services) {
+        private void fill(@NonNull List<ProspectivePartner> partnerList, @NonNull Services services) {
             Node node = partnerList.get(0).getNode(0);
             getHeadline().setText("<html><b>Join Goal " + node.serialNr() + "</b></html>");
             getSequentViewer1().setSequent(node.sequent(), proof.getServices());
@@ -194,7 +197,7 @@ public class JoinDialog extends StdDialog {
 
         }
 
-        private Box createLeftAlignedComponent(JComponent comp) {
+        private @NonNull Box createLeftAlignedComponent(JComponent comp) {
 
             Box box = Box.createHorizontalBox();
             box.add(comp);
@@ -252,7 +255,7 @@ public class JoinDialog extends StdDialog {
 
         }
 
-        private void refreshInfoBox(String reason) {
+        private void refreshInfoBox(@Nullable String reason) {
             ContentItem item = getSelectedItem();
             getInfoBox().clear();
             if (!item.isApplicable()) {
@@ -307,7 +310,7 @@ public class JoinDialog extends StdDialog {
             return infoPredicate;
         }
 
-        private CheckedUserInput getPredicateInput() {
+        private @NonNull CheckedUserInput getPredicateInput() {
             if (predicateInput == null) {
                 predicateInput = new CheckedUserInput(false);
             }
@@ -352,7 +355,7 @@ public class JoinDialog extends StdDialog {
             return sequentViewer2;
         }
 
-        public ProspectivePartner getSelectedPartner() {
+        public @NonNull ProspectivePartner getSelectedPartner() {
             return getSelectedItem().partner;
         }
 
@@ -363,7 +366,7 @@ public class JoinDialog extends StdDialog {
 
     }
 
-    public ProspectivePartner getSelectedPartner() {
+    public @NonNull ProspectivePartner getSelectedPartner() {
 
         return content.getSelectedPartner();
     }

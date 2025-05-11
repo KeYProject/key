@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util.removegenerics;
 
 import java.util.regex.Pattern;
 
+import org.jspecify.annotations.Nullable;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -64,7 +65,7 @@ public class ResolveGenericClass {
         }
     }
 
-    private String firstDifferentChar(String s1, String s2) {
+    private @Nullable String firstDifferentChar(String s1, String s2) {
         Pattern nospaces1 = Pattern.compile("(\\w)(\\W)");
         s1 = nospaces1.matcher(s1).replaceAll("$1 $2");
         s2 = nospaces1.matcher(s2).replaceAll("$1 $2");

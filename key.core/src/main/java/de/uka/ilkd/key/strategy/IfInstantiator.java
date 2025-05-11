@@ -32,8 +32,8 @@ import org.key_project.util.collection.ImmutableSLList;
  * This class implements custom instantiation of if-formulas.
  */
 public class IfInstantiator {
-    private final Goal goal;
-    private final IfInstantiationCache ifInstCache;
+    private final @NonNull Goal goal;
+    private final @NonNull IfInstantiationCache ifInstCache;
 
     private ImmutableArray<IfFormulaInstantiation> allAntecFormulas;
     private ImmutableArray<IfFormulaInstantiation> allSuccFormulas;
@@ -250,7 +250,7 @@ public class IfInstantiator {
     /**
      * @return Returns the results.
      */
-    public ImmutableList<NoPosTacletApp> getResults() {
+    public @NonNull ImmutableList<NoPosTacletApp> getResults() {
         return results;
     }
 }

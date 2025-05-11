@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -28,6 +29,7 @@ public interface IExecutionLoopCondition extends IExecutionBlockStartNode<JavaSt
      *
      * @return The executed loop expression.
      */
+    @Nullable
     Expression getGuardExpression();
 
     /**
@@ -35,5 +37,6 @@ public interface IExecutionLoopCondition extends IExecutionBlockStartNode<JavaSt
      *
      * @return The code of the executed loop expression.
      */
+    @Nullable
     PositionInfo getGuardExpressionPositionInfo();
 }

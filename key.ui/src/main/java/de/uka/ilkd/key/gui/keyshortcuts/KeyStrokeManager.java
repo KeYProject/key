@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.lang.ref.WeakReference;
@@ -64,7 +67,7 @@ public final class KeyStrokeManager {
      * @return nullable
      * @see KeyStrokeSettings
      */
-    public static KeyStroke get(String key, KeyStroke defaultValue) {
+    public static KeyStroke get(@NonNull String key, KeyStroke defaultValue) {
         KeyStroke ks = KeyStrokeSettings.getInstance().getKeyStroke(key, defaultValue);
         KeyStrokeSettings.getInstance().setKeyStroke(key, ks, false);
         return ks;
@@ -77,7 +80,7 @@ public final class KeyStrokeManager {
      * @param defaultValue
      * @return
      */
-    public static KeyStroke get(Object action, String defaultValue) {
+    public static KeyStroke get(@NonNull Object action, String defaultValue) {
         return get(action, KeyStroke.getKeyStroke(defaultValue));
     }
 
@@ -88,7 +91,7 @@ public final class KeyStrokeManager {
      * @param defaultValue
      * @return
      */
-    public static KeyStroke get(Object action, KeyStroke defaultValue) {
+    public static KeyStroke get(@NonNull Object action, KeyStroke defaultValue) {
         return get(action.getClass().getName(), defaultValue);
     }
 
@@ -99,7 +102,7 @@ public final class KeyStrokeManager {
      * @param action
      * @return
      */
-    public static KeyStroke get(Object action) {
+    public static KeyStroke get(@NonNull Object action) {
         return get(action, (KeyStroke) null);
     }
 
@@ -108,7 +111,7 @@ public final class KeyStrokeManager {
      * @return
      * @see #lookupAndOverride(Action, String)
      */
-    public static KeyStroke lookupAndOverride(Action action) {
+    public static KeyStroke lookupAndOverride(@NonNull Action action) {
         return lookupAndOverride(action, action.getClass().getName());
     }
 
@@ -122,7 +125,7 @@ public final class KeyStrokeManager {
      * @param key
      * @return
      */
-    public static KeyStroke lookupAndOverride(Action action, String key) {
+    public static KeyStroke lookupAndOverride(@NonNull Action action, @NonNull String key) {
         KeyStroke def = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
         KeyStroke found = get(key, def);
         action.putValue(Action.ACCELERATOR_KEY, found);
@@ -133,15 +136,15 @@ public final class KeyStrokeManager {
     /**
      * Register an action. Helps later to update the keyboard shortcut.
      */
-    public static void registerAction(Action action) {
+    public static void registerAction(@NonNull Action action) {
         actions.put(action.getClass().getName(), new WeakReference<>(action));
     }
 
-    public static KeyStrokeSettings getSettings() {
+    public static @NonNull KeyStrokeSettings getSettings() {
         return KeyStrokeSettings.getInstance();
     }
 
-    static Action findAction(String clazz) {
+    static @Nullable Action findAction(String clazz) {
         return actions.getOrDefault(clazz, new WeakReference<>(null)).get();
     }
 
@@ -161,7 +164,7 @@ public final class KeyStrokeManager {
      *
      * @return all actions
      */
-    public static Collection<WeakReference<Action>> getAllActions() {
+    public static @NonNull Collection<WeakReference<Action>> getAllActions() {
         return actions.values();
     }
 }

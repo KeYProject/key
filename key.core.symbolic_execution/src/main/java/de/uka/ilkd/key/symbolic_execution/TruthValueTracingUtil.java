@@ -41,6 +41,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
@@ -65,7 +67,7 @@ public final class TruthValueTracingUtil {
      * @param sequentFormula The {@link SequentFormula} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
-    public static boolean isPredicate(SequentFormula sequentFormula) {
+    public static boolean isPredicate(@Nullable SequentFormula sequentFormula) {
         return sequentFormula != null && isPredicate(sequentFormula.formula());
     }
 
@@ -75,7 +77,7 @@ public final class TruthValueTracingUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
-    public static boolean isPredicate(Term term) {
+    public static boolean isPredicate(@Nullable Term term) {
         return term != null && isPredicate(term.op());
     }
 
@@ -96,7 +98,7 @@ public final class TruthValueTracingUtil {
                 || operator == AbstractTermTransformer.META_LEQ
                 || operator == AbstractTermTransformer.META_LESS) {
             return true; // These Meta constructs evaluate always to true or false
-        } else if (operator instanceof final SortedOperator sortedOperator) {
+        } else if (operator instanceof final @NonNull SortedOperator sortedOperator) {
             return sortedOperator.sort() == JavaDLTheory.FORMULA;
         } else {
             return false;
@@ -109,7 +111,7 @@ public final class TruthValueTracingUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is logical operator, {@code false} is something else.
      */
-    public static boolean isLogicOperator(Term term) {
+    public static boolean isLogicOperator(@Nullable Term term) {
         if (term != null) {
             return isLogicOperator(term.op(), term.subs());
         } else {
@@ -124,7 +126,7 @@ public final class TruthValueTracingUtil {
      * @param subs The sub {@link Term}s.
      * @return {@code true} is logical operator, {@code false} is something else.
      */
-    public static boolean isLogicOperator(Operator operator, ImmutableArray<Term> subs) {
+    public static boolean isLogicOperator(Operator operator, @NonNull ImmutableArray<Term> subs) {
         if (operator instanceof Junctor) {
             return operator != Junctor.TRUE && operator != Junctor.FALSE;
         } else if (operator == Equality.EQV) {
@@ -139,7 +141,7 @@ public final class TruthValueTracingUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is if-then-else formula, {@code false} is something else.
      */
-    public static boolean isIfThenElseFormula(Term term) {
+    public static boolean isIfThenElseFormula(@Nullable Term term) {
         if (term != null) {
             return isIfThenElseFormula(term.op(), term.subs());
         } else {
@@ -155,7 +157,7 @@ public final class TruthValueTracingUtil {
      * @param subs The sub {@link Term}s.
      * @return {@code true} is if-then-else formula, {@code false} is something else.
      */
-    public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
+    public static boolean isIfThenElseFormula(@NonNull Operator operator, @NonNull ImmutableArray<Term> subs) {
         if (operator == IfThenElse.IF_THEN_ELSE) {
             Sort[] sorts = new Sort[subs.size()];
             for (int i = 0; i < sorts.length; i++) {
@@ -181,8 +183,8 @@ public final class TruthValueTracingUtil {
      * @return The result.
      * @throws ProofInputException Occurred Exception
      */
-    public static TruthValueTracingResult evaluate(Node node, Name termLabelName,
-            boolean useUnicode, boolean usePrettyPrinting) throws ProofInputException {
+    public static @NonNull TruthValueTracingResult evaluate(@NonNull Node node, @NonNull Name termLabelName,
+                                                            boolean useUnicode, boolean usePrettyPrinting) throws ProofInputException {
         TruthValueTracingResult result = new TruthValueTracingResult();
         Deque<Map<String, MultiEvaluationResult>> evaluationStack =
             new LinkedList<>();
@@ -228,9 +230,9 @@ public final class TruthValueTracingUtil {
      */
     private static void evaluateNode(
             final Node evaluationNode, final boolean useUnicode,
-            final boolean usePrettyPrinting, final Node child, final int childIndexOnParent,
-            final Name termLabelName, Map<String, MultiEvaluationResult> nodeResult,
-            final TruthValueTracingResult result, final Services services)
+            final boolean usePrettyPrinting, final @NonNull Node child, final int childIndexOnParent,
+            final @NonNull Name termLabelName, @NonNull Map<String, MultiEvaluationResult> nodeResult,
+            final @NonNull TruthValueTracingResult result, final @NonNull Services services)
             throws ProofInputException {
         // Analyze parent rule application
         boolean checkPerformed = false;
@@ -310,7 +312,7 @@ public final class TruthValueTracingUtil {
      * @param taclet The {@link Taclet} to check.
      * @return {@code true} is closing, {@code false} is not closing.
      */
-    private static boolean isClosingRule(Taclet taclet) {
+    private static boolean isClosingRule(@NonNull Taclet taclet) {
         return taclet.goalTemplates().isEmpty();
     }
 
@@ -322,9 +324,9 @@ public final class TruthValueTracingUtil {
      * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
      * @return The found {@link LabelOccurrence}s.
      */
-    private static List<LabelOccurrence> findInvolvedLabels(
-            Sequent sequent, TacletApp tacletApp,
-            Name termLabelName) {
+    private static @NonNull List<LabelOccurrence> findInvolvedLabels(
+            Sequent sequent, @NonNull TacletApp tacletApp,
+            @NonNull Name termLabelName) {
         List<LabelOccurrence> result = new LinkedList<>();
         // Search for labels in find part
         PosInOccurrence pio = tacletApp.posInOccurrence();
@@ -396,7 +398,7 @@ public final class TruthValueTracingUtil {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return label + (inAntecedent ? " in antecedent" : " in succedent");
         }
     }
@@ -413,8 +415,8 @@ public final class TruthValueTracingUtil {
      */
     private static void analyzeTacletGoal(
             Node parent, TacletApp tacletApp,
-            TacletGoalTemplate tacletGoal, List<LabelOccurrence> labels, Services services,
-            Map<String, MultiEvaluationResult> results) {
+            @NonNull TacletGoalTemplate tacletGoal, @NonNull List<LabelOccurrence> labels, Services services,
+            @NonNull Map<String, MultiEvaluationResult> results) {
         Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
         if (replaceObject instanceof Term) {
             Term replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (Term) replaceObject,
@@ -443,14 +445,14 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResultBasedOnNewMinorIdsOSS(
-            final PosInOccurrence childPio,
-            final PosInOccurrence parentPio, final Name termLabelName, final TermBuilder tb,
-            final Map<String, MultiEvaluationResult> results) {
+            final @NonNull PosInOccurrence childPio,
+            final @Nullable PosInOccurrence parentPio, final @NonNull Name termLabelName, final @NonNull TermBuilder tb,
+            final @NonNull Map<String, MultiEvaluationResult> results) {
         if (parentPio != null) {
             // Check application term and all of its children and grand children
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                 @Override
-                public void visit(Term visited) {
+                public void visit(@NonNull Term visited) {
                     checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName,
                         parentPio, tb, results);
                 }
@@ -476,9 +478,9 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void checkForNewMinorIdsOSS(
-            SequentFormula onlyChangedChildSF, Term term,
-            Name termLabelName, PosInOccurrence parentPio, TermBuilder tb,
-            Map<String, MultiEvaluationResult> results) {
+            @NonNull SequentFormula onlyChangedChildSF, @NonNull Term term,
+            @NonNull Name termLabelName, @NonNull PosInOccurrence parentPio, @NonNull TermBuilder tb,
+            @NonNull Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
             Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (FormulaTermLabel) label,
@@ -499,9 +501,9 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
-    private static Term checkForNewMinorIdsOSS(
-            SequentFormula onlyChangedChildSF,
-            FormulaTermLabel label, boolean antecedentRuleApplication, TermBuilder tb) {
+    private static @Nullable Term checkForNewMinorIdsOSS(
+            @NonNull SequentFormula onlyChangedChildSF,
+            @NonNull FormulaTermLabel label, boolean antecedentRuleApplication, @NonNull TermBuilder tb) {
         // Search replacements
         List<Term> antecedentReplacements = new LinkedList<>();
         List<Term> succedentReplacements = new LinkedList<>();
@@ -526,9 +528,9 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResultBasedOnNewMinorIds(
-            final Node childNode,
-            final Name termLabelName, final TermBuilder tb,
-            final Map<String, MultiEvaluationResult> results) {
+            final @NonNull Node childNode,
+            final @NonNull Name termLabelName, final @NonNull TermBuilder tb,
+            final @NonNull Map<String, MultiEvaluationResult> results) {
         final Node parentNode = childNode.parent();
         if (parentNode != null) {
             final RuleApp parentRuleApp = parentNode.getAppliedRuleApp();
@@ -537,7 +539,7 @@ public final class TruthValueTracingUtil {
                 // Check application term and all of its children and grand children
                 parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                     @Override
-                    public void visit(Term visited) {
+                    public void visit(@NonNull Term visited) {
                         checkForNewMinorIds(childNode, visited, termLabelName, parentPio, tb,
                             results);
                     }
@@ -573,8 +575,8 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void checkForNewMinorIds(
-            Node childNode, Term term, Name termLabelName,
-            PosInOccurrence parentPio, TermBuilder tb, Map<String, MultiEvaluationResult> results) {
+            @NonNull Node childNode, @NonNull Term term, @NonNull Name termLabelName,
+            @NonNull PosInOccurrence parentPio, @NonNull TermBuilder tb, @NonNull Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
             Term replacement =
@@ -595,9 +597,9 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
-    private static Term checkForNewMinorIds(
-            Node childNode, FormulaTermLabel label,
-            boolean antecedentRuleApplication, TermBuilder tb) {
+    private static @Nullable Term checkForNewMinorIds(
+            @NonNull Node childNode, @NonNull FormulaTermLabel label,
+            boolean antecedentRuleApplication, @NonNull TermBuilder tb) {
         // Search replacements
         List<Term> antecedentReplacements = new LinkedList<>();
         List<Term> succedentReplacements = new LinkedList<>();
@@ -621,22 +623,22 @@ public final class TruthValueTracingUtil {
      * @param resultToFill The result {@link List} to fill.
      */
     private static void listLabelReplacements(
-            final SequentFormula sf, final Name labelName,
-            final String labelId, final List<Term> resultToFill) {
+            final @NonNull SequentFormula sf, final @NonNull Name labelName,
+            final String labelId, final @NonNull List<Term> resultToFill) {
         sf.formula().execPreOrder(new DefaultVisitor() {
             @Override
-            public boolean visitSubtree(Term visited) {
+            public boolean visitSubtree(@NonNull Term visited) {
                 return !hasLabelOfInterest(visited);
             }
 
             @Override
-            public void visit(Term visited) {
+            public void visit(@NonNull Term visited) {
                 if (hasLabelOfInterest(visited)) {
                     resultToFill.add(visited);
                 }
             }
 
-            private boolean hasLabelOfInterest(Term visited) {
+            private boolean hasLabelOfInterest(@NonNull Term visited) {
                 TermLabel visitedLabel = visited.getLabel(labelName);
                 if (visitedLabel instanceof FormulaTermLabel pLabel) {
                     String[] beforeIds = pLabel.getBeforeIds();
@@ -659,9 +661,9 @@ public final class TruthValueTracingUtil {
      * @param tb The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
-    private static Term computeInstructionTerm(
-            List<Term> antecedentReplacements,
-            List<Term> succedentReplacements, boolean antecedentRuleApplication, TermBuilder tb) {
+    private static @Nullable Term computeInstructionTerm(
+            @NonNull List<Term> antecedentReplacements,
+            @NonNull List<Term> succedentReplacements, boolean antecedentRuleApplication, @NonNull TermBuilder tb) {
         if (!antecedentReplacements.isEmpty() || !succedentReplacements.isEmpty()) {
             Term left = tb.andPreserveLabels(antecedentReplacements);
             Term right = tb.orPreserveLabels(succedentReplacements);
@@ -684,8 +686,8 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResult(
-            FormulaTermLabel label, Term instructionTerm,
-            Map<String, MultiEvaluationResult> results) {
+            @NonNull FormulaTermLabel label, Term instructionTerm,
+            @NonNull Map<String, MultiEvaluationResult> results) {
         MultiEvaluationResult result = results.get(label.getId());
         if (result == null) {
             result = new MultiEvaluationResult(instructionTerm);
@@ -705,8 +707,8 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResult(
-            FormulaTermLabel label, boolean evaluationResult,
-            Map<String, MultiEvaluationResult> results) {
+            @NonNull FormulaTermLabel label, boolean evaluationResult,
+            @NonNull Map<String, MultiEvaluationResult> results) {
         MultiEvaluationResult result = results.get(label.getId());
         if (result == null) {
             result = new MultiEvaluationResult(evaluationResult);
@@ -827,7 +829,7 @@ public final class TruthValueTracingUtil {
          *        {@code false} label never evaluates to true.
          * @return The new created {@link MultiEvaluationResult}.
          */
-        public MultiEvaluationResult newEvaluatesToTrue(boolean newEvaluatesToTrue) {
+        public @NonNull MultiEvaluationResult newEvaluatesToTrue(boolean newEvaluatesToTrue) {
             return new MultiEvaluationResult(newEvaluatesToTrue, evaluatesToFalse, instructionTerm);
         }
 
@@ -839,7 +841,7 @@ public final class TruthValueTracingUtil {
          *        {@code false} label never evaluates to false.
          * @return The new created {@link MultiEvaluationResult}.
          */
-        public MultiEvaluationResult newEvaluatesToFalse(boolean newEvaluatesToFalse) {
+        public @NonNull MultiEvaluationResult newEvaluatesToFalse(boolean newEvaluatesToFalse) {
             return new MultiEvaluationResult(evaluatesToTrue, newEvaluatesToFalse, instructionTerm);
         }
 
@@ -850,7 +852,7 @@ public final class TruthValueTracingUtil {
          * @param newInstructionTerm The new instruction {@link Term}.
          * @return The new created {@link MultiEvaluationResult}.
          */
-        public MultiEvaluationResult newInstructionTerm(Term newInstructionTerm) {
+        public @NonNull MultiEvaluationResult newInstructionTerm(Term newInstructionTerm) {
             return new MultiEvaluationResult(evaluatesToTrue, evaluatesToFalse, newInstructionTerm);
         }
 
@@ -858,7 +860,7 @@ public final class TruthValueTracingUtil {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "true=" + evaluatesToTrue + ", false=" + evaluatesToFalse + ", instruction="
                 + instructionTerm;
         }
@@ -869,7 +871,7 @@ public final class TruthValueTracingUtil {
          * @param services The {@link Services} to use.
          * @return The pretty printed {@link String}.
          */
-        public String toPrettyString(Services services) {
+        public @NonNull String toPrettyString(Services services) {
             return "true=" + evaluatesToTrue + ", false=" + evaluatesToFalse
                 + (instructionTerm != null
                         ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services)
@@ -883,7 +885,7 @@ public final class TruthValueTracingUtil {
          * @param results All available {@link MultiEvaluationResult}s.
          * @return The computed {@link TruthValue}.
          */
-        public TruthValue evaluate(Name termLabelName, Map<String, MultiEvaluationResult> results) {
+        public @Nullable TruthValue evaluate(@NonNull Name termLabelName, @NonNull Map<String, MultiEvaluationResult> results) {
             if (evaluatesToTrue && evaluatesToFalse) {
                 return TruthValue.UNKNOWN;
             } else if (evaluatesToTrue) {
@@ -905,8 +907,8 @@ public final class TruthValueTracingUtil {
          * @param results All available {@link MultiEvaluationResult}s.
          * @return The computed {@link TruthValue}.
          */
-        private static TruthValue evaluateTerm(Term term, Name termLabelName,
-                Map<String, MultiEvaluationResult> results) {
+        private static @Nullable TruthValue evaluateTerm(@NonNull Term term, @NonNull Name termLabelName,
+                                                         @NonNull Map<String, MultiEvaluationResult> results) {
             TermLabel label = term.getLabel(termLabelName);
             // Return direct label result if available
             if (label instanceof FormulaTermLabel) {
@@ -1017,7 +1019,7 @@ public final class TruthValueTracingUtil {
          *
          * @param result The {@link BranchResult} to add.
          */
-        public void addBranchResult(BranchResult result) {
+        public void addBranchResult(@Nullable BranchResult result) {
             if (result != null) {
                 branchResults.add(result);
             }
@@ -1028,7 +1030,7 @@ public final class TruthValueTracingUtil {
          *
          * @return The {@link BranchResult}s.
          */
-        public BranchResult[] getBranchResults() {
+        public BranchResult @NonNull [] getBranchResults() {
             return branchResults.toArray(new BranchResult[0]);
         }
 
@@ -1036,7 +1038,7 @@ public final class TruthValueTracingUtil {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             StringBuilder sb = new StringBuilder();
             boolean afterFirst = false;
             for (BranchResult result : branchResults) {
@@ -1090,7 +1092,7 @@ public final class TruthValueTracingUtil {
          * @return All found results.
          */
         @Override
-        public Map<String, MultiEvaluationResult> results() {
+        public @NonNull Map<String, MultiEvaluationResult> results() {
             return Collections.unmodifiableMap(results);
         }
 
@@ -1100,7 +1102,7 @@ public final class TruthValueTracingUtil {
          * @param termLabel The {@link FormulaTermLabel}.
          * @return The found {@link MultiEvaluationResult} or {@code null} if not available.
          */
-        public MultiEvaluationResult getResult(FormulaTermLabel termLabel) {
+        public MultiEvaluationResult getResult(@Nullable FormulaTermLabel termLabel) {
             return termLabel != null ? results.get(termLabel.getId()) : null;
         }
 
@@ -1113,7 +1115,7 @@ public final class TruthValueTracingUtil {
          * @param termLabel The {@link FormulaTermLabel} to update.
          * @param result The new result of the given {@link FormulaTermLabel}.
          */
-        public void updateResult(FormulaTermLabel termLabel, MultiEvaluationResult result) {
+        public void updateResult(@Nullable FormulaTermLabel termLabel, MultiEvaluationResult result) {
             if (termLabel != null) {
                 results.put(termLabel.getId(), result);
             }
@@ -1160,7 +1162,7 @@ public final class TruthValueTracingUtil {
          * @param term The {@link Term} to check.
          * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
          */
-        public boolean hasPredicateLabel(Term term) {
+        public boolean hasPredicateLabel(@NonNull Term term) {
             return getPredicateLabel(term) != null;
         }
 
@@ -1170,7 +1172,7 @@ public final class TruthValueTracingUtil {
          * @param term The {@link Term}.
          * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
          */
-        public FormulaTermLabel getPredicateLabel(Term term) {
+        public @Nullable FormulaTermLabel getPredicateLabel(@NonNull Term term) {
             TermLabel label = term.getLabel(termLabelName);
             return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
         }
@@ -1189,7 +1191,7 @@ public final class TruthValueTracingUtil {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Goal ");
             sb.append(leafNode.serialNr());
@@ -1215,7 +1217,7 @@ public final class TruthValueTracingUtil {
          *
          * @return The pretty printed {@link String}.
          */
-        public String toPrettyString() {
+        public @NonNull String toPrettyString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Goal ");
             sb.append(leafNode.serialNr());
@@ -1242,7 +1244,7 @@ public final class TruthValueTracingUtil {
          * @param termLabel The {@link FormulaTermLabel} to evaluate.
          * @return The evaluation result.
          */
-        public TruthValue evaluate(FormulaTermLabel termLabel) {
+        public TruthValue evaluate(@Nullable FormulaTermLabel termLabel) {
             if (termLabel != null) {
                 MultiEvaluationResult instruction = getResult(termLabel);
                 return instruction != null ? instruction.evaluate(termLabelName, results) : null;
@@ -1284,7 +1286,7 @@ public final class TruthValueTracingUtil {
          * @return
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             if (this == TRUE) {
                 return "true";
             } else if (this == FALSE) {
@@ -1301,7 +1303,7 @@ public final class TruthValueTracingUtil {
          * @param right The right {@link TruthValue}.
          * @return The computed {@code and} value.
          */
-        public static TruthValue and(TruthValue left, TruthValue right) {
+        public static @NonNull TruthValue and(@Nullable TruthValue left, @Nullable TruthValue right) {
             if (left == null || UNKNOWN.equals(left)) {
                 if (FALSE.equals(right)) {
                     return FALSE;
@@ -1341,7 +1343,7 @@ public final class TruthValueTracingUtil {
          * @param right The right {@link TruthValue}.
          * @return The computed {@code or} value.
          */
-        public static TruthValue or(TruthValue left, TruthValue right) {
+        public static @NonNull TruthValue or(@Nullable TruthValue left, @Nullable TruthValue right) {
             if (left == null || UNKNOWN.equals(left)) {
                 if (TRUE.equals(right)) {
                     return TRUE;
@@ -1369,7 +1371,7 @@ public final class TruthValueTracingUtil {
          * @param value The {@link TruthValue}.
          * @return The computed {@code not} value.
          */
-        public static TruthValue not(TruthValue value) {
+        public static @NonNull TruthValue not(TruthValue value) {
             if (TRUE.equals(value)) {
                 return FALSE;
             } else if (FALSE.equals(value)) {

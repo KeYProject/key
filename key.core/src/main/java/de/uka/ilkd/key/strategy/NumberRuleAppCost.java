@@ -23,7 +23,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return ZERO_COST;
     }
 
-    public static RuleAppCost create(int p_cost) {
+    public static @NonNull RuleAppCost create(int p_cost) {
         if (p_cost == 0) {
             return NumberRuleAppCost.getZeroCost();
         }
@@ -43,7 +43,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return ac;
     }
 
-    public static RuleAppCost create(long p_cost) {
+    public static @NonNull RuleAppCost create(long p_cost) {
 
         if (p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
             return create((int) p_cost);
@@ -109,7 +109,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         }
     }
 
-    public final RuleAppCost add(@NonNull NumberRuleAppCost cost2) {
+    public final @NonNull RuleAppCost add(@NonNull NumberRuleAppCost cost2) {
         if (getValue() == 0) {
             return cost2;
         } else if (cost2.getValue() == 0) {

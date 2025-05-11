@@ -9,6 +9,7 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Option to specify all instantiations manually (does not apply to the automatic solver).
@@ -23,7 +24,7 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
      *
      */
     private static final long serialVersionUID = -3381517803006651928L;
-    private final MainWindow mainWindow;
+    private final @NonNull MainWindow mainWindow;
 
     /**
      * Listens for changes on
@@ -35,7 +36,7 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
     private final PropertyChangeListener generalSettingsListener =
         this::handleGeneralSettingsChanged;
 
-    public MinimizeInteraction(MainWindow mainWindow) {
+    public MinimizeInteraction(@NonNull MainWindow mainWindow) {
         super(mainWindow, NAME);
         this.mainWindow = mainWindow;
         setName("MinimizeInteractionInstance");

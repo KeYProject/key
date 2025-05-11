@@ -46,7 +46,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus, @NonNull Goal goal) {
         if (t1.op() == Z) {
             if (t2.op() != Z) {
                 return true;

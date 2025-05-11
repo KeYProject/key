@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -31,7 +33,7 @@ class TrafficLight extends JPanel {
 
 
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(@NonNull Graphics g) {
         super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g.create();
 

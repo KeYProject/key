@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.ui;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -31,7 +33,7 @@ public class PanZoomImageView extends JComponent
     /**
      * Current display transformation.
      */
-    private final AffineTransform at;
+    private final @NonNull AffineTransform at;
     /**
      * Timer used to control redraws.
      */
@@ -105,7 +107,7 @@ public class PanZoomImageView extends JComponent
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(@NonNull MouseEvent e) {
         p.setLocation(e.getPoint());
     }
 
@@ -122,7 +124,7 @@ public class PanZoomImageView extends JComponent
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(@NonNull MouseEvent e) {
         double deltaX = e.getX() - p.getX();
         double deltaY = e.getY() - p.getY();
         moveBy(deltaX, deltaY, e.getPoint());
@@ -133,7 +135,7 @@ public class PanZoomImageView extends JComponent
     }
 
     @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
+    public void mouseWheelMoved(@NonNull MouseWheelEvent e) {
         double scale = e.getWheelRotation() < 0 ? 1.1 : 0.9;
         this.scale(scale, -e.getX(), -e.getY());
     }
@@ -174,7 +176,7 @@ public class PanZoomImageView extends JComponent
         private int events = 0;
 
         @Override
-        public void componentResized(ComponentEvent e) {
+        public void componentResized(@NonNull ComponentEvent e) {
             PanZoomImageView pziw = (PanZoomImageView) e.getComponent();
             double newWidth = e.getComponent().getWidth();
             double newHeight = e.getComponent().getHeight();

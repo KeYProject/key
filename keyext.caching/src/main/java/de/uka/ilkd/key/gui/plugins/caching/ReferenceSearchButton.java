@@ -16,6 +16,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Status line button to indicate whether cached goals are present.
@@ -33,14 +35,14 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
     /**
      * The mediator.
      */
-    private final KeYMediator mediator;
+    private final @NonNull KeYMediator mediator;
 
     /**
      * Construct a new button.
      *
      * @param mediator the mediator
      */
-    public ReferenceSearchButton(KeYMediator mediator) {
+    public ReferenceSearchButton(@NonNull KeYMediator mediator) {
         super("Proof Caching");
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
@@ -70,7 +72,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
     }
 
     @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
+    public void selectedNodeChanged(@NonNull KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
         updateState(p);
     }
@@ -80,7 +82,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
      *
      * @param p the currently selected proof
      */
-    public void updateState(Proof p) {
+    public void updateState(@Nullable Proof p) {
         if (p == null) {
             setText("Proof Caching");
             setForeground(null);

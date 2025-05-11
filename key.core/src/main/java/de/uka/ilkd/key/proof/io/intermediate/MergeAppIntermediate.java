@@ -94,7 +94,7 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
     /**
      * @return The user-supplied distinguishing formula; null if none given.
      */
-    public String getDistinguishingFormula() {
+    public @Nullable String getDistinguishingFormula() {
         return distinguishingFormula;
     }
 
@@ -108,7 +108,7 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
     /**
      * @return The abstraction predicates for predicate abstraction; null if none given.
      */
-    public String getAbstractionPredicates() {
+    public @Nullable String getAbstractionPredicates() {
         return abstractionPredicates;
     }
 
@@ -116,7 +116,7 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
      * @return The abstraction predicates for program variables involved in a join that are manually
      *         chosen by the user.
      */
-    public String getUserChoices() {
+    public @Nullable String getUserChoices() {
         return userChoices;
     }
 

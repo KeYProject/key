@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.Component;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
@@ -49,7 +51,7 @@ public class InfoDialog {
         return infoText;
     }
 
-    private JCheckBox getShowAgainBox() {
+    private @NonNull JCheckBox getShowAgainBox() {
         if (showAgainBox == null) {
             showAgainBox = new JCheckBox("Don't show this dialog again.");
 

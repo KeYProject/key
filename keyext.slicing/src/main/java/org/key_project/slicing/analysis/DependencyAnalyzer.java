@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingSettingsProvider;
@@ -113,7 +114,7 @@ public final class DependencyAnalyzer {
     /**
      * The proof to analyze.
      */
-    private final Proof proof;
+    private final @NonNull Proof proof;
     /**
      * The dependency graph of the proof to analyze.
      */
@@ -157,7 +158,7 @@ public final class DependencyAnalyzer {
      * @param doDeduplicateRuleApps whether to de-duplicate rule applications
      */
     public DependencyAnalyzer(
-            Proof proof,
+            @NonNull Proof proof,
             DependencyGraph graph,
             boolean doDependencyAnalysis,
             boolean doDeduplicateRuleApps) {
@@ -178,7 +179,7 @@ public final class DependencyAnalyzer {
      *
      * @return analysis results
      */
-    public AnalysisResults analyze() {
+    public @NonNull AnalysisResults analyze() {
         if (GeneralSettings.noPruningClosed) {
             throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, "
                 + "try disabling GeneralSettings.noPruningClosed");
@@ -260,7 +261,7 @@ public final class DependencyAnalyzer {
         }
     }
 
-    private RuleStatistics getRuleStatistics() {
+    private @NonNull RuleStatistics getRuleStatistics() {
         RuleStatistics rules = new RuleStatistics();
         proof.breadthFirstSearch(proof.root(), (theProof, node) -> {
             if (node.getAppliedRuleApp() == null) {
@@ -352,7 +353,7 @@ public final class DependencyAnalyzer {
      *
      * @return queue of closed goals in the proof
      */
-    private Deque<Node> analyzeDependenciesUsefulRoots() {
+    private @NonNull Deque<Node> analyzeDependenciesUsefulRoots() {
         Deque<Node> queue = new ArrayDeque<>();
         for (Goal e : proof.closedGoals()) {
             queue.add(e.node());
@@ -593,8 +594,8 @@ public final class DependencyAnalyzer {
      * @param mergeBase common prefix of <code>locA</code> and <code>locB</code>
      * @return whether a merge is valid
      */
-    private boolean canMergeStepsInto(List<Node> apps, int idxA, Node stepA, Node stepB,
-            BranchLocation locA, BranchLocation locB, BranchLocation mergeBase) {
+    private boolean canMergeStepsInto(@NonNull List<Node> apps, int idxA, Node stepA, Node stepB,
+                                      @NonNull BranchLocation locA, BranchLocation locB, @NonNull BranchLocation mergeBase) {
         // calculate the step index of the merged rule application
         BranchLocation differingSuffix = locA.size() == mergeBase.size() ? locB : locA;
         int newStepIdx = differingSuffix.stripPrefix(mergeBase).getNode(0).getStepIndex() - 1;
@@ -716,8 +717,8 @@ public final class DependencyAnalyzer {
      * @param mergeBase merge base of stepA and stepB
      * @return whether the merge is obstructed
      */
-    private boolean otherStepsRequireConsumedInputs(List<Node> apps, int idxA, Node stepA,
-            Node stepB, BranchLocation mergeBase) {
+    private boolean otherStepsRequireConsumedInputs(@NonNull List<Node> apps, int idxA, Node stepA,
+                                                    Node stepB, @NonNull BranchLocation mergeBase) {
         boolean consumesInput = graph.edgesOf(apps.get(idxA)).stream()
                 .anyMatch(AnnotatedEdge::replacesInputNode);
         if (consumesInput) {

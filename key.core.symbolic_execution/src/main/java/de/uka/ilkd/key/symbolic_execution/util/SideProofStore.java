@@ -16,6 +16,8 @@ import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.ProofUserManager;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -96,7 +98,7 @@ public final class SideProofStore {
      * @param description The description.
      * @param proof The {@link Proof} to add.
      */
-    public void addProof(String description, Proof proof) {
+    public void addProof(String description, @NonNull Proof proof) {
         synchronized (entries) {
             if (!containsEntry(proof)) {
                 Entry entry = new Entry(description, proof);
@@ -113,7 +115,7 @@ public final class SideProofStore {
      *
      * @param entries The {@link Entry}s to remove.
      */
-    public void removeEntries(Collection<Entry> entries) {
+    public void removeEntries(@NonNull Collection<Entry> entries) {
         synchronized (entries) {
             if (this.entries.removeAll(entries)) {
                 for (Entry entry : entries) {
@@ -148,7 +150,7 @@ public final class SideProofStore {
      * @param proof The {@link Proof} for which the {@link Entry} is requested.
      * @return The {@link Entry} with the given {@link Proof} or {@code null} if not available.
      */
-    public Entry getEntry(final Proof proof) {
+    public @Nullable Entry getEntry(final Proof proof) {
         return CollectionUtil.search(entries,
             element -> element != null && element.getProof() == proof);
     }
@@ -179,7 +181,7 @@ public final class SideProofStore {
      * @param index The index.
      * @return The {@link Entry} at the given index.
      */
-    public Entry getEntryAt(int index) {
+    public @Nullable Entry getEntryAt(int index) {
         return index >= 0 && index < entries.size() ? entries.get(index) : null;
     }
 
@@ -188,7 +190,7 @@ public final class SideProofStore {
      *
      * @return All available {@link Entry}s.
      */
-    public Entry[] getEntries() {
+    public Entry @NonNull [] getEntries() {
         return entries.toArray(new Entry[0]);
     }
 
@@ -197,7 +199,7 @@ public final class SideProofStore {
      *
      * @param l The {@link ISideProofStoreListener} to register.
      */
-    public void addProofStoreListener(ISideProofStoreListener l) {
+    public void addProofStoreListener(@Nullable ISideProofStoreListener l) {
         if (l != null) {
             listener.add(l);
         }
@@ -208,7 +210,7 @@ public final class SideProofStore {
      *
      * @param l The {@link ISideProofStoreListener} to unregister.
      */
-    public void removeProofStoreListener(ISideProofStoreListener l) {
+    public void removeProofStoreListener(@Nullable ISideProofStoreListener l) {
         if (l != null) {
             listener.remove(l);
         }
@@ -219,7 +221,7 @@ public final class SideProofStore {
      *
      * @return All registered {@link ISideProofStoreListener}.
      */
-    public ISideProofStoreListener[] getProofStoreListener() {
+    public ISideProofStoreListener @NonNull [] getProofStoreListener() {
         return listener.toArray(new ISideProofStoreListener[0]);
     }
 
@@ -304,7 +306,7 @@ public final class SideProofStore {
         /**
          * The {@link KeYEnvironment}.
          */
-        private final KeYEnvironment<DefaultUserInterfaceControl> environment;
+        private final @NonNull KeYEnvironment<DefaultUserInterfaceControl> environment;
 
         /**
          * Constructor.
@@ -312,7 +314,7 @@ public final class SideProofStore {
          * @param description The description.
          * @param proof The {@link Proof}.
          */
-        public Entry(String description, Proof proof) {
+        public Entry(String description, @NonNull Proof proof) {
             this.description = description;
             this.proof = proof;
             DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();

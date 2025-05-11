@@ -11,6 +11,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The notificatin manager controls the list of active notification tasks. It receives KeY System
@@ -27,7 +28,7 @@ public class NotificationManager {
     /** true if we are currently in automode */
     private boolean autoMode = false;
 
-    private final NotificationListener notificationListener;
+    private final @NonNull NotificationListener notificationListener;
 
     public void setDefaultNotification(JFrame comp) {
         notificationTasks.clear();
@@ -49,7 +50,7 @@ public class NotificationManager {
     /**
      * creates an instance of the notification manager
      */
-    public NotificationManager(KeYMediator mediator, JFrame comp) {
+    public NotificationManager(@NonNull KeYMediator mediator, JFrame comp) {
         notificationListener = new NotificationListener();
         // This method delegates the request only to the UserInterfaceControl
         // which implements the functionality.
@@ -63,7 +64,7 @@ public class NotificationManager {
      *
      * @param task the NotificationTask to be added
      */
-    public void addNotificationTask(NotificationTask task) {
+    public void addNotificationTask(@NonNull NotificationTask task) {
         notificationTasks.put(task.getEventID(), task);
     }
 
@@ -72,7 +73,7 @@ public class NotificationManager {
      *
      * @param task the task to be removed
      */
-    public void removeNotificationTask(NotificationTask task) {
+    public void removeNotificationTask(@NonNull NotificationTask task) {
         removeNotificationTask(task.getEventID());
     }
 
@@ -122,7 +123,7 @@ public class NotificationManager {
      *
      * @param event
      */
-    public void handleNotificationEvent(NotificationEvent event) {
+    public void handleNotificationEvent(@NonNull NotificationEvent event) {
         NotificationTask notificationTask = notificationTasks.get(event.getEventID());
         if (notificationTask != null) {
             notificationTask.execute(event, this);

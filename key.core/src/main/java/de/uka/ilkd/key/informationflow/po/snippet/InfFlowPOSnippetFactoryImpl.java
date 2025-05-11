@@ -32,10 +32,10 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     final BasicSnippetData data;
 
     /** The first copy of the proof obligation variables. */
-    final ProofObligationVars poVars1;
+    final @NonNull ProofObligationVars poVars1;
 
     /** The second copy of the proof obligation variables. */
-    final ProofObligationVars poVars2;
+    final @NonNull ProofObligationVars poVars2;
 
 
     /**

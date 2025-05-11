@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
@@ -42,35 +43,31 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
      * {@inheritDoc}
      */
     @Override
-    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
         String name = MiscTools.getRuleName(node);
         if (name != null && name.toLowerCase().contains("methodcall")) {
             NodeInfo info = node.getNodeInfo();
-            if (info != null) {
-                if (info.getActiveStatement() instanceof MethodReference) {
-                    ExecutionContext context = extractContext(node, services);
-                    IProofReference<IProgramMethod> reference = createReference(node, services,
-                        context, (MethodReference) info.getActiveStatement());
-                    LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<>();
-                    result.add(reference);
-                    return result;
-                } else if (info.getActiveStatement() instanceof Assignment assignment) {
-                    ExecutionContext context = extractContext(node, services);
-                    LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<>();
-                    for (int i = 0; i < assignment.getChildCount(); i++) {
-                        ProgramElement child = assignment.getChildAt(i);
-                        if (child instanceof MethodReference) {
-                            IProofReference<IProgramMethod> reference =
-                                createReference(node, services, context, (MethodReference) child);
-                            ProofReferenceUtil.merge(result, reference);
-                        }
+            if (info.getActiveStatement() instanceof MethodReference) {
+                ExecutionContext context = extractContext(node, services);
+                IProofReference<IProgramMethod> reference = createReference(node, services,
+                    context, (MethodReference) info.getActiveStatement());
+                LinkedHashSet<IProofReference<?>> result =
+                    new LinkedHashSet<>();
+                result.add(reference);
+                return result;
+            } else if (info.getActiveStatement() instanceof Assignment assignment) {
+                ExecutionContext context = extractContext(node, services);
+                LinkedHashSet<IProofReference<?>> result =
+                    new LinkedHashSet<>();
+                for (int i = 0; i < assignment.getChildCount(); i++) {
+                    ProgramElement child = assignment.getChildAt(i);
+                    if (child instanceof MethodReference) {
+                        IProofReference<IProgramMethod> reference =
+                            createReference(node, services, context, (MethodReference) child);
+                        ProofReferenceUtil.merge(result, reference);
                     }
-                    return result;
-                } else {
-                    return null;
                 }
+                return result;
             } else {
                 return null;
             }

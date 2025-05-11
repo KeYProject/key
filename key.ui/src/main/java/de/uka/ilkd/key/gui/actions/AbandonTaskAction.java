@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
 
 public final class AbandonTaskAction extends MainWindowAction {
 
@@ -18,7 +19,7 @@ public final class AbandonTaskAction extends MainWindowAction {
 
     private final Proof proof;
 
-    public AbandonTaskAction(MainWindow mainWindow, Proof proof) {
+    public AbandonTaskAction(@NonNull MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Abandon Proof");
         setIcon(IconFactory.abandon(16));

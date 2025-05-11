@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extracts inlined methods.
@@ -23,8 +24,8 @@ public class MethodBodyExpandProofReferencesAnalyst implements IProofReferencesA
      * {@inheritDoc}
      */
     @Override
-    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
-        if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
+    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+        if (node.getAppliedRuleApp() != null) {
             NodeInfo info = node.getNodeInfo();
             if (info.getActiveStatement() instanceof MethodBodyStatement mbs) {
                 IProgramMethod pm = mbs.getProgramMethod(services);

@@ -47,7 +47,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
      *
      * @return Sequent being paramter in the rule goal replacewith(Seq)
      */
-    public Sequent replaceWith() {
+    public @NonNull Sequent replaceWith() {
         return replacewith;
     }
 

@@ -18,6 +18,8 @@ import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 import de.uka.ilkd.key.smt.SMTFocusResults;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.SwingUtil;
 
 import org.slf4j.Logger;
@@ -31,7 +33,7 @@ public class ProgressDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
 
-    private final ProgressTable table;
+    private final @NonNull ProgressTable table;
     /**
      * Button to apply the results of running the SMT solver.
      * May close some open goals if the solver returned unsat.
@@ -55,7 +57,7 @@ public class ProgressDialog extends JDialog {
      * Overall progress of the SMT solvers (# goals started / total goals).
      */
     private JProgressBar progressBar;
-    private final ProgressDialogListener listener;
+    private final @NonNull ProgressDialogListener listener;
 
     /**
      * Current state of the dialog.
@@ -88,9 +90,9 @@ public class ProgressDialog extends JDialog {
         void focusButtonClicked();
     }
 
-    public ProgressDialog(ProgressModel model, ProgressDialogListener listener,
-            boolean counterexample, int resolution, int progressBarMax, String[] labelTitles,
-            String... titles) {
+    public ProgressDialog(@NonNull ProgressModel model, @NonNull ProgressDialogListener listener,
+                          boolean counterexample, int resolution, int progressBarMax, String[] labelTitles,
+                          String... titles) {
         super(MainWindow.getInstance());
         table = new ProgressTable(resolution, listener, labelTitles);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -141,7 +143,7 @@ public class ProgressDialog extends JDialog {
         getProgressBar().setValue(value);
     }
 
-    public JProgressBar getProgressBar() {
+    public @NonNull JProgressBar getProgressBar() {
         if (progressBar == null) {
             progressBar = new JProgressBar();
 
@@ -188,7 +190,7 @@ public class ProgressDialog extends JDialog {
         return applyButton;
     }
 
-    private JScrollPane getScrollPane() {
+    private @NonNull JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = SwingUtil.createScrollPane(table);
         }
@@ -323,7 +325,7 @@ class ProgressTable extends JTable {
             getProgressBar().setValue(value);
         }
 
-        public void setText(String text) {
+        public void setText(@Nullable String text) {
             getProgressBar().setString(text);
             getProgressBar().setStringPainted(text != null && !text.isEmpty());
         }
@@ -343,8 +345,8 @@ class ProgressTable extends JTable {
 
 
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                int row, int column) {
+        public @NonNull Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+                                                              int row, int column) {
 
             currentEditorCell.x = column;
             currentEditorCell.y = row;
@@ -356,7 +358,7 @@ class ProgressTable extends JTable {
 
 
         @Override
-        public Object getCellEditorValue() {
+        public @Nullable Object getCellEditorValue() {
             return null;
         }
 
@@ -364,7 +366,7 @@ class ProgressTable extends JTable {
 
 
 
-    private void prepareProgressPanel(ProgressPanel panel, final ProcessData data) {
+    private void prepareProgressPanel(@NonNull ProgressPanel panel, final @NonNull ProcessData data) {
         panel.setValue(data.getProgress());
         panel.setText(data.getText());
         panel.infoButton.setEnabled(data.isEditable());
@@ -396,7 +398,7 @@ class ProgressTable extends JTable {
 
 
 
-    public ProgressTable(int resolution, ProgressTableListener listener, String... titles) {
+    public ProgressTable(int resolution, @NonNull ProgressTableListener listener, String... titles) {
         this.setDefaultRenderer(ProgressModel.ProcessColumn.class, renderer);
         this.setDefaultEditor(ProgressModel.ProcessColumn.class, editor);
         init(getProgressPanelEditor(), this.getFont(), resolution, listener);
@@ -404,8 +406,8 @@ class ProgressTable extends JTable {
 
     }
 
-    private void init(ProgressPanel panel, Font font, int resolution,
-            final ProgressTableListener listener) {
+    private void init(@NonNull ProgressPanel panel, Font font, int resolution,
+                      final @NonNull ProgressTableListener listener) {
         panel.setFont(font);
         panel.progressBar.setMaximum(resolution);
         panel.infoButton.addActionListener(
@@ -415,7 +417,7 @@ class ProgressTable extends JTable {
     }
 
 
-    public void setModel(ProgressModel model, String... titles) {
+    public void setModel(@NonNull ProgressModel model, String @NonNull ... titles) {
 
         assert titles.length == model.getColumnCount();
         super.setModel(model);
@@ -443,7 +445,7 @@ class ProgressTable extends JTable {
     // }
 
     @Override
-    public Dimension getPreferredScrollableViewportSize() {
+    public @NonNull Dimension getPreferredScrollableViewportSize() {
         Dimension dim = new Dimension(super.getPreferredScrollableViewportSize());
 
         dim.height =
@@ -452,7 +454,7 @@ class ProgressTable extends JTable {
         return dim;
     }
 
-    public static void packColumn(JTable table, int vColIndex, int margin) {
+    public static void packColumn(@NonNull JTable table, int vColIndex, int margin) {
 
         TableColumnModel colModel = table.getColumnModel();
         TableColumn col = colModel.getColumn(vColIndex);
@@ -482,7 +484,7 @@ class ProgressTable extends JTable {
 
 
 
-    private ProgressPanel getProgressPanelEditor() {
+    private @NonNull ProgressPanel getProgressPanelEditor() {
         if (progressPanelEditor == null) {
             progressPanelEditor = new ProgressPanel();
         }
@@ -491,7 +493,7 @@ class ProgressTable extends JTable {
 
 
     @Override
-    public void tableChanged(TableModelEvent e) {
+    public void tableChanged(@NonNull TableModelEvent e) {
         if (e.getType() == TableModelEvent.UPDATE) {
             this.repaint();
 

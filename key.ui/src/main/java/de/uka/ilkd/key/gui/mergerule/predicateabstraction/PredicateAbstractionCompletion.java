@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactor
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
@@ -37,8 +38,8 @@ public class PredicateAbstractionCompletion
      * ilkd.key.rule.join.JoinProcedure, de.uka.ilkd.key.proof.Goal)
      */
     @Override
-    public MergeWithPredicateAbstraction complete(MergeWithPredicateAbstraction proc,
-            Pair<Goal, PosInOccurrence> joinGoalPio, Collection<MergePartner> partners) {
+    public @NonNull MergeWithPredicateAbstraction complete(MergeWithPredicateAbstraction proc,
+                                                           @NonNull Pair<Goal, PosInOccurrence> joinGoalPio, @NonNull Collection<MergePartner> partners) {
         final Services services = joinGoalPio.first.proof().getServices();
 
         // Compute the program variables that are different in the

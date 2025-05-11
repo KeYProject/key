@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 /**
@@ -60,12 +61,12 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
     }
 
     @Override
-    public GraphNode popLastBranchID() {
+    public @NonNull GraphNode popLastBranchID() {
         return new TrackedFormula(formula, branchLocation.removeLast(), inAntec, services);
     }
 
     @Override
-    public String toString(boolean abbreviated, boolean omitBranch) {
+    public @NonNull String toString(boolean abbreviated, boolean omitBranch) {
         if (abbreviated) {
             return Integer.toHexString(hashCode());
         }

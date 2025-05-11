@@ -31,14 +31,14 @@ public abstract class TacletVisitor implements DefaultVisitor {
         visit(seq.succedent());
     }
 
-    public String visit(@NonNull Taclet taclet, boolean visitAddrules) {
+    public @Nullable String visit(@NonNull Taclet taclet, boolean visitAddrules) {
         visit(taclet.ifSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
         return failureDescription;
     }
 
-    public String visit(@NonNull Taclet taclet) {
+    public @Nullable String visit(@NonNull Taclet taclet) {
         return visit(taclet, false);
     }
 

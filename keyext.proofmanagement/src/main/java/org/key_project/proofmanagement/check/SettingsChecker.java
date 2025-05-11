@@ -14,6 +14,7 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
@@ -41,7 +42,7 @@ public class SettingsChecker implements Checker {
 
     // TODO: Carry file info with the data to allow for good user feedback
     @Override
-    public void check(ProofBundleHandler pbh, CheckerData data) throws ProofManagementException {
+    public void check(@NonNull ProofBundleHandler pbh, @NonNull CheckerData data) throws ProofManagementException {
         data.addCheck("settings");
         data.print("Running settings checker ...");
 
@@ -81,7 +82,7 @@ public class SettingsChecker implements Checker {
      */
 
     // TODO: SMT settings ignored for now! (strategy settings should be irrelevant)
-    private static boolean consistent(List<ProofSettings> proofSettings, CheckerData data) {
+    private static boolean consistent(@NonNull List<ProofSettings> proofSettings, @NonNull CheckerData data) {
 
         // TODO change to map Settings -> ProofEntry (for feedback)
         // extract ChoiceSettings from ProofSettings and check for compatibility
@@ -92,8 +93,8 @@ public class SettingsChecker implements Checker {
         return choicesConsistent(choiceSettings, data);
     }
 
-    private static boolean choicesConsistent(List<ChoiceSettings> choiceSettings,
-            CheckerData data) {
+    private static boolean choicesConsistent(@NonNull List<ChoiceSettings> choiceSettings,
+                                             @NonNull CheckerData data) {
         if (choiceSettings.isEmpty()) {
             return true;
         }
@@ -150,7 +151,7 @@ public class SettingsChecker implements Checker {
         return consistent;
     }
 
-    private static boolean compatible(Choice a, Choice b) {
+    private static boolean compatible(@NonNull Choice a, @NonNull Choice b) {
         if (!a.name().equals(b.name())) {
             return false;
         }

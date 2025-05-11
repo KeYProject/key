@@ -17,6 +17,8 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -48,7 +50,7 @@ public final class GoalBackAction extends MainWindowAction {
      * @param longName true iff long names (including the name of the rule to undo) shall be
      *        displayed (e.g. in menu items)
      */
-    public GoalBackAction(MainWindow mainWindow, boolean longName) {
+    public GoalBackAction(@NonNull MainWindow mainWindow, boolean longName) {
         super(mainWindow);
         this.longName = longName;
         putValue(SMALL_ICON, IconFactory.goalBackLogo(MainWindow.TOOLBAR_ICON_SIZE));
@@ -152,7 +154,7 @@ public final class GoalBackAction extends MainWindowAction {
      *         open/closedGoals lists. This may be the case if the flag "--no-pruning-closed" is set
      *         (which means that the closedGoals list is empty) and the given subtree is closed.
      */
-    private Goal findNewestGoal(Node subtree) {
+    private Goal findNewestGoal(@Nullable Node subtree) {
         if (subtree == null) {
             return null;
         }

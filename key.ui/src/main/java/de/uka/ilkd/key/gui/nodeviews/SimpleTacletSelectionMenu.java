@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.PosTacletApp;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -37,8 +38,8 @@ public class SimpleTacletSelectionMenu extends JMenu {
      * @param info the NotationInfo used to pretty print the taclets in tooltips
      * @param listener the ActionListener which is registered at each menu item
      */
-    public SimpleTacletSelectionMenu(ImmutableList<PosTacletApp> apps, NotationInfo info,
-            ActionListener listener, Services services) {
+    public SimpleTacletSelectionMenu(@NonNull ImmutableList<PosTacletApp> apps, @NonNull NotationInfo info,
+                                     ActionListener listener, @NonNull Services services) {
         super("Select Rule to Apply");
 
         addMenuEntries(apps, info, listener, services);
@@ -51,8 +52,8 @@ public class SimpleTacletSelectionMenu extends JMenu {
      * @param info the NotationInfo used to pretty print the taclets in tooltips
      * @param listener the ActionListener which is registered at each menu item
      */
-    private void addMenuEntries(ImmutableList<PosTacletApp> apps, NotationInfo info,
-            ActionListener listener, Services services) {
+    private void addMenuEntries(@NonNull ImmutableList<PosTacletApp> apps, @NonNull NotationInfo info,
+                                ActionListener listener, @NonNull Services services) {
         for (PosTacletApp app : apps) {
             final DefaultTacletMenuItem item = new DefaultTacletMenuItem(app, info, services);
             item.addActionListener(listener);

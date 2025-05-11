@@ -10,6 +10,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The default implementation of {@link IExecutionStatement}.
@@ -25,7 +26,7 @@ public class ExecutionStatement extends AbstractExecutionNode<SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public ExecutionStatement(ITreeSettings settings, Node proofNode) {
+    public ExecutionStatement(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -41,7 +42,7 @@ public class ExecutionStatement extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -49,7 +50,7 @@ public class ExecutionStatement extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Statement";
     }
 }

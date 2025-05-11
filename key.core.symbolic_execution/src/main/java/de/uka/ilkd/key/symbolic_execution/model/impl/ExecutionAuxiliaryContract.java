@@ -31,6 +31,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Named;
 
 /**
@@ -47,7 +48,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public ExecutionAuxiliaryContract(ITreeSettings settings, Node proofNode) {
+    public ExecutionAuxiliaryContract(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -55,7 +56,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Block Contract";
     }
 
@@ -63,7 +64,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -71,7 +72,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() throws ProofInputException {
+    protected @NonNull String lazyComputeName() throws ProofInputException {
         // Find self term
         Term self = null;
         Term applicationTerm = getModalityPIO().subTerm();
@@ -147,7 +148,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      *        of interest.
      * @return The variable as {@link Term}.
      */
-    protected Term declaredVariableAsTerm(StatementBlock sb, int statementIndex) {
+    protected @NonNull Term declaredVariableAsTerm(@NonNull StatementBlock sb, int statementIndex) {
         Statement resultInitStatement = sb.getStatementAt(statementIndex);
         assert resultInitStatement instanceof LocalVariableDeclaration
                 : "Block Contract Rule has changed.";
@@ -164,9 +165,9 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * @param remembranceHeaps The {@link Map} to fill.
      * @param remembranceLocalVariables The {@link Map} to fill.
      */
-    protected void collectRemembranceVariables(Term term,
-            Map<LocationVariable, Term> remembranceHeaps,
-            Map<LocationVariable, Term> remembranceLocalVariables) {
+    protected void collectRemembranceVariables(@NonNull Term term,
+                                               @NonNull Map<LocationVariable, Term> remembranceHeaps,
+                                               @NonNull Map<LocationVariable, Term> remembranceLocalVariables) {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term sub : term.subs()) {
                 collectRemembranceVariables(sub, remembranceHeaps, remembranceLocalVariables);
@@ -198,7 +199,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public AuxiliaryContract getContract() {
+    public @NonNull AuxiliaryContract getContract() {
         return ((AbstractAuxiliaryContractBuiltInRuleApp) getProofNode().getAppliedRuleApp())
                 .getContract();
     }
@@ -207,7 +208,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public StatementBlock getBlock() {
+    public @NonNull StatementBlock getBlock() {
         return (StatementBlock) ((AbstractAuxiliaryContractBuiltInRuleApp) getProofNode()
                 .getAppliedRuleApp()).getStatement();
     }

@@ -63,7 +63,7 @@ public abstract class SubtermGenerator implements TermGenerator {
         };
     }
 
-    protected Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected @Nullable Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return completeTerm.toTerm(app, pos, goal, mState);
     }
 

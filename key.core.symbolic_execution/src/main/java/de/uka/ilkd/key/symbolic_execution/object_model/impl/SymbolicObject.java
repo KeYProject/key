@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -60,7 +62,7 @@ public class SymbolicObject extends AbstractSymbolicAssociationValueContainer
      * {@inheritDoc}
      */
     @Override
-    public Sort getType() {
+    public @Nullable Sort getType() {
         return name != null ? name.sort() : null;
     }
 
@@ -68,7 +70,7 @@ public class SymbolicObject extends AbstractSymbolicAssociationValueContainer
      * {@inheritDoc}
      */
     @Override
-    public String getTypeString() {
+    public @Nullable String getTypeString() {
         Sort sort = getType();
         return sort != null ? sort.toString() : null;
     }
@@ -77,7 +79,7 @@ public class SymbolicObject extends AbstractSymbolicAssociationValueContainer
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "Object " + getNameString();
     }
 }

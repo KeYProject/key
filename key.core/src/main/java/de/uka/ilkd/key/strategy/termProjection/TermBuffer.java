@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Projection that can store and returns an arbitrary term or formula. Objects of this class are
@@ -19,7 +20,7 @@ public class TermBuffer implements ProjectionToTerm {
 
 
 
-    public Term getContent(@NonNull MutableState mState) {
+    public @Nullable Term getContent(@NonNull MutableState mState) {
         return mState.read(this);
     }
 

@@ -15,6 +15,8 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -28,7 +30,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     /**
      * The up to know discovered {@link IExecutionBaseMethodReturn}s.
      */
-    private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+    private @NonNull ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
 
     /**
      * Constructor.
@@ -37,7 +39,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public ExecutionMethodCall(ITreeSettings settings, Node proofNode) {
+    public ExecutionMethodCall(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -45,7 +47,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() {
+    protected @NonNull String lazyComputeName() {
         return INTERNAL_NODE_NAME_START + "call " + getMethodCallText() + INTERNAL_NODE_NAME_END;
     }
 
@@ -54,7 +56,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      *
      * @return The method call text.
      */
-    protected String getMethodCallText() {
+    protected @NonNull String getMethodCallText() {
         MethodReference explicitConstructorMR = getExplicitConstructorMethodReference();
         String call = explicitConstructorMR != null ? explicitConstructorMR.toString()
                 : getMethodReference().toString();
@@ -86,7 +88,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      * {@inheritDoc}
      */
     @Override
-    public MethodReference getExplicitConstructorMethodReference() {
+    public @Nullable MethodReference getExplicitConstructorMethodReference() {
         IProgramMethod explicitConstructor = getExplicitConstructorProgramMethod();
         if (explicitConstructor != null) {
             MethodReference mr = getMethodReference();
@@ -105,7 +107,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      * {@inheritDoc}
      */
     @Override
-    public IProgramMethod getExplicitConstructorProgramMethod() {
+    public @Nullable IProgramMethod getExplicitConstructorProgramMethod() {
         IProgramMethod pm = getProgramMethod();
         if (KeYTypeUtil.isImplicitConstructor(pm)) {
             return KeYTypeUtil.findExplicitConstructor(getServices(), pm);
@@ -118,7 +120,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      * {@inheritDoc}
      */
     @Override
-    public MethodReference getMethodReference() {
+    public @NonNull MethodReference getMethodReference() {
         return getActiveStatement().getMethodReference();
     }
 
@@ -126,7 +128,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      * {@inheritDoc}
      */
     @Override
-    public IProgramMethod getProgramMethod() {
+    public @NonNull IProgramMethod getProgramMethod() {
         return getActiveStatement().getProgramMethod(getServices());
     }
 
@@ -134,7 +136,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Method Call";
     }
 
@@ -151,7 +153,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      *
      * @param methodReturn The {@link IExecutionBaseMethodReturn} to register.
      */
-    public void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
+    public void addMethodReturn(@Nullable IExecutionBaseMethodReturn<?> methodReturn) {
         if (methodReturn != null) {
             assert methodReturn.getMethodCall() == this;
             methodReturns = methodReturns.append(methodReturn);
@@ -162,7 +164,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 }

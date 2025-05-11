@@ -6,6 +6,7 @@ package org.key_project.slicing.graph;
 import java.util.Objects;
 
 import de.uka.ilkd.key.proof.BranchLocation;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Graph node that represents a rule added by some rule application.
@@ -30,7 +31,7 @@ public class AddedRule extends GraphNode {
     }
 
     @Override
-    public GraphNode popLastBranchID() {
+    public @NonNull GraphNode popLastBranchID() {
         return this;
     }
 
@@ -52,7 +53,7 @@ public class AddedRule extends GraphNode {
     }
 
     @Override
-    public String toString(boolean abbreviated, boolean omitBranch) {
+    public @NonNull String toString(boolean abbreviated, boolean omitBranch) {
         return "added rule " + name;
     }
 }

@@ -14,6 +14,8 @@ import java.net.URL;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.SwingUtil;
 
 /**
@@ -27,7 +29,7 @@ public class KeYProjectHomepageAction extends MainWindowAction {
     private static final long serialVersionUID = 8657661861116034536L;
     private final static String url = "https://www.key-project.org/";
 
-    public KeYProjectHomepageAction(MainWindow mainWindow) {
+    public KeYProjectHomepageAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("KeY Homepage");
         setEnabled(desktopEnabled());
@@ -40,7 +42,7 @@ public class KeYProjectHomepageAction extends MainWindowAction {
         return SwingUtil.browseIsSupported();
     }
 
-    private static URI getURI() {
+    private static @Nullable URI getURI() {
         URI res = null;
         try {
             res = (new URL(url)).toURI();

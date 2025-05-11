@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
@@ -196,7 +197,7 @@ public class TestTriggersSet {
 
     }
 
-    private Term parseTerm(String termstr) {
+    private @NonNull Term parseTerm(@NonNull String termstr) {
         return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
             new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }

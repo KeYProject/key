@@ -18,6 +18,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -35,12 +37,12 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * a Set of Nodes that represent exceptions
      */
-    private final Set<Node> exceptionNodes;
+    private final @NonNull Set<Node> exceptionNodes;
 
     /**
      * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
      */
-    private final Set<Node> exceptionParentNodes;
+    private final @NonNull Set<Node> exceptionParentNodes;
 
     /**
      * a flag whether to watch for an uncaught exception
@@ -84,8 +86,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * {@inheritDoc}
      */
     @Override
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public void updateState(int maxApplications, long timeout, @NonNull Proof proof, long startTime,
+                            int countApplied, @Nullable Goal goal) {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
@@ -125,7 +127,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * @param parent The {@link Node} that is thought to be the parent.
      * @return true if the parent node is one of the nodes parents
      */
-    public boolean isParentNode(Node node, Node parent) {
+    public boolean isParentNode(@Nullable Node node, Node parent) {
         if (node != null) {
             Node parentIter = node.parent();
             boolean result = false;
@@ -146,8 +148,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, @NonNull RuleApp ruleApp, Proof proof,
+                                   @NonNull Node node) {
         Node parent = null;
         for (Node parents : exceptionNodes) {
             if (isParentNode(node, parents)) {

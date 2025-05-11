@@ -14,6 +14,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 
@@ -115,7 +117,7 @@ public abstract class ProofBundleHandler implements Closeable {
      * @return the bootclasspath or null, if none is specified
      * @throws IOException if the bundle can not be opened/accessed
      */
-    public abstract Path getBootclasspath() throws IOException;
+    public abstract @Nullable Path getBootclasspath() throws IOException;
 
     /**
      * Returns a tree of the complete file hierarchy inside the bundle.
@@ -142,7 +144,7 @@ public abstract class ProofBundleHandler implements Closeable {
      *         points to.
      * @throws IOException if the bundle can not be opened/accessed
      */
-    public static ProofBundleHandler createBundleHandler(Path root) throws IOException {
+    public static @NonNull ProofBundleHandler createBundleHandler(@NonNull Path root) throws IOException {
         if (Files.isDirectory(root)) {
             return new DirectoryProofBundleHandler(root);
         } else {
@@ -167,7 +169,7 @@ public abstract class ProofBundleHandler implements Closeable {
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+        public @NonNull FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
             PathNode node = new PathNode(current, dir);
             current.addChild(node);
             current = node; // descend in tree
@@ -175,14 +177,14 @@ public abstract class ProofBundleHandler implements Closeable {
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+        public @NonNull FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
             PathNode node = new PathNode(current, file);
             current.addChild(node);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+        public @NonNull FileVisitResult postVisitDirectory(Path dir, IOException exc) {
             current = current.getParent(); // ascend in tree
             return FileVisitResult.CONTINUE;
         }

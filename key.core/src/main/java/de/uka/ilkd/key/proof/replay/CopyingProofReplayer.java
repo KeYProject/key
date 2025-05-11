@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -39,7 +40,7 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
      * @param skippedNodes nodes to skip when copying
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    public void copy(Node originalNode, Goal newNode, Set<Node> skippedNodes)
+    public void copy(Node originalNode, @NonNull Goal newNode, @NonNull Set<Node> skippedNodes)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         newNode.proof().reOpenGoal(newNode);
         newNode.proof().register(this, CopyingProofReplayer.class);

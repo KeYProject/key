@@ -31,6 +31,8 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -68,7 +70,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * The {@link IProgramMethod} to execute code parts from.
      */
-    private final IProgramMethod pm;
+    private final @NonNull IProgramMethod pm;
 
     /**
      * The precondition in JML syntax.
@@ -83,8 +85,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param pm The {@link IProgramMethod} to execute code parts from.
      * @param precondition An optional precondition to use.
      */
-    public ProgramMethodPO(InitConfig initConfig, String name, IProgramMethod pm,
-            String precondition) {
+    public ProgramMethodPO(@NonNull InitConfig initConfig, @NonNull String name, @NonNull IProgramMethod pm,
+                           String precondition) {
         super(initConfig, name);
         assert pm != null;
         this.pm = pm;
@@ -103,9 +105,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
-    public ProgramMethodPO(InitConfig initConfig, String name, IProgramMethod pm,
-            String precondition, boolean addUninterpretedPredicate,
-            boolean addSymbolicExecutionLabel) {
+    public ProgramMethodPO(@NonNull InitConfig initConfig, @NonNull String name, @NonNull IProgramMethod pm,
+                           String precondition, boolean addUninterpretedPredicate,
+                           boolean addSymbolicExecutionLabel) {
         super(initConfig, name, addUninterpretedPredicate, addSymbolicExecutionLabel);
         assert pm != null;
         this.pm = pm;
@@ -116,7 +118,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    public IProgramMethod getProgramMethod() {
+    public @NonNull IProgramMethod getProgramMethod() {
         return pm;
     }
 
@@ -132,7 +134,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected KeYJavaType getCalleeKeYJavaType() {
+    protected @NonNull KeYJavaType getCalleeKeYJavaType() {
         return pm.getContainerType();
     }
 
@@ -140,8 +142,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableList<StatementBlock> buildOperationBlocks(
-            ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
+    protected @NonNull ImmutableList<StatementBlock> buildOperationBlocks(
+            @NonNull ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
             ProgramVariable resultVar, Services services) {
         // Get program method to execute
         IProgramMethod pm = getProgramMethod();
@@ -157,8 +159,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term generateMbyAtPreDef(LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, Services services) {
+    protected @NonNull Term generateMbyAtPreDef(LocationVariable selfVar,
+                                                ImmutableList<LocationVariable> paramVars, Services services) {
         return tb.tt();
     }
 
@@ -166,9 +168,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+    protected @NonNull Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+                                   ImmutableList<LocationVariable> paramVars,
+                                   Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         if (precondition != null && !precondition.isEmpty()) {
             var context = Context.inMethod(getProgramMethod(), services.getTermBuilder());
             JmlIO io = new JmlIO(services).context(context).parameters(paramVars);
@@ -184,10 +186,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
-            Services services) {
+    protected @NonNull Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+                                    ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+                                    LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+                                    Services services) {
         return tb.tt();
     }
 
@@ -205,7 +207,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Modality.JavaModalityKind getTerminationMarker() {
+    protected Modality.@NonNull JavaModalityKind getTerminationMarker() {
         return Modality.JavaModalityKind.DIA;
     }
 
@@ -229,7 +231,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected String buildPOName(boolean transactionFlag) {
+    protected @NonNull String buildPOName(boolean transactionFlag) {
         return name;
     }
 
@@ -269,7 +271,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @return
      */
     @Override
-    public Configuration createLoaderConfig() {
+    public @NonNull Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         c.set("method", getProgramMethodSignature(getProgramMethod(), true));
         if (getPrecondition() != null && !getPrecondition().isEmpty()) {
@@ -285,7 +287,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param includeType Include the container type?
      * @return The human-readable method signature.
      */
-    public static String getProgramMethodSignature(IProgramMethod pm, boolean includeType) {
+    public static @NonNull String getProgramMethodSignature(@NonNull IProgramMethod pm, boolean includeType) {
         PosTableLayouter l = PosTableLayouter.pure();
         l.beginC(0);
         if (includeType) {
@@ -308,7 +310,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @throws IOException Occurred Exception if it was not possible to find the
      *         {@link IProgramMethod}.
      */
-    public static IProgramMethod getProgramMethod(InitConfig initConfig, Configuration properties)
+    public static @NonNull IProgramMethod getProgramMethod(@NonNull InitConfig initConfig, @NonNull Configuration properties)
             throws IOException {
         // Get container class and method signature
         String value = properties.getString("method");
@@ -370,7 +372,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param properties The proof obligation settings to read from.
      * @return The precondition or {@code null} if not available.
      */
-    public static String getPrecondition(Configuration properties) {
+    public static @Nullable String getPrecondition(@NonNull Configuration properties) {
         return properties.getString("precondition");
     }
 
@@ -385,7 +387,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    public KeYJavaType getContainerType() {
+    public @NonNull KeYJavaType getContainerType() {
         return getProgramMethod().getContainerType();
     }
 }

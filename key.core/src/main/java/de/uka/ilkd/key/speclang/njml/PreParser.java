@@ -35,7 +35,7 @@ public class PreParser {
      * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a
      * parse tree.
      */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull JmlLexer lexer) {
+    public @NonNull ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull JmlLexer lexer) {
         @NonNull
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
@@ -61,7 +61,7 @@ public class PreParser {
      * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a
      * parse tree.
      */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull String content) {
+    public @NonNull ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull String content) {
         return parseClassLevel(JmlFacade.createLexer(content));
     }
 
@@ -69,7 +69,7 @@ public class PreParser {
      * Parses a JML constructs which occurs inside methods (mostly JML statements) and returns a
      * parse tree.
      */
-    public ImmutableList<TextualJMLConstruct> parseMethodLevel(@NonNull PositionedString positionedString) {
+    public @NonNull ImmutableList<TextualJMLConstruct> parseMethodLevel(@NonNull PositionedString positionedString) {
         return parseMethodLevel(JmlFacade.createLexer(positionedString));
     }
 
@@ -77,7 +77,7 @@ public class PreParser {
      * Parses a JML constructs which occurs inside methods (mostly JML statements) and returns a
      * parse tree.
      */
-    private ImmutableList<TextualJMLConstruct> parseMethodLevel(@NonNull JmlLexer lexer) {
+    private @NonNull ImmutableList<TextualJMLConstruct> parseMethodLevel(@NonNull JmlLexer lexer) {
         @NonNull
         JmlParser p = JmlFacade.createParser(lexer);
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
@@ -92,8 +92,8 @@ public class PreParser {
     /**
      * Parse and interpret class level comments.
      */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull String concatenatedComment,
-                                                              @Nullable URI fileName, @NonNull Position pos) {
+    public @NonNull ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull String concatenatedComment,
+                                                                       @Nullable URI fileName, @NonNull Position pos) {
         return parseClassLevel(
             new PositionedString(concatenatedComment, new Location(fileName, pos)));
     }
@@ -101,7 +101,7 @@ public class PreParser {
     /**
      * Parse and interpret class level comments.
      */
-    private ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull PositionedString positionedString) {
+    private @NonNull ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull PositionedString positionedString) {
         JmlLexer lexer = JmlFacade.createLexer(positionedString);
         return parseClassLevel(lexer);
     }
@@ -118,7 +118,7 @@ public class PreParser {
     /**
      * returns the gathered interpretation warnings, e.g., deprecated constructs.
      */
-    public ImmutableList<PositionedString> getWarnings() {
+    public @NonNull ImmutableList<PositionedString> getWarnings() {
         return warnings;
     }
 

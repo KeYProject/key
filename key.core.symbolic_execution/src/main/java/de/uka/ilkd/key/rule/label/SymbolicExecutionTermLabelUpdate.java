@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.rule.*;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -41,10 +42,10 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
      * {@inheritDoc}
      */
     @Override
-    public void updateLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
-            Set<TermLabel> labels) {
+    public void updateLabels(TermLabelState state, @NonNull Services services,
+                             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+                             Rule rule, RuleApp ruleApp, @NonNull Object hint, Term tacletTerm, Term newTerm,
+                             @NonNull Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint)
                 || (rule instanceof AbstractAuxiliaryContractRule
                         && ((AbstractBlockContractRule.BlockContractHint) hint)

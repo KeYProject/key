@@ -198,12 +198,12 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(@NonNull Collection<?> c) {
         return paths.containsAll(c);
     }
 
     @Override
-    public Iterator<TreePath> iterator() {
+    public @NonNull Iterator<TreePath> iterator() {
         return new Iterator<>() {
             final Iterator<TreePath> i = paths.iterator();
 
@@ -241,7 +241,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      *
      * @param tree the JTree to collapse
      */
-    public static void collapseAll(JTree tree) {
+    public static void collapseAll(@NonNull JTree tree) {
         TreeModel data = tree.getModel();
 
         if (data == null) {
@@ -272,7 +272,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @param tree the JTree to collapse
      * @param path the path which will be collapsed afterwards (including all children recursively)
      */
-    public static void collapseAllBelow(JTree tree, TreePath path) {
+    public static void collapseAllBelow(@NonNull JTree tree, @NonNull TreePath path) {
         Object node = path.getLastPathComponent();
         TreeModel data = tree.getModel();
 
@@ -300,7 +300,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @param tree the JTree to expand
      * @param filter only the nodes that pass this filter will be expanded
      */
-    public static void expandAll(JTree tree, Predicate<TreePath> filter) {
+    public static void expandAll(@NonNull JTree tree, @NonNull Predicate<TreePath> filter) {
         TreeModel data = tree.getModel();
 
         if (data == null) {
@@ -325,7 +325,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @param path the root path under which everything should be expanded afterwards
      * @param filter only the nodes that pass this filter will be expanded
      */
-    public static void expandAllBelow(JTree tree, TreePath path, Predicate<TreePath> filter) {
+    public static void expandAllBelow(@NonNull JTree tree, @NonNull TreePath path, @NonNull Predicate<TreePath> filter) {
         // we temporarily remove all expansion listeners (except that which updates the expanded
         // paths set) before expanding
         TreeExpansionListener[] expansionListeners = tree.getTreeExpansionListeners();
@@ -355,8 +355,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * collection of a leave is empty. The extremal paths are stored in the order in which they
      * appear in pre-order in the tree model.
      */
-    private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path,
-            Predicate<TreePath> filter) {
+    private static @NonNull Collection<TreePath> extremalPaths(@NonNull TreeModel data, @NonNull TreePath path,
+                                                               @NonNull Predicate<TreePath> filter) {
         LinkedHashSet<TreePath> result = new LinkedHashSet<>();
 
         if (data.isLeaf(path.getLastPathComponent())) {
@@ -367,8 +367,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         return result;
     }
 
-    private static void extremalPathsImpl(TreeModel data, TreePath path,
-            Collection<TreePath> result, Predicate<TreePath> filter) {
+    private static void extremalPathsImpl(@NonNull TreeModel data, @NonNull TreePath path,
+                                          @NonNull Collection<TreePath> result, @NonNull Predicate<TreePath> filter) {
         Object node = path.getLastPathComponent();
 
         boolean hasNonLeafChildren = false;
@@ -410,7 +410,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @return the TreePaths that are currently expanded in the given tree, even if any of their
      *         parents are collapsed
      */
-    public static Collection<TreePath> paths(JTree tree) {
+    public static @NonNull Collection<TreePath> paths(@NonNull JTree tree) {
         Collection<TreePath> result = new LinkedHashSet<>();
 
         TreeModel data = tree.getModel();
@@ -444,8 +444,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         return result;
     }
 
-    private static void pathsImpl(JTree tree, TreeModel data, TreePath path,
-            Collection<TreePath> result) {
+    private static void pathsImpl(@NonNull JTree tree, @NonNull TreeModel data, @NonNull TreePath path,
+                                  @NonNull Collection<TreePath> result) {
         boolean expanded = tree.isExpanded(path);
 
         if (expanded) {
@@ -544,12 +544,12 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     private class Listener implements TreeExpansionListener, TreeModelListener {
         @Override
-        public void treeExpanded(TreeExpansionEvent e) {
+        public void treeExpanded(@NonNull TreeExpansionEvent e) {
             paths.add(e.getPath());
         }
 
         @Override
-        public void treeCollapsed(TreeExpansionEvent e) {
+        public void treeCollapsed(@NonNull TreeExpansionEvent e) {
             paths.remove(e.getPath());
         }
 
@@ -562,7 +562,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         }
 
         @Override
-        public void treeNodesRemoved(TreeModelEvent e) {
+        public void treeNodesRemoved(@NonNull TreeModelEvent e) {
             // TODO: this code seems to be never called, since GUIProofTreeModel only
             // fires treeStructureChanged events
             TreePath parent = e.getTreePath();
@@ -575,7 +575,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         }
 
         @Override
-        public void treeStructureChanged(TreeModelEvent e) {
+        public void treeStructureChanged(@NonNull TreeModelEvent e) {
             TreePath path = e.getTreePath();
 
             // Heuristic for new null root. It is undocumented which

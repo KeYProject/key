@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Action to search for suitable references on a single node.
@@ -34,7 +35,7 @@ public final class CloseByReference extends KeyAction {
     /**
      * The node to try to close by reference.
      */
-    private final Node node;
+    private final @NonNull Node node;
 
     /**
      * Construct new action.
@@ -42,7 +43,7 @@ public final class CloseByReference extends KeyAction {
      * @param mediator the mediator
      * @param node the node
      */
-    public CloseByReference(CachingExtension cachingExtension, KeYMediator mediator, Node node) {
+    public CloseByReference(CachingExtension cachingExtension, KeYMediator mediator, @NonNull Node node) {
         this.cachingExtension = cachingExtension;
         this.mediator = mediator;
         this.node = node;

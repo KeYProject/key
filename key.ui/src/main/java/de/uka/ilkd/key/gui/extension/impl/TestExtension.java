@@ -47,55 +47,55 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     private final KeyAction actionTest = new TestAction();
     private final ContextMenuAdapter cmAdapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                Proof underlyingObject) {
+        public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                                                       Proof underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                Node underlyingObject) {
+        public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                                                       Node underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                PosInSequent underlyingObject) {
+        public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                                                       PosInSequent underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                Rule underlyingObject) {
+        public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                                                       Rule underlyingObject) {
             return Collections.singletonList(actionTest);
         }
     };
 
     @Override
-    public List<Action> getMainMenuActions(MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(MainWindow mainWindow) {
         return Collections.singletonList(actionTest);
     }
 
     @Override
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-            Object underlyingObject) {
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator, @NonNull ContextMenuKind kind,
+                                                   @NonNull Object underlyingObject) {
         return cmAdapter.getContextActions(mediator, kind, underlyingObject);
     }
 
     @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar bar = new JToolBar();
         bar.add(actionTest);
         return bar;
     }
 
     @Override
-    public List<JComponent> getStatusLineComponents() {
+    public @NonNull List<JComponent> getStatusLineComponents() {
         return Collections.singletonList(new JButton(actionTest));
     }
 
     @Override
-    public SettingsProvider getSettings() {
+    public @NonNull SettingsProvider getSettings() {
         return new TestSettingsProvider();
     }
 
@@ -104,20 +104,20 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
             @NonNull KeYMediator mediator) {
         return Collections.singleton(new TabPanel() {
             @Override
-            public String getTitle() {
+            public @NonNull String getTitle() {
                 return "Test";
             }
 
             @Override
-            public JComponent getComponent() {
+            public @NonNull JComponent getComponent() {
                 return new JLabel("Test");
             }
         });
     }
 
     @Override
-    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
-            JComponent component) {
+    public @NonNull Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+                                                    JComponent component) {
         return Collections.singleton(actionTest);
     }
 
@@ -141,12 +141,12 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
 
     private static class TestSettingsProvider implements SettingsProvider {
         @Override
-        public String getDescription() {
+        public @NonNull String getDescription() {
             return "Test Settings";
         }
 
         @Override
-        public JPanel getPanel(MainWindow window) {
+        public @NonNull JPanel getPanel(MainWindow window) {
             JPanel p = new JPanel();
             p.add(new JLabel("Test"));
             return p;

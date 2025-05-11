@@ -117,7 +117,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
+    public TextualJMLSpecCase(@NonNull ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
         super(modifiers);
         if (behavior == null) {
             throw new IllegalArgumentException();
@@ -147,16 +147,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public @NonNull TextualJMLSpecCase addClause(Clause clause, ParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(Clause clause, @NonNull ParserRuleContext ctx) {
         return addClause(clause, new LabeledParserRuleContext(ctx));
     }
 
-    public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, ParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, @NonNull ParserRuleContext ctx) {
         return addClause(clause, null, new LabeledParserRuleContext(ctx));
     }
 
     public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
-                                                 ParserRuleContext ctx) {
+                                                 @NonNull ParserRuleContext ctx) {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
@@ -184,7 +184,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         // setPosition(n);
     }
 
-    public Behavior getBehavior() {
+    public @NonNull Behavior getBehavior() {
         return behavior;
     }
 

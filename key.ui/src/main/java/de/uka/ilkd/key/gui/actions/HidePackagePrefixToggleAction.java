@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import org.jspecify.annotations.NonNull;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
@@ -29,7 +30,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
      */
     private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
-    public HidePackagePrefixToggleAction(MainWindow mainWindow) {
+    public HidePackagePrefixToggleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOL_TIP);
@@ -49,7 +50,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NonNull ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = selected; // Needs to be executed before the
                                                              // ViewSettings are modified, because

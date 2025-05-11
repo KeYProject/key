@@ -134,35 +134,35 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param subst the Term the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(@NonNull SchemaVariable sv, @NonNull Term subst, Services services) {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, @NonNull Term subst, Services services) {
         return add(sv, new TermInstantiation(sv, subst), services);
     }
 
 
-    public SVInstantiations addInteresting(@NonNull SchemaVariable sv, @NonNull Term subst, Services services) {
+    public @NonNull SVInstantiations addInteresting(@NonNull SchemaVariable sv, @NonNull Term subst, Services services) {
         return addInteresting(sv, new TermInstantiation(sv, subst), services);
     }
 
 
-    public SVInstantiations add(@NonNull SchemaVariable sv, @NonNull ProgramList pes, Services services) {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, @NonNull ProgramList pes, Services services) {
         return add(sv, new ProgramListInstantiation(pes.getList()), services);
     }
 
-    public SVInstantiations add(@NonNull SchemaVariable sv, @NonNull ImmutableArray<TermLabel> labels,
-                                Services services) {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, @NonNull ImmutableArray<TermLabel> labels,
+                                         Services services) {
         return add(sv, new TermLabelInstantiationEntry(labels), services);
     }
 
     /**
      * Add the given additional condition for the generic sort instantiations
      */
-    public SVInstantiations add(@NonNull SchemaVariable sv, Modality.@NonNull JavaModalityKind kind,
-                                Services services) throws SortException {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, Modality.@NonNull JavaModalityKind kind,
+                                         Services services) throws SortException {
         return add(sv, new InstantiationEntry<>(kind) {
         }, services);
     }
 
-    public SVInstantiations addList(@NonNull SchemaVariable sv, Object[] list, Services services) {
+    public @NonNull SVInstantiations addList(@NonNull SchemaVariable sv, Object[] list, Services services) {
         return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
             services);
     }
@@ -176,18 +176,18 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(@NonNull SchemaVariable sv, @NonNull ProgramElement pe, Services services) {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, @NonNull ProgramElement pe, Services services) {
         return add(sv, new ProgramInstantiation(pe), services);
     }
 
 
-    public SVInstantiations addInteresting(@NonNull SchemaVariable sv, @NonNull ProgramElement pe,
-                                           Services services) {
+    public @NonNull SVInstantiations addInteresting(@NonNull SchemaVariable sv, @NonNull ProgramElement pe,
+                                                    Services services) {
         return addInteresting(sv, new ProgramInstantiation(pe), services);
     }
 
-    public SVInstantiations addInterestingList(@NonNull SchemaVariable sv, Object[] list,
-                                               Services services) {
+    public @NonNull SVInstantiations addInterestingList(@NonNull SchemaVariable sv, Object[] list,
+                                                        Services services) {
         return addInteresting(sv,
             new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)), services);
     }
@@ -203,8 +203,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param pe the ProgramElement the context positions are related to
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
-            ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
+    public @NonNull SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
+                                         ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
         return add(CONTEXTSV,
             new ContextInstantiationEntry(prefix, postfix, activeStatementContext, pe), services);
     }
@@ -282,7 +282,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
 
-    public SVInstantiations addInteresting(@NonNull SchemaVariable sv, @NonNull Name name, Services services) {
+    public @NonNull SVInstantiations addInteresting(@NonNull SchemaVariable sv, @NonNull Name name, Services services) {
         SchemaVariable existingSV = lookupVar(sv.name());
         Name oldValue = (Name) getInstantiation(existingSV);
         if (name.equals(oldValue)) {
@@ -336,7 +336,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param sv the SchemaVariable to be instantiated
      * @param term the Term the SchemaVariable is instantiated with
      */
-    public SVInstantiations replace(@NonNull SchemaVariable sv, @NonNull Term term, Services services) {
+    public @NonNull SVInstantiations replace(@NonNull SchemaVariable sv, @NonNull Term term, Services services) {
         return replace(sv, new TermInstantiation(sv, term), services);
     }
 
@@ -347,7 +347,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param sv the SchemaVariable to be instantiated
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      */
-    public SVInstantiations replace(@NonNull SchemaVariable sv, @NonNull ProgramElement pe, Services services) {
+    public @NonNull SVInstantiations replace(@NonNull SchemaVariable sv, @NonNull ProgramElement pe, Services services) {
         return replace(sv, new ProgramInstantiation(pe), services);
     }
 
@@ -358,8 +358,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param sv the SchemaVariable to be instantiated
      * @param pes the ArrayOf<t> the SchemaVariable is instantiated with
      */
-    public SVInstantiations replace(@NonNull SchemaVariable sv, @NonNull ImmutableArray<ProgramElement> pes,
-                                    Services services) {
+    public @NonNull SVInstantiations replace(@NonNull SchemaVariable sv, @NonNull ImmutableArray<ProgramElement> pes,
+                                             Services services) {
         return replace(sv, new ProgramListInstantiation(pes), services);
     }
 
@@ -374,8 +374,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param activeStatementContext the ExecutionContext of the first active statement
      * @param pe the ProgramElement the context positions are related to
      */
-    public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
-            ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
+    public @NonNull SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
+                                             ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
         return replace(CONTEXTSV,
             new ContextInstantiationEntry(prefix, postfix, activeStatementContext, pe), services);
     }

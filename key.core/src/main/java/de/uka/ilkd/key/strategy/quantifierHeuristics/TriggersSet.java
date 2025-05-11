@@ -37,7 +37,7 @@ import org.key_project.util.collection.ImmutableSet;
 public class TriggersSet {
 
     /** Quantified formula of PCNF */
-    private final Term allTerm;
+    private final @NonNull Term allTerm;
     /** all <code>Trigger</code>s for <code>allTerm</code> */
     private @NonNull ImmutableSet<Trigger> allTriggers = DefaultImmutableSet.nil();
     /**
@@ -157,9 +157,9 @@ public class TriggersSet {
      */
     private class ClauseTrigger {
 
-        final Term clause;
+        final @NonNull Term clause;
         /** all unversal variables of <code>clause</code> */
-        final ImmutableSet<QuantifiableVariable> selfUQVS;
+        final @NonNull ImmutableSet<QuantifiableVariable> selfUQVS;
         /**
          * elements which are uni-trigges and will be used to construct several multi-triggers for
          * <code>clause</code>
@@ -388,15 +388,15 @@ public class TriggersSet {
         }
     }
 
-    public Term getQuantifiedFormula() {
+    public @NonNull Term getQuantifiedFormula() {
         return allTerm;
     }
 
-    public ImmutableSet<Trigger> getAllTriggers() {
+    public @NonNull ImmutableSet<Trigger> getAllTriggers() {
         return allTriggers;
     }
 
-    public Substitution getReplacementWithMVs() {
+    public @NonNull Substitution getReplacementWithMVs() {
         return replacementWithMVs;
     }
 

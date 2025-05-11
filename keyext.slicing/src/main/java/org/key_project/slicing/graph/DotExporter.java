@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.collection.Pair;
@@ -47,10 +49,10 @@ public final class DotExporter {
      * @param abbreviateFormulas whether node labels should be shortened
      * @return string representing the dependency graph
      */
-    public static String exportDot(
-            Proof proof,
-            DependencyGraph graph,
-            AnalysisResults analysisResults,
+    public static @NonNull String exportDot(
+            @NonNull Proof proof,
+            @NonNull DependencyGraph graph,
+            @Nullable AnalysisResults analysisResults,
             boolean abbreviateFormulas) {
         StringBuilder buf = new StringBuilder();
         buf.append("digraph {\n");
@@ -95,12 +97,12 @@ public final class DotExporter {
      * @param graphNode the graph node to export a drawing around
      * @return DOT string of the nodes and edges around {@code graphNode}
      */
-    public static String exportDotAround(
-            DependencyGraph graph,
+    public static @NonNull String exportDotAround(
+            @NonNull DependencyGraph graph,
             AnalysisResults analysisResults,
             boolean abbreviateFormulas,
             boolean omitBranch,
-            GraphNode graphNode) {
+            @NonNull GraphNode graphNode) {
         StringBuilder buf = new StringBuilder();
         buf.append("digraph {\n");
         buf.append("edge [dir=\"back\"];\n");
@@ -153,8 +155,8 @@ public final class DotExporter {
      * @param node the node to describe
      * @param data dependency graph data on the node
      */
-    private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
-            boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data) {
+    private static void outputEdge(@NonNull StringBuilder buf, @Nullable AnalysisResults analysisResults,
+                                   boolean abbreviateFormulas, boolean omitBranch, Node node, @NonNull DependencyNodeData data) {
         for (Pair<GraphNode, Boolean> in : data.inputs) {
             String inString = in.first.toString(abbreviateFormulas, omitBranch);
             for (GraphNode out : data.outputs) {
@@ -198,9 +200,9 @@ public final class DotExporter {
         }
     }
 
-    private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
-            boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data,
-            Collection<AnnotatedEdge> edges) {
+    private static void outputEdge(@NonNull StringBuilder buf, @Nullable AnalysisResults analysisResults,
+                                   boolean abbreviateFormulas, boolean omitBranch, Node node, @NonNull DependencyNodeData data,
+                                   @NonNull Collection<AnnotatedEdge> edges) {
         for (var edge : edges) {
             var in = ((GraphNode) edge.getSource());
             var out = ((GraphNode) edge.getTarget());

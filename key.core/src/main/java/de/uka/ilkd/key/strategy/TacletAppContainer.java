@@ -48,7 +48,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return age;
     }
 
-    private ImmutableList<NoPosTacletApp> incMatchIfFormulas(@NonNull Goal p_goal) {
+    private @NonNull ImmutableList<NoPosTacletApp> incMatchIfFormulas(@NonNull Goal p_goal) {
         final IfInstantiator instantiator = new IfInstantiator(this, p_goal);
         instantiator.findIfFormulaInstantiations();
         return instantiator.getResults();
@@ -151,8 +151,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Create a container object for the given taclet app, provided that the app is
      * <code>sufficientlyComplete</code>, and add the container to <code>targetList</code>
      */
-    private ImmutableList<RuleAppContainer> addContainer(@NonNull NoPosTacletApp app,
-                                                         @NonNull ImmutableList<RuleAppContainer> targetList, @NonNull Goal p_goal, RuleAppCost cost) {
+    private @NonNull ImmutableList<RuleAppContainer> addContainer(@NonNull NoPosTacletApp app,
+                                                                  @NonNull ImmutableList<RuleAppContainer> targetList, @NonNull Goal p_goal, RuleAppCost cost) {
         if (!sufficientlyCompleteApp(app)) {
             return targetList;
         }

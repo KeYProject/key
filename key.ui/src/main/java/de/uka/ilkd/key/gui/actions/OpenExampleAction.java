@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Opens a file dialog allowing to select the example to be loaded
@@ -22,7 +23,7 @@ public final class OpenExampleAction extends MainWindowAction {
      */
     private static final long serialVersionUID = -7703620988220254791L;
 
-    public OpenExampleAction(MainWindow mainWindow) {
+    public OpenExampleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Load Example...");
         setIcon(IconFactory.openExamples(MainWindow.TOOLBAR_ICON_SIZE));

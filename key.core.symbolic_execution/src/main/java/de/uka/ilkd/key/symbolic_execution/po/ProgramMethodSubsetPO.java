@@ -24,6 +24,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.Configuration;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -95,12 +97,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * The start position.
      */
-    private final Position startPosition;
+    private final @NonNull Position startPosition;
 
     /**
      * The end position.
      */
-    private final Position endPosition;
+    private final @NonNull Position endPosition;
 
     /**
      * Constructor.
@@ -112,8 +114,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @param startPosition The start position.
      * @param endPosition The end position.
      */
-    public ProgramMethodSubsetPO(InitConfig initConfig, String name, IProgramMethod pm,
-            String precondition, Position startPosition, Position endPosition) {
+    public ProgramMethodSubsetPO(@NonNull InitConfig initConfig, @NonNull String name, @NonNull IProgramMethod pm,
+                                 String precondition, @NonNull Position startPosition, @NonNull Position endPosition) {
         super(initConfig, name, pm, precondition);
         assert startPosition != null;
         assert endPosition != null;
@@ -135,9 +137,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
-    public ProgramMethodSubsetPO(InitConfig initConfig, String name, IProgramMethod pm,
-            String precondition, Position startPosition, Position endPosition,
-            boolean addUninterpretedPredicate, boolean addSymbolicExecutionLabel) {
+    public ProgramMethodSubsetPO(@NonNull InitConfig initConfig, @NonNull String name, @NonNull IProgramMethod pm,
+                                 String precondition, @NonNull Position startPosition, @NonNull Position endPosition,
+                                 boolean addUninterpretedPredicate, boolean addSymbolicExecutionLabel) {
         super(initConfig, name, pm, precondition, addUninterpretedPredicate,
             addSymbolicExecutionLabel);
         assert startPosition != null;
@@ -150,7 +152,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableList<StatementBlock> buildOperationBlocks(
+    protected @NonNull ImmutableList<StatementBlock> buildOperationBlocks(
             ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
             ProgramVariable resultVar, Services services) {
         // Get program method to execute
@@ -183,8 +185,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @param toFill The result {@link List} to fill.
      * @param container The {@link StatementContainer} to seach in.
      */
-    protected void collectStatementsToExecute(List<Statement> toFill,
-            StatementContainer container) {
+    protected void collectStatementsToExecute(@NonNull List<Statement> toFill,
+                                              @NonNull StatementContainer container) {
         for (int i = 0; i < container.getStatementCount(); i++) {
             Statement s = container.getStatementAt(i);
             if (s.getEndPosition().compareTo(startPosition) > 0
@@ -212,7 +214,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @return {@code true} last statement is {@link Return}, {@code false} statements are empty or
      *         last statement is something else.
      */
-    protected boolean endsWithReturn(Statement[] statements) {
+    protected boolean endsWithReturn(Statement @Nullable [] statements) {
         if (statements != null && statements.length >= 1) {
             return statements[statements.length - 1] instanceof Return;
         } else {
@@ -224,9 +226,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+    protected @NonNull Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+                                   ImmutableList<LocationVariable> paramVars,
+                                   Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.getPre(modHeaps, selfVar, paramVarsList, atPreVars, services);
@@ -236,9 +238,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
-            ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
-            Services proofServices) {
+    protected @NonNull Term buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
+                                         ImmutableList<LocationVariable> paramVars, @NonNull List<LocationVariable> heaps,
+                                         Services proofServices) {
         ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices);
@@ -248,9 +250,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
-            ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
-            String name, Services proofServices) {
+    protected @NonNull Term ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
+                                                               @NonNull ImmutableList<LocationVariable> formalParamVars, @NonNull LocationVariable exceptionVar,
+                                                               @NonNull String name, @NonNull Services proofServices) {
         ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.ensureUninterpretedPredicateExists(paramVarsList, formalParamVars,
@@ -263,7 +265,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @param c The {@link Collection} to convert.
      * @return The created {@link ImmutableList}.
      */
-    protected static ImmutableList<LocationVariable> convert(Collection<LocationVariable> c) {
+    protected static @NonNull ImmutableList<LocationVariable> convert(@NonNull Collection<LocationVariable> c) {
         ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         for (LocationVariable var : c) {
             result = result.append(var);
@@ -318,7 +320,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @return
      */
     @Override
-    public Configuration createLoaderConfig() {
+    public @NonNull Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         if (getStartPosition() != null) {
             c.set(START_LINE, getStartPosition().line() + "");
@@ -338,7 +340,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @return The defined start {@link Position}.
      * @throws IOException Occurred Exception if it was not possible to read the start position.
      */
-    protected static Position getStartPosition(Configuration properties) throws IOException {
+    protected static @NonNull Position getStartPosition(@NonNull Configuration properties) throws IOException {
         String line = properties.getString(START_LINE);
         if (line == null || line.isEmpty()) {
             throw new IOException("Start line property \"startLine\" is not available or empty.");
@@ -376,7 +378,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * @return The defined end {@link Position}.
      * @throws IOException Occurred Exception if it was not possible to read the end position.
      */
-    protected static Position getEndPosition(Configuration properties) throws IOException {
+    protected static @NonNull Position getEndPosition(@NonNull Configuration properties) throws IOException {
         String line = properties.getString(END_LINE);
         if (line == null || line.isEmpty()) {
             throw new IOException("End line property \"endLine\" is not available or empty.");

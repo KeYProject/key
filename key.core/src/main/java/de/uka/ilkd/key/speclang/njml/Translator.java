@@ -69,10 +69,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final static String[] DISCOURAGED_CLAUSE_NAMES =
         { "assigning", "assigns", "modifying", "modifies", "writing", "writes" };
 
-    private final Services services;
+    private final @NonNull Services services;
     private final @NonNull TermBuilder tb;
     private final @NonNull JavaInfo javaInfo;
-    private final KeYJavaType containerType;
+    private final @NonNull KeYJavaType containerType;
     private final @NonNull HeapLDT heapLDT;
     private final @NonNull LocSetLDT locSetLDT;
     private final @NonNull BooleanLDT booleanLDT;
@@ -80,7 +80,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final @NonNull SLExceptionFactory exc;
     private final @NonNull JmlTermFactory termFactory;
     private final @Nullable LocationVariable selfVar;
-    private final ImmutableList<LocationVariable> paramVars;
+    private final @Nullable ImmutableList<LocationVariable> paramVars;
     private final LocationVariable resultVar;
     private final LocationVariable excVar;
     private final Map<LocationVariable, Term> atPres;
@@ -90,7 +90,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final @NonNull JMLResolverManager resolverManager;
 
     Translator(@NonNull Services services, @NonNull KeYJavaType specInClass, @Nullable LocationVariable self,
-               SpecMathMode specMathMode, @Nullable ImmutableList<LocationVariable> paramVars,
+               @NonNull SpecMathMode specMathMode, @Nullable ImmutableList<LocationVariable> paramVars,
                LocationVariable result, LocationVariable exc, Map<LocationVariable, Term> atPres,
                Map<LocationVariable, Term> atBefores) {
         assert self == null || specInClass != null;
@@ -307,7 +307,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Term visitTermexpression(JmlParser.@NonNull TermexpressionContext ctx) {
+    public @Nullable Term visitTermexpression(JmlParser.@NonNull TermexpressionContext ctx) {
         return ((SLExpression) requireNonNull(accept(ctx.expression()))).getTerm();
     }
 
@@ -941,7 +941,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return new SLExpression(tb.var(selfVar), selfVar.getKeYJavaType());
     }
 
-    private @Nullable SLExpression lookupIdentifier(String lookupName, @Nullable SLExpression receiver,
+    private @Nullable SLExpression lookupIdentifier(@NonNull String lookupName, @Nullable SLExpression receiver,
                                                     @Nullable SLParameters params, @NonNull ParserRuleContext ctx) {
         exc.updatePosition(ctx.start);
 
@@ -1148,7 +1148,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public ImmutableList<SLExpression> visitExpressionlist(JmlParser.@NonNull ExpressionlistContext ctx) {
+    public @NonNull ImmutableList<SLExpression> visitExpressionlist(JmlParser.@NonNull ExpressionlistContext ctx) {
         return listOf(ctx.expression());
     }
 
@@ -1782,17 +1782,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitJava_math_expression(JmlParser.@NonNull Java_math_expressionContext ctx) {
+    public @Nullable Object visitJava_math_expression(JmlParser.@NonNull Java_math_expressionContext ctx) {
         return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.JAVA);
     }
 
     @Override
-    public Object visitSafe_math_expression(JmlParser.@NonNull Safe_math_expressionContext ctx) {
+    public @Nullable Object visitSafe_math_expression(JmlParser.@NonNull Safe_math_expressionContext ctx) {
         return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.SAFE);
     }
 
     @Override
-    public Object visitBigint_math_expression(JmlParser.@NonNull Bigint_math_expressionContext ctx) {
+    public @Nullable Object visitBigint_math_expression(JmlParser.@NonNull Bigint_math_expressionContext ctx) {
         return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.BIGINT);
     }
 
@@ -1894,7 +1894,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public KeYJavaType visitReferencetype(JmlParser.@NonNull ReferencetypeContext ctx) {
+    public @Nullable KeYJavaType visitReferencetype(JmlParser.@NonNull ReferencetypeContext ctx) {
         String typename = accept(ctx.name());
         try {
             return resolverManager.resolve(null, typename, null).getType();
@@ -2080,7 +2080,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitMethod_specification(JmlParser.@NonNull Method_specificationContext ctx) {
+    public @NonNull Object visitMethod_specification(JmlParser.@NonNull Method_specificationContext ctx) {
         return listOf(ctx.spec_case());
     }
 
@@ -2535,7 +2535,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     // endregion
 
     // region exception helper
-    protected void addWarning(@NonNull ParserRuleContext node, String description) {
+    protected void addWarning(@NonNull ParserRuleContext node, @NonNull String description) {
         exc.addWarning(description, node.start);
     }
 
@@ -2559,7 +2559,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
     }
 
-    public List<PositionedString> getWarnings() {
+    public @NonNull List<PositionedString> getWarnings() {
         return exc.getWarnings();
     }
 

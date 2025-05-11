@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Responsible for estimating decision predicates for a join.
@@ -34,8 +36,10 @@ public interface PredicateEstimator {
      * which to prune, i.e. apply the delayed cut.
      */
     interface Result {
+        @Nullable
         Term getPredicate();
 
+        @Nullable
         Node getCommonParent();
     }
 }
@@ -54,7 +58,7 @@ class StdPredicateEstimator implements PredicateEstimator {
     private static final String CUT_LABEL = "CUT:";
 
     @Override
-    public Result estimate(ProspectivePartner partner, final Proof proof) {
+    public @NonNull Result estimate(@NonNull ProspectivePartner partner, final @NonNull Proof proof) {
         final Node node = getFirstDifferentNode(partner);
         String branchLabel = node.getNodeInfo().getBranchLabel();
         if (branchLabel != null
@@ -74,7 +78,7 @@ class StdPredicateEstimator implements PredicateEstimator {
                 return new Result() {
 
                     @Override
-                    public Term getPredicate() {
+                    public @NonNull Term getPredicate() {
                         if (!positive) {
                             return proof.getServices().getTermBuilder().not(term);
                         }
@@ -82,7 +86,7 @@ class StdPredicateEstimator implements PredicateEstimator {
                     }
 
                     @Override
-                    public Node getCommonParent() {
+                    public @Nullable Node getCommonParent() {
                         return node.parent();
                     }
                 };
@@ -94,13 +98,13 @@ class StdPredicateEstimator implements PredicateEstimator {
         return new Result() {
 
             @Override
-            public Term getPredicate() {
+            public @Nullable Term getPredicate() {
                 // The decision predicate has to be specified by the user.
                 return null;
             }
 
             @Override
-            public Node getCommonParent() {
+            public @Nullable Node getCommonParent() {
                 return node.parent();
             }
 
@@ -114,7 +118,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * @param partner The prospective partner object.
      * @return The next node on the path to partner.getNode(0).
      */
-    private Node getFirstDifferentNode(ProspectivePartner partner) {
+    private @Nullable Node getFirstDifferentNode(@NonNull ProspectivePartner partner) {
         TreeSet<Node> set = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
 
         Node node = partner.getNode(0);
@@ -151,7 +155,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * @param services The services object.
      * @return A term corresponding to the branch label.
      */
-    private Term translate(String estimation, Services services) {
+    private @Nullable Term translate(@NonNull String estimation, @NonNull Services services) {
         try {
             return new KeyIO(services).parseExpression(estimation);
         } catch (Throwable e) {

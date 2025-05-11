@@ -5,6 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import de.uka.ilkd.key.logic.Term;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -19,6 +20,7 @@ public interface ISymbolicEquivalenceClass extends ISymbolicElement {
      *
      * @return The terms which represents the same {@link ISymbolicObject}.
      */
+    @Nullable
     ImmutableList<Term> getTerms();
 
     /**
@@ -43,6 +45,7 @@ public interface ISymbolicEquivalenceClass extends ISymbolicElement {
      *
      * @return The most representative term.
      */
+    @Nullable
     Term getRepresentative();
 
     /**

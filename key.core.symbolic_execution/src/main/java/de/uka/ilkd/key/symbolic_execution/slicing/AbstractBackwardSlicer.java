@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -37,8 +38,8 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
      * {@inheritDoc}
      */
     @Override
-    public ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation,
-            ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
+    public @NonNull ImmutableArray<Node> doSlicing(@NonNull Node seedNode, @NonNull Location seedLocation,
+                                                   ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         final Services services = seedNode.proof().getServices();
         Set<Location> relevantLocations = null;
         List<Node> result = new LinkedList<>();
@@ -113,8 +114,8 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
      * @param services The {@link Services} to use.
      */
     protected void updateRelevantLocations(final ProgramElement read,
-            final Set<Location> relevantLocations, final SequentInfo info,
-            final Services services) {
+                                           final @NonNull Set<Location> relevantLocations, final @NonNull SequentInfo info,
+                                           final Services services) {
         ReferencePrefix relevantElement = toReferencePrefix(read);
         if (relevantElement != null) {
             Location normalizedElement = normalizeAlias(services, relevantElement, info);
@@ -139,10 +140,10 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
      *        ({@link ThisReference}).
      * @return The updated locations.
      */
-    protected Set<Location> updateOutdatedLocations(Services services,
-            Set<Location> oldLocationsToUpdate, Map<Location, SortedSet<Location>> newAliases,
-            Map<Location, SortedSet<Location>> oldAliases, Location outdatedPrefix,
-            ReferencePrefix thisReference) {
+    protected @NonNull Set<Location> updateOutdatedLocations(Services services,
+                                                             @NonNull Set<Location> oldLocationsToUpdate, @NonNull Map<Location, SortedSet<Location>> newAliases,
+                                                             @NonNull Map<Location, SortedSet<Location>> oldAliases, Location outdatedPrefix,
+                                                             ReferencePrefix thisReference) {
         // Ensure that at least one possibly outdated location is available.
         if (!oldLocationsToUpdate.isEmpty()) {
             // Ensure that alternatives are different

@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
+import org.jspecify.annotations.NonNull;
 
 /*
  * Menu option for showing the next search result of sequent search Keyboard shortcut: F3. This
@@ -18,7 +19,7 @@ public class SearchNextAction extends MainWindowAction {
     private static final long serialVersionUID = -9002009635814787502L;
     private final SequentViewSearchBar searchBar;
 
-    public SearchNextAction(MainWindow mainWindow, SequentViewSearchBar searchBar) {
+    public SearchNextAction(@NonNull MainWindow mainWindow, SequentViewSearchBar searchBar) {
         super(mainWindow);
         setName("Find Next Occurrence");
         setIcon(IconFactory.SEARCH_NEXT.get(16));

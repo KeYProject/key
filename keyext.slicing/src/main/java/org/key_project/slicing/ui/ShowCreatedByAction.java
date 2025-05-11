@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Context menu action to select the proof step that created a formula.
@@ -21,7 +22,7 @@ public class ShowCreatedByAction extends MainWindowAction {
     /**
      * The node to switch to.
      */
-    private final transient Node node;
+    private final transient @NonNull Node node;
 
     /**
      * Construct a new action.
@@ -29,7 +30,7 @@ public class ShowCreatedByAction extends MainWindowAction {
      * @param mw main window
      * @param node node to switch to
      */
-    public ShowCreatedByAction(MainWindow mw, Node node) {
+    public ShowCreatedByAction(@NonNull MainWindow mw, @NonNull Node node) {
         super(mw);
         setName(String.format(
             "Show proof step that created this formula (switches to proof step %d)",

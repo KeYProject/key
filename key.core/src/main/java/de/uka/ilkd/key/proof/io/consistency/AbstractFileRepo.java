@@ -348,7 +348,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param keyFileContent a String containing the content of a .key/.proof file.
      * @return the modified content of the file with inserted "\classpath ..." declarations.
      */
-    private String addClasspath(@NonNull String keyFileContent) {
+    private @NonNull String addClasspath(@NonNull String keyFileContent) {
         if (classpath == null || classpath.isEmpty()) {
             return keyFileContent;
         }

@@ -20,8 +20,8 @@ public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
     private final @NonNull SeqLDT seqLDT;
 
 
-    public JMLBuiltInPropertyResolver(@NonNull JavaInfo javaInfo, SLResolverManager manager,
-                                      KeYJavaType specInClass) {
+    public JMLBuiltInPropertyResolver(@NonNull JavaInfo javaInfo, @NonNull SLResolverManager manager,
+                                      @NonNull KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
         this.seqLDT = services.getTypeConverter().getSeqLDT();
     }

@@ -22,6 +22,8 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,12 +61,12 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * singleton instance
      */
-    private static KeyStrokeSettings INSTANCE = null;
+    private static @Nullable KeyStrokeSettings INSTANCE = null;
 
     /**
      * default {@link KeyStroke}s
      */
-    private static Map<String, String> DEFAULT_KEYSTROKES = new TreeMap<>();
+    private static @NonNull Map<String, String> DEFAULT_KEYSTROKES = new TreeMap<>();
 
     // define the default mappings
     static {
@@ -129,7 +131,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         // defineDefault(HelpFacade.ACTION_OPEN_HELP.getClass(), KeyEvent.VK_F1, 0);
     }
 
-    private KeyStrokeSettings(Properties init) {
+    private KeyStrokeSettings(@NonNull Properties init) {
         super(""); // no category, separate file
         this.properties.putAll(DEFAULT_KEYSTROKES);
         init.forEach((key, value) -> {
@@ -141,7 +143,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
-    public KeyStrokeSettings(Configuration config) {
+    public KeyStrokeSettings(@NonNull Configuration config) {
         super("");
         this.properties.putAll(DEFAULT_KEYSTROKES);
         readSettings(config);
@@ -149,24 +151,24 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
-    public static <T> void defineDefault(T any, KeyStroke ks) {
+    public static <T> void defineDefault(@NonNull T any, @NonNull KeyStroke ks) {
         defineDefault(any.getClass(), ks);
     }
 
-    public static <T> void defineDefault(Class<T> clazz, KeyStroke ks) {
+    public static <T> void defineDefault(@NonNull Class<T> clazz, @NonNull KeyStroke ks) {
         DEFAULT_KEYSTROKES.put(clazz.getName(), ks.toString());
     }
 
     // convenience method to make the definitions above better readable
-    private static <T> void defineDefault(Class<T> clazz, int keyCode, int modifiers) {
+    private static <T> void defineDefault(@NonNull Class<T> clazz, int keyCode, int modifiers) {
         defineDefault(clazz, KeyStroke.getKeyStroke(keyCode, modifiers));
     }
 
-    private static KeyStrokeSettings loadFromConfig() {
+    private static @NonNull KeyStrokeSettings loadFromConfig() {
         return new KeyStrokeSettings(SettingsManager.loadProperties(SETTINGS_FILE));
     }
 
-    public static KeyStrokeSettings getInstance() {
+    public static @NonNull KeyStrokeSettings getInstance() {
 
         if (INSTANCE == null) {
             if (SETTINGS_FILE.exists()) {
@@ -183,11 +185,11 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     @Override
-    public void readSettings(Properties props) {
+    public void readSettings(@NonNull Properties props) {
         props.forEach((k, v) -> this.properties.put(k.toString(), v));
     }
 
-    void setKeyStroke(String key, KeyStroke stroke, boolean override) {
+    void setKeyStroke(@NonNull String key, @Nullable KeyStroke stroke, boolean override) {
         var old = getKeyStroke(key, null);
         if (override || (old == null)) {
             properties.put(key, stroke != null ? stroke.toString() : "");

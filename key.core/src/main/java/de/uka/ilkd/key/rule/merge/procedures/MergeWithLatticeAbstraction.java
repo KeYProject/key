@@ -49,7 +49,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
     /**
      * @return Manually chosen lattice elements for program variables.
      */
-    public abstract LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices();
+    public abstract @Nullable LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices();
 
     /*
      * (non-Javadoc)

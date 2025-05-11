@@ -23,12 +23,12 @@ class Matching {
      * @param targetTerm a gound term
      * @return all substitution found from this matching
      */
-    public static ImmutableSet<Substitution> basicMatching(@NonNull Trigger trigger, @NonNull Term targetTerm) {
+    public static @NonNull ImmutableSet<Substitution> basicMatching(@NonNull Trigger trigger, @NonNull Term targetTerm) {
         return BasicMatching.getSubstitutions(trigger.getTriggerTerm(), targetTerm);
     }
 
-    public static ImmutableSet<Substitution> twoSidedMatching(@NonNull UniTrigger trigger, Term targetTerm,
-                                                              Services services) {
+    public static @NonNull ImmutableSet<Substitution> twoSidedMatching(@NonNull UniTrigger trigger, Term targetTerm,
+                                                                       @NonNull Services services) {
         TwoSidedMatching tsm = new TwoSidedMatching(trigger, targetTerm, services);
         return tsm.getSubstitutions(services);
     }

@@ -60,7 +60,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         return term;
     }
 
-    public static String checkTaclet(final @NonNull Taclet taclet) {
+    public static @Nullable String checkTaclet(final @NonNull Taclet taclet) {
         String result = checkForIllegalConditions(taclet);
         if (result != null) {
             return result;

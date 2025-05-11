@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
@@ -64,26 +65,26 @@ public class TestJMLTranslator {
                 .selfVar(buildSelfVarAsProgVar());
     }
 
-    protected LocationVariable buildSelfVarAsProgVar() {
+    protected @NonNull LocationVariable buildSelfVarAsProgVar() {
         ProgramElementName classPEN = new ProgramElementName("self");
         return new LocationVariable(classPEN, testClassType);
     }
 
 
-    protected LocationVariable buildExcVar() {
+    protected @NonNull LocationVariable buildExcVar() {
         KeYJavaType excType = javaInfo.getTypeByClassName("java.lang.Throwable");
         ProgramElementName excPEN = new ProgramElementName("exc");
         return new LocationVariable(excPEN, excType);
     }
 
 
-    protected LocationVariable buildResultVar(IProgramMethod pm) {
+    protected @NonNull LocationVariable buildResultVar(@NonNull IProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
         return new LocationVariable(resPEN, pm.getReturnType());
     }
 
 
-    private boolean termContains(Term t, Term sub) {
+    private boolean termContains(@NonNull Term t, Term sub) {
         for (int i = 0; i < t.arity(); i++) {
             if (t.sub(i).equals(sub) || termContains(t.sub(i), sub)) {
                 return true;
@@ -94,7 +95,7 @@ public class TestJMLTranslator {
     }
 
 
-    private boolean termContains(Term t, Operator op) {
+    private boolean termContains(@NonNull Term t, @NonNull Operator op) {
 
         if (t.op().arity() == op.arity() && t.op().name().equals(op.name())) {
             return true;
@@ -482,7 +483,7 @@ public class TestJMLTranslator {
         "\\locset(this.b) >= \\locset(this.s) : \\subset(\\locset(this.s), \\locset(this.b))",
         "\\locset(this.b) > \\locset(this.s) : \\subset(\\locset(this.s), \\locset(this.b)) && \\locset(this.b) != \\locset(this.s)",
     }, delimiter = ':')
-    public void testOperatorOverloading(String expression, String expected) {
+    public void testOperatorOverloading(@NonNull String expression, @NonNull String expected) {
         Term tTrans = null, tExp = null;
         try {
             tTrans = jmlIO.parseExpression(expression);

@@ -35,6 +35,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
@@ -81,79 +82,79 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * The proof currently shown in the KeY UI.
      */
-    private transient Proof currentProof = null;
+    private transient @Nullable Proof currentProof = null;
     /**
      * "Export as DOT" button.
      */
-    private JButton dotExport = null;
+    private @Nullable JButton dotExport = null;
     /**
      * "Show rendering of graph" button.
      */
-    private JButton showGraphRendering = null;
+    private @Nullable JButton showGraphRendering = null;
     /**
      * "Slice proof" button.
      */
-    private JButton sliceProof = null;
+    private @Nullable JButton sliceProof = null;
     /**
      * "Slice proof to fixed point" button.
      */
-    private JButton sliceProofFixedPoint = null;
+    private @Nullable JButton sliceProofFixedPoint = null;
     /**
      * "Run analysis" button.
      */
-    private JButton runAnalysis = null;
+    private @Nullable JButton runAnalysis = null;
     /**
      * "Show rule statistics" button.
      */
-    private JButton showRuleStatistics = null;
+    private @Nullable JButton showRuleStatistics = null;
     /**
      * Label indicating the number of dependency graph nodes.
      *
      * @see org.key_project.slicing.graph.DependencyGraph
      */
-    private JLabel graphNodes = null;
+    private @Nullable JLabel graphNodes = null;
     /**
      * Label indicating the number of dependency graph edges.
      *
      * @see org.key_project.slicing.graph.DependencyGraph
      */
-    private JLabel graphEdges = null;
+    private @Nullable JLabel graphEdges = null;
     /**
      * Label showing total number of steps in the analyzed proof.
      */
-    private JLabel totalSteps = null;
+    private @Nullable JLabel totalSteps = null;
     /**
      * Label showing number of useful steps as determined by the analysis.
      */
-    private JLabel usefulSteps = null;
+    private @Nullable JLabel usefulSteps = null;
     /**
      * Label showing total number of branches in the analyzed proof.
      */
-    private JLabel totalBranches = null;
+    private @Nullable JLabel totalBranches = null;
     /**
      * Label showing number of useful branches as determined by the analysis.
      */
-    private JLabel usefulBranches = null;
+    private @Nullable JLabel usefulBranches = null;
     /**
      * Checkbox to abbreviate formulas in DOT output.
      */
-    private JCheckBox abbreviateFormulas = null;
+    private @Nullable JCheckBox abbreviateFormulas = null;
     /**
      * Checkbox to shorten chains in DOT output.
      */
-    private JCheckBox abbreviateChains = null;
+    private @Nullable JCheckBox abbreviateChains = null;
     /**
      * Checkbox to enable the dependency analysis algorithm.
      */
-    private JCheckBox doDependencyAnalysis = null;
+    private @Nullable JCheckBox doDependencyAnalysis = null;
     /**
      * Checkbox to enable rule de-duplication.
      */
-    private JCheckBox doDeduplicateRuleApps = null;
+    private @Nullable JCheckBox doDeduplicateRuleApps = null;
     /**
      * Panel showing execution time of the algorithm.
      */
-    private JPanel timings = null;
+    private @Nullable JPanel timings = null;
 
     /**
      * Number of nodes in the dependency graph.
@@ -253,7 +254,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         add(Box.createVerticalGlue());
     }
 
-    private JPanel getProofAnalysisPanel() {
+    private @NonNull JPanel getProofAnalysisPanel() {
         JPanel panel2 = new JPanel();
         panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
         panel2.setBorder(new TitledBorder("Proof analysis"));
@@ -285,7 +286,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return panel2;
     }
 
-    private JPanel getDependencyGraphPanel() {
+    private @NonNull JPanel getDependencyGraphPanel() {
         JPanel panel1 = new JPanel();
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
         panel1.setBorder(new TitledBorder("Dependency graph"));
@@ -328,7 +329,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return panel1;
     }
 
-    private GridBagConstraints gridBagConstraints(int y) {
+    private @NonNull GridBagConstraints gridBagConstraints(int y) {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = y;
@@ -346,7 +347,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return List.of(HelpFacade.createHelpButton("user/ProofSlicing/"));
     }
 
-    private void exportDot(ActionEvent event) {
+    private void exportDot(@NonNull ActionEvent event) {
         if (currentProof == null) {
             return;
         }
@@ -390,7 +391,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         new PreviewDialog(MainWindow.getInstance(), text);
     }
 
-    private AnalysisResults analyzeProof() {
+    private @Nullable AnalysisResults analyzeProof() {
         if (currentProof == null) {
             return null;
         }
@@ -462,7 +463,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }, this::showError).execute();
     }
 
-    private void showError(Throwable e) {
+    private void showError(@NonNull Throwable e) {
         LOGGER.error("failed to slice proof ", e);
         SwingUtilities.invokeLater(
             () -> IssueDialog.showExceptionDialog(MainWindow.getInstance(), e));
@@ -478,7 +479,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         timings.removeAll();
     }
 
-    private void displayResults(AnalysisResults results) {
+    private void displayResults(@Nullable AnalysisResults results) {
         if (results == null) {
             resetLabels();
             return;
@@ -529,7 +530,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
         currentProof = e.getSource().getSelectedProof();
         resetLabels();
         resetGraphLabels();
@@ -554,7 +555,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * @param proof proof
      * @param tracker dependency tracker of that proof
      */
-    public void ruleAppliedOnProof(Proof proof, DependencyTracker tracker) {
+    public void ruleAppliedOnProof(Proof proof, @NonNull DependencyTracker tracker) {
         currentProof = proof;
         graphNodesNr = tracker.getDependencyGraph().countNodes();
         graphEdgesNr = tracker.getDependencyGraph().countEdges();
@@ -565,7 +566,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     @Override
-    public void proofPruned(ProofTreeEvent e) {
+    public void proofPruned(@NonNull ProofTreeEvent e) {
         ruleAppliedOnProof(e.getSource(), extension.trackers.get(e.getSource()));
     }
 

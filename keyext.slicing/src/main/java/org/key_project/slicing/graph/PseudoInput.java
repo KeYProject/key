@@ -4,6 +4,7 @@
 package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.BranchLocation;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Graph node used if a rule application did not use any input formulas.
@@ -20,12 +21,12 @@ public class PseudoInput extends GraphNode {
     }
 
     @Override
-    public GraphNode popLastBranchID() {
+    public @NonNull GraphNode popLastBranchID() {
         return this;
     }
 
     @Override
-    public String toString(boolean abbreviated, boolean omitBranch) {
+    public @NonNull String toString(boolean abbreviated, boolean omitBranch) {
         return "pseudo input " + Integer.toHexString(hashCode());
     }
 }

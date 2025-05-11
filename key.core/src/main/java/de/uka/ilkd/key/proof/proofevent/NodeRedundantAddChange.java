@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import org.jspecify.annotations.NonNull;
 
 /**
  * An instance of this class informs the listerns if a formula has been tried to add to the sequent
@@ -34,7 +35,7 @@ public class NodeRedundantAddChange implements NodeChange {
 
     /** toString */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "Redundant formula:" + pio;
     }
 

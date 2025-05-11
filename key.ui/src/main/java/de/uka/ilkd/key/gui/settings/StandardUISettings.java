@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
@@ -39,25 +40,25 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private static final List<String> LAF_CLASSES =
         new ArrayList<>(List.of(UIManager.getCrossPlatformLookAndFeelClassName()));
 
-    private final JComboBox<String> lookAndFeel;
-    private final JSpinner spFontSizeGlobal;
-    private final JSpinner txtMaxTooltipLines;
-    private final JCheckBox chkShowLoadExamplesDialog;
-    private final JCheckBox chkShowWholeTacletCB;
-    private final JCheckBox chkShowUninstantiatedTaclet;
-    private final JCheckBox chkRightClickMacros;
-    private final JCheckBox chkPrettyPrint;
-    private final JCheckBox chkUseUnicode;
-    private final JCheckBox chkSyntaxHighlightning;
-    private final JCheckBox chkHidePackagePrefix;
-    private final JCheckBox chkConfirmExit;
-    private final JSpinner spAutoSaveProof;
-    private final JCheckBox chkMinimizeInteraction;
-    private final JComboBox<String> spFontSizeTreeSequent;
-    private final JCheckBox chkEnsureSourceConsistency;
+    private final @NonNull JComboBox<String> lookAndFeel;
+    private final @NonNull JSpinner spFontSizeGlobal;
+    private final @NonNull JSpinner txtMaxTooltipLines;
+    private final @NonNull JCheckBox chkShowLoadExamplesDialog;
+    private final @NonNull JCheckBox chkShowWholeTacletCB;
+    private final @NonNull JCheckBox chkShowUninstantiatedTaclet;
+    private final @NonNull JCheckBox chkRightClickMacros;
+    private final @NonNull JCheckBox chkPrettyPrint;
+    private final @NonNull JCheckBox chkUseUnicode;
+    private final @NonNull JCheckBox chkSyntaxHighlightning;
+    private final @NonNull JCheckBox chkHidePackagePrefix;
+    private final @NonNull JCheckBox chkConfirmExit;
+    private final @NonNull JSpinner spAutoSaveProof;
+    private final @NonNull JCheckBox chkMinimizeInteraction;
+    private final @NonNull JComboBox<String> spFontSizeTreeSequent;
+    private final @NonNull JCheckBox chkEnsureSourceConsistency;
     private final JTextArea txtClutterRules;
     private final JTextArea txtClutterRuleSets;
-    private final JComboBox<String> notificationAfterMacro;
+    private final @NonNull JComboBox<String> notificationAfterMacro;
 
     public StandardUISettings() {
         setHeaderText(getDescription());
@@ -136,12 +137,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Appearance & Behaviour";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         GeneralSettings generalSettings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
@@ -177,7 +178,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     }
 
     @Override
-    public List<SettingsProvider> getChildren() {
+    public @NonNull List<SettingsProvider> getChildren() {
         return Arrays.asList(SettingsManager.COLOR_SETTINGS, SettingsManager.SHORTCUT_SETTINGS);
     }
 

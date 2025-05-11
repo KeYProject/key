@@ -19,7 +19,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * A JML model method declaration in textual form.
  */
 public final class TextualJMLMethodDecl extends TextualJMLConstruct {
-    private final JmlParser.Method_declarationContext methodDefinition;
+    private final JmlParser.@NonNull Method_declarationContext methodDefinition;
 
 
     public TextualJMLMethodDecl(@NonNull ImmutableList<JMLModifier> modifiers,
@@ -53,7 +53,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
             getMethodName(), paramsString);
     }
 
-    public JmlParser.Method_declarationContext getDecl() {
+    public JmlParser.@NonNull Method_declarationContext getDecl() {
         return methodDefinition;
     }
 
@@ -61,7 +61,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         return methodDefinition.IDENT().getText();
     }
 
-    public ParserRuleContext getMethodDefinition() {
+    public @NonNull ParserRuleContext getMethodDefinition() {
         return methodDefinition;
     }
 

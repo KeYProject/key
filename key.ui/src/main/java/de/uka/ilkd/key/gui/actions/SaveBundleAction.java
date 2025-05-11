@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Saves the currently selected proof as a zip archive with file extension "zproof". The bundle
@@ -28,7 +29,7 @@ public final class SaveBundleAction extends MainWindowAction {
      *
      * @param mainWindow the main window of the program
      */
-    public SaveBundleAction(MainWindow mainWindow) {
+    public SaveBundleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Save Proof as Bundle...");
         setIcon(IconFactory.saveBundle(MainWindow.TOOLBAR_ICON_SIZE));

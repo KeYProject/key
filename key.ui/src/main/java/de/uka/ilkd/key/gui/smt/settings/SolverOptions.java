@@ -12,6 +12,8 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -24,15 +26,15 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     private static final int SOLVER_NOT_SUPPOTED = 1;
     private static final int SOLVER_SUPPORT_NOT_CHECKED = 2;
-    private final transient SolverType solverType;
-    private final JTextField solverCommand;
-    private final JTextField solverParameters;
-    private final JTextField solverSupported;
-    private final JTextField solverName;
-    private final JTextField solverInstalled;
-    private final JSpinner solverTimeout;
+    private final transient @NonNull SolverType solverType;
+    private final @NonNull JTextField solverCommand;
+    private final @NonNull JTextField solverParameters;
+    private final @NonNull JTextField solverSupported;
+    private final @NonNull JTextField solverName;
+    private final @NonNull JTextField solverInstalled;
+    private final @NonNull JSpinner solverTimeout;
 
-    public SolverOptions(SolverType solverType) {
+    public SolverOptions(@NonNull SolverType solverType) {
         this.setName(solverType.getName());
         this.solverType = solverType;
         setHeaderText("SMT Solver: " + getDescription());
@@ -48,11 +50,11 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         createCheckSupportButton();
     }
 
-    private static String versionInfo(String info, String versionString) {
+    private static @NonNull String versionInfo(String info, String versionString) {
         return info + " " + "(" + versionString + ")";
     }
 
-    protected JButton createDefaultButton() {
+    protected @NonNull JButton createDefaultButton() {
         JButton toDefaultButton = new JButton("Set parameters to default");
         toDefaultButton.addActionListener(
             arg0 -> solverParameters.setText(solverType.getDefaultSolverParameters()));
@@ -60,12 +62,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         return toDefaultButton;
     }
 
-    private String createSupportedVersionText() {
+    private @NonNull String createSupportedVersionText() {
         return "The following minimal version is supported: "
             + solverType.getMinimumSupportedVersion();
     }
 
-    private String getSolverSupportText() {
+    private @NonNull String getSolverSupportText() {
         if (solverType.supportHasBeenChecked()) {
             return solverType.isSupportedVersion() ? SOLVER_SUPPORT_TEXT[SOLVER_SUPPORTED]
                     : SOLVER_SUPPORT_TEXT[SOLVER_NOT_SUPPOTED];
@@ -74,7 +76,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private JTextArea createSolverInformation() {
+    private @Nullable JTextArea createSolverInformation() {
         String info = solverType.getInfo();
         if (info != null && !info.isEmpty()) {
             JTextArea solverInfo =
@@ -94,7 +96,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         return null;
     }
 
-    protected JTextField createSolverSupported() {
+    protected @NonNull JTextField createSolverSupported() {
 
         JTextField txt = addTextField("Support", getSolverSupportText(),
             SMTSettingsProvider.INFO_SOLVER_SUPPORT + createSupportedVersionText(),
@@ -103,7 +105,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         return txt;
     }
 
-    private JSpinner createSolverTimeout() {
+    private @NonNull JSpinner createSolverTimeout() {
         var model = new SpinnerNumberModel(0.0, -1.0, Long.MAX_VALUE, 1);
         // Validator is empty as no additional requirements have to be fulfilled by the entered
         // value (except being a number, which is ensured by the model itself).
@@ -117,7 +119,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         return jsp;
     }
 
-    protected JButton createCheckSupportButton() {
+    protected @NonNull JButton createCheckSupportButton() {
         JButton checkForSupportButton = new JButton("Check for support");
         checkForSupportButton.setEnabled(solverType.isInstalled(false));
         checkForSupportButton.addActionListener(arg0 -> {
@@ -128,20 +130,20 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         return checkForSupportButton;
     }
 
-    protected JTextField createSolverParameters() {
+    protected @NonNull JTextField createSolverParameters() {
         return addTextField("Parameters", solverType.getSolverParameters(),
             SMTSettingsProvider.INFO_SOLVER_PARAMETERS, e -> {
             });
     }
 
-    public JTextField createSolverCommand() {
+    public @NonNull JTextField createSolverCommand() {
         return addTextField("Command", solverType.getSolverCommand(),
             SMTSettingsProvider.INFO_SOLVER_COMMAND, e -> {
             });
     }
 
 
-    protected JTextField createSolverInstalled() {
+    protected @NonNull JTextField createSolverInstalled() {
         final boolean installed = solverType.isInstalled(true);
         String info = installed ? "yes" : "no";
         if (installed) {
@@ -163,7 +165,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         return txt;
     }
 
-    protected JTextField createSolverName() {
+    protected @NonNull JTextField createSolverName() {
         JTextField txt = addTextField("Name", solverType.getName(),
             SMTSettingsProvider.INFO_SOLVER_NAME, emptyValidator());
         txt.setEditable(false);
@@ -171,17 +173,17 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return solverType.getName();
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         setSmtSettings(SettingsManager.getSmtPiSettings().clone());
         return this;
     }
 
-    private void setSmtSettings(ProofIndependentSMTSettings clone) {
+    private void setSmtSettings(@NonNull ProofIndependentSMTSettings clone) {
         if (clone.containsSolver(solverType)) {
             solverCommand.setText(clone.getCommand(solverType));
             solverParameters.setText(clone.getParameters(solverType));
@@ -201,7 +203,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public void applySettings(MainWindow window) {
+    public void applySettings(@NonNull MainWindow window) {
         var settings = SettingsManager.getSmtPiSettings();
         if (settings.containsSolver(solverType)) {
             String command = solverCommand.getText();

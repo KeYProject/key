@@ -25,8 +25,8 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class SLAttributeResolver extends SLExpressionResolver {
 
-    public SLAttributeResolver(@NonNull JavaInfo javaInfo, SLResolverManager manager,
-                               KeYJavaType specInClass) {
+    public SLAttributeResolver(@NonNull JavaInfo javaInfo, @NonNull SLResolverManager manager,
+                               @NonNull KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
     }
 

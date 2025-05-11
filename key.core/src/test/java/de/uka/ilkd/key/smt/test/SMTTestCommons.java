@@ -17,6 +17,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Tag;
 
@@ -31,7 +32,7 @@ public abstract class SMTTestCommons {
     protected static final String FOLDER =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
             + File.separator + "tacletTranslation" + File.separator;
-    protected static ProblemInitializer initializer = null;
+    protected static @Nullable ProblemInitializer initializer = null;
     protected static final Profile profile = new JavaProfile();
 
     private TermServices services;
@@ -49,8 +50,8 @@ public abstract class SMTTestCommons {
 
     public abstract boolean toolInstalled();
 
-    protected SMTSolverResult.ThreeValuedTruth getResult(SMTSolverResult.ThreeValuedTruth expected,
-            String filepath)
+    protected SMTSolverResult.@NonNull ThreeValuedTruth getResult(SMTSolverResult.ThreeValuedTruth expected,
+                                                                  @NonNull String filepath)
             throws ProblemLoaderException {
         Assumptions.assumeTrue(toolInstalled());
         return checkFile(expected, filepath).isValid();
@@ -64,7 +65,7 @@ public abstract class SMTTestCommons {
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
-    protected SMTSolverResult checkFile(SMTSolverResult.ThreeValuedTruth expected, String filepath)
+    protected @NonNull SMTSolverResult checkFile(SMTSolverResult.ThreeValuedTruth expected, @NonNull String filepath)
             throws ProblemLoaderException {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
@@ -78,7 +79,7 @@ public abstract class SMTTestCommons {
         }
     }
 
-    private @NonNull SMTSolverResult checkGoal(SMTSolverResult.ThreeValuedTruth expected, Goal g) {
+    private @NonNull SMTSolverResult checkGoal(SMTSolverResult.ThreeValuedTruth expected, @NonNull Goal g) {
         SMTTestSettings settings = new SMTTestSettings();
         if (expected == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
             /*
@@ -93,21 +94,21 @@ public abstract class SMTTestCommons {
         return problem.getFinalResult();
     }
 
-    protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
+    protected @NonNull KeYEnvironment<?> loadProof(@NonNull String filepath) throws ProblemLoaderException {
         return KeYEnvironment.load(new File(filepath), null, null, null);
     }
 
     /**
      * Use this method if you only need taclets for testing.
      */
-    protected ProofAggregate parse() {
+    protected @NonNull ProofAggregate parse() {
         return parse(new File(FOLDER + "dummyFile.key"));
     }
 
     /**
      * Calls <code>parse(File file, Profile profile)</code> with the standard profile for testing.
      */
-    protected ProofAggregate parse(File file) {
+    protected @NonNull ProofAggregate parse(@NonNull File file) {
         return parse(file, profile);
     }
 
@@ -119,7 +120,7 @@ public abstract class SMTTestCommons {
      * @return ProofAggregate of the problem file.
      * @profile determines the profile that should be used.
      */
-    protected ProofAggregate parse(File file, Profile pro) {
+    protected @NonNull ProofAggregate parse(@NonNull File file, @NonNull Profile pro) {
         assertTrue(file.exists());
         ProofAggregate result = null;
         try {

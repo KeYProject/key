@@ -219,7 +219,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * org.key_project.util.collection.ImmutableList)
      */
     @Override
-    public synchronized ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals) {
+    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals) {
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();
         return start(proof, goals, stratSet);
@@ -232,8 +232,8 @@ public class ApplyStrategy extends AbstractProverCore {
      * org.key_project.util.collection.ImmutableList, de.uka.ilkd.key.settings.StrategySettings)
      */
     @Override
-    public synchronized ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals,
-                                                @NonNull StrategySettings stratSet) {
+    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals,
+                                                         @NonNull StrategySettings stratSet) {
 
         int maxSteps = stratSet.getMaxSteps();
         long timeout = stratSet.getTimeout();

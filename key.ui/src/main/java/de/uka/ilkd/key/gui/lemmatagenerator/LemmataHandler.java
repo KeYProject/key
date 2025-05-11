@@ -26,6 +26,7 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -122,7 +123,7 @@ public class LemmataHandler implements TacletFilter {
         loader.start();
     }
 
-    private Collection<File> createFilesForAxioms(Collection<String> filenames) {
+    private @NonNull Collection<File> createFilesForAxioms(@NonNull Collection<String> filenames) {
         Collection<File> list = new LinkedList<>();
         for (String filename : filenames) {
             list.add(new File(filename));
@@ -136,7 +137,7 @@ public class LemmataHandler implements TacletFilter {
         printException(exception);
     }
 
-    private void startProofs(ProofAggregate pa) {
+    private void startProofs(@NonNull ProofAggregate pa) {
         println("Start the proving:");
         for (Proof p : pa.getProofs()) {
             try {
@@ -150,13 +151,13 @@ public class LemmataHandler implements TacletFilter {
         }
     }
 
-    private void saveProof(Proof p) throws IOException {
+    private void saveProof(@NonNull Proof p) throws IOException {
         ProofSaver saver =
             new ProofSaver(p, options.createProofPath(p), options.getInternalVersion());
         saver.save();
     }
 
-    private void startProof(Proof proof) {
+    private void startProof(@NonNull Proof proof) {
         print(proof.name() + "...");
         AutomaticProver prover = new AutomaticProver();
         try {
@@ -210,7 +211,7 @@ public class LemmataHandler implements TacletFilter {
     }
 
     @Override
-    public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
+    public @NonNull ImmutableSet<Taclet> filter(@NonNull List<TacletInfo> taclets) {
         ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
         for (TacletInfo tacletInfo : taclets) {
             if (!tacletInfo.isAlreadyInUse() && !tacletInfo.isNotSupported()) {

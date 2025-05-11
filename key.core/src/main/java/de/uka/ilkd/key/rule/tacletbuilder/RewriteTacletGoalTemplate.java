@@ -56,7 +56,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      *
      * @return Term being paramter in the rule goal replacewith(Seq)
      */
-    public Term replaceWith() {
+    public @NonNull Term replaceWith() {
         return replacewith;
     }
 

@@ -39,7 +39,7 @@ class GenericTranslator {
     /**
      * Translates generic variables.
      */
-    public @NonNull Collection<Term> translate(Term term, @NonNull ImmutableSet<Sort> sorts, Taclet t,
+    public @NonNull Collection<Term> translate(@NonNull Term term, @NonNull ImmutableSet<Sort> sorts, Taclet t,
                                                @NonNull TacletConditions conditions, Services serv, int maxGeneric)
             throws IllegalTacletException {
         this.services = serv;

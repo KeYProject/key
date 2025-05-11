@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Inspects whether a given string can be translated into a formula.
@@ -26,7 +28,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
 
 
     @Override
-    public String check(String toBeChecked) {
+    public @Nullable String check(@NonNull String toBeChecked) {
         if (toBeChecked.isEmpty()) {
             return CheckedUserInputInspector.NO_USER_INPUT;
         }
@@ -43,7 +45,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
 
     }
 
-    public static Term translate(Services services, String toBeChecked) {
+    public static @Nullable Term translate(@NonNull Services services, @NonNull String toBeChecked) {
         try {
             return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {

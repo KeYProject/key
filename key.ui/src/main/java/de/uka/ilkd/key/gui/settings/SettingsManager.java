@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class SettingsManager {
     private static SettingsManager INSTANCE;
     private final List<SettingsProvider> settingsProviders = new LinkedList<>();
 
-    static SettingsManager createWithExtensions() {
+    static @NonNull SettingsManager createWithExtensions() {
         SettingsManager sm = new SettingsManager();
         KeYGuiExtensionFacade.getSettingsProvider()
                 .forEach(it -> sm.settingsProviders.add(it.getSettings()));
@@ -67,7 +68,7 @@ public class SettingsManager {
         return INSTANCE;
     }
 
-    public static ProofDependentSMTSettings getSmtPdSettings(MainWindow window) {
+    public static @NonNull ProofDependentSMTSettings getSmtPdSettings(@NonNull MainWindow window) {
         Proof proof = window.getMediator().getSelectedProof();
         ProofDependentSMTSettings pdSettings;
         if (proof == null) {
@@ -77,7 +78,7 @@ public class SettingsManager {
         }
     }
 
-    public static NewSMTTranslationSettings getNewSmtSettings(MainWindow window) {
+    public static @NonNull NewSMTTranslationSettings getNewSmtSettings(@NonNull MainWindow window) {
         Proof proof = window.getMediator().getSelectedProof();
         ProofDependentSMTSettings pdSettings;
         if (proof == null) {
@@ -87,11 +88,11 @@ public class SettingsManager {
         }
     }
 
-    public static ProofIndependentSMTSettings getSmtPiSettings() {
+    public static @NonNull ProofIndependentSMTSettings getSmtPiSettings() {
         return ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
     }
 
-    public static ChoiceSettings getChoiceSettings(MainWindow window) {
+    public static @NonNull ChoiceSettings getChoiceSettings(MainWindow window) {
         return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
         /*
          * if (null != window.getMediator().getSelectedProof()) { return
@@ -100,7 +101,7 @@ public class SettingsManager {
          */
     }
 
-    public static Properties loadProperties(File settingsFile) {
+    public static @NonNull Properties loadProperties(@NonNull File settingsFile) {
         Properties props = new Properties();
         if (settingsFile.exists()) {
             try (FileReader reader = new FileReader(settingsFile, StandardCharsets.UTF_8)) {
@@ -117,7 +118,7 @@ public class SettingsManager {
         dialog.setVisible(true);
     }
 
-    private SettingsDialog createDialog(MainWindow mainWindow) {
+    private @NonNull SettingsDialog createDialog(MainWindow mainWindow) {
         settingsProviders.sort(Comparator.comparingInt(SettingsProvider::getPriorityOfSettings));
         initializeProviders(settingsProviders, mainWindow);
 
@@ -136,7 +137,7 @@ public class SettingsManager {
      * @param providers
      * @param mainWindow
      */
-    private void initializeProviders(List<SettingsProvider> providers, MainWindow mainWindow) {
+    private void initializeProviders(@NonNull List<SettingsProvider> providers, MainWindow mainWindow) {
         providers.forEach(it -> it.getPanel(mainWindow));
         providers.forEach(it -> initializeProviders(it.getChildren(), mainWindow));
     }
@@ -156,7 +157,7 @@ public class SettingsManager {
     }
 
     public static class ShowSettingsAction extends MainWindowAction {
-        public ShowSettingsAction(MainWindow mainWindow) {
+        public ShowSettingsAction(@NonNull MainWindow mainWindow) {
             super(mainWindow);
             setName("Settings");
             setIcon(IconFactory.editFile(16));
@@ -168,7 +169,7 @@ public class SettingsManager {
         }
     }
 
-    public static Action getActionShowSettings(MainWindow window) {
+    public static @NonNull Action getActionShowSettings(@NonNull MainWindow window) {
         return new ShowSettingsAction(window);
     }
 }

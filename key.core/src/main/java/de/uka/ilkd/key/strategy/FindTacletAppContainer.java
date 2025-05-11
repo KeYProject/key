@@ -33,7 +33,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * was created
      */
     private final @NonNull FormulaTag positionTag;
-    private final PosInOccurrence applicationPosition;
+    private final @NonNull PosInOccurrence applicationPosition;
 
     /**
      * Creates a FindTacletAppContainer for applying a find taclet.

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,7 +19,7 @@ class SequentViewPanel extends JPanel {
 
     private static final long serialVersionUID = -4052156449188977483L;
 
-    protected SequentViewPanel(SequentView sequentView) {
+    protected SequentViewPanel(@NonNull SequentView sequentView) {
 
         setLayout(new GridBagLayout());
         setBackground(sequentView.getBackground());

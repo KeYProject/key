@@ -59,8 +59,8 @@ public abstract class ScaleFeature implements Feature {
      * @param img0 point 0 in the image
      * @param img1 point 1 in the image
      */
-    public static Feature createAffine(Feature f, @NonNull RuleAppCost dom0, RuleAppCost dom1,
-                                       @NonNull RuleAppCost img0, RuleAppCost img1) {
+    public static @NonNull Feature createAffine(Feature f, @NonNull RuleAppCost dom0, RuleAppCost dom1,
+                                                @NonNull RuleAppCost img0, RuleAppCost img1) {
         Debug.assertFalse(dom0.equals(dom1),
             "Two different points are needed to define the " + "affine transformation");
         if (img0.equals(img1)) {

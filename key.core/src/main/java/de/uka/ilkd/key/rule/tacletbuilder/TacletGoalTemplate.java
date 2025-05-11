@@ -83,7 +83,7 @@ public class TacletGoalTemplate {
      *
      * @return Sequent to be added as Goal or Sequent.EMPTY_SEQUENT if no such Sequent exists
      */
-    public Sequent sequent() {
+    public @NonNull Sequent sequent() {
         return addedSeq;
     }
 

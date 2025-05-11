@@ -157,7 +157,8 @@ public class Proof implements Named {
      * The {@link File} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
-    private @MonotonicNonNull File proofFile;
+    private @MonotonicNonNull
+    @Nullable File proofFile;
 
     private Lookup userData;
 

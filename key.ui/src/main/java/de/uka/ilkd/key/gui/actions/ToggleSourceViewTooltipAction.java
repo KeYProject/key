@@ -10,6 +10,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Toggles the tooltips of the source view.
@@ -36,7 +37,7 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public ToggleSourceViewTooltipAction(MainWindow mainWindow) {
+    public ToggleSourceViewTooltipAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOL_TIP);
@@ -55,7 +56,7 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NonNull ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .setShowSourceViewTooltips(selected);

@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s that are grouped
@@ -20,17 +21,17 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
 
     private static final long serialVersionUID = 1L;
     private final String groupName;
-    private final List<TestFile> testFiles;
-    private final ProofCollectionSettings settings;
+    private final @NonNull List<TestFile> testFiles;
+    private final @NonNull ProofCollectionSettings settings;
 
-    public GroupedProofCollectionUnit(String groupName, ProofCollectionSettings settings) {
+    public GroupedProofCollectionUnit(String groupName, @NonNull ProofCollectionSettings settings) {
         this.groupName = groupName;
         this.settings = new ProofCollectionSettings(settings);
         this.testFiles = new ArrayList<>();
     }
 
     @Override
-    public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName) {
+    public @NonNull RunAllProofsTestUnit createRunAllProofsTestUnit(String testName) {
         return new RunAllProofsTestUnit(testName, settings, testFiles, false);
     }
 
@@ -39,28 +40,28 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
         return groupName;
     }
 
-    public TestFile provable(String path) throws IOException {
+    public @NonNull TestFile provable(String path) throws IOException {
         RunAllProofsDirectories.init();
         var tf = new TestFile(TestProperty.PROVABLE, path, settings);
         testFiles.add(tf);
         return tf;
     }
 
-    public TestFile notprovable(String path) throws IOException {
+    public @NonNull TestFile notprovable(String path) throws IOException {
         RunAllProofsDirectories.init();
         var tf = new TestFile(TestProperty.NOTPROVABLE, path, settings);
         testFiles.add(tf);
         return tf;
     }
 
-    public TestFile loadable(String path) throws IOException {
+    public @NonNull TestFile loadable(String path) throws IOException {
         RunAllProofsDirectories.init();
         var tf = new TestFile(TestProperty.LOADABLE, path, settings);
         testFiles.add(tf);
         return tf;
     }
 
-    public TestFile notloadable(String path) throws IOException {
+    public @NonNull TestFile notloadable(String path) throws IOException {
         RunAllProofsDirectories.init();
         var tf = new TestFile(TestProperty.NOTLOADABLE, path, settings);
         testFiles.add(tf);

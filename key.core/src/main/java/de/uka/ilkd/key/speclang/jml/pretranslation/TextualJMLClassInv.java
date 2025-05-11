@@ -18,7 +18,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
     private final @NonNull ParserRuleContext inv;
     private final boolean free;
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers, @NonNull ParserRuleContext inv,
+    public TextualJMLClassInv(@NonNull ImmutableList<JMLModifier> modifiers, @NonNull ParserRuleContext inv,
                               String name, boolean free) {
         super(modifiers, name);
         assert inv != null;
@@ -28,12 +28,12 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers,
+    public TextualJMLClassInv(@NonNull ImmutableList<JMLModifier> modifiers,
                               JmlParser.@NonNull Class_invariantContext inv, boolean free) {
         this(modifiers, inv, null, free);
     }
 
-    public ParserRuleContext getInv() {
+    public @NonNull ParserRuleContext getInv() {
         return inv;
     }
 

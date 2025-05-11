@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
@@ -66,7 +67,7 @@ public final class RunAllProofsTest {
      * @return The parameters. Each row will be one test case.
      * @throws IOException If an exceptions occurs while reading and parsing the index file
      */
-    public static Stream<DynamicTest> data(ProofCollection proofCollection) throws IOException {
+    public static Stream<DynamicTest> data(@NonNull ProofCollection proofCollection) throws IOException {
         /*
          * Create list of constructor parameters that will be returned by this method. Suitable
          * constructor is automatically determined by JUnit.
@@ -77,7 +78,7 @@ public final class RunAllProofsTest {
                 .map(unit -> DynamicTest.dynamicTest(unit.getTestName(), () -> executeUnit(unit)));
     }
 
-    private static void executeUnit(RunAllProofsTestUnit unit) throws Exception {
+    private static void executeUnit(@NonNull RunAllProofsTestUnit unit) throws Exception {
         /*
          * Tests each file defined by the instance variables. The tests steps are described in
          * the

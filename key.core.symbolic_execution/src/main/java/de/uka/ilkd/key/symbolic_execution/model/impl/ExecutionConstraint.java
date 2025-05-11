@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The default implementation of {@link IExecutionConstraint}.
@@ -20,12 +21,12 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     /**
      * The {@link Term} representing the constraint.
      */
-    private final Term term;
+    private final @NonNull Term term;
 
     /**
      * The {@link PosInOccurrence} of the modality of interest.
      */
-    private final PosInOccurrence modalityPIO;
+    private final @NonNull PosInOccurrence modalityPIO;
 
     /**
      * Constructor.
@@ -35,8 +36,8 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      *        {@link IExecutionNode}.
      * @param term The {@link Term} representing the constraint.
      */
-    public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO,
-            Term term) {
+    public ExecutionConstraint(@NonNull ITreeSettings settings, @NonNull Node proofNode, @NonNull PosInOccurrence modalityPIO,
+                               @NonNull Term term) {
         super(settings, proofNode);
         assert term != null;
         assert modalityPIO != null;
@@ -56,7 +57,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Constraint";
     }
 

@@ -39,7 +39,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
     }
 
 
-    public LabeledParserRuleContext getAxiom() {
+    public @NonNull LabeledParserRuleContext getAxiom() {
         return inv;
     }
 

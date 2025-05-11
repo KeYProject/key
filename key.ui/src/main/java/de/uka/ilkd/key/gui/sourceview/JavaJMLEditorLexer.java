@@ -16,6 +16,7 @@ import javax.swing.text.*;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This lexer splits a text into tokens with coloured attributes.
@@ -256,17 +257,17 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
     /**
      * The current token of the parser.
      */
-    private String token = "";
+    private @NonNull String token = "";
 
     /**
      * Stores the mode in which the parser currently is.
      */
-    private JavaJMLEditorLexer.Mode mode = Mode.NORMAL;
+    private JavaJMLEditorLexer.@NonNull Mode mode = Mode.NORMAL;
 
     /**
      * Stores the current comment state of the parser to recognize comments/comment ends.
      */
-    private JavaJMLEditorLexer.CommentState state = CommentState.NO;
+    private JavaJMLEditorLexer.@NonNull CommentState state = CommentState.NO;
 
     /**
      * The settings listener of this document (registered in the static listener list).
@@ -295,7 +296,7 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
      * @return list of tokens with their respective styles
      */
     @Override
-    public List<SourceHighlightDocument.Token> applyTo(String text) {
+    public @NonNull List<SourceHighlightDocument.Token> applyTo(@NonNull String text) {
         result.clear();
         currentPos = 0;
         tokenStart = 0;
@@ -508,19 +509,19 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
         }
     }
 
-    private void insertCommentString(String str, int pos) throws BadLocationException {
+    private void insertCommentString(@NonNull String str, int pos) throws BadLocationException {
         result.add(new SourceHighlightDocument.Token(str.length(), comment));
     }
 
-    private void insertAnnotation(String str, int pos) throws BadLocationException {
+    private void insertAnnotation(@NonNull String str, int pos) throws BadLocationException {
         result.add(new SourceHighlightDocument.Token(str.length(), annotation));
     }
 
-    private void insertJavadocString(String str, int pos) throws BadLocationException {
+    private void insertJavadocString(@NonNull String str, int pos) throws BadLocationException {
         result.add(new SourceHighlightDocument.Token(str.length(), javadoc));
     }
 
-    private void insertJMLString(String str, int pos) throws BadLocationException {
+    private void insertJMLString(@NonNull String str, int pos) throws BadLocationException {
         String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
         for (String t : tokens) {
             if (jmlkeywords.contains(t)) {
@@ -531,7 +532,7 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
         }
     }
 
-    private void insertNormalString(String str, int pos) throws BadLocationException {
+    private void insertNormalString(@NonNull String str, int pos) throws BadLocationException {
         String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
         for (String t : tokens) {
             if (keywords.contains(t)) {

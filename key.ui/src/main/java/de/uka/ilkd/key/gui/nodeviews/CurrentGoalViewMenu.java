@@ -51,6 +51,8 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -101,9 +103,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param builtInList with all applicable BuiltInRules
      * @param pos the PosInSequent
      */
-    CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
-            ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
-            ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
+    CurrentGoalViewMenu(@NonNull CurrentGoalView sequentView, @NonNull ImmutableList<TacletApp> findList,
+                        @NonNull ImmutableList<TacletApp> rewriteList, @NonNull ImmutableList<TacletApp> noFindList,
+                        @NonNull ImmutableList<BuiltInRule> builtInList, @NonNull PosInSequent pos) {
         super(sequentView, pos);
         this.mediator = sequentView.getMediator();
 
@@ -121,8 +123,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param list The list from which to filter.
      * @return The original list, without the "introduceAxiom" taclet.
      */
-    private static ImmutableList<TacletApp> removeIntroduceAxiomTaclet(
-            ImmutableList<TacletApp> list) {
+    private static @NonNull ImmutableList<TacletApp> removeIntroduceAxiomTaclet(
+            @NonNull ImmutableList<TacletApp> list) {
         return list.stream()
                 .filter(app -> !app.rule().name().toString().equals(INTRODUCE_AXIOM_TACLET_NAME))
                 .collect(ImmutableSLList.toImmutableList());
@@ -134,7 +136,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param list from where the RewriteTaclet are removed
      * @return list without RewriteTaclets
      */
-    public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
+    public static @NonNull ImmutableList<TacletApp> removeRewrites(@NonNull ImmutableList<TacletApp> list) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
         for (TacletApp tacletApp : list) {
@@ -159,8 +161,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      *
      * @param control the action listener.
      */
-    private void createMenu(ImmutableList<TacletApp> find, ImmutableList<TacletApp> noFind,
-            ImmutableList<BuiltInRule> builtInList, MenuControl control) {
+    private void createMenu(@NonNull ImmutableList<TacletApp> find, @NonNull ImmutableList<TacletApp> noFind,
+                            @NonNull ImmutableList<BuiltInRule> builtInList, MenuControl control) {
         addActionListener(control);
 
         ImmutableList<TacletApp> toAdd = sort(find, comp);
@@ -208,8 +210,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
     }
 
-    private void createBuiltInRuleMenu(ImmutableList<BuiltInRule> builtInList,
-            MenuControl control) {
+    private void createBuiltInRuleMenu(@NonNull ImmutableList<BuiltInRule> builtInList,
+                                       MenuControl control) {
 
         if (!builtInList.isEmpty()) {
             addSeparator();
@@ -269,7 +271,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
      */
-    private void addBuiltInRuleItem(BuiltInRule builtInRule, MenuControl control) {
+    private void addBuiltInRuleItem(@NonNull BuiltInRule builtInRule, MenuControl control) {
         JMenuItem item = null;
         if (builtInRule == LoopScopeInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
@@ -330,8 +332,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * This method is also used by the KeYIDE has to be static and public.
      */
-    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
-            TacletAppComparator comp) {
+    public static @NonNull ImmutableList<TacletApp> sort(@NonNull ImmutableList<TacletApp> finds,
+                                                         TacletAppComparator comp) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
         List<TacletApp> list = new ArrayList<>(finds.size());
@@ -349,7 +351,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         return result;
     }
 
-    private void createAbbrevSection(Term t, MenuControl control) {
+    private void createAbbrevSection(@NonNull Term t, MenuControl control) {
         AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
         JMenuItem sc = null;
         if (scm.containsTerm(t)) {
@@ -375,7 +377,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param taclets {@link ImmutableList<Taclet>} with the Taclets the items represent
      * @param control the ActionListener
      */
-    private void addToMenu(ImmutableList<TacletApp> taclets, MenuControl control) {
+    private void addToMenu(@NonNull ImmutableList<TacletApp> taclets, MenuControl control) {
 
         final InsertHiddenTacletMenuItem insHiddenItem = new InsertHiddenTacletMenuItem(
             MainWindow.getInstance(), mediator.getNotationInfo(), mediator.getServices());
@@ -457,7 +459,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          */
     }
 
-    private boolean isRareRule(Taclet taclet) {
+    private boolean isRareRule(@NonNull Taclet taclet) {
         if (clutterRules.contains(taclet.name().toString())) {
             return true;
         }
@@ -465,7 +467,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 .anyMatch(it -> clutterRuleSets.contains(it.name().toString()));
     }
 
-    private Component createMenuItem(TacletApp app, MenuControl control) {
+    private @NonNull Component createMenuItem(@NonNull TacletApp app, MenuControl control) {
         final DefaultTacletMenuItem item =
             new DefaultTacletMenuItem(app, mediator.getNotationInfo(), mediator.getServices());
         item.addActionListener(control);
@@ -488,7 +490,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     class MenuControl extends SequentViewMenu<CurrentGoalView>.MenuControl {
 
-        private boolean validAbbreviation(String s) {
+        private boolean validAbbreviation(@Nullable String s) {
             if (s == null || s.length() == 0) {
                 return false;
             }
@@ -503,7 +505,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(@NonNull ActionEvent e) {
             if (e.getSource() instanceof TacletMenuItem) {
                 ((CurrentGoalView) (getPopupMenu().getInvoker()))
                         .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), getPos());
@@ -631,7 +633,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
     public static class TacletAppComparator implements Comparator<TacletApp> {
 
-        private int countFormulaSV(TacletSchemaVariableCollector c) {
+        private int countFormulaSV(@NonNull TacletSchemaVariableCollector c) {
             int formulaSV = 0;
             Iterator<SchemaVariable> it = c.varIterator();
             while (it.hasNext()) {
@@ -649,7 +651,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          * of the term to be replaced. If no such term exists we add a constant (may be refined in
          * future)
          */
-        private int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
+        private int measureGoalComplexity(@NonNull ImmutableList<TacletGoalTemplate> l) {
             int result = 0;
             for (TacletGoalTemplate gt : l) {
                 if (gt instanceof RewriteTacletGoalTemplate) {
@@ -667,7 +669,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         /**
          * rough approximation of the program complexity
          */
-        public int programComplexity(JavaBlock b) {
+        public int programComplexity(@NonNull JavaBlock b) {
             if (b.isEmpty()) {
                 return 0;
             }
@@ -688,7 +690,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         @Override
-        public int compare(TacletApp o1, TacletApp o2) {
+        public int compare(@NonNull TacletApp o1, @NonNull TacletApp o2) {
             LinkedHashMap<String, Integer> map1 = score(o1);
             LinkedHashMap<String, Integer> map2 = score(o2);
             Iterator<Map.Entry<String, Integer>> it1 = map1.entrySet().iterator();
@@ -720,7 +722,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          * same named criteria, but the scoring scheme must force a decision before the first
          * divergence point.
          */
-        public LinkedHashMap<String, Integer> score(TacletApp o1) {
+        public @NonNull LinkedHashMap<String, Integer> score(@NonNull TacletApp o1) {
             LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
 
             final Taclet taclet1 = o1.taclet();

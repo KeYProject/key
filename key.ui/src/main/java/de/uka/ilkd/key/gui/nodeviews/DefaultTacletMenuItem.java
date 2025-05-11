@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -25,7 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     @Serial
     private static final long serialVersionUID = -5537139155045230424L;
-    private final TacletApp connectedTo;
+    private final @NonNull TacletApp connectedTo;
 
     /**
      * creates TacletMenuItem attached to a Taclet
@@ -33,8 +34,8 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param connectedTo the TacletApp that is represented by the item
      * @param notationInfo the NotationInfo used to print terms
      */
-    public DefaultTacletMenuItem(TacletApp connectedTo, NotationInfo notationInfo,
-            Services services) {
+    public DefaultTacletMenuItem(@NonNull TacletApp connectedTo, @NonNull NotationInfo notationInfo,
+                                 @NonNull Services services) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;
 
@@ -106,7 +107,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param sb The StringBuffer with forbidden HTML characters
      * @return A new StringBuffer with the masked characters.
      */
-    protected static StringBuilder ascii2html(String sb) {
+    protected static @NonNull StringBuilder ascii2html(@NonNull String sb) {
         StringBuilder nsb = new StringBuilder();
         String asb = removeEmptyLines(sb);
         int sbl = asb.length();
@@ -122,7 +123,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         return nsb;
     }
 
-    private static String removeEmptyLines(String string) {
+    private static @NonNull String removeEmptyLines(@NonNull String string) {
         // This regular expression matches against lines that only have spaces
         // (' ' or '\t') in them and against trailing new line characters and
         // replaces them with "".
@@ -131,7 +132,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     }
 
     @Override
-    public TacletApp connectedTo() {
+    public @NonNull TacletApp connectedTo() {
         return connectedTo;
     }
 

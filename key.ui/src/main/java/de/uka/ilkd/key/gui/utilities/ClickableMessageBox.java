@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -57,7 +60,7 @@ public class ClickableMessageBox extends JTextPane {
         listeners.add(listener);
     }
 
-    public void add(Object item, String message, Color color) {
+    public void add(@Nullable Object item, String message, @NonNull Color color) {
         try {
             if (item != null) {
                 kit.insertHTML(doc, doc.getLength(),

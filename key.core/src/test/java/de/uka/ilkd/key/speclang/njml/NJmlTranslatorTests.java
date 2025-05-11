@@ -18,6 +18,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class NJmlTranslatorTests {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
         + "speclang" + File.separator + "testFile.key";
-    private final PreParser preParser;
+    private final @NonNull PreParser preParser;
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =

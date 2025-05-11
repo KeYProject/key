@@ -54,19 +54,19 @@ public class TacletAppIntermediate extends AppIntermediate {
         return tacletName;
     }
 
-    public Pair<Integer, PosInTerm> getPosInfo() {
+    public @Nullable Pair<Integer, PosInTerm> getPosInfo() {
         return posInfo;
     }
 
-    public LinkedList<String> getInsts() {
+    public @Nullable LinkedList<String> getInsts() {
         return insts;
     }
 
-    public ImmutableList<String> getIfSeqFormulaList() {
+    public @Nullable ImmutableList<String> getIfSeqFormulaList() {
         return ifSeqFormulaList;
     }
 
-    public ImmutableList<String> getIfDirectFormulaList() {
+    public @Nullable ImmutableList<String> getIfDirectFormulaList() {
         return ifDirectFormulaList;
     }
 

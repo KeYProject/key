@@ -18,6 +18,8 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.util.collection.Pair;
@@ -38,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class EndToEndTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(EndToEndTests.class);
 
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final @Nullable File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     /**
      * Load and slice a proof after analyzing it using the dependency analysis algorithm.
@@ -243,8 +245,8 @@ class EndToEndTests {
         Files.delete(iteration1.second.toPath());
     }
 
-    private Proof sliceProof(String filename, int expectedTotal,
-            int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
+    private @Nullable Proof sliceProof(@NonNull String filename, int expectedTotal,
+                                       int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         Pair<Proof, File> it =
             sliceProofFullFilename(new File(testCaseDirectory, filename), expectedTotal,
@@ -253,8 +255,8 @@ class EndToEndTests {
         return it.first;
     }
 
-    private Proof sliceProofOffline(String filename, int expectedTotal,
-            int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
+    private @Nullable Proof sliceProofOffline(@NonNull String filename, int expectedTotal,
+                                              int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         Pair<Proof, File> it =
             sliceProofFullFilename(new File(testCaseDirectory, filename), expectedTotal,
@@ -263,9 +265,9 @@ class EndToEndTests {
         return it.first;
     }
 
-    private Pair<Proof, File> sliceProofFullFilename(File proofFile, int expectedTotal,
-            int expectedInSlice, boolean doDependencyAnalysis,
-            boolean doDeduplicateRuleApps, boolean trackOnline) throws Exception {
+    private @NonNull Pair<Proof, File> sliceProofFullFilename(@NonNull File proofFile, int expectedTotal,
+                                                              int expectedInSlice, boolean doDependencyAnalysis,
+                                                              boolean doDeduplicateRuleApps, boolean trackOnline) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // load proof

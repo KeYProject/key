@@ -68,9 +68,9 @@ public class TacletGenerator {
      * Returns a no-find taclet to the passed axiom. If the axiom expression does not contain
      * reference to self, it is considered as if it were static.
      */
-    public Taclet generateAxiomTaclet(Name tacletName, @NonNull Term originalAxiom,
-                                      @NonNull ImmutableList<LocationVariable> programVars, KeYJavaType kjt, RuleSet ruleSet,
-                                      @NonNull TermServices services) {
+    public @NonNull Taclet generateAxiomTaclet(Name tacletName, @NonNull Term originalAxiom,
+                                               @NonNull ImmutableList<LocationVariable> programVars, KeYJavaType kjt, RuleSet ruleSet,
+                                               @NonNull TermServices services) {
         // create schema terms
         final ImmutableList<OperatorSV> schemaVars = createSchemaVariables(programVars);
         final TermAndBoundVarPair schemaAxiom =

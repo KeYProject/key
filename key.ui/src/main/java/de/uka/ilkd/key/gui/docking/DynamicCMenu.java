@@ -17,6 +17,7 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CMenu;
 import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
 import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
+import org.jspecify.annotations.NonNull;
 
 /**
  * CMenu that gets (re-)generated when the action gets fired using the provided supplier.
@@ -74,8 +75,8 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
             return supplier.get().intern().getMenu(dockable);
         }
 
-        public <V> V createView(ViewTarget<V> target, ActionViewConverter converter,
-                Dockable dockable) {
+        public <V> V createView(ViewTarget<V> target, @NonNull ActionViewConverter converter,
+                                Dockable dockable) {
             return converter.createView(ActionType.MENU, this, target, dockable);
         }
 

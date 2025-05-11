@@ -23,6 +23,8 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
@@ -45,10 +47,10 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
     /**
      * {@inheritDoc}
      */
-    public void updateLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
-            Set<TermLabel> labels) {
+    public void updateLabels(@NonNull TermLabelState state, @NonNull Services services,
+                             @NonNull PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
+                             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, @NonNull Term newTerm,
+                             @NonNull Set<TermLabel> labels) {
         if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))
@@ -108,7 +110,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      * @param name The {@link Name} of the {@link TermLabel} to search.
      * @return The found {@link TermLabel} or {@code} null if no element was found.
      */
-    protected TermLabel getTermLabel(Set<TermLabel> labels, final Name name) {
+    protected @Nullable TermLabel getTermLabel(@NonNull Set<TermLabel> labels, final Name name) {
         return CollectionUtil.search(labels,
             element -> element != null && element.name().equals(name));
     }

@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -24,14 +26,14 @@ public class Location {
     /**
      * The {@link Access} path.
      */
-    private final ImmutableList<Access> accesses;
+    private final @NonNull ImmutableList<Access> accesses;
 
     /**
      * Constructor.
      *
      * @param accesses The {@link Access} path.
      */
-    public Location(ImmutableList<Access> accesses) {
+    public Location(@NonNull ImmutableList<Access> accesses) {
         assert accesses != null;
         this.accesses = accesses;
     }
@@ -41,7 +43,7 @@ public class Location {
      *
      * @param accesses The {@link Access} path.
      */
-    public Location(Access... accesses) {
+    public Location(Access @NonNull ... accesses) {
         assert accesses != null;
         this.accesses = ImmutableSLList.<Access>nil().append(accesses);
     }
@@ -90,7 +92,7 @@ public class Location {
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder sb = new StringBuilder();
         boolean afterFirst = false;
         for (Access access : accesses) {
@@ -110,7 +112,7 @@ public class Location {
      * @param sub The {@link Location} to append.
      * @return The new {@link Location}.
      */
-    public Location append(Location sub) {
+    public @NonNull Location append(@NonNull Location sub) {
         return new Location(accesses.append(sub.getAccesses()));
     }
 
@@ -120,7 +122,7 @@ public class Location {
      * @param sub The {@link Access} to append.
      * @return The new {@link Location}.
      */
-    public Location append(Access sub) {
+    public @NonNull Location append(Access sub) {
         return new Location(accesses.append(sub));
     }
 
@@ -130,7 +132,7 @@ public class Location {
      * @param services The {@link Services} to use.
      * @return The created {@link Term}.
      */
-    public Term toTerm(Services services) {
+    public @Nullable Term toTerm(@NonNull Services services) {
         Term parent = null;
         for (Access access : accesses) {
             if (access.isArrayIndex()) {

@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.SlicingSettings;
 import org.key_project.slicing.SlicingSettingsProvider;
 
@@ -99,7 +100,7 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     }
 
     @Override
-    protected GraphvizResult doInBackground() {
+    protected @NonNull GraphvizResult doInBackground() {
         SlicingSettings ss = SlicingSettingsProvider.getSlicingSettings();
         Process process = null;
         try {

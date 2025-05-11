@@ -74,7 +74,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus, @NonNull Goal goal) {
 
         // here, the ordering is graded concerning multiplication on integers
         final int t1Deg = degree(t1);
@@ -122,7 +122,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     private int compareLexNewSyms(@NonNull ImmutableList<Term> atoms1, @NonNull ImmutableList<Term> atoms2,
-                                  Goal goal) {
+                                  @NonNull Goal goal) {
         while (!atoms1.isEmpty()) {
             final Term t1 = atoms1.head();
             final Term t2 = atoms2.head();
@@ -169,7 +169,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             }
         }
 
-        private Term stripOffLiteral(@NonNull Term te, MutableState mState, Services services) {
+        private @NonNull Term stripOffLiteral(@NonNull Term te, MutableState mState, Services services) {
             if (!(hasCoeff.compute(te, mState, services) instanceof TopRuleAppCost))
             // we leave out literals/coefficients on the right, because we
             // do not want to compare these literals

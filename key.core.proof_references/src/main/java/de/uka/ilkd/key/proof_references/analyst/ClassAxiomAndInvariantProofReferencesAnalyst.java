@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -36,7 +37,7 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
      * {@inheritDoc}
      */
     @Override
-    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
         String name = MiscTools.getRuleName(node);
         if (name != null
                 && (name.toLowerCase().contains("axiom_for")
@@ -102,7 +103,7 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
      * @return The {@link KeYJavaType} which provides the proof obligation or {@code null} if it was
      *         not possible to compute it.
      */
-    protected KeYJavaType findProofsKeYJavaType(Services services) {
+    protected @Nullable KeYJavaType findProofsKeYJavaType(Services services) {
         ProofOblInput problem =
             services.getSpecificationRepository().getProofOblInput(services.getProof());
         if (problem != null) {

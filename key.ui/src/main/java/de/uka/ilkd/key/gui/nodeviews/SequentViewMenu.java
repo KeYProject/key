@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The menu shown by a {@link SequentViewListener} when the user clicks on a {@link SequentView}.
@@ -51,7 +52,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
      * @param sequentView the SequentView that is the parent of this menu
      * @param pos the PosInSequent
      */
-    SequentViewMenu(T sequentView, PosInSequent pos) {
+    SequentViewMenu(@NonNull T sequentView, @NonNull PosInSequent pos) {
         super();
         this.sequentView = sequentView;
         this.pos = pos;
@@ -122,7 +123,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     protected class MenuControl implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(@NonNull ActionEvent e) {
             if (((JMenuItem) e.getSource()).getText().startsWith(COPY_TO_CLIPBOARD)) {
                 GuiUtilities.copyHighlightToClipboard(sequentView, pos);
             } else if (((JMenuItem) e.getSource()).getText()

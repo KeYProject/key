@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
+import org.jspecify.annotations.NonNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,7 +20,7 @@ public class DataRecordingTable implements AutoCloseable {
     /**
      * @param description A description of the data stored in the table.
      */
-    DataRecordingTable(File location, String[] columns, String description) {
+    DataRecordingTable(@NonNull File location, String @NonNull [] columns, String description) {
         this.location = location;
         this.columns = columns;
 
@@ -42,7 +44,7 @@ public class DataRecordingTable implements AutoCloseable {
         }
     }
 
-    private final PrintWriter w;
+    private final @NonNull PrintWriter w;
 
     @Override
     public void close() throws Exception {
@@ -52,12 +54,12 @@ public class DataRecordingTable implements AutoCloseable {
     /**
      * The file to which the recorded data is written.
      */
-    final File location;
+    final @NonNull File location;
 
     /**
      * The table columns.
      */
-    final String[] columns;
+    final String @NonNull [] columns;
 
     public void writeComment(String comment) {
         w.println("# " + comment);
@@ -67,7 +69,7 @@ public class DataRecordingTable implements AutoCloseable {
      * Write a row to the table file. Column entries are specified via map, which maps: columnName
      * -> columnValue
      */
-    public void writeRow(Object... lineData) {
+    public void writeRow(Object @NonNull ... lineData) {
         if (lineData.length != columns.length) {
             throw new RuntimeException(
                 "Incorrect number of column values specified.\n" + "Expected: " + columns.length

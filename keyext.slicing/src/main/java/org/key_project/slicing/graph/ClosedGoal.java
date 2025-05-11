@@ -4,6 +4,7 @@
 package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.BranchLocation;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Graph node that represents a closed goal.
@@ -30,12 +31,12 @@ public class ClosedGoal extends GraphNode {
     }
 
     @Override
-    public GraphNode popLastBranchID() {
+    public @NonNull GraphNode popLastBranchID() {
         return new ClosedGoal(serialNr, branchLocation.removeLast());
     }
 
     @Override
-    public String toString(boolean abbreviated, boolean omitBranch) {
+    public @NonNull String toString(boolean abbreviated, boolean omitBranch) {
         return "closed goal " + serialNr;
     }
 }

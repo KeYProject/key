@@ -36,26 +36,26 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
     }
 
     public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(
-            FormulaSV sv) {
+            @NonNull FormulaSV sv) {
         return new MatchFormulaSVInstruction(sv);
     }
 
-    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(TermSV sv) {
+    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(@NonNull TermSV sv) {
         return new MatchTermSVInstruction(sv);
     }
 
     public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(
-            VariableSV sv) {
+            @NonNull VariableSV sv) {
         return new MatchVariableSVInstruction(sv);
     }
 
     public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(
-            ProgramSV sv) {
+            @NonNull ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
     }
 
     public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(
-            UpdateSV sv) {
+            @NonNull UpdateSV sv) {
         return new MatchUpdateSVInstruction(sv);
     }
 

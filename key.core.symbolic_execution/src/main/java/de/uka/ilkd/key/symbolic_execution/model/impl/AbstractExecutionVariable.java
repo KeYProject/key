@@ -13,6 +13,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides a basic implementation of {@link IExecutionVariable}s.
@@ -58,9 +60,9 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * @param additionalCondition An optional additional condition to consider.
      * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
      */
-    public AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
-            IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,
-            Term additionalCondition, PosInOccurrence modalityPIO) {
+    public AbstractExecutionVariable(@NonNull ITreeSettings settings, @NonNull Node proofNode,
+                                     IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,
+                                     Term additionalCondition, PosInOccurrence modalityPIO) {
         super(settings, proofNode);
         this.programVariable = programVariable;
         this.parentValue = parentValue;
@@ -110,7 +112,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public String getArrayIndexString() {
+    public @Nullable String getArrayIndexString() {
         return arrayIndex != null ? formatTerm(arrayIndex, getServices()) : null;
     }
 
@@ -126,7 +128,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Variable";
     }
 

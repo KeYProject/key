@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -46,6 +47,7 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
      *
      * @return The {@link IProgramVariable} which is used to caught global exceptions.
      */
+    @Nullable
     IProgramVariable getExceptionVariable();
 
     /**
@@ -53,6 +55,7 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
      *
      * @return The {@link Sort} of the caught exception.
      */
+    @Nullable
     Sort getExceptionSort();
 
     /**

@@ -13,6 +13,7 @@ import javax.swing.JTextArea;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.jspecify.annotations.NonNull;
 
 public class SystemInfoAction extends MainWindowAction {
 
@@ -20,7 +21,7 @@ public class SystemInfoAction extends MainWindowAction {
     private static final int TEXT_ROWS = 20;
     private static final int TEXT_COLS = 60;
 
-    public SystemInfoAction(MainWindow mainWindow) {
+    public SystemInfoAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("System Info");
         // setIcon(IconFactory.help(16));
@@ -69,7 +70,7 @@ public class SystemInfoAction extends MainWindowAction {
     }
 
     @SuppressWarnings("finally")
-    private String getProperties() {
+    private @NonNull String getProperties() {
         StringBuffer sb = new StringBuffer();
         java.util.Properties props;
         try {
@@ -82,7 +83,7 @@ public class SystemInfoAction extends MainWindowAction {
 
 
     @SuppressWarnings("finally")
-    private String getEnv() {
+    private @NonNull String getEnv() {
         StringBuffer sb = new StringBuffer();
         try {
             formatMap(sb, System.getenv());
@@ -91,7 +92,7 @@ public class SystemInfoAction extends MainWindowAction {
         }
     }
 
-    private void formatMap(StringBuffer sb, Map<?, ?> props) {
+    private void formatMap(@NonNull StringBuffer sb, @NonNull Map<?, ?> props) {
         for (Object o : props.keySet()) {
             sb.append(o);
             sb.append("=\"");
@@ -100,7 +101,7 @@ public class SystemInfoAction extends MainWindowAction {
         }
     }
 
-    private String formatList(List<?> l) {
+    private @NonNull String formatList(@NonNull List<?> l) {
         StringBuilder sb = new StringBuilder();
         for (Object o : l) {
             sb.append(o);
@@ -110,7 +111,7 @@ public class SystemInfoAction extends MainWindowAction {
         return sb.toString();
     }
 
-    private String getMemoryInfo() {
+    private @NonNull String getMemoryInfo() {
         Runtime rt = Runtime.getRuntime();
         rt.gc(); // call garbage collection to normalize stats
 

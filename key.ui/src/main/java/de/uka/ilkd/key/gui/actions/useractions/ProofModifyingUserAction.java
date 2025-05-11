@@ -11,6 +11,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * User action that modifies the proof in some way.
@@ -23,11 +25,11 @@ public abstract class ProofModifyingUserAction extends UserAction {
      * The open goals of the proof, before the user action is applied.
      * Will be restored (by pruning the proof) on undo.
      */
-    private final Collection<Node> originalOpenGoals;
+    private final @NonNull Collection<Node> originalOpenGoals;
     /**
      * The node selected before the user action is performed.
      */
-    private final Node originalSelection;
+    private final @Nullable Node originalSelection;
 
     /**
      * Save the current state of the proof.
@@ -35,7 +37,7 @@ public abstract class ProofModifyingUserAction extends UserAction {
      * @param mediator the mediator
      * @param originalState the proof
      */
-    protected ProofModifyingUserAction(KeYMediator mediator, Proof originalState) {
+    protected ProofModifyingUserAction(@NonNull KeYMediator mediator, @NonNull Proof originalState) {
         super(mediator, originalState);
         this.originalOpenGoals =
             originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
@@ -50,8 +52,8 @@ public abstract class ProofModifyingUserAction extends UserAction {
      * @param originalState the proof
      * @param justModifiedNode just modified node
      */
-    protected ProofModifyingUserAction(KeYMediator mediator, Proof originalState,
-            Node justModifiedNode) {
+    protected ProofModifyingUserAction(@NonNull KeYMediator mediator, @NonNull Proof originalState,
+                                       Node justModifiedNode) {
         super(mediator, originalState);
         List<Node> openGoals =
             originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());

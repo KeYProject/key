@@ -78,7 +78,7 @@ public class DockingHelper {
      * @see #createSingleDock(String, JComponent)
      * @see #createSingleDock(TabPanel)
      */
-    public static void restoreFactoryDefault(MainWindow mainWindow) {
+    public static void restoreFactoryDefault(@NonNull MainWindow mainWindow) {
         List<CDockable> leftPanels = new LinkedList<>(), leftTopPanels = new LinkedList<>(),
                 mainPanels = new LinkedList<>(), rightPanels = new LinkedList<>();
 
@@ -125,7 +125,7 @@ public class DockingHelper {
      * @param mainWindow main window
      * @param panel class name of the panel to show
      */
-    public static void focus(MainWindow mainWindow, Class<?> panel) {
+    public static void focus(@NonNull MainWindow mainWindow, @NonNull Class<?> panel) {
         SingleCDockable dockable = mainWindow.getDockControl().getSingleDockable(panel.getName());
         if (dockable == null) {
             return;
@@ -143,7 +143,7 @@ public class DockingHelper {
      *
      * @param mainWindow the main window
      */
-    public static void restoreMissingPanels(MainWindow mainWindow) {
+    public static void restoreMissingPanels(@NonNull MainWindow mainWindow) {
         for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0; i < c; i++) {
             final CDockable cur = mainWindow.getDockControl().getCDockable(i);
             if (cur.isVisible()) {
@@ -164,11 +164,11 @@ public class DockingHelper {
      * @return a {@link DefaultSingleCDockable}
      * @see #createSingleDock(TabPanel)
      */
-    public static SingleCDockable createSingleDock(String title, JComponent component) {
+    public static @NonNull SingleCDockable createSingleDock(String title, @NonNull JComponent component) {
         return createSingleDock(title, component, component.getClass().getName());
     }
 
-    public static SingleCDockable createSingleDock(String title, JComponent component, String id) {
+    public static @NonNull SingleCDockable createSingleDock(String title, JComponent component, @NonNull String id) {
         return new DefaultSingleCDockable(id, title, component);
     }
 
@@ -176,7 +176,7 @@ public class DockingHelper {
      * @param p
      * @return
      */
-    public static SingleCDockable createSingleDock(TabPanel p) {
+    public static @NonNull SingleCDockable createSingleDock(@NonNull TabPanel p) {
         Stream<CAction> actions = p.getTitleActions().stream().map(DockingHelper::translateAction);
         CAction[] a = Stream.concat(actions, p.getTitleCActions().stream()).toArray(CAction[]::new);
 
@@ -194,7 +194,7 @@ public class DockingHelper {
     }
 
     public static <A extends CommonDecoratableDockAction> void deriveBaseProperties(
-            CDecorateableAction<A> derive, @NonNull Action action) {
+            @NonNull CDecorateableAction<A> derive, @NonNull Action action) {
         derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
         derive.setEnabled(action.isEnabled());
 
@@ -221,7 +221,7 @@ public class DockingHelper {
         return button;
     }
 
-    private static CAction createButton(Action action) {
+    private static @NonNull CAction createButton(@NonNull Action action) {
         CButton button = new CButton((String) action.getValue(Action.NAME),
             (Icon) action.getValue(Action.SMALL_ICON));
         button.addActionListener(action);

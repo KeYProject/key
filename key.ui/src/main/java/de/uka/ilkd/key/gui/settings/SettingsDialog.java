@@ -14,6 +14,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class SettingsDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsDialog.class);
 
     private final MainWindow mainWindow;
-    private final SettingsUi ui;
+    private final @NonNull SettingsUi ui;
     private final Action actionCancel = new CancelAction();
     private final Action actionAccept = new AcceptAction();
     private final Action actionApply = new ApplyAction();
@@ -54,7 +55,7 @@ public class SettingsDialog extends JDialog {
         setSize(new Dimension(900, 600));
     }
 
-    private JPanel createButtonBar() {
+    private @NonNull JPanel createButtonBar() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnCancel = new JButton(actionCancel);
         JButton btnApply = new JButton(actionApply);
@@ -65,24 +66,25 @@ public class SettingsDialog extends JDialog {
         return p;
     }
 
-    public void setSettingsProvider(List<SettingsProvider> providers) {
+    public void setSettingsProvider(@NonNull List<SettingsProvider> providers) {
         this.providers = providers;
         int width = this.ui.setSettingsProvider(providers);
         setSize(new Dimension(width, 600));
     }
 
+    @NonNull
     SettingsUi getUi() {
         return ui;
     }
 
-    private List<Exception> apply() {
+    private @NonNull List<Exception> apply() {
         List<Exception> exc = new LinkedList<>();
         apply(providers, exc);
 
         return exc;
     }
 
-    private void apply(List<SettingsProvider> providers, List<Exception> exceptions) {
+    private void apply(@NonNull List<SettingsProvider> providers, @NonNull List<Exception> exceptions) {
         for (SettingsProvider it : providers) {
             try {
                 it.applySettings(mainWindow);
@@ -93,7 +95,7 @@ public class SettingsDialog extends JDialog {
         }
     }
 
-    private boolean showErrors(List<Exception> apply) {
+    private boolean showErrors(@NonNull List<Exception> apply) {
         if (!apply.isEmpty()) {
             for (Exception e : apply) {
                 LOGGER.error("", e);

@@ -171,8 +171,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     /**
      * Add a new rule app to the heap, provided that the rule app is not infinitely expensive
      */
-    private static ImmutableHeap<RuleAppContainer> push(@NonNull RuleAppContainer c,
-                                                        @NonNull ImmutableHeap<RuleAppContainer> sourceQueue) {
+    private static @NonNull ImmutableHeap<RuleAppContainer> push(@NonNull RuleAppContainer c,
+                                                                 @NonNull ImmutableHeap<RuleAppContainer> sourceQueue) {
         if (c.getCost() == TopRuleAppCost.INSTANCE) {
             return sourceQueue;
         } else {
@@ -375,7 +375,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     }
 
     @Override
-    public AutomatedRuleApplicationManager copy() {
+    public @NonNull AutomatedRuleApplicationManager copy() {
         return (AutomatedRuleApplicationManager) clone();
     }
 

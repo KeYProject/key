@@ -76,7 +76,7 @@ public final class JmlTermFactory {
     private final @NonNull OverloadedOperatorHandler overloadedFunctionHandler;
 
 
-    public JmlTermFactory(SLExceptionFactory exc, @NonNull Services services, SpecMathMode specMathMode) {
+    public JmlTermFactory(SLExceptionFactory exc, @NonNull Services services, @NonNull SpecMathMode specMathMode) {
 
         this.exc = exc;
         this.services = services;

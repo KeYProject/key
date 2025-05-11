@@ -743,10 +743,10 @@ public class JMLSpecFactory {
         return result;
     }
 
-    private Term translateReturns(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
-                                  LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
-                                  Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                  @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) {
+    private @NonNull Term translateReturns(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
+                                           LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
+                                           Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
+                                           @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.NORMAL_BEHAVIOR) {
             assert originalClauses.isEmpty();
             return tb.ff();
@@ -756,10 +756,10 @@ public class JMLSpecFactory {
         }
     }
 
-    private Term translateSignals(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
-                                  LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
-                                  Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                  @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) {
+    private @NonNull Term translateSignals(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
+                                           LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
+                                           Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
+                                           @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.NORMAL_BEHAVIOR) {
             assert originalClauses.isEmpty();
             return tb.ff();
@@ -769,16 +769,16 @@ public class JMLSpecFactory {
         }
     }
 
-    private Term translateSignalsOnly(@NonNull Context context, LocationVariable excVar,
-                                      Behavior originalBehavior, @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) {
+    private @NonNull Term translateSignalsOnly(@NonNull Context context, LocationVariable excVar,
+                                               Behavior originalBehavior, @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) {
         return translateSignals(context, null, null, excVar, null, null, originalBehavior,
             originalClauses);
     }
 
-    private Term translateEnsures(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
-                                  LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
-                                  Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                  @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) {
+    private @NonNull Term translateEnsures(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
+                                           LocationVariable resultVar, LocationVariable excVar, Map<LocationVariable, Term> atPres,
+                                           Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
+                                           @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
             if (!originalClauses.isEmpty()) {
                 throw new IllegalArgumentException(
@@ -792,9 +792,9 @@ public class JMLSpecFactory {
     }
 
     @SuppressWarnings("unused")
-    private Term translateAccessible(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
-                                     Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
-                                     @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+    private @NonNull Term translateAccessible(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
+                                              Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
+                                              @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
         if (originalClauses.isEmpty()) {
             return tb.allLocs();
         } else {
@@ -807,9 +807,9 @@ public class JMLSpecFactory {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    private Term translateAssignable(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
-                                     Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
-                                     @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+    private @NonNull Term translateAssignable(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
+                                              Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
+                                              @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
 
         if (originalClauses.isEmpty()) {
             return tb.allLocs();
@@ -823,9 +823,9 @@ public class JMLSpecFactory {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    private Term translateAssignableFree(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
-                                         Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
-                                         @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+    private @NonNull Term translateAssignableFree(@NonNull Context context, @NonNull ImmutableList<LocationVariable> paramVars,
+                                                  Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
+                                                  @NonNull ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
         // If originalClauses.isEmpty, the default value for _free is strictly_nothing,
         // which cannot be represented by a LocSet term.
         assert !originalClauses.isEmpty();
@@ -890,8 +890,8 @@ public class JMLSpecFactory {
         return decreases;
     }
 
-    public String generateName(IProgramMethod pm, @NonNull TextualJMLSpecCase textualSpecCase,
-                               @NonNull Behavior originalBehavior) {
+    public @NonNull String generateName(IProgramMethod pm, @NonNull TextualJMLSpecCase textualSpecCase,
+                                        @NonNull Behavior originalBehavior) {
         String customName = textualSpecCase.getName();
         return generateName(pm, originalBehavior, customName);
     }
@@ -1135,8 +1135,8 @@ public class JMLSpecFactory {
 
     }
 
-    public InitiallyClause createJMLInitiallyClause(@NonNull KeYJavaType kjt,
-                                                    @NonNull TextualJMLInitially textualInv) {
+    public @NonNull InitiallyClause createJMLInitiallyClause(@NonNull KeYJavaType kjt,
+                                                             @NonNull TextualJMLInitially textualInv) {
         return createJMLInitiallyClause(kjt, getVisibility(textualInv), textualInv.getInv());
     }
 
@@ -1237,7 +1237,7 @@ public class JMLSpecFactory {
             dep.observerFunction().isStatic() ? null : context.selfVar());
     }
 
-    public Contract createJMLDependencyContract(@NonNull KeYJavaType kjt, @NonNull TextualJMLDepends textualDep) {
+    public @NonNull Contract createJMLDependencyContract(@NonNull KeYJavaType kjt, @NonNull TextualJMLDepends textualDep) {
         LabeledParserRuleContext dep = null;
         LocationVariable targetHeap = null;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {

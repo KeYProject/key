@@ -15,6 +15,8 @@ import javax.swing.event.AncestorListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Central part of MainWindow. Its main purpose is to serve as container for SequentView instances.
@@ -26,10 +28,10 @@ public final class MainFrame extends JPanel {
     private static final long serialVersionUID = -2412537422601138379L;
 
     private final JScrollPane scrollPane = new JScrollPane();
-    private SequentView sequentView;
+    private @Nullable SequentView sequentView;
     private boolean showTacletInfo = false;
 
-    public void setSequentView(SequentView component) {
+    public void setSequentView(@Nullable SequentView component) {
         SequentView oldSequentView = sequentView;
         sequentView = component;
         if (component != null) {
@@ -48,7 +50,7 @@ public final class MainFrame extends JPanel {
 
     }
 
-    public MainFrame(final MainWindow mainWindow, EmptySequent emptySequent) {
+    public MainFrame(final @NonNull MainWindow mainWindow, EmptySequent emptySequent) {
         setBorder(new EmptyBorder(0, 0, 0, 0));
         scrollPane.getVerticalScrollBar().setUnitIncrement(30);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(30);
@@ -113,7 +115,7 @@ public final class MainFrame extends JPanel {
         scrollPane.getVerticalScrollBar().setValue(y);
     }
 
-    public SequentView getSequentView() {
+    public @Nullable SequentView getSequentView() {
         return sequentView;
     }
 }

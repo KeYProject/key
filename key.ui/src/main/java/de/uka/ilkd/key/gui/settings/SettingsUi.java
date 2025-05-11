@@ -19,6 +19,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -28,9 +30,9 @@ public class SettingsUi extends JPanel {
     private static final long serialVersionUID = -217841876110516940L;
     private static int calculatedWidth = 0;
 
-    private final JSplitPane root;
-    private final JComponent westPanel;
-    private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
+    private final @NonNull JSplitPane root;
+    private final @NonNull JComponent westPanel;
+    private @NonNull DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
     private final JTree treeSettingsPanels = new JTree(treeModel);
     private final JTextField txtSearch = new JTextField();
     private final MainWindow mainWindow;
@@ -106,7 +108,7 @@ public class SettingsUi extends JPanel {
         root.setDividerLocation(0.3d);
     }
 
-    private void setSettingsPanel(JComponent comp) {
+    private void setSettingsPanel(@NonNull JComponent comp) {
         SwingUtilities.updateComponentTreeUI(comp);
         root.setRightComponent(comp);
 
@@ -114,7 +116,7 @@ public class SettingsUi extends JPanel {
         root.setDividerLocation(root.getLeftComponent().getPreferredSize().width + 2);
     }
 
-    private JPanel createWestPanel() {
+    private @NonNull JPanel createWestPanel() {
         JPanel p = new JPanel(new BorderLayout(5, 5));
         Box boxNorth = new Box(BoxLayout.X_AXIS);
         JLabel lblSearch;
@@ -133,7 +135,7 @@ public class SettingsUi extends JPanel {
      * @param providers settings providers
      * @return maximum width of the dialog
      */
-    public int setSettingsProvider(List<SettingsProvider> providers) {
+    public int setSettingsProvider(@NonNull List<SettingsProvider> providers) {
         SettingsTreeNode root = new SettingsTreeNode(providers);
         treeModel = new DefaultTreeModel(root);
         treeSettingsPanels.setModel(treeModel);
@@ -172,7 +174,7 @@ public class SettingsUi extends JPanel {
         return calculatedWidth;
     }
 
-    public void getPaths(TreePath parent, List<TreePath> list) {
+    public void getPaths(@NonNull TreePath parent, @NonNull List<TreePath> list) {
         list.add(parent);
 
         TreeNode node = (TreeNode) parent.getLastPathComponent();
@@ -191,6 +193,7 @@ public class SettingsUi extends JPanel {
         treeSettingsPanels.setSelectionPath(path);
     }
 
+    @Nullable
     SettingsTreeNode findNode(SettingsProvider provider) {
         LinkedList<SettingsTreeNode> nodes = new LinkedList<>();
         nodes.offer((SettingsTreeNode) treeModel.getRoot());
@@ -208,9 +211,9 @@ public class SettingsUi extends JPanel {
 
 class SettingsTreeNode implements TreeNode {
     final SettingsProvider provider;
-    final List<SettingsTreeNode> children;
+    final @NonNull List<SettingsTreeNode> children;
 
-    SettingsTreeNode(SettingsProvider cur, List<SettingsProvider> providers) {
+    SettingsTreeNode(SettingsProvider cur, @NonNull List<SettingsProvider> providers) {
         provider = cur;
         if (!providers.isEmpty()) {
             children = providers.stream().map(SettingsTreeNode::new).collect(Collectors.toList());
@@ -219,11 +222,11 @@ class SettingsTreeNode implements TreeNode {
         }
     }
 
-    public SettingsTreeNode(List<SettingsProvider> providers) {
+    public SettingsTreeNode(@NonNull List<SettingsProvider> providers) {
         this(null, providers);
     }
 
-    public SettingsTreeNode(SettingsProvider provider) {
+    public SettingsTreeNode(@NonNull SettingsProvider provider) {
         this(provider, provider.getChildren());
     }
 
@@ -238,7 +241,7 @@ class SettingsTreeNode implements TreeNode {
     }
 
     @Override
-    public TreeNode getParent() {
+    public @Nullable TreeNode getParent() {
         return null;
     }
 
@@ -258,7 +261,7 @@ class SettingsTreeNode implements TreeNode {
     }
 
     @Override
-    public Enumeration<? extends TreeNode> children() {
+    public @NonNull Enumeration<? extends TreeNode> children() {
         return Collections.enumeration(children);
     }
 }

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
+import org.jspecify.annotations.NonNull;
 
 public class UnicodeToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 6078839876754730405L;
@@ -32,7 +33,7 @@ public class UnicodeToggleAction extends MainWindowAction {
      */
     private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
-    public UnicodeToggleAction(MainWindow window) {
+    public UnicodeToggleAction(@NonNull MainWindow window) {
         super(window);
         setName(NAME);
         setTooltip(TOOL_TIP);
@@ -55,7 +56,7 @@ public class UnicodeToggleAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NonNull ActionEvent e) {
         boolean useUnicode = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         boolean usePretty =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();

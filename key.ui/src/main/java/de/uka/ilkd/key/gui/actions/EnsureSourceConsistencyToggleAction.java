@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Toggles the flag to ensure consistency between source code and saved proof. Consistency is
@@ -24,7 +25,7 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
      *
      * @param mainWindow the main window of the program
      */
-    public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
+    public EnsureSourceConsistencyToggleAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Ensure Source Consistency");
         setTooltip("If ticked, consistency between source and proof is ensured"

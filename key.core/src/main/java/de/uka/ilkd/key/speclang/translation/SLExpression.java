@@ -62,12 +62,12 @@ public final class SLExpression {
     }
 
 
-    public Term getTerm() {
+    public @Nullable Term getTerm() {
         return term;
     }
 
 
-    public KeYJavaType getType() {
+    public @Nullable KeYJavaType getType() {
         return type;
     }
 

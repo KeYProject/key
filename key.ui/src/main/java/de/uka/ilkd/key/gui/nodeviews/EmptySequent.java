@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Use this class in case no proof is loaded.
@@ -14,13 +15,13 @@ public class EmptySequent extends SequentView {
 
     private static final long serialVersionUID = 7572244482555772604L;
 
-    public EmptySequent(MainWindow mainWindow) {
+    public EmptySequent(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setBackground(INACTIVE_BACKGROUND_COLOR);
     }
 
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "No proof loaded";
     }
 

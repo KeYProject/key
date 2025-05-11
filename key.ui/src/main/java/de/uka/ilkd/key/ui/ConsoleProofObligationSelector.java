@@ -20,6 +20,8 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
@@ -31,13 +33,13 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     public static final String TAB = "   ";
 
-    private final KeYMediator mediator;
+    private final @NonNull KeYMediator mediator;
     protected final InitConfig initConfig;
-    protected final ConsoleUserInterfaceControl ui;
+    protected final @NonNull ConsoleUserInterfaceControl ui;
 
     protected List<Contract> contracts;
 
-    public ConsoleProofObligationSelector(ConsoleUserInterfaceControl ui, InitConfig initConfig) {
+    public ConsoleProofObligationSelector(@NonNull ConsoleUserInterfaceControl ui, InitConfig initConfig) {
         this.ui = ui;
         this.mediator = ui.getMediator();
 
@@ -75,13 +77,13 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         LOGGER.info(TAB + "PO:" + contracts.get(i).getDisplayName());
     }
 
-    protected ProofOblInput createPOForSelectedContract() {
+    protected @Nullable ProofOblInput createPOForSelectedContract() {
         final Contract contract = selectContract();
         LOGGER.info("Contract: " + contract);
         return contract == null ? null : contract.createProofObl(initConfig, contract);
     }
 
-    protected void findOrStartProof(ProofOblInput po) {
+    protected void findOrStartProof(@NonNull ProofOblInput po) {
 
 
         Proof proof = findPreferablyClosedProof(po);
@@ -107,7 +109,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     }
 
-    private Proof findPreferablyClosedProof(ProofOblInput po) {
+    private @Nullable Proof findPreferablyClosedProof(@NonNull ProofOblInput po) {
         ImmutableSet<Proof> proofs =
             initConfig.getServices().getSpecificationRepository().getProofs(po);
 

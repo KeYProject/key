@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,21 +27,21 @@ public class KeYSelectionModel {
     /** if true the selectedGoal field below can be trusted */
     private boolean goalIsValid;
     /** is the selected node a goal */
-    private Goal selectedGoal;
+    private @Nullable Goal selectedGoal;
     /** the current displayed node */
-    private Node selectedNode;
+    private @Nullable Node selectedNode;
     /**
      * The currently displayed sequent. Equal to the sequent of {@link #selectedNode} unless
      * we are displaying an OSS node.
      */
-    private Sequent selectedSequent;
+    private @Nullable Sequent selectedSequent;
     /**
      * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
      * unless we are displaying an OSS node.
      */
-    private RuleApp selectedRuleApp;
+    private @Nullable RuleApp selectedRuleApp;
     /** the listeners to this model */
-    private final List<KeYSelectionListener> listenerList;
+    private final @NonNull List<KeYSelectionListener> listenerList;
 
     /** cached selected node event */
 
@@ -118,8 +119,8 @@ public class KeYSelectionModel {
      * @param node selected node
      * @param sequent selected sequent
      */
-    public synchronized void setSelectedSequentAndRuleApp(Node node, Sequent sequent,
-            RuleApp ruleApp) {
+    public synchronized void setSelectedSequentAndRuleApp(@NonNull Node node, Sequent sequent,
+                                                          RuleApp ruleApp) {
         final Node previousNode = selectedNode;
         // switch proof if needed
         if (node.proof() != getSelectedProof()) {
@@ -138,7 +139,7 @@ public class KeYSelectionModel {
      *
      * @param g the Goal that contains the selected node
      */
-    public synchronized void setSelectedGoal(Goal g) {
+    public synchronized void setSelectedGoal(@NonNull Goal g) {
         final Node previousNode = selectedNode;
         goalIsValid = true;
         selectedGoal = g;
@@ -153,15 +154,15 @@ public class KeYSelectionModel {
      *
      * @return the node that is selected by the user
      */
-    public Node getSelectedNode() {
+    public @Nullable Node getSelectedNode() {
         return selectedNode;
     }
 
-    public Sequent getSelectedSequent() {
+    public @Nullable Sequent getSelectedSequent() {
         return selectedSequent;
     }
 
-    public RuleApp getSelectedRuleApp() {
+    public @Nullable RuleApp getSelectedRuleApp() {
         return selectedRuleApp;
     }
 
@@ -170,7 +171,7 @@ public class KeYSelectionModel {
      *
      * @return the goal the selected node belongs to, null if it is an inner node
      */
-    public Goal getSelectedGoal() {
+    public @Nullable Goal getSelectedGoal() {
         if (proof == null) {
             throw new IllegalStateException("No proof loaded.");
         }
@@ -202,9 +203,9 @@ public class KeYSelectionModel {
         private static final int POS_GOAL_LIST = 2;
 
         private int currentPos = POS_START;
-        private Goal nextOne;
-        private Iterator<Goal> goalIt;
-        private Iterator<Node> nodeIt;
+        private @Nullable Goal nextOne;
+        private @Nullable Iterator<Goal> goalIt;
+        private @Nullable Iterator<Node> nodeIt;
 
         public DefaultSelectionIterator() {
             findNext();
@@ -247,7 +248,7 @@ public class KeYSelectionModel {
         }
 
         @Override
-        public Goal next() {
+        public @Nullable Goal next() {
             Goal res = nextOne;
             findNext();
             return res;
@@ -295,7 +296,7 @@ public class KeYSelectionModel {
      * @param old the Node to start looking for open goals
      */
     // XXX this method is never used
-    public void nearestOpenGoalSelection(Node old) {
+    public void nearestOpenGoalSelection(@NonNull Node old) {
         Node n = old;
         while (n != null && n.isClosed()) {
             n = n.parent();
@@ -324,7 +325,7 @@ public class KeYSelectionModel {
      * @return the goal containing the first leaf of the subtree starting at <code>n</code>, which
      *         is not already closed. <code>null</code> is returned if no such goal exists.
      */
-    private Goal getFirstOpenGoalBelow(Node n) {
+    private @Nullable Goal getFirstOpenGoalBelow(@NonNull Node n) {
         final Iterator<Node> it = n.leavesIterator();
         while (it.hasNext()) {
             final Node node = it.next();
@@ -335,7 +336,7 @@ public class KeYSelectionModel {
         return null;
     }
 
-    public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
+    public void addKeYSelectionListenerChecked(@NonNull KeYSelectionListener listener) {
         synchronized (listenerList) {
             if (!listenerList.contains(listener)) {
                 addKeYSelectionListener(listener);
@@ -343,14 +344,14 @@ public class KeYSelectionModel {
         }
     }
 
-    public void addKeYSelectionListener(KeYSelectionListener listener) {
+    public void addKeYSelectionListener(@NonNull KeYSelectionListener listener) {
         synchronized (listenerList) {
             LOGGER.trace("Adding {}", listener.getClass());
             listenerList.add(listener);
         }
     }
 
-    public void removeKeYSelectionListener(KeYSelectionListener listener) {
+    public void removeKeYSelectionListener(@NonNull KeYSelectionListener listener) {
         synchronized (listenerList) {
             LOGGER.trace("Removing {}", listener.getClass());
             listenerList.remove(listener);

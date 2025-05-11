@@ -25,7 +25,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
     }
 
 
-    public JmlParser.Set_statementContext getAssignment() {
+    public JmlParser.@NonNull Set_statementContext getAssignment() {
         return assignment;
     }
 

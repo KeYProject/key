@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
 
 /**
@@ -78,7 +79,7 @@ public final class ExecutionTime {
      *
      * @return mapping of activities to running times
      */
-    public Map<String, Long> executionTimesMap() {
+    public @NonNull Map<String, Long> executionTimesMap() {
         return startTimes.entrySet().stream()
                 .filter(e -> endTimes.containsKey(e.getKey()))
                 .map(e -> new Pair<>(e.getKey(), endTimes.get(e.getKey()) - e.getValue()))

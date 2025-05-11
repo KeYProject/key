@@ -16,6 +16,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -32,8 +33,8 @@ public class TermLabelMenu extends JMenu {
     private static final long serialVersionUID = 1L;
     private final TermLabelVisibilityManager visibleTermLabels = new TermLabelVisibilityManager();
     private final Map<Name, TermLabelCheckBox> checkBoxMap = new TreeMap<>();
-    private final MainWindow mainWindow;
-    private final DisplayLabelsCheckBox displayLabelsCheckBox;
+    private final @NonNull MainWindow mainWindow;
+    private final @NonNull DisplayLabelsCheckBox displayLabelsCheckBox;
 
     /**
      * Observes changes on {@link #visibleTermLabels}.
@@ -41,7 +42,7 @@ public class TermLabelMenu extends JMenu {
     private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener =
         this::handleVisibleLabelsChanged;
 
-    public TermLabelMenu(final MainWindow mainWindow) {
+    public TermLabelMenu(final @NonNull MainWindow mainWindow) {
         this.mainWindow = mainWindow;
         setText(TERM_LABEL_MENU);
         setToolTipText("Configure term label visibility.");
@@ -148,7 +149,7 @@ public class TermLabelMenu extends JMenu {
          */
         private static final long serialVersionUID = 8766949321781919880L;
 
-        private DisplayLabelsCheckBox(MainWindow mainWindow) {
+        private DisplayLabelsCheckBox(@NonNull MainWindow mainWindow) {
             super(mainWindow, LABEL, true);
             setTooltip(TOOL_TIP);
             setName("DisplayLabelsCheckBox");
@@ -180,12 +181,12 @@ public class TermLabelMenu extends JMenu {
         private static final long serialVersionUID = 4582177241207958225L;
 
         // The name of the label, which belongs to this checkbox.
-        private final Name labelName;
+        private final @NonNull Name labelName;
 
         // This String is used as ToolTipText in case the CheckBox is enabled.
         private String enabledToolTipText;
 
-        TermLabelCheckBox(Name labelName) {
+        TermLabelCheckBox(@NonNull Name labelName) {
             super(mainWindow, labelName.toString(), true);
             this.labelName = labelName;
             setName(labelName.toString());

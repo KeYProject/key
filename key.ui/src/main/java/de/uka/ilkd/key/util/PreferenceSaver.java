@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import org.jspecify.annotations.NonNull;
+
 import java.awt.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -101,7 +103,7 @@ public class PreferenceSaver {
         saveChildren(component);
     }
 
-    private <C extends Component> void saveComponent(C component) {
+    private <C extends Component> void saveComponent(@NonNull C component) {
         String name = component.getName();
         if (name != null) {
             Saver<C> saver = getSaver(component);
@@ -135,7 +137,7 @@ public class PreferenceSaver {
         loadChildren(component);
     }
 
-    private <C extends Component> void loadComponent(C component) {
+    private <C extends Component> void loadComponent(@NonNull C component) {
         String name = component.getName();
         if (name != null) {
             Saver<C> saver = getSaver(component);

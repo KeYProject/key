@@ -254,7 +254,7 @@ public class StrategySettingsDefinition {
      *
      * @return The definition of controls to edit {@link StrategyProperties}.
      */
-    public ImmutableArray<AbstractStrategyPropertyDefinition> getProperties() {
+    public @NonNull ImmutableArray<AbstractStrategyPropertyDefinition> getProperties() {
         return properties;
     }
 
@@ -274,7 +274,7 @@ public class StrategySettingsDefinition {
      * @return The {@link IDefaultStrategyPropertiesFactory} used to create default
      *         {@link StrategyProperties}.
      */
-    public IDefaultStrategyPropertiesFactory getDefaultPropertiesFactory() {
+    public @NonNull IDefaultStrategyPropertiesFactory getDefaultPropertiesFactory() {
         return defaultPropertiesFactory;
     }
 

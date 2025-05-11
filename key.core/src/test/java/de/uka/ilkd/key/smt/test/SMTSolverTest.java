@@ -11,6 +11,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,7 +71,7 @@ public abstract class SMTSolverTest extends SMTTestCommons {
 
     @MethodSource("provideTestData")
     @ParameterizedTest(name = "test {1}")
-    public void test(SMTSolverResult.ThreeValuedTruth expected, String filename)
+    public void test(SMTSolverResult.@NonNull ThreeValuedTruth expected, String filename)
             throws ProblemLoaderException {
         SMTSolverResult.ThreeValuedTruth actual = getResult(expected, TEST_DIR + filename);
         Assertions.assertSame(expected, actual, "Expected \"" + expected.name() + "\" for "
