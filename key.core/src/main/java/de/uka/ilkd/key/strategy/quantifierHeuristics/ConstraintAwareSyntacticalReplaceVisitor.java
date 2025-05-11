@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -26,9 +27,10 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
     private final Constraint metavariableInst;
 
     public ConstraintAwareSyntacticalReplaceVisitor(@NonNull TermLabelState termLabelState,
-                                                    @NonNull Services services, Constraint metavariableInst,
-                                                    @NonNull PosInOccurrence applicationPosInOccurrence, @NonNull Rule rule, @NonNull RuleApp ruleApp,
-                                                    @NonNull TacletLabelHint labelHint, @NonNull Goal goal) {
+            @NonNull Services services, Constraint metavariableInst,
+            @NonNull PosInOccurrence applicationPosInOccurrence, @NonNull Rule rule,
+            @NonNull RuleApp ruleApp,
+            @NonNull TacletLabelHint labelHint, @NonNull Goal goal) {
         super(termLabelState, labelHint, applicationPosInOccurrence, goal, rule, ruleApp, services,
             services.getTermBuilder(false));
         this.metavariableInst = metavariableInst;

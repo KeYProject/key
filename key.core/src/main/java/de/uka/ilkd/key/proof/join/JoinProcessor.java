@@ -20,10 +20,11 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -123,7 +124,8 @@ public class JoinProcessor implements Runnable {
 
     }
 
-    private @Nullable SequentFormula findFormula(@NonNull Sequent sequent, Term content, boolean antecedent) {
+    private @Nullable SequentFormula findFormula(@NonNull Sequent sequent, Term content,
+            boolean antecedent) {
         for (SequentFormula sf : (antecedent ? sequent.antecedent() : sequent.succedent())) {
             if (sf.formula().equals(content)) {
                 return sf;
@@ -145,7 +147,8 @@ public class JoinProcessor implements Runnable {
     /**
      * Applies one of the given taclets if this possible otherwise an exception is thrown.
      */
-    private @Nullable ImmutableList<Goal> apply(final String @NonNull [] tacletNames, @NonNull Goal goal, @NonNull PosInOccurrence pio) {
+    private @Nullable ImmutableList<Goal> apply(final String @NonNull [] tacletNames,
+            @NonNull Goal goal, @NonNull PosInOccurrence pio) {
 
         TacletFilter filter = new TacletFilter() {
 
@@ -248,8 +251,9 @@ public class JoinProcessor implements Runnable {
         return seed;
     }
 
-    private @NonNull Collection<Term> createConstrainedTerms(@NonNull Collection<Term> terms, @NonNull Term predicate,
-                                                             boolean gamma) {
+    private @NonNull Collection<Term> createConstrainedTerms(@NonNull Collection<Term> terms,
+            @NonNull Term predicate,
+            boolean gamma) {
         Collection<Term> result = new LinkedList<>();
         for (Term term : terms) {
             if (gamma) {
@@ -261,7 +265,8 @@ public class JoinProcessor implements Runnable {
         return result;
     }
 
-    private @NonNull Collection<Term> computeCommonFormulas(@NonNull Semisequent s1, @NonNull Semisequent s2, Term exclude) {
+    private @NonNull Collection<Term> computeCommonFormulas(@NonNull Semisequent s1,
+            @NonNull Semisequent s2, Term exclude) {
         TreeSet<Term> formulas1 = createTree(s1, exclude);
         TreeSet<Term> result = createTree();
         for (SequentFormula sf : s2) {
@@ -272,8 +277,9 @@ public class JoinProcessor implements Runnable {
         return result;
     }
 
-    private @NonNull Collection<Term> computeDifference(@NonNull Semisequent s, @NonNull Collection<Term> excludeSet,
-                                                        Term exclude) {
+    private @NonNull Collection<Term> computeDifference(@NonNull Semisequent s,
+            @NonNull Collection<Term> excludeSet,
+            Term exclude) {
         LinkedList<Term> result = new LinkedList<>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {

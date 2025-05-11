@@ -18,12 +18,13 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -43,7 +44,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     }
 
     @Override
-    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst, @NonNull Services services) {
+    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst,
+            @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Term target = term.sub(0);
 
@@ -69,9 +71,11 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * @param atPreHeapVars all remembrance heaps.
      * @param services services.
      */
-    public void updateBlockAndLoopContracts(final @NonNull ImmutableSet<? extends JavaStatement> statements,
-                                            Map<LocationVariable, LocationVariable> atPreVars,
-                                            @NonNull Map<LocationVariable, LocationVariable> atPreHeapVars, @NonNull Services services) {
+    public void updateBlockAndLoopContracts(
+            final @NonNull ImmutableSet<? extends JavaStatement> statements,
+            Map<LocationVariable, LocationVariable> atPreVars,
+            @NonNull Map<LocationVariable, LocationVariable> atPreHeapVars,
+            @NonNull Services services) {
         for (JavaStatement statement : statements) {
             ImmutableSet<AuxiliaryContract> contracts = DefaultImmutableSet.nil();
 
@@ -134,8 +138,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
          */
         private Term atPreUpdate;
 
-        public PrestateVariablesUpdater(final @NonNull MethodFrame frame, final @NonNull Services services,
-                                        final @NonNull TermBuilder tb) {
+        public PrestateVariablesUpdater(final @NonNull MethodFrame frame,
+                final @NonNull Services services,
+                final @NonNull TermBuilder tb) {
             super(frame, services);
             this.frame = frame;
             selfTerm = MiscTools.getSelfTerm(frame, services);
@@ -316,9 +321,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     }
 
     private static void updateAuxiliaryContract(final @NonNull AuxiliaryContract contract,
-                                                final JavaStatement statement, final AuxiliaryContract.@NonNull Variables variables,
-                                                final @NonNull Map<LocationVariable, LocationVariable> nonHeapVars,
-                                                final @NonNull Map<LocationVariable, LocationVariable> atPreHeapVars, final @NonNull Services services) {
+            final JavaStatement statement, final AuxiliaryContract.@NonNull Variables variables,
+            final @NonNull Map<LocationVariable, LocationVariable> nonHeapVars,
+            final @NonNull Map<LocationVariable, LocationVariable> atPreHeapVars,
+            final @NonNull Services services) {
         final AuxiliaryContract.Variables newVariables = new AuxiliaryContract.Variables(
             variables.self, variables.breakFlags, variables.continueFlags, variables.returnFlag,
             variables.result, variables.exception, variables.remembranceHeaps,

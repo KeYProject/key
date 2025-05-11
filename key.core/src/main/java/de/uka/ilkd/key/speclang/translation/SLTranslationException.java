@@ -16,7 +16,8 @@ import org.jspecify.annotations.Nullable;
 public class SLTranslationException extends ProofInputException implements HasLocation {
     protected final @NonNull Location location;
 
-    public SLTranslationException(@NonNull String message, @NonNull Throwable cause, @NonNull Location location) {
+    public SLTranslationException(@NonNull String message, @NonNull Throwable cause,
+            @NonNull Location location) {
         super(message, cause);
         if (location == null) {
             throw new IllegalArgumentException();
@@ -24,7 +25,8 @@ public class SLTranslationException extends ProofInputException implements HasLo
         this.location = location;
     }
 
-    public SLTranslationException(@NonNull String message, @NonNull Location location, @NonNull Throwable cause) {
+    public SLTranslationException(@NonNull String message, @NonNull Location location,
+            @NonNull Throwable cause) {
         this(message, cause, location);
     }
 

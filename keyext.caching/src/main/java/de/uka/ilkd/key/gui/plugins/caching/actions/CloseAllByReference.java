@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -44,7 +45,7 @@ public class CloseAllByReference extends KeyAction {
      * @param proof the proof
      */
     public CloseAllByReference(CachingExtension cachingExtension, KeYMediator mediator,
-                               @NonNull Proof proof) {
+            @NonNull Proof proof) {
         this.cachingExtension = cachingExtension;
         this.mediator = mediator;
         this.proof = proof;

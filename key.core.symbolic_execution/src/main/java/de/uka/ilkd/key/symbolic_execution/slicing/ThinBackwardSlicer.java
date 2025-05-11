@@ -21,8 +21,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Implementation of thin backward slicing.
@@ -34,8 +35,10 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
      * {@inheritDoc}
      */
     @Override
-    protected boolean accept(@NonNull Node node, @NonNull Node previousChild, @NonNull Services services,
-                             @NonNull Set<Location> relevantLocations, @NonNull SequentInfo info, SourceElement activeStatement)
+    protected boolean accept(@NonNull Node node, @NonNull Node previousChild,
+            @NonNull Services services,
+            @NonNull Set<Location> relevantLocations, @NonNull SequentInfo info,
+            SourceElement activeStatement)
             throws ProofInputException {
         try {
             boolean accept = false;

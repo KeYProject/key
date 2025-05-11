@@ -12,8 +12,9 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
@@ -47,7 +48,7 @@ public class SimpleFilteredStrategy implements Strategy {
      *         all (it is discarded by the strategy).
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
             return TopRuleAppCost.INSTANCE;
         }

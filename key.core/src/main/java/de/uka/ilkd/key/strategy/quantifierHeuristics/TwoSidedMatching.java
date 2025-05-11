@@ -10,12 +10,13 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Matching triggers within another quantifier expression. Problems with the current implementation:
@@ -75,7 +76,8 @@ class TwoSidedMatching {
         return getAllSubstitutions(targetWithMVs, services);
     }
 
-    private @NonNull ImmutableSet<Substitution> getAllSubstitutions(@NonNull Term target, Services services) {
+    private @NonNull ImmutableSet<Substitution> getAllSubstitutions(@NonNull Term target,
+            Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         Substitution sub = match(triggerWithMVs, target, services);
         if (sub != null

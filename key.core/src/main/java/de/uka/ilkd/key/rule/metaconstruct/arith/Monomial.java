@@ -15,10 +15,11 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Class for analysing and modifying monomial expressions over the integers
@@ -53,7 +54,8 @@ public class Monomial {
         return res;
     }
 
-    private static @NonNull Monomial createHelp(@NonNull Term monomial, @NonNull Services services) {
+    private static @NonNull Monomial createHelp(@NonNull Term monomial,
+            @NonNull Services services) {
         final Analyser a = new Analyser(services);
         a.analyse(monomial);
         return new Monomial(a.parts, a.coeff);
@@ -292,7 +294,8 @@ public class Monomial {
      * @return the list of all terms that occur in <code>a</code> but not in <code>b</code>.
      *         multiplicity is treated as well here, so this is really difference of multisets
      */
-    private static ImmutableList<Term> difference(ImmutableList<Term> a, @NonNull ImmutableList<Term> b) {
+    private static ImmutableList<Term> difference(ImmutableList<Term> a,
+            @NonNull ImmutableList<Term> b) {
         ImmutableList<Term> res = a;
         final Iterator<Term> it = b.iterator();
         while (it.hasNext() && !res.isEmpty()) {

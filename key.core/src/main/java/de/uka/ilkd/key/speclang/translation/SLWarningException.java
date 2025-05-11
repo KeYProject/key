@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+
 import org.jspecify.annotations.NonNull;
 
 

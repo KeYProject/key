@@ -20,9 +20,9 @@ import de.uka.ilkd.key.proof.runallproofs.ProveTest;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -196,7 +196,8 @@ public class TestProofBundleIO {
      * @param expectedSize the minimal size (in bytes) the generated bundle should have
      * @throws Exception on errors (should not happen)
      */
-    private @NonNull Path testBundleGeneration(@NonNull String dirName, long expectedSize) throws Exception {
+    private @NonNull Path testBundleGeneration(@NonNull String dirName, long expectedSize)
+            throws Exception {
         // we test DiskFileRepo here!
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
                 .setEnsureSourceConsistency(true);

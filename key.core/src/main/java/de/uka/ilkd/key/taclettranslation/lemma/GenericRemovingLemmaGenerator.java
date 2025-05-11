@@ -12,10 +12,11 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Generic removing lemma generator adds the default implementation only that all
@@ -88,7 +89,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * @return the immutable set
      */
     private @NonNull ImmutableSet<Sort> replaceSorts(@NonNull ImmutableSet<Sort> extendsSorts,
-                                                     TermServices services) {
+            TermServices services) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
         for (Sort sort : extendsSorts) {
             result = result.add(replaceSort(sort, services));

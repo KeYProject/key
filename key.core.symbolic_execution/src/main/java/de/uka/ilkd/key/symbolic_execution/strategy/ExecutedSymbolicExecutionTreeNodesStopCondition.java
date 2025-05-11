@@ -16,6 +16,7 @@ import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -103,7 +104,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      */
     @Override
     public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-                                 int countApplied, @Nullable Goal goal) {
+            int countApplied, @Nullable Goal goal) {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
@@ -207,7 +208,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      */
     @Override
     public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
-                              int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
         // Check if a rule was applied
         if (singleRuleApplicationInfo != null) {
             // Get the node on which a rule was applied.
@@ -242,8 +243,9 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
-                                           int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+    public @Nullable String getStopMessage(int maxApplications, long timeout, Proof proof,
+            long startTime,
+            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return null;
     }
 

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.rule.BuiltInRule;
+
 import org.jspecify.annotations.NonNull;
 
 

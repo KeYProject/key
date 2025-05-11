@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -32,7 +33,7 @@ public class CreateObject extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(@NonNull ProgramElement pe, Services services,
-                                                SVInstantiations svInst) {
+            SVInstantiations svInst) {
 
         TypeReference classReference = ((New) pe).getTypeReference();
 

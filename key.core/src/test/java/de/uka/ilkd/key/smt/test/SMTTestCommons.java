@@ -50,8 +50,9 @@ public abstract class SMTTestCommons {
 
     public abstract boolean toolInstalled();
 
-    protected SMTSolverResult.@NonNull ThreeValuedTruth getResult(SMTSolverResult.ThreeValuedTruth expected,
-                                                                  @NonNull String filepath)
+    protected SMTSolverResult.@NonNull ThreeValuedTruth getResult(
+            SMTSolverResult.ThreeValuedTruth expected,
+            @NonNull String filepath)
             throws ProblemLoaderException {
         Assumptions.assumeTrue(toolInstalled());
         return checkFile(expected, filepath).isValid();
@@ -65,7 +66,8 @@ public abstract class SMTTestCommons {
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
-    protected @NonNull SMTSolverResult checkFile(SMTSolverResult.ThreeValuedTruth expected, @NonNull String filepath)
+    protected @NonNull SMTSolverResult checkFile(SMTSolverResult.ThreeValuedTruth expected,
+            @NonNull String filepath)
             throws ProblemLoaderException {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
@@ -79,7 +81,8 @@ public abstract class SMTTestCommons {
         }
     }
 
-    private @NonNull SMTSolverResult checkGoal(SMTSolverResult.ThreeValuedTruth expected, @NonNull Goal g) {
+    private @NonNull SMTSolverResult checkGoal(SMTSolverResult.ThreeValuedTruth expected,
+            @NonNull Goal g) {
         SMTTestSettings settings = new SMTTestSettings();
         if (expected == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
             /*
@@ -94,7 +97,8 @@ public abstract class SMTTestCommons {
         return problem.getFinalResult();
     }
 
-    protected @NonNull KeYEnvironment<?> loadProof(@NonNull String filepath) throws ProblemLoaderException {
+    protected @NonNull KeYEnvironment<?> loadProof(@NonNull String filepath)
+            throws ProblemLoaderException {
         return KeYEnvironment.load(new File(filepath), null, null, null);
     }
 

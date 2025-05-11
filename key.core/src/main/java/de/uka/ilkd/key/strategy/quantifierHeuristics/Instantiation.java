@@ -20,14 +20,15 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class Instantiation {
 
@@ -61,7 +62,8 @@ class Instantiation {
     private static @Nullable Sequent lastSequent = null;
     private static @Nullable Instantiation lastResult = null;
 
-    static @Nullable Instantiation create(@NonNull Term qf, @NonNull Sequent seq, @NonNull Services services) {
+    static @Nullable Instantiation create(@NonNull Term qf, @NonNull Sequent seq,
+            @NonNull Services services) {
         synchronized (Instantiation.class) {
             if (qf == lastQuantifiedFormula && seq == lastSequent) {
                 return lastResult;
@@ -113,7 +115,8 @@ class Instantiation {
         addInstance(new Substitution(varMap), services);
     }
 
-    private @NonNull Term createArbitraryInstantiation(@NonNull QuantifiableVariable var, @NonNull Services services) {
+    private @NonNull Term createArbitraryInstantiation(@NonNull QuantifiableVariable var,
+            @NonNull Services services) {
         return services.getTermBuilder().func(
             services.getJavaDLTheory().getCastSymbol(var.sort(), services),
             services.getTermBuilder().zero());
@@ -148,7 +151,8 @@ class Instantiation {
      * @param services TODO
      * @return all literals in antesequent, and all negation of literal in succedent
      */
-    private @NonNull ImmutableSet<Term> initAssertLiterals(@NonNull Sequent seq, @NonNull TermServices services) {
+    private @NonNull ImmutableSet<Term> initAssertLiterals(@NonNull Sequent seq,
+            @NonNull TermServices services) {
         ImmutableList<Term> assertLits = ImmutableSLList.nil();
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
@@ -170,7 +174,8 @@ class Instantiation {
     /**
      * Try to find the cost of an instance(inst) according its quantified formula and current goal.
      */
-    static RuleAppCost computeCost(@NonNull Term inst, @NonNull Term form, @NonNull Sequent seq, @NonNull Services services) {
+    static RuleAppCost computeCost(@NonNull Term inst, @NonNull Term form, @NonNull Sequent seq,
+            @NonNull Services services) {
         return Instantiation.create(form, seq, services).computeCostHelp(inst);
     }
 

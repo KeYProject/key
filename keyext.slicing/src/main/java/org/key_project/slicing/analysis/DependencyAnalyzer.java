@@ -37,7 +37,6 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingSettingsProvider;
@@ -51,6 +50,7 @@ import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -595,7 +595,7 @@ public final class DependencyAnalyzer {
      * @return whether a merge is valid
      */
     private boolean canMergeStepsInto(@NonNull List<Node> apps, int idxA, Node stepA, Node stepB,
-                                      @NonNull BranchLocation locA, BranchLocation locB, @NonNull BranchLocation mergeBase) {
+            @NonNull BranchLocation locA, BranchLocation locB, @NonNull BranchLocation mergeBase) {
         // calculate the step index of the merged rule application
         BranchLocation differingSuffix = locA.size() == mergeBase.size() ? locB : locA;
         int newStepIdx = differingSuffix.stripPrefix(mergeBase).getNode(0).getStepIndex() - 1;
@@ -718,7 +718,7 @@ public final class DependencyAnalyzer {
      * @return whether the merge is obstructed
      */
     private boolean otherStepsRequireConsumedInputs(@NonNull List<Node> apps, int idxA, Node stepA,
-                                                    Node stepB, @NonNull BranchLocation mergeBase) {
+            Node stepB, @NonNull BranchLocation mergeBase) {
         boolean consumesInput = graph.edgesOf(apps.get(idxA)).stream()
                 .anyMatch(AnnotatedEdge::replacesInputNode);
         if (consumesInput) {

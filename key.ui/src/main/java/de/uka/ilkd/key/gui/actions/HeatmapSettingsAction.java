@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.HeatmapOptionsDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 
 /**

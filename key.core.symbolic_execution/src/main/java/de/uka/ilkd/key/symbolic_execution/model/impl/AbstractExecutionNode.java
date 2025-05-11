@@ -23,11 +23,12 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides a basic implementation of {@link IExecutionNode}.
@@ -80,7 +81,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * The up to know discovered completed {@link IExecutionBlockStartNode}s.
      */
-    private @NonNull ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
+    private @NonNull ImmutableList<IExecutionBlockStartNode<?>> completedBlocks =
+        ImmutableSLList.nil();
 
     /**
      * The already computed block completion conditions.
@@ -466,8 +468,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      *        {@link Term} is returned.
      * @throws ProofInputException Occurred Exception
      */
-    protected @Nullable Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode,
-                                                                   boolean returnFormattedCondition) throws ProofInputException {
+    protected @Nullable Object lazyComputeBlockCompletionCondition(
+            IExecutionBlockStartNode<?> completedNode,
+            boolean returnFormattedCondition) throws ProofInputException {
         final InitConfig initConfig = getInitConfig();
         if (initConfig != null && // Otherwise Proof is disposed.
                 completedBlocks.contains(completedNode)) {

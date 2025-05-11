@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
+
 import org.jspecify.annotations.NonNull;
 
 /**

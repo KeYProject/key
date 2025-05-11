@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -29,7 +30,7 @@ public class MatchModalityInstruction extends Instruction<Modality>
      */
     @Override
     public final MatchConditions match(@NonNull Term t, MatchConditions matchConditions,
-                                       Services services) {
+            Services services) {
         return match(t.op(), matchConditions, services);
     }
 
@@ -37,8 +38,9 @@ public class MatchModalityInstruction extends Instruction<Modality>
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-                                           Services services) {
+    public @Nullable MatchConditions match(Operator instantiationCandidate,
+            MatchConditions matchConditions,
+            Services services) {
         if (instantiationCandidate instanceof Modality mod1 && mod1.kind() == op.kind()) {
             return matchConditions;
         } else {
@@ -50,8 +52,9 @@ public class MatchModalityInstruction extends Instruction<Modality>
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition, MatchConditions matchConditions,
-                                           Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
+            MatchConditions matchConditions,
+            Services services) {
         return match(termPosition.getCurrentSubterm(), matchConditions, services);
     }
 

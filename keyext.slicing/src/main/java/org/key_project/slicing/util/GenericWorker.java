@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.util;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import javax.swing.*;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Generic background thread worker.

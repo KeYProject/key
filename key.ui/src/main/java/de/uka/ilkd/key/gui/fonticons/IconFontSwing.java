@@ -47,7 +47,8 @@ public final class IconFontSwing {
      * @param color
      * @return
      */
-    public static @NonNull Image buildImage(@NonNull IconFont iconCode, float size, Color color, double rotation) {
+    public static @NonNull Image buildImage(@NonNull IconFont iconCode, float size, Color color,
+            double rotation) {
         Image img = buildImage(iconCode, size, color);
         BufferedImage newImage =
             new BufferedImage((int) size, (int) size, BufferedImage.TYPE_INT_RGB);

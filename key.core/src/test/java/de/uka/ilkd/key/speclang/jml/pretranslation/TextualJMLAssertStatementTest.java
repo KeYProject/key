@@ -6,9 +6,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -25,18 +26,21 @@ public class TermConstructionProjection implements ProjectionToTerm {
     private final ProjectionToTerm @NonNull [] subTerms;
 
 
-    private TermConstructionProjection(@NonNull Operator op, ProjectionToTerm @NonNull [] subTerms) {
+    private TermConstructionProjection(@NonNull Operator op,
+            ProjectionToTerm @NonNull [] subTerms) {
         assert !(op instanceof Modality); // XXX
         this.op = op;
         this.subTerms = subTerms;
         assert op.arity() == subTerms.length;
     }
 
-    public static @NonNull ProjectionToTerm create(@NonNull Operator op, ProjectionToTerm @NonNull [] subTerms) {
+    public static @NonNull ProjectionToTerm create(@NonNull Operator op,
+            ProjectionToTerm @NonNull [] subTerms) {
         return new TermConstructionProjection(op, subTerms);
     }
 
-    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Term[] subs = new Term[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {
             subs[i] = subTerms[i].toTerm(app, pos, goal, mState);

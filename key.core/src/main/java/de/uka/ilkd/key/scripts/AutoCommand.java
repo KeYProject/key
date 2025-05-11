@@ -18,10 +18,10 @@ import de.uka.ilkd.key.scripts.meta.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -58,7 +58,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     @Override
     @SuppressWarnings("override.param.invalid")
     public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters arguments,
-                        @NonNull EngineState state) throws ScriptException, InterruptedException {
+            @NonNull EngineState state) throws ScriptException, InterruptedException {
         final Services services = state.getProof().getServices();
         final Profile profile = services.getProfile();
 
@@ -120,8 +120,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * @throws ScriptException
      */
     private void setupFocussedBreakpointStrategy(final @NonNull Optional<String> maybeMatchesRegEx,
-                                                 final Optional<String> breakpointArg, final @NonNull Goal goal, final @NonNull ProverCore proverCore,
-                                                 final @NonNull Services services) throws ScriptException {
+            final Optional<String> breakpointArg, final @NonNull Goal goal,
+            final @NonNull ProverCore proverCore,
+            final @NonNull Services services) throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
                 ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
                     maybeMatchesRegEx.get(), services))

@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.*;
 import java.util.List;
 import java.util.Timer;
@@ -13,6 +11,8 @@ import java.util.TimerTask;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**

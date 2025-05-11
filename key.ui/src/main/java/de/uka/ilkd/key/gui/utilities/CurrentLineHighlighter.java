@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Swing highlighter that highlights the current line in a JTextComponent.

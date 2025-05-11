@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A JML model method declaration in textual form.
@@ -23,7 +23,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
 
     public TextualJMLMethodDecl(@NonNull ImmutableList<JMLModifier> modifiers,
-                                JmlParser.@NonNull Method_declarationContext methodDefinition) {
+            JmlParser.@NonNull Method_declarationContext methodDefinition) {
         super(modifiers);
         this.methodDefinition = methodDefinition;
         setPosition(methodDefinition);

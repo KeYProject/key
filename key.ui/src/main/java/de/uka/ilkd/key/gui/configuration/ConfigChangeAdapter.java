@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.configuration;
 
-import org.jspecify.annotations.NonNull;
-
 import javax.swing.JComponent;
+
+import org.jspecify.annotations.NonNull;
 
 
 public class ConfigChangeAdapter implements ConfigChangeListener {

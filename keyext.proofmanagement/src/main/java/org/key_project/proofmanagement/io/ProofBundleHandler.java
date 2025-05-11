@@ -14,10 +14,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides methods to collect paths of files inside a proof bundle.
@@ -144,7 +145,8 @@ public abstract class ProofBundleHandler implements Closeable {
      *         points to.
      * @throws IOException if the bundle can not be opened/accessed
      */
-    public static @NonNull ProofBundleHandler createBundleHandler(@NonNull Path root) throws IOException {
+    public static @NonNull ProofBundleHandler createBundleHandler(@NonNull Path root)
+            throws IOException {
         if (Files.isDirectory(root)) {
             return new DirectoryProofBundleHandler(root);
         } else {

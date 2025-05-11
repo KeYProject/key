@@ -50,14 +50,14 @@ import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Visitor;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -339,8 +339,9 @@ public final class SourceView extends JComponent {
      * @throws BadLocationException if the line number is invalid.
      * @throws IOException if the file cannot be read.
      */
-    public @NonNull Set<Highlight> addHighlightsForJMLStatement(URI fileURI, int firstLine, Color color,
-                                                                int level) throws BadLocationException, IOException {
+    public @NonNull Set<Highlight> addHighlightsForJMLStatement(URI fileURI, int firstLine,
+            Color color,
+            int level) throws BadLocationException, IOException {
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);
@@ -384,7 +385,8 @@ public final class SourceView extends JComponent {
      *
      * @throws BadLocationException if the line number is invalid.
      */
-    public void changeHighlight(@NonNull Highlight highlight, int newLine) throws BadLocationException {
+    public void changeHighlight(@NonNull Highlight highlight, int newLine)
+            throws BadLocationException {
         URI fileURI = highlight.getFileURI();
         int oldLine = highlight.getLine();
 
@@ -695,8 +697,9 @@ public final class SourceView extends JComponent {
         }
     }
 
-    private void addPosToList(@Nullable PositionInfo pos, @NonNull LinkedList<Pair<Node, PositionInfo>> list,
-                              @NonNull Node node) {
+    private void addPosToList(@Nullable PositionInfo pos,
+            @NonNull LinkedList<Pair<Node, PositionInfo>> list,
+            @NonNull Node node) {
         if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                 && pos.getURI().isPresent()) {
             list.addLast(new Pair<>(node, pos));

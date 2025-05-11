@@ -10,8 +10,9 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This variable condition checks if the instantiation of a schemavariable (of type Field) refers to
@@ -34,8 +35,9 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, @NonNull SVInstantiations instMap,
-                         Services services) {
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull SVInstantiations instMap,
+            Services services) {
         final Object o = instMap.getInstantiation(field);
         if (!(o instanceof Term f)) {
             return false;

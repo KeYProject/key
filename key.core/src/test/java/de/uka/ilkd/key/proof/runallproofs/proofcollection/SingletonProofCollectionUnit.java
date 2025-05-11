@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -27,7 +28,8 @@ public class SingletonProofCollectionUnit extends ProofCollectionUnit {
     }
 
     @Override
-    public @NonNull RunAllProofsTestUnit createRunAllProofsTestUnit(String testName) throws IOException {
+    public @NonNull RunAllProofsTestUnit createRunAllProofsTestUnit(String testName)
+            throws IOException {
         return new RunAllProofsTestUnit(testName, settings, Collections.singletonList(file), true);
     }
 

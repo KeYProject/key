@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+
 import org.jspecify.annotations.NonNull;
 
 public class FunctionPerformanceData {
@@ -52,7 +53,8 @@ public class FunctionPerformanceData {
         totalDuration += duration;
     }
 
-    private @NonNull DataRecordingTable getTable(String ruleName, @NonNull Map<String, DataRecordingTable> tables) {
+    private @NonNull DataRecordingTable getTable(String ruleName,
+            @NonNull Map<String, DataRecordingTable> tables) {
         DataRecordingTable table = tables.get(ruleName);
         if (table == null) {
             try {

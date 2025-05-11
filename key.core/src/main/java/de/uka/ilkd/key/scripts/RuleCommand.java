@@ -22,11 +22,11 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.scripts.meta.Option;
 import de.uka.ilkd.key.scripts.meta.Varargs;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -79,7 +79,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            EngineState state)
             throws ScriptException, InterruptedException {
         RuleApp theApp = makeRuleApp(args, state);
         Goal g = state.getFirstOpenAutomaticGoal();
@@ -105,7 +106,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         g.apply(theApp);
     }
 
-    private @Nullable RuleApp makeRuleApp(@NonNull Parameters p, @NonNull EngineState state) throws ScriptException {
+    private @Nullable RuleApp makeRuleApp(@NonNull Parameters p, @NonNull EngineState state)
+            throws ScriptException {
 
         final Proof proof = state.getProof();
         final Optional<BuiltInRule> maybeBuiltInRule =
@@ -151,8 +153,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
     }
 
-    private @Nullable TacletApp instantiateTacletApp(final @NonNull Parameters p, final @NonNull EngineState state,
-                                                     final @NonNull Proof proof, final @NonNull TacletApp theApp) throws ScriptException {
+    private @Nullable TacletApp instantiateTacletApp(final @NonNull Parameters p,
+            final @NonNull EngineState state,
+            final @NonNull Proof proof, final @NonNull TacletApp theApp) throws ScriptException {
         TacletApp result;
 
         Services services = proof.getServices();
@@ -230,7 +233,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return NoPosTacletApp.createNoPosTacletApp(taclet);
     }
 
-    private IBuiltInRuleApp builtInRuleApp(@NonNull Parameters p, @NonNull EngineState state, @NonNull BuiltInRule rule)
+    private IBuiltInRuleApp builtInRuleApp(@NonNull Parameters p, @NonNull EngineState state,
+            @NonNull BuiltInRule rule)
             throws ScriptException {
         final List<IBuiltInRuleApp> matchingApps = //
             findBuiltInRuleApps(p, state).stream().filter(r -> r.rule().name().equals(rule.name()))
@@ -256,7 +260,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
     }
 
-    private TacletApp findTacletApp(@NonNull Parameters p, @NonNull EngineState state) throws ScriptException {
+    private TacletApp findTacletApp(@NonNull Parameters p, @NonNull EngineState state)
+            throws ScriptException {
 
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         List<TacletApp> matchingApps = filterList(p, allApps);
@@ -279,7 +284,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
     }
 
-    private @NonNull ImmutableList<IBuiltInRuleApp> findBuiltInRuleApps(@NonNull Parameters p, @NonNull EngineState state)
+    private @NonNull ImmutableList<IBuiltInRuleApp> findBuiltInRuleApps(@NonNull Parameters p,
+            @NonNull EngineState state)
             throws ScriptException {
         final Services services = state.getProof().getServices();
         final Goal g = state.getFirstOpenAutomaticGoal();
@@ -307,7 +313,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return allApps;
     }
 
-    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p, @NonNull EngineState state)
+    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p,
+            @NonNull EngineState state)
             throws ScriptException {
         Services services = state.getProof().getServices();
         TacletFilter filter = new TacletNameFilter(p.rulename);
@@ -346,7 +353,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      * @param sf The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
-    private boolean isFormulaSearchedFor(@NonNull Parameters p, @NonNull SequentFormula sf, @NonNull Services services) {
+    private boolean isFormulaSearchedFor(@NonNull Parameters p, @NonNull SequentFormula sf,
+            @NonNull Services services) {
         final boolean satisfiesFormulaParameter =
             p.formula != null && sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY);
 
@@ -373,7 +381,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private @NonNull List<TacletApp> filterList(@NonNull Parameters p, @NonNull ImmutableList<TacletApp> list) {
+    private @NonNull List<TacletApp> filterList(@NonNull Parameters p,
+            @NonNull ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<>();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {

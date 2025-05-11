@@ -5,9 +5,10 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 public class NodeChangesHolder {

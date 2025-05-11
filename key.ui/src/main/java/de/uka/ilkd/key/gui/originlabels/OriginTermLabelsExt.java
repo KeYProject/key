@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -42,7 +43,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     /** @see ToggleOriginHighlightAction */
     private ToggleOriginHighlightAction toggleSourceViewHighlightAction;
 
-    private @NonNull ToggleTermOriginTrackingAction getToggleTrackingAction(@NonNull MainWindow mainWindow) {
+    private @NonNull ToggleTermOriginTrackingAction getToggleTrackingAction(
+            @NonNull MainWindow mainWindow) {
         if (toggleTrackingAction == null) {
             toggleTrackingAction = new ToggleTermOriginTrackingAction(mainWindow);
         }
@@ -50,7 +52,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
         return toggleTrackingAction;
     }
 
-    private @NonNull ToggleOriginHighlightAction getToggleSourceViewHighlightAction(@NonNull MainWindow mainWindow) {
+    private @NonNull ToggleOriginHighlightAction getToggleSourceViewHighlightAction(
+            @NonNull MainWindow mainWindow) {
         if (toggleSourceViewHighlightAction == null) {
             toggleSourceViewHighlightAction = new ToggleOriginHighlightAction(mainWindow);
         }
@@ -68,7 +71,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
     @Override
     public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                                                   Object underlyingObject) {
+            Object underlyingObject) {
         if (kind == DefaultContextMenuKind.SEQUENT_VIEW) {
             return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
         } else if (kind == DefaultContextMenuKind.PROOF_TREE
@@ -81,7 +84,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public @NonNull List<String> getTermInfoStrings(MainWindow mainWindow, @NonNull PosInSequent pos) {
+    public @NonNull List<String> getTermInfoStrings(MainWindow mainWindow,
+            @NonNull PosInSequent pos) {
         Origin origin = OriginTermLabel.getOrigin(pos);
 
         List<String> result = new LinkedList<>();
@@ -94,7 +98,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public @NonNull List<String> getTooltipStrings(MainWindow mainWindow, @Nullable PosInSequent pos) {
+    public @NonNull List<String> getTooltipStrings(MainWindow mainWindow,
+            @Nullable PosInSequent pos) {
         if (pos == null || pos.isSequent()) {
             return Collections.emptyList();
         }

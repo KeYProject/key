@@ -13,9 +13,10 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.*;
 
+import org.key_project.util.collection.*;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.*;
 
 public class TacletPrefixBuilder {
 
@@ -44,7 +45,7 @@ public class TacletPrefixBuilder {
     }
 
     private void setPrefixOfOccurrence(@NonNull SchemaVariable sv,
-                                       @NonNull ImmutableSet<SchemaVariable> relevantBoundVars) {
+            @NonNull ImmutableSet<SchemaVariable> relevantBoundVars) {
         prefixMap = prefixMap.put(sv, new TacletPrefix(relevantBoundVars, false));
     }
 
@@ -217,7 +218,7 @@ public class TacletPrefixBuilder {
         private static final long serialVersionUID = 5855187579027274363L;
 
         InvalidPrefixException(String tacletName, SchemaVariable sv, @Nullable TacletPrefix prefix,
-                               ImmutableSet<SchemaVariable> sndPrefixVar) {
+                ImmutableSet<SchemaVariable> sndPrefixVar) {
             super("Schema variable " + sv + "occurs at different places " + "in taclet "
                 + tacletName + " with different prefixes.\n" + "Prefix P1:"
                 + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix())

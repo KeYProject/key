@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * ProofBundleHandler for a directory that respects the bundle file hierarchy.
@@ -45,7 +46,8 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
      * @return the list of paths
      * @throws IOException if the directory can not be opened
      */
-    private static @NonNull List<Path> getFiles(@NonNull Path directory, @NonNull PathMatcher matcher) throws IOException {
+    private static @NonNull List<Path> getFiles(@NonNull Path directory,
+            @NonNull PathMatcher matcher) throws IOException {
         if (Files.isDirectory(directory)) {
             // IMPORTANT: use try-with-resources here to ensure the stream is closed and does not
             // prevent the files from deletion on Windows!

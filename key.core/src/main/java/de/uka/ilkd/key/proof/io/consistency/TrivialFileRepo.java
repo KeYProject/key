@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.io.RuleSource;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.io.RuleSource;
 
 /**
  * This FileRepo does not cache any files but writes to / reads from the original files on disk. It

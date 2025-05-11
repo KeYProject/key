@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -30,7 +31,7 @@ public class ReattachLoopInvariant extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-                                                @NonNull SVInstantiations svInst) {
+            @NonNull SVInstantiations svInst) {
         final ProgramElement context = //
             svInst.getContextInstantiation().contextProgram();
 

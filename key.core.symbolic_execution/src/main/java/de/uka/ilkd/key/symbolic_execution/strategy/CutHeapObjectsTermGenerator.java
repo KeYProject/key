@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -35,7 +36,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      */
     @Override
     public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                            MutableState mState) {
+            MutableState mState) {
         // Compute collect terms of sequent formulas
         Sequent sequent = goal.sequent();
         Set<Term> topTerms = new LinkedHashSet<>();
@@ -61,8 +62,9 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      * @param heapLDT The {@link HeapLDT} to use.
      * @param services TODO
      */
-    protected void collectEqualityTerms(@NonNull SequentFormula sf, @NonNull Set<Term> equalityTerms,
-                                        @NonNull Set<Term> topTerms, @NonNull HeapLDT heapLDT, @NonNull Services services) {
+    protected void collectEqualityTerms(@NonNull SequentFormula sf,
+            @NonNull Set<Term> equalityTerms,
+            @NonNull Set<Term> topTerms, @NonNull HeapLDT heapLDT, @NonNull Services services) {
         // Collect objects (target of store operations on heap)
         Set<Term> storeLocations = new LinkedHashSet<>();
         collectStoreLocations(sf.formula(), storeLocations, heapLDT);
@@ -97,8 +99,9 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      * @param heapLDT The {@link HeapLDT} to use (it provides the store and create
      *        {@link JFunction}).
      */
-    protected void collectStoreLocations(@NonNull Term term, final @NonNull Set<Term> storeLocations,
-                                         final @NonNull HeapLDT heapLDT) {
+    protected void collectStoreLocations(@NonNull Term term,
+            final @NonNull Set<Term> storeLocations,
+            final @NonNull HeapLDT heapLDT) {
         term.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(@NonNull Term visited) {

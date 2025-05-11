@@ -14,9 +14,9 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.TermCreationException;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.LoggerFactory;
 
 
@@ -45,8 +45,9 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         new EnumMap<>(Snippet.class);
 
 
-    InfFlowPOSnippetFactoryImpl(@NonNull InformationFlowContract contract, @NonNull ProofObligationVars vars1,
-                                @NonNull ProofObligationVars vars2, @NonNull Services services) {
+    InfFlowPOSnippetFactoryImpl(@NonNull InformationFlowContract contract,
+            @NonNull ProofObligationVars vars1,
+            @NonNull ProofObligationVars vars2, @NonNull Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
@@ -54,16 +55,18 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     }
 
     InfFlowPOSnippetFactoryImpl(@NonNull BlockContract contract, @NonNull ProofObligationVars vars1,
-                                @NonNull ProofObligationVars vars2, ExecutionContext context, @NonNull Services services) {
+            @NonNull ProofObligationVars vars2, ExecutionContext context,
+            @NonNull Services services) {
         this.data = new BasicSnippetData(contract, context, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
         registerFactoryMethods();
     }
 
-    InfFlowPOSnippetFactoryImpl(@NonNull LoopSpecification invariant, @NonNull ProofObligationVars vars1,
-                                @NonNull ProofObligationVars vars2, ExecutionContext context, @NonNull Term guardTerm,
-                                @NonNull Services services) {
+    InfFlowPOSnippetFactoryImpl(@NonNull LoopSpecification invariant,
+            @NonNull ProofObligationVars vars1,
+            @NonNull ProofObligationVars vars2, ExecutionContext context, @NonNull Term guardTerm,
+            @NonNull Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
@@ -71,7 +74,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     }
 
     InfFlowPOSnippetFactoryImpl(BasicSnippetData d, @NonNull ProofObligationVars vars1,
-                                @NonNull ProofObligationVars vars2) {
+            @NonNull ProofObligationVars vars2) {
         this.data = d;
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();

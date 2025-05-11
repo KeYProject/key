@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -31,11 +32,12 @@ public class CoeffGcdProjection implements ProjectionToTerm {
     }
 
     public static @NonNull ProjectionToTerm create(ProjectionToTerm monomialLeft,
-                                                   ProjectionToTerm polynomialRight) {
+            ProjectionToTerm polynomialRight) {
         return new CoeffGcdProjection(monomialLeft, polynomialRight);
     }
 
-    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Services services = goal.proof().getServices();
 
         final Term monoT = monomialLeft.toTerm(app, pos, goal, mState);

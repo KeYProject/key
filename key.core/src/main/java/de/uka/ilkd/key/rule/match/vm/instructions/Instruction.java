@@ -10,9 +10,10 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.util.collection.ImmutableArray;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableArray;
 
 /** Class encoding the instructions of the matching vm */
 public abstract class Instruction<OP extends Operator> implements MatchInstruction {
@@ -40,7 +41,8 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
         return new MatchFormulaSVInstruction(sv);
     }
 
-    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(@NonNull TermSV sv) {
+    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(
+            @NonNull TermSV sv) {
         return new MatchTermSVInstruction(sv);
     }
 
@@ -72,11 +74,13 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
         return new BindVariablesInstruction(boundVars);
     }
 
-    public static @NonNull MatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
+    public static @NonNull MatchInstruction unbindVariables(
+            ImmutableArray<QuantifiableVariable> boundVars) {
         return new UnbindVariablesInstruction();
     }
 
-    public static @NonNull MatchInstruction matchElementaryUpdate(@NonNull ElementaryUpdate elementaryUpdate) {
+    public static @NonNull MatchInstruction matchElementaryUpdate(
+            @NonNull ElementaryUpdate elementaryUpdate) {
         return new MatchElementaryUpdateInstruction(elementaryUpdate);
     }
 
@@ -97,6 +101,7 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair {@code (sv, instantiationCandidate)} added
      */
-    public abstract @Nullable MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-                                                    Services services);
+    public abstract @Nullable MatchConditions match(Term instantiationCandidate,
+            MatchConditions matchCond,
+            Services services);
 }

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.prover;
 
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.Nullable;
 
 /**

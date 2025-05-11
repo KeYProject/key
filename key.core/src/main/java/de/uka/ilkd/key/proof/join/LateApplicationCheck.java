@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -22,11 +23,13 @@ import org.jspecify.annotations.NonNull;
 public enum LateApplicationCheck {
     INSTANCE;
 
-    public @NonNull List<String> check(@NonNull Node node, Node cutNode, @NonNull ApplicationCheck check) {
+    public @NonNull List<String> check(@NonNull Node node, Node cutNode,
+            @NonNull ApplicationCheck check) {
         return check(check, node.sequent(), cutNode);
     }
 
-    private @NonNull List<String> check(@NonNull ApplicationCheck check, @NonNull Sequent sequent, Node cutNode) {
+    private @NonNull List<String> check(@NonNull ApplicationCheck check, @NonNull Sequent sequent,
+            Node cutNode) {
         List<String> conflicts = new LinkedList<>();
         for (SequentFormula sf : sequent) {
             String result = check.check(cutNode, sf.formula());

@@ -12,10 +12,10 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 

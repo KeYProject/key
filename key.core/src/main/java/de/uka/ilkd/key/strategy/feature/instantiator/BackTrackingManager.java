@@ -9,9 +9,10 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableSLList;
 
 
 /**

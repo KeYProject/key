@@ -325,7 +325,8 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * @param path the root path under which everything should be expanded afterwards
      * @param filter only the nodes that pass this filter will be expanded
      */
-    public static void expandAllBelow(@NonNull JTree tree, @NonNull TreePath path, @NonNull Predicate<TreePath> filter) {
+    public static void expandAllBelow(@NonNull JTree tree, @NonNull TreePath path,
+            @NonNull Predicate<TreePath> filter) {
         // we temporarily remove all expansion listeners (except that which updates the expanded
         // paths set) before expanding
         TreeExpansionListener[] expansionListeners = tree.getTreeExpansionListeners();
@@ -355,8 +356,9 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
      * collection of a leave is empty. The extremal paths are stored in the order in which they
      * appear in pre-order in the tree model.
      */
-    private static @NonNull Collection<TreePath> extremalPaths(@NonNull TreeModel data, @NonNull TreePath path,
-                                                               @NonNull Predicate<TreePath> filter) {
+    private static @NonNull Collection<TreePath> extremalPaths(@NonNull TreeModel data,
+            @NonNull TreePath path,
+            @NonNull Predicate<TreePath> filter) {
         LinkedHashSet<TreePath> result = new LinkedHashSet<>();
 
         if (data.isLeaf(path.getLastPathComponent())) {
@@ -368,7 +370,7 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     }
 
     private static void extremalPathsImpl(@NonNull TreeModel data, @NonNull TreePath path,
-                                          @NonNull Collection<TreePath> result, @NonNull Predicate<TreePath> filter) {
+            @NonNull Collection<TreePath> result, @NonNull Predicate<TreePath> filter) {
         Object node = path.getLastPathComponent();
 
         boolean hasNonLeafChildren = false;
@@ -444,8 +446,9 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         return result;
     }
 
-    private static void pathsImpl(@NonNull JTree tree, @NonNull TreeModel data, @NonNull TreePath path,
-                                  @NonNull Collection<TreePath> result) {
+    private static void pathsImpl(@NonNull JTree tree, @NonNull TreeModel data,
+            @NonNull TreePath path,
+            @NonNull Collection<TreePath> result) {
         boolean expanded = tree.isExpanded(path);
 
         if (expanded) {

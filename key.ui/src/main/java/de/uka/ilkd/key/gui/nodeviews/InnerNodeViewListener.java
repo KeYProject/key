@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.pp.PosInSequent;
+
 import org.jspecify.annotations.NonNull;
 
 /**

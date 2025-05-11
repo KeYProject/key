@@ -21,11 +21,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 public abstract class TacletLoader {
 
@@ -122,8 +123,8 @@ public abstract class TacletLoader {
         private final ProblemInitializer problemInitializer;
 
         public TacletFromFileLoader(ProgressMonitor pm, ProblemInitializerListener listener,
-                                    ProblemInitializer problemInitializer, File fileForTaclets,
-                                    Collection<File> filesForAxioms, @NonNull InitConfig initConfig) {
+                ProblemInitializer problemInitializer, File fileForTaclets,
+                Collection<File> filesForAxioms, @NonNull InitConfig initConfig) {
             super(pm, listener, initConfig.getProfile());
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
@@ -140,15 +141,17 @@ public abstract class TacletLoader {
             this.problemInitializer = problemInitializer;
         }
 
-        public TacletFromFileLoader(@NonNull TacletFromFileLoader loader, @NonNull InitConfig initConfig) {
+        public TacletFromFileLoader(@NonNull TacletFromFileLoader loader,
+                @NonNull InitConfig initConfig) {
             this(loader.monitor, loader.listener, makeProblemInitializer(loader, initConfig),
                 loader.profile, loader.fileForTaclets, loader.filesForAxioms);
             assert initConfig == null || loader.profile == initConfig.getProfile();
             this.initConfig = initConfig;
         }
 
-        private static @NonNull ProblemInitializer makeProblemInitializer(@NonNull TacletFromFileLoader loader,
-                                                                          @NonNull InitConfig initConfig) {
+        private static @NonNull ProblemInitializer makeProblemInitializer(
+                @NonNull TacletFromFileLoader loader,
+                @NonNull InitConfig initConfig) {
             return new ProblemInitializer(loader.monitor, initConfig.getServices(),
                 loader.listener);
         }

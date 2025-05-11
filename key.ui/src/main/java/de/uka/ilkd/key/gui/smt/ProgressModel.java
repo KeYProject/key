@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Encapsulates the table of progress bars that is shown within the progress dialog: For each solver

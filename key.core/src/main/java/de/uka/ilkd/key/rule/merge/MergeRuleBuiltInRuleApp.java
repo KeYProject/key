@@ -24,10 +24,11 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Rule application class for merge rule applications. Is complete iff the mergePartners field as
@@ -54,16 +55,16 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected MergeRuleBuiltInRuleApp(@NonNull BuiltInRule rule, @NonNull PosInOccurrence pio,
-                                      @NonNull ImmutableList<PosInOccurrence> ifInsts) {
+            @NonNull ImmutableList<PosInOccurrence> ifInsts) {
         super(rule, pio, ifInsts);
     }
 
     public MergeRuleBuiltInRuleApp(@NonNull BuiltInRule rule, @NonNull PosInOccurrence pio,
-                                   @NonNull ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
-                                   ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
-                                   SymbolicExecutionStateWithProgCnt thisSEState,
-                                   ImmutableList<SymbolicExecutionState> mergePartnerStates, Term distForm,
-                                   ArrayList<MergeRuleProgressListener> progressListeners) {
+            @NonNull ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
+            ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
+            SymbolicExecutionStateWithProgCnt thisSEState,
+            ImmutableList<SymbolicExecutionState> mergePartnerStates, Term distForm,
+            ArrayList<MergeRuleProgressListener> progressListeners) {
         super(rule, pio, ifInsts);
         this.mergeNode = mergeNode;
         this.mergePartners = mergePartners;

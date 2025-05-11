@@ -23,9 +23,10 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract the self-composed states
@@ -69,7 +70,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
     @Override
     protected boolean ruleApplicationInContextAllowed(@NonNull RuleApp ruleApp, PosInOccurrence pio,
-                                                      Goal goal) {
+            Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
         return !"andLeft".equals(ruleName)
                 || !(pio.sequentFormula().formula().op() instanceof UpdateApplication);
@@ -125,8 +126,9 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(@NonNull RuleApp ruleApp, @NonNull PosInOccurrence pio, @NonNull Goal goal,
-                                       MutableState mState) {
+        public RuleAppCost computeCost(@NonNull RuleApp ruleApp, @NonNull PosInOccurrence pio,
+                @NonNull Goal goal,
+                MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {

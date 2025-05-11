@@ -17,6 +17,7 @@ import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -41,7 +42,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      *
      * @param breakpoints The {@link IBreakpoint} to use.
      */
-    public BreakpointStopCondition(IBreakpoint @Nullable ... breakpoints) {
+    public BreakpointStopCondition(IBreakpoint @Nullable... breakpoints) {
         if (breakpoints != null) {
             Collections.addAll(this.breakpoints, breakpoints);
         }
@@ -61,7 +62,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      */
     @Override
     public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-                                 int countApplied, @Nullable Goal goal) {
+            int countApplied, @Nullable Goal goal) {
         for (IBreakpoint breakpoint : breakpoints) {
             breakpoint.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
         }
@@ -119,8 +120,9 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
-                                          int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+    public @NonNull String getStopMessage(int maxApplications, long timeout, Proof proof,
+            long startTime,
+            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return "Breakpoint hit!";
     }
 

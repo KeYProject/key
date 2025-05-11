@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.instantiator.BackTrackingManager;
 import de.uka.ilkd.key.strategy.feature.instantiator.ChoicePoint;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

@@ -19,10 +19,10 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,8 +181,9 @@ public class ProveTest {
      * By overriding this method we can change the way how we invoke automode, for instance if we
      * want to use a different strategy.
      */
-    private void autoMode(@NonNull KeYEnvironment<DefaultUserInterfaceControl> env, @NonNull Proof loadedProof,
-                          KeyAst.@Nullable ProofScript script) throws Exception {
+    private void autoMode(@NonNull KeYEnvironment<DefaultUserInterfaceControl> env,
+            @NonNull Proof loadedProof,
+            KeyAst.@Nullable ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -197,7 +198,8 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private @NonNull Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(@NonNull File keyFile)
+    private @NonNull Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(
+            @NonNull File keyFile)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());

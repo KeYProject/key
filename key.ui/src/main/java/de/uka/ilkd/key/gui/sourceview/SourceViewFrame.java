@@ -12,6 +12,7 @@ import javax.swing.JTabbedPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.ClosableTabComponent;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -113,7 +114,8 @@ public class SourceViewFrame extends JSplitPane {
      * @param toolTipText the tool tip text for the new tab.
      * @param closeAction the action to perform when the tab is closed.
      */
-    public void addComponent(@NonNull JComponent component, String toolTipText, Action closeAction) {
+    public void addComponent(@NonNull JComponent component, String toolTipText,
+            Action closeAction) {
         tabbedPane.add(component);
         tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(component),
             new ClosableTabComponent(component.getName(), closeAction));

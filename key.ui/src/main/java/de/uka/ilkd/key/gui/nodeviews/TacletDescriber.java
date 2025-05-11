@@ -13,9 +13,10 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
+import org.key_project.util.collection.ImmutableSet;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The methods of class TacletDescriber have been extracted from class {@link InnerNodeView}. They
@@ -50,7 +51,8 @@ class TacletDescriber {
         }
     }
 
-    private static void writeTacletSchemaVariable(@NonNull StringBuffer out, SchemaVariable schemaVar) {
+    private static void writeTacletSchemaVariable(@NonNull StringBuffer out,
+            SchemaVariable schemaVar) {
         if (schemaVar instanceof ModalOperatorSV modalOpSV) {
             String sep = "";
             for (final var op : modalOpSV.getModalities()) {
@@ -88,7 +90,8 @@ class TacletDescriber {
         out.append(" ").append(schemaVar.name());
     }
 
-    private static void writeTacletSchemaVariablesHelper(@NonNull StringBuffer out, final @NonNull Taclet t) {
+    private static void writeTacletSchemaVariablesHelper(@NonNull StringBuffer out,
+            final @NonNull Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
 
         for (final NewVarcond nvc : t.varsNew()) {
@@ -127,7 +130,8 @@ class TacletDescriber {
      * @param app The {@link RuleApp} to use.
      * @return The text to show.
      */
-    public static @NonNull String getTacletDescription(@NonNull KeYMediator mediator, @Nullable RuleApp app, int width) {
+    public static @NonNull String getTacletDescription(@NonNull KeYMediator mediator,
+            @Nullable RuleApp app, int width) {
         StringBuilder s = new StringBuilder();
 
         if (app != null) {

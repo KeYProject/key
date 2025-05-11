@@ -61,7 +61,7 @@ public class TestgenExtension
 
     @Override
     public @NonNull Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
-                                                    JComponent component) {
+            JComponent component) {
         return Collections.emptyList();
     }
 

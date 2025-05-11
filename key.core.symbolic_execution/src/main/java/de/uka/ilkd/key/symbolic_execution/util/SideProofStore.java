@@ -16,9 +16,10 @@ import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.ProofUserManager;
 
+import org.key_project.util.java.CollectionUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>

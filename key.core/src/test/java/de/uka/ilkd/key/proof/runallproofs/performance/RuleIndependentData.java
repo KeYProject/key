@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import org.jspecify.annotations.NonNull;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -12,6 +10,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The purpose of this class is to write rule-independent data to the filesystem, that is obtained
@@ -53,7 +53,8 @@ public class RuleIndependentData {
         totalTimesData.setProperty(key, value + "");
     }
 
-    private void addTotalDurationAndInvocations(String functionName, @NonNull FunctionPerformanceData data) {
+    private void addTotalDurationAndInvocations(String functionName,
+            @NonNull FunctionPerformanceData data) {
         add(functionName + "Invocations", data.totalInvocations);
         add(functionName + "Duration", data.totalDuration);
     }
@@ -108,7 +109,7 @@ public class RuleIndependentData {
      * {@link DataRecordingStrategy}.
      */
     public static void updateData(long applyStrategyDuration,
-                                  @NonNull DataRecordingStrategy dataRecordingStrategy) {
+            @NonNull DataRecordingStrategy dataRecordingStrategy) {
         RuleIndependentData t = new RuleIndependentData(
             dataRecordingStrategy.dataRecordingTestFile.getProfileDirectories());
 

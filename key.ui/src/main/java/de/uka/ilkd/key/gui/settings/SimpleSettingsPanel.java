@@ -17,9 +17,9 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +90,7 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     protected @NonNull JCheckBox createCheckBox(String title, boolean value,
-                                                final @Nullable Validator<Boolean> validator) {
+            final @Nullable Validator<Boolean> validator) {
         JCheckBox checkBox = new JCheckBox(title, value);
         checkBox.addActionListener(e -> {
             try {
@@ -112,7 +112,8 @@ public class SimpleSettingsPanel extends JPanel {
         return new JScrollPane(area);
     }
 
-    protected @NonNull JTextArea createTextAreaWithoutScroll(String text, Validator<String> validator) {
+    protected @NonNull JTextArea createTextAreaWithoutScroll(String text,
+            Validator<String> validator) {
         JTextArea area = new JTextArea(text);
         area.setRows(5);
         area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
@@ -120,14 +121,15 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
 
-    protected @NonNull JTextField createTextField(String text, final @Nullable Validator<String> validator) {
+    protected @NonNull JTextField createTextField(String text,
+            final @Nullable Validator<String> validator) {
         JTextField field = new JTextField(text);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
     }
 
     protected @NonNull JFormattedTextField createNumberFormattedTextField(Format format,
-                                                                          final @Nullable Validator<String> validator) {
+            final @Nullable Validator<String> validator) {
         JFormattedTextField field = new JFormattedTextField(format);
         field.getDocument().addDocumentListener(new DocumentValidatorAdapter(field, validator));
         return field;
@@ -149,14 +151,15 @@ public class SimpleSettingsPanel extends JPanel {
      * @return the created JSpinner
      * @param <T> the class of the minimum value
      */
-    protected <T extends Number & Comparable<T>> @NonNull JSpinner createNumberTextField(@NonNull T min,
-                                                                                         Comparable<T> max, @NonNull Number step, final @Nullable Validator<Number> validator) {
+    protected <T extends Number & Comparable<T>> @NonNull JSpinner createNumberTextField(
+            @NonNull T min,
+            Comparable<T> max, @NonNull Number step, final @Nullable Validator<Number> validator) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(min, min, max, step);
         return createNumberTextField(spinnerModel, validator);
     }
 
     protected @NonNull JSpinner createNumberTextField(@NonNull SpinnerModel model,
-                                                      final @Nullable Validator<Number> validator) {
+            final @Nullable Validator<Number> validator) {
         // create a new spinner that delegates background color changes/requests to its TextField
         JSpinner spinner = new JSpinner(model) {
             @Override

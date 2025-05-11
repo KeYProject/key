@@ -19,12 +19,13 @@ import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 interface VariablePool {
     LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv);
@@ -48,7 +49,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     }
 
-    public @NonNull TacletFormula translate(@NonNull Taclet t, @NonNull ImmutableSet<Sort> sorts, int maxGeneric)
+    public @NonNull TacletFormula translate(@NonNull Taclet t, @NonNull ImmutableSet<Sort> sorts,
+            int maxGeneric)
             throws IllegalTacletException {
 
         // determine the variable conditions.
@@ -122,7 +124,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         return term;
     }
 
-    public @NonNull LogicVariable getInstantiationOfLogicVar(@NonNull Sort instantiation, @NonNull LogicVariable lv) {
+    public @NonNull LogicVariable getInstantiationOfLogicVar(@NonNull Sort instantiation,
+            @NonNull LogicVariable lv) {
         LogicVariable res = getLogicVariable(
             new Name(instantiation.name().toString() + "__" + lv.name().toString()), instantiation);
         for (TranslationListener l : listener) {
@@ -151,7 +154,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         return genericSorts;
     }
 
-    private static void collectGenerics(@NonNull Term term, @NonNull HashSet<GenericSort> genericSorts) {
+    private static void collectGenerics(@NonNull Term term,
+            @NonNull HashSet<GenericSort> genericSorts) {
 
         if (term.op() instanceof SortDependingFunction func) {
             if (func.getSortDependingOn() instanceof GenericSort) {
@@ -218,9 +222,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * notSame-Condition is hurted.
      */
     public static void checkTable(byte[][] referenceTable,
-                                  Sort[] instTable,
-                                  Sort[] genericTable,
-                                  TacletConditions conditions, Services services) {
+            Sort[] instTable,
+            Sort[] genericTable,
+            TacletConditions conditions, Services services) {
 
         for (int r = 0; r < referenceTable.length; r++) {
             for (int c = 0; c < referenceTable[r].length; c++) {
@@ -354,7 +358,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     }
 
     private static @NonNull StringBuilder removeIllegalChars(@NonNull StringBuilder template,
-                                                             @NonNull ArrayList<String> toReplace, @NonNull ArrayList<String> replacement) {
+            @NonNull ArrayList<String> toReplace, @NonNull ArrayList<String> replacement) {
         // replace one String
         for (int i = 0; i < toReplace.size(); i++) {
             String toRep = toReplace.get(i);

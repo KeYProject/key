@@ -48,25 +48,25 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     private final ContextMenuAdapter cmAdapter = new ContextMenuAdapter() {
         @Override
         public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                                                       Proof underlyingObject) {
+                Proof underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
         public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                                                       Node underlyingObject) {
+                Node underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
         public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                                                       PosInSequent underlyingObject) {
+                PosInSequent underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
         public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                                                       Rule underlyingObject) {
+                Rule underlyingObject) {
             return Collections.singletonList(actionTest);
         }
     };
@@ -77,8 +77,9 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     @Override
-    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator, @NonNull ContextMenuKind kind,
-                                                   @NonNull Object underlyingObject) {
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind,
+            @NonNull Object underlyingObject) {
         return cmAdapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -117,7 +118,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
 
     @Override
     public @NonNull Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
-                                                    JComponent component) {
+            JComponent component) {
         return Collections.singleton(actionTest);
     }
 

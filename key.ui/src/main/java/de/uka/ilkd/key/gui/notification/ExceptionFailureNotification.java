@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.notification;
 import java.awt.Frame;
 
 import de.uka.ilkd.key.gui.notification.actions.ExceptionFailureNotificationDialog;
+
 import org.jspecify.annotations.NonNull;
 
 public class ExceptionFailureNotification extends NotificationTask {

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.util.Debug;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -59,8 +60,9 @@ public abstract class ScaleFeature implements Feature {
      * @param img0 point 0 in the image
      * @param img1 point 1 in the image
      */
-    public static @NonNull Feature createAffine(Feature f, @NonNull RuleAppCost dom0, RuleAppCost dom1,
-                                                @NonNull RuleAppCost img0, RuleAppCost img1) {
+    public static @NonNull Feature createAffine(Feature f, @NonNull RuleAppCost dom0,
+            RuleAppCost dom1,
+            @NonNull RuleAppCost img0, RuleAppCost img1) {
         Debug.assertFalse(dom0.equals(dom1),
             "Two different points are needed to define the " + "affine transformation");
         if (img0.equals(img1)) {
@@ -92,7 +94,7 @@ public abstract class ScaleFeature implements Feature {
     }
 
     private static @NonNull Feature firstDomInfty(Feature f, RuleAppCost dom1, RuleAppCost img0,
-                                                  RuleAppCost img1) {
+            RuleAppCost img1) {
         if (img0 instanceof TopRuleAppCost) {
             final long img1Val = getValue(img1);
             final long dom1Val = getValue(dom1);
@@ -108,12 +110,12 @@ public abstract class ScaleFeature implements Feature {
     }
 
     private static @NonNull Feature firstImgInfty(Feature f, RuleAppCost dom0, RuleAppCost dom1,
-                                                  RuleAppCost img1) {
+            RuleAppCost img1) {
         return ShannonFeature.createConditional(f, dom1, img1, TopRuleAppCost.INSTANCE);
     }
 
     public static @NonNull Feature realAffine(Feature f, RuleAppCost dom0, RuleAppCost dom1,
-                                              RuleAppCost img0, RuleAppCost img1) {
+            RuleAppCost img0, RuleAppCost img1) {
         final double img0Val = getValue(img0);
         final double img1Val = getValue(img1);
         final double dom0Val = getValue(dom0);
@@ -162,7 +164,7 @@ public abstract class ScaleFeature implements Feature {
         }
 
         public @Nullable RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-                                                 MutableState mState) {
+                MutableState mState) {
             final RuleAppCost cost = getFeature().computeCost(app, pos, goal, mState);
             long costVal;
 

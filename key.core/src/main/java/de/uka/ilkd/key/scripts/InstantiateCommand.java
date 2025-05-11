@@ -21,11 +21,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -51,7 +51,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters params,
-                        @NonNull EngineState state) throws ScriptException, InterruptedException {
+            @NonNull EngineState state) throws ScriptException, InterruptedException {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
@@ -81,7 +81,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         g.apply(theApp);
     }
 
-    private @NonNull TacletApp findTacletApp(@NonNull Parameters p, @NonNull EngineState state) throws ScriptException {
+    private @NonNull TacletApp findTacletApp(@NonNull Parameters p, @NonNull EngineState state)
+            throws ScriptException {
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         TacletApp matchingApp = filterList(p, allApps);
 
@@ -92,7 +93,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         return matchingApp;
     }
 
-    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p, @NonNull EngineState state)
+    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p,
+            @NonNull EngineState state)
             throws ScriptException {
         boolean hide = p.hide.equals("hide");
 
@@ -136,7 +138,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private @Nullable TacletApp filterList(@NonNull Parameters p, @NonNull ImmutableList<TacletApp> list) {
+    private @Nullable TacletApp filterList(@NonNull Parameters p,
+            @NonNull ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,
@@ -148,7 +151,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         return null;
     }
 
-    private void computeFormula(@NonNull Parameters params, @NonNull Goal goal) throws ScriptException {
+    private void computeFormula(@NonNull Parameters params, @NonNull Goal goal)
+            throws ScriptException {
         Node n = goal.node();
         Sequent seq = n.sequent();
         int occ = params.occ;

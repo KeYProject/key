@@ -20,12 +20,13 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -77,7 +78,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     private static LocationVariable createSelf(@Nullable IProgramMethod pm, KeYJavaType selfKJT,
-                                               TermServices services) {
+            TermServices services) {
         if (pm == null) {
             return services.getTermBuilder().selfVar(selfKJT, false);
         } else {
@@ -85,7 +86,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static @Nullable LocationVariable createResult(@Nullable IProgramMethod pm, TermServices services) {
+    private static @Nullable LocationVariable createResult(@Nullable IProgramMethod pm,
+            TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -93,7 +95,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static @Nullable LocationVariable createException(@Nullable IProgramMethod pm, TermServices services) {
+    private static @Nullable LocationVariable createException(@Nullable IProgramMethod pm,
+            TermServices services) {
         if (pm == null) {
             return null;
         } else {

@@ -11,8 +11,9 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Stores the given {@link Term}, after substitution of {@link SchemaVariable}s, into the given
@@ -31,7 +32,7 @@ public class StoreTermInCondition implements VariableCondition {
 
     @Override
     public @NonNull MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-                                          @NonNull MatchConditions matchCond, Services services) {
+            @NonNull MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {

@@ -13,6 +13,7 @@ import javax.swing.JTextArea;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYConstants;
+
 import org.jspecify.annotations.NonNull;
 
 public class SystemInfoAction extends MainWindowAction {

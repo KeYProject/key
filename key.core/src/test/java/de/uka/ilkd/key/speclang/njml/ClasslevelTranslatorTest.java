@@ -41,7 +41,8 @@ public class ClasslevelTranslatorTest {
         return readInputs(resourceAsStream, this::parseAndInterpret);
     }
 
-    static Stream<DynamicTest> readInputs(InputStream resourceAsStream, @NonNull Consumer<String> fn)
+    static Stream<DynamicTest> readInputs(InputStream resourceAsStream,
+            @NonNull Consumer<String> fn)
             throws IOException {
         List<String> seq = new LinkedList<>();
         try (InputStream s = resourceAsStream;

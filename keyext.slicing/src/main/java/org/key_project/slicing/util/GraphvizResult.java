@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.util;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.image.BufferedImage;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Result of running an external graph renderer.

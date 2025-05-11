@@ -6,12 +6,13 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.jspecify.annotations.Nullable;
 
 public interface MatchOperatorInstruction extends MatchInstruction {
 
     @Nullable
     MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-                          Services services);
+            Services services);
 
 }

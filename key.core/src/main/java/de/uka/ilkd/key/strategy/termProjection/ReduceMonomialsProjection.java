@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -24,11 +25,13 @@ public class ReduceMonomialsProjection implements ProjectionToTerm {
         this.divisor = divisor;
     }
 
-    public static @NonNull ProjectionToTerm create(ProjectionToTerm dividend, ProjectionToTerm divisor) {
+    public static @NonNull ProjectionToTerm create(ProjectionToTerm dividend,
+            ProjectionToTerm divisor) {
         return new ReduceMonomialsProjection(dividend, divisor);
     }
 
-    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 

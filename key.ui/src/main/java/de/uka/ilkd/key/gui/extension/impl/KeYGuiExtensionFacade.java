@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -74,7 +75,8 @@ public final class KeYGuiExtensionFacade {
     /**
      * Adds all registered and activated {@link KeYGuiExtension.MainMenu} to the given menuBar.
      */
-    public static void addExtensionsToMainMenu(@NonNull MainWindow mainWindow, @NonNull JMenuBar menuBar) {
+    public static void addExtensionsToMainMenu(@NonNull MainWindow mainWindow,
+            @NonNull JMenuBar menuBar) {
         JMenu menu = new JMenu("Extensions");
         getMainMenuActions(mainWindow).forEach(it -> sortActionIntoMenu(it, menuBar, menu));
 
@@ -127,7 +129,8 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static void sortActionIntoMenu(@NonNull Action act, @NonNull JMenuBar menuBar, JMenu defaultMenu) {
+    private static void sortActionIntoMenu(@NonNull Action act, @NonNull JMenuBar menuBar,
+            JMenu defaultMenu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menuBar, mpath, defaultMenu);
 
@@ -138,7 +141,8 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static JMenu findMenu(@NonNull JMenuBar menuBar, @NonNull Iterator<String> mpath, JMenu defaultMenu) {
+    private static JMenu findMenu(@NonNull JMenuBar menuBar, @NonNull Iterator<String> mpath,
+            JMenu defaultMenu) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             for (int i = 0; i < menuBar.getMenuCount(); i++) {
@@ -155,7 +159,8 @@ public final class KeYGuiExtensionFacade {
         return defaultMenu;
     }
 
-    private static @Nullable JMenu findMenu(@NonNull JPopupMenu menu, @NonNull Iterator<String> mpath) {
+    private static @Nullable JMenu findMenu(@NonNull JPopupMenu menu,
+            @NonNull Iterator<String> mpath) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             Component[] children = menu.getComponents();
@@ -237,8 +242,9 @@ public final class KeYGuiExtensionFacade {
      * @param mediator the KeY mediator
      * @return populated context menu
      */
-    public static @NonNull JPopupMenu createContextMenu(@NonNull ContextMenuKind kind, Object underlyingObject,
-                                                        @NonNull KeYMediator mediator) {
+    public static @NonNull JPopupMenu createContextMenu(@NonNull ContextMenuKind kind,
+            Object underlyingObject,
+            @NonNull KeYMediator mediator) {
         JPopupMenu menu = new JPopupMenu();
         if (underlyingObject instanceof Proof proof) {
             for (Component comp : MainWindow.getInstance().createProofMenu(proof)
@@ -252,13 +258,14 @@ public final class KeYGuiExtensionFacade {
     }
 
     public static void addContextMenuItems(@NonNull ContextMenuKind kind, @NonNull JPopupMenu menu,
-                                           @NonNull Object underlyingObject, @NonNull KeYMediator mediator) {
+            @NonNull Object underlyingObject, @NonNull KeYMediator mediator) {
         getContextMenuItems(kind, underlyingObject, mediator)
                 .forEach(it -> sortActionIntoMenu(it, menu));
     }
 
-    public static @NonNull List<Action> getContextMenuItems(@NonNull ContextMenuKind kind, @NonNull Object underlyingObject,
-                                                            @NonNull KeYMediator mediator) {
+    public static @NonNull List<Action> getContextMenuItems(@NonNull ContextMenuKind kind,
+            @NonNull Object underlyingObject,
+            @NonNull KeYMediator mediator) {
         if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) {
             throw new IllegalArgumentException();
         }
@@ -268,8 +275,9 @@ public final class KeYGuiExtensionFacade {
                 .collect(Collectors.toList());
     }
 
-    public static @NonNull JMenu createTermMenu(@NonNull ContextMenuKind kind, @NonNull Object underlyingObject,
-                                                @NonNull KeYMediator mediator) {
+    public static @NonNull JMenu createTermMenu(@NonNull ContextMenuKind kind,
+            @NonNull Object underlyingObject,
+            @NonNull KeYMediator mediator) {
         JMenu menu = new JMenu("Extensions");
         getContextMenuItems(kind, underlyingObject, mediator)
                 .forEach(it -> sortActionIntoMenu(it, menu));
@@ -359,7 +367,7 @@ public final class KeYGuiExtensionFacade {
      * @param componentId
      */
     public static void installKeyboardShortcuts(KeYMediator mediator, @NonNull JComponent component,
-                                                String componentId) {
+            String componentId) {
         Stream<Action> provider = getKeyboardShortcuts(mediator, componentId, component);
         provider.forEach(it -> {
             int condition = it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION) != null
@@ -400,7 +408,8 @@ public final class KeYGuiExtensionFacade {
     // endregion
 
 
-    public static Stream<String> getTermInfoStrings(@NonNull MainWindow mainWindow, @NonNull PosInSequent mousePos) {
+    public static Stream<String> getTermInfoStrings(@NonNull MainWindow mainWindow,
+            @NonNull PosInSequent mousePos) {
         return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream()
                 .flatMap(it -> it.getTermInfoStrings(mainWindow, mousePos).stream());
     }

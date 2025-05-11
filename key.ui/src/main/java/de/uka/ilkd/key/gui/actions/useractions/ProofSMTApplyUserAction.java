@@ -17,8 +17,9 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * User action to apply the results of running SMT solvers.
@@ -42,7 +43,7 @@ public class ProofSMTApplyUserAction extends UserAction {
     private final int numberOfGoalsClosed;
 
     public ProofSMTApplyUserAction(KeYMediator mediator, Proof proof,
-                                   @NonNull Collection<SolverListener.InternSMTProblem> smtProblems) {
+            @NonNull Collection<SolverListener.InternSMTProblem> smtProblems) {
         super(mediator, proof);
         this.smtProblems = smtProblems;
         this.numberOfGoalsClosed = (int) smtProblems.stream()

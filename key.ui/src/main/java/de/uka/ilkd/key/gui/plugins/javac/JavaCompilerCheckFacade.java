@@ -269,7 +269,7 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
 
     @Override
     public JavaFileObject getJavaFileForOutput(Location location, String className,
-                                               JavaFileObject.@NonNull Kind kind, FileObject sibling) throws IOException {
+            JavaFileObject.@NonNull Kind kind, FileObject sibling) throws IOException {
         if (kind == JavaFileObject.Kind.CLASS && location == StandardLocation.CLASS_OUTPUT) {
             // do not save compiled .class files on disk
             try {
@@ -349,7 +349,8 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
  * @author Alexander Weigl
  */
 class IgnoreOutputJavaFileObject extends SimpleJavaFileObject {
-    public IgnoreOutputJavaFileObject(final String name, @NonNull Kind kind) throws URISyntaxException {
+    public IgnoreOutputJavaFileObject(final String name, @NonNull Kind kind)
+            throws URISyntaxException {
         super(new URI("memory://" + name + ".class"), kind);
     }
 

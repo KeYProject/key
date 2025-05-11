@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -25,23 +26,28 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         this.divisor = divisor;
     }
 
-    public static @NonNull Feature createReducible(ProjectionToTerm dividend, ProjectionToTerm divisor) {
+    public static @NonNull Feature createReducible(ProjectionToTerm dividend,
+            ProjectionToTerm divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
-            protected boolean checkReducibility(@NonNull Monomial mDividend, @NonNull Monomial mDivisor) {
+            protected boolean checkReducibility(@NonNull Monomial mDividend,
+                    @NonNull Monomial mDivisor) {
                 return mDivisor.reducible(mDividend);
             }
         };
     }
 
-    public static @NonNull Feature createDivides(ProjectionToTerm dividend, ProjectionToTerm divisor) {
+    public static @NonNull Feature createDivides(ProjectionToTerm dividend,
+            ProjectionToTerm divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
-            protected boolean checkReducibility(@NonNull Monomial mDividend, @NonNull Monomial mDivisor) {
+            protected boolean checkReducibility(@NonNull Monomial mDividend,
+                    @NonNull Monomial mDivisor) {
                 return mDivisor.divides(mDividend);
             }
         };
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 

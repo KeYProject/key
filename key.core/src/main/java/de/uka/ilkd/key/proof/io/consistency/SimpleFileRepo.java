@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This FileRepo is able to build a proof bundle but is not able to guarantee consistency between
@@ -108,7 +108,8 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    protected @NonNull InputStream getInputStreamInternal(@NonNull Path p) throws FileNotFoundException {
+    protected @NonNull InputStream getInputStreamInternal(@NonNull Path p)
+            throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> directly read
             concrete = p.normalize();
@@ -165,7 +166,8 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public @NonNull OutputStream createOutputStream(@NonNull Path path) throws FileNotFoundException {
+    public @NonNull OutputStream createOutputStream(@NonNull Path path)
+            throws FileNotFoundException {
         if (path.isAbsolute()) {
             // programming error!
             throw new IllegalArgumentException("The path is not relative: " + path);

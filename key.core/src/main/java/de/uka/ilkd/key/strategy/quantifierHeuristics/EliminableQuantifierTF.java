@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
 import org.jspecify.annotations.NonNull;
 
 public class EliminableQuantifierTF extends BinaryTermFeature {

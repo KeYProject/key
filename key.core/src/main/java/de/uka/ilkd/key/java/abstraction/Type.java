@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import de.uka.ilkd.key.java.expression.Literal;
+
 import org.jspecify.annotations.Nullable;
 
 /**

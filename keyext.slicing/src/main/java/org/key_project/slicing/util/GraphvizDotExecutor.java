@@ -13,10 +13,10 @@ import java.nio.charset.StandardCharsets;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.SlicingSettings;
 import org.key_project.slicing.SlicingSettingsProvider;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

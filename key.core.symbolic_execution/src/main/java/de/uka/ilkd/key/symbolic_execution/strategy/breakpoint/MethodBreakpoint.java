@@ -21,6 +21,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.jspecify.annotations.NonNull;
 
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
@@ -67,9 +68,10 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param isExit flag to tell whether to stop on method exit
      * @throws SLTranslationException if the condition could not be parsed to a valid Term
      */
-    public MethodBreakpoint(String classPath, int lineNumber, int hitCount, @NonNull IProgramMethod pm,
-                            Proof proof, String condition, boolean enabled, boolean conditionEnabled,
-                            int methodStart, int methodEnd, boolean isEntry, boolean isExit)
+    public MethodBreakpoint(String classPath, int lineNumber, int hitCount,
+            @NonNull IProgramMethod pm,
+            Proof proof, String condition, boolean enabled, boolean conditionEnabled,
+            int methodStart, int methodEnd, boolean isEntry, boolean isExit)
             throws SLTranslationException {
         super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd,
             pm.getContainerType());
@@ -82,8 +84,9 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, @NonNull RuleApp ruleApp, @NonNull Proof proof,
-                                   @NonNull Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, @NonNull RuleApp ruleApp,
+            @NonNull Proof proof,
+            @NonNull Node node) {
         return !proof.isDisposed()
                 && ((isEntry && isMethodCallNode(node, ruleApp))
                         || (isExit && isMethodReturnNode(node, ruleApp)))

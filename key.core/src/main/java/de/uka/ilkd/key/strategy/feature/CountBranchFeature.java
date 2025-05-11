@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -32,7 +33,7 @@ public class CountBranchFeature implements Feature {
      * @return the cost of <code>app</code>
      */
     public RuleAppCost computeCost(@NonNull RuleApp app, PosInOccurrence pos, Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         if (app.rule() instanceof Taclet tac) {
             final long branches = tac.goalTemplates().size();
             return NumberRuleAppCost.create(branches);

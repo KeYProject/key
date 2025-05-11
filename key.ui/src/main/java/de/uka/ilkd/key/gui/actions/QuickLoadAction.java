@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import de.uka.ilkd.key.gui.MainWindow;
+
 import org.jspecify.annotations.NonNull;
 
 /**

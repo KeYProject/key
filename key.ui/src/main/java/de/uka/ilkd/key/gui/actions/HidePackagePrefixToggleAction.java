@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
 import org.jspecify.annotations.NonNull;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {

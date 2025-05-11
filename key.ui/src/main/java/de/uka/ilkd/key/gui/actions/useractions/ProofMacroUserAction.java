@@ -7,6 +7,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -24,8 +25,9 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
      */
     private final PosInOccurrence pio;
 
-    public ProofMacroUserAction(@NonNull KeYMediator mediator, ProofMacro macro, PosInOccurrence pio,
-                                @NonNull Proof proof) {
+    public ProofMacroUserAction(@NonNull KeYMediator mediator, ProofMacro macro,
+            PosInOccurrence pio,
+            @NonNull Proof proof) {
         super(mediator, proof);
         this.macro = macro;
         this.pio = pio;

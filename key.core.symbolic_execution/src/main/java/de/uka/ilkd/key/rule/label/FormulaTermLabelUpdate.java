@@ -23,11 +23,12 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The {@link TermLabelUpdate} used to label predicates with a {@link FormulaTermLabel} of add
@@ -48,9 +49,10 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      * {@inheritDoc}
      */
     public void updateLabels(@NonNull TermLabelState state, @NonNull Services services,
-                             @NonNull PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-                             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, @NonNull Term newTerm,
-                             @NonNull Set<TermLabel> labels) {
+            @NonNull PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
+            Term modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, @NonNull Term newTerm,
+            @NonNull Set<TermLabel> labels) {
         if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))

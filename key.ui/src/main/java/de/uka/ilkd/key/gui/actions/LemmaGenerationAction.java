@@ -24,10 +24,10 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,7 +150,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
                 @Override
                 public void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
-                                      boolean addAxioms) {
+                        boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
                         mainWindow.getUserInterface().registerProofAggregate(p);
@@ -230,7 +230,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
                 @Override
                 public void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
-                                      boolean addAxioms) {
+                        boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
                         mainWindow.getUserInterface().registerProofAggregate(p);
@@ -304,8 +304,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 }
 
                 @Override
-                public void doStopped(@Nullable ProofAggregate p, @NonNull ImmutableSet<Taclet> taclets,
-                                      boolean addAxioms) {
+                public void doStopped(@Nullable ProofAggregate p,
+                        @NonNull ImmutableSet<Taclet> taclets,
+                        boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
                         mainWindow.getUserInterface().registerProofAggregate(p);

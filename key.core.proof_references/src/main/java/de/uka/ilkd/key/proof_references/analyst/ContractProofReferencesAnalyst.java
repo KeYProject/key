@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.speclang.Contract;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -23,7 +24,8 @@ public class ContractProofReferencesAnalyst implements IProofReferencesAnalyst {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node,
+            Services services) {
         if (node.getAppliedRuleApp() instanceof AbstractContractRuleApp contractRuleApp) {
             DefaultProofReference<Contract> reference = new DefaultProofReference<>(
                 IProofReference.USE_CONTRACT, node, contractRuleApp.getInstantiation());

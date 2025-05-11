@@ -11,9 +11,10 @@ import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.sort.Sort;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.sort.Sort;
 
 /**
  * Default implementation of {@link ISymbolicValue}.
@@ -65,8 +66,9 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * @param condition The optional condition under which this value is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicValue(@NonNull Services services, @NonNull Term arrayIndex, Term value, Term condition,
-                         IModelSettings settings) {
+    public SymbolicValue(@NonNull Services services, @NonNull Term arrayIndex, Term value,
+            Term condition,
+            IModelSettings settings) {
         super(settings);
         assert services != null;
         assert arrayIndex != null;
@@ -91,7 +93,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicValue(@NonNull Services services, @NonNull Term arrayIndex, Term arrayStartIndex,
-                         Term arrayEndIndex, Term value, Term condition, IModelSettings settings) {
+            Term arrayEndIndex, Term value, Term condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert arrayIndex != null;
@@ -113,8 +115,9 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * @param condition The optional condition under which this value is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicValue(@NonNull Services services, @NonNull IProgramVariable programVariable, Term value,
-                         Term condition, IModelSettings settings) {
+    public SymbolicValue(@NonNull Services services, @NonNull IProgramVariable programVariable,
+            Term value,
+            Term condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert programVariable != null;

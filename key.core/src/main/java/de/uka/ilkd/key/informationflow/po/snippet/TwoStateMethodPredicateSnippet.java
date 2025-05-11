@@ -17,11 +17,12 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -50,7 +51,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
     protected Sort @NonNull [] generateContApplArgumentSorts(@NonNull ImmutableList<Term> termList,
-                                                             IProgramMethod pm) {
+            IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
         // ImmutableArray<Sort> pmSorts = pm.argSorts();
@@ -66,8 +67,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
 
     private JFunction generateContApplPredicate(@NonNull String nameString, Sort[] argSorts,
-                                                TermBuilder tb,
-                                                @NonNull Services services) {
+            TermBuilder tb,
+            @NonNull Services services) {
         final Name name = new Name(nameString);
         Namespace<JFunction> functionNS = services.getNamespaces().functions();
 
@@ -89,8 +90,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private @NonNull Term instantiateContApplPredicate(@NonNull JFunction pred, @NonNull ImmutableList<Term> termList,
-                                                       @NonNull TermBuilder tb) {
+    private @NonNull Term instantiateContApplPredicate(@NonNull JFunction pred,
+            @NonNull ImmutableList<Term> termList,
+            @NonNull TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         Term[] predArgs = new Term[predArgSorts.length];
@@ -117,7 +119,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * @return
      */
     private @NonNull ImmutableList<Term> extractTermListForPredicate(@NonNull IProgramMethod pm,
-                                                                     @NonNull ProofObligationVars poVars, boolean hasMby) {
+            @NonNull ProofObligationVars poVars, boolean hasMby) {
         ImmutableList<Term> relevantPreVars = ImmutableSLList.nil();
         ImmutableList<Term> relevantPostVars = ImmutableSLList.nil();
 

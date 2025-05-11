@@ -23,10 +23,10 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,8 +39,9 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
-    private PosInOccurrence getApplicablePosInOcc(@NonNull Proof proof, Goal goal, @Nullable PosInOccurrence posInOcc,
-                                                  @NonNull ProofMacro macro) {
+    private PosInOccurrence getApplicablePosInOcc(@NonNull Proof proof, Goal goal,
+            @Nullable PosInOccurrence posInOcc,
+            @NonNull ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
         } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
@@ -77,7 +78,8 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(@NonNull Proof proof, @NonNull ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(@NonNull Proof proof, @NonNull ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
         final Services services = proof.getServices();
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =
@@ -109,8 +111,8 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     @Override
     public @NonNull ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, @NonNull Proof proof,
-                                                   ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
-                                                   @Nullable ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =

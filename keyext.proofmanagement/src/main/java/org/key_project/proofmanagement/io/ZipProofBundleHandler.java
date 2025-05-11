@@ -10,11 +10,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 import org.key_project.util.java.IOUtil;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A ProofBundleHandler for a proof bundle stored inside a zip file

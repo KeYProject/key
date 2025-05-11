@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
+
 import org.jspecify.annotations.NonNull;
 
 public class AnnotationUseSpecification extends Modifier implements TypeReferenceContainer {

@@ -16,8 +16,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The default implementation of {@link IExecutionExceptionalMethodReturn}.
@@ -35,7 +36,7 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
     public ExecutionExceptionalMethodReturn(ITreeSettings settings, Node proofNode,
-                                            @NonNull ExecutionMethodCall methodCall) {
+            @NonNull ExecutionMethodCall methodCall) {
         super(settings, proofNode, methodCall);
     }
 

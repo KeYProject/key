@@ -10,8 +10,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.EqualsModProofIrrelevancy;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A sequent formula tracked by the dependency graph.

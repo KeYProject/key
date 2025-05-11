@@ -40,11 +40,11 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -792,7 +792,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
      *        associated branch node
      * @return the path to the branch node if available otherwise {@code defaultPath}
      */
-    private @Nullable TreePath getPathForBranchNode(@NonNull Node invokedNode, @NonNull TreePath defaultPath) {
+    private @Nullable TreePath getPathForBranchNode(@NonNull Node invokedNode,
+            @NonNull TreePath defaultPath) {
         if (delegateModel.getRoot() instanceof GUIBranchNode rootNode) {
             final TreeNode node = rootNode.findBranch(invokedNode);
             if (node instanceof GUIBranchNode childAsBranchNode &&
@@ -1249,7 +1250,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
         }
 
-        private void renderOneStepSimplification(@NonNull Style style, @NonNull GUIOneStepChildTreeNode node) {
+        private void renderOneStepSimplification(@NonNull Style style,
+                @NonNull GUIOneStepChildTreeNode node) {
             style.foreground = GRAY_COLOR.get();
             style.icon = IconFactory.oneStepSimplifier(16);
             RuleApp app = node.getRuleApp();

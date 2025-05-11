@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
 import org.jspecify.annotations.NonNull;
 
 /*

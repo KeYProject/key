@@ -13,9 +13,10 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElement;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.SyntaxElement;
 
 
 public final class ObserverCondition implements VariableCondition {
@@ -32,8 +33,8 @@ public final class ObserverCondition implements VariableCondition {
 
     @Override
     public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                           @NonNull MatchConditions mc,
-                                           Services services) {
+            @NonNull MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         final Term obsInst = (Term) svInst.getInstantiation(obs);
 

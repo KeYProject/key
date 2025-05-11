@@ -84,7 +84,8 @@ public class SettingsDialog extends JDialog {
         return exc;
     }
 
-    private void apply(@NonNull List<SettingsProvider> providers, @NonNull List<Exception> exceptions) {
+    private void apply(@NonNull List<SettingsProvider> providers,
+            @NonNull List<Exception> exceptions) {
         for (SettingsProvider it : providers) {
             try {
                 it.applySettings(mainWindow);

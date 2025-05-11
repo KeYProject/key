@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -23,14 +24,15 @@ class DataRecordingTestFile extends TestFile {
     public final @NonNull ProfilingDirectories directories;
 
     public DataRecordingTestFile(TestProperty testProperty, String path,
-                                 @NonNull ProofCollectionSettings settings) throws IOException {
+            @NonNull ProofCollectionSettings settings) throws IOException {
         super(testProperty, path, settings);
         this.directories = new ProfilingDirectories(settings.runStart);
     }
 
     @Override
-    protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, @NonNull Proof loadedProof,
-                            KeyAst.@Nullable ProofScript script) throws Exception {
+    protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env,
+            @NonNull Proof loadedProof,
+            KeyAst.@Nullable ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             DataRecordingStrategy strategy = new DataRecordingStrategy(loadedProof, this);
@@ -48,7 +50,8 @@ class DataRecordingTestFile extends TestFile {
         // we skip reloading for these test cases
     }
 
-    private static ApplyStrategyInfo applyStrategy(@NonNull Proof proof, @NonNull Strategy strategy) {
+    private static ApplyStrategyInfo applyStrategy(@NonNull Proof proof,
+            @NonNull Strategy strategy) {
         proof.setActiveStrategy(strategy);
         return new ApplyStrategy(
             proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create())

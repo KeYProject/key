@@ -9,10 +9,11 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -26,7 +27,7 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
     @Override
     @NonNull
     String generatePredicateName(@NonNull IProgramMethod pm, StatementBlock block,
-                                 LoopSpecification loopInv) {
+            LoopSpecification loopInv) {
         final String nameString =
             MiscTools.toValidTacletName("RELATED_BY_" + pm.getUniqueName()).toString();
         return nameString;
@@ -34,7 +35,7 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
     protected Sort @NonNull [] generateContApplArgumentSorts(@NonNull ImmutableList<Term> termList,
-                                                             @NonNull IProgramMethod pm) {
+            @NonNull IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
         ImmutableArray<Sort> pmSorts = pm.argSorts();

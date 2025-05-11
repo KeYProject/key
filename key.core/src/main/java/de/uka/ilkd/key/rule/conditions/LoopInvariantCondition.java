@@ -23,8 +23,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Extracts the loop invariants for a loop term (for all applicable heap contexts).
@@ -45,7 +46,7 @@ public class LoopInvariantCondition implements VariableCondition {
 
     @Override
     public @NonNull MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                          @NonNull MatchConditions matchCond, @NonNull Services services) {
+            @NonNull MatchConditions matchCond, @NonNull Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
 

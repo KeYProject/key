@@ -16,12 +16,13 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -56,7 +57,7 @@ public abstract class TypeResolver {
             SVInstantiations instMap, TermServices services);
 
     public abstract @Nullable Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-                                               SVInstantiations instMap, Services services);
+            SVInstantiations instMap, Services services);
 
 
     // -------------------------------------------------------------------------
@@ -77,13 +78,13 @@ public abstract class TypeResolver {
 
         @Override
         public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
-                                  @NonNull SVInstantiations instMap, TermServices services) {
+                @NonNull SVInstantiations instMap, TermServices services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
         @Override
         public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-                                @NonNull SVInstantiations instMap, Services services) {
+                @NonNull SVInstantiations instMap, Services services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
 
@@ -133,13 +134,13 @@ public abstract class TypeResolver {
 
         @Override
         public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
-                                  @NonNull SVInstantiations instMap, TermServices services) {
+                @NonNull SVInstantiations instMap, TermServices services) {
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
         @Override
         public @Nullable Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-                                          @NonNull SVInstantiations instMap, @NonNull Services services) {
+                @NonNull SVInstantiations instMap, @NonNull Services services) {
 
             final Sort s;
 
@@ -181,14 +182,14 @@ public abstract class TypeResolver {
 
         @Override
         public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
-                                  @NonNull SVInstantiations instMap, TermServices services) {
+                @NonNull SVInstantiations instMap, TermServices services) {
 
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
 
         @Override
         public @Nullable Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-                                          @NonNull SVInstantiations instMap, @NonNull Services services) {
+                @NonNull SVInstantiations instMap, @NonNull Services services) {
             final Sort result;
 
             final SyntaxElement inst = (SyntaxElement) (memberSV == sv ? instCandidate

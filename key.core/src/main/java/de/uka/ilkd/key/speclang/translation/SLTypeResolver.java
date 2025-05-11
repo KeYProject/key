@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -16,7 +17,8 @@ import org.jspecify.annotations.Nullable;
  */
 public final class SLTypeResolver extends SLExpressionResolver {
 
-    public SLTypeResolver(@NonNull JavaInfo javaInfo, @NonNull SLResolverManager manager, @NonNull KeYJavaType specInClass) {
+    public SLTypeResolver(@NonNull JavaInfo javaInfo, @NonNull SLResolverManager manager,
+            @NonNull KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
     }
 
@@ -28,7 +30,8 @@ public final class SLTypeResolver extends SLExpressionResolver {
 
 
     @Override
-    protected @Nullable SLExpression doResolving(@Nullable SLExpression receiver, @NonNull String name, SLParameters parameters)
+    protected @Nullable SLExpression doResolving(@Nullable SLExpression receiver,
+            @NonNull String name, SLParameters parameters)
             throws SLTranslationException {
         try {
             KeYJavaType type = javaInfo.getTypeByClassName(name, specInClass);

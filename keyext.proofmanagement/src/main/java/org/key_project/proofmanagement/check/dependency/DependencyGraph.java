@@ -11,9 +11,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.key_project.proofmanagement.io.Logger;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.proofmanagement.io.Logger;
 
 /**
  * Represents a graph of dependencies between contracts/proofs, i.e. which proof depends on

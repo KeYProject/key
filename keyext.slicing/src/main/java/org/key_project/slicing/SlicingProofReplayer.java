@@ -25,11 +25,12 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Proof slicer: constructs a new proof based on the original proof by omitting some steps that
@@ -68,7 +69,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * @param progressMonitor progress monitor (may be null)
      */
     private SlicingProofReplayer(Proof originalProof,
-                                 Proof proof, @NonNull AnalysisResults results, ProgressMonitor progressMonitor) {
+            Proof proof, @NonNull AnalysisResults results, ProgressMonitor progressMonitor) {
         super(originalProof, proof);
         this.originalProof = originalProof;
         this.proof = proof;
@@ -96,10 +97,11 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * @throws ProofInputException if there was an issue loading the original proof obligation
      * @throws ProblemLoaderException if there was an issue loading the original proof obligation
      */
-    public static @NonNull SlicingProofReplayer constructSlicer(@NonNull ProblemLoaderControl control,
-                                                                @NonNull Proof originalProof,
-                                                                @NonNull AnalysisResults results,
-                                                                @Nullable ProgressMonitor progressMonitor)
+    public static @NonNull SlicingProofReplayer constructSlicer(
+            @NonNull ProblemLoaderControl control,
+            @NonNull Proof originalProof,
+            @NonNull AnalysisResults results,
+            @Nullable ProgressMonitor progressMonitor)
             throws Exception {
         boolean loadInUI = MainWindow.hasInstance();
         if (loadInUI) {
@@ -222,7 +224,8 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * @return path to the saved proof slice
      * @throws IOException on I/O error
      */
-    private @NonNull File saveProof(@NonNull Proof currentProof, @NonNull Proof proof) throws IOException {
+    private @NonNull File saveProof(@NonNull Proof currentProof, @NonNull Proof proof)
+            throws IOException {
         Path tempDir = Files.createTempDirectory("KeYslice");
         String filename;
         if (currentProof.getProofFile() != null) {

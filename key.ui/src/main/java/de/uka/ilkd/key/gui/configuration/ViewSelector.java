@@ -12,6 +12,7 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -162,7 +163,8 @@ public class ViewSelector extends JDialog {
          */
         private static final long serialVersionUID = -5423315366275141764L;
 
-        public void insertString(int offs, @Nullable String str, AttributeSet a) throws BadLocationException {
+        public void insertString(int offs, @Nullable String str, AttributeSet a)
+                throws BadLocationException {
             if (str == null) {
                 return;
             }

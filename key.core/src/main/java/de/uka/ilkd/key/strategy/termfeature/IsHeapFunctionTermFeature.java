@@ -9,8 +9,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.Function;
+
+import org.jspecify.annotations.NonNull;
 
 
 public final class IsHeapFunctionTermFeature extends BinaryTermFeature {

@@ -16,10 +16,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utility class for proof caching.
@@ -38,7 +39,8 @@ public final class ReferenceSearcher {
      * @param newNode new node (must be an open goal)
      * @return a reference (or null, if none found)
      */
-    public static @Nullable ClosedBy findPreviousProof(@NonNull List<Proof> previousProofs, @NonNull Node newNode) {
+    public static @Nullable ClosedBy findPreviousProof(@NonNull List<Proof> previousProofs,
+            @NonNull Node newNode) {
         // first verify that the new node does not contain any terms that depend on external
         // influences
         if (!suitableForCloseByReference(newNode)) {

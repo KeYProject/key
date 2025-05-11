@@ -12,6 +12,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.util.Debug;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -40,7 +41,7 @@ public class ApplyTFFeature implements Feature {
     }
 
     public static @NonNull Feature createNonStrict(ProjectionToTerm proj, TermFeature tf,
-                                                   RuleAppCost noInstCost) {
+            RuleAppCost noInstCost) {
         return new ApplyTFFeature(proj, tf, noInstCost, false);
     }
 
@@ -49,7 +50,7 @@ public class ApplyTFFeature implements Feature {
     }
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         final Term te = proj.toTerm(app, pos, goal, mState);
         if (te == null) {
             Debug.assertFalse(demandInst, "ApplyTFFeature: got undefined argument (null)");

@@ -6,8 +6,9 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**

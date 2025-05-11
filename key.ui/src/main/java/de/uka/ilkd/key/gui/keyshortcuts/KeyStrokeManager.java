@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.lang.ref.WeakReference;
@@ -13,6 +10,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Manager of the configurable {@link KeyStroke}s for proof macros and GUI actions.

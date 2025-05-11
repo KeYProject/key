@@ -5,6 +5,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -13,7 +14,7 @@ public class InfFlowLoopInvAppSnippet extends ReplaceAndRegisterMethod
 
     @Override
     public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars1,
-                                 @NonNull ProofObligationVars poVars2) throws UnsupportedOperationException {
+            @NonNull ProofObligationVars poVars2) throws UnsupportedOperationException {
         BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, poVars2);
 

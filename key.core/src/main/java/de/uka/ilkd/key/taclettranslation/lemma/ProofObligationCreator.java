@@ -19,10 +19,11 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -50,7 +51,7 @@ public class ProofObligationCreator {
      * @return A proof aggregate containing the proofs created by this method.
      */
     public ProofAggregate create(@NonNull ImmutableSet<Taclet> taclets, InitConfig[] initConfigs,
-                                 @NonNull ImmutableSet<Taclet> axioms, @NonNull Collection<LoaderListener> listeners) {
+            @NonNull ImmutableSet<Taclet> axioms, @NonNull Collection<LoaderListener> listeners) {
 
         ProofAggregate[] singleProofs = new ProofAggregate[taclets.size()];
 
@@ -87,7 +88,7 @@ public class ProofObligationCreator {
 
 
     private @NonNull UserDefinedSymbols analyzeTaclets(@NonNull ImmutableSet<Taclet> taclets,
-                                                       NamespaceSet referenceNamespaces) {
+            NamespaceSet referenceNamespaces) {
         final UserDefinedSymbols userDefinedSymbols =
             new UserDefinedSymbols(referenceNamespaces, taclets);
         TacletVisitor visitor = new TacletVisitor() {
@@ -106,7 +107,8 @@ public class ProofObligationCreator {
 
 
 
-    private void collectUserDefinedSymbols(@NonNull Term term, @NonNull UserDefinedSymbols userDefinedSymbols) {
+    private void collectUserDefinedSymbols(@NonNull Term term,
+            @NonNull UserDefinedSymbols userDefinedSymbols) {
         for (Term sub : term.subs()) {
             collectUserDefinedSymbols(sub, userDefinedSymbols);
         }
@@ -134,7 +136,7 @@ public class ProofObligationCreator {
 
 
     private @NonNull ProofAggregate create(@NonNull Taclet taclet, @NonNull InitConfig initConfig,
-                                           @NonNull UserDefinedSymbols symbolsForAxioms) {
+            @NonNull UserDefinedSymbols symbolsForAxioms) {
         LemmaGenerator generator = new GenericRemovingLemmaGenerator();
         TacletFormula tacletFormula = generator.translate(taclet, initConfig.getServices());
         Term formula = tacletFormula.getFormula(initConfig.getServices());

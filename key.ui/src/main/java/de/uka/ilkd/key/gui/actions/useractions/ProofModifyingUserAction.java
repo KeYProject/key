@@ -11,6 +11,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -37,7 +38,8 @@ public abstract class ProofModifyingUserAction extends UserAction {
      * @param mediator the mediator
      * @param originalState the proof
      */
-    protected ProofModifyingUserAction(@NonNull KeYMediator mediator, @NonNull Proof originalState) {
+    protected ProofModifyingUserAction(@NonNull KeYMediator mediator,
+            @NonNull Proof originalState) {
         super(mediator, originalState);
         this.originalOpenGoals =
             originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
@@ -53,7 +55,7 @@ public abstract class ProofModifyingUserAction extends UserAction {
      * @param justModifiedNode just modified node
      */
     protected ProofModifyingUserAction(@NonNull KeYMediator mediator, @NonNull Proof originalState,
-                                       Node justModifiedNode) {
+            Node justModifiedNode) {
         super(mediator, originalState);
         List<Node> openGoals =
             originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());

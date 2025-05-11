@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -29,7 +30,7 @@ public class IsStatic extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
-                                                SVInstantiations svInst) {
+            SVInstantiations svInst) {
         if (pe instanceof VariableReference) {
             if (((VariableReference) pe).getProgramVariable().isStatic()) {
                 return new ProgramElement[] { KeYJavaASTFactory.trueLiteral() };

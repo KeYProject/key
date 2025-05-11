@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing.ui;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -16,6 +14,8 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A simple image view that may be panned and zoomed by the user.

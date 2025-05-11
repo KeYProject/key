@@ -31,10 +31,11 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 public class InfFlowContractAppFeature implements Feature {
@@ -51,8 +52,9 @@ public class InfFlowContractAppFeature implements Feature {
      * <code>equals</code> or <code>eqEquals</code> (checking for same or equal formulas), which has
      * to be decided by the subclasses
      */
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp, @NonNull PosInOccurrence newPio,
-                                 @NonNull PosInOccurrence oldPio) {
+    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
+            @NonNull PosInOccurrence newPio,
+            @NonNull PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
     }
 
@@ -61,7 +63,8 @@ public class InfFlowContractAppFeature implements Feature {
      * Check whether a semisequent contains a formula. Again, one can either search for the same or
      * an equal formula
      */
-    protected boolean semiSequentContains(@NonNull Semisequent semisequent, @NonNull SequentFormula cfma) {
+    protected boolean semiSequentContains(@NonNull Semisequent semisequent,
+            @NonNull SequentFormula cfma) {
         return semisequent.containsEqual(cfma);
     }
 
@@ -71,7 +74,8 @@ public class InfFlowContractAppFeature implements Feature {
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(@NonNull RuleApp ruleCmp, @NonNull TacletApp newApp, @Nullable PosInOccurrence newPio) {
+    protected boolean sameApplication(@NonNull RuleApp ruleCmp, @NonNull TacletApp newApp,
+            @Nullable PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -113,7 +117,8 @@ public class InfFlowContractAppFeature implements Feature {
     }
 
 
-    private boolean equalInterestingInsts(@NonNull SVInstantiations inst0, @NonNull SVInstantiations inst1) {
+    private boolean equalInterestingInsts(@NonNull SVInstantiations inst0,
+            @NonNull SVInstantiations inst1) {
         if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
             return false;
         }
@@ -127,7 +132,7 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private boolean subset(@NonNull ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
-                           @NonNull ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
+            @NonNull ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
 
         for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
             if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
@@ -152,7 +157,8 @@ public class InfFlowContractAppFeature implements Feature {
      * soon as we have reached a point where the formula containing the focus no longer occurs in
      * the sequent
      */
-    protected boolean duplicateFindTaclet(@NonNull TacletApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal) {
+    protected boolean duplicateFindTaclet(@NonNull TacletApp app, @NonNull PosInOccurrence pos,
+            @NonNull Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert app.ifFormulaInstantiations().size() >= 1
                 : "Featureis only applicable to rules with at least one assumes.";
@@ -204,8 +210,9 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, @NonNull PosInOccurrence pos, @NonNull Goal goal,
-                                   MutableState mState) {
+    public RuleAppCost computeCost(RuleApp ruleApp, @NonNull PosInOccurrence pos,
+            @NonNull Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;

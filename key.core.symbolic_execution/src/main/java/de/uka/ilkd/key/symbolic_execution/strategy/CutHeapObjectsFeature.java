@@ -17,8 +17,9 @@ import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -38,7 +39,8 @@ public class CutHeapObjectsFeature extends BinaryFeature {
      * {@inheritDoc}
      */
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         Term cutFormula =
             SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal,
                 mState);

@@ -146,7 +146,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return null;
     }
 
-    private @Nullable InputStream getJavaFileInputStream(@NonNull Path javaFile) throws IOException {
+    private @Nullable InputStream getJavaFileInputStream(@NonNull Path javaFile)
+            throws IOException {
         // assumes that javaFile is an actual *.java file, path has to be absolute and normalized
 
         Path newFile = null;
@@ -201,7 +202,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return new FileInputStream(newFile.toFile());
     }
 
-    private @Nullable InputStream getClassFileInputStream(@NonNull Path classFile) throws IOException {
+    private @Nullable InputStream getClassFileInputStream(@NonNull Path classFile)
+            throws IOException {
         // copy to classpath folder (*.class files may only occur in classpath)
 
         Path newFile = null;
@@ -230,7 +232,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
     // norm: absolute and normalized path of the requested file
     // containing: src, classpath, or bootclasspath folder containing norm (absolute and normalized)
     // target: src, classpath, or bootclasspath in repo (relative to repo base dir)
-    private @NonNull Path resolveAndCopy(@NonNull Path norm, @NonNull Path containing, @NonNull Path relTarget) throws IOException {
+    private @NonNull Path resolveAndCopy(@NonNull Path norm, @NonNull Path containing,
+            @NonNull Path relTarget) throws IOException {
         // compute relative path from containing to norm
         Path rel = containing.relativize(norm);
 
@@ -254,7 +257,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
     /////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public @NonNull OutputStream createOutputStream(@NonNull Path path) throws FileNotFoundException {
+    public @NonNull OutputStream createOutputStream(@NonNull Path path)
+            throws FileNotFoundException {
 
         if (path.isAbsolute()) {
             // programming error!
@@ -295,7 +299,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    protected @Nullable InputStream getInputStreamInternal(@NonNull Path p) throws FileNotFoundException {
+    protected @Nullable InputStream getInputStreamInternal(@NonNull Path p)
+            throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> lookup in map
             concrete = map.get(p.normalize());

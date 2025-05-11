@@ -56,9 +56,10 @@ import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Collection of strategy features that can be accessed statically. This class is essentially a
@@ -165,20 +166,24 @@ public abstract class StaticFeatureCollection {
         return countOccurrencesInSeq;
     }
 
-    protected static @NonNull Feature termSmallerThan(@NonNull String smaller, @NonNull String bigger) {
+    protected static @NonNull Feature termSmallerThan(@NonNull String smaller,
+            @NonNull String bigger) {
         return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
     }
 
-    protected static @NonNull Feature monSmallerThan(@NonNull String smaller, @NonNull String bigger, @NonNull IntegerLDT numbers) {
+    protected static @NonNull Feature monSmallerThan(@NonNull String smaller,
+            @NonNull String bigger, @NonNull IntegerLDT numbers) {
         return MonomialsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
-    protected static @NonNull Feature atomSmallerThan(@NonNull String smaller, @NonNull String bigger, @NonNull IntegerLDT numbers) {
+    protected static @NonNull Feature atomSmallerThan(@NonNull String smaller,
+            @NonNull String bigger, @NonNull IntegerLDT numbers) {
         return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
-    protected static @NonNull Feature literalsSmallerThan(@NonNull String smaller, @NonNull String bigger,
-                                                          IntegerLDT numbers) {
+    protected static @NonNull Feature literalsSmallerThan(@NonNull String smaller,
+            @NonNull String bigger,
+            IntegerLDT numbers) {
         return LiteralsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
@@ -231,7 +236,7 @@ public abstract class StaticFeatureCollection {
         return or(a, or(b, c));
     }
 
-    protected static @NonNull TermFeature or(TermFeature @NonNull ... features) {
+    protected static @NonNull TermFeature or(TermFeature @NonNull... features) {
         TermFeature orFeature = inftyTermConst();
         for (var f : features) {
             orFeature = or(orFeature, f);
@@ -247,7 +252,7 @@ public abstract class StaticFeatureCollection {
         return or(a, or(b, c));
     }
 
-    protected static @NonNull Feature or(Feature @NonNull ... features) {
+    protected static @NonNull Feature or(Feature @NonNull... features) {
         Feature orFeature = inftyConst();
         for (Feature f : features) {
             orFeature = or(orFeature, f);
@@ -259,7 +264,8 @@ public abstract class StaticFeatureCollection {
         return ShannonFeature.createConditionalBinary(cond, thenFeature);
     }
 
-    protected static @NonNull Feature ifZero(Feature cond, Feature thenFeature, Feature elseFeature) {
+    protected static @NonNull Feature ifZero(Feature cond, Feature thenFeature,
+            Feature elseFeature) {
         return ShannonFeature.createConditionalBinary(cond, thenFeature, elseFeature);
     }
 
@@ -268,7 +274,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static @NonNull TermFeature ifZero(TermFeature cond, TermFeature thenFeature,
-                                                 TermFeature elseFeature) {
+            TermFeature elseFeature) {
         return ShannonTermFeature.createConditionalBinary(cond, thenFeature, elseFeature);
     }
 
@@ -343,16 +349,19 @@ public abstract class StaticFeatureCollection {
         return SubtermProjection.create(t, PosInTerm.getTopLevel().down(index));
     }
 
-    protected static @NonNull ProjectionToTerm opTerm(@NonNull Operator op, ProjectionToTerm @NonNull [] subTerms) {
+    protected static @NonNull ProjectionToTerm opTerm(@NonNull Operator op,
+            ProjectionToTerm @NonNull [] subTerms) {
         return TermConstructionProjection.create(op, subTerms);
     }
 
-    protected static @NonNull ProjectionToTerm opTerm(@NonNull Operator op, ProjectionToTerm subTerm) {
+    protected static @NonNull ProjectionToTerm opTerm(@NonNull Operator op,
+            ProjectionToTerm subTerm) {
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
-    protected static @NonNull ProjectionToTerm opTerm(@NonNull Operator op, ProjectionToTerm subTerm0,
-                                                      ProjectionToTerm subTerm1) {
+    protected static @NonNull ProjectionToTerm opTerm(@NonNull Operator op,
+            ProjectionToTerm subTerm0,
+            ProjectionToTerm subTerm1) {
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 
@@ -397,7 +406,8 @@ public abstract class StaticFeatureCollection {
         return let(buf, t1, applyTF(t2, eq(buf)));
     }
 
-    protected static @NonNull Feature contains(ProjectionToTerm bigTerm, ProjectionToTerm searchedTerm) {
+    protected static @NonNull Feature contains(ProjectionToTerm bigTerm,
+            ProjectionToTerm searchedTerm) {
         final TermBuffer buf = new TermBuffer();
         return let(buf, searchedTerm, applyTF(bigTerm, not(rec(any(), not(eq(buf))))));
     }

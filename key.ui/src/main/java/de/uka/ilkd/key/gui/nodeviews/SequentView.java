@@ -28,11 +28,11 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.DoNothingCaret;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -929,7 +929,8 @@ public abstract class SequentView extends JEditorPane {
      * @param max_age the maximum age, specified in viewSettings
      * @return the sf's age
      */
-    private int computeSeqFormulaAge(@Nullable Node node, @NonNull SequentFormula form, int max_age) {
+    private int computeSeqFormulaAge(@Nullable Node node, @NonNull SequentFormula form,
+            int max_age) {
         int age = -1;
         while (age < max_age && node != null && node.sequent().contains(form)) {
             age++;

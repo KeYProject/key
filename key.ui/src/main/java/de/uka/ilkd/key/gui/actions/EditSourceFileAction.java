@@ -30,9 +30,9 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,8 +107,9 @@ public class EditSourceFileAction extends KeyAction {
         textArea.setCaretPosition(i);
     }
 
-    private static @NonNull JScrollPane createParserMessageScrollPane(final @NonNull Throwable exception,
-                                                                      final int columnNumber) {
+    private static @NonNull JScrollPane createParserMessageScrollPane(
+            final @NonNull Throwable exception,
+            final int columnNumber) {
         JTextArea parserMessage = new JTextArea();
         String message = exception.getMessage();
         message = message == null ? "" : message;
@@ -128,7 +129,8 @@ public class EditSourceFileAction extends KeyAction {
         return parserMessageScrollPane;
     }
 
-    private @NonNull JTextPane createSrcTextPane(final @NonNull Location location) throws IOException {
+    private @NonNull JTextPane createSrcTextPane(final @NonNull Location location)
+            throws IOException {
         final JTextPane textPane = new JTextPane() {
             @Override
             public void addNotify() {
@@ -185,8 +187,9 @@ public class EditSourceFileAction extends KeyAction {
         return sourceFile;
     }
 
-    private @NonNull JPanel createButtonPanel(final URI sourceURI, final @NonNull JTextPane textPane,
-                                              final @NonNull JDialog dialog) {
+    private @NonNull JPanel createButtonPanel(final URI sourceURI,
+            final @NonNull JTextPane textPane,
+            final @NonNull JDialog dialog) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         JButton saveButton = new JButton("Save");

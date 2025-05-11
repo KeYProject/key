@@ -23,10 +23,11 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -51,14 +52,14 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * used instead of the initial services form the InitConfig.
      */
     public SymbolicExecutionPO(InitConfig initConfig, @NonNull InformationFlowContract contract,
-                               ProofObligationVars symbExecVars, Goal initiatingGoal, Services services) {
+            ProofObligationVars symbExecVars, Goal initiatingGoal, Services services) {
         this(initConfig, contract, symbExecVars, initiatingGoal);
         this.environmentServices = services;
     }
 
 
     public SymbolicExecutionPO(InitConfig initConfig, @NonNull InformationFlowContract contract,
-                               ProofObligationVars symbExecVars, Goal initiatingGoal) {
+            ProofObligationVars symbExecVars, Goal initiatingGoal) {
         super(initConfig,
             ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
@@ -220,7 +221,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     @Override
     protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-                                           ImmutableList<Term> paramTerms, Services services) {
+            ImmutableList<Term> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }

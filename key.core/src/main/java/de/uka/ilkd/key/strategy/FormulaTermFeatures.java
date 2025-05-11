@@ -9,6 +9,7 @@ import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
 import org.jspecify.annotations.NonNull;
 
 class FormulaTermFeatures extends StaticFeatureCollection {

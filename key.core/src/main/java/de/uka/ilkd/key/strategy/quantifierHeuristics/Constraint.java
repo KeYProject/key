@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -153,7 +154,8 @@ public interface Constraint {
          * @return the instantiation of the metavariable
          */
         @Override
-        public @NonNull Term getInstantiation(@NonNull Metavariable p_mv, @NonNull Services services) {
+        public @NonNull Term getInstantiation(@NonNull Metavariable p_mv,
+                @NonNull Services services) {
             // As there is in fact no instantiation satisfying this
             // constraint, we could return everything
             return services.getTermBuilder().var(p_mv);
@@ -172,7 +174,7 @@ public interface Constraint {
 
         @Override
         public @NonNull Constraint unify(Term t1, Term t2, Services services,
-                                         @NonNull BooleanContainer unchanged) {
+                @NonNull BooleanContainer unchanged) {
             unchanged.setVal(true);
             return this;
         }
@@ -211,7 +213,8 @@ public interface Constraint {
          * @return this
          */
         @Override
-        public @NonNull Constraint join(Constraint co, Services services, @NonNull BooleanContainer c) {
+        public @NonNull Constraint join(Constraint co, Services services,
+                @NonNull BooleanContainer c) {
             c.setVal(true);
             return this;
         }

@@ -25,14 +25,15 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 // need to switch spotless off for this comment as it replaces @code with &#64;code
 // spotless:off
@@ -196,8 +197,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      */
-    public SymbolicLayoutExtractor(@NonNull Node node, @NonNull PosInOccurrence modalityPio, boolean useUnicode,
-                                   boolean usePrettyPrinting, boolean simplifyConditions) {
+    public SymbolicLayoutExtractor(@NonNull Node node, @NonNull PosInOccurrence modalityPio,
+            boolean useUnicode,
+            boolean usePrettyPrinting, boolean simplifyConditions) {
         super(node, modalityPio);
         this.settings = new ModelSettings(useUnicode, usePrettyPrinting, simplifyConditions);
     }
@@ -343,7 +345,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException
      */
     protected @NonNull Set<Term> filterOutObjectsToIgnore(@NonNull Set<Term> objectsToFilter,
-                                                          @NonNull Set<Term> objectsToIgnore) throws ProofInputException {
+            @NonNull Set<Term> objectsToIgnore) throws ProofInputException {
         Set<Term> result = new LinkedHashSet<>();
         for (Term symbolicObject : objectsToFilter) {
             if (!objectsToIgnore.contains(symbolicObject)) {
@@ -382,7 +384,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @param updates The updates to consider.
      */
     protected void applyCutRules(@NonNull ProofStarter starter, @NonNull Set<Term> symbolicObjects,
-                                 @NonNull ImmutableList<Term> updates) {
+            @NonNull ImmutableList<Term> updates) {
         final TermBuilder tb = getServices().getTermBuilder();
         List<Term> objectsCopy = new ArrayList<>(symbolicObjects);
         int maxProofSteps = 8000;
@@ -464,7 +466,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The applied cut rules.
      * @throws ProofInputException Occurred Exception.
      */
-    protected @NonNull ImmutableSet<Term> extractAppliedCutsSet(@NonNull Node goalnode, @NonNull Node root)
+    protected @NonNull ImmutableSet<Term> extractAppliedCutsSet(@NonNull Node goalnode,
+            @NonNull Node root)
             throws ProofInputException {
         ImmutableSet<Term> result = DefaultImmutableSet.nil();
         if (!root.find(goalnode)) {
@@ -583,8 +586,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected ISymbolicLayout getLayout(@NonNull Map<Integer, ISymbolicLayout> confiurationsMap,
-                                        int layoutIndex, @NonNull Set<ExtractLocationParameter> locations, String stateName,
-                                        boolean currentLayout) throws ProofInputException {
+            int layoutIndex, @NonNull Set<ExtractLocationParameter> locations, String stateName,
+            boolean currentLayout) throws ProofInputException {
         synchronized (this) {
             assert layoutIndex >= 0;
             assert layoutIndex < appliedCutsPerLayout.size();
@@ -622,9 +625,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected ISymbolicLayout lazyComputeLayout(@NonNull ImmutableSet<Term> layout,
-                                                @NonNull Set<ExtractLocationParameter> locations,
-                                                @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, String stateName,
-                                                boolean currentLayout) throws ProofInputException {
+            @NonNull Set<ExtractLocationParameter> locations,
+            @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, String stateName,
+            boolean currentLayout) throws ProofInputException {
         if (!locations.isEmpty()) {
             final TermBuilder tb = getServices().getTermBuilder();
             List<Term> updateConditions = new ArrayList<>(layout.size());
@@ -679,7 +682,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The found objects.
      * @throws ProofInputException Occurred Exception.
      */
-    protected @NonNull Set<Term> collectObjectsFromSequent(@NonNull Sequent sequent, @NonNull Set<Term> objectsToIgnore)
+    protected @NonNull Set<Term> collectObjectsFromSequent(@NonNull Sequent sequent,
+            @NonNull Set<Term> objectsToIgnore)
             throws ProofInputException {
         Set<Term> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
@@ -698,7 +702,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The found objects.
      * @throws ProofInputException Occurred Exception.
      */
-    protected @NonNull Set<Term> collectSymbolicObjectsFromTerm(@NonNull Term term, final @NonNull Set<Term> objectsToIgnore)
+    protected @NonNull Set<Term> collectSymbolicObjectsFromTerm(@NonNull Term term,
+            final @NonNull Set<Term> objectsToIgnore)
             throws ProofInputException {
         final Set<Term> result = new LinkedHashSet<>();
         term.execPreOrder(new DefaultVisitor() {
@@ -812,7 +817,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected @NonNull ISymbolicLayout createLayoutFromExecutionVariableValuePairs(
             @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
-            @NonNull Set<ExecutionVariableValuePair> pairs, String stateName) throws ProofInputException {
+            @NonNull Set<ExecutionVariableValuePair> pairs, String stateName)
+            throws ProofInputException {
         SymbolicLayout result = new SymbolicLayout(settings, equivalentClasses);
         // Create state
         SymbolicState state = new SymbolicState(stateName, settings);
@@ -924,8 +930,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      *        {@link SymbolicObject} should be created for.
      */
     protected void createObjectForTerm(@NonNull Map<Term, SymbolicObject> objects,
-                                       @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, @NonNull SymbolicLayout result,
-                                       @Nullable Term objectTerm) {
+            @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
+            @NonNull SymbolicLayout result,
+            @Nullable Term objectTerm) {
         if (objectTerm != null
                 && SymbolicExecutionUtil.hasReferenceSort(getServices(), objectTerm)) {
             ISymbolicEquivalenceClass equivalentClass =

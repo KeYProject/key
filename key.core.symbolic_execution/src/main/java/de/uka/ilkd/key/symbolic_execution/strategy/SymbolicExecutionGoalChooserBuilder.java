@@ -5,6 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.GoalChooserBuilder;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.op;

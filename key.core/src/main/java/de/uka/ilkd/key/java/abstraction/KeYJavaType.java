@@ -11,9 +11,9 @@ import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**

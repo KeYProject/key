@@ -29,7 +29,7 @@ public class ActivateCommand extends NoArgumentCommand {
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, @Nullable Void args,
-                        @NonNull EngineState state)
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenGoal(false);
         goal.setEnabled(true);

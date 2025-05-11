@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.analyst;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -36,6 +36,6 @@ public interface IProofReferencesAnalyst {
      * @return The found {@link IProofReference} or {@code null}/empty set if the applied rule is
      *         not supported.
      */
-   @Nullable
-   Set<IProofReference<?>> computeReferences(Node node, Services services);
+    @Nullable
+    Set<IProofReference<?>> computeReferences(Node node, Services services);
 }

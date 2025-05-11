@@ -59,7 +59,8 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
-    private static @NonNull CCheckBox createFilter(@NonNull ProofTreeView view, @NonNull ProofTreeViewFilter filter) {
+    private static @NonNull CCheckBox createFilter(@NonNull ProofTreeView view,
+            @NonNull ProofTreeViewFilter filter) {
         CCheckBox check = new ProofTreeSettingsCheckBox();
         check.setText(filter.name());
         check.setEnabled(view.getDelegateModel() != null);

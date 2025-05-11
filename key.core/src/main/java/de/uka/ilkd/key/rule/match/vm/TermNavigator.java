@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.ArrayDeque;
 
 import de.uka.ilkd.key.logic.Term;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

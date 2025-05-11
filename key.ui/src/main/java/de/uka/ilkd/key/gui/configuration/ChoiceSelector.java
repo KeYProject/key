@@ -26,9 +26,9 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -286,7 +286,8 @@ public class ChoiceSelector extends JDialog {
      * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
-    public static @Nullable ChoiceEntry findChoice(ChoiceEntry @NonNull [] choices, final String choice) {
+    public static @Nullable ChoiceEntry findChoice(ChoiceEntry @NonNull [] choices,
+            final String choice) {
         return ArrayUtil.search(choices, element -> element.choice().equals(choice));
     }
 

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -55,7 +56,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * @param condition The optional condition or {@code null} if no condition is available.
      */
     public ExecutionMethodReturnValue(@NonNull ITreeSettings settings, @NonNull Node proofNode,
-                                      @NonNull PosInOccurrence modalityPIO, @NonNull Term returnValue, Term condition) {
+            @NonNull PosInOccurrence modalityPIO, @NonNull Term returnValue, Term condition) {
         super(settings, proofNode);
         assert returnValue != null;
         assert modalityPIO != null;

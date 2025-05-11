@@ -22,11 +22,12 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
@@ -44,8 +45,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public @NonNull RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                                                            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-                                                            Object hint, Term tacletTerm) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm) {
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return RefactoringScope.NONE;
@@ -58,8 +59,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public void refactorLabels(TermLabelState state, @NonNull Services services,
-                               PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-                               Object hint, Term tacletTerm, @NonNull Term term, @NonNull LabelCollection labels) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm, @NonNull Term term, @NonNull LabelCollection labels) {
         if (services.getProof() == null) {
             return;
         }
@@ -104,7 +105,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
     }
 
-    private @NonNull Set<Origin> collectSubtermOrigins(@NonNull ImmutableArray<Term> terms, @NonNull Set<Origin> result) {
+    private @NonNull Set<Origin> collectSubtermOrigins(@NonNull ImmutableArray<Term> terms,
+            @NonNull Set<Origin> result) {
         for (Term term : terms) {
             collectSubtermOrigins(term, result);
         }
@@ -127,7 +129,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     @SuppressWarnings("unchecked")
-    private @NonNull Set<Origin> collectSubtermOrigins(@NonNull Term term, @NonNull Set<Origin> result) {
+    private @NonNull Set<Origin> collectSubtermOrigins(@NonNull Term term,
+            @NonNull Set<Origin> result) {
         TermLabel label = term.getLabel(OriginTermLabel.NAME);
 
         if (label != null) {

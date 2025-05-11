@@ -19,9 +19,10 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElement;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.SyntaxElement;
 
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {
@@ -37,7 +38,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     private static @Nullable Term dropEffectlessElementariesHelper(@NonNull Term update,
-                                                                   @NonNull Set<LocationVariable> relevantVars, @NonNull TermServices services) {
+            @NonNull Set<LocationVariable> relevantVars, @NonNull TermServices services) {
         if (update.op() instanceof ElementaryUpdate eu) {
             LocationVariable lhs = (LocationVariable) eu.lhs();
             if (relevantVars.contains(lhs)) {
@@ -76,7 +77,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
 
-    private static @Nullable Term dropEffectlessElementaries(@NonNull Term update, @NonNull Term target, @NonNull Services services) {
+    private static @Nullable Term dropEffectlessElementaries(@NonNull Term update,
+            @NonNull Term target, @NonNull Services services) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);
         Set<LocationVariable> varsInTarget = collector.result();
@@ -89,8 +91,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
     @Override
     public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                           @NonNull MatchConditions mc,
-                                           Services services) {
+            @NonNull MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);
         Term xInst = (Term) svInst.getInstantiation(x);

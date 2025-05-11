@@ -114,7 +114,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
      * @param arg 0 or more objects that will be expanded to a ;-separated list after the message
      */
 
-    public static void debugOut(String msg, Object @NonNull ... arg) {
+    public static void debugOut(String msg, Object @NonNull... arg) {
         if (DEBUG_OUTPUT) {
             var args = new StringBuilder();
             if (arg.length > 0) {

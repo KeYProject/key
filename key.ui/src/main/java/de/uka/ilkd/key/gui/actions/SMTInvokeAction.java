@@ -14,6 +14,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -41,7 +42,8 @@ public class SMTInvokeAction extends MainWindowAction {
      * @param solverUnion the solvers/solver types to be started by this action
      * @param mainWindow the main window this action belongs to
      */
-    public SMTInvokeAction(@NonNull SolverTypeCollection solverUnion, @NonNull MainWindow mainWindow) {
+    public SMTInvokeAction(@NonNull SolverTypeCollection solverUnion,
+            @NonNull MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
         this.solverUnion = solverUnion;

@@ -5,8 +5,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -19,7 +20,8 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
     private final @NonNull LabeledParserRuleContext inv;
 
 
-    public TextualJMLInitially(@NonNull ImmutableList<JMLModifier> modifiers, @NonNull LabeledParserRuleContext inv) {
+    public TextualJMLInitially(@NonNull ImmutableList<JMLModifier> modifiers,
+            @NonNull LabeledParserRuleContext inv) {
         super(modifiers);
         assert inv != null;
         this.inv = inv;

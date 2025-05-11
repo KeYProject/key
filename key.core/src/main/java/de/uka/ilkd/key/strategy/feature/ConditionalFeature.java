@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -24,7 +25,7 @@ public class ConditionalFeature implements Feature {
     }
 
     public RuleAppCost computeCost(@NonNull RuleApp app, PosInOccurrence pos, Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         if (cond.filter(app.rule())) {
             return thenFeature.computeCost(app, pos, goal, mState);
         } else {
@@ -46,7 +47,7 @@ public class ConditionalFeature implements Feature {
      * @param elseValue the value of the feature, if <code>filter</code> returns false
      */
     public static @NonNull Feature createConditional(RuleFilter cond, RuleAppCost thenValue,
-                                                     RuleAppCost elseValue) {
+            RuleAppCost elseValue) {
         return createConditional(cond, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
     }
@@ -66,7 +67,7 @@ public class ConditionalFeature implements Feature {
      * @param elseValue the value of the feature, if <code>filter</code> returns false
      */
     public static @NonNull Feature createConditional(RuleFilter cond, Feature thenFeature,
-                                                     RuleAppCost elseValue) {
+            RuleAppCost elseValue) {
         return createConditional(cond, thenFeature, ConstFeature.createConst(elseValue));
     }
 
@@ -76,7 +77,7 @@ public class ConditionalFeature implements Feature {
      * @param elseFeature the feature that is evaluted, if <code>filter</code> returns false
      */
     public static @NonNull Feature createConditional(RuleFilter cond, Feature thenFeature,
-                                                     Feature elseFeature) {
+            Feature elseFeature) {
         return new ConditionalFeature(cond, thenFeature, elseFeature);
     }
 

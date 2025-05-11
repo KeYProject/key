@@ -13,8 +13,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The axiom command takes one argument: a formula to which the command is applied.
@@ -29,7 +30,8 @@ public class AxiomCommand extends AbstractCommand<AxiomCommand.FormulaParameter>
     }
 
     @Override
-    public FormulaParameter evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
+    public FormulaParameter evaluateArguments(@NonNull EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
     }
@@ -40,7 +42,8 @@ public class AxiomCommand extends AbstractCommand<AxiomCommand.FormulaParameter>
     }
 
     @Override
-    public void execute(@NonNull FormulaParameter parameter) throws ScriptException, InterruptedException {
+    public void execute(@NonNull FormulaParameter parameter)
+            throws ScriptException, InterruptedException {
         Taclet cut =
             Objects.requireNonNull(state).getProof().getEnv().getInitConfigForEnvironment()
                     .lookupActiveTaclet(TACLET_NAME);

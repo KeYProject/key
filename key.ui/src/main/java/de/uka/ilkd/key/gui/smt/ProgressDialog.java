@@ -18,10 +18,10 @@ import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 import de.uka.ilkd.key.smt.SMTFocusResults;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.SwingUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,8 +91,8 @@ public class ProgressDialog extends JDialog {
     }
 
     public ProgressDialog(@NonNull ProgressModel model, @NonNull ProgressDialogListener listener,
-                          boolean counterexample, int resolution, int progressBarMax, String[] labelTitles,
-                          String... titles) {
+            boolean counterexample, int resolution, int progressBarMax, String[] labelTitles,
+            String... titles) {
         super(MainWindow.getInstance());
         table = new ProgressTable(resolution, listener, labelTitles);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -345,8 +345,9 @@ class ProgressTable extends JTable {
 
 
         @Override
-        public @NonNull Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                              int row, int column) {
+        public @NonNull Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected,
+                int row, int column) {
 
             currentEditorCell.x = column;
             currentEditorCell.y = row;
@@ -366,7 +367,8 @@ class ProgressTable extends JTable {
 
 
 
-    private void prepareProgressPanel(@NonNull ProgressPanel panel, final @NonNull ProcessData data) {
+    private void prepareProgressPanel(@NonNull ProgressPanel panel,
+            final @NonNull ProcessData data) {
         panel.setValue(data.getProgress());
         panel.setText(data.getText());
         panel.infoButton.setEnabled(data.isEditable());
@@ -398,7 +400,8 @@ class ProgressTable extends JTable {
 
 
 
-    public ProgressTable(int resolution, @NonNull ProgressTableListener listener, String... titles) {
+    public ProgressTable(int resolution, @NonNull ProgressTableListener listener,
+            String... titles) {
         this.setDefaultRenderer(ProgressModel.ProcessColumn.class, renderer);
         this.setDefaultEditor(ProgressModel.ProcessColumn.class, editor);
         init(getProgressPanelEditor(), this.getFont(), resolution, listener);
@@ -407,7 +410,7 @@ class ProgressTable extends JTable {
     }
 
     private void init(@NonNull ProgressPanel panel, Font font, int resolution,
-                      final @NonNull ProgressTableListener listener) {
+            final @NonNull ProgressTableListener listener) {
         panel.setFont(font);
         panel.progressBar.setMaximum(resolution);
         panel.infoButton.addActionListener(
@@ -417,7 +420,7 @@ class ProgressTable extends JTable {
     }
 
 
-    public void setModel(@NonNull ProgressModel model, String @NonNull ... titles) {
+    public void setModel(@NonNull ProgressModel model, String @NonNull... titles) {
 
         assert titles.length == model.getColumnCount();
         super.setModel(model);

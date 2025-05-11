@@ -39,19 +39,21 @@ public class LabeledParserRuleContext {
         second = null;
     }
 
-    public static @NonNull LabeledParserRuleContext createLabeledParserRuleContext(@NonNull ParserRuleContext ctx,
-                                                                                   OriginTermLabel.@NonNull SpecType specType, boolean attachOriginLabel) {
+    public static @NonNull LabeledParserRuleContext createLabeledParserRuleContext(
+            @NonNull ParserRuleContext ctx,
+            OriginTermLabel.@NonNull SpecType specType, boolean attachOriginLabel) {
         return attachOriginLabel
                 ? new LabeledParserRuleContext(ctx, constructTermLabel(ctx, specType))
                 : new LabeledParserRuleContext(ctx);
     }
 
-    private LabeledParserRuleContext(@NonNull ParserRuleContext ctx, OriginTermLabel.@NonNull SpecType specType) {
+    private LabeledParserRuleContext(@NonNull ParserRuleContext ctx,
+            OriginTermLabel.@NonNull SpecType specType) {
         this(ctx, constructTermLabel(ctx, specType));
     }
 
     private static @NonNull TermLabel constructTermLabel(@NonNull ParserRuleContext ctx,
-                                                         OriginTermLabel.@NonNull SpecType specType) {
+            OriginTermLabel.@NonNull SpecType specType) {
         URI filename = MiscTools.getURIFromTokenSource(ctx.start.getTokenSource());
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);

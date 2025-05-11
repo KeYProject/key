@@ -11,6 +11,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -32,7 +33,7 @@ public class InstantiationCostScalerFeature implements Feature {
     }
 
     public @Nullable RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-                                             MutableState mState) {
+            MutableState mState) {
 
         final RuleAppCost cost = costFeature.computeCost(app, pos, goal, mState);
 

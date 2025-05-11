@@ -6,10 +6,11 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides the basic functionality for classes like {@link ExecutionNodeWriter} and
@@ -51,8 +52,9 @@ public abstract class AbstractWriter {
      * @param attributeValues The attributes.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendEmptyTag(int level, @NonNull String tagName, @NonNull Map<String, String> attributeValues,
-                                  @NonNull StringBuilder sb) {
+    protected void appendEmptyTag(int level, @NonNull String tagName,
+            @NonNull Map<String, String> attributeValues,
+            @NonNull StringBuilder sb) {
         XMLUtil.appendEmptyTag(level, tagName, attributeValues, sb);
     }
 
@@ -64,8 +66,9 @@ public abstract class AbstractWriter {
      * @param attributeValues The attributes.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendStartTag(int level, String tagName, @NonNull Map<String, String> attributeValues,
-                                  @NonNull StringBuilder sb) {
+    protected void appendStartTag(int level, String tagName,
+            @NonNull Map<String, String> attributeValues,
+            @NonNull StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("<");
         sb.append(tagName);
@@ -108,7 +111,8 @@ public abstract class AbstractWriter {
      * @param value The attribute value.
      * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendAttribute(@Nullable String attributeName, @Nullable String value, @NonNull StringBuilder sb) {
+    protected void appendAttribute(@Nullable String attributeName, @Nullable String value,
+            @NonNull StringBuilder sb) {
         if (attributeName != null && value != null) {
             sb.append(" ");
             sb.append(attributeName);

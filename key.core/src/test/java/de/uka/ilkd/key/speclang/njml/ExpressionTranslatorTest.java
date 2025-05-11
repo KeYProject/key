@@ -13,10 +13,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

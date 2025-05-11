@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -124,8 +125,9 @@ public class CompoundStopCondition implements StopCondition {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
-                                           int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+    public @Nullable String getStopMessage(int maxApplications, long timeout, Proof proof,
+            long startTime,
+            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return lastShouldStopChild != null
                 ? lastShouldStopChild.getStopMessage(maxApplications, timeout, proof, startTime,
                     countApplied, singleRuleApplicationInfo)

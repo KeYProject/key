@@ -14,13 +14,14 @@ import java.util.ResourceBundle;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.HTMLReport;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is the starting class for ProofManagement.
@@ -163,7 +164,7 @@ public final class Main {
      * @param reportPath the output path for the HTML report (if selected)
      */
     public static void check(boolean missing, boolean settings, boolean replay, boolean dependency,
-                             @NonNull Path bundlePath, @Nullable Path reportPath) {
+            @NonNull Path bundlePath, @Nullable Path reportPath) {
 
         // we accumulate results in this variable
         CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
@@ -208,7 +209,8 @@ public final class Main {
         }
     }
 
-    private static void generateReport(@NonNull CheckerData globalResult, @NonNull Path reportPath) {
+    private static void generateReport(@NonNull CheckerData globalResult,
+            @NonNull Path reportPath) {
         try {
             HTMLReport.print(globalResult, reportPath);
         } catch (IOException e) {

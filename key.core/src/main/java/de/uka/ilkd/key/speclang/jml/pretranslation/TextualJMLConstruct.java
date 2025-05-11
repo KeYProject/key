@@ -102,7 +102,7 @@ public abstract class TextualJMLConstruct {
      */
     @Deprecated
     protected void addGeneric(@NonNull Map<String, ImmutableList<LabeledParserRuleContext>> item,
-                              @NonNull LabeledParserRuleContext ps) {
+            @NonNull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
         if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());

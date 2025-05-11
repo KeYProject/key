@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -26,7 +27,8 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
 
     private NotInScopeOfModalityFeature() {}
 
-    protected boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
         return !inScopeOfModality(pos);

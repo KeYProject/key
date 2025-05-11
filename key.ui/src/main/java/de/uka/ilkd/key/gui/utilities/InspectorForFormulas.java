@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -45,7 +46,8 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
 
     }
 
-    public static @Nullable Term translate(@NonNull Services services, @NonNull String toBeChecked) {
+    public static @Nullable Term translate(@NonNull Services services,
+            @NonNull String toBeChecked) {
         try {
             return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {

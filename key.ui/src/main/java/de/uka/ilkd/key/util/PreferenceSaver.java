@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A simple utility which stores and loads user manipulatable properties of swing components in the

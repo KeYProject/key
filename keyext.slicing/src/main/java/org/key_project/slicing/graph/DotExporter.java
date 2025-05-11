@@ -15,11 +15,12 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Exports a {@link DependencyGraph} in DOT format.
@@ -155,8 +156,10 @@ public final class DotExporter {
      * @param node the node to describe
      * @param data dependency graph data on the node
      */
-    private static void outputEdge(@NonNull StringBuilder buf, @Nullable AnalysisResults analysisResults,
-                                   boolean abbreviateFormulas, boolean omitBranch, Node node, @NonNull DependencyNodeData data) {
+    private static void outputEdge(@NonNull StringBuilder buf,
+            @Nullable AnalysisResults analysisResults,
+            boolean abbreviateFormulas, boolean omitBranch, Node node,
+            @NonNull DependencyNodeData data) {
         for (Pair<GraphNode, Boolean> in : data.inputs) {
             String inString = in.first.toString(abbreviateFormulas, omitBranch);
             for (GraphNode out : data.outputs) {
@@ -200,9 +203,11 @@ public final class DotExporter {
         }
     }
 
-    private static void outputEdge(@NonNull StringBuilder buf, @Nullable AnalysisResults analysisResults,
-                                   boolean abbreviateFormulas, boolean omitBranch, Node node, @NonNull DependencyNodeData data,
-                                   @NonNull Collection<AnnotatedEdge> edges) {
+    private static void outputEdge(@NonNull StringBuilder buf,
+            @Nullable AnalysisResults analysisResults,
+            boolean abbreviateFormulas, boolean omitBranch, Node node,
+            @NonNull DependencyNodeData data,
+            @NonNull Collection<AnnotatedEdge> edges) {
         for (var edge : edges) {
             var in = ((GraphNode) edge.getSource());
             var out = ((GraphNode) edge.getTarget());

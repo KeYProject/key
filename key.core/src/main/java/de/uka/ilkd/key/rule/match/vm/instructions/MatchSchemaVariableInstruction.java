@@ -34,8 +34,9 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * schemavariable has been already matched to a term <tt>t2</tt> which is not unifiable with the
      * given term.
      */
-    protected final @Nullable MatchConditions addInstantiation(@NonNull Term term, @NonNull MatchConditions matchCond,
-                                                               @NonNull Services services) {
+    protected final @Nullable MatchConditions addInstantiation(@NonNull Term term,
+            @NonNull MatchConditions matchCond,
+            @NonNull Services services) {
 
         if (op.isRigid() && !term.isRigid()) {
             return null;
@@ -71,8 +72,9 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair ({@link SchemaVariable}, {@link ProgramElement}) added
      */
-    public @Nullable MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc,
-                                           Services services) {
+    public @Nullable MatchConditions match(ProgramElement instantiationCandidate,
+            MatchConditions mc,
+            Services services) {
         return null;
     }
 

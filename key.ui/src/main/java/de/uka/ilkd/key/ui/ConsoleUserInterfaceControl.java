@@ -41,12 +41,12 @@ import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +92,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         this.loadOnly = loadOnly;
     }
 
-    private void printResults(final int openGoals, @NonNull TaskFinishedInfo info, final Object result2) {
+    private void printResults(final int openGoals, @NonNull TaskFinishedInfo info,
+            final Object result2) {
         LOGGER.info("]"); // end progress bar
         LOGGER.info("[ DONE  ... rule application ]");
         if (LOGGER.isDebugEnabled()) {
@@ -217,8 +218,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param bootClassPath the boot class path to use.
      * @param includes the included files to use
      */
-    public void loadProblem(@NonNull File file, @NonNull List<File> classPath, @NonNull File bootClassPath,
-                            @NonNull List<File> includes) {
+    public void loadProblem(@NonNull File file, @NonNull List<File> classPath,
+            @NonNull File bootClassPath,
+            @NonNull List<File> includes) {
         ProblemLoader problemLoader =
             getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
@@ -351,7 +353,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public @NonNull IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @NonNull IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
+            boolean forced) {
         return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
     }
 
@@ -371,7 +374,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param keyProblemFile the key problem file
      * @return true, if successful
      */
-    public static boolean saveProof(Object result, @NonNull Proof proof, @NonNull File keyProblemFile) {
+    public static boolean saveProof(Object result, @NonNull Proof proof,
+            @NonNull File keyProblemFile) {
         if (result instanceof Throwable) {
             throw new RuntimeException("Error in batchmode.", (Throwable) result);
         }

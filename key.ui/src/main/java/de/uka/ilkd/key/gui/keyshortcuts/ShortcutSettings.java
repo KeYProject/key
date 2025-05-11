@@ -17,6 +17,7 @@ import javax.swing.table.TableRowSorter;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
+
 import org.jspecify.annotations.NonNull;
 
 /**

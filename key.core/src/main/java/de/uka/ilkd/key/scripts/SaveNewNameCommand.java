@@ -17,9 +17,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
@@ -44,7 +45,7 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters params,
-                        EngineState stateMap) throws ScriptException, InterruptedException {
+            EngineState stateMap) throws ScriptException, InterruptedException {
 
         if (!params.abbreviation.startsWith("@")) {
             throw new ScriptException(

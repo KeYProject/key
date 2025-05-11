@@ -16,8 +16,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * this class extends JMenuItem. The objective is to store the Taclet of each item in the item for
@@ -35,7 +36,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param notationInfo the NotationInfo used to print terms
      */
     public DefaultTacletMenuItem(@NonNull TacletApp connectedTo, @NonNull NotationInfo notationInfo,
-                                 @NonNull Services services) {
+            @NonNull Services services) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;
 

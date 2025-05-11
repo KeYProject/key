@@ -31,11 +31,12 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -62,8 +63,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         return prog;
     }
 
-    private @NonNull Term buildProgramTerm(@NonNull BasicSnippetData d, @NonNull ProofObligationVars vs, @NonNull Term postTerm,
-                                           @NonNull TermBuilder tb) {
+    private @NonNull Term buildProgramTerm(@NonNull BasicSnippetData d,
+            @NonNull ProofObligationVars vs, @NonNull Term postTerm,
+            @NonNull TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a contract without modality.");
@@ -104,9 +106,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         return tb.apply(update, programTerm);
     }
 
-    private @NonNull JavaBlock buildJavaBlock(@NonNull BasicSnippetData d, @NonNull ImmutableList<Term> formalPars,
-                                              @NonNull ProgramVariable selfVar, @Nullable ProgramVariable resultVar, @NonNull ProgramVariable exceptionVar,
-                                              @NonNull LocationVariable eVar) {
+    private @NonNull JavaBlock buildJavaBlock(@NonNull BasicSnippetData d,
+            @NonNull ImmutableList<Term> formalPars,
+            @NonNull ProgramVariable selfVar, @Nullable ProgramVariable resultVar,
+            @NonNull ProgramVariable exceptionVar,
+            @NonNull LocationVariable eVar) {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod pm)) {
@@ -156,7 +160,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
     }
 
 
-    private ProgramVariable @NonNull [] extractProgramVariables(@NonNull ImmutableList<Term> formalPars)
+    private ProgramVariable @NonNull [] extractProgramVariables(
+            @NonNull ImmutableList<Term> formalPars)
             throws IllegalArgumentException {
         ProgramVariable[] formalParVars = new ProgramVariable[formalPars.size()];
         int i = 0;

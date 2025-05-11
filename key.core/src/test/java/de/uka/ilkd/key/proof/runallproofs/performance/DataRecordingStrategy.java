@@ -13,6 +13,7 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -26,7 +27,8 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
 
     final @NonNull DataRecordingTestFile dataRecordingTestFile;
 
-    DataRecordingStrategy(@NonNull Proof proof, @NonNull DataRecordingTestFile dataRecordingTestFile) {
+    DataRecordingStrategy(@NonNull Proof proof,
+            @NonNull DataRecordingTestFile dataRecordingTestFile) {
         super(proof, proof.getInitConfig().getSettings().getStrategySettings()
                 .getActiveStrategyProperties());
         this.dataRecordingTestFile = dataRecordingTestFile;
@@ -42,7 +44,7 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
 
     @Override
     public RuleAppCost computeCost(@NonNull RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         long begin = System.nanoTime();
         RuleAppCost result = super.computeCost(app, pio, goal, mState);
         long end = System.nanoTime();
@@ -52,7 +54,7 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
 
     @Override
     public void instantiateApp(@NonNull RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
-                               @NonNull RuleAppCostCollector collector) {
+            @NonNull RuleAppCostCollector collector) {
         long begin = System.nanoTime();
         super.instantiateApp(app, pio, goal, collector);
         long end = System.nanoTime();

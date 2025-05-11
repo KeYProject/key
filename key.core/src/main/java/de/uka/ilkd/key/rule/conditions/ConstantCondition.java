@@ -12,8 +12,9 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This variable condition checks if an instantiation is a constant formula or term, i.e. its arity

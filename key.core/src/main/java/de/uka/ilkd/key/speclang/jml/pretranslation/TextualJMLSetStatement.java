@@ -5,8 +5,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A JML set statement in textual form.
@@ -17,7 +18,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
 
     public TextualJMLSetStatement(@NonNull ImmutableList<JMLModifier> modifiers,
-                                  JmlParser.@NonNull Set_statementContext assignment) {
+            JmlParser.@NonNull Set_statementContext assignment) {
         super(modifiers);
         assert assignment != null;
         this.assignment = assignment;

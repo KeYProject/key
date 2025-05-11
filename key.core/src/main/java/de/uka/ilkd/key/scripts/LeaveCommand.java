@@ -24,7 +24,8 @@ public class LeaveCommand extends NoArgumentCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Void args, @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, Void args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenAutomaticGoal();
         LOGGER.info("Deactivating " + goal.node().serialNr());

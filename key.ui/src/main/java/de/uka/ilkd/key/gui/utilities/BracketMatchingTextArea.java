@@ -325,7 +325,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         /**
          * The code is copied from @link DefaultHighlighter#DefaultPainter#paint(Graphics)
          */
-        public void paint(@NonNull Graphics g, int offs0, int offs1, @NonNull Shape bounds, @NonNull JTextComponent c) {
+        public void paint(@NonNull Graphics g, int offs0, int offs1, @NonNull Shape bounds,
+                @NonNull JTextComponent c) {
 
             // dont render if empty
             if (offs0 == offs1) {

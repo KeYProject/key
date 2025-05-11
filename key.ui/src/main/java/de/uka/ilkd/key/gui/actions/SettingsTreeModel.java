@@ -17,6 +17,7 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.Settings;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -115,7 +116,8 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
     }
 
-    private @NonNull OptionContentNode generateTableNode(String title, @NonNull ChoiceSettings settings) {
+    private @NonNull OptionContentNode generateTableNode(String title,
+            @NonNull ChoiceSettings settings) {
         Properties props = getChoicesAsProperties(settings);
         return new OptionContentNode(title, generateJTable(props));
 

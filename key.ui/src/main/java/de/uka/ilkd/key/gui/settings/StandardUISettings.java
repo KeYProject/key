@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

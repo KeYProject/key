@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -34,7 +35,7 @@ public class AssumptionFormula implements TacletFormula {
 
 
     public AssumptionFormula(@NonNull Taclet taclet, Collection<Term> formula, String status,
-                             @Nullable TacletConditions conditions) throws IllegalTacletException {
+            @Nullable TacletConditions conditions) throws IllegalTacletException {
         super();
         this.taclet = taclet;
         this.formula = formula;

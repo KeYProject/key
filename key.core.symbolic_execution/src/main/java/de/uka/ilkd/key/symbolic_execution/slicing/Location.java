@@ -11,10 +11,11 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a location like a local variable, method parameter, static field or an instance field
@@ -43,7 +44,7 @@ public class Location {
      *
      * @param accesses The {@link Access} path.
      */
-    public Location(Access @NonNull ... accesses) {
+    public Location(Access @NonNull... accesses) {
         assert accesses != null;
         this.accesses = ImmutableSLList.<Access>nil().append(accesses);
     }

@@ -30,8 +30,9 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      * @param classType class
      * @param isStaticContext whether this is a static context
      */
-    private static @Nullable LocationVariable createSelfVar(@NonNull TermBuilder tb, @NonNull KeYJavaType classType,
-                                                            boolean isStaticContext) {
+    private static @Nullable LocationVariable createSelfVar(@NonNull TermBuilder tb,
+            @NonNull KeYJavaType classType,
+            boolean isStaticContext) {
         return isStaticContext ? null : tb.selfVar(classType, false);
     }
 
@@ -54,7 +55,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      * @param selfVar self var
      */
     public static @NonNull Context inMethodWithSelfVar(@NonNull IProgramMethod pm,
-                                                       LocationVariable selfVar) {
+            LocationVariable selfVar) {
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(pm);
         return new Context(mode, pm.getContainerType(), selfVar);
     }
@@ -67,7 +68,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      * @param tb term builder
      */
     public static @NonNull Context inClass(@NonNull KeYJavaType classType, boolean isStaticContext,
-                                           @NonNull TermBuilder tb) {
+            @NonNull TermBuilder tb) {
         var selfVar = createSelfVar(tb, classType, isStaticContext);
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(classType);
         return new Context(mode, classType, selfVar);

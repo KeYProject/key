@@ -34,14 +34,14 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.Terminatio
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -199,7 +199,8 @@ public class ExecutionNodeReader {
      * @return The found {@link IExecutionNode}.
      * @throws SAXException If it was not possible to find the node.
      */
-    protected IExecutionNode<?> findNode(@NonNull IExecutionNode<?> root, @Nullable String path) throws SAXException {
+    protected IExecutionNode<?> findNode(@NonNull IExecutionNode<?> root, @Nullable String path)
+            throws SAXException {
         if (path != null && !path.isEmpty()) {
             StringTokenizer tokenizer =
                 new StringTokenizer(path, ExecutionNodeWriter.PATH_SEPARATOR + "");
@@ -292,7 +293,8 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public void startElement(String uri, String localName, String qName, @NonNull Attributes attributes)
+        public void startElement(String uri, String localName, String qName,
+                @NonNull Attributes attributes)
                 throws SAXException {
             AbstractKeYlessExecutionNode<?> parent = parentNodeStack.peekFirst();
             if (isConstraint(uri, localName, qName)) {
@@ -659,7 +661,7 @@ public class ExecutionNodeReader {
      * @return The created {@link IExecutionVariable}.
      */
     protected @NonNull KeYlessVariable createVariable(IExecutionValue parentValue, String uri,
-                                                      String localName, String qName, @NonNull Attributes attributes) {
+            String localName, String qName, @NonNull Attributes attributes) {
         return new KeYlessVariable(parentValue, isArrayIndex(attributes),
             getArrayIndexString(attributes), getName(attributes));
     }
@@ -674,7 +676,7 @@ public class ExecutionNodeReader {
      * @return The created {@link IExecutionMethodReturnValue}.
      */
     public @NonNull KeYlessMethodReturnValue createMethodReturnValue(String uri, String localName,
-                                                                     String qName, @NonNull Attributes attributes) {
+            String qName, @NonNull Attributes attributes) {
         return new KeYlessMethodReturnValue(getName(attributes), getReturnValueString(attributes),
             getHasCondition(attributes), getConditionString(attributes));
     }
@@ -690,7 +692,7 @@ public class ExecutionNodeReader {
      * @return The created {@link IExecutionValue}.
      */
     protected @NonNull KeYlessValue createValue(IExecutionVariable parentVariable, String uri,
-                                                String localName, String qName, @NonNull Attributes attributes) {
+            String localName, String qName, @NonNull Attributes attributes) {
         return new KeYlessValue(parentVariable, getTypeString(attributes),
             getValueString(attributes), getName(attributes), isValueUnknown(attributes),
             isValueAnObject(attributes), getConditionString(attributes));
@@ -708,7 +710,8 @@ public class ExecutionNodeReader {
      * @throws SAXException Occurred Exception.
      */
     protected @NonNull AbstractKeYlessExecutionNode<?> createExecutionNode(IExecutionNode<?> parent,
-                                                                           String uri, String localName, String qName, @NonNull Attributes attributes) throws SAXException {
+            String uri, String localName, String qName, @NonNull Attributes attributes)
+            throws SAXException {
         if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
             return new KeYlessBranchCondition(parent, getName(attributes),
                 getPathCondition(attributes), isPathConditionChanged(attributes),
@@ -1278,7 +1281,8 @@ public class ExecutionNodeReader {
         /**
          * The completed blocks.
          */
-        private @NonNull ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
+        private @NonNull ImmutableList<IExecutionBlockStartNode<?>> completedBlocks =
+            ImmutableSLList.nil();
 
         /**
          * The formated conditions under which a block is completed.
@@ -1449,7 +1453,8 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public @Nullable ISymbolicLayout getInitialLayout(int configurationIndex) throws ProofInputException {
+        public @Nullable ISymbolicLayout getInitialLayout(int configurationIndex)
+                throws ProofInputException {
             return null;
         }
 
@@ -1457,7 +1462,8 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public @Nullable ISymbolicLayout getCurrentLayout(int configurationIndex) throws ProofInputException {
+        public @Nullable ISymbolicLayout getCurrentLayout(int configurationIndex)
+                throws ProofInputException {
             return null;
         }
 
@@ -1511,7 +1517,7 @@ public class ExecutionNodeReader {
          * @param formatedCondition The formated condition under which the block is completed.
          */
         public void addCompletedBlock(@Nullable IExecutionBlockStartNode<?> completedBlock,
-                                      String formatedCondition) {
+                String formatedCondition) {
             if (completedBlock != null) {
                 completedBlocks = completedBlocks.append(completedBlock);
                 formatedCompletedBlockConditions.put(completedBlock, formatedCondition);
@@ -2014,7 +2020,8 @@ public class ExecutionNodeReader {
         /**
          * The up to now discovered {@link IExecutionBaseMethodReturn<?>}s.
          */
-        private @NonNull ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+        private @NonNull ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns =
+            ImmutableSLList.nil();
 
         /**
          * Constructor.
@@ -2313,7 +2320,8 @@ public class ExecutionNodeReader {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionMethodReturnValue @NonNull [] getReturnValues() throws ProofInputException {
+        public IExecutionMethodReturnValue @NonNull [] getReturnValues()
+                throws ProofInputException {
             return returnValues.toArray(new IExecutionMethodReturnValue[0]);
         }
 

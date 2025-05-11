@@ -15,10 +15,11 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The default implementation of {@link IExecutionMethodCall}.
@@ -30,7 +31,8 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
     /**
      * The up to know discovered {@link IExecutionBaseMethodReturn}s.
      */
-    private @NonNull ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+    private @NonNull ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns =
+        ImmutableSLList.nil();
 
     /**
      * Constructor.

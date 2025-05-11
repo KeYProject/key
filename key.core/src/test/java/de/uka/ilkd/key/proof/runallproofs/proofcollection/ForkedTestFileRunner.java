@@ -73,7 +73,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
     /**
      * Process a single {@link TestFile} in a separate subprocess.
      */
-    public static TestResult processTestFile(@NonNull TestFile testFile, @NonNull Path pathToTempDir)
+    public static TestResult processTestFile(@NonNull TestFile testFile,
+            @NonNull Path pathToTempDir)
             throws Exception {
         List<TestFile> files = List.of(testFile);
         return processTestFiles(files, pathToTempDir).get(0);
@@ -85,7 +86,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * @param testFiles files to be tested
      * @param pathToTempDir a path to the temporary data directory
      */
-    public static @NonNull List<TestResult> processTestFiles(@NonNull List<TestFile> testFiles, @NonNull Path pathToTempDir)
+    public static @NonNull List<TestResult> processTestFiles(@NonNull List<TestFile> testFiles,
+            @NonNull Path pathToTempDir)
             throws Exception {
         if (testFiles.isEmpty()) {
             return new ArrayList<>();
@@ -209,7 +211,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * @param tempDirectory
      */
     private static void installTimeoutWatchdog(@NonNull ProofCollectionSettings settings,
-                                               final @NonNull Path tempDirectory) {
+            final @NonNull Path tempDirectory) {
 
         String timeoutString = settings.getForkTimeout();
         if (timeoutString == null) {

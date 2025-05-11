@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
+
 import org.jspecify.annotations.NonNull;
 
 /**

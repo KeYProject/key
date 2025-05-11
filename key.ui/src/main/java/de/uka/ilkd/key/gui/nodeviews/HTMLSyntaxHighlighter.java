@@ -214,7 +214,7 @@ public class HTMLSyntaxHighlighter {
      * @return The input String augmented by syntax highlighting tags.
      */
     private static @NonNull String addSyntaxHighlighting(String htmlString,
-                                                         @NonNull Iterable<? extends IProgramVariable> programVariables) {
+            @NonNull Iterable<? extends IProgramVariable> programVariables) {
 
         htmlString = PROP_LOGIC_KEYWORDS_PATTERN.matcher(htmlString)
                 .replaceAll(PROP_LOGIC_KEYWORDS_REPLACEMENT);
@@ -290,7 +290,7 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated array, elements separated by the given delimiter.
      */
     private static String concat(@NonNull String delim, @NonNull Iterable<?> strings,
-                                 @NonNull StringTransformer strTransformer) {
+            @NonNull StringTransformer strTransformer) {
         StringBuilder sb = new StringBuilder();
         boolean loopEntered = false;
         for (Object str : strings) {

@@ -29,8 +29,9 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * TODO
@@ -57,8 +58,9 @@ public class EvaluateArgs extends ProgramTransformer {
      * @param ec TODO
      * @return TODO
      */
-    public static @NonNull ProgramVariable evaluate(@NonNull Expression e, @NonNull List<? super LocalVariableDeclaration> l,
-                                                    @NonNull Services services, @NonNull ExecutionContext ec) {
+    public static @NonNull ProgramVariable evaluate(@NonNull Expression e,
+            @NonNull List<? super LocalVariableDeclaration> l,
+            @NonNull Services services, @NonNull ExecutionContext ec) {
 
         final VariableNamer varNamer = services.getVariableNamer();
         final KeYJavaType t = e.getKeYJavaType(services, ec);
@@ -73,7 +75,7 @@ public class EvaluateArgs extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-                                                @NonNull SVInstantiations svInst) {
+            @NonNull SVInstantiations svInst) {
 
         final ExecutionContext ec = svInst.getExecutionContext();
 

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -48,7 +49,7 @@ public class PostWork extends ProgramTransformer {
      */
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-                                                @NonNull SVInstantiations svInst) {
+            @NonNull SVInstantiations svInst) {
         final ProgramVariable newObject =
             schema ? (ProgramVariable) svInst.getInstantiation((SchemaVariable) body())
                     : (ProgramVariable) body();

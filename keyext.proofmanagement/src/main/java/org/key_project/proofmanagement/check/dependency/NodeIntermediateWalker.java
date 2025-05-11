@@ -4,6 +4,7 @@
 package org.key_project.proofmanagement.check.dependency;
 
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
+
 import org.jspecify.annotations.NonNull;
 
 /**

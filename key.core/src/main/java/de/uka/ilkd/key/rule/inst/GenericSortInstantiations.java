@@ -16,8 +16,6 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
@@ -25,6 +23,9 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -95,7 +96,7 @@ public final class GenericSortInstantiations {
      * @throws GenericSortException if no instantiations has been found
      */
     public static GenericSortInstantiations create(@NonNull ImmutableList<GenericSort> p_sorts,
-                                                   @NonNull ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            @NonNull ImmutableList<GenericSortCondition> p_conditions, Services services) {
 
         if (p_sorts.isEmpty()) {
             return EMPTY_INSTANTIATIONS;
@@ -211,8 +212,9 @@ public final class GenericSortInstantiations {
      * @throws GenericSortException no solution could be found
      * @return the/a found solution
      */
-    private static @NonNull ImmutableMap<GenericSort, Sort> solve(@NonNull ImmutableList<GenericSort> p_sorts,
-                                                                  @NonNull ImmutableList<GenericSortCondition> p_conditions, Services services) {
+    private static @NonNull ImmutableMap<GenericSort, Sort> solve(
+            @NonNull ImmutableList<GenericSort> p_sorts,
+            @NonNull ImmutableList<GenericSortCondition> p_conditions, Services services) {
 
         ImmutableMap<GenericSort, Sort> res;
 
@@ -251,7 +253,8 @@ public final class GenericSortInstantiations {
      * @return a solution if one could be found, null otherwise
      */
     private static @Nullable ImmutableMap<GenericSort, Sort> solveHelp(
-            @NonNull ImmutableList<GenericSort> p_remainingSorts, @NonNull ImmutableMap<GenericSort, Sort> p_curRes,
+            @NonNull ImmutableList<GenericSort> p_remainingSorts,
+            @NonNull ImmutableMap<GenericSort, Sort> p_curRes,
             @NonNull ImmutableList<GenericSortCondition> p_conditions,
             @NonNull ImmutableList<GenericSort> p_pushedBack, Services services) {
 
@@ -317,10 +320,12 @@ public final class GenericSortInstantiations {
 
 
     private static @Nullable ImmutableMap<GenericSort, Sort> descend(
-            @NonNull ImmutableList<GenericSort> p_remainingSorts, @NonNull ImmutableMap<GenericSort, Sort> p_curRes,
+            @NonNull ImmutableList<GenericSort> p_remainingSorts,
+            @NonNull ImmutableMap<GenericSort, Sort> p_curRes,
             @NonNull ImmutableList<GenericSortCondition> p_conditions,
             @NonNull ImmutableList<GenericSort> p_pushedBack, @NonNull GenericSort p_gs,
-            @NonNull ImmutableList<Sort> p_subsorts, @NonNull ImmutableList<Sort> p_chosenList, Services services) {
+            @NonNull ImmutableList<Sort> p_subsorts, @NonNull ImmutableList<Sort> p_chosenList,
+            Services services) {
         for (Sort chosen : p_chosenList) {
             if (!isSupersortOf(chosen, p_subsorts) // this test is unnecessary in some cases
                     || !p_gs.isPossibleInstantiation(chosen)) {
@@ -338,7 +343,7 @@ public final class GenericSortInstantiations {
 
 
     private static @Nullable ImmutableList<Sort> chooseResults(@NonNull GenericSort p_gs,
-                                                               @NonNull ImmutableList<GenericSortCondition> p_idConditions) throws FailException {
+            @NonNull ImmutableList<GenericSortCondition> p_idConditions) throws FailException {
         if (!p_idConditions.isEmpty()) {
             // then the instantiation is completely determined by
             // an identity condition
@@ -403,7 +408,8 @@ public final class GenericSortInstantiations {
      * @return a solution if one could be found, null otherwise
      */
     private static @Nullable ImmutableMap<GenericSort, Sort> solveForcedInst(
-            @NonNull ImmutableList<GenericSort> p_remainingSorts, @NonNull ImmutableMap<GenericSort, Sort> p_curRes,
+            @NonNull ImmutableList<GenericSort> p_remainingSorts,
+            @NonNull ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions, Services services) {
 
         if (p_remainingSorts.isEmpty()) {
@@ -433,7 +439,8 @@ public final class GenericSortInstantiations {
      * @return a solution if one could be found, null otherwise
      */
     private static @Nullable ImmutableMap<GenericSort, Sort> solveForcedInstHelp(
-            @NonNull ImmutableList<GenericSort> p_remainingSorts, @NonNull ImmutableMap<GenericSort, Sort> p_curRes,
+            @NonNull ImmutableList<GenericSort> p_remainingSorts,
+            @NonNull ImmutableMap<GenericSort, Sort> p_curRes,
             Services services) {
 
         if (p_remainingSorts.isEmpty()) {
@@ -505,7 +512,8 @@ public final class GenericSortInstantiations {
      *
      * @return sorted sorts
      */
-    private static @NonNull ImmutableList<GenericSort> topology(@NonNull ImmutableList<GenericSort> p_sorts) {
+    private static @NonNull ImmutableList<GenericSort> topology(
+            @NonNull ImmutableList<GenericSort> p_sorts) {
         ImmutableList<GenericSort> res = ImmutableSLList.nil();
         Iterator<GenericSort> it;
         GenericSort curMax;
@@ -548,8 +556,9 @@ public final class GenericSortInstantiations {
      *
      * PRECONDITION: !p_sorts.isEmpty ()
      */
-    private static @NonNull ImmutableList<Sort> minimalSupersorts(@NonNull ImmutableList<Sort> p_sorts,
-                                                                  Services services) {
+    private static @NonNull ImmutableList<Sort> minimalSupersorts(
+            @NonNull ImmutableList<Sort> p_sorts,
+            Services services) {
 
         // if the list only consists of a single sort, return this sort
         if (p_sorts.size() == 1) {
@@ -629,7 +638,8 @@ public final class GenericSortInstantiations {
     }
 
 
-    private static void addSortsToSet(@NonNull Set<Sort> p_set, @NonNull ImmutableSet<Sort> p_sorts) {
+    private static void addSortsToSet(@NonNull Set<Sort> p_set,
+            @NonNull ImmutableSet<Sort> p_sorts) {
         for (Sort p_sort : p_sorts) {
             p_set.add(p_sort);
         }
@@ -640,7 +650,8 @@ public final class GenericSortInstantiations {
     /**
      * @return true iff "p_s" is supersort of every sort of "p_subsorts"
      */
-    private static boolean isSupersortOf(@NonNull Sort p_s, @NonNull ImmutableList<Sort> p_subsorts) {
+    private static boolean isSupersortOf(@NonNull Sort p_s,
+            @NonNull ImmutableList<Sort> p_subsorts) {
 
         for (Sort p_subsort : p_subsorts) {
             if (!p_subsort.extendsTrans(p_s)) {
@@ -657,7 +668,7 @@ public final class GenericSortInstantiations {
      *         instantiation is consistent with previously chosen instantiations
      */
     private static boolean isPossibleInstantiation(@NonNull GenericSort p_gs, @NonNull Sort p_s,
-                                                   @NonNull ImmutableMap<GenericSort, Sort> p_curRes) {
+            @NonNull ImmutableMap<GenericSort, Sort> p_curRes) {
 
         if (!p_gs.isPossibleInstantiation(p_s)) {
             return false;

@@ -10,11 +10,12 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
@@ -34,14 +35,14 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      * @param pvs the set of schema variables
      */
     public RewriteTacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules,
-                                     @NonNull Term replacewith, ImmutableSet<SchemaVariable> pvs) {
+            @NonNull Term replacewith, ImmutableSet<SchemaVariable> pvs) {
         super(addedSeq, addedRules, pvs);
         TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith term");
         this.replacewith = replacewith;
     }
 
     public RewriteTacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules,
-                                     @NonNull Term replacewith) {
+            @NonNull Term replacewith) {
         this(addedSeq, addedRules, replacewith, DefaultImmutableSet.nil());
     }
 

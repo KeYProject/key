@@ -16,13 +16,14 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.*;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * abstract taclet builder class to be inherited from taclet builders specialised for their concrete
@@ -208,7 +209,7 @@ public abstract class TacletBuilder<T extends Taclet> {
 
 
     public void addVarsNotFreeIn(@NonNull Iterable<? extends SchemaVariable> v0,
-                                 @NonNull Iterable<? extends SchemaVariable> v1) {
+            @NonNull Iterable<? extends SchemaVariable> v1) {
         for (SchemaVariable boundSV : v0) {
             for (SchemaVariable schemaVar : v1) {
                 addVarsNotFreeIn(boundSV, schemaVar);
@@ -217,7 +218,8 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
 
-    public void addVarsNotFreeIn(@NonNull Iterable<? extends SchemaVariable> v0, SchemaVariable @NonNull ... v1) {
+    public void addVarsNotFreeIn(@NonNull Iterable<? extends SchemaVariable> v0,
+            SchemaVariable @NonNull... v1) {
         for (SchemaVariable boundSV : v0) {
             for (SchemaVariable schemaVar : v1) {
                 addVarsNotFreeIn(boundSV, schemaVar);

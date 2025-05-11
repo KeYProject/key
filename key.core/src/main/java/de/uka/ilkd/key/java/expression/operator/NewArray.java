@@ -10,8 +10,9 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The array allocation operator. There are two variants for NewArray:
@@ -59,7 +60,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      */
 
     public NewArray(@NonNull ExtList children, KeYJavaType keyJavaType, ArrayInitializer init,
-                    int dimensions) {
+            int dimensions) {
         super(children);
         this.arrayInitializer = init;
         this.dimensions = dimensions;
@@ -76,8 +77,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * @param init the arrayInitializer
      * @param dimensions an int value.
      */
-    public NewArray(Expression @NonNull [] arguments, TypeReference typeRef, KeYJavaType keyJavaType,
-                    ArrayInitializer init, int dimensions) {
+    public NewArray(Expression @NonNull [] arguments, TypeReference typeRef,
+            KeYJavaType keyJavaType,
+            ArrayInitializer init, int dimensions) {
         super(arguments, typeRef);
         this.arrayInitializer = init;
         this.dimensions = dimensions;

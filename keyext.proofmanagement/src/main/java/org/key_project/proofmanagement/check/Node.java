@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
-import org.jspecify.annotations.NonNull;
-
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a vertex/node of a tree.

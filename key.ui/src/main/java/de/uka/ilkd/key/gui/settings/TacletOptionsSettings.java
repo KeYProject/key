@@ -152,7 +152,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
-    public static @Nullable ChoiceEntry findChoice(@NonNull List<ChoiceEntry> choices, final String choice) {
+    public static @Nullable ChoiceEntry findChoice(@NonNull List<ChoiceEntry> choices,
+            final String choice) {
         return choices.stream().filter(it -> it.getChoice().equals(choice)).findAny().orElse(null);
     }
 
@@ -162,7 +163,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
-    public static @NonNull List<ChoiceEntry> createChoiceEntries(@Nullable Collection<String> choices) {
+    public static @NonNull List<ChoiceEntry> createChoiceEntries(
+            @Nullable Collection<String> choices) {
         if (choices == null) {
             return Collections.emptyList();
         }
@@ -241,7 +243,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     @NonNull
-    private JPanel createCollapsableTitlePane(@NonNull JComponent title, @NonNull JComponent child) {
+    private JPanel createCollapsableTitlePane(@NonNull JComponent title,
+            @NonNull JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
         JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel more = new JLabel(IconFactory.TREE_NODE_RETRACTED.get());
@@ -273,7 +276,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return p;
     }
 
-    private @NonNull JRadioButton mkRadioButton(@NonNull ChoiceEntry c, @NonNull ButtonGroup btnGroup) {
+    private @NonNull JRadioButton mkRadioButton(@NonNull ChoiceEntry c,
+            @NonNull ButtonGroup btnGroup) {
         Box b = new Box(BoxLayout.X_AXIS);
         JRadioButton button = new JRadioButton(c.choice);
         btnGroup.add(button);
@@ -326,7 +330,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param cat The category of the choice
      * @param entry The current choice
      */
-    private void checkForDifferingOptions(@NonNull JLabel lbl, String cat, @Nullable ChoiceEntry entry) {
+    private void checkForDifferingOptions(@NonNull JLabel lbl, String cat,
+            @Nullable ChoiceEntry entry) {
         if (loadedProof != null) {
             String choiceOfLoadedProof =
                 loadedProof.getSettings().getChoiceSettings().getDefaultChoices().get(cat);
@@ -417,7 +422,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          * @param incomplete Is incomplete?
          * @param information An optionally information.
          */
-        public ChoiceEntry(@NonNull String choice, boolean unsound, boolean incomplete, String information) {
+        public ChoiceEntry(@NonNull String choice, boolean unsound, boolean incomplete,
+                String information) {
             assert choice != null;
             this.choice = choice;
             this.unsound = unsound;

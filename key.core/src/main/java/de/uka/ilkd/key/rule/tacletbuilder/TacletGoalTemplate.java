@@ -9,12 +9,13 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new
@@ -45,7 +46,7 @@ public class TacletGoalTemplate {
      *        template
      */
     public TacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules,
-                              ImmutableSet<SchemaVariable> addedProgVars) {
+            ImmutableSet<SchemaVariable> addedProgVars) {
         TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 
         this.addedRules = addedRules;

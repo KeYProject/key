@@ -57,7 +57,8 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args, @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         final Services services = state.getProof().getServices();
         // look up macro name
@@ -126,8 +127,9 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
      * @return
      * @throws ScriptException
      */
-    public static @NonNull PosInOccurrence extractMatchingPio(final @NonNull Sequent sequent, final String matchRegEx,
-                                                              final @NonNull Services services) throws ScriptException {
+    public static @NonNull PosInOccurrence extractMatchingPio(final @NonNull Sequent sequent,
+            final String matchRegEx,
+            final @NonNull Services services) throws ScriptException {
         PosInOccurrence pio = null;
         boolean matched = false;
 

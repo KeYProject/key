@@ -5,8 +5,9 @@ package de.uka.ilkd.key.java.abstraction;
 
 import de.uka.ilkd.key.java.Services;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A program model element representing class types.

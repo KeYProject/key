@@ -8,8 +8,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Feature that returns zero iff the given rule app is a taclet app that needs explicit
@@ -23,7 +24,8 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
         super(false);
     }
 
-    protected boolean filter(@NonNull TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final ImmutableSet<SchemaVariable> neededVars = app.uninstantiatedVars();
         final ImmutableSet<SchemaVariable> ifFindVars = app.taclet().getIfFindVariables();
         for (SchemaVariable neededVar : neededVars) {

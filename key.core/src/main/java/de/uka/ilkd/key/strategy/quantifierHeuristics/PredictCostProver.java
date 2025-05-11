@@ -14,9 +14,10 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -38,7 +39,8 @@ public class PredictCostProver {
 
     private final @NonNull Services services;
 
-    private PredictCostProver(@NonNull Term instance, ImmutableSet<Term> assertList, @NonNull Services services) {
+    private PredictCostProver(@NonNull Term instance, ImmutableSet<Term> assertList,
+            @NonNull Services services) {
         this.assertLiterals = assertList;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -48,7 +50,7 @@ public class PredictCostProver {
     }
 
     public static long computerInstanceCost(@NonNull Substitution sub, Term matrix,
-                                            ImmutableSet<Term> assertList, @NonNull Services services) {
+            ImmutableSet<Term> assertList, @NonNull Services services) {
 
         if (!sub.isGround()) {
             // non-ground substitutions not supported yet
@@ -70,7 +72,8 @@ public class PredictCostProver {
         }
     }
 
-    private @NonNull ImmutableSet<ImmutableSet<Term>> createClause(@NonNull ImmutableSet<Term> set) {
+    private @NonNull ImmutableSet<ImmutableSet<Term>> createClause(
+            @NonNull ImmutableSet<Term> set) {
         final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.nil();
         ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
         for (Term t : set) {
@@ -122,7 +125,8 @@ public class PredictCostProver {
      * @return trueT if problem is equal axiom, false if problem's negation is equal axiom.
      *         Otherwise retrun problem.
      */
-    private @NonNull Term directConsequenceOrContradictionOfAxiom(@NonNull Term problem, Term axiom) {
+    private @NonNull Term directConsequenceOrContradictionOfAxiom(@NonNull Term problem,
+            Term axiom) {
         boolean negated = false;
         Term pro = problem;
         while (pro.op() == Junctor.NOT) {
@@ -164,7 +168,8 @@ public class PredictCostProver {
      * @return return <code>trueT</code> if if formu is proved to true, <code> falseT</code> if
      *         false, and <code>atom</code> if it cann't be proved.
      */
-    private @NonNull Term proveLiteral(@NonNull Term problem, @NonNull Iterable<? extends Term> assertLits) {
+    private @NonNull Term proveLiteral(@NonNull Term problem,
+            @NonNull Iterable<? extends Term> assertLits) {
         Term res;
         /*
          * res = provedFromCache(problem, cache); if (res.equals(trueT) || res.equals(falseT)) {

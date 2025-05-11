@@ -12,8 +12,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The statement inserted by KeY if a method call is executed.
@@ -48,7 +49,7 @@ public class MethodFrame extends JavaStatement
      * @param body a Statement containing the method body of the called method
      */
     public MethodFrame(@Nullable IProgramVariable resultVar, IExecutionContext execContext,
-                       StatementBlock body) {
+            StatementBlock body) {
         this.resultVar = resultVar;
         this.body = body;
         this.execContext = execContext;

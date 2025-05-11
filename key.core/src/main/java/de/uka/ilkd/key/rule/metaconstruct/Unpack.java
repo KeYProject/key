@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
 import org.jspecify.annotations.NonNull;
 
 public class Unpack extends ProgramTransformer {
@@ -25,7 +26,7 @@ public class Unpack extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
-                                                SVInstantiations svInst) {
+            SVInstantiations svInst) {
         Debug.assertTrue(pe instanceof For, "Unpack cannot handle ", pe);
         final For astFor = (For) pe;
         final Statement[] loopInitStatementList =

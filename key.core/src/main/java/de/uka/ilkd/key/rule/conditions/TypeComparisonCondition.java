@@ -19,10 +19,11 @@ import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -89,7 +90,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
 
-    private boolean checkSorts(final Sort fstSort, final Sort sndSort, final @NonNull Services services) {
+    private boolean checkSorts(final Sort fstSort, final Sort sndSort,
+            final @NonNull Services services) {
 
         boolean proxy1 = fstSort instanceof ProxySort;
         boolean proxy2 = sndSort instanceof ProxySort;
@@ -149,7 +151,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         return false;
     }
 
-    private static @Nullable Boolean lookupInCache(Sort s1, Sort s2, @NonNull ServiceCaches caches) {
+    private static @Nullable Boolean lookupInCache(Sort s1, Sort s2,
+            @NonNull ServiceCaches caches) {
         Boolean result = null;
 
         final Map<Sort, Map<Sort, Boolean>> disjointnessCache = caches.getDisjointnessCache();
@@ -202,7 +205,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     /**
      * Checks for disjointness modulo "null".
      */
-    private boolean checkDisjointness(@NonNull Sort fstSort, @NonNull Sort sndSort, @NonNull Services services) {
+    private boolean checkDisjointness(@NonNull Sort fstSort, @NonNull Sort sndSort,
+            @NonNull Services services) {
         // sorts identical?
         if (fstSort == sndSort) {
             return false;

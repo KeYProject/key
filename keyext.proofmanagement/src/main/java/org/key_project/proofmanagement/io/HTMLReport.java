@@ -10,10 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
 
+import org.jspecify.annotations.NonNull;
 import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.MapModelAdaptor;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
@@ -85,7 +85,7 @@ public final class HTMLReport {
         group.registerModelAdaptor(Object.class, new ObjectModelAdaptor<>() {
             @Override
             public synchronized Object getProperty(Interpreter interp, ST self, @NonNull Object o,
-                                                   Object property, String propertyName)
+                    Object property, String propertyName)
                     throws STNoSuchPropertyException {
                 Method m = tryGetMethod(o.getClass(), propertyName);
                 if (m != null) {
@@ -103,8 +103,9 @@ public final class HTMLReport {
         Class<Map<?, ?>> mapClass = (Class<Map<?, ?>>) (Class) Map.class;
         group.registerModelAdaptor(mapClass, new MapModelAdaptor() {
             @Override
-            public Object getProperty(Interpreter interp, ST self, @NonNull Map<?, ?> map, @NonNull Object property,
-                                      String propertyName)
+            public Object getProperty(Interpreter interp, ST self, @NonNull Map<?, ?> map,
+                    @NonNull Object property,
+                    String propertyName)
                     throws STNoSuchPropertyException {
                 if (property.equals("entrySet")) {
                     return map.entrySet();
@@ -123,8 +124,8 @@ public final class HTMLReport {
         group.registerModelAdaptor(mapEntryClass, new ObjectModelAdaptor<>() {
             @Override
             public synchronized Object getProperty(Interpreter interp, ST self,
-                                                   Map.@NonNull Entry<?, ?> entry, @NonNull Object property,
-                                                   String propertyName)
+                    Map.@NonNull Entry<?, ?> entry, @NonNull Object property,
+                    String propertyName)
                     throws STNoSuchPropertyException {
                 if (property.equals("value")) {
                     return entry.getValue();

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -61,8 +62,8 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
      */
     public AbstractExecutionVariable(@NonNull ITreeSettings settings, @NonNull Node proofNode,
-                                     IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,
-                                     Term additionalCondition, PosInOccurrence modalityPIO) {
+            IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,
+            Term additionalCondition, PosInOccurrence modalityPIO) {
         super(settings, proofNode);
         this.programVariable = programVariable;
         this.parentValue = parentValue;

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.Option;
+
 import org.jspecify.annotations.NonNull;
 
 public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Parameters> {

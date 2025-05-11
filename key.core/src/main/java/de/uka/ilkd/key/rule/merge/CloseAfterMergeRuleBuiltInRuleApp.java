@@ -14,9 +14,10 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Rule application class for close-after-merge rule applications.
@@ -31,9 +32,10 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private Term pc;
     private Set<Name> newNames;
 
-    public CloseAfterMergeRuleBuiltInRuleApp(@NonNull BuiltInRule builtInRule, @NonNull PosInOccurrence pio,
-                                             Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
-                                             SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
+    public CloseAfterMergeRuleBuiltInRuleApp(@NonNull BuiltInRule builtInRule,
+            @NonNull PosInOccurrence pio,
+            Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
+            SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
         setCorrespondingMergeNode(correspondingMergeNode);
@@ -43,7 +45,8 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         setNewNames(newNames);
     }
 
-    public CloseAfterMergeRuleBuiltInRuleApp(@NonNull BuiltInRule builtInRule, @NonNull PosInOccurrence pio) {
+    public CloseAfterMergeRuleBuiltInRuleApp(@NonNull BuiltInRule builtInRule,
+            @NonNull PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 

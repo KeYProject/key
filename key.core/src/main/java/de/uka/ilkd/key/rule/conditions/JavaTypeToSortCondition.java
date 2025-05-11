@@ -19,10 +19,11 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -37,7 +38,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
 
     public JavaTypeToSortCondition(final @NonNull OperatorSV exprOrTypeSV, final GenericSort sort,
-                                   final boolean elemSort) {
+            final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         this.elemSort = elemSort;
@@ -58,7 +59,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
     @Override
     public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
-                                           MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, Services services) {
         if (var != exprOrTypeSV) {
             return matchCond;
         }

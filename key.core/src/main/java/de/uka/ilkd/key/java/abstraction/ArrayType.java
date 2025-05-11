@@ -6,6 +6,7 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import de.uka.ilkd.key.java.reference.TypeReference;
+
 import org.jspecify.annotations.Nullable;
 
 /**

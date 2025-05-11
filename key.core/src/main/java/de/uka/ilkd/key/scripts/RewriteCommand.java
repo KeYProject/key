@@ -19,10 +19,10 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -77,7 +77,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args, @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Proof proof = state.getProof();
         assert proof != null;
@@ -102,7 +103,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     /**
      * get all TacletApps that are applicable on the formula term
      */
-    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p, @NonNull EngineState state)
+    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p,
+            @NonNull EngineState state)
             throws ScriptException {
         Services services = state.getProof().getServices();
         TacletFilter filter = TacletFilter.TRUE;
@@ -142,7 +144,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * conditions
      **/
     private @NonNull List<PosInOccurrence> findAndExecReplacement(@NonNull Parameters p,
-                                                                  @NonNull ImmutableList<TacletApp> list, @NonNull EngineState state) {
+            @NonNull ImmutableList<TacletApp> list, @NonNull EngineState state) {
 
         // Find taclet that transforms find term to replace term, when applied on find term
         for (TacletApp tacletApp : list) {
@@ -189,8 +191,9 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param goalold
      * @param rewriteResult
      */
-    private void executeRewriteTaclet(@NonNull Parameters p, @NonNull PosTacletApp pta, @NonNull Goal goalold,
-                                      @NonNull SequentFormula rewriteResult) {
+    private void executeRewriteTaclet(@NonNull Parameters p, @NonNull PosTacletApp pta,
+            @NonNull Goal goalold,
+            @NonNull SequentFormula rewriteResult) {
         if (rewriteResult.formula().equals(p.replace)
                 || getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)) {
             failposInOccs.remove(pta.posInOccurrence());

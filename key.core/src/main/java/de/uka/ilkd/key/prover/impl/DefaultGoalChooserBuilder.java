@@ -5,6 +5,7 @@ package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.GoalChooserBuilder;
+
 import org.jspecify.annotations.NonNull;
 
 /**

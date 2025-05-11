@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import org.jspecify.annotations.NonNull;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A table in which data is stored during a {@link RunAllProofsTestWithComputeCostProfiling} test
@@ -69,7 +69,7 @@ public class DataRecordingTable implements AutoCloseable {
      * Write a row to the table file. Column entries are specified via map, which maps: columnName
      * -> columnValue
      */
-    public void writeRow(Object @NonNull ... lineData) {
+    public void writeRow(Object @NonNull... lineData) {
         if (lineData.length != columns.length) {
             throw new RuntimeException(
                 "Incorrect number of column values specified.\n" + "Expected: " + columns.length

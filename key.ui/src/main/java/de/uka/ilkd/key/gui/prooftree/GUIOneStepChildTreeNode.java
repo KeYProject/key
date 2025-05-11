@@ -25,7 +25,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     private final @NonNull GUIAbstractTreeNode parent;
 
     public GUIOneStepChildTreeNode(GUIProofTreeModel tree, @NonNull GUIAbstractTreeNode parent,
-                                   RuleApp app, int formulaNr) {
+            RuleApp app, int formulaNr) {
         super(tree, parent.getNode());
         this.parent = parent;
         this.app = app;

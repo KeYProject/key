@@ -9,9 +9,10 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.ImmutableList;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This feature checks that the position of application is not contained in the if-formulas. If the
@@ -24,7 +25,8 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter(@NonNull TacletApp p_app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp p_app, @Nullable PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         Debug.assertTrue(pos != null,
             "NoSelfApplicationFeature: Need to know the position of the application of the taclet");
 

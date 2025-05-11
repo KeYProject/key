@@ -32,7 +32,8 @@ public class ResolveTypeReference extends GenericResolutionTransformation {
 
     private final CrossReferenceSourceInfo sourceInfo;
 
-    public ResolveTypeReference(TypeReference reference, @NonNull CrossReferenceServiceConfiguration sc) {
+    public ResolveTypeReference(TypeReference reference,
+            @NonNull CrossReferenceServiceConfiguration sc) {
         super(sc);
         this.reference = reference;
         sourceInfo = sc.getCrossReferenceSourceInfo();

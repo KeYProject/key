@@ -119,7 +119,8 @@ public class TestProgramMetaConstructs {
             new String[] { "i++;", "i--;", "z = 17;" });
     }
 
-    private void forInitUnfoldTransformerTest(@NonNull String programBlock, String @NonNull [] expectedStmts) {
+    private void forInitUnfoldTransformerTest(@NonNull String programBlock,
+            String @NonNull [] expectedStmts) {
         final ProgramElement block = TacletForTests.parsePrg(programBlock);
 
         final JavaASTCollector coll = new JavaASTCollector(block, LoopInit.class);

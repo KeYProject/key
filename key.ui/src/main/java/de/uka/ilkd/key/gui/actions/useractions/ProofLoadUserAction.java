@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

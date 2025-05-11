@@ -12,8 +12,9 @@ import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The constructor call meta construct is used to handle a allocation expression like
@@ -39,7 +40,7 @@ public class SpecialConstructorCall extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
-                                                SVInstantiations svInst) {
+            SVInstantiations svInst) {
 
         SpecialConstructorReference constructorReference = (SpecialConstructorReference) pe;
 

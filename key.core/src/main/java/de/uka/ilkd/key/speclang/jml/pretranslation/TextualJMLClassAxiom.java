@@ -5,9 +5,10 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -24,7 +25,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      * @param inv the expression in this clause
      */
     public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers,
-                                @NonNull LabeledParserRuleContext inv) {
+            @NonNull LabeledParserRuleContext inv) {
         super(ImmutableSLList.nil()); // no modifiers allowed in axiom clause (see
                                       // Sect. 8 of reference manual)
         assert inv != null;
@@ -32,8 +33,9 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers, @NonNull LabeledParserRuleContext inv,
-                                String name) {
+    public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers,
+            @NonNull LabeledParserRuleContext inv,
+            String name) {
         this(modifiers, inv);
         this.name = name;
     }

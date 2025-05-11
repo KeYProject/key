@@ -16,8 +16,9 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
@@ -36,7 +37,7 @@ public class IsLabeledCondition implements VariableCondition {
 
     @Override
     public @NonNull MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-                                          @NonNull MatchConditions matchCond, Services services) {
+            @NonNull MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);

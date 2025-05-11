@@ -13,13 +13,14 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 public final class DropEffectlessStoresCondition implements VariableCondition {
@@ -38,8 +39,9 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static @Nullable Term dropEffectlessStoresHelper(@NonNull Term heapTerm, @NonNull TermServices services,
-                                                             @NonNull ImmutableSet<Pair<Term, Term>> overwrittenLocs, Function store) {
+    private static @Nullable Term dropEffectlessStoresHelper(@NonNull Term heapTerm,
+            @NonNull TermServices services,
+            @NonNull ImmutableSet<Pair<Term, Term>> overwrittenLocs, Function store) {
         if (heapTerm.op() == store) {
             final Term subHeapTerm = heapTerm.sub(0);
             final Term objTerm = heapTerm.sub(1);
@@ -61,7 +63,8 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static @Nullable Term dropEffectlessStores(@NonNull Term t, @NonNull Services services) {
+    private static @Nullable Term dropEffectlessStores(@NonNull Term t,
+            @NonNull Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert t.sort() == heapLDT.targetSort();
         return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.nil(),
@@ -71,8 +74,8 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
     @Override
     public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                           @NonNull MatchConditions mc,
-                                           Services services) {
+            @NonNull MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term hInst = (Term) svInst.getInstantiation(h);
         Term oInst = (Term) svInst.getInstantiation(o);

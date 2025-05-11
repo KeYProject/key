@@ -97,7 +97,8 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
     }
 
-    private @NonNull ColorProperty createColorProperty(String key, String description, @NonNull Color defaultValue) {
+    private @NonNull ColorProperty createColorProperty(String key, String description,
+            @NonNull Color defaultValue) {
         Optional<ColorProperty> item =
             getProperties().filter(it -> it.getKey().equals(key)).findFirst();
         if (item.isPresent()) {

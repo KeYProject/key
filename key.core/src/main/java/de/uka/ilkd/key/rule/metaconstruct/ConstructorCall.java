@@ -22,11 +22,12 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The constructor call meta construct is used to handle a allocation expression like
@@ -89,7 +90,7 @@ public class ConstructorCall extends ProgramTransformer {
      */
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-                                                @NonNull SVInstantiations svInst) {
+            @NonNull SVInstantiations svInst) {
 
         final New constructorReference = (New) pe;
         final KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();
@@ -108,8 +109,10 @@ public class ConstructorCall extends ProgramTransformer {
     /**
      * returns a sequence of statements modelling the Java constructor call semantics explicitly
      */
-    protected @NonNull List<Statement> constructorCallSequence(final @NonNull New constructorReference,
-                                                               final @NonNull KeYJavaType classType, @NonNull SVInstantiations svInst, @NonNull Services services) {
+    protected @NonNull List<Statement> constructorCallSequence(
+            final @NonNull New constructorReference,
+            final @NonNull KeYJavaType classType, @NonNull SVInstantiations svInst,
+            @NonNull Services services) {
         assert (newObjectVar == null) != (newObjectSV == null);
 
         final ProgramVariable newObject = newObjectSV == null ? newObjectVar

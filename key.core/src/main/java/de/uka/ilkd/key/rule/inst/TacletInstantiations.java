@@ -8,8 +8,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableMap;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * this class contains a Taclet together with its suggested instantiations.

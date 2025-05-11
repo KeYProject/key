@@ -15,11 +15,12 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * ProgramTransformers are used to describe schematic transformations that cannot be expressed by
@@ -71,7 +72,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return the transformated program
      */
     public abstract ProgramElement @Nullable [] transform(ProgramElement pe, Services services,
-                                                          SVInstantiations svInst);
+            SVInstantiations svInst);
 
     /**
      * returns the name of the meta construct

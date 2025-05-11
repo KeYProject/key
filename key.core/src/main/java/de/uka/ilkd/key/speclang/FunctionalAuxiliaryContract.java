@@ -23,9 +23,10 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is only used to generate a proof obligation for an {@link AuxiliaryContract}.

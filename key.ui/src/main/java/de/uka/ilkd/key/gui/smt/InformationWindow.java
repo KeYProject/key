@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -68,8 +69,9 @@ public class InformationWindow extends JDialog {
     private JTabbedPane tabbedPane;
     private Model model;
 
-    public InformationWindow(Dialog parent, @NonNull SMTSolver solver, @NonNull Collection<Information> information,
-                             String title) {
+    public InformationWindow(Dialog parent, @NonNull SMTSolver solver,
+            @NonNull Collection<Information> information,
+            String title) {
         super(parent);
         this.setTitle(title);
         initModel(solver);

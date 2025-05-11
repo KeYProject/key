@@ -557,7 +557,7 @@ public class KeYMediator {
      * @param selection a Runnable that selects the correct node after unfreezing the interface
      */
     public void finishAutoMode(@NonNull Proof proof, boolean fullStop, boolean interactive,
-                               @Nullable Runnable selection) {
+            @Nullable Runnable selection) {
         setInteractive(interactive);
         startInterface(fullStop);
         getUI().getProofControl().fireAutoModeStopped(new ProofEvent(proof));

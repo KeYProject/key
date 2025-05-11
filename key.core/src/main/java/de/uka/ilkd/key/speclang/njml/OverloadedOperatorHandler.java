@@ -13,9 +13,9 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -98,7 +98,8 @@ public class OverloadedOperatorHandler {
     private final List<JMLOperatorHandler> handlers = new ArrayList<>();
     private final @NonNull IntegerHandler integerHandler;
 
-    public OverloadedOperatorHandler(@NonNull Services services, @NonNull SpecMathMode specMathMode) {
+    public OverloadedOperatorHandler(@NonNull Services services,
+            @NonNull SpecMathMode specMathMode) {
         this.integerHandler = new IntegerHandler(services, specMathMode);
 
         handlers.add(new BinaryBooleanHandler(services));
@@ -149,7 +150,8 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left, @Nullable SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left,
+                @Nullable SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -174,7 +176,8 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left, @Nullable SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left,
+                @Nullable SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -207,7 +210,8 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left, @NonNull SLExpression right) {
+        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left,
+                @NonNull SLExpression right) {
             if ((left.getTerm().sort() == sortBoolean
                     || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean

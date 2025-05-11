@@ -45,14 +45,15 @@ import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.io.OutputStreamProofSaver.printAnything;
 
@@ -91,7 +92,8 @@ public abstract class AbstractProofReplayer {
      * @return the new goals added by this rule application
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    protected @Nullable ImmutableList<Goal> reApplyRuleApp(@NonNull Node node, @NonNull Goal openGoal)
+    protected @Nullable ImmutableList<Goal> reApplyRuleApp(@NonNull Node node,
+            @NonNull Goal openGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         RuleApp ruleApp = node.getAppliedRuleApp();
         ImmutableList<Goal> nextGoals;
@@ -224,7 +226,8 @@ public abstract class AbstractProofReplayer {
      * @param currGoal open goal in proof slice
      * @return new taclet app equivalent to {@code originalStep}
      */
-    private @Nullable TacletApp constructTacletApp(@NonNull Node originalStep, @NonNull Goal currGoal) {
+    private @Nullable TacletApp constructTacletApp(@NonNull Node originalStep,
+            @NonNull Goal currGoal) {
 
         final String tacletName = originalStep.getAppliedRuleApp().rule().name().toString();
         TacletApp originalTacletApp = null;
@@ -334,7 +337,8 @@ public abstract class AbstractProofReplayer {
      * @param newSequent sequent
      * @return the formula in the sequent, or null if not found
      */
-    private @Nullable PosInOccurrence findInNewSequent(@NonNull PosInOccurrence oldPos, @NonNull Sequent newSequent) {
+    private @Nullable PosInOccurrence findInNewSequent(@NonNull PosInOccurrence oldPos,
+            @NonNull Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();
@@ -352,7 +356,8 @@ public abstract class AbstractProofReplayer {
      * @param inst instantiations
      * @return the "interesting" instantiations (serialized)
      */
-    public @NonNull Collection<String> getInterestingInstantiations(@NonNull SVInstantiations inst) {
+    public @NonNull Collection<String> getInterestingInstantiations(
+            @NonNull SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
         for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst

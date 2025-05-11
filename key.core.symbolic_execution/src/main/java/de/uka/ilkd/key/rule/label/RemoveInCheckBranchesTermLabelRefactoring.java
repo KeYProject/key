@@ -19,11 +19,12 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel} in check branches.
@@ -71,8 +72,9 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public @NonNull RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                                                            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, @Nullable Goal goal,
-                                                            Object hint, Term tacletTerm) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+            @Nullable Goal goal,
+            Object hint, Term tacletTerm) {
         if (goal != null) {
             if (rule instanceof UseOperationContractRule
                     && (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") || goal.node()
@@ -97,8 +99,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-                               PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-                               Object hint, Term tacletTerm, Term term, @NonNull LabelCollection labels) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm, Term term, @NonNull LabelCollection labels) {
         labels.removeIf(next -> termLabelNameToRemove.equals(next.name()));
     }
 }

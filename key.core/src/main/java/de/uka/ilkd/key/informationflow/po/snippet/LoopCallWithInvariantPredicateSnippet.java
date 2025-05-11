@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.jspecify.annotations.NonNull;
 
 public class LoopCallWithInvariantPredicateSnippet extends TwoStateMethodPredicateSnippet {
@@ -14,7 +15,7 @@ public class LoopCallWithInvariantPredicateSnippet extends TwoStateMethodPredica
     @Override
     @NonNull
     String generatePredicateName(@NonNull IProgramMethod pm, StatementBlock block,
-                                 @NonNull LoopSpecification loopInv) {
+            @NonNull LoopSpecification loopInv) {
         final String nameString = MiscTools.toValidTacletName(
             "EXECUTION_OF_LOOP_" + "at_line_" + loopInv.getLoop().getStartPosition().line()
                 + "_in_" + pm.getUniqueName() + "_WITH_INV").toString();

@@ -114,8 +114,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     public abstract void loadProofFromBundle(File proofBundle, File proofFilename);
 
-    public @NonNull ProblemLoader getProblemLoader(@NonNull File file, @NonNull List<File> classPath, @NonNull File bootClassPath,
-                                                   @NonNull List<File> includes, @NonNull KeYMediator mediator) {
+    public @NonNull ProblemLoader getProblemLoader(@NonNull File file,
+            @NonNull List<File> classPath, @NonNull File bootClassPath,
+            @NonNull List<File> includes, @NonNull KeYMediator mediator) {
         final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
             AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
         return pl;
@@ -180,7 +181,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     }
 
     protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo,
-                                           final @NonNull Proof initiatingProof, final @NonNull Proof sideProof) {
+            final @NonNull Proof initiatingProof, final @NonNull Proof sideProof) {
         ThreadUtilities.invokeAndWait(() -> {
             saveSideProof(sideProof);
             // make everyone listen to the proof remove
@@ -225,8 +226,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * {@inheritDoc}
      */
     @Override
-    public @NonNull ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput,
-                                                                            ProofAggregate proofList, InitConfig initConfig) {
+    public @NonNull ProofEnvironment createProofEnvironmentAndRegisterProof(
+            ProofOblInput proofOblInput,
+            ProofAggregate proofList, InitConfig initConfig) {
         final ProofEnvironment env = new ProofEnvironment(initConfig);
         env.addProofEnvironmentListener(this);
         env.registerProof(proofOblInput, proofList);

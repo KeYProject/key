@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -208,8 +208,9 @@ public class CheckedUserInput extends JPanel {
 
     }
 
-    public static @Nullable String showAsDialog(String title, @Nullable String description, final @Nullable String helpText,
-                                                String defaultInput, CheckedUserInputInspector inspector, boolean showInformation
+    public static @Nullable String showAsDialog(String title, @Nullable String description,
+            final @Nullable String helpText,
+            String defaultInput, CheckedUserInputInspector inspector, boolean showInformation
 
     ) {
         CheckedUserInput userInput = new CheckedUserInput(inspector, showInformation);

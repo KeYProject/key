@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.BoundUniquenessChecker;
 import de.uka.ilkd.key.rule.FindTaclet;
+
 import org.jspecify.annotations.Nullable;
 
 /**

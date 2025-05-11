@@ -19,10 +19,11 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableMapEntry;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This variable condition ensures that no other label of the same name exists in the context
@@ -44,7 +45,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
 
     @Override
     public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                           MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, Services services) {
         if (var != labelSV && matchCond.getInstantiations().isInstantiated(labelSV)) {
             var = labelSV;
             instCandidate = (SyntaxElement) matchCond.getInstantiations().getInstantiation(labelSV);
@@ -77,7 +78,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
         return result;
     }
 
-    private boolean isUnique(@NonNull Label label, @NonNull List<ProgramElement> programs, @NonNull Services services) {
+    private boolean isUnique(@NonNull Label label, @NonNull List<ProgramElement> programs,
+            @NonNull Services services) {
         for (final ProgramElement pe : programs) {
             final LabelCollector lc = new LabelCollector(pe, services);
             lc.start();

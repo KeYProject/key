@@ -11,6 +11,7 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -35,7 +36,7 @@ public class IFProofObligationVars {
 
 
     public IFProofObligationVars(ProofObligationVars c1, ProofObligationVars c2,
-                                 @NonNull ProofObligationVars symbExecVars) {
+            @NonNull ProofObligationVars symbExecVars) {
         this.c1 = c1;
         this.c2 = c2;
         this.symbExecVars = symbExecVars;
@@ -64,7 +65,8 @@ public class IFProofObligationVars {
     }
 
 
-    private void linkStateVarsToCopies(@NonNull StateVars ifVars, @NonNull StateVars seVars, @NonNull Map<Term, Term> map) {
+    private void linkStateVarsToCopies(@NonNull StateVars ifVars, @NonNull StateVars seVars,
+            @NonNull Map<Term, Term> map) {
         final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
         for (final Term symbTerm : seVars.termList) {
             final Term ifTerm;

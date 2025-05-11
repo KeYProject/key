@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -43,7 +44,7 @@ public class ForInitUnfoldTransformer extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
-                                                SVInstantiations svInst) {
+            SVInstantiations svInst) {
         Debug.assertTrue(pe instanceof LoopInit, "ForInitUnfoldTransformer cannot handle ", pe);
 
         final LoopInit astLoopInit = (LoopInit) pe;

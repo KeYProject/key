@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.pp.PosInSequent;
+
 import org.jspecify.annotations.NonNull;
 
 /**

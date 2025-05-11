@@ -82,7 +82,9 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return getProofTreeModel().getBranchNode(p_node, label);
     }
 
-    public static @NonNull String ensureBranchLabelIsSet(@NonNull Node p_node) { // TODO: This functionality should be
+    public static @NonNull String ensureBranchLabelIsSet(@NonNull Node p_node) { // TODO: This
+                                                                                 // functionality
+                                                                                 // should be
         // hidden somewhere in NodeInfo
         // without the need to call it explicitly.
         var nodeInfo = p_node.getNodeInfo();

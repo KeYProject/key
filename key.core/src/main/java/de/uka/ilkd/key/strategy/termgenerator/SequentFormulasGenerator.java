@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -47,7 +48,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     protected abstract Iterator<SequentFormula> generateForIt(Goal goal);
 
     public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-                                            MutableState mState) {
+            MutableState mState) {
         return new SFIterator(generateForIt(goal));
     }
 

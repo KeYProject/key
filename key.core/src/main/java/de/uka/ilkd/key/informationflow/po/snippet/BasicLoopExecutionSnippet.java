@@ -19,10 +19,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
@@ -53,8 +54,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         return buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
     }
 
-    private @NonNull Term buildProgramTerm(@NonNull BasicSnippetData d, @NonNull ProofObligationVars vs, @NonNull Term postTerm,
-                                           @NonNull TermBuilder tb) {
+    private @NonNull Term buildProgramTerm(@NonNull BasicSnippetData d,
+            @NonNull ProofObligationVars vs, @NonNull Term postTerm,
+            @NonNull TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a loop without modality.");

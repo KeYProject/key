@@ -10,8 +10,9 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 class ArithTermFeatures extends StaticFeatureCollection {
 

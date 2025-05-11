@@ -12,13 +12,13 @@ import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +88,7 @@ public class DependencyGraph {
      * @param output outputs produced by this proof step
      */
     public void addRuleApplication(Node node, @NonNull Collection<Pair<GraphNode, Boolean>> input,
-                                   @NonNull Collection<GraphNode> output) {
+            @NonNull Collection<GraphNode> output) {
         for (Pair<GraphNode, Boolean> in : input) {
             for (GraphNode out : output) {
                 AnnotatedEdge edge = new AnnotatedEdge(node, in.second);
@@ -361,7 +361,8 @@ public class DependencyGraph {
      * @param pio formula
      * @return graph node, null if not found
      */
-    public @Nullable GraphNode getGraphNode(@Nullable Proof proof, @NonNull BranchLocation locationGuess, @NonNull PosInOccurrence pio) {
+    public @Nullable GraphNode getGraphNode(@Nullable Proof proof,
+            @NonNull BranchLocation locationGuess, @NonNull PosInOccurrence pio) {
         if (proof == null) {
             return null;
         }

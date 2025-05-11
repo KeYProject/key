@@ -6,6 +6,7 @@ package de.uka.ilkd.key.prover.impl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.StopCondition;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -43,7 +44,7 @@ public final class AppliedRuleStopCondition implements StopCondition {
      */
     @Override
     public @Nullable String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
-                                                     long startTime, int countApplied, Goal goal) {
+            long startTime, int countApplied, Goal goal) {
         return null;
     }
 
@@ -61,8 +62,9 @@ public final class AppliedRuleStopCondition implements StopCondition {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
-                                          int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+    public @NonNull String getStopMessage(int maxApplications, long timeout, Proof proof,
+            long startTime,
+            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return "Maximal number of rule applications reached or timed out.";
     }
 }

@@ -18,9 +18,10 @@ import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
 import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -36,7 +37,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
 
 
     private MonomialsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
-                                        @NonNull IntegerLDT numbers) {
+            @NonNull IntegerLDT numbers) {
         super(numbers);
         this.left = left;
         this.right = right;
@@ -55,12 +56,13 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
-                                          @NonNull IntegerLDT numbers) {
+            @NonNull IntegerLDT numbers) {
         return new MonomialsSmallerThanFeature(left, right, numbers);
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
         m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();
@@ -74,7 +76,8 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus, @NonNull Goal goal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus,
+            @NonNull Goal goal) {
 
         // here, the ordering is graded concerning multiplication on integers
         final int t1Deg = degree(t1);
@@ -121,8 +124,9 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         return super.lessThan(t1, t2, focus, goal);
     }
 
-    private int compareLexNewSyms(@NonNull ImmutableList<Term> atoms1, @NonNull ImmutableList<Term> atoms2,
-                                  @NonNull Goal goal) {
+    private int compareLexNewSyms(@NonNull ImmutableList<Term> atoms1,
+            @NonNull ImmutableList<Term> atoms2,
+            @NonNull Goal goal) {
         while (!atoms1.isEmpty()) {
             final Term t1 = atoms1.head();
             final Term t2 = atoms2.head();
@@ -169,7 +173,8 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             }
         }
 
-        private @NonNull Term stripOffLiteral(@NonNull Term te, MutableState mState, Services services) {
+        private @NonNull Term stripOffLiteral(@NonNull Term te, MutableState mState,
+                Services services) {
             if (!(hasCoeff.compute(te, mState, services) instanceof TopRuleAppCost))
             // we leave out literals/coefficients on the right, because we
             // do not want to compare these literals

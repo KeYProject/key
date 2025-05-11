@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -23,7 +24,8 @@ public class NotBelowBinderFeature extends BinaryFeature {
 
     private NotBelowBinderFeature() {}
 
-    public boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
+    public boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
         return !belowBinder(pos);

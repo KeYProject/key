@@ -90,7 +90,7 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     protected void lookupAcceleratorKey(@UnderInitialization KeyAction this,
-                                        @NonNull KeyStroke defaultValue) {
+            @NonNull KeyStroke defaultValue) {
         KeyStrokeManager.lookupAndOverride(this, defaultValue.toString());
     }
 

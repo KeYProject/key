@@ -10,13 +10,13 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +85,8 @@ public class Substitution {
         return t;
     }
 
-    private @NonNull Term applySubst(@NonNull QuantifiableVariable var, @NonNull Term instance, @NonNull Term t, @NonNull TermBuilder tb) {
+    private @NonNull Term applySubst(@NonNull QuantifiableVariable var, @NonNull Term instance,
+            @NonNull Term t, @NonNull TermBuilder tb) {
         final ClashFreeSubst subst = new ClashFreeSubst(var, instance, tb);
         return subst.apply(t);
     }

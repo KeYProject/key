@@ -5,8 +5,9 @@ package org.key_project.slicing;
 
 import de.uka.ilkd.key.proof.BranchLocation;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.graph.GraphNode;
+
+import org.jspecify.annotations.NonNull;
 
 public class TestGraphNode extends GraphNode {
     TestGraphNode() {

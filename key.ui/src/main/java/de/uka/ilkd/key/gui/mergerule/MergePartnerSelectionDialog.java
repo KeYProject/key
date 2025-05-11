@@ -27,11 +27,12 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
@@ -302,7 +303,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param services The services object.
      */
     public MergePartnerSelectionDialog(@NonNull Goal mergeGoal, @NonNull PosInOccurrence pio,
-                                       @NonNull ImmutableList<MergePartner> candidates, Services services) {
+            @NonNull ImmutableList<MergePartner> candidates, Services services) {
 
         this();
         this.services = services;
@@ -428,7 +429,8 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param formulaToProve Formula to prove.
      * @return True iff formulaToProve can be proven within the given sequent.
      */
-    private static boolean checkProvability(@NonNull Sequent seq, @NonNull Term formulaToProve, @NonNull Services services) {
+    private static boolean checkProvability(@NonNull Sequent seq, @NonNull Term formulaToProve,
+            @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Semisequent antecedent = seq.antecedent();
@@ -510,7 +512,8 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param pio Position indicating subterm to highlight.
      * @param area The editor pane to add the highlighted goal to.
      */
-    private void setHighlightedSequentForArea(@NonNull Goal goal, @NonNull PosInOccurrence pio, @NonNull JEditorPane area) {
+    private void setHighlightedSequentForArea(@NonNull Goal goal, @NonNull PosInOccurrence pio,
+            @NonNull JEditorPane area) {
 
         String subterm = LogicPrinter.quickPrintTerm(pio.subTerm(), services);
 

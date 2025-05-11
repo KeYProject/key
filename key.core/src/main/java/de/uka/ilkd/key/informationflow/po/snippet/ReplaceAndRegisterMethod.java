@@ -19,11 +19,12 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Visitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -34,14 +35,16 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 abstract class ReplaceAndRegisterMethod {
 
-    final @NonNull Term replace(@NonNull Term term, @NonNull ProofObligationVars origVars, @NonNull ProofObligationVars poVars,
-                                @NonNull TermBuilder tb) {
+    final @NonNull Term replace(@NonNull Term term, @NonNull ProofObligationVars origVars,
+            @NonNull ProofObligationVars poVars,
+            @NonNull TermBuilder tb) {
         Term intermediateResult = replace(term, origVars.pre, poVars.pre, tb);
         return replace(intermediateResult, origVars.post, poVars.post, tb);
     }
 
 
-    final @NonNull Term replace(@NonNull Term term, @NonNull StateVars origVars, @NonNull StateVars poVars, @NonNull TermBuilder tb) {
+    final @NonNull Term replace(@NonNull Term term, @NonNull StateVars origVars,
+            @NonNull StateVars poVars, @NonNull TermBuilder tb) {
         LinkedHashMap<Term, Term> map = new LinkedHashMap<>();
 
         Iterator<Term> origVarsIt;
@@ -66,7 +69,8 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final Term @NonNull [] replace(Term @NonNull [] terms, @NonNull StateVars origVars, @NonNull StateVars poVars, @NonNull TermBuilder tb) {
+    final Term @NonNull [] replace(Term @NonNull [] terms, @NonNull StateVars origVars,
+            @NonNull StateVars poVars, @NonNull TermBuilder tb) {
         final Term[] result = new Term[terms.length];
         for (int i = 0; i < terms.length; i++) {
             result[i] = replace(terms[i], origVars, poVars, tb);
@@ -76,8 +80,9 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final @NonNull InfFlowSpec replace(@NonNull InfFlowSpec terms, @NonNull StateVars origVars, @NonNull StateVars poVars,
-                                       @NonNull TermBuilder tb) {
+    final @NonNull InfFlowSpec replace(@NonNull InfFlowSpec terms, @NonNull StateVars origVars,
+            @NonNull StateVars poVars,
+            @NonNull TermBuilder tb) {
         ImmutableList<Term> resultPreExps = ImmutableSLList.nil();
         for (Term t : terms.preExpressions) {
             resultPreExps = resultPreExps.append(replace(t, origVars, poVars, tb));
@@ -94,8 +99,9 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final InfFlowSpec @NonNull [] replace(@NonNull ImmutableList<InfFlowSpec> termss, @NonNull StateVars origVars,
-                                          @NonNull StateVars poVars, @NonNull TermBuilder tb) {
+    final InfFlowSpec @NonNull [] replace(@NonNull ImmutableList<InfFlowSpec> termss,
+            @NonNull StateVars origVars,
+            @NonNull StateVars poVars, @NonNull TermBuilder tb) {
         final InfFlowSpec[] result = new InfFlowSpec[termss.size()];
         Iterator<InfFlowSpec> it = termss.iterator();
         for (int i = 0; it.hasNext(); i++) {
@@ -105,7 +111,8 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final @NonNull Term replace(@NonNull Term term, Term @NonNull [] origVars, Term @NonNull [] poVars, @NonNull TermBuilder tb) {
+    final @NonNull Term replace(@NonNull Term term, Term @NonNull [] origVars,
+            Term @NonNull [] poVars, @NonNull TermBuilder tb) {
         LinkedHashMap<Term, Term> map = new LinkedHashMap<>();
 
         assert origVars.length == poVars.length;
@@ -148,8 +155,9 @@ abstract class ReplaceAndRegisterMethod {
         }
     }
 
-    static @NonNull Term replaceQuantifiableVariables(Term term, @NonNull Set<QuantifiableVariable> qvs,
-                                                      @NonNull Services services) {
+    static @NonNull Term replaceQuantifiableVariables(Term term,
+            @NonNull Set<QuantifiableVariable> qvs,
+            @NonNull Services services) {
         Map<QuantifiableVariable, QuantifiableVariable> replaceMap = new LinkedHashMap<>();
         for (QuantifiableVariable qv : qvs) {
             replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));

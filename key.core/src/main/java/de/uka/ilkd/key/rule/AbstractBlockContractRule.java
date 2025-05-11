@@ -276,7 +276,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             ImmutableList<Term> localOuts, ImmutableList<Term> localOutsAtPost, Term baseHeap,
             Term applPredTerm, final TermBuilder tb) {
         Term resultEq =
-            instVars.pre.resultTerm != null ? tb.equals(instVars.post.resultTerm, instVars.pre.resultTerm)
+            instVars.pre.resultTerm != null
+                    ? tb.equals(instVars.post.resultTerm, instVars.pre.resultTerm)
                     : tb.tt();
         Term exceptionEq = instVars.pre.exception != null
                 ? tb.equals(instVars.post.exception, instVars.pre.exception)

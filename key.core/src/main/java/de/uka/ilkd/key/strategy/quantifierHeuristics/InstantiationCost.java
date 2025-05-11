@@ -11,6 +11,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -32,7 +33,7 @@ public class InstantiationCost implements Feature {
      * Compute the cost of a RuleApp.
      */
     public RuleAppCost computeCost(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         final Term formula = pos.sequentFormula().formula();

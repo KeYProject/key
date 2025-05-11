@@ -17,8 +17,6 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -26,6 +24,9 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class SuperTermGenerator implements TermGenerator {
 
@@ -38,16 +39,19 @@ public abstract class SuperTermGenerator implements TermGenerator {
     public static @NonNull TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator(cond) {
             @Override
-            protected @NonNull Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
+            protected @NonNull Iterator<Term> createIterator(PosInOccurrence focus,
+                    MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
         };
     }
 
-    public static @NonNull TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
+    public static @NonNull TermGenerator upwardsWithIndex(TermFeature cond,
+            final Services services) {
         return new SuperTermWithIndexGenerator(cond) {
             @Override
-            protected @NonNull Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
+            protected @NonNull Iterator<Term> createIterator(PosInOccurrence focus,
+                    MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
         };
@@ -78,7 +82,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
 
         @Override
         public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                       MutableState mState) {
+                MutableState mState) {
             if (services == null) {
                 services = goal.proof().getServices();
                 final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();

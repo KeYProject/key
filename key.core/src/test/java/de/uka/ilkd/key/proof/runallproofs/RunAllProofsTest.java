@@ -67,7 +67,8 @@ public final class RunAllProofsTest {
      * @return The parameters. Each row will be one test case.
      * @throws IOException If an exceptions occurs while reading and parsing the index file
      */
-    public static Stream<DynamicTest> data(@NonNull ProofCollection proofCollection) throws IOException {
+    public static Stream<DynamicTest> data(@NonNull ProofCollection proofCollection)
+            throws IOException {
         /*
          * Create list of constructor parameters that will be returned by this method. Suitable
          * constructor is automatically determined by JUnit.
