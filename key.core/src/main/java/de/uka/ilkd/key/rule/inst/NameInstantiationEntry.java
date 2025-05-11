@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -10,7 +11,7 @@ import org.key_project.logic.Name;
  */
 public class NameInstantiationEntry extends InstantiationEntry<Name> {
 
-    NameInstantiationEntry(Name name) {
+    NameInstantiationEntry(@NonNull Name name) {
         super(name);
     }
 }

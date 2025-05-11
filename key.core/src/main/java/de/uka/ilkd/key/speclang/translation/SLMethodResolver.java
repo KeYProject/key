@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -24,20 +26,20 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class SLMethodResolver extends SLExpressionResolver {
 
-    public SLMethodResolver(JavaInfo javaInfo, SLResolverManager manager, KeYJavaType specInClass) {
+    public SLMethodResolver(@NonNull JavaInfo javaInfo, SLResolverManager manager, KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
     }
 
 
     @Override
-    protected boolean canHandleReceiver(SLExpression receiver) {
+    protected boolean canHandleReceiver(@Nullable SLExpression receiver) {
         return receiver != null && !receiver.getType().getFullName().endsWith("[]");
     }
 
 
     @Override
-    protected SLExpression doResolving(SLExpression receiver, String methodName,
-            SLParameters parameters) throws SLTranslationException {
+    protected SLExpression doResolving(@NonNull SLExpression receiver, @NonNull String methodName,
+                                       @Nullable SLParameters parameters) throws SLTranslationException {
 
         if (parameters == null || !parameters.isListOfTerm()) {
             return null;

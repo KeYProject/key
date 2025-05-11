@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 
 /**
@@ -34,8 +35,8 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
+    public @NonNull MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
+                                          @NonNull MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);
@@ -58,7 +59,7 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return String.format("\\varcond (%s\\isLabeled(%s)", negated ? "\\not" : "", stmtSV);
     }
 }

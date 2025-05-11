@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 
@@ -26,7 +27,7 @@ public final class MetaPow extends AbstractTermTransformer {
     }
 
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         final Term arg1 = term.sub(0);
         final Term arg2 = term.sub(1);
 

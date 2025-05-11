@@ -29,7 +29,7 @@ public final class JMLInfoExtractor {
     /**
      * Checks whether "comment" is a JML comment containing "key". see bugreport #1166
      */
-    private static boolean checkFor(String key, String comment) {
+    private static boolean checkFor(@NonNull String key, @NonNull String comment) {
         return comment.contains(key) && MiscTools.isJMLComment(comment);
     }
 
@@ -37,7 +37,7 @@ public final class JMLInfoExtractor {
     /**
      * Checks whether one of the passed comments is a JML comment containing "key".
      */
-    private static boolean checkFor(String key, ImmutableList<Comment> coms) {
+    private static boolean checkFor(@NonNull String key, @NonNull ImmutableList<Comment> coms) {
         for (Comment c : coms) {
             if (checkFor(key, c.getText())) {
                 return true;
@@ -49,8 +49,8 @@ public final class JMLInfoExtractor {
     /**
      * Checks whether one of the passed comments is a JML comment containing "key" and not *bad*.
      */
-    private static boolean checkForNotContaining(String key, String bad,
-            ImmutableList<Comment> coms) {
+    private static boolean checkForNotContaining(@NonNull String key, @NonNull String bad,
+                                                 @NonNull ImmutableList<Comment> coms) {
         for (Comment c : coms) {
             if (checkFor(key, c.getText()) && !c.getText().contains(bad)) {
                 return true;
@@ -62,7 +62,7 @@ public final class JMLInfoExtractor {
     /**
      * Checks the passed comments for the spec math mode.
      */
-    private static SpecMathMode checkForSpecMathMode(ImmutableList<Comment> comments) {
+    private static @Nullable SpecMathMode checkForSpecMathMode(@NonNull ImmutableList<Comment> comments) {
         // This is hacky but hard to do better
         // We exclude comments containing 'behaviour' since they can be from the method contract
         var specBigintMath = checkForNotContaining("spec_bigint_math", "behaviour", comments);
@@ -73,7 +73,7 @@ public final class JMLInfoExtractor {
                 : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
     }
 
-    private static ImmutableList<Comment> getJMLComments(TypeDeclaration decl) {
+    private static @NonNull ImmutableList<Comment> getJMLComments(@NonNull TypeDeclaration decl) {
         ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either decl is attached to the declaration itself ...
@@ -91,7 +91,7 @@ public final class JMLInfoExtractor {
         return coms;
     }
 
-    private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
+    private static @NonNull ImmutableList<Comment> getJMLComments(@NonNull MethodDeclaration method) {
         ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either method is attached to the method itself ...
@@ -126,7 +126,7 @@ public final class JMLInfoExtractor {
      * @param methodDeclaration the method declaration
      * @return modifiers
      */
-    public static MethodDeclaration.JMLModifiers parseMethod(MethodDeclaration methodDeclaration) {
+    public static MethodDeclaration.@NonNull JMLModifiers parseMethod(@NonNull MethodDeclaration methodDeclaration) {
         var comments = getJMLComments(methodDeclaration);
 
         var pure = checkFor("pure", comments);
@@ -145,8 +145,8 @@ public final class JMLInfoExtractor {
      * @param td
      * @return
      */
-    private static ImmutableList<Comment> extractFieldModifiers(String fieldName,
-            TypeDeclaration td) {
+    private static @NonNull ImmutableList<Comment> extractFieldModifiers(String fieldName,
+                                                                         @NonNull TypeDeclaration td) {
         ImmutableList<Comment> comments = ImmutableSLList.nil();
         FieldDeclaration fd = null;
         int position = 0;
@@ -183,7 +183,7 @@ public final class JMLInfoExtractor {
     // public interface
     // -------------------------------------------------------------------------
 
-    public static boolean hasJMLModifier(FieldDeclaration fd, String modifiers) {
+    public static boolean hasJMLModifier(@NonNull FieldDeclaration fd, @NonNull String modifiers) {
         ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either fd is attached to the declaration itself ...
@@ -207,7 +207,7 @@ public final class JMLInfoExtractor {
      * <p>
      * If t is not a reference type, false is returned.
      */
-    public static boolean isPureByDefault(KeYJavaType t) {
+    public static boolean isPureByDefault(@NonNull KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
@@ -221,7 +221,7 @@ public final class JMLInfoExtractor {
      * <p>
      * If t is not a reference type, false is returned.
      */
-    public static boolean isStrictlyPureByDefault(KeYJavaType t) {
+    public static boolean isStrictlyPureByDefault(@NonNull KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
@@ -236,7 +236,7 @@ public final class JMLInfoExtractor {
      * <p>
      * If t is not a reference type, false is returned.
      */
-    public static boolean isNullableByDefault(KeYJavaType t) {
+    public static boolean isNullableByDefault(@NonNull KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
@@ -250,7 +250,7 @@ public final class JMLInfoExtractor {
      * @param td the type declaration
      * @return modifiers
      */
-    public static TypeDeclaration.JMLModifiers parseClass(TypeDeclaration td) {
+    public static TypeDeclaration.@NonNull JMLModifiers parseClass(@NonNull TypeDeclaration td) {
         var comments = getJMLComments(td);
 
         var strictlyPure = checkFor("strictly_pure", comments);
@@ -266,7 +266,7 @@ public final class JMLInfoExtractor {
      * Returns true, if <tt>containingClass</tt> is a reference Type and has a field declaration
      * with name <tt>fieldName</tt>, which is explicitly or implicitly declared "nullable"
      */
-    public static boolean isNullable(String fieldName, TypeDeclaration td) {
+    public static boolean isNullable(String fieldName, @NonNull TypeDeclaration td) {
 
         ImmutableList<Comment> comments = extractFieldModifiers(fieldName, td);
         if (comments.isEmpty()) {
@@ -288,7 +288,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the <code>pos</code>-th parameter of the given method is declared "nullable"
      * (implicitly or explicitly).
      */
-    public static boolean parameterIsNullable(IProgramMethod pm, int pos) {
+    public static boolean parameterIsNullable(@NonNull IProgramMethod pm, int pos) {
         MethodDeclaration decl = pm.getMethodDeclaration();
         ParameterDeclaration pd = decl.getParameterDeclarationAt(pos);
 
@@ -300,7 +300,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the parameter of the given method is declared "nullable" (implicitly or
      * explicitly). Warning: weird things may happen if the parameter doesn't belong to the method.
      */
-    public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
+    public static boolean parameterIsNullable(@NonNull IProgramMethod pm, @NonNull ParameterDeclaration pd) {
         assert pm.getMethodDeclaration().getParameters().contains(pd)
                 : "parameter " + pd + " does not belong to method declaration " + pm;
         ImmutableList<Comment> comments = ImmutableSLList.nil();
@@ -322,7 +322,7 @@ public final class JMLInfoExtractor {
     }
 
 
-    public static boolean resultIsNullable(IProgramMethod pm) {
+    public static boolean resultIsNullable(@NonNull IProgramMethod pm) {
         MethodDeclaration decl = pm.getMethodDeclaration();
 
         ImmutableList<Comment> comments = ImmutableSLList.nil();
@@ -351,7 +351,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns true iff the given method is specified "pure".
      */
-    public static boolean isPure(IProgramMethod pm) {
+    public static boolean isPure(@NonNull IProgramMethod pm) {
         return pm.getMethodDeclaration().getJmlModifiers().pure()
                 || isPureByDefault(pm.getContainerType());
     }
@@ -360,7 +360,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns true iff the given method is specified "helper".
      */
-    public static boolean isHelper(IProgramMethod pm) {
+    public static boolean isHelper(@NonNull IProgramMethod pm) {
         return pm.getMethodDeclaration().getJmlModifiers().helper();
     }
 
@@ -368,7 +368,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "strictly_pure" or the containing type is
      * specified so.
      */
-    public static boolean isStrictlyPure(IProgramMethod pm) {
+    public static boolean isStrictlyPure(@NonNull IProgramMethod pm) {
         return pm.getMethodDeclaration().getJmlModifiers().strictlyPure()
                 || isStrictlyPureByDefault(pm.getContainerType());
     }

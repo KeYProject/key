@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.speclang.translation.*;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -15,24 +17,24 @@ import de.uka.ilkd.key.speclang.translation.*;
  */
 public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
 
-    private final SeqLDT seqLDT;
+    private final @NonNull SeqLDT seqLDT;
 
 
-    public JMLBuiltInPropertyResolver(JavaInfo javaInfo, SLResolverManager manager,
-            KeYJavaType specInClass) {
+    public JMLBuiltInPropertyResolver(@NonNull JavaInfo javaInfo, SLResolverManager manager,
+                                      KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
         this.seqLDT = services.getTypeConverter().getSeqLDT();
     }
 
 
     @Override
-    protected boolean canHandleReceiver(SLExpression receiver) {
+    protected boolean canHandleReceiver(@Nullable SLExpression receiver) {
         return receiver != null;
     }
 
 
     @Override
-    protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
+    protected SLExpression doResolving(@NonNull SLExpression receiver, @NonNull String name, @Nullable SLParameters parameters)
             throws SLTranslationException {
         if (parameters != null) {
             return null;

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -43,14 +44,14 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters params,
-            EngineState state) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters params,
+                        @NonNull EngineState state) throws ScriptException, InterruptedException {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
@@ -80,7 +81,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         g.apply(theApp);
     }
 
-    private TacletApp findTacletApp(Parameters p, EngineState state) throws ScriptException {
+    private @NonNull TacletApp findTacletApp(@NonNull Parameters p, @NonNull EngineState state) throws ScriptException {
         ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         TacletApp matchingApp = filterList(p, allApps);
 
@@ -91,7 +92,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         return matchingApp;
     }
 
-    private ImmutableList<TacletApp> findAllTacletApps(Parameters p, EngineState state)
+    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p, @NonNull EngineState state)
             throws ScriptException {
         boolean hide = p.hide.equals("hide");
 
@@ -135,7 +136,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private @Nullable TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
+    private @Nullable TacletApp filterList(@NonNull Parameters p, @NonNull ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.posInOccurrence().subTerm().equalsModProperty(p.formula,
@@ -147,7 +148,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         return null;
     }
 
-    private void computeFormula(Parameters params, Goal goal) throws ScriptException {
+    private void computeFormula(@NonNull Parameters params, @NonNull Goal goal) throws ScriptException {
         Node n = goal.node();
         Sequent seq = n.sequent();
         int occ = params.occ;
@@ -185,7 +186,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             "Variable '" + params.var + "' has no occurrence no. '" + params.occ + "'.");
     }
 
-    private Term stripUpdates(Term term) {
+    private @NonNull Term stripUpdates(@NonNull Term term) {
         while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
             term = term.sub(1);
         }
@@ -216,12 +217,12 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
      * return params; }
      */
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "instantiate";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return """
                 instantiate var=a occ=2 with="a_8" hide
                   <p>
@@ -241,7 +242,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         public int occ = 1;
 
         @Option(value = "#2", required = false)
-        public String hide = "";
+        public @NonNull String hide = "";
 
         @Option(value = "with", required = false)
         public Term with;
@@ -249,14 +250,14 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
 
     private static class TacletNameFilter extends TacletFilter {
 
-        private final Name rulename;
+        private final @NonNull Name rulename;
 
-        public TacletNameFilter(String rulename) {
+        public TacletNameFilter(@NonNull String rulename) {
             this.rulename = new Name(rulename);
         }
 
         @Override
-        protected boolean filter(Taclet taclet) {
+        protected boolean filter(@NonNull Taclet taclet) {
             return taclet.name().equals(rulename);
         }
 

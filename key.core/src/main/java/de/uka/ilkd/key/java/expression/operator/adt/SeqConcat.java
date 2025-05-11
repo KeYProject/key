@@ -7,16 +7,17 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 public class SeqConcat extends BinaryOperator {
 
-    public SeqConcat(ExtList children) {
+    public SeqConcat(@NonNull ExtList children) {
         super(children);
     }
 
 
-    public SeqConcat(Expression seq1, Expression seq2) {
+    public SeqConcat(@NonNull Expression seq1, @NonNull Expression seq2) {
         super(seq1, seq2);
     }
 
@@ -31,7 +32,7 @@ public class SeqConcat extends BinaryOperator {
     }
 
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSeqConcat(this);
     }
 

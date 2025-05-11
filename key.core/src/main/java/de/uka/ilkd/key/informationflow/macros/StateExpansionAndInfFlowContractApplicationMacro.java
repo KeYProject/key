@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -22,7 +23,7 @@ import org.key_project.util.collection.ImmutableList;
 public class StateExpansionAndInfFlowContractApplicationMacro extends SequentialProofMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Self-composition state expansion with inf flow contracts";
     }
 
@@ -32,12 +33,12 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
     }
 
     @Override
-    public String getScriptCommandName() {
+    public @NonNull String getScriptCommandName() {
         return "inf-flow-state-expansion";
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Extract the self-composed states after the merge of the "
             + "symbolic execution goals which is included in the proof "
             + "obligation generation from information flow contracts "
@@ -45,7 +46,7 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
+    protected ProofMacro @NonNull [] createProofMacroArray() {
         return new ProofMacro[] { new SelfcompositionStateExpansionMacro(),
             new PropositionalExpansionWithSimplificationMacro(),
             new FullUseInformationFlowContractMacro() };

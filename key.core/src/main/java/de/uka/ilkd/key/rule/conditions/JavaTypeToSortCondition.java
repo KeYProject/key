@@ -19,6 +19,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
@@ -29,13 +31,13 @@ import org.key_project.logic.sort.Sort;
  */
 public final class JavaTypeToSortCondition implements VariableCondition {
 
-    private final OperatorSV exprOrTypeSV;
+    private final @NonNull OperatorSV exprOrTypeSV;
     private final GenericSort sort;
     private final boolean elemSort;
 
 
-    public JavaTypeToSortCondition(final OperatorSV exprOrTypeSV, final GenericSort sort,
-            final boolean elemSort) {
+    public JavaTypeToSortCondition(final @NonNull OperatorSV exprOrTypeSV, final GenericSort sort,
+                                   final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         this.elemSort = elemSort;
@@ -46,7 +48,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     }
 
 
-    public static boolean checkSortedSV(final OperatorSV exprOrTypeSV) {
+    public static boolean checkSortedSV(final @NonNull OperatorSV exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
         return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE
@@ -55,8 +57,8 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
-            MatchConditions matchCond, Services services) {
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
+                                           MatchConditions matchCond, Services services) {
         if (var != exprOrTypeSV) {
             return matchCond;
         }
@@ -91,7 +93,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\hasSort(" + (elemSort ? "\\elemSort(" + exprOrTypeSV + ")" : exprOrTypeSV) + ", "
             + sort + ")";
     }

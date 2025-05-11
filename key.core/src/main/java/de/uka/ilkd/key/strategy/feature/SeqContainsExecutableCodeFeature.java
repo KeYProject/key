@@ -13,10 +13,11 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import org.jspecify.annotations.NonNull;
 
 public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 
-    private final TermFeature tf;
+    private final @NonNull TermFeature tf;
 
     private SeqContainsExecutableCodeFeature(boolean considerQueries) {
         if (considerQueries) {
@@ -29,15 +30,15 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
     public final static Feature PROGRAMS = new SeqContainsExecutableCodeFeature(false);
     public final static Feature PROGRAMS_OR_QUERIES = new SeqContainsExecutableCodeFeature(true);
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         return containsExec(goal.sequent().succedent().iterator(), mState,
             goal.proof().getServices())
                 || containsExec(goal.sequent().antecedent().iterator(), mState,
                     goal.proof().getServices());
     }
 
-    private boolean containsExec(Iterator<SequentFormula> it, MutableState mState,
-            Services services) {
+    private boolean containsExec(@NonNull Iterator<SequentFormula> it, MutableState mState,
+                                 Services services) {
         while (it.hasNext()) {
             if (tf.compute(it.next().formula(), mState, services)
                     .equals(BinaryTermFeature.ZERO_COST)) {

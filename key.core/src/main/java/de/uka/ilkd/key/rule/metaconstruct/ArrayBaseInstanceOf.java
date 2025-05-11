@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
@@ -31,7 +32,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
      * It is assumed that <tt>term.sub(0)</tt> is either a term of reference array sort or a term
      * with an <tt>exactInstance</tt> symbol as top level depending on a reference array sort.
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         final Term array = term.sub(0);
         final Term element = term.sub(1);
 

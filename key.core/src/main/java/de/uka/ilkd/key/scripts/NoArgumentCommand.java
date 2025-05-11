@@ -17,7 +17,7 @@ import org.jspecify.annotations.NonNull;
  */
 public abstract class NoArgumentCommand implements ProofScriptCommand<@NonNull Void> {
     @Override
-    public List<ProofScriptArgument<@NonNull Void>> getArguments() {
+    public @NonNull List<ProofScriptArgument<@NonNull Void>> getArguments() {
         return new ArrayList<>();
     }
 

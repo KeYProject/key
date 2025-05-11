@@ -314,7 +314,7 @@ public class Configuration {
      * @throws IllegalArgumentException if defaultValue does not belong to an enum
      */
     @SuppressWarnings("unchecked")
-    public <T extends Enum<T>> T getEnum(String name, T defaultValue) {
+    public <T extends Enum<T>> @NonNull T getEnum(String name, @NonNull T defaultValue) {
         Class<T> clazz = (Class<T>) defaultValue.getClass();
         if (!clazz.isEnum()) {
             throw new IllegalArgumentException(clazz + " is not an enum type.");

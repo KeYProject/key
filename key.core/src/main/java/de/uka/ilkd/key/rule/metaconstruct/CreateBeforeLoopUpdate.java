@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 
@@ -37,7 +38,7 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         final Term loopTerm = term.sub(0);
 
         final Term anonHeapTerm = term.sub(1);
@@ -62,10 +63,10 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
-    private static Term createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
-            Term anonHeapTerm, Term anonSavedHeapTerm,
-            Term anonPermissionsHeapTerm,
-            Services services) {
+    private static @NonNull Term createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
+                                                        @NonNull Term anonHeapTerm, @NonNull Term anonSavedHeapTerm,
+                                                        @NonNull Term anonPermissionsHeapTerm,
+                                                        @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 

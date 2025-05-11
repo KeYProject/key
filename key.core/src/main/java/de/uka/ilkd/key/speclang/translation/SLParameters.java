@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -30,7 +31,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
      * @param services the Services
      * @return the list of types that compose the type signature
      */
-    public ImmutableList<KeYJavaType> getSignature(Services services) {
+    public @NonNull ImmutableList<KeYJavaType> getSignature(@NonNull Services services) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
         for (SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
@@ -47,7 +48,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
         return result;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return parameters == null ? "" : parameters.toString();
     }
 

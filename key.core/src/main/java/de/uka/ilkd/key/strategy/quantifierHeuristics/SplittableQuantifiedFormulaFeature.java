@@ -15,6 +15,7 @@ import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -24,7 +25,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
     public static final Feature INSTANCE = new SplittableQuantifiedFormulaFeature();
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @NonNull PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser();
@@ -45,12 +46,12 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
     }
 
     private static class Analyser {
-        public ImmutableSet<QuantifiableVariable> existentialVars =
+        public @NonNull ImmutableSet<QuantifiableVariable> existentialVars =
             DefaultImmutableSet.nil();
         public Operator binOp;
         public Term left, right;
 
-        public boolean analyse(Term formula) {
+        public boolean analyse(@NonNull Term formula) {
             final Operator op = formula.op();
 
             if (op == Quantifier.ALL) {

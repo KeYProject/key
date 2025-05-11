@@ -9,6 +9,8 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableSLList;
 
 
@@ -27,7 +29,7 @@ public final class BackTrackingManager {
      * The original rule application in question, i.e., the application without the changes that can
      * possibly be applied by <code>ChoicePoint</code>s
      */
-    private RuleApp initialApp = null;
+    private @Nullable RuleApp initialApp = null;
 
     /**
      * Stack of <code>Iterator<CPBranch></code>: the branches of <code>ChoicePoint</code>s that have
@@ -58,7 +60,7 @@ public final class BackTrackingManager {
      *        evaluation run (after backtracking). The <code>ticket</code> must not change between
      *        two evaluation runs of the feature term
      */
-    public void passChoicePoint(ChoicePoint cp, Object ticket) {
+    public void passChoicePoint(@NonNull ChoicePoint cp, Object ticket) {
         assert initialApp != null;
         assertValidTicket(ticket);
         assert chosenBranches.size() == choices.size();
@@ -123,16 +125,16 @@ public final class BackTrackingManager {
      * @return the resulting rule application when all choice points have applied their
      *         modifications
      */
-    public RuleApp getResultingapp() {
+    public @Nullable RuleApp getResultingapp() {
         return getOldRuleApp();
     }
 
-    private void pushChoices(Iterator<CPBranch> remainingChoices, CPBranch chosen) {
+    private void pushChoices(@NonNull Iterator<CPBranch> remainingChoices, CPBranch chosen) {
         choices.push(remainingChoices);
         chosenBranches.add(chosen);
     }
 
-    private void addChoicePoint(ChoicePoint cp) {
+    private void addChoicePoint(@NonNull ChoicePoint cp) {
         final RuleApp oldApp = getOldRuleApp();
         if (oldApp == null) {
             // This means that an earlier <code>ChoicePoint</code> did not have
@@ -177,7 +179,7 @@ public final class BackTrackingManager {
         }
     }
 
-    private RuleApp getOldRuleApp() {
+    private @Nullable RuleApp getOldRuleApp() {
         if (chosenBranches.isEmpty()) {
             return initialApp;
         }

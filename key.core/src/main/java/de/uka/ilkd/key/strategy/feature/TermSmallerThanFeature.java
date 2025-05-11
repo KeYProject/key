@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Feature that returns zero iff one term is smaller than another term in the current term ordering
@@ -15,7 +16,7 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm left, right;
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right) {
+    public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right) {
         return new TermSmallerThanFeature(left, right);
     }
 

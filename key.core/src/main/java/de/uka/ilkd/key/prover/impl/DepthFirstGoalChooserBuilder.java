@@ -5,6 +5,7 @@ package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.GoalChooserBuilder;
+import org.jspecify.annotations.NonNull;
 
 public class DepthFirstGoalChooserBuilder implements GoalChooserBuilder {
 
@@ -12,15 +13,15 @@ public class DepthFirstGoalChooserBuilder implements GoalChooserBuilder {
 
     public DepthFirstGoalChooserBuilder() {}
 
-    public GoalChooser create() {
+    public @NonNull GoalChooser create() {
         return new DepthFirstGoalChooser();
     }
 
-    public GoalChooserBuilder copy() {
+    public @NonNull GoalChooserBuilder copy() {
         return new DepthFirstGoalChooserBuilder();
     }
 
-    public String name() {
+    public @NonNull String name() {
         return NAME;
     }
 }

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The final result of the strategy application is stored in this container and returned to the
@@ -70,7 +71,7 @@ public class ApplyStrategyInfo {
         return proof;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Apply Strategy Info:");
         sb.append("\n Message: ").append(message);

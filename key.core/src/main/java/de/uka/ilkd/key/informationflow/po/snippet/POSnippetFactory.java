@@ -11,6 +11,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -19,51 +20,51 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  */
 public class POSnippetFactory {
 
-    public static BasicPOSnippetFactory getBasicFactory(FunctionalOperationContract contract,
-            ProofObligationVars vars, Services services) {
+    public static @NonNull BasicPOSnippetFactory getBasicFactory(@NonNull FunctionalOperationContract contract,
+                                                                 ProofObligationVars vars, @NonNull Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }
 
-    public static BasicPOSnippetFactory getBasicFactory(LoopSpecification invariant,
-            ProofObligationVars vars, ExecutionContext context, Term guardTerm, Services services) {
+    public static @NonNull BasicPOSnippetFactory getBasicFactory(@NonNull LoopSpecification invariant,
+                                                                 ProofObligationVars vars, ExecutionContext context, Term guardTerm, @NonNull Services services) {
         return new BasicPOSnippetFactoryImpl(invariant, vars, context, guardTerm, services);
     }
 
-    public static BasicPOSnippetFactory getBasicFactory(InformationFlowContract contract,
-            ProofObligationVars vars, Services services) {
+    public static @NonNull BasicPOSnippetFactory getBasicFactory(@NonNull InformationFlowContract contract,
+                                                                 ProofObligationVars vars, @NonNull Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }
 
-    public static BasicPOSnippetFactory getBasicFactory(BlockContract contract,
-            ProofObligationVars vars, ExecutionContext context, Services services) {
+    public static @NonNull BasicPOSnippetFactory getBasicFactory(@NonNull BlockContract contract,
+                                                                 ProofObligationVars vars, ExecutionContext context, @NonNull Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, context, services);
     }
 
-    static BasicPOSnippetFactory getBasicFactory(BasicSnippetData data,
-            ProofObligationVars poVars) {
+    static @NonNull BasicPOSnippetFactory getBasicFactory(BasicSnippetData data,
+                                                          ProofObligationVars poVars) {
         return new BasicPOSnippetFactoryImpl(data, poVars);
     }
 
-    public static InfFlowPOSnippetFactory getInfFlowFactory(LoopSpecification invariant,
-            ProofObligationVars vars1, ProofObligationVars vars2, ExecutionContext context,
-            Term guardTerm, Services services) {
+    public static @NonNull InfFlowPOSnippetFactory getInfFlowFactory(@NonNull LoopSpecification invariant,
+                                                                     @NonNull ProofObligationVars vars1, @NonNull ProofObligationVars vars2, ExecutionContext context,
+                                                                     Term guardTerm, @NonNull Services services) {
         return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, context, guardTerm,
             services);
     }
 
-    public static InfFlowPOSnippetFactory getInfFlowFactory(InformationFlowContract contract,
-            ProofObligationVars vars1, ProofObligationVars vars2, Services services) {
+    public static @NonNull InfFlowPOSnippetFactory getInfFlowFactory(@NonNull InformationFlowContract contract,
+                                                                     @NonNull ProofObligationVars vars1, @NonNull ProofObligationVars vars2, @NonNull Services services) {
         return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, services);
     }
 
-    public static InfFlowPOSnippetFactory getInfFlowFactory(BlockContract contract,
-            ProofObligationVars vars1, ProofObligationVars vars2, ExecutionContext context,
-            Services services) {
+    public static @NonNull InfFlowPOSnippetFactory getInfFlowFactory(@NonNull BlockContract contract,
+                                                                     @NonNull ProofObligationVars vars1, @NonNull ProofObligationVars vars2, ExecutionContext context,
+                                                                     @NonNull Services services) {
         return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, context, services);
     }
 
-    static InfFlowPOSnippetFactory getInfFlowFactory(BasicSnippetData data,
-            ProofObligationVars vars1, ProofObligationVars vars2) {
+    static @NonNull InfFlowPOSnippetFactory getInfFlowFactory(BasicSnippetData data,
+                                                              @NonNull ProofObligationVars vars1, @NonNull ProofObligationVars vars2) {
         return new InfFlowPOSnippetFactoryImpl(data, vars1, vars2);
     }
 }

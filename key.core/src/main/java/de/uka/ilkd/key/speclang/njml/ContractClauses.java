@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
@@ -48,7 +49,7 @@ class ContractClauses {
 
     private final Map<Clauses<?, ?>, List<Pair<Object, Object>>> clauseData = new LinkedHashMap<>();
 
-    public <K, V> ContractClauses add(Clauses<K, V> type, K heapOrLabel, V t) {
+    public <K, V> @NonNull ContractClauses add(Clauses<K, V> type, K heapOrLabel, V t) {
         List<Pair<Object, Object>> list =
             clauseData.computeIfAbsent(type, key -> new LinkedList<>());
         list.add(new Pair<>(heapOrLabel, t));
@@ -56,7 +57,7 @@ class ContractClauses {
     }
 
     @SuppressWarnings("unchecked")
-    public <K, V> List<Pair<K, V>> get(Clauses<K, V> type) {
+    public <K, V> @NonNull List<Pair<K, V>> get(Clauses<K, V> type) {
         List<Pair<Object, Object>> list =
             clauseData.computeIfAbsent(type, key -> new LinkedList<>());
         return list.stream().map(p -> new Pair<>((K) p.first, (V) p.second))

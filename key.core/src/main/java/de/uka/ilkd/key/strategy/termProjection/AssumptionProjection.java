@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -23,11 +24,11 @@ public class AssumptionProjection implements ProjectionToTerm {
         this.no = no;
     }
 
-    public static ProjectionToTerm create(int no) {
+    public static @NonNull ProjectionToTerm create(int no) {
         return new AssumptionProjection(no);
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
         assert app instanceof TacletApp
                 : "Projection is only applicable to taclet apps," + " but got " + app;
         final TacletApp tapp = (TacletApp) app;

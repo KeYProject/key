@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -44,7 +46,7 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      * @return the resulting term of the translation or <code>null</code> if both antecedent and
      *         succendent are empty.
      */
-    protected Term translate(Sequent s, TermServices services) {
+    protected @Nullable Term translate(@NonNull Sequent s, @NonNull TermServices services) {
         TermBuilder builder = services.getTermBuilder();
 
         ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
@@ -70,7 +72,7 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      * @param s Semisequent.
      * @return A list of all formulae of the semisequent <code>s </code>.
      */
-    private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
+    private @NonNull ImmutableList<Term> getFormulaeOfSemisequent(@NonNull Semisequent s) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
         for (SequentFormula cf : s) {
             terms = terms.append(cf.formula());

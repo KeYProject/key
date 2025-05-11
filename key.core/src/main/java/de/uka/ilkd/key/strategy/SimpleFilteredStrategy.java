@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -34,7 +35,7 @@ public class SimpleFilteredStrategy implements Strategy {
         ruleFilter = p_ruleFilter;
     }
 
-    public Name name() {
+    public @NonNull Name name() {
         return NAME;
     }
 
@@ -45,8 +46,8 @@ public class SimpleFilteredStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
+                                   MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
             return TopRuleAppCost.INSTANCE;
         }

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInProgram;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to store the information about a matched context of a dl formula. (the pi and
@@ -64,7 +65,7 @@ public class ContextInstantiationEntry
     }
 
     /** toString */
-    public String toString() {
+    public @NonNull String toString() {
         return "[\npi:" + prefix() + "\nomega:" + suffix() + "\n]";
     }
 

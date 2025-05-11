@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 
 
@@ -29,9 +31,9 @@ public final class ObserverCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
-            Services services) {
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+                                           @NonNull MatchConditions mc,
+                                           Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         final Term obsInst = (Term) svInst.getInstantiation(obs);
 
@@ -55,7 +57,7 @@ public final class ObserverCondition implements VariableCondition {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\isObserver (" + obs + ", " + heap + ")";
     }
 }

@@ -36,6 +36,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
@@ -114,17 +115,17 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return RULE_NAME;
     }
 
     @Override
-    public String displayName() {
+    public @NonNull String displayName() {
         return DISPLAY_NAME;
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return displayName();
     }
 
@@ -306,9 +307,9 @@ public class MergeRule implements BuiltInRule {
      */
     @SuppressWarnings("unused")
     /* For deactivated equiv check */
-    protected MergeStateEntry mergeStates(
-            MergeProcedure mergeRule, SymbolicExecutionState state1, SymbolicExecutionState state2,
-            Term programCounter, Term distinguishingFormula, Services services) {
+    protected @NonNull MergeStateEntry mergeStates(
+            @NonNull MergeProcedure mergeRule, @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2,
+            @NonNull Term programCounter, Term distinguishingFormula, @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -463,10 +464,10 @@ public class MergeRule implements BuiltInRule {
      *        Maybe null (for automatic generation).
      * @return A merged heap term.
      */
-    protected ValuesMergeResult mergeHeaps(final MergeProcedure mergeRule,
-            final LocationVariable heapVar, final Term heap1, final Term heap2,
-            final SymbolicExecutionState state1, final SymbolicExecutionState state2,
-            Term distinguishingFormula, final Services services) {
+    protected @NonNull ValuesMergeResult mergeHeaps(final @NonNull MergeProcedure mergeRule,
+                                                    final LocationVariable heapVar, final @NonNull Term heap1, final @NonNull Term heap2,
+                                                    final @NonNull SymbolicExecutionState state1, final @NonNull SymbolicExecutionState state2,
+                                                    Term distinguishingFormula, final @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
@@ -604,8 +605,8 @@ public class MergeRule implements BuiltInRule {
      * @param doMergePartnerCheck Checks for available merge partners iff this flag is set to true.
      * @return true iff a suitable top level formula for merging.
      */
-    public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence pio,
-            boolean doMergePartnerCheck) {
+    public static boolean isOfAdmissibleForm(@NonNull Goal goal, @Nullable PosInOccurrence pio,
+                                             boolean doMergePartnerCheck) {
         // We admit top level formulas of the form \<{ ... }\> phi
         // and U \<{ ... }\> phi, where U must be an update
         // in normal form, i.e. a parallel update of elementary
@@ -657,7 +658,7 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pio, TermServices services) {
+    public @NonNull IBuiltInRuleApp createApp(PosInOccurrence pio, TermServices services) {
         return new MergeRuleBuiltInRuleApp(this, pio);
     }
 
@@ -668,8 +669,8 @@ public class MergeRule implements BuiltInRule {
      * @param pio Position of update-program counter formula in goal.
      * @return A list of suitable merge partners. May be empty if none exist.
      */
-    public static ImmutableList<MergePartner> findPotentialMergePartners(Goal goal,
-            PosInOccurrence pio) {
+    public static @NonNull ImmutableList<MergePartner> findPotentialMergePartners(@NonNull Goal goal,
+                                                                                  @NonNull PosInOccurrence pio) {
 
         final Services services = goal.proof().getServices();
 

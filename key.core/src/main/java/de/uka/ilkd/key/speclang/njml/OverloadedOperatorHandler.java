@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
@@ -49,7 +50,7 @@ public class OverloadedOperatorHandler {
             this.image = image;
         }
 
-        public static JMLOperator get(String image) {
+        public static @NonNull JMLOperator get(String image) {
             for (JMLOperator value : JMLOperator.values()) {
                 if (value.image.equals(image)) {
                     return value;
@@ -95,9 +96,9 @@ public class OverloadedOperatorHandler {
     }
 
     private final List<JMLOperatorHandler> handlers = new ArrayList<>();
-    private final IntegerHandler integerHandler;
+    private final @NonNull IntegerHandler integerHandler;
 
-    public OverloadedOperatorHandler(Services services, SpecMathMode specMathMode) {
+    public OverloadedOperatorHandler(@NonNull Services services, @NonNull SpecMathMode specMathMode) {
         this.integerHandler = new IntegerHandler(services, specMathMode);
 
         handlers.add(new BinaryBooleanHandler(services));
@@ -139,16 +140,16 @@ public class OverloadedOperatorHandler {
 
 
     public static class SequenceHandler implements JMLOperatorHandler {
-        private final SeqLDT ldtSequence;
-        private final TermBuilder tb;
+        private final @NonNull SeqLDT ldtSequence;
+        private final @NonNull TermBuilder tb;
 
-        public SequenceHandler(Services services) {
+        public SequenceHandler(@NonNull Services services) {
             ldtSequence = services.getTypeConverter().getSeqLDT();
             tb = services.getTermBuilder();
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left, @Nullable SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -164,16 +165,16 @@ public class OverloadedOperatorHandler {
     }
 
     public static class LocSetHandler implements JMLOperatorHandler {
-        private final LocSetLDT ldt;
-        private final TermBuilder tb;
+        private final @NonNull LocSetLDT ldt;
+        private final @NonNull TermBuilder tb;
 
-        public LocSetHandler(Services services) {
+        public LocSetHandler(@NonNull Services services) {
             ldt = services.getTypeConverter().getLocSetLDT();
             tb = services.getTermBuilder();
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left, @Nullable SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -197,16 +198,16 @@ public class OverloadedOperatorHandler {
     }
 
     private static class BinaryBooleanHandler implements JMLOperatorHandler {
-        private final Sort sortBoolean;
-        private final TermBuilder tb;
+        private final @NonNull Sort sortBoolean;
+        private final @NonNull TermBuilder tb;
 
-        public BinaryBooleanHandler(Services services) {
+        public BinaryBooleanHandler(@NonNull Services services) {
             sortBoolean = services.getTypeConverter().getBooleanLDT().targetSort();
             tb = services.getTermBuilder();
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
+        public @Nullable SLExpression build(JMLOperator op, @NonNull SLExpression left, @NonNull SLExpression right) {
             if ((left.getTerm().sort() == sortBoolean
                     || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean

@@ -17,6 +17,8 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -33,19 +35,19 @@ public abstract class SuperTermGenerator implements TermGenerator {
         this.cond = cond;
     }
 
-    public static TermGenerator upwards(TermFeature cond, final Services services) {
+    public static @NonNull TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator(cond) {
             @Override
-            protected Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
+            protected @NonNull Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
         };
     }
 
-    public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
+    public static @NonNull TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator(cond) {
             @Override
-            protected Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
+            protected @NonNull Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
         };
@@ -75,8 +77,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
 
         @Override
-        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-                MutableState mState) {
+        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+                                       MutableState mState) {
             if (services == null) {
                 services = goal.proof().getServices();
                 final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
@@ -91,14 +93,14 @@ public abstract class SuperTermGenerator implements TermGenerator {
             return createIterator(pos, mState);
         }
 
-        protected Term generateOneTerm(Term superterm, int child) {
+        protected @NonNull Term generateOneTerm(Term superterm, int child) {
             final Term index = services.getTermBuilder().zTerm(String.valueOf(child));
             return services.getTermBuilder().tf().createTerm(binFunc, superterm, index);
         }
 
         private static class SuperTermGeneratedOp
                 implements SortedOperator, Operator, TerminalSyntaxElement {
-            private final Name NAME;
+            private final @NonNull Name NAME;
             private final IntegerLDT numbers;
 
             public SuperTermGeneratedOp(IntegerLDT numbers) {
@@ -106,7 +108,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 NAME = new Name("SuperTermGenerated");
             }
 
-            public Name name() {
+            public @NonNull Name name() {
                 return NAME;
             }
 
@@ -114,19 +116,19 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 return 2;
             }
 
-            public Sort sort(Sort[] sorts) {
+            public @NonNull Sort sort(Sort[] sorts) {
                 return JavaDLTheory.ANY;
             }
 
-            public Sort sort() {
+            public @NonNull Sort sort() {
                 return JavaDLTheory.ANY;
             }
 
-            public Sort argSort(int i) {
+            public @NonNull Sort argSort(int i) {
                 return JavaDLTheory.ANY;
             }
 
-            public ImmutableArray<Sort> argSorts() {
+            public @Nullable ImmutableArray<Sort> argSorts() {
                 return null;
             }
 
@@ -135,7 +137,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             }
 
             @Override
-            public Modifier modifier() {
+            public @NonNull Modifier modifier() {
                 return Modifier.RIGID;
             }
 
@@ -144,7 +146,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             }
 
             @Override
-            public void validTopLevelException(org.key_project.logic.Term term)
+            public void validTopLevelException(org.key_project.logic.@NonNull Term term)
                     throws TermCreationException {
                 if (!(term.arity() == 2 && term.sub(1).sort()
                         .extendsTrans(numbers.getNumberSymbol().sort()))) {
@@ -155,7 +157,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     }
 
     class UpwardsIterator implements Iterator<Term> {
-        private PosInOccurrence currentPos;
+        private @Nullable PosInOccurrence currentPos;
         private final MutableState mState;
         private final Services services;
 

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
@@ -45,13 +46,13 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
 
         Goal goal = Objects.requireNonNull(state).getFirstOpenAutomaticGoal();
 
@@ -83,7 +84,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
         }
     }
 
-    private SequentFormula find(SequentFormula sf, Semisequent semiseq) throws ScriptException {
+    private @NonNull SequentFormula find(@NonNull SequentFormula sf, @NonNull Semisequent semiseq) throws ScriptException {
         for (SequentFormula s : semiseq) {
             if (s.formula().equalsModProperty(sf.formula(), TERM_LABELS_PROPERTY)) {
                 return s;
@@ -93,7 +94,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "hide";
     }
 

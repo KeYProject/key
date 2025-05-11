@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 
 public interface TacletMatcher {
@@ -41,6 +42,7 @@ public interface TacletMatcher {
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
+    @Nullable
     MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services);
 

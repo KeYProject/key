@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -18,7 +19,7 @@ public class RemoveParentUpdateModifier implements Modifier {
 
 
     @Override
-    public PosInOccurrence modifyPosistion(PosInOccurrence pos) {
+    public PosInOccurrence modifyPosistion(@NonNull PosInOccurrence pos) {
         if (!pos.isTopLevel() && pos.up().subTerm().op() instanceof UpdateApplication) {
             return modifyPosistion(pos.up());
         } else {

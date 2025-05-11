@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Pulls the initializor out of a for-loop. Only receives the init as a parameter, not the whole
@@ -41,8 +42,8 @@ public class ForInitUnfoldTransformer extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
+                                                SVInstantiations svInst) {
         Debug.assertTrue(pe instanceof LoopInit, "ForInitUnfoldTransformer cannot handle ", pe);
 
         final LoopInit astLoopInit = (LoopInit) pe;

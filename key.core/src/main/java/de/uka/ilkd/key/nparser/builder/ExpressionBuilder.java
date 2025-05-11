@@ -543,7 +543,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitTermorseq(KeYParser.TermorseqContext ctx) {
+    public @Nullable Object visitTermorseq(KeYParser.TermorseqContext ctx) {
         Term head = accept(ctx.head);
         Sequent s = accept(ctx.s);
         Semisequent ss = accept(ctx.ss);

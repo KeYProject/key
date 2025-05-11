@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
         Path root = state.getBaseFileName();
         if (!Files.isDirectory(root)) {
             root = root.getParent();
@@ -50,7 +51,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "script";
     }
 }

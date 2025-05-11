@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -23,8 +24,8 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
 
 
-    protected final ImmutableArray<Expression> children;
-    protected final KeYJavaType kjt;
+    protected final @NonNull ImmutableArray<Expression> children;
+    protected final @NonNull KeYJavaType kjt;
 
     /**
      * Array initializer.
@@ -32,7 +33,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
      * @param list with all children. May contain: several of Expression (as the initializing
      *        expression) Comments
      */
-    public ArrayInitializer(ExtList list, KeYJavaType kjt) {
+    public ArrayInitializer(@NonNull ExtList list, @NonNull KeYJavaType kjt) {
         super(list);
         assert kjt != null;
         this.kjt = kjt;
@@ -45,7 +46,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
      *
      * @param expressions a list of all contained elements
      */
-    public ArrayInitializer(Expression[] expressions, KeYJavaType kjt) {
+    public ArrayInitializer(Expression[] expressions, @NonNull KeYJavaType kjt) {
         super();
         assert kjt != null;
         this.kjt = kjt;
@@ -60,7 +61,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
 
     @Override
-    public ProgramElement getChildAt(int index) {
+    public @NonNull ProgramElement getChildAt(int index) {
         if (children != null) {
             return children.get(index);
         }
@@ -75,7 +76,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
 
     @Override
-    public Expression getExpressionAt(int index) {
+    public @NonNull Expression getExpressionAt(int index) {
         if (children != null) {
             return children.get(index);
         }
@@ -84,7 +85,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnArrayInitializer(this);
     }
 
@@ -100,7 +101,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return kjt;
     }
 }

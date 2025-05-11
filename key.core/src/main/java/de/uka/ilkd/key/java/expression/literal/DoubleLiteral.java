@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -52,7 +53,7 @@ public class DoubleLiteral extends Literal {
      * @param value a string.
      */
 
-    public DoubleLiteral(ExtList children, String value) {
+    public DoubleLiteral(@NonNull ExtList children, String value) {
         super(children);
         this.value = value;
     }
@@ -99,16 +100,16 @@ public class DoubleLiteral extends Literal {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnDoubleLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return DoubleLDT.NAME;
     }
 

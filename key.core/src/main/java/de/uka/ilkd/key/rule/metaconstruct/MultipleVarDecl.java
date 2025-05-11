@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -29,8 +30,8 @@ public class MultipleVarDecl extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
+                                                SVInstantiations svInst) {
         VariableDeclaration vardecl = (VariableDeclaration) pe;
         ImmutableArray<Modifier> modifiers = vardecl.getModifiers();
         TypeReference tref = vardecl.getTypeReference();

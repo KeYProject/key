@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +24,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MatchProgramSVInstruction.class);
 
-    public MatchProgramSVInstruction(ProgramSV sv) {
+    public MatchProgramSVInstruction(@NonNull ProgramSV sv) {
         super(sv);
     }
 
@@ -32,8 +34,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * match conditions are returned, otherwise <tt>null</tt>. Such an addition can fail, e.g. if
      * already a pair <tt>(this,x)</tt> exists where <tt>x!=pe</tt>
      */
-    protected MatchConditions addInstantiation(ProgramElement pe, MatchConditions matchCond,
-            Services services) {
+    protected @Nullable MatchConditions addInstantiation(@NonNull ProgramElement pe, @NonNull MatchConditions matchCond,
+                                                         @NonNull Services services) {
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
         final Object inMap = instantiations.getInstantiation(op);
@@ -66,8 +68,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-            Services services) {
+    public @Nullable MatchConditions match(Operator instantiationCandidate, @NonNull MatchConditions matchConditions,
+                                           @NonNull Services services) {
         if (instantiationCandidate instanceof ProgramElement) {
             return match((ProgramElement) instantiationCandidate, matchConditions, services);
         }
@@ -78,8 +80,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-            Services services) {
+    public @Nullable MatchConditions match(@NonNull Term instantiationCandidate, @NonNull MatchConditions matchCond,
+                                           @NonNull Services services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate)) {
@@ -93,8 +95,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions matchCond,
-            Services services) {
+    public @Nullable MatchConditions match(@NonNull ProgramElement instantiationCandidate, @NonNull MatchConditions matchCond,
+                                           @NonNull Services services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate,
@@ -110,8 +112,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition, @NonNull MatchConditions mc,
+                                           @NonNull Services services) {
         MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();

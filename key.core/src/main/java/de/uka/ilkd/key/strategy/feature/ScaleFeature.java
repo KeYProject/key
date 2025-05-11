@@ -10,6 +10,8 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A feature that applies an affine transformation to the result of a given feature. As a special
@@ -30,7 +32,7 @@ public abstract class ScaleFeature implements Feature {
      * @param f the base feature
      * @param coeff the coefficient to be applied to the result of <code>f</code>
      */
-    public static Feature createScaled(Feature f, double coeff) {
+    public static @NonNull Feature createScaled(Feature f, double coeff) {
         return createAffine(f, coeff, 0);
     }
 
@@ -43,7 +45,7 @@ public abstract class ScaleFeature implements Feature {
      * @param offset the offset to be added to the result of <code>f</code> (after multiplication
      *        with <code>coeff</code>)
      */
-    public static Feature createAffine(Feature f, double coeff, long offset) {
+    public static @NonNull Feature createAffine(Feature f, double coeff, long offset) {
         return new MultFeature(f, coeff, offset);
     }
 
@@ -57,8 +59,8 @@ public abstract class ScaleFeature implements Feature {
      * @param img0 point 0 in the image
      * @param img1 point 1 in the image
      */
-    public static Feature createAffine(Feature f, RuleAppCost dom0, RuleAppCost dom1,
-            RuleAppCost img0, RuleAppCost img1) {
+    public static Feature createAffine(Feature f, @NonNull RuleAppCost dom0, RuleAppCost dom1,
+                                       @NonNull RuleAppCost img0, RuleAppCost img1) {
         Debug.assertFalse(dom0.equals(dom1),
             "Two different points are needed to define the " + "affine transformation");
         if (img0.equals(img1)) {
@@ -89,8 +91,8 @@ public abstract class ScaleFeature implements Feature {
         }
     }
 
-    private static Feature firstDomInfty(Feature f, RuleAppCost dom1, RuleAppCost img0,
-            RuleAppCost img1) {
+    private static @NonNull Feature firstDomInfty(Feature f, RuleAppCost dom1, RuleAppCost img0,
+                                                  RuleAppCost img1) {
         if (img0 instanceof TopRuleAppCost) {
             final long img1Val = getValue(img1);
             final long dom1Val = getValue(dom1);
@@ -105,13 +107,13 @@ public abstract class ScaleFeature implements Feature {
         }
     }
 
-    private static Feature firstImgInfty(Feature f, RuleAppCost dom0, RuleAppCost dom1,
-            RuleAppCost img1) {
+    private static @NonNull Feature firstImgInfty(Feature f, RuleAppCost dom0, RuleAppCost dom1,
+                                                  RuleAppCost img1) {
         return ShannonFeature.createConditional(f, dom1, img1, TopRuleAppCost.INSTANCE);
     }
 
-    public static Feature realAffine(Feature f, RuleAppCost dom0, RuleAppCost dom1,
-            RuleAppCost img0, RuleAppCost img1) {
+    public static @NonNull Feature realAffine(Feature f, RuleAppCost dom0, RuleAppCost dom1,
+                                              RuleAppCost img0, RuleAppCost img1) {
         final double img0Val = getValue(img0);
         final double img1Val = getValue(img1);
         final double dom0Val = getValue(dom0);
@@ -135,7 +137,7 @@ public abstract class ScaleFeature implements Feature {
         }
     }
 
-    protected static void illegalCostError(final RuleAppCost cost) {
+    protected static void illegalCostError(final @NonNull RuleAppCost cost) {
         Debug.fail("Don't know what to do with cost class " + cost.getClass());
     }
 
@@ -159,8 +161,8 @@ public abstract class ScaleFeature implements Feature {
             offset = p_offset;
         }
 
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-                MutableState mState) {
+        public @Nullable RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+                                                 MutableState mState) {
             final RuleAppCost cost = getFeature().computeCost(app, pos, goal, mState);
             long costVal;
 

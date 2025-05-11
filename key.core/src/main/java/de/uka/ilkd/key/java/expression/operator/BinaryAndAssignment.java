@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.expression.operator;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -23,7 +24,7 @@ public class BinaryAndAssignment extends Assignment {
      * @param children an ExtList with all children of this node the first children in list will be
      * the one on the left side, the second the one on the right side.
      */
-    public BinaryAndAssignment(ExtList children) {
+    public BinaryAndAssignment(@NonNull ExtList children) {
         super(children);
     }
 
@@ -64,7 +65,7 @@ public class BinaryAndAssignment extends Assignment {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnBinaryAndAssignment(this);
     }
 }

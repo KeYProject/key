@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -41,7 +42,7 @@ public class RootsGenerator implements TermGenerator {
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf(2);
 
-    public static TermGenerator create(ProjectionToTerm powerRelation, TermServices services) {
+    public static @NonNull TermGenerator create(ProjectionToTerm powerRelation, @NonNull TermServices services) {
         return new RootsGenerator(powerRelation, services.getTermBuilder());
     }
 
@@ -51,8 +52,8 @@ public class RootsGenerator implements TermGenerator {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+                                   MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
@@ -87,18 +88,18 @@ public class RootsGenerator implements TermGenerator {
         return emptyIterator();
     }
 
-    private Iterator<Term> emptyIterator() {
+    private @NonNull Iterator<Term> emptyIterator() {
         return ImmutableSLList.<Term>nil().iterator();
     }
 
-    private Iterator<Term> toIterator(Term res) {
+    private @NonNull Iterator<Term> toIterator(@NonNull Term res) {
         if (res.equalsModProperty(tb.ff(), IRRELEVANT_TERM_LABELS_PROPERTY)) {
             return emptyIterator();
         }
         return ImmutableSLList.<Term>nil().prepend(res).iterator();
     }
 
-    private Term breakDownEq(Term var, BigInteger lit, int pow, TermServices services) {
+    private @NonNull Term breakDownEq(@NonNull Term var, @NonNull BigInteger lit, int pow, TermServices services) {
         final Term zero = tb.zero();
 
         if ((pow % 2 == 0)) {
@@ -137,7 +138,7 @@ public class RootsGenerator implements TermGenerator {
         }
     }
 
-    private Term breakDownGeq(Term var, BigInteger lit, int pow, TermServices services) {
+    private @NonNull Term breakDownGeq(@NonNull Term var, @NonNull BigInteger lit, int pow, TermServices services) {
         if ((pow % 2 == 0)) {
             // the even case
 
@@ -158,7 +159,7 @@ public class RootsGenerator implements TermGenerator {
         }
     }
 
-    private Term breakDownLeq(Term var, BigInteger lit, int pow, TermServices services) {
+    private @NonNull Term breakDownLeq(@NonNull Term var, @NonNull BigInteger lit, int pow, TermServices services) {
         if ((pow % 2 == 0)) {
             // the even case
 
@@ -183,7 +184,7 @@ public class RootsGenerator implements TermGenerator {
     /**
      * @return a number <tt>res</tt> with the property <tt>prod in ((res-1)^exp, res^exp]</tt>
      */
-    private BigInteger rootRoundingUpwards(BigInteger prod, int exp) {
+    private BigInteger rootRoundingUpwards(@NonNull BigInteger prod, int exp) {
         final BigInteger res = root(prod, exp);
         if (power(res, exp).compareTo(prod) < 0) {
             return res.add(one);
@@ -194,7 +195,7 @@ public class RootsGenerator implements TermGenerator {
     /**
      * @return a number <tt>res</tt> with the property <tt>prod in [res^exp, (res+1)^exp)</tt>
      */
-    private BigInteger root(BigInteger prod, int exp) {
+    private BigInteger root(@NonNull BigInteger prod, int exp) {
         assert exp > 0;
 
         if (prod.signum() >= 0) {
@@ -211,7 +212,7 @@ public class RootsGenerator implements TermGenerator {
         }
     }
 
-    private BigInteger posRoot(BigInteger prod, int exp) {
+    private @NonNull BigInteger posRoot(@NonNull BigInteger prod, int exp) {
         assert exp > 0;
         assert prod.signum() >= 0;
 
@@ -230,7 +231,7 @@ public class RootsGenerator implements TermGenerator {
         return lb;
     }
 
-    private BigInteger power(BigInteger base, int exp) {
+    private @NonNull BigInteger power(BigInteger base, int exp) {
         assert exp >= 0;
 
         // shift-multiplier

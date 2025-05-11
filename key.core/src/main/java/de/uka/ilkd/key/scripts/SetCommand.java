@@ -14,6 +14,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
@@ -23,13 +24,13 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
         if (args.key == null ^ args.value == null) {
             throw new IllegalArgumentException(
                 "When using key or value in a set command, you have to use both.");
@@ -63,7 +64,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
      * quite complicated implementation, which is inspired by StrategySelectionView.
      */
 
-    private void updateStrategySettings(StrategyProperties p) {
+    private void updateStrategySettings(@NonNull StrategyProperties p) {
         final Proof proof = state.getProof();
         final Strategy strategy = getStrategy(p);
 
@@ -92,7 +93,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "set";
     }
 

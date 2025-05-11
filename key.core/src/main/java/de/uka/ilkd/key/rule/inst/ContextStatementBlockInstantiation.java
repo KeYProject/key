@@ -6,6 +6,8 @@ package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInProgram;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * this class is created if the scheme given by a context term has matched to a java program. The
@@ -105,7 +107,7 @@ public class ContextStatementBlockInstantiation {
 
     }
 
-    private boolean isDifferent(Object self, Object other) {
+    private boolean isDifferent(@Nullable Object self, @Nullable Object other) {
         if (self != null && other != null) {
             return !self.equals(other);
         } else {
@@ -133,7 +135,7 @@ public class ContextStatementBlockInstantiation {
     /**
      * toString
      */
-    public String toString() {
+    public @NonNull String toString() {
         String result = "ContextStatementBlockInstantiation:\n";
         result += "Prefix ends before " + prefixEnd.toString();
         result += "\nSuffix starts after " + suffixStart.toString();

@@ -8,6 +8,7 @@ import java.util.Map;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -34,7 +35,7 @@ public class ProgramVariableCollection {
     /**
      * {@code exception}
      */
-    public LocationVariable excVar;
+    public @Nullable LocationVariable excVar;
 
     /**
      * A map from every variable {@code var} to {@code \old(var)}.

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import org.jspecify.annotations.NonNull;
 
 public class ExitCommand extends NoArgumentCommand {
     @Override
@@ -15,12 +16,12 @@ public class ExitCommand extends NoArgumentCommand {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "exit";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return "Kills the script execution.";
     }
 }

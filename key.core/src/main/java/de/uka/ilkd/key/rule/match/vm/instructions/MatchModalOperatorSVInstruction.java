@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class MatchModalOperatorSVInstruction implements MatchInstruction {
 
@@ -18,7 +20,7 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
         this.op = op;
     }
 
-    public MatchConditions match(Term t, MatchConditions mc, Services services) {
+    public @Nullable MatchConditions match(@NonNull Term t, @NonNull MatchConditions mc, Services services) {
         if (t.op() instanceof Modality mod
                 && op.getModalities().contains(mod.kind())) {
             return mc.setInstantiations(
@@ -29,8 +31,8 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition, @NonNull MatchConditions mc,
+                                           Services services) {
         return match(termPosition.getCurrentSubterm(), mc, services);
     }
 

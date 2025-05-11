@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.jspecify.annotations.NonNull;
 
 public class TypeOf extends ProgramTransformer {
 
@@ -27,8 +28,8 @@ public class TypeOf extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations insts) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
+                                                @NonNull SVInstantiations insts) {
 
         ExecutionContext ec = null;
 

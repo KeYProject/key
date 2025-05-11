@@ -21,6 +21,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
@@ -31,11 +33,11 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, InfFlowLeafPO {
 
-    private final InformationFlowContract contract;
+    private final @NonNull InformationFlowContract contract;
 
-    private final ProofObligationVars symbExecVars;
+    private final @NonNull ProofObligationVars symbExecVars;
 
-    private final IFProofObligationVars ifVars;
+    private final @NonNull IFProofObligationVars ifVars;
 
     /**
      * For saving and loading Information-Flow proofs, we need to remember the according taclets,
@@ -43,7 +45,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      */
     private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
-    public InfFlowContractPO(InitConfig initConfig, InformationFlowContract contract) {
+    public InfFlowContractPO(InitConfig initConfig, @NonNull InformationFlowContract contract) {
         super(initConfig, contract.getName());
         this.contract = contract;
 
@@ -104,7 +106,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
 
     @Override
-    public Term getMbyAtPre() {
+    public @Nullable Term getMbyAtPre() {
         if (contract.hasMby()) {
             return symbExecVars.pre.mbyAtPre;
         } else {
@@ -117,7 +119,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      * {@inheritDoc}
      */
     @Override
-    protected String buildPOName(boolean transactionFlag) {
+    protected @NonNull String buildPOName(boolean transactionFlag) {
         return getContract().getName();
     }
 
@@ -126,7 +128,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      * {@inheritDoc}
      */
     @Override
-    protected IProgramMethod getProgramMethod() {
+    protected @NonNull IProgramMethod getProgramMethod() {
         return contract.getTarget();
     }
 
@@ -144,7 +146,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      * {@inheritDoc}
      */
     @Override
-    protected KeYJavaType getCalleeKeYJavaType() {
+    protected @NonNull KeYJavaType getCalleeKeYJavaType() {
         return contract.getKJT();
     }
 
@@ -153,7 +155,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      * {@inheritDoc}
      */
     @Override
-    protected Modality.JavaModalityKind getTerminationMarker() {
+    protected Modality.@NonNull JavaModalityKind getTerminationMarker() {
         return getContract().getModalityKind();
     }
 
@@ -174,7 +176,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      * @return
      */
     @Override
-    public Configuration createLoaderConfig() {
+    public @NonNull Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         c.set("contract", contract.getName());
         return c;
@@ -182,44 +184,44 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
 
     @Override
-    public InfFlowProofSymbols getIFSymbols() {
+    public @NonNull InfFlowProofSymbols getIFSymbols() {
         assert infFlowSymbols != null;
         return infFlowSymbols;
     }
 
     @Override
-    public final void addIFSymbol(Term t) {
+    public final void addIFSymbol(@NonNull Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
 
     @Override
-    public void addIFSymbol(Named n) {
+    public void addIFSymbol(@NonNull Named n) {
         assert n != null;
         infFlowSymbols.add(n);
     }
 
     @Override
-    public void addLabeledIFSymbol(Term t) {
+    public void addLabeledIFSymbol(@NonNull Term t) {
         assert t != null;
         infFlowSymbols.addLabeled(t);
     }
 
     @Override
-    public void addLabeledIFSymbol(Named n) {
+    public void addLabeledIFSymbol(@NonNull Named n) {
         assert n != null;
         infFlowSymbols.addLabeled(n);
     }
 
     @Override
-    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+    public void unionLabeledIFSymbols(@NonNull InfFlowProofSymbols symbols) {
         assert symbols != null;
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+                                           ImmutableList<Term> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }

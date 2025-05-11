@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
@@ -73,7 +74,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      *
      * This is not threadsafe.
      */
-    public void add(E sym) {
+    public void add(@NonNull E sym) {
 
         if (sealed) {
             LOGGER.warn("Namespace is SEALED");
@@ -112,7 +113,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * Adds the object <code>sym</code> to this namespace. Throws a runtime exception if an object
      * with the same name is already there.
      */
-    public void addSafely(E sym) {
+    public void addSafely(@NonNull E sym) {
         Named old = lookup(sym.name());
         if (old != null && old != sym) {
             throw new RuntimeException("Name already in namespace: " + sym.name());
@@ -184,7 +185,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     /** Convenience method to look up. */
-    public E lookup(String name) {
+    public @Nullable E lookup(String name) {
         return lookup(new Name(name));
     }
 
@@ -275,7 +276,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         return result;
     }
 
-    public boolean contains(E var) {
+    public boolean contains(@NonNull E var) {
         return lookup(var.name()) == var;
     }
 

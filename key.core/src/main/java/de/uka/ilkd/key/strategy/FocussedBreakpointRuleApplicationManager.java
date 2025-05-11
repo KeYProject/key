@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -38,7 +39,7 @@ public class FocussedBreakpointRuleApplicationManager
 
     public FocussedBreakpointRuleApplicationManager(
             @Nullable AutomatedRuleApplicationManager delegate,
-            Goal goal, Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
+            @NonNull Goal goal, @NonNull Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
         this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
                 .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
             breakpoint);
@@ -57,7 +58,7 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public Object clone() {
+    public @NonNull Object clone() {
         return new FocussedBreakpointRuleApplicationManager(delegate.copy(), breakpoint);
     }
 
@@ -85,7 +86,7 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+    public void rulesAdded(@NonNull ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
             ImmutableSLList.nil();
         for (RuleApp r : rules) {
@@ -97,7 +98,7 @@ public class FocussedBreakpointRuleApplicationManager
         delegate.rulesAdded(applicableRules, pos);
     }
 
-    private boolean mayAddRule(RuleApp rule, PosInOccurrence pos) {
+    private boolean mayAddRule(RuleApp rule, @NonNull PosInOccurrence pos) {
         if (!breakpoint.isPresent()) {
             return true;
         }
@@ -117,7 +118,7 @@ public class FocussedBreakpointRuleApplicationManager
         return true;
     }
 
-    private static boolean isJavaPIO(PosInOccurrence pio) {
+    private static boolean isJavaPIO(@Nullable PosInOccurrence pio) {
         return pio != null && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
     }
 

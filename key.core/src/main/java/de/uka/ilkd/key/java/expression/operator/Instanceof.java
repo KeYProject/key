@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -29,13 +30,13 @@ public class Instanceof extends TypeOperator {
      *        reference.
      */
 
-    public Instanceof(ExtList children) {
+    public Instanceof(@NonNull ExtList children) {
         super(children);
         assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();
     }
 
 
-    public Instanceof(Expression unaryChild, TypeReference typeref) {
+    public Instanceof(@NonNull Expression unaryChild, TypeReference typeref) {
         super(unaryChild, typeref);
         assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();
     }
@@ -57,7 +58,7 @@ public class Instanceof extends TypeOperator {
         return result;
     }
 
-    public SourceElement getLastElement() {
+    public @NonNull SourceElement getLastElement() {
         return typeReference;
     }
 
@@ -69,7 +70,7 @@ public class Instanceof extends TypeOperator {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
-    public ProgramElement getChildAt(int index) {
+    public @NonNull ProgramElement getChildAt(int index) {
         int len;
         if (children != null) {
             len = children.size();
@@ -122,15 +123,15 @@ public class Instanceof extends TypeOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnInstanceof(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 

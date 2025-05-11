@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Feature that returns zero if there is no atom with negative polarity on a common d-path and on
@@ -24,7 +25,7 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
     private LeftmostNegAtomFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation(@NonNull PosInOccurrence pos, Term findTerm, @NonNull ServiceCaches caches) {
         final PIOPathIterator it = pos.iterator();
         boolean positive = pos.isInAntec();
 

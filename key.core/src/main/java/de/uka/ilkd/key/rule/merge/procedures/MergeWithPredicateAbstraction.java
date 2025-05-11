@@ -16,6 +16,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
@@ -44,12 +46,12 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * The concrete lattice type which determines how abstract elements are generated from
      * abstraction predicates.
      */
-    private Class<? extends AbstractPredicateAbstractionLattice> latticeType = null;
+    private @Nullable Class<? extends AbstractPredicateAbstractionLattice> latticeType = null;
 
     /**
      * Manually chosen lattice elements for program variables.
      */
-    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices = null;
+    private @Nullable LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices = null;
 
     /**
      * Default constructor for subclasses.
@@ -65,9 +67,9 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * @param latticeType The concrete lattice type which determines how abstract elements are
      *        generated from abstraction predicates.
      */
-    public MergeWithPredicateAbstraction(Iterable<AbstractionPredicate> predicates,
-            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-            Map<ProgramVariable, AbstractDomainElement> userChoices) {
+    public MergeWithPredicateAbstraction(@NonNull Iterable<AbstractionPredicate> predicates,
+                                         Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+                                         Map<ProgramVariable, AbstractDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
                 this.predicates.put(pred.getArgSort(), new ArrayList<>());
@@ -92,7 +94,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     }
 
     @Override
-    public AbstractDomainLattice getAbstractDomainForSort(final Sort s, final Services services) {
+    public @Nullable AbstractDomainLattice getAbstractDomainForSort(final Sort s, final Services services) {
         return instantiateAbstractDomain(s, predicates.get(s), latticeType, services);
     }
 
@@ -107,9 +109,9 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * @return The corresponding {@link AbstractDomainLattice}.
      */
     public static AbstractDomainLattice instantiateAbstractDomain(final Sort s,
-            final List<AbstractionPredicate> applicablePredicates,
-            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-            final Services services) {
+                                                                  final @Nullable List<AbstractionPredicate> applicablePredicates,
+                                                                  @NonNull Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+                                                                  final Services services) {
 
         if (applicablePredicates == null) {
             // A returned null value indicates to
@@ -150,7 +152,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      *
      * @param predicate The predicate.
      */
-    public void addPredicate(AbstractionPredicate predicate) {
+    public void addPredicate(@NonNull AbstractionPredicate predicate) {
         Sort s = predicate.getArgSort();
 
         if (!predicates.containsKey(s)) {
@@ -165,7 +167,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      *
      * @param predicates The predicates to set.
      */
-    public void addPredicates(Iterable<AbstractionPredicate> predicates) {
+    public void addPredicates(@NonNull Iterable<AbstractionPredicate> predicates) {
         for (AbstractionPredicate predicate : predicates) {
             addPredicate(predicate);
         }
@@ -176,19 +178,19 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      *         {@link AbstractPredicateAbstractionLattice} which determines how abstract elements
      *         are constructed from abstraction predicates.
      */
-    public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
+    public @Nullable Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
         return latticeType;
     }
 
     /**
      * @return Manually chosen lattice elements for program variables.
      */
-    public LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
+    public @Nullable LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
         return userChoices;
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return DISPLAY_NAME;
     }
 }

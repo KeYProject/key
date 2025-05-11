@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -645,7 +646,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         handleJmlStatements(x, SetStatement::new);
     }
 
-    public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
+    public <T extends Statement> void handleJmlStatements(@NonNull T x, Function<T, T> cloner) {
         var spec = Objects.requireNonNull(
             services.getSpecificationRepository().getStatementSpec(x));
 

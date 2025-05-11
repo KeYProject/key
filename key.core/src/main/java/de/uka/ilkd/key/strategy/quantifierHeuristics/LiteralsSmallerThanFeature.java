@@ -19,6 +19,8 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
@@ -35,8 +37,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         this.numbers = numbers;
     }
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
-            IntegerLDT numbers) {
+    public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
+                                          IntegerLDT numbers) {
         return new LiteralsSmallerThanFeature(left, right, numbers);
     }
 
@@ -47,7 +49,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return compareTerms(leftTerm, rightTerm, pos, goal);
     }
 
-    protected boolean compareTerms(Term leftTerm, Term rightTerm, PosInOccurrence pos, Goal goal) {
+    protected boolean compareTerms(@NonNull Term leftTerm, @NonNull Term rightTerm, PosInOccurrence pos, Goal goal) {
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final LiteralCollector m2 = new LiteralCollector();
@@ -60,7 +62,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, @NonNull PosInOccurrence focus, @NonNull Goal goal) {
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);
 
@@ -157,18 +159,18 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         }
     }
 
-    private Term discardNegation(Term t) {
+    private @NonNull Term discardNegation(@NonNull Term t) {
         while (t.op() == Junctor.NOT) {
             t = t.sub(0);
         }
         return t;
     }
 
-    private boolean isBinaryIntRelation(Term t) {
+    private boolean isBinaryIntRelation(@NonNull Term t) {
         return formulaKind(t) >= 0;
     }
 
-    private int formulaKind(Term t) {
+    private int formulaKind(@NonNull Term t) {
         final Operator op = t.op();
         if (op == numbers.getLessOrEquals()) {
             return 1;
@@ -184,8 +186,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     private class MonomialIterator implements Iterator<Term> {
-        private Term polynomial;
-        private Term nextMonomial = null;
+        private @Nullable Term polynomial;
+        private @Nullable Term nextMonomial = null;
 
         private MonomialIterator(Term polynomial) {
             this.polynomial = polynomial;
@@ -228,7 +230,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     private static class LiteralCollector extends Collector {
-        protected void collect(Term te) {
+        protected void collect(@NonNull Term te) {
             final Operator op = te.op();
             if (op == Junctor.OR) {
                 collect(te.sub(0));

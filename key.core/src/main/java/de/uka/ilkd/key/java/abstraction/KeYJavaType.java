@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
@@ -72,14 +73,14 @@ public class KeYJavaType implements Type {
      *
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
-    public Literal getDefaultValue() {
+    public @Nullable Literal getDefaultValue() {
         if (javaType == null) {
             return null;
         }
         return javaType.getDefaultValue();
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         if (this == VOID_TYPE) {
             return "KeYJavaType:void";
         }
@@ -89,7 +90,7 @@ public class KeYJavaType implements Type {
         return "(type, sort): (" + javaType.getName() + "," + sort + ")";
     }
 
-    public String getFullName() {
+    public @NonNull String getFullName() {
         Type type = getJavaType();
         if (type != null) {
             String fullName = type.getFullName();
@@ -99,7 +100,7 @@ public class KeYJavaType implements Type {
         return getSort().name().toString();
     }
 
-    public String getName() {
+    public @NonNull String getName() {
         Type type = getJavaType();
         if (type != null)
             return type.getName();
@@ -128,7 +129,7 @@ public class KeYJavaType implements Type {
     }
 
 
-    public PackageReference createPackagePrefix() {
+    public @Nullable PackageReference createPackagePrefix() {
         PackageReference ref = null;
         String rest = getFullName();
         if (rest.indexOf('.') > 0) {
@@ -144,7 +145,7 @@ public class KeYJavaType implements Type {
 
     public static final class LexicographicalKeYJavaTypeOrder<T extends KeYJavaType>
             implements Comparator<T> {
-        public int compare(T arg0, T arg1) {
+        public int compare(@NonNull T arg0, @NonNull T arg1) {
             return arg0.getFullName().compareTo(arg1.getFullName());
         }
     }

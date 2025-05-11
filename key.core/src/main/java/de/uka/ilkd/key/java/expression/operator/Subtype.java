@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.expression.operator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -13,11 +14,11 @@ import org.key_project.util.ExtList;
  */
 public class Subtype extends BinaryOperator {
 
-    public Subtype(ExtList children) {
+    public Subtype(@NonNull ExtList children) {
         super(children);
     }
 
-    public Subtype(Expression lhs, Expression rhs) {
+    public Subtype(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -48,7 +49,7 @@ public class Subtype extends BinaryOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSubtype(this);
     }
 }

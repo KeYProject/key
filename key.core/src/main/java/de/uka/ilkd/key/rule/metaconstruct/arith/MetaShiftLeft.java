@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 public class MetaShiftLeft extends MetaShift {
@@ -14,7 +15,7 @@ public class MetaShiftLeft extends MetaShift {
     }
 
     @Override
-    protected BigInteger shiftOp(BigInteger left, BigInteger right) {
+    protected @NonNull BigInteger shiftOp(@NonNull BigInteger left, @NonNull BigInteger right) {
         return left.shiftLeft(right.intValue());
     }
 

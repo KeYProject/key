@@ -6,11 +6,12 @@ package de.uka.ilkd.key.java.expression.operator.adt;
 import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 public class SetUnion extends BinaryOperator {
 
-    public SetUnion(ExtList children) {
+    public SetUnion(@NonNull ExtList children) {
         super(children);
     }
 
@@ -25,7 +26,7 @@ public class SetUnion extends BinaryOperator {
     }
 
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSetUnion(this);
     }
 

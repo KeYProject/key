@@ -14,6 +14,8 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -47,7 +49,7 @@ public class Polynomial {
         this.constantPart = constantPart;
     }
 
-    public static Polynomial create(Term polyTerm, Services services) {
+    public static @NonNull Polynomial create(Term polyTerm, @NonNull Services services) {
         final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
         polyTerm = TermLabelManager.removeIrrelevantLabels(polyTerm, services);
 
@@ -65,13 +67,13 @@ public class Polynomial {
         return res;
     }
 
-    private static Polynomial createHelp(Term polynomial, Services services) {
+    private static @NonNull Polynomial createHelp(@NonNull Term polynomial, @NonNull Services services) {
         final Analyser a = new Analyser(services);
         a.analyse(polynomial);
         return new Polynomial(a.parts, a.constantPart);
     }
 
-    public Polynomial multiply(BigInteger c) {
+    public @NonNull Polynomial multiply(@NonNull BigInteger c) {
         if (c.signum() == 0) {
             return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
         }
@@ -83,7 +85,7 @@ public class Polynomial {
         return new Polynomial(newParts, constantPart.multiply(c));
     }
 
-    public Polynomial multiply(Monomial m) {
+    public @NonNull Polynomial multiply(@NonNull Monomial m) {
         if (m.getCoefficient().signum() == 0) {
             return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
         }
@@ -101,11 +103,11 @@ public class Polynomial {
         return new Polynomial(newParts, BigInteger.ZERO);
     }
 
-    public Polynomial add(BigInteger c) {
+    public @NonNull Polynomial add(BigInteger c) {
         return new Polynomial(parts, constantPart.add(c));
     }
 
-    public Polynomial sub(Polynomial p) {
+    public @NonNull Polynomial sub(@NonNull Polynomial p) {
         final BigInteger newConst = getConstantTerm().subtract(p.getConstantTerm());
         ImmutableList<Monomial> newParts = parts;
         for (Monomial monomial : p.getParts()) {
@@ -114,7 +116,7 @@ public class Polynomial {
         return new Polynomial(newParts, newConst);
     }
 
-    public Polynomial add(Monomial m) {
+    public @NonNull Polynomial add(@NonNull Monomial m) {
         if (m.getParts().isEmpty()) {
             return new Polynomial(parts, constantPart.add(m.getCoefficient()));
         }
@@ -122,7 +124,7 @@ public class Polynomial {
         return new Polynomial(addPart(parts, m), constantPart);
     }
 
-    public Polynomial add(Polynomial p) {
+    public @NonNull Polynomial add(@NonNull Polynomial p) {
         final BigInteger newConst = getConstantTerm().add(p.getConstantTerm());
         ImmutableList<Monomial> newParts = parts;
         for (Monomial monomial : p.getParts()) {
@@ -136,7 +138,7 @@ public class Polynomial {
      *         The constant part of the polynomial is not taken into account. If there are no
      *         monomials (apart from the constant term), the result is <code>BigInteger.ZERO</code>
      */
-    public BigInteger coeffGcd() {
+    public @NonNull BigInteger coeffGcd() {
         BigInteger res = BigInteger.ZERO;
         for (Monomial part : parts) {
             res = res.gcd(part.getCoefficient());
@@ -149,7 +151,7 @@ public class Polynomial {
      *         value of <code>p</code> (i.e., same monomials, but the constant part is less or
      *         equal)
      */
-    public boolean valueLess(Polynomial p) {
+    public boolean valueLess(@NonNull Polynomial p) {
         if (!sameParts(p)) {
             return false;
         }
@@ -160,14 +162,14 @@ public class Polynomial {
      * @return <code>true</code> if the value of <code>this</code> will always be equal to the value
      *         of <code>p</code> (i.e., same monomials and same constant part)
      */
-    public boolean valueEq(Polynomial p) {
+    public boolean valueEq(@NonNull Polynomial p) {
         if (!sameParts(p)) {
             return false;
         }
         return constantPart.equals(p.constantPart);
     }
 
-    public boolean valueUneq(Polynomial p) {
+    public boolean valueUneq(@NonNull Polynomial p) {
         if (!sameParts(p)) {
             return false;
         }
@@ -193,7 +195,7 @@ public class Polynomial {
      *         the value of <code>p</code> (i.e., same monomials, but the constant part is less or
      *         equal)
      */
-    public boolean valueLeq(Polynomial p) {
+    public boolean valueLeq(@NonNull Polynomial p) {
         if (!sameParts(p)) {
             return false;
         }
@@ -214,7 +216,7 @@ public class Polynomial {
         return constantPart.compareTo(c) >= 0;
     }
 
-    public boolean sameParts(Polynomial p) {
+    public boolean sameParts(@NonNull Polynomial p) {
         if (parts.size() != p.parts.size()) {
             return false;
         }
@@ -227,7 +229,7 @@ public class Polynomial {
      * @param services the services object
      * @return the resulting term
      */
-    public Term toTerm(Services services) {
+    public @NonNull Term toTerm(@NonNull Services services) {
         final Operator add = services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;
 
@@ -251,7 +253,7 @@ public class Polynomial {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         final StringBuilder res = new StringBuilder();
         res.append(constantPart);
 
@@ -263,13 +265,13 @@ public class Polynomial {
     }
 
     private static class Analyser {
-        public BigInteger constantPart = BigInteger.ZERO;
-        public ImmutableList<Monomial> parts = ImmutableSLList.nil();
-        private final Services services;
-        private final TypeConverter tc;
-        private final Operator numbers, add;
+        public @NonNull BigInteger constantPart = BigInteger.ZERO;
+        public @NonNull ImmutableList<Monomial> parts = ImmutableSLList.nil();
+        private final @NonNull Services services;
+        private final @NonNull TypeConverter tc;
+        private final @NonNull Operator numbers, add;
 
-        public Analyser(final Services services) {
+        public Analyser(final @NonNull Services services) {
             this.services = services;
             this.tc = services.getTypeConverter();
             final IntegerLDT intLDT = tc.getIntegerLDT();
@@ -277,7 +279,7 @@ public class Polynomial {
             add = intLDT.getAdd();
         }
 
-        public void analyse(Term polynomial) {
+        public void analyse(@NonNull Term polynomial) {
             final Operator op = polynomial.op();
             if (op == add) {
                 analyse(polynomial.sub(0));
@@ -297,7 +299,7 @@ public class Polynomial {
      *         multiplicity is treated as well here, so this is really difference of multisets
      */
     private static ImmutableList<Monomial> difference(ImmutableList<Monomial> a,
-            ImmutableList<Monomial> b) {
+                                                      @NonNull ImmutableList<Monomial> b) {
         ImmutableList<Monomial> res = a;
         final Iterator<Monomial> it = b.iterator();
         while (it.hasNext() && !res.isEmpty()) {
@@ -306,7 +308,7 @@ public class Polynomial {
         return res;
     }
 
-    private static ImmutableList<Monomial> addPart(ImmutableList<Monomial> oldParts, Monomial m) {
+    private static @NonNull ImmutableList<Monomial> addPart(@NonNull ImmutableList<Monomial> oldParts, @NonNull Monomial m) {
         if (m.getCoefficient().signum() == 0) {
             return oldParts;
         }
@@ -317,8 +319,8 @@ public class Polynomial {
         return oldParts.prepend(m);
     }
 
-    private static ImmutableList<Monomial> addPartHelp(ImmutableList<Monomial> oldParts,
-            Monomial m) {
+    private static @Nullable ImmutableList<Monomial> addPartHelp(@NonNull ImmutableList<Monomial> oldParts,
+                                                                 @NonNull Monomial m) {
         if (oldParts.isEmpty()) {
             return null;
         }

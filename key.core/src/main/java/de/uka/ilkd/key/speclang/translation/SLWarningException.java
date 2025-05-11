@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+import org.jspecify.annotations.NonNull;
 
 
 public class SLWarningException extends SLTranslationException {
@@ -18,7 +19,7 @@ public class SLWarningException extends SLTranslationException {
         super(text, location);
     }
 
-    public PositionedString getWarning() {
+    public @NonNull PositionedString getWarning() {
         return new PositionedString(getMessage(), location);
     }
 }

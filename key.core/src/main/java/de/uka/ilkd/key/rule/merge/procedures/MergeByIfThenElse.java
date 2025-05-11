@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -35,7 +37,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
  * @see MergeRule
  */
 public class MergeByIfThenElse extends MergeProcedure implements UnparametricMergeProcedure {
-    private static MergeByIfThenElse INSTANCE = null;
+    private static @Nullable MergeByIfThenElse INSTANCE = null;
 
     /**
      * Time in milliseconds after which a simplification attempt of a distinguishing formula times
@@ -43,7 +45,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      */
     private static final int SIMPLIFICATION_TIMEOUT_MS = 1000;
 
-    public static MergeByIfThenElse instance() {
+    public static @NonNull MergeByIfThenElse instance() {
         if (INSTANCE == null) {
             INSTANCE = new MergeByIfThenElse();
         }
@@ -64,9 +66,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public @NonNull ValuesMergeResult mergeValuesInStates(Term v, @NonNull SymbolicExecutionState state1,
+                                                          Term valueInState1, @NonNull SymbolicExecutionState state2, Term valueInState2,
+                                                          Term distinguishingFormula, @NonNull Services services) {
 
         return new ValuesMergeResult(DefaultImmutableSet.nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
@@ -98,9 +100,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * @return An if then else term like <code>\if (c1) \then (t1) \else (t2)</code>, where the cI
      *         are the path conditions of stateI.
      */
-    public static Term createIfThenElseTerm(final SymbolicExecutionState state1,
-            final SymbolicExecutionState state2, final Term ifTerm, final Term elseTerm,
-            Term distinguishingFormula, final Services services) {
+    public static @NonNull Term createIfThenElseTerm(final @NonNull SymbolicExecutionState state1,
+                                                     final @NonNull SymbolicExecutionState state2, final Term ifTerm, final Term elseTerm,
+                                                     @Nullable Term distinguishingFormula, final @NonNull Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -146,9 +148,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
-            LocationVariable v, SymbolicExecutionState state1, SymbolicExecutionState state2,
-            Services services) {
+    static @NonNull DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
+            @NonNull LocationVariable v, @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2,
+            @NonNull Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -190,9 +192,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
-            SymbolicExecutionState state1, SymbolicExecutionState state2, Term ifTerm,
-            Term elseTerm, Services services) {
+    static @NonNull DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
+            @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2, Term ifTerm,
+            Term elseTerm, @NonNull Services services) {
 
         // We only need the distinguishing subformula; the equal part
         // is not needed. For soundness, it suffices that the "distinguishing"
@@ -252,7 +254,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return DISPLAY_NAME;
     }
 

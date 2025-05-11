@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -22,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
 public class TacletGoalTemplate {
 
     /** stores sequent that is one of the new goals */
-    private Sequent addedSeq = Sequent.EMPTY_SEQUENT;
+    private @NonNull Sequent addedSeq = Sequent.EMPTY_SEQUENT;
 
     /** stores list of Taclet which are introduced */
     private ImmutableList<Taclet> addedRules = ImmutableSLList.nil();
@@ -30,7 +32,7 @@ public class TacletGoalTemplate {
     /** program variables added by this taclet to the namespace */
     private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
 
-    private String name = null;
+    private @Nullable String name = null;
 
 
     /**
@@ -42,8 +44,8 @@ public class TacletGoalTemplate {
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-            ImmutableSet<SchemaVariable> addedProgVars) {
+    public TacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules,
+                              ImmutableSet<SchemaVariable> addedProgVars) {
         TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 
         this.addedRules = addedRules;
@@ -60,7 +62,7 @@ public class TacletGoalTemplate {
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
+    public TacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
@@ -71,7 +73,7 @@ public class TacletGoalTemplate {
      * @return term (or sequent) to be placed instead of the findexp-term. REMARK: returns 'null' if
      *         there is no replace-with part ! Overwritten in subclasses !
      */
-    public Object replaceWithExpressionAsObject() {
+    public @Nullable Object replaceWithExpressionAsObject() {
         return null;
     }
 
@@ -108,7 +110,7 @@ public class TacletGoalTemplate {
      *
      * @return all variables that occur bound in this goal template
      */
-    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
+    public @NonNull ImmutableSet<QuantifiableVariable> getBoundVariables() {
         ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         for (Taclet taclet : rules()) {
@@ -127,7 +129,7 @@ public class TacletGoalTemplate {
     }
 
 
-    public String name() {
+    public @Nullable String name() {
         return name;
     }
 
@@ -162,7 +164,7 @@ public class TacletGoalTemplate {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String result = "";
         if (!sequent().isEmpty()) {
             result += "\\add " + sequent() + " ";

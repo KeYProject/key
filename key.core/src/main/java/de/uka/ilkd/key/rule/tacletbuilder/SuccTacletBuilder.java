@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
+import org.jspecify.annotations.NonNull;
 
 
 /** class builds SuccTaclet objects. */
@@ -20,7 +21,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      *
      * @return this SuccTacletBuilder
      */
-    public SuccTacletBuilder setFind(Term findTerm) {
+    public @NonNull SuccTacletBuilder setFind(@NonNull Term findTerm) {
         if (findTerm.sort() == JavaDLTheory.FORMULA) {
             find = findTerm;
         }
@@ -52,7 +53,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if and find or an
      * InvalidPrefixException if the building of the Taclet Prefix fails.
      */
-    public SuccTaclet getSuccTaclet() {
+    public @NonNull SuccTaclet getSuccTaclet() {
         if (find == null) {
             throw new TacletBuilderException(this, "No find part specified");
 
@@ -77,7 +78,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * semisequences. No specification for the interactive or recursive flags imply that the flags
      * are not set. No specified find part causes an IllegalStateException.
      */
-    public SuccTaclet getTaclet() {
+    public @NonNull SuccTaclet getTaclet() {
         return getSuccTaclet();
     }
 

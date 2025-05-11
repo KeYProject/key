@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -28,8 +29,8 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
      * @param mergeNodeId The ID of the corresponding merge node.
      * @param newNames New names registered in the course of partner goal closing.
      */
-    public MergePartnerAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
-            int mergeNodeId, ImmutableList<Name> newNames) {
+    public MergePartnerAppIntermediate(@NonNull String ruleName, Pair<Integer, PosInTerm> pos,
+                                       int mergeNodeId, ImmutableList<Name> newNames) {
         super(ruleName, pos, null, null, null, newNames);
 
         assert ruleName.equals(CloseAfterMerge.INSTANCE.name().toString())

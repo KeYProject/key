@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
@@ -21,14 +22,14 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     private final JmlParser.Method_declarationContext methodDefinition;
 
 
-    public TextualJMLMethodDecl(ImmutableList<JMLModifier> modifiers,
-            JmlParser.Method_declarationContext methodDefinition) {
+    public TextualJMLMethodDecl(@NonNull ImmutableList<JMLModifier> modifiers,
+                                JmlParser.@NonNull Method_declarationContext methodDefinition) {
         super(modifiers);
         this.methodDefinition = methodDefinition;
         setPosition(methodDefinition);
     }
 
-    public String getParsableDeclaration() {
+    public @NonNull String getParsableDeclaration() {
         String m = modifiers.stream().map(it -> {
             if (JMLTransformer.javaModifiers.contains(it)) {
                 return it.toString();

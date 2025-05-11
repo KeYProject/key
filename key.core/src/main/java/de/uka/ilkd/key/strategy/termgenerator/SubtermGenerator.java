@@ -15,6 +15,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -37,10 +39,10 @@ public abstract class SubtermGenerator implements TermGenerator {
      * Left-traverse the subterms of a term in depth-first order. Each term is returned before its
      * proper subterms.
      */
-    public static TermGenerator leftTraverse(ProjectionToTerm cTerm, TermFeature cond) {
+    public static @NonNull TermGenerator leftTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-                    MutableState mState) {
+            public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+                                                    MutableState mState) {
                 return new LeftIterator(getTermInst(app, pos, goal, mState), mState,
                     goal.proof().getServices());
             }
@@ -51,10 +53,10 @@ public abstract class SubtermGenerator implements TermGenerator {
      * Right-traverse the subterms of a term in depth-first order. Each term is returned before its
      * proper subterms.
      */
-    public static TermGenerator rightTraverse(ProjectionToTerm cTerm, TermFeature cond) {
+    public static @NonNull TermGenerator rightTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-                    MutableState mState) {
+            public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+                                                    MutableState mState) {
                 return new RightIterator(getTermInst(app, pos, goal, mState), mState,
                     goal.proof().getServices());
             }
@@ -90,7 +92,7 @@ public abstract class SubtermGenerator implements TermGenerator {
             super(t, mState, services);
         }
 
-        public Term next() {
+        public @Nullable Term next() {
             final Term res = termStack.head();
             termStack = termStack.tail();
 
@@ -117,7 +119,7 @@ public abstract class SubtermGenerator implements TermGenerator {
             super(t, mState, services);
         }
 
-        public Term next() {
+        public @Nullable Term next() {
             final Term res = termStack.head();
             termStack = termStack.tail();
 

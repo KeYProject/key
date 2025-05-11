@@ -31,6 +31,8 @@ import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -40,14 +42,14 @@ import org.key_project.util.collection.ImmutableSLList;
  * example, see java_dl/DLContractChooser.
  */
 public final class DLSpecFactory {
-    private final Services services;
+    private final @NonNull Services services;
 
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    public DLSpecFactory(Services services) {
+    public DLSpecFactory(@NonNull Services services) {
         assert services != null;
         this.services = services;
     }
@@ -58,7 +60,7 @@ public final class DLSpecFactory {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Term extractPre(Term fma) throws ProofInputException {
+    private @NonNull Term extractPre(@NonNull Term fma) throws ProofInputException {
         if (!fma.op().equals(Junctor.IMP)) {
             throw new ProofInputException("Implication expected");
         } else {
@@ -67,7 +69,7 @@ public final class DLSpecFactory {
     }
 
 
-    private LocationVariable extractHeapAtPre(Term fma) throws ProofInputException {
+    private @Nullable LocationVariable extractHeapAtPre(@NonNull Term fma) throws ProofInputException {
         if (fma.sub(1).op() instanceof UpdateApplication) {
             final Term update = fma.sub(1).sub(0);
             assert update.sort() == JavaDLTheory.UPDATE;
@@ -89,7 +91,7 @@ public final class DLSpecFactory {
     }
 
 
-    private LocationVariable extractExcVar(Term fma) {
+    private @Nullable LocationVariable extractExcVar(@NonNull Term fma) {
         final Term modFma =
             fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
 
@@ -102,7 +104,7 @@ public final class DLSpecFactory {
     }
 
 
-    private UseOperationContractRule.Instantiation extractInst(Term fma)
+    private UseOperationContractRule.@NonNull Instantiation extractInst(@NonNull Term fma)
             throws ProofInputException {
         final UseOperationContractRule.Instantiation result =
             UseOperationContractRule.computeInstantiation(fma.sub(1), services);
@@ -114,20 +116,20 @@ public final class DLSpecFactory {
     }
 
 
-    private IProgramMethod extractProgramMethod(UseOperationContractRule.Instantiation inst)
+    private @NonNull IProgramMethod extractProgramMethod(UseOperationContractRule.@NonNull Instantiation inst)
             throws ProofInputException {
         return inst.pm;
     }
 
 
-    private Modality.JavaModalityKind extractModalityKind(
-            UseOperationContractRule.Instantiation inst)
+    private Modality.@NonNull JavaModalityKind extractModalityKind(
+            UseOperationContractRule.@NonNull Instantiation inst)
             throws ProofInputException {
         return inst.modality.kind();
     }
 
 
-    private LocationVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
+    private @NonNull LocationVariable extractSelfVar(UseOperationContractRule.@NonNull Instantiation inst)
             throws ProofInputException {
         if (inst.actualSelf == null) {
             assert inst.pm.isStatic();
@@ -141,8 +143,8 @@ public final class DLSpecFactory {
     }
 
 
-    private ImmutableList<LocationVariable> extractParamVars(
-            UseOperationContractRule.Instantiation inst) throws ProofInputException {
+    private @NonNull ImmutableList<LocationVariable> extractParamVars(
+            UseOperationContractRule.@NonNull Instantiation inst) throws ProofInputException {
         ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         for (Term param : inst.actualParams) {
             if (param.op() instanceof LocationVariable lv) {
@@ -156,7 +158,7 @@ public final class DLSpecFactory {
     }
 
 
-    private LocationVariable extractResultVar(UseOperationContractRule.Instantiation inst)
+    private @NonNull LocationVariable extractResultVar(UseOperationContractRule.@NonNull Instantiation inst)
             throws ProofInputException {
         if (inst.actualResult == null) {
             return null;
@@ -169,7 +171,7 @@ public final class DLSpecFactory {
     }
 
 
-    private Term extractPost(Term fma) {
+    private @NonNull Term extractPost(@NonNull Term fma) {
         final Term modFma =
             fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
         return modFma.sub(0);
@@ -184,8 +186,8 @@ public final class DLSpecFactory {
     /**
      * Creates a class invariant from a formula and a designated "self".
      */
-    public ClassInvariant createDLClassInvariant(String name, String displayName,
-            LocationVariable selfVar, Term inv) throws ProofInputException {
+    public @NonNull ClassInvariant createDLClassInvariant(@NonNull String name, @Nullable String displayName,
+                                                          @NonNull LocationVariable selfVar, @NonNull Term inv) throws ProofInputException {
         assert name != null;
         if (displayName == null) {
             displayName = name;
@@ -205,8 +207,8 @@ public final class DLSpecFactory {
      * heap} [#catchAll(java.lang.Throwable exc){m();}]post", (where the update and/or the #catchAll
      * may be omitted) and a modifiable clause.
      */
-    public FunctionalOperationContract createDLOperationContract(String name, Term fma,
-            Term modifiable) throws ProofInputException {
+    public @NonNull FunctionalOperationContract createDLOperationContract(@NonNull String name, @NonNull Term fma,
+                                                                          @NonNull Term modifiable) throws ProofInputException {
         assert name != null;
         assert fma != null;
         assert modifiable != null;

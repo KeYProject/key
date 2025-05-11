@@ -12,6 +12,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Visitor;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -48,7 +49,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    public static Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
+    public static @NonNull Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
         return new ContainsTermFeature(proj1, proj2);
     }
 
@@ -83,7 +84,7 @@ public class ContainsTermFeature implements Feature {
         }
 
         @Override
-        public void visit(Term visited) {
+        public void visit(@NonNull Term visited) {
             found = found || visited.equalsModProperty(term, RENAMING_TERM_PROPERTY);
         }
 

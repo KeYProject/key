@@ -11,6 +11,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Named;
 
 /**
@@ -64,7 +65,7 @@ public interface Strategy extends Named, Feature {
      * @param proof The {@link Proof} the strategy of which should be updated.
      * @param p The new {@link StrategyProperties}
      */
-    static void updateStrategySettings(Proof proof, StrategyProperties p) {
+    static void updateStrategySettings(@NonNull Proof proof, @NonNull StrategyProperties p) {
         final Strategy strategy = proof.getActiveStrategy();
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);

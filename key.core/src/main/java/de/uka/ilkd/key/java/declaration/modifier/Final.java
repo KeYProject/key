@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.declaration.modifier;
 
 import de.uka.ilkd.key.java.declaration.Modifier;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -36,7 +37,7 @@ public class Final extends Modifier {
      *
      * @return the string.
      */
-    protected String getSymbol() {
+    protected @NonNull String getSymbol() {
         return "final";
     }
 }

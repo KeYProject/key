@@ -85,18 +85,18 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return RULE_NAME;
     }
 
     @Override
-    public String displayName() {
+    public @NonNull String displayName() {
         return DISPLAY_NAME;
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
-            final RuleApp ruleApp) throws RuleAbortException {
+    public @NonNull ImmutableList<Goal> apply(final @NonNull Goal goal, final @NonNull Services services,
+                                              final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 
         assert ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp : //
@@ -172,8 +172,8 @@ public class CloseAfterMerge implements BuiltInRule {
      * @return The syntactic weakening formula for the instantiated
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    private Term getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
-            Goal isWeakeningGoal) {
+    private @NonNull Term getSyntacticWeakeningFormula(@NonNull CloseAfterMergeRuleBuiltInRuleApp closeApp,
+                                                       @NonNull Goal isWeakeningGoal) {
         final Services services = isWeakeningGoal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -245,8 +245,8 @@ public class CloseAfterMerge implements BuiltInRule {
      *         Skolem constants in {@code constsToReplace} having been replaced by fresh variables
      *         before.
      */
-    private Term allClosure(final Term term, final HashSet<Function> constsToReplace,
-            Services services) {
+    private @NonNull Term allClosure(final @NonNull Term term, final HashSet<Function> constsToReplace,
+                                     @NonNull Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         Term termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
@@ -266,7 +266,7 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public @NonNull IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pos);
     }
 
@@ -287,9 +287,9 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param newNames The set of new names (of Skolem constants) introduced in the merge.
      * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio, Node thePartnerNode,
-            Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
-            SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
+    public @NonNull CloseAfterMergeRuleBuiltInRuleApp createApp(@NonNull PosInOccurrence pio, Node thePartnerNode,
+                                                                Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
+                                                                SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pio, thePartnerNode,
             correspondingMergeNode, mergeNodeState, partnerState, pc, newNames);
     }

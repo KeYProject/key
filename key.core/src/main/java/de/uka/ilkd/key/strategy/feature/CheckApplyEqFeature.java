@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This feature checks that an equation is not applied to itself. This means that the focus of the
@@ -24,7 +26,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     private CheckApplyEqFeature() {}
 
-    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp p_app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertTrue(pos != null,
             "Need to know the position of " + "the application of the taclet");
 
@@ -37,7 +39,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         ;
     }
 
-    private boolean isNotSelfApplication(PosInOccurrence pos, IfFormulaInstantiation ifInst) {
+    private boolean isNotSelfApplication(@NonNull PosInOccurrence pos, IfFormulaInstantiation ifInst) {
         if (!(ifInst instanceof IfFormulaInstSeq)
                 || ifInst.getConstrainedFormula() != pos.sequentFormula()
                 || ((IfFormulaInstSeq) ifInst).inAntec() != pos.isInAntec()) {

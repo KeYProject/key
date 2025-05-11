@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -22,12 +23,12 @@ class Matching {
      * @param targetTerm a gound term
      * @return all substitution found from this matching
      */
-    public static ImmutableSet<Substitution> basicMatching(Trigger trigger, Term targetTerm) {
+    public static ImmutableSet<Substitution> basicMatching(@NonNull Trigger trigger, @NonNull Term targetTerm) {
         return BasicMatching.getSubstitutions(trigger.getTriggerTerm(), targetTerm);
     }
 
-    public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger, Term targetTerm,
-            Services services) {
+    public static ImmutableSet<Substitution> twoSidedMatching(@NonNull UniTrigger trigger, Term targetTerm,
+                                                              Services services) {
         TwoSidedMatching tsm = new TwoSidedMatching(trigger, targetTerm, services);
         return tsm.getSubstitutions(services);
     }

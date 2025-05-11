@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This program is a little for debugging KeY Lexer.
@@ -38,7 +39,7 @@ public class DebugJmlLexer {
         this.lexer = lexer;
     }
 
-    public DebugJmlLexer(List<File> files) {
+    public DebugJmlLexer(@NonNull List<File> files) {
         stream = System.out;
         lexer = files.stream().map(it -> {
             try {
@@ -51,7 +52,7 @@ public class DebugJmlLexer {
         format = DEFAULT_FORMAT;
     }
 
-    public static void main(String[] args) {
+    public static void main(String @NonNull [] args) {
         if (args.length > 0) {
             new DebugJmlLexer(Arrays.stream(args).map(File::new).collect(Collectors.toList()))
                     .run();
@@ -74,7 +75,7 @@ public class DebugJmlLexer {
         }
     }
 
-    public static void debug(String content) {
+    public static void debug(@NonNull String content) {
         debug(JmlFacade.createLexer(CharStreams.fromString(content)));
     }
 
@@ -90,7 +91,7 @@ public class DebugJmlLexer {
         }
     }
 
-    private void run(JmlLexer toks) {
+    private void run(@NonNull JmlLexer toks) {
         Token t;
         do {
             int modeBefore = toks._mode;

@@ -8,6 +8,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -25,7 +26,7 @@ public abstract class AbstractProverCore implements ProverCore {
      * We use an immutable list to store listeners to allow for addition/removal within listener
      * code without causing a deadlock
      */
-    private ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
+    private @NonNull ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
 
 
     /**

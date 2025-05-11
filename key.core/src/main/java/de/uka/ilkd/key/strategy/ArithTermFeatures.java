@@ -10,11 +10,12 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
 class ArithTermFeatures extends StaticFeatureCollection {
 
-    public ArithTermFeatures(IntegerLDT numbers) {
+    public ArithTermFeatures(@NonNull IntegerLDT numbers) {
         Z = numbers.getNumberSymbol();
         C = numbers.getCharSymbol();
 
@@ -88,69 +89,69 @@ class ArithTermFeatures extends StaticFeatureCollection {
         notContainsDivMod = rec(any(), add(add(not(divF), not(modF)), add(not(jdivF), not(jmodF))));
     }
 
-    final Sort intS;
+    final @NonNull Sort intS;
 
-    final JFunction Z;
-    final JFunction C;
-    final JFunction add;
-    final JFunction mul;
-    final JFunction mod;
-    final JFunction div;
-    final JFunction jmod;
-    final JFunction jdiv;
+    final @NonNull JFunction Z;
+    final @NonNull JFunction C;
+    final @NonNull JFunction add;
+    final @NonNull JFunction mul;
+    final @NonNull JFunction mod;
+    final @NonNull JFunction div;
+    final @NonNull JFunction jmod;
+    final @NonNull JFunction jdiv;
 
-    final Operator eq;
-    final JFunction leq;
-    final JFunction geq;
+    final @NonNull Operator eq;
+    final @NonNull JFunction leq;
+    final @NonNull JFunction geq;
 
-    final TermFeature intF;
+    final @NonNull TermFeature intF;
 
-    final TermFeature addF;
-    final TermFeature mulF;
-    final TermFeature modF;
-    final TermFeature divF;
-    final TermFeature jmodF;
-    final TermFeature jdivF;
+    final @NonNull TermFeature addF;
+    final @NonNull TermFeature mulF;
+    final @NonNull TermFeature modF;
+    final @NonNull TermFeature divF;
+    final @NonNull TermFeature jmodF;
+    final @NonNull TermFeature jdivF;
 
-    final TermFeature eqF;
-    final TermFeature leqF;
-    final TermFeature geqF;
+    final @NonNull TermFeature eqF;
+    final @NonNull TermFeature leqF;
+    final @NonNull TermFeature geqF;
 
-    final TermFeature constant;
-    final TermFeature atom;
-    final TermFeature linearMonomial;
+    final @NonNull TermFeature constant;
+    final @NonNull TermFeature atom;
+    final @NonNull TermFeature linearMonomial;
 
     // left-associatively arranged monomials
-    final TermFeature monomial;
+    final @NonNull TermFeature monomial;
     // left-associatively arranged polynomials
-    final TermFeature polynomial;
+    final @NonNull TermFeature polynomial;
 
-    final TermFeature literal;
-    final TermFeature posLiteral;
-    final TermFeature negLiteral;
-    final TermFeature nonNegLiteral;
-    final TermFeature nonPosLiteral;
-    final TermFeature zeroLiteral;
-    final TermFeature oneLiteral;
-    final TermFeature atLeastTwoLiteral;
+    final @NonNull TermFeature literal;
+    final @NonNull TermFeature posLiteral;
+    final @NonNull TermFeature negLiteral;
+    final @NonNull TermFeature nonNegLiteral;
+    final @NonNull TermFeature nonPosLiteral;
+    final @NonNull TermFeature zeroLiteral;
+    final @NonNull TermFeature oneLiteral;
+    final @NonNull TermFeature atLeastTwoLiteral;
 
-    final TermFeature charLiteral;
+    final @NonNull TermFeature charLiteral;
 
-    final TermFeature nonNegMonomial;
-    final TermFeature posMonomial;
-    final TermFeature negMonomial;
-    final TermFeature nonCoeffMonomial;
-    final TermFeature nonNegOrNonCoeffMonomial;
-    final TermFeature atLeastTwoCoeffMonomial;
+    final @NonNull TermFeature nonNegMonomial;
+    final @NonNull TermFeature posMonomial;
+    final @NonNull TermFeature negMonomial;
+    final @NonNull TermFeature nonCoeffMonomial;
+    final @NonNull TermFeature nonNegOrNonCoeffMonomial;
+    final @NonNull TermFeature atLeastTwoCoeffMonomial;
 
-    final TermFeature intEquation;
-    final TermFeature linearEquation;
-    final TermFeature monomialEquation;
-    final TermFeature intInEquation;
-    final TermFeature linearInEquation;
-    final TermFeature intRelation;
+    final @NonNull TermFeature intEquation;
+    final @NonNull TermFeature linearEquation;
+    final @NonNull TermFeature monomialEquation;
+    final @NonNull TermFeature intInEquation;
+    final @NonNull TermFeature linearInEquation;
+    final @NonNull TermFeature intRelation;
 
-    final TermFeature notContainsProduct;
-    final TermFeature notContainsDivMod;
+    final @NonNull TermFeature notContainsProduct;
+    final @NonNull TermFeature notContainsDivMod;
 
 }

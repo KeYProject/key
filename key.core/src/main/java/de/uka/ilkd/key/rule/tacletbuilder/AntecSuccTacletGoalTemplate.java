@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -20,7 +21,7 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /** sequent that replaces another one */
-    private Sequent replacewith = Sequent.EMPTY_SEQUENT;
+    private @NonNull Sequent replacewith = Sequent.EMPTY_SEQUENT;
 
     /**
      * creates new Goaldescription
@@ -29,15 +30,15 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      * @param replacewith the Sequent that replaces another one
      */
-    public AntecSuccTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-            Sequent replacewith, ImmutableSet<SchemaVariable> pvs) {
+    public AntecSuccTacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules,
+                                       @NonNull Sequent replacewith, ImmutableSet<SchemaVariable> pvs) {
         super(addedSeq, addedRules, pvs);
         TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith sequent");
         this.replacewith = replacewith;
     }
 
-    public AntecSuccTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-            Sequent replacewith) {
+    public AntecSuccTacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules,
+                                       @NonNull Sequent replacewith) {
         this(addedSeq, addedRules, replacewith, DefaultImmutableSet.nil());
     }
 
@@ -56,7 +57,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
      * @return all variables that occur bound in this goal template
      */
     @Override
-    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
+    public @NonNull ImmutableSet<QuantifiableVariable> getBoundVariables() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());
@@ -91,7 +92,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
 
     /** toString */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String result = super.toString();
         result += "\\replacewith(" + replaceWith() + ") ";
         return result;

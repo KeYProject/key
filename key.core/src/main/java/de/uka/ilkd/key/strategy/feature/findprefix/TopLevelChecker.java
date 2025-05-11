@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -14,7 +15,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 class TopLevelChecker implements Checker {
 
     @Override
-    public boolean check(PosInOccurrence pio) {
+    public boolean check(@NonNull PosInOccurrence pio) {
         return pio.isTopLevel();
     }
 

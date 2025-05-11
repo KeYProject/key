@@ -16,6 +16,7 @@ import java.util.List;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This FileRepo does not cache any files but writes to / reads from the original files on disk. It
@@ -25,24 +26,24 @@ import de.uka.ilkd.key.proof.io.RuleSource;
  */
 public class TrivialFileRepo implements FileRepo {
     @Override
-    public InputStream getInputStream(Path path) throws IOException {
+    public InputStream getInputStream(@NonNull Path path) throws IOException {
 
         // wrap path into URL for uniform treatment
         return getInputStream(path.toUri().toURL());
     }
 
     @Override
-    public InputStream getInputStream(RuleSource ruleSource) {
+    public @NonNull InputStream getInputStream(@NonNull RuleSource ruleSource) {
         return ruleSource.getNewStream();
     }
 
     @Override
-    public InputStream getInputStream(URL url) throws IOException {
+    public InputStream getInputStream(@NonNull URL url) throws IOException {
         return url.openStream();
     }
 
     @Override
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException {
+    public @NonNull OutputStream createOutputStream(@NonNull Path path) throws FileNotFoundException {
         return new FileOutputStream(path.toFile());
     }
 

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 
@@ -16,7 +17,7 @@ public final class MetaBinaryOr extends MetaArithBitMaskOp {
 
 
     @Override
-    protected BigInteger bitmaskOp(BigInteger left, BigInteger right) {
+    protected @NonNull BigInteger bitmaskOp(@NonNull BigInteger left, BigInteger right) {
         return left.or(right);
     }
 }

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java.abstraction;
 
 import de.uka.ilkd.key.java.Services;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -36,6 +37,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      *
      * @return the array of locally defined supertypes of this type.
      */
+    @Nullable
     ImmutableList<KeYJavaType> getSupertypes();
 
     /**
@@ -45,6 +47,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      *
      * @return the array of all supertypes of this type in topological order.
      */
+    @Nullable
     ImmutableList<ClassType> getAllSupertypes(Services services);
 
     /**
@@ -52,6 +55,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      *
      * @return the array of field members of this type.
      */
+    @Nullable
     ImmutableList<Field> getFields(Services services);
 
 
@@ -61,6 +65,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      *
      * @return the array of visible field members of this type and its supertypes.
      */
+    @Nullable
     ImmutableList<Field> getAllFields(Services services);
 
     /**
@@ -68,6 +73,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      *
      * @return the array of methods of this type.
      */
+    @Nullable
     ImmutableList<Method> getMethods(Services services);
 
     /**
@@ -76,6 +82,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      *
      * @return the array of visible methods of this type and its supertypes.
      */
+    @Nullable
     ImmutableList<Method> getAllMethods(Services services);
 
     /**
@@ -83,6 +90,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      *
      * @return the array of constructors of this type.
      */
+    @Nullable
     ImmutableList<Constructor> getConstructors(Services services);
 
     /**
@@ -92,6 +100,7 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * @return an array of class types that are members of this type or any of its supertypes.
      * @see #getAllSupertypes
      */
+    @Nullable
     ImmutableList<ClassType> getAllTypes(Services services);
 
 }

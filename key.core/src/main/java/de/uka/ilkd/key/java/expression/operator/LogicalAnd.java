@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -26,11 +27,11 @@ public class LogicalAnd extends Operator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public LogicalAnd(ExtList children) {
+    public LogicalAnd(@NonNull ExtList children) {
         super(children);
     }
 
-    public LogicalAnd(Expression lhs, Expression rhs) {
+    public LogicalAnd(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -70,11 +71,11 @@ public class LogicalAnd extends Operator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnLogicalAnd(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services services, ExecutionContext ec) {
         return services.getTypeConverter().getBooleanType();
     }
 

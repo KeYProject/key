@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -21,7 +22,7 @@ public class LabeledParserRuleContext {
     public final @Nullable ParserRuleContext first;
     public final @Nullable TermLabel second;
 
-    public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
+    public LabeledParserRuleContext(@NonNull ParserRuleContext first, TermLabel second) {
         if (first == null) {
             throw new IllegalArgumentException("ParserRuleContext is null");
         }
@@ -30,7 +31,7 @@ public class LabeledParserRuleContext {
     }
 
 
-    public LabeledParserRuleContext(ParserRuleContext first) {
+    public LabeledParserRuleContext(@NonNull ParserRuleContext first) {
         if (first == null) {
             throw new IllegalArgumentException("ParserRuleContext is null");
         }
@@ -38,19 +39,19 @@ public class LabeledParserRuleContext {
         second = null;
     }
 
-    public static LabeledParserRuleContext createLabeledParserRuleContext(ParserRuleContext ctx,
-            OriginTermLabel.SpecType specType, boolean attachOriginLabel) {
+    public static @NonNull LabeledParserRuleContext createLabeledParserRuleContext(@NonNull ParserRuleContext ctx,
+                                                                                   OriginTermLabel.@NonNull SpecType specType, boolean attachOriginLabel) {
         return attachOriginLabel
                 ? new LabeledParserRuleContext(ctx, constructTermLabel(ctx, specType))
                 : new LabeledParserRuleContext(ctx);
     }
 
-    private LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
+    private LabeledParserRuleContext(@NonNull ParserRuleContext ctx, OriginTermLabel.@NonNull SpecType specType) {
         this(ctx, constructTermLabel(ctx, specType));
     }
 
-    private static TermLabel constructTermLabel(ParserRuleContext ctx,
-            OriginTermLabel.SpecType specType) {
+    private static @NonNull TermLabel constructTermLabel(@NonNull ParserRuleContext ctx,
+                                                         OriginTermLabel.@NonNull SpecType specType) {
         URI filename = MiscTools.getURIFromTokenSource(ctx.start.getTokenSource());
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);

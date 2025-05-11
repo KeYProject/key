@@ -51,11 +51,11 @@ public final class JmlTermFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(JmlTermFactory.class);
 
     public Services services;
-    public final TermBuilder tb;
+    public final @NonNull TermBuilder tb;
     public final SLExceptionFactory exc;
     // public final JMLArithmeticHelper arithmeticHelper;
     public final List<PositionedString> warnings = new ArrayList<>();
-    public static final Map<String, String> jml2jdl;
+    public static final @NonNull Map<String, String> jml2jdl;
 
     static {
         Map<String, String> tmp = new TreeMap<>();
@@ -73,10 +73,10 @@ public final class JmlTermFactory {
         jml2jdl = Collections.unmodifiableMap(tmp);
     }
 
-    private final OverloadedOperatorHandler overloadedFunctionHandler;
+    private final @NonNull OverloadedOperatorHandler overloadedFunctionHandler;
 
 
-    public JmlTermFactory(SLExceptionFactory exc, Services services, SpecMathMode specMathMode) {
+    public JmlTermFactory(SLExceptionFactory exc, @NonNull Services services, SpecMathMode specMathMode) {
 
         this.exc = exc;
         this.services = services;
@@ -89,7 +89,7 @@ public final class JmlTermFactory {
     }
 
     // region reach
-    public SLExpression reach(Term t, SLExpression e1, SLExpression e2, SLExpression e3) {
+    public @NonNull SLExpression reach(@NonNull Term t, @NonNull SLExpression e1, @NonNull SLExpression e2, @Nullable SLExpression e3) {
         final LogicVariable stepsLV = e3 == null
                 ? new LogicVariable(new Name("n"),
                     services.getTypeConverter().getIntegerLDT().targetSort())
@@ -106,7 +106,7 @@ public final class JmlTermFactory {
         return new SLExpression(reach);
     }
 
-    public SLExpression reachLocs(Term t, SLExpression e1, SLExpression e2, SLExpression e3) {
+    public @NonNull SLExpression reachLocs(@NonNull Term t, @NonNull SLExpression e1, SLExpression e2, @Nullable SLExpression e3) {
         final LogicVariable objLV =
             new LogicVariable(new Name("o"), services.getJavaInfo().objectSort());
         final LogicVariable stepsLV = e3 == null
@@ -139,7 +139,7 @@ public final class JmlTermFactory {
      * @return allObjects term (see <code>LocSetADT</code>) @ in case <code>t</code> is not a
      *         store-ref term cosisting of unions of singletons
      */
-    private Term getFields(Term t) {
+    private @NonNull Term getFields(@NonNull Term t) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         if (t.op().equals(locSetLDT.getUnion())) {
             final Term sub0 = getFields(t.sub(0));
@@ -155,8 +155,8 @@ public final class JmlTermFactory {
 
 
     // region quantification
-    private Term typerestrictMinAndMax(KeYJavaType kjt, final boolean nullable,
-            Iterable<LogicVariable> qvs) {
+    private @NonNull Term typerestrictMinAndMax(@NonNull KeYJavaType kjt, final boolean nullable,
+                                                @NonNull Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();
@@ -192,8 +192,8 @@ public final class JmlTermFactory {
         return res;
     }
 
-    public SLExpression quantifiedMin(Term _guard, Term body, KeYJavaType declsType,
-            boolean nullable, ImmutableList<LogicVariable> qvs) {
+    public @NonNull SLExpression quantifiedMin(@NonNull Term _guard, @NonNull Term body, @NonNull KeYJavaType declsType,
+                                               boolean nullable, @NonNull ImmutableList<LogicVariable> qvs) {
         Term guard = tb.convertToFormula(_guard);
         assert guard.sort() == JavaDLTheory.FORMULA;
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
@@ -207,8 +207,8 @@ public final class JmlTermFactory {
         return new SLExpression(min, type);
     }
 
-    public SLExpression quantifiedMax(Term _guard, Term body, KeYJavaType declsType,
-            boolean nullable, ImmutableList<LogicVariable> qvs) {
+    public @NonNull SLExpression quantifiedMax(@NonNull Term _guard, @NonNull Term body, @NonNull KeYJavaType declsType,
+                                               boolean nullable, @NonNull ImmutableList<LogicVariable> qvs) {
         Term guard = tb.convertToFormula(_guard);
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         if (body.sort() != intSort) {
@@ -222,8 +222,8 @@ public final class JmlTermFactory {
         return new SLExpression(max, type);
     }
 
-    public @NonNull SLExpression quantifiedNumOf(@Nullable Term t1, Term t2, KeYJavaType declsType,
-            boolean nullable, Iterable<LogicVariable> qvs, KeYJavaType resultType) {
+    public @NonNull SLExpression quantifiedNumOf(@Nullable Term t1, @NonNull Term t2, KeYJavaType declsType,
+                                                 boolean nullable, @NonNull Iterable<LogicVariable> qvs, KeYJavaType resultType) {
         BoundedNumericalQuantifier bounded = (qv, lo, hi, body) -> {
             final Term cond = tb.ife(tb.convertToFormula(body), tb.one(), tb.zero());
             return tb.bsum(qv, lo, hi, cond);
@@ -237,7 +237,7 @@ public final class JmlTermFactory {
     }
 
     public @NonNull SLExpression quantifiedProduct(KeYJavaType declsType, boolean nullable,
-            Iterable<LogicVariable> qvs, @Nullable Term t1, Term t2, KeYJavaType resultType) {
+                                                   @NonNull Iterable<LogicVariable> qvs, @Nullable Term t1, @NonNull Term t2, KeYJavaType resultType) {
         BoundedNumericalQuantifier bounded =
             (qv, lo, hi, body) -> tb.bprod(qv, lo, hi, body, services);
 
@@ -249,7 +249,7 @@ public final class JmlTermFactory {
     }
 
     public @NonNull SLExpression quantifiedSum(KeYJavaType javaType, boolean nullable,
-            Iterable<LogicVariable> qvs, @Nullable Term t1, Term t2, KeYJavaType resultType) {
+                                               @NonNull Iterable<LogicVariable> qvs, @Nullable Term t1, @NonNull Term t2, KeYJavaType resultType) {
         BoundedNumericalQuantifier bounded = tb::bsum;
         UnboundedNumericalQuantifier unbounded = (declsType, n, vars, range, body) -> {
             final Term tr = typerestrict(declsType, n, vars);
@@ -258,16 +258,16 @@ public final class JmlTermFactory {
         return numeralQuantifier(javaType, nullable, qvs, t1, t2, resultType, unbounded, bounded);
     }
 
-    public SLExpression forall(Term preTerm, Term bodyTerm, KeYJavaType declsType,
-            ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
+    public @NonNull SLExpression forall(Term preTerm, @NonNull Term bodyTerm, @NonNull KeYJavaType declsType,
+                                        @NonNull ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
         BiFunction<QuantifiableVariable, Term, Term> quantify = tb::all;
         BiFunction<Term, Term, Term> combineGuard = tb::imp;
         return simpleQuantifier(preTerm, bodyTerm, declsType, declVars, nullable, resultType,
             quantify, combineGuard);
     }
 
-    public SLExpression exists(Term preTerm, Term bodyTerm, KeYJavaType declsType,
-            ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
+    public @NonNull SLExpression exists(Term preTerm, @NonNull Term bodyTerm, @NonNull KeYJavaType declsType,
+                                        @NonNull ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
         boolean isGeneralized = false;
         BiFunction<QuantifiableVariable, Term, Term> quantify = tb::ex;
         BiFunction<Term, Term, Term> combineGuard = tb::andSC;
@@ -275,10 +275,10 @@ public final class JmlTermFactory {
             quantify, combineGuard);
     }
 
-    private SLExpression simpleQuantifier(Term preTerm, Term bodyTerm, KeYJavaType declsType,
-            ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType,
-            BiFunction<QuantifiableVariable, Term, Term> combine,
-            BiFunction<Term, Term, Term> combineQuantifiedTerms) {
+    private @NonNull SLExpression simpleQuantifier(Term preTerm, @NonNull Term bodyTerm, @NonNull KeYJavaType declsType,
+                                                   @NonNull ImmutableList<LogicVariable> declVars, boolean nullable, @Nullable KeYJavaType resultType,
+                                                   @NonNull BiFunction<QuantifiableVariable, Term, Term> combine,
+                                                   @NonNull BiFunction<Term, Term, Term> combineQuantifiedTerms) {
         final Type type = declsType.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
 
@@ -316,7 +316,7 @@ public final class JmlTermFactory {
      * cond), resultType); }
      */
 
-    private boolean isBoundedNumerical(Term a, LogicVariable lv) {
+    private boolean isBoundedNumerical(@NonNull Term a, LogicVariable lv) {
         return lowerBound(a, lv) != null && upperBound(a, lv) != null;
     }
 
@@ -328,7 +328,7 @@ public final class JmlTermFactory {
      * @param lv variable bound by quantifier
      * @return lower bound term (or null)
      */
-    private Term lowerBound(Term a, LogicVariable lv) {
+    private @Nullable Term lowerBound(@NonNull Term a, LogicVariable lv) {
         if (a.arity() == 2 && a.op() == Junctor.AND && a.sub(0).arity() == 2
                 && a.sub(0).sub(1).op() == lv && a.sub(0).op()
                         .equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())) {
@@ -344,7 +344,7 @@ public final class JmlTermFactory {
      * @param lv variable bound by quantifier
      * @return upper bound term (or null)
      */
-    public Term upperBound(Term a, LogicVariable lv) {
+    public @Nullable Term upperBound(@NonNull Term a, LogicVariable lv) {
         if (a.arity() == 2 && a.op() == Junctor.AND && a.sub(1).arity() == 2
                 && a.sub(1).sub(0).op() == lv && a.sub(1).op()
                         .equals(services.getTypeConverter().getIntegerLDT().getLessThan())) {
@@ -354,8 +354,8 @@ public final class JmlTermFactory {
     }
 
     private @NonNull SLExpression numeralQuantifier(KeYJavaType declsType, boolean nullable,
-            Iterable<LogicVariable> qvs, Term t1, Term t2, @Nullable KeYJavaType resultType,
-            UnboundedNumericalQuantifier unbounded, BoundedNumericalQuantifier bounded) {
+                                                    @NonNull Iterable<LogicVariable> qvs, @NonNull Term t1, @NonNull Term t2, @Nullable KeYJavaType resultType,
+                                                    @NonNull UnboundedNumericalQuantifier unbounded, @NonNull BoundedNumericalQuantifier bounded) {
         Iterator<LogicVariable> it = qvs.iterator();
         LogicVariable lv = it.next();
         Term t;
@@ -383,13 +383,13 @@ public final class JmlTermFactory {
         return result;
     }
 
-    public Term notModified(Term term, SLExpression t) {
+    public @Nullable Term notModified(Term term, SLExpression t) {
         return null;
     }
 
-    public @NonNull SLExpression binary(OverloadedOperatorHandler.JMLOperator jmlOperator,
-            SLExpression left,
-            SLExpression right) {
+    public @NonNull SLExpression binary(OverloadedOperatorHandler.@NonNull JMLOperator jmlOperator,
+                                        @NonNull SLExpression left,
+                                        @NonNull SLExpression right) {
         try {
             SLExpression result = overloadedFunctionHandler.build(jmlOperator, left, right);
             if (result == null) {
@@ -404,7 +404,7 @@ public final class JmlTermFactory {
         }
     }
 
-    public SLExpression unary(JMLOperator unaryOp, SLExpression arg) {
+    public @NonNull SLExpression unary(@NonNull JMLOperator unaryOp, @NonNull SLExpression arg) {
         try {
             SLExpression result = overloadedFunctionHandler.build(unaryOp, arg, null);
             if (result == null) {
@@ -430,8 +430,8 @@ public final class JmlTermFactory {
     // endregion
 
 
-    public @NonNull SLExpression arrayRef(SLExpression receiver, String fullyQualifiedName,
-            SLExpression rangeFrom, SLExpression rangeTo) {
+    public @NonNull SLExpression arrayRef(@NonNull SLExpression receiver, String fullyQualifiedName,
+                                          SLExpression rangeFrom, SLExpression rangeTo) {
         SLExpression result;
         try {
             if (receiver == null) {
@@ -459,8 +459,8 @@ public final class JmlTermFactory {
         }
     }
 
-    public SLExpression translateArrayReference(SLExpression receiver, SLExpression rangeFrom,
-            SLExpression rangeTo) {
+    public @NonNull SLExpression translateArrayReference(@NonNull SLExpression receiver, @Nullable SLExpression rangeFrom,
+                                                         @Nullable SLExpression rangeTo) {
         SLExpression result;
         if (rangeFrom == null) {
             // We have a star. A star includes all components of an array even
@@ -482,8 +482,8 @@ public final class JmlTermFactory {
     }
 
 
-    public SLExpression translateSequenceReference(SLExpression receiver, SLExpression rangeFrom,
-            SLExpression rangeTo) {
+    public @NonNull SLExpression translateSequenceReference(@NonNull SLExpression receiver, @Nullable SLExpression rangeFrom,
+                                                            @Nullable SLExpression rangeTo) {
         if (rangeFrom == null) {
             // a star
             return new SLExpression(tb.allFields(receiver.getTerm()));
@@ -495,16 +495,16 @@ public final class JmlTermFactory {
         }
     }
 
-    public SLExpression dlKeyword(String name, ImmutableList<SLExpression> list) {
+    public @NonNull SLExpression dlKeyword(@NonNull String name, ImmutableList<SLExpression> list) {
         if (name.startsWith("\\dl_")) {
             name = name.substring(4);
         }
         return translateToJDLTerm(name, list);
     }
 
-    public SLExpression commentary(String desc, LocationVariable selfVar,
-            LocationVariable resultVar,
-            ImmutableList<LocationVariable> paramVars, Term heapAtPre) {
+    public @NonNull SLExpression commentary(String desc, @Nullable LocationVariable selfVar,
+                                            @Nullable LocationVariable resultVar,
+                                            @Nullable ImmutableList<LocationVariable> paramVars, @Nullable Term heapAtPre) {
         // strip leading and trailing (* ... *)
         String text = desc;
         text = text.substring(2, text.length() - 2);
@@ -540,7 +540,7 @@ public final class JmlTermFactory {
         }
     }
 
-    public SLExpression ite(SLExpression result, SLExpression a, SLExpression b) {
+    public @NonNull SLExpression ite(@NonNull SLExpression result, @NonNull SLExpression a, @NonNull SLExpression b) {
         // handle cases where a and b are of sort FORMULA and boolean respectively (which are
         // incompatible, unfortunately)
         final KeYJavaType bool = services.getTypeConverter().getBooleanType();
@@ -571,7 +571,7 @@ public final class JmlTermFactory {
         return result;
     }
 
-    public SLExpression cast(KeYJavaType type, SLExpression result) {
+    public @NonNull SLExpression cast(@Nullable KeYJavaType type, @NonNull SLExpression result) {
         if (type != null) {
             if (result.isType()) {
                 throw exc.createException0("Casting of type variables not (yet) supported.");
@@ -604,32 +604,32 @@ public final class JmlTermFactory {
     }
 
     // region equalities
-    public SLExpression equivalence(SLExpression left, SLExpression right) {
+    public @NonNull SLExpression equivalence(@NonNull SLExpression left, @NonNull SLExpression right) {
         checkSLExpressions(left, right, "<==>");
         return buildEqualityTerm(left, right);
     }
 
-    public SLExpression antivalence(SLExpression left, SLExpression right) {
+    public @NonNull SLExpression antivalence(@NonNull SLExpression left, @NonNull SLExpression right) {
         checkSLExpressions(left, right, "<=!=>");
         SLExpression eq = buildEqualityTerm(left, right);
         return new SLExpression(tb.not(eq.getTerm()));
     }
 
-    public SLExpression eq(SLExpression left, SLExpression right) {
+    public @NonNull SLExpression eq(@NonNull SLExpression left, @NonNull SLExpression right) {
         checkSLExpressions(left, right, "==");
         return buildEqualityTerm(left, right);
     }
 
-    public SLExpression fpEq(SLExpression left, SLExpression right) {
+    public @NonNull SLExpression fpEq(@NonNull SLExpression left, @NonNull SLExpression right) {
         return new SLExpression(tb.fpEq(left.getTerm(), right.getTerm()));
     }
 
-    public SLExpression fpNeq(SLExpression left, SLExpression right) {
+    public @NonNull SLExpression fpNeq(@NonNull SLExpression left, @NonNull SLExpression right) {
         return new SLExpression(tb.not(tb.fpEq(left.getTerm(), right.getTerm())));
     }
 
 
-    public SLExpression neq(SLExpression left, SLExpression right) {
+    public @NonNull SLExpression neq(@NonNull SLExpression left, @NonNull SLExpression right) {
         checkSLExpressions(left, right, "!=");
         SLExpression eq = buildEqualityTerm(left, right);
         if (eq.getType() != null) {
@@ -639,14 +639,14 @@ public final class JmlTermFactory {
         }
     }
 
-    private void checkSLExpressions(SLExpression left, SLExpression right, String eqSymb) {
+    private void checkSLExpressions(@NonNull SLExpression left, @NonNull SLExpression right, String eqSymb) {
         if (left.isType() != right.isType()) {
             throw exc.createException0("Cannot build equality expression (" + eqSymb
                 + ") between term and type.\n" + "The expression was: " + left + eqSymb + right);
         }
     }
 
-    private SLExpression buildEqualityTerm(SLExpression a, SLExpression b) {
+    private @NonNull SLExpression buildEqualityTerm(@NonNull SLExpression a, @NonNull SLExpression b) {
         if (a.isTerm() && b.isTerm()) {
             return new SLExpression(buildEqualityTerm(a.getTerm(), b.getTerm()));
         }
@@ -685,7 +685,7 @@ public final class JmlTermFactory {
             "Equality must be between two terms or " + "two formulas, not term and formula.");
     }
 
-    private Term buildEqualityTerm(Term a, Term b) {
+    private @NonNull Term buildEqualityTerm(@NonNull Term a, @NonNull Term b) {
         Term result;
         try {
             if (a.sort() != JavaDLTheory.FORMULA && b.sort() != JavaDLTheory.FORMULA) {
@@ -707,8 +707,8 @@ public final class JmlTermFactory {
     }
     // endregion
 
-    public SLExpression bsum(SLExpression a, SLExpression b, SLExpression t, KeYJavaType declsType,
-            ImmutableList<LogicVariable> declVars) {
+    public @NonNull SLExpression bsum(@NonNull SLExpression a, @NonNull SLExpression b, @NonNull SLExpression t, @NonNull KeYJavaType declsType,
+                                      @NonNull ImmutableList<LogicVariable> declVars) {
         KeYJavaType promo = t.getType();
         // services.getTypeConverter().getPromotedType(declsType, t.getType());
 
@@ -734,7 +734,7 @@ public final class JmlTermFactory {
      * @param term the term
      * @return the maybe truncated expression
      */
-    private SLExpression buildBigintTruncationExpression(KeYJavaType resultType, Term term) {
+    private @NonNull SLExpression buildBigintTruncationExpression(@NonNull KeYJavaType resultType, @NonNull Term term) {
         assert term.sort() == services.getTypeConverter().getIntegerLDT().targetSort();
 
         SpecMathMode mode = this.overloadedFunctionHandler.getSpecMathMode();
@@ -746,7 +746,7 @@ public final class JmlTermFactory {
         }
     }
 
-    private SLExpression buildIntCastExpression(KeYJavaType resultType, Term term) {
+    private @NonNull SLExpression buildIntCastExpression(@NonNull KeYJavaType resultType, @NonNull Term term) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
             JFunction cast = integerLDT.getSpecCast(resultType.getJavaType());
@@ -762,8 +762,8 @@ public final class JmlTermFactory {
         }
     }
 
-    public SLExpression fresh(ImmutableList<SLExpression> list,
-            Map<LocationVariable, Term> atPres) {
+    public @NonNull SLExpression fresh(@NonNull ImmutableList<SLExpression> list,
+                                       @NonNull Map<LocationVariable, Term> atPres) {
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         if (atPres == null || atPres.get(baseHeap) == null) {
             throw exc.createException0("\\fresh not allowed in this context");
@@ -790,37 +790,37 @@ public final class JmlTermFactory {
         return new SLExpression(t);
     }
 
-    public SLExpression invFor(SLExpression param) {
+    public @NonNull SLExpression invFor(@NonNull SLExpression param) {
         Term obj = param.getTerm();
         return new SLExpression(tb.inv(obj));
     }
 
-    public SLExpression staticInfFor(KeYJavaType kjt) {
+    public @NonNull SLExpression staticInfFor(@NonNull KeYJavaType kjt) {
         final Term term = tb.staticInv(kjt);
         return new SLExpression(term);
     }
 
-    public SLExpression invFreeFor(SLExpression param) {
+    public @NonNull SLExpression invFreeFor(@NonNull SLExpression param) {
         Term obj = param.getTerm();
         return new SLExpression(tb.invFree(obj));
     }
 
-    public SLExpression staticInfFreeFor(KeYJavaType kjt) {
+    public @NonNull SLExpression staticInfFreeFor(@NonNull KeYJavaType kjt) {
         final Term term = tb.staticInvFree(kjt);
         return new SLExpression(term);
     }
 
 
-    public SLExpression empty(JavaInfo javaInfo) {
+    public @NonNull SLExpression empty(@NonNull JavaInfo javaInfo) {
         return createIntersect(tb.empty(), javaInfo);
     }
 
-    public SLExpression index() {
+    public @NonNull SLExpression index() {
         final KeYJavaType t = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
         return new SLExpression(tb.index(), t);
     }
 
-    public SLExpression values(KeYJavaType t) {
+    public @NonNull SLExpression values(@NonNull KeYJavaType t) {
         return new SLExpression(tb.values(), t);
     }
 
@@ -828,7 +828,7 @@ public final class JmlTermFactory {
      * Need to handle this one differently from INV_FOR since here static invariants may occur too.
      * For a static invariant, take the passed type as receiver.
      */
-    public @NonNull SLExpression createInv(Term selfVar, KeYJavaType targetType) {
+    public @NonNull SLExpression createInv(@Nullable Term selfVar, @Nullable KeYJavaType targetType) {
         final boolean isStatic = selfVar == null;
         assert targetType != null || !isStatic;
         final Term result = isStatic ? tb.staticInv(targetType) : tb.inv(selfVar);
@@ -839,15 +839,15 @@ public final class JmlTermFactory {
      * Need to handle this one differently from INV_FREE_FOR since here static invariants may occur
      * too. For a static invariant, take the passed type as receiver.
      */
-    public @NonNull SLExpression createInvFree(Term selfVar, KeYJavaType targetType) {
+    public @NonNull SLExpression createInvFree(@Nullable Term selfVar, @Nullable KeYJavaType targetType) {
         final boolean isStatic = selfVar == null;
         assert targetType != null || !isStatic;
         final Term result = isStatic ? tb.staticInvFree(targetType) : tb.invFree(selfVar);
         return new SLExpression(result);
     }
 
-    public SLExpression createSeqDef(SLExpression a, SLExpression b, SLExpression t,
-            KeYJavaType declsType, ImmutableList<? extends QuantifiableVariable> declVars) {
+    public @NonNull SLExpression createSeqDef(@NonNull SLExpression a, @NonNull SLExpression b, @NonNull SLExpression t,
+                                              @NonNull KeYJavaType declsType, @NonNull ImmutableList<? extends QuantifiableVariable> declVars) {
         if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
                 || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
             throw exc.createException0(
@@ -869,8 +869,8 @@ public final class JmlTermFactory {
         return new SLExpression(resultTerm, seqtype);
     }
 
-    public SLExpression createUnionF(boolean nullable,
-            Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars, Term expr, Term guard) {
+    public @NonNull SLExpression createUnionF(boolean nullable,
+                                              @NonNull Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars, @NonNull Term expr, Term guard) {
         final JavaInfo javaInfo = services.getJavaInfo();
         final Term restr =
             JmlTermFactory.this.typerestrict(declVars.first, nullable, declVars.second);
@@ -880,15 +880,15 @@ public final class JmlTermFactory {
             javaInfo);
     }
 
-    public SLExpression createUnion(JavaInfo javaInfo, Term t) {
+    public @NonNull SLExpression createUnion(@NonNull JavaInfo javaInfo, @NonNull Term t) {
         return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
     }
 
-    public SLExpression createIntersect(Term t, JavaInfo javaInfo) {
+    public @NonNull SLExpression createIntersect(@NonNull Term t, @NonNull JavaInfo javaInfo) {
         return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
     }
 
-    public Term createStoreRef(SLExpression expr) {
+    public @NonNull Term createStoreRef(@NonNull SLExpression expr) {
         if (expr.isTerm()) {
             Term t = expr.getTerm();
             LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
@@ -904,7 +904,7 @@ public final class JmlTermFactory {
         throw exc.createException0("Not a term: " + expr);
     }
 
-    public Term createLocSet(ImmutableList<SLExpression> exprList) {
+    public @NonNull Term createLocSet(@NonNull ImmutableList<SLExpression> exprList) {
         ImmutableList<Term> singletons = ImmutableSLList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
@@ -943,7 +943,7 @@ public final class JmlTermFactory {
         return tb.union(singletons);
     }
 
-    public SLExpression createPairwiseDisjoint(ImmutableList<Term> list) {
+    public @NonNull SLExpression createPairwiseDisjoint(@NonNull ImmutableList<Term> list) {
         ImmutableList<Term> disTerms = ImmutableSLList.nil();
         while (!list.isEmpty()) {
             Term t1 = list.head();
@@ -956,16 +956,16 @@ public final class JmlTermFactory {
         return new SLExpression(tb.and(disTerms));
     }
 
-    public SLExpression seqConcat(Term seq1, Term seq2) {
+    public @NonNull SLExpression seqConcat(@NonNull Term seq1, @NonNull Term seq2) {
         final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
         return new SLExpression(tb.seqConcat(seq1, seq2), seqtype);
     }
 
-    public @NonNull SLExpression seqGet(Term seq, Term idx) {
+    public @NonNull SLExpression seqGet(@NonNull Term seq, @NonNull Term idx) {
         return new SLExpression(tb.seqGet(JavaDLTheory.ANY, seq, idx));
     }
 
-    public SLExpression seqConst(ImmutableList<SLExpression> exprList) {
+    public @NonNull SLExpression seqConst(@NonNull ImmutableList<SLExpression> exprList) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
@@ -979,7 +979,7 @@ public final class JmlTermFactory {
         return new SLExpression(tb.seq(terms), seqtype);
     }
 
-    public SLExpression createIndexOf(Term seq, Term elem) {
+    public @NonNull SLExpression createIndexOf(@NonNull Term seq, @NonNull Term elem) {
         final KeYJavaType inttype =
             services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
         return new SLExpression(tb.indexOf(seq, elem), inttype);
@@ -993,14 +993,14 @@ public final class JmlTermFactory {
         return createBreaks(term, label);
     }
 
-    public @NonNull Pair<Label, Term> createBreaks(Term term, String label) {
+    public @NonNull Pair<Label, Term> createBreaks(@Nullable Term term, @Nullable String label) {
         Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
         return new Pair<>(label == null ? null : new ProgramElementName(label), formula);
     }
 
 
     // region clauses
-    public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, LocationVariable excVar) {
+    public @NonNull Term signalsOnly(@NonNull ImmutableList<KeYJavaType> signalsonly, @NonNull LocationVariable excVar) {
         Term result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
             JFunction instance =
@@ -1011,8 +1011,8 @@ public final class JmlTermFactory {
         return result;
     }
 
-    public Term signals(Term result, LogicVariable eVar, LocationVariable excVar,
-            KeYJavaType excType) {
+    public @NonNull Term signals(@Nullable Term result, LogicVariable eVar, @NonNull LocationVariable excVar,
+                                 @NonNull KeYJavaType excType) {
         if (result == null) {
             result = tb.tt();
         } else {
@@ -1030,7 +1030,7 @@ public final class JmlTermFactory {
         return result;
     }
 
-    public Pair<IObserverFunction, Term> represents(SLExpression lhs, Term t) {
+    public @NonNull Pair<IObserverFunction, Term> represents(@NonNull SLExpression lhs, Term t) {
         return new Pair<>((IObserverFunction) lhs.getTerm().op(), t);
     }
 
@@ -1043,7 +1043,7 @@ public final class JmlTermFactory {
      * @param mby measured by term, can be omitted
      * @return {@link TranslatedDependencyContract}
      */
-    public TranslatedDependencyContract depends(SLExpression lhs, Term rhs, SLExpression mby) {
+    public @NonNull TranslatedDependencyContract depends(@NonNull SLExpression lhs, Term rhs, @Nullable SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
         if (!lhs.isTerm()) {
@@ -1071,11 +1071,11 @@ public final class JmlTermFactory {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public Term assignable(@NonNull Term term) {
+    public @NonNull Term assignable(@NonNull Term term) {
         return accessible(term);
     }
 
-    public Term accessible(@NonNull Term ensuresTerm) {
+    public @NonNull Term accessible(@NonNull Term ensuresTerm) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
         if (ensuresTerm.sort() == booleanLDT.targetSort()) {
             return tb.convertToFormula(ensuresTerm);
@@ -1089,7 +1089,8 @@ public final class JmlTermFactory {
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of
      * type int.
      */
-    SLExpression createSkolemExprInt(Token jmlKeyWord) {
+    @NonNull
+    SLExpression createSkolemExprInt(@NonNull Token jmlKeyWord) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_INT);
     }
 
@@ -1097,11 +1098,12 @@ public final class JmlTermFactory {
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of
      * type long.
      */
-    SLExpression createSkolemExprLong(Token jmlKeyWord) {
+    @NonNull
+    SLExpression createSkolemExprLong(@NonNull Token jmlKeyWord) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_LONG);
     }
 
-    public SLExpression createSkolemExprLong(String text) {
+    public @NonNull SLExpression createSkolemExprLong(@NonNull String text) {
         return skolemExprHelper(text, PrimitiveType.JAVA_LONG);
     }
 
@@ -1110,7 +1112,8 @@ public final class JmlTermFactory {
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of
      * type \bigint.
      */
-    SLExpression createSkolemExprBigint(Token jmlKeyWord) {
+    @NonNull
+    SLExpression createSkolemExprBigint(@NonNull Token jmlKeyWord) {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_BIGINT);
     }
 
@@ -1118,14 +1121,15 @@ public final class JmlTermFactory {
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of
      * type Object.
      */
-    SLExpression createSkolemExprObject(Token jmlKeyWord) {
+    @NonNull
+    SLExpression createSkolemExprObject(@NonNull Token jmlKeyWord) {
         assert services != null;
         final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
         assert objType != null;
         return skolemExprHelper(jmlKeyWord, objType, services);
     }
 
-    public SLExpression createSkolemExprObject(String jmlKeyWord) {
+    public @NonNull SLExpression createSkolemExprObject(@NonNull String jmlKeyWord) {
         assert services != null;
         final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
         assert objType != null;
@@ -1140,7 +1144,7 @@ public final class JmlTermFactory {
         return createSkolemExprBool(jmlKeyWord.getText());
     }
 
-    public @NonNull SLExpression createSkolemExprBool(String jmlKeyWord) {
+    public @NonNull SLExpression createSkolemExprBool(@NonNull String jmlKeyWord) {
         exc.addUnderspecifiedWarning(jmlKeyWord);
         final Namespace<JFunction> fns = services.getNamespaces().functions();
         final String shortName = jmlKeyWord.replace("\\", "");
@@ -1175,25 +1179,25 @@ public final class JmlTermFactory {
         return sb.toString();
     }
 
-    public SLExpression skolemExprHelper(Token jmlKeyWord, PrimitiveType type) {
+    public @NonNull SLExpression skolemExprHelper(@NonNull Token jmlKeyWord, @NonNull PrimitiveType type) {
         final KeYJavaType kjt = services.getJavaInfo().getPrimitiveKeYJavaType(type);
         return skolemExprHelper(jmlKeyWord, kjt, services);
     }
 
-    public SLExpression skolemExprHelper(String jmlKeyWord, PrimitiveType type) {
+    public @NonNull SLExpression skolemExprHelper(@NonNull String jmlKeyWord, @NonNull PrimitiveType type) {
         final KeYJavaType kjt = services.getJavaInfo().getPrimitiveKeYJavaType(type);
         return skolemExprHelper(kjt, services, jmlKeyWord);
     }
 
-    public SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type,
-            TermServices services) {
+    public @NonNull SLExpression skolemExprHelper(@NonNull Token jmlKeyWord, @NonNull KeYJavaType type,
+                                                  @NonNull TermServices services) {
         exc.addUnderspecifiedWarning(jmlKeyWord.getText());
         final String shortName = jmlKeyWord.getText();
         return skolemExprHelper(type, services, shortName);
     }
 
-    public SLExpression skolemExprHelper(String jmlKeyWord, KeYJavaType type,
-            TermServices services) {
+    public @NonNull SLExpression skolemExprHelper(@NonNull String jmlKeyWord, @NonNull KeYJavaType type,
+                                                  @NonNull TermServices services) {
         exc.addUnderspecifiedWarning(jmlKeyWord);
         return skolemExprHelper(type, services, jmlKeyWord);
     }
@@ -1218,8 +1222,8 @@ public final class JmlTermFactory {
     // endregion
 
 
-    public SLExpression translateToJDLTerm(final String functName,
-            ImmutableList<SLExpression> list) {
+    public @NonNull SLExpression translateToJDLTerm(final @NonNull String functName,
+                                                    @Nullable ImmutableList<SLExpression> list) {
         Namespace<JFunction> funcs = services.getNamespaces().functions();
         Named symbol = funcs.lookup(new Name(functName));
 
@@ -1305,13 +1309,13 @@ public final class JmlTermFactory {
     /*
      * Translate a term of type \map to JavaDL, if it occurs in a JML expression.
      */
-    public SLExpression translateMapExpressionToJDL(Token t, ImmutableList<SLExpression> list,
-            Services services) {
+    public @NonNull SLExpression translateMapExpressionToJDL(@NonNull Token t, ImmutableList<SLExpression> list,
+                                                             Services services) {
         return translateMapExpressionToJDL(t.getText(), list, services);
     }
 
-    public SLExpression translateMapExpressionToJDL(String text, ImmutableList<SLExpression> list,
-            Services services) {
+    public @NonNull SLExpression translateMapExpressionToJDL(String text, ImmutableList<SLExpression> list,
+                                                             Services services) {
         String functName = jml2jdl.get(text);
         if (functName == null) {
             throw exc.createException0("Unknown function: " + text);
@@ -1326,7 +1330,7 @@ public final class JmlTermFactory {
      */
     private @NonNull Term typerestrict(
             @NonNull KeYJavaType kjt, final boolean nullable,
-            Iterable<LogicVariable> qvs) {
+            @NonNull Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();

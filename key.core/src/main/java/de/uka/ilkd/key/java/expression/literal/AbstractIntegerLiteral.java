@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.expression.literal;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -30,7 +31,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
      *
      * @param children the children of this AST element as KeY classes, may contain: Comments
      */
-    protected AbstractIntegerLiteral(ExtList children) {
+    protected AbstractIntegerLiteral(@NonNull ExtList children) {
         super(children);
     }
 
@@ -59,7 +60,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return getValueString();
     }
 
@@ -70,7 +71,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return IntegerLDT.NAME;
     }
 
@@ -85,7 +86,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
      *         hexadecimal ("0x"), binary ("0b"), nor octal ("0") prefix. Note that the literal "0"
      *         is decimal too.
      */
-    public static boolean representsDecLiteral(String literalStr) {
+    public static boolean representsDecLiteral(@NonNull String literalStr) {
         if (literalStr.length() == 0) {
             throw new NumberFormatException(literalStr + "does not represent a number.");
         }

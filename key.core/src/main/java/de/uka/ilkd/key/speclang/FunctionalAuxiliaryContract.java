@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
 
@@ -65,7 +66,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      *
      * @param contract a block contract.
      */
-    FunctionalAuxiliaryContract(T contract) {
+    FunctionalAuxiliaryContract(@NonNull T contract) {
         this(contract, Contract.INVALID_ID);
     }
 
@@ -74,7 +75,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * @param contract a block contract.
      * @param id an ID.
      */
-    FunctionalAuxiliaryContract(T contract, int id) {
+    FunctionalAuxiliaryContract(@NonNull T contract, int id) {
         this.contract = contract;
         this.id = id;
 
@@ -334,7 +335,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      *
      * @return the corresponding {@link AuxiliaryContract}.
      */
-    public T getAuxiliaryContract() {
+    public @NonNull T getAuxiliaryContract() {
         return contract;
     }
 

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to store the instantiation of a schemavarible if it is a term.
@@ -22,7 +23,7 @@ public class TermInstantiation extends InstantiationEntry<Term> {
      * @param sv the SchemaVariable that is instantiated
      * @param term the Term the SchemaVariable is instantiated with
      */
-    TermInstantiation(SchemaVariable sv, Term term) {
+    TermInstantiation(SchemaVariable sv, @NonNull Term term) {
         super(term);
         // TODO: Remove the check below and move it to the matching logic
         // Done for VM based matching

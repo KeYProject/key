@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.Function;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.Pair;
@@ -34,7 +35,7 @@ public class HandleArith {
      * @return <code>trueT</code> if if formu is proved to true, <code>falseT</code> if false, and
      *         <code>problem</code> if it cann't be proved.
      */
-    public static Term provedByArith(Term problem, Services services) {
+    public static Term provedByArith(@NonNull Term problem, @NonNull Services services) {
         final LRUCache<Term, Term> provedByArithCache =
             services.getCaches().getProvedByArithFstCache();
         Term result;
@@ -74,7 +75,7 @@ public class HandleArith {
 
 
 
-    private static void putInTermCache(final LRUCache<Term, Term> provedByArithCache,
+    private static void putInTermCache(final @NonNull LRUCache<Term, Term> provedByArithCache,
             final Term key, final Term value) {
         synchronized (provedByArithCache) {
             provedByArithCache.put(key, value);
@@ -85,7 +86,7 @@ public class HandleArith {
      * @param problem
      * @return true if atom.sub(0) is euqual to atom.sub(1), false if not equal, else return atom
      */
-    private static Term provedArithEqual(Term problem, TermBuilder tb, Services services) {
+    private static @NonNull Term provedArithEqual(@NonNull Term problem, @NonNull TermBuilder tb, @NonNull Services services) {
         final Term trueT = tb.tt();
         final Term falseT = tb.ff();
 
@@ -125,7 +126,7 @@ public class HandleArith {
      * @param axiom
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
-    public static Term provedByArith(Term problem, Term axiom, Services services) {
+    public static Term provedByArith(@NonNull Term problem, Term axiom, @NonNull Services services) {
         final Pair<Term, Term> key = new Pair<>(problem, axiom);
         final LRUCache<Pair<Term, Term>, Term> provedByArithCache =
             services.getCaches().getProvedByArithSndCache();
@@ -186,8 +187,8 @@ public class HandleArith {
      * @param problem
      * @return falseT if <code>term</code>'s operator is not >= or <=
      */
-    private static Term formatArithTerm(final Term problem, TermBuilder tb, IntegerLDT ig,
-            ServiceCaches caches) {
+    private static @NonNull Term formatArithTerm(final Term problem, @NonNull TermBuilder tb, @NonNull IntegerLDT ig,
+                                                 @NonNull ServiceCaches caches) {
         final LRUCache<Term, Term> formattedTermCache = caches.getFormattedTermCache();
         Term pro;
         synchronized (formattedTermCache) {

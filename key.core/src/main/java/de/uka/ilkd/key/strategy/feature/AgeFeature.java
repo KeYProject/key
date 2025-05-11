@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Feature that computes the age of the goal (i.e. total number of rules applications that have been
@@ -19,8 +20,8 @@ public class AgeFeature implements Feature {
 
     private AgeFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+                                   MutableState mState) {
         return NumberRuleAppCost.create(goal.getTime());
         // return LongRuleAppCost.create ( goal.getTime() / goal.sequent ().size () );
         // return LongRuleAppCost.create ( (long)Math.sqrt ( goal.getTime () ) );

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,18 +18,18 @@ import org.jspecify.annotations.Nullable;
  */
 public class ActivateCommand extends NoArgumentCommand {
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "activate";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return "";
     }
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, @Nullable Void args,
-            EngineState state)
+                        @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenGoal(false);
         goal.setEnabled(true);

@@ -34,6 +34,8 @@ import de.uka.ilkd.key.java.recoderext.adt.Singleton;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.SpecDataLocation;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ParserException;
@@ -70,7 +72,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
     public static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceSourceInfo.class);
 
-    private HashMap<String, recoder.java.declaration.VariableSpecification> names2vars = null;
+    private @Nullable HashMap<String, recoder.java.declaration.VariableSpecification> names2vars = null;
     private PrimitiveType locsetType;
     private PrimitiveType seqType;
     private PrimitiveType freeType;
@@ -96,7 +98,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      *
      * @param cfg the service configuration this services has been assigned to.
      */
-    public void initialize(ServiceConfiguration cfg) {
+    public void initialize(@NonNull ServiceConfiguration cfg) {
         super.initialize(cfg);
         cfg.getChangeHistory().removeChangeHistoryListener(this);
         cfg.getChangeHistory().addChangeHistoryListener(this);
@@ -124,7 +126,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     }
 
     @Override
-    public boolean isWidening(PrimitiveType from, PrimitiveType to) {
+    public boolean isWidening(@Nullable PrimitiveType from, @Nullable PrimitiveType to) {
         // we do not handle null's
         if (from == null || to == null) {
             return false;
@@ -173,7 +175,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     }
 
     @Override
-    public ClassType getBoxedType(PrimitiveType unboxedType) {
+    public @Nullable ClassType getBoxedType(PrimitiveType unboxedType) {
         if (unboxedType == locsetType || unboxedType == seqType || unboxedType == freeType
                 || unboxedType == mapType || unboxedType == bigintType || unboxedType == realType) {
             return null;
@@ -187,7 +189,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * @param context a program element.
      * @return the type to which the given program element belongs (may be <CODE>null</CODE>).
      */
-    public ClassType getContainingClassType(ProgramElement context) {
+    public @Nullable ClassType getContainingClassType(ProgramElement context) {
         if (context instanceof TypeDeclaration) {
             context = context.getASTParent();
         }
@@ -204,7 +206,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     }
 
 
-    public void modelChanged(ChangeHistoryEvent event) {
+    public void modelChanged(@NonNull ChangeHistoryEvent event) {
         List<TreeChange> changes = new ArrayList<>(event.getChanges());
         super.modelChanged(event);
 
@@ -224,7 +226,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         }
     }
 
-    void registerSubtype(ClassType c1, ClassType c2) {
+    void registerSubtype(ClassType c1, @NonNull ClassType c2) {
 
         try {
             super.registerSubtype(c1, c2);
@@ -255,7 +257,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         }
     }
 
-    public Variable getVariable(String name, ProgramElement context) {
+    public @Nullable Variable getVariable(String name, ProgramElement context) {
         updateModel();
         // look for the next variable scope equals to or parent of context
         ProgramElement pe = context;
@@ -402,7 +404,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * @param context a program element defining the lookup context (scope).
      * @return the corresponding type (may be <CODE>null</CODE>).
      */
-    public Type getType(String name, ProgramElement context) {
+    public @Nullable Type getType(@NonNull String name, @NonNull ProgramElement context) {
 
         NameInfo ni = getNameInfo();
 
@@ -598,7 +600,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * @see recoder.service.DefaultSourceInfo#getType(recoder.java.reference.TypeReference)
      */
     @Override
-    public Type getType(TypeReference tr) {
+    public Type getType(@NonNull TypeReference tr) {
         try {
             return super.getType(tr);
         } catch (ExceptionHandlerException e) {
@@ -615,7 +617,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * make dummy classes for unresolved type references, store newly created classes to stubClasses
      * and register the compilation unit.
      */
-    private void registerUnresolvedTypeRef(TypeReference tyref) {
+    private void registerUnresolvedTypeRef(@NonNull TypeReference tyref) {
         NameInfo ni = serviceConfiguration.getNameInfo();
         String typeString = Naming.toPathName(tyref);
 
@@ -672,7 +674,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      *
      * @return the unmodifiable collection of created compilation units
      */
-    public Collection<? extends CompilationUnit> getCreatedStubClasses() {
+    public @NonNull Collection<? extends CompilationUnit> getCreatedStubClasses() {
         return stubClasses.values();
     }
 

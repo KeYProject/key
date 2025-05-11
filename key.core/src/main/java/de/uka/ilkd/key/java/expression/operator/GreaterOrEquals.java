@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -21,7 +22,7 @@ public class GreaterOrEquals extends ComparativeOperator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public GreaterOrEquals(ExtList children) {
+    public GreaterOrEquals(@NonNull ExtList children) {
         super(children);
     }
 
@@ -41,7 +42,7 @@ public class GreaterOrEquals extends ComparativeOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnGreaterOrEquals(this);
     }
 }

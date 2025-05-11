@@ -36,6 +36,8 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -50,9 +52,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
     private static final String AUTONAME = "_taclet";
 
-    protected final TacletKind taclet;
+    protected final @NonNull TacletKind taclet;
 
-    public TacletExecutor(TacletKind taclet) {
+    public TacletExecutor(@NonNull TacletKind taclet) {
         this.taclet = taclet;
     }
 
@@ -78,9 +80,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param services the {@link Services} with the Java model information
      * @return the (partially) instantiated term
      */
-    protected Term syntacticalReplace(Term term, TermLabelState termLabelState,
-            TacletLabelHint labelHint, PosInOccurrence applicationPosInOccurrence,
-            MatchConditions mc, Goal goal, RuleApp ruleApp, Services services) {
+    protected @NonNull Term syntacticalReplace(@NonNull Term term, @NonNull TermLabelState termLabelState,
+                                               @NonNull TacletLabelHint labelHint, @NonNull PosInOccurrence applicationPosInOccurrence,
+                                               @NonNull MatchConditions mc, @NonNull Goal goal, @NonNull RuleApp ruleApp, @NonNull Services services) {
         final SyntacticalReplaceVisitor srVisitor =
             new SyntacticalReplaceVisitor(termLabelState, labelHint, applicationPosInOccurrence,
                 mc.getInstantiations(), goal, taclet, ruleApp, services);
@@ -99,8 +101,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
      *        (only looked at if pos == null)
      */
-    private void addToPosWithoutInst(SequentFormula frm, SequentChangeInfo currentSequent,
-            PosInOccurrence pos, boolean antec) {
+    private void addToPosWithoutInst(@NonNull SequentFormula frm, @NonNull SequentChangeInfo currentSequent,
+                                     @Nullable PosInOccurrence pos, boolean antec) {
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(frm, pos));
         } else {
@@ -125,10 +127,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @return the as far as possible instantiated SequentFormula
      */
-    private SequentFormula instantiateReplacement(TermLabelState termLabelState,
-            SequentFormula schemaFormula, Services services, MatchConditions matchCond,
-            PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint, Goal goal,
-            RuleApp tacletApp) {
+    private @NonNull SequentFormula instantiateReplacement(@NonNull TermLabelState termLabelState,
+                                                           @NonNull SequentFormula schemaFormula, @NonNull Services services, @NonNull MatchConditions matchCond,
+                                                           @NonNull PosInOccurrence applicationPosInOccurrence, @NonNull TacletLabelHint labelHint, @NonNull Goal goal,
+                                                           @NonNull RuleApp tacletApp) {
 
         final SVInstantiations svInst = matchCond.getInstantiations();
 
@@ -157,10 +159,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param services the Services
      * @return the instantiated formulas of the semisequent as list
      */
-    protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
-            TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-            RuleApp tacletApp, Services services) {
+    protected @NonNull ImmutableList<SequentFormula> instantiateSemisequent(@NonNull Semisequent semi,
+                                                                            @NonNull TermLabelState termLabelState, @NonNull TacletLabelHint labelHint,
+                                                                            @NonNull PosInOccurrence applicationPosInOccurrence, @NonNull MatchConditions matchCond, @NonNull Goal goal,
+                                                                            @NonNull RuleApp tacletApp, @NonNull Services services) {
 
         ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
@@ -188,9 +190,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      *        schemavariables
      * @param services the Services encapsulating all java information
      */
-    protected void replaceAtPos(Semisequent semi, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
-            TacletLabelHint labelHint, Goal goal, RuleApp ruleApp, Services services) {
+    protected void replaceAtPos(@NonNull Semisequent semi, @NonNull TermLabelState termLabelState,
+                                @NonNull SequentChangeInfo currentSequent, @NonNull PosInOccurrence pos, @NonNull MatchConditions matchCond,
+                                @NonNull TacletLabelHint labelHint, @NonNull Goal goal, @NonNull RuleApp ruleApp, @NonNull Services services) {
         final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
             termLabelState, labelHint, pos, matchCond, goal, ruleApp, services);
         currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
@@ -214,10 +216,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param matchCond the MatchConditions containing in particular
      * @param services the Services encapsulating all java information
      */
-    private void addToPos(Semisequent semi, TermLabelState termLabelState,
-            SequentChangeInfo currentSequent, PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, boolean antec, TacletLabelHint labelHint,
-            MatchConditions matchCond, Goal goal, Services services, RuleApp tacletApp) {
+    private void addToPos(@NonNull Semisequent semi, @NonNull TermLabelState termLabelState,
+                          @NonNull SequentChangeInfo currentSequent, @Nullable PosInOccurrence pos,
+                          @NonNull PosInOccurrence applicationPosInOccurrence, boolean antec, @NonNull TacletLabelHint labelHint,
+                          @NonNull MatchConditions matchCond, @NonNull Goal goal, @NonNull Services services, @NonNull RuleApp tacletApp) {
 
         final ImmutableList<SequentFormula> replacements =
             instantiateSemisequent(semi, termLabelState, labelHint, applicationPosInOccurrence,
@@ -247,10 +249,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      *        schemavariables
      * @param services the Services encapsulating all java information
      */
-    protected void addToAntec(Semisequent semi, TermLabelState termLabelState,
-            TacletLabelHint labelHint, SequentChangeInfo currentSequent, PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-            RuleApp tacletApp, Services services) {
+    protected void addToAntec(@NonNull Semisequent semi, @NonNull TermLabelState termLabelState,
+                              @NonNull TacletLabelHint labelHint, @NonNull SequentChangeInfo currentSequent, PosInOccurrence pos,
+                              @NonNull PosInOccurrence applicationPosInOccurrence, @NonNull MatchConditions matchCond, @NonNull Goal goal,
+                              @NonNull RuleApp tacletApp, @NonNull Services services) {
         addToPos(semi, termLabelState, currentSequent, pos, applicationPosInOccurrence, true,
             labelHint, matchCond, goal, services, tacletApp);
     }
@@ -272,10 +274,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param goal the Goal that knows the node the formulae have to be added
      * @param services the Services encapsulating all java information
      */
-    protected void addToSucc(Semisequent semi, TermLabelState termLabelState,
-            TacletLabelHint labelHint, SequentChangeInfo currentSequent, PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-            RuleApp ruleApp, Services services) {
+    protected void addToSucc(@NonNull Semisequent semi, @NonNull TermLabelState termLabelState,
+                             @NonNull TacletLabelHint labelHint, @NonNull SequentChangeInfo currentSequent, PosInOccurrence pos,
+                             @NonNull PosInOccurrence applicationPosInOccurrence, @NonNull MatchConditions matchCond, @NonNull Goal goal,
+                             @NonNull RuleApp ruleApp, @NonNull Services services) {
         addToPos(semi, termLabelState, currentSequent, pos, applicationPosInOccurrence, false,
             labelHint, matchCond, goal, services, ruleApp);
     }
@@ -291,8 +293,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      */
-    protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, Services services,
-            MatchConditions matchCond) {
+    protected void applyAddrule(@NonNull ImmutableList<Taclet> rules, @NonNull Goal goal, Services services,
+                                @NonNull MatchConditions matchCond) {
 
         for (Taclet tacletToAdd : rules) {
             final Node n = goal.node();
@@ -335,9 +337,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     }
 
 
-    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
-            SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
-            Services services, MatchConditions matchCond) {
+    protected void applyAddProgVars(@NonNull ImmutableSet<SchemaVariable> pvs,
+                                    @NonNull SequentChangeInfo currentSequent, @NonNull Goal goal, @NonNull PosInOccurrence posOfFind,
+                                    @NonNull Services services, @NonNull MatchConditions matchCond) {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {
             final var inst =
@@ -398,9 +400,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      *         two entries: one for the original sequent and one with the sequent encoding the proof
      *         obligation for the to be proven formulas of the assumes goal
      */
-    protected ImmutableList<SequentChangeInfo> checkIfGoals(Goal p_goal,
-            ImmutableList<IfFormulaInstantiation> p_list, MatchConditions p_matchCond,
-            int p_numberOfNewGoals) {
+    protected @NonNull ImmutableList<SequentChangeInfo> checkIfGoals(@NonNull Goal p_goal,
+                                                                     @Nullable ImmutableList<IfFormulaInstantiation> p_list, MatchConditions p_matchCond,
+                                                                     int p_numberOfNewGoals) {
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
 

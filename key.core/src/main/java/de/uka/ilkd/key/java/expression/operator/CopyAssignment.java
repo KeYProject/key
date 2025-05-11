@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -22,7 +23,7 @@ public class CopyAssignment extends Assignment {
      *
      * @param children the children of this AST element as KeY classes.
      */
-    public CopyAssignment(ExtList children) {
+    public CopyAssignment(@NonNull ExtList children) {
         super(children);
     }
 
@@ -32,7 +33,7 @@ public class CopyAssignment extends Assignment {
      * @param lhs the Expression the value is assigned to
      * @param rhs the Expression the value which is assigned to <tt>lhs</tt>
      */
-    public CopyAssignment(Expression lhs, Expression rhs) {
+    public CopyAssignment(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -70,7 +71,7 @@ public class CopyAssignment extends Assignment {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnCopyAssignment(this);
     }
 }

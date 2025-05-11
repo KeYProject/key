@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.InfFlowProgVarRenamer;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
@@ -35,7 +36,7 @@ import org.key_project.util.collection.ImmutableList;
 public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Finish auxiliary computation";
     }
 
@@ -45,11 +46,11 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Finish auxiliary computation.";
     }
 
-    static Term calculateResultingTerm(Proof proof, IFProofObligationVars ifVars, Goal initGoal) {
+    static @NonNull Term calculateResultingTerm(@NonNull Proof proof, @NonNull IFProofObligationVars ifVars, @NonNull Goal initGoal) {
         final Term[] goalFormulas1 =
             buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1), proof.openGoals(), initGoal);
         final Term[] goalFormulas2 =
@@ -71,7 +72,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
      * @param initiatingProof the initiating proof
      * @param sideProof the side proof
      */
-    protected final void mergeNamespaces(Proof initiatingProof, Proof sideProof) {
+    protected final void mergeNamespaces(@NonNull Proof initiatingProof, @NonNull Proof sideProof) {
         NamespaceSet initiatingProofNS = initiatingProof.getServices().getNamespaces();
         NamespaceSet sideProofNS = sideProof.getServices().getNamespaces();
 
@@ -83,7 +84,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         mergeNamespace(initiatingProofNS.choices(), sideProofNS.choices());
     }
 
-    private final <E extends Named> void mergeNamespace(Namespace<E> tar, Namespace<E> src) {
+    private <E extends Named> void mergeNamespace(@NonNull Namespace<E> tar, @NonNull Namespace<E> src) {
         for (E el : src.allElements()) {
             if (!tar.contains(el)) {
                 tar.add(el);
@@ -91,8 +92,8 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         }
     }
 
-    private static Term[] buildExecution(ProofObligationVars c, Map<Term, Term> vsMap,
-            ImmutableList<Goal> symbExecGoals, Goal initGoal) {
+    private static Term @NonNull [] buildExecution(@NonNull ProofObligationVars c, Map<Term, Term> vsMap,
+                                                   @NonNull ImmutableList<Goal> symbExecGoals, @NonNull Goal initGoal) {
         Services services = initGoal.proof().getServices();
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         final InfFlowProgVarRenamer renamer = new InfFlowProgVarRenamer(goalFormulas, vsMap,
@@ -106,7 +107,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return result;
     }
 
-    private static Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
+    private static Term @NonNull [] buildFormulasFromGoals(@NonNull ImmutableList<Goal> symbExecGoals) {
         Term[] result = new Term[symbExecGoals.size()];
         int i = 0;
         for (final Goal symbExecGoal : symbExecGoals) {
@@ -116,7 +117,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return result;
     }
 
-    private static Term buildFormulaFromGoal(Goal symbExecGoal) {
+    private static @NonNull Term buildFormulaFromGoal(@NonNull Goal symbExecGoal) {
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
         final TermFactory tf = symbExecGoal.proof().getServices().getTermFactory();
         Term result = tb.tt();
@@ -130,7 +131,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         return result;
     }
 
-    protected static void addContractApplicationTaclets(Goal initiatingGoal, Proof symbExecProof) {
+    protected static void addContractApplicationTaclets(@NonNull Goal initiatingGoal, @NonNull Proof symbExecProof) {
         final ImmutableList<Goal> openGoals = symbExecProof.openGoals();
         for (final Goal openGoal : openGoals) {
             final Set<NoPosTacletApp> ruleApps = openGoal.indexOfTaclets().allNoPosTacletApps();

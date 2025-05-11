@@ -5,11 +5,12 @@ package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 public class Intersect extends BinaryOperator {
 
-    public Intersect(ExtList children) {
+    public Intersect(@NonNull ExtList children) {
         super(children);
     }
 
@@ -24,7 +25,7 @@ public class Intersect extends BinaryOperator {
     }
 
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnIntersect(this);
     }
 

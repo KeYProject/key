@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,17 +14,17 @@ public class LeaveCommand extends NoArgumentCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(LeaveCommand.class.getName());
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "leave";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return "Marks the current goal to be ignored by the macros.";
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Void args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, Void args, @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenAutomaticGoal();
         LOGGER.info("Deactivating " + goal.node().serialNr());

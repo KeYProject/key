@@ -9,6 +9,8 @@ import java.util.Set;
 
 import de.uka.ilkd.key.settings.Configuration;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,7 +238,7 @@ public final class StrategyProperties extends Properties {
         put(AUTO_INDUCTION_OPTIONS_KEY, DEFAULT_MAP.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
     }
 
-    public static String userTacletsOptionsKey(int i) {
+    public static @NonNull String userTacletsOptionsKey(int i) {
         return USER_TACLETS_OPTIONS_KEY_BASE + i;
     }
 
@@ -244,7 +246,7 @@ public final class StrategyProperties extends Properties {
         return DEFAULT_MAP.getProperty(key);
     }
 
-    public static StrategyProperties read(Properties p) {
+    public static @NonNull StrategyProperties read(@NonNull Properties p) {
         StrategyProperties sp = new StrategyProperties();
 
         sp.put(SPLITTING_OPTIONS_KEY, readSingleOption(p, SPLITTING_OPTIONS_KEY));
@@ -286,10 +288,10 @@ public final class StrategyProperties extends Properties {
      *        side proofs, {@code false} do not hide execution branch labels.
      * @param aliasChecks Do alias checks?
      */
-    public static void setDefaultStrategyProperties(StrategyProperties sp,
-            boolean quantifierInstantiationWithSplitting, boolean methodTreatmentContract,
-            boolean loopTreatmentInvariant, boolean blockTreatmentContract,
-            boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
+    public static void setDefaultStrategyProperties(@NonNull StrategyProperties sp,
+                                                    boolean quantifierInstantiationWithSplitting, boolean methodTreatmentContract,
+                                                    boolean loopTreatmentInvariant, boolean blockTreatmentContract,
+                                                    boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
         // TODO (DS, 2017-05-11): Would be great to also use the loop scope
         // invariant for the SED. For this, one would
         // however have to change the SED's
@@ -335,7 +337,7 @@ public final class StrategyProperties extends Properties {
     /**
      * @param p
      */
-    private static Object readSingleOption(Properties p, String key) {
+    private static @NonNull Object readSingleOption(@NonNull Properties p, String key) {
         String o = (String) p.get(STRATEGY_PROPERTY + key);
         if (o != null) {
             o = getUniqueString(o);
@@ -353,7 +355,7 @@ public final class StrategyProperties extends Properties {
      *        <code>stringPool</code>.
      * @return Returns the same string but possibly with a different but unique object identity.
      */
-    private static String getUniqueString(String in) {
+    private static @Nullable String getUniqueString(String in) {
         for (String id : STRING_POOL) {
             if (id.equals(in)) {
                 return id;
@@ -371,7 +373,7 @@ public final class StrategyProperties extends Properties {
         return null;
     }
 
-    public static StrategyProperties read(Configuration category) {
+    public static @NonNull StrategyProperties read(Configuration category) {
         category = category.getOrCreateSection("options");
         StrategyProperties sp = new StrategyProperties();
         for (Map.Entry<Object, Object> entry : DEFAULT_MAP.entrySet()) {
@@ -403,7 +405,7 @@ public final class StrategyProperties extends Properties {
         return DEFAULT_MAP.getProperty(key);
     }
 
-    public void write(Properties p) {
+    public void write(@NonNull Properties p) {
         p.put(STRATEGY_PROPERTY + SPLITTING_OPTIONS_KEY, get(SPLITTING_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY + LOOP_OPTIONS_KEY, get(LOOP_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY + BLOCK_OPTIONS_KEY, get(BLOCK_OPTIONS_KEY));
@@ -436,7 +438,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
-    public synchronized Object clone() {
+    public synchronized @NonNull Object clone() {
         final Properties p = (Properties) super.clone();
         final StrategyProperties sp = new StrategyProperties();
         sp.putAll(p);

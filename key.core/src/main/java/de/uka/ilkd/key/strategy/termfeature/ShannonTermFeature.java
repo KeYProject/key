@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A conditional feature, in which the condition itself is a (binary) feature. The general notion is
@@ -60,8 +61,8 @@ public class ShannonTermFeature implements TermFeature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, the value of
      *         <code>elseFeature</code> otherwise
      */
-    public static TermFeature createConditionalBinary(TermFeature cond, TermFeature thenFeature,
-            TermFeature elseFeature) {
+    public static @NonNull TermFeature createConditionalBinary(TermFeature cond, TermFeature thenFeature,
+                                                               TermFeature elseFeature) {
         return new ShannonTermFeature(cond, BinaryTermFeature.ZERO_COST, thenFeature, elseFeature);
     }
 
@@ -71,7 +72,7 @@ public class ShannonTermFeature implements TermFeature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */
-    public static TermFeature createConditionalBinary(TermFeature cond, TermFeature thenFeature) {
+    public static @NonNull TermFeature createConditionalBinary(TermFeature cond, TermFeature thenFeature) {
         return createConditionalBinary(cond, thenFeature,
             ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()));
     }

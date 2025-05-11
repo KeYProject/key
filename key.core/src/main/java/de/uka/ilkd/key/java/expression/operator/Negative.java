@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 
@@ -26,12 +27,12 @@ public class Negative extends Operator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public Negative(ExtList children) {
+    public Negative(@NonNull ExtList children) {
         super(children);
     }
 
 
-    public Negative(Expression expr) {
+    public Negative(@NonNull Expression expr) {
         super(expr);
     }
 
@@ -82,11 +83,11 @@ public class Negative extends Operator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnNegative(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services services, ExecutionContext ec) {
         return services.getTypeConverter()
                 .getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
     }

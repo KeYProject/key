@@ -14,6 +14,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.util.collection.ImmutableList;
@@ -29,16 +31,16 @@ public abstract class SLResolverManager {
 
     public final SLExceptionFactory excManager;
 
-    private ImmutableList<SLExpressionResolver> resolvers =
+    private @NonNull ImmutableList<SLExpressionResolver> resolvers =
         ImmutableSLList.nil();
     private final KeYJavaType specInClass;
     private final LocationVariable selfVar;
     private final TermBuilder tb;
 
-    private ImmutableList<Namespace<LocationVariable>> localVariablesNamespaces =
+    private @NonNull ImmutableList<Namespace<LocationVariable>> localVariablesNamespaces =
         ImmutableSLList.nil();
 
-    private ImmutableList<Namespace<LogicVariable>> logicVariablesNamespaces =
+    private @NonNull ImmutableList<Namespace<LogicVariable>> logicVariablesNamespaces =
         ImmutableSLList.nil();
 
     private final Map<ParsableVariable, KeYJavaType> kjts = new LinkedHashMap<>();
@@ -61,18 +63,18 @@ public abstract class SLResolverManager {
     // internal methods
     // -------------------------------------------------------------------------
 
-    protected void addResolver(SLExpressionResolver resolver) {
+    protected void addResolver(@NonNull SLExpressionResolver resolver) {
         assert resolver != null;
         resolvers = resolvers.append(resolver);
     }
 
 
-    private String getShortName(String name) {
+    private @NonNull String getShortName(@NonNull String name) {
         return name.substring(name.lastIndexOf('.') + 1);
     }
 
 
-    private boolean isFullyQualified(String name) {
+    private boolean isFullyQualified(@NonNull String name) {
         return name.contains(".");
     }
 
@@ -80,7 +82,7 @@ public abstract class SLResolverManager {
     /**
      * Tries to resolve a name as a local variable.
      */
-    private SLExpression resolveLocal(String name) {
+    private @Nullable SLExpression resolveLocal(@NonNull String name) {
         Name n = new Name(name);
         for (Namespace<LogicVariable> ns : logicVariablesNamespaces) {
             var logicVar = ns.lookup(n);
@@ -104,7 +106,7 @@ public abstract class SLResolverManager {
     /**
      * Tries to resolve a name as a property call on any available implicit receiver.
      */
-    private SLExpression resolveImplicit(String name, SLParameters parameters)
+    private @Nullable SLExpression resolveImplicit(String name, SLParameters parameters)
             throws SLTranslationException {
         if (selfVar != null) {
             SLExpression receiver = new SLExpression(tb.var(selfVar), specInClass);
@@ -129,7 +131,7 @@ public abstract class SLResolverManager {
      * Tries to resolve a name as a property call on an explicitly given receiver, by calling the
      * registered resolvers.
      */
-    private SLExpression resolveExplicit(SLExpression receiver, String name, SLParameters params)
+    private @Nullable SLExpression resolveExplicit(SLExpression receiver, String name, SLParameters params)
             throws SLTranslationException {
         for (SLExpressionResolver resolver : resolvers) {
             SLExpression result = resolver.resolve(receiver, name, params);
@@ -145,7 +147,7 @@ public abstract class SLResolverManager {
     /**
      * Helper for resolve().
      */
-    private SLExpression resolveIt(SLExpression receiver, String name, SLParameters parameters)
+    private @Nullable SLExpression resolveIt(@Nullable SLExpression receiver, @NonNull String name, SLParameters parameters)
             throws SLTranslationException {
         SLExpression result;
 
@@ -177,7 +179,7 @@ public abstract class SLResolverManager {
      * @param parameters actual parameters of the property call, or null
      * @return corresponding term, type or collection if successful, null otherwise
      */
-    public SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
+    public SLExpression resolve(SLExpression receiver, @NonNull String name, SLParameters parameters)
             throws SLTranslationException {
         String shortName = name;
 
@@ -206,7 +208,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLocalVariablesNamespace(LocationVariable pv, KeYJavaType kjt) {
+    public void putIntoTopLocalVariablesNamespace(@NonNull LocationVariable pv, KeYJavaType kjt) {
         localVariablesNamespaces.head().addSafely(pv);
         kjts.put(pv, kjt);
     }
@@ -214,7 +216,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLogicVariablesNamespace(LogicVariable pv, KeYJavaType kjt) {
+    public void putIntoTopLogicVariablesNamespace(@NonNull LogicVariable pv, KeYJavaType kjt) {
         logicVariablesNamespaces.head().addSafely(pv);
         kjts.put(pv, kjt);
     }
@@ -223,15 +225,15 @@ public abstract class SLResolverManager {
     /**
      * Puts a local variable into the topmost namespace on the stack
      */
-    public void putIntoTopLocalVariablesNamespace(LocationVariable pv) {
+    public void putIntoTopLocalVariablesNamespace(@NonNull LocationVariable pv) {
         putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
     }
 
     /**
      * Puts a list of local variables into the topmost namespace on the stack.
      */
-    public void putIntoTopLocalVariablesNamespace(ImmutableList<LogicVariable> pvs,
-            KeYJavaType kjt) {
+    public void putIntoTopLocalVariablesNamespace(@NonNull ImmutableList<LogicVariable> pvs,
+                                                  KeYJavaType kjt) {
         for (LogicVariable pv : pvs) {
             putIntoTopLogicVariablesNamespace(pv, kjt);
         }
@@ -241,7 +243,7 @@ public abstract class SLResolverManager {
     /**
      * Puts a list of local variables into the topmost namespace on the stack.
      */
-    public void putIntoTopLocalVariablesNamespace(ImmutableList<? extends LocationVariable> pvs) {
+    public void putIntoTopLocalVariablesNamespace(@NonNull ImmutableList<? extends LocationVariable> pvs) {
         for (var pv : pvs) {
             putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
         }
@@ -261,7 +263,7 @@ public abstract class SLResolverManager {
      * Returns a specification-language based visibility level for the passed member that should
      * take precedence over Java's ordinary visibility, or null.
      */
-    public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
+    public @Nullable VisibilityModifier getSpecVisibility(MemberDeclaration md) {
         return null;
     }
 }

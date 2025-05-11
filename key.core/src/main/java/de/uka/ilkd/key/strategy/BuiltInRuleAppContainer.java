@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -25,7 +27,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * formula, and <code>applicationPosition</code> is the original position for which the rule app
      * was created
      */
-    private final FormulaTag positionTag;
+    private final @Nullable FormulaTag positionTag;
     private final PosInOccurrence applicationPosition;
 
     private final IBuiltInRuleApp bir;
@@ -36,8 +38,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // constructors
     // -------------------------------------------------------------------------
 
-    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio, RuleAppCost cost,
-            Goal goal) {
+    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, @Nullable PosInOccurrence pio, RuleAppCost cost,
+                                    @NonNull Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
         positionTag = pio == null ? null : goal.getFormulaTagManager().getTagForPos(pio.topLevel());
@@ -55,7 +57,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * @return true iff the stored rule app is applicable for the given sequent, i.e. if the bound
      *         position does still exist (if-formulas are not considered)
      */
-    private boolean isStillApplicable(Goal goal) {
+    private boolean isStillApplicable(@NonNull Goal goal) {
         if (applicationPosition == null) {
             return bir.rule().isApplicable(goal, null);
         } else {
@@ -73,7 +75,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     /**
      * Copied from FindTaclet.
      */
-    private PosInOccurrence getPosInOccurrence(Goal p_goal) {
+    private @NonNull PosInOccurrence getPosInOccurrence(@NonNull Goal p_goal) {
         final PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
         assert topPos != null;
@@ -93,8 +95,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * @return container for the currently applicable BuiltInRuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    static RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
-            Goal goal) {
+    static @NonNull RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
+                                                        @NonNull Goal goal) {
         final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
         return new BuiltInRuleAppContainer(bir, pio, cost, goal);
     }
@@ -105,8 +107,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * @return container for the currently applicable BuiltInRuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    static ImmutableList<RuleAppContainer> createInitialAppContainers(
-            ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio, Goal goal) {
+    static @NonNull ImmutableList<RuleAppContainer> createInitialAppContainers(
+            @NonNull ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio, @NonNull Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         for (IBuiltInRuleApp bir : birs) {
@@ -119,7 +121,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 
 
     @Override
-    public ImmutableList<RuleAppContainer> createFurtherApps(Goal goal) {
+    public @NonNull ImmutableList<RuleAppContainer> createFurtherApps(@NonNull Goal goal) {
         if (!isStillApplicable(goal)) {
             return ImmutableSLList.nil();
         }
@@ -135,7 +137,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 
 
     @Override
-    public RuleApp completeRuleApp(Goal goal) {
+    public @Nullable RuleApp completeRuleApp(@NonNull Goal goal) {
         if (!isStillApplicable(goal)) {
             return null;
         }

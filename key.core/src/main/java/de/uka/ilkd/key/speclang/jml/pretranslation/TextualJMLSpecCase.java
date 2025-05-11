@@ -27,11 +27,11 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
-    public ImmutableList<LabeledParserRuleContext> getRequiresFree(Name toString) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getRequiresFree(@NonNull Name toString) {
         return getList(REQUIRES_FREE, toString);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getEnsuresFree(Name toString) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getEnsuresFree(@NonNull Name toString) {
         return getList(ENSURES_FREE, toString);
     }
 
@@ -39,12 +39,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignableFree(@NonNull Name toString) {
         return getList(ASSIGNABLE_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
-            @NonNull Name heap) {
+    private @NonNull ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
+                                                                     @NonNull Name heap) {
         List<LabeledParserRuleContext> seq =
             clauses.stream().filter(it -> it.clauseType.equals(clause))
                     .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
@@ -52,19 +52,19 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return ImmutableList.fromList(seq);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAccessible(Name heap) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getAccessible(@NonNull Name heap) {
         return getList(ACCESSIBLE, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAxioms(Name heap) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getAxioms(@NonNull Name heap) {
         return getList(AXIOMS, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getEnsures(Name heap) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getEnsures(@NonNull Name heap) {
         return getList(ENSURES, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getRequires(Name heap) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getRequires(@NonNull Name heap) {
         return getList(REQUIRES, heap);
     }
 
@@ -72,11 +72,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public ImmutableList<LabeledParserRuleContext> getAssignable(Name heap) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignable(@NonNull Name heap) {
         return getList(ASSIGNABLE, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getDecreases() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getDecreases() {
         return getList(DECREASES);
     }
 
@@ -98,8 +98,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         AXIOMS,
     }
 
-    private final Behavior behavior;
-    private ArrayList<Entry> clauses = new ArrayList<>(16);
+    private final @NonNull Behavior behavior;
+    private @NonNull ArrayList<Entry> clauses = new ArrayList<>(16);
 
     static class Entry {
         final Object clauseType;
@@ -125,7 +125,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         this.behavior = behavior;
     }
 
-    public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(Clause clause, @NonNull LabeledParserRuleContext ctx) {
         if (clauses.isEmpty()) {
             setPosition(ctx);
         }
@@ -133,12 +133,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return this;
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, LabeledParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, LabeledParserRuleContext ctx) {
         return addClause(clause, null, ctx);
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
-            LabeledParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
+                                                 LabeledParserRuleContext ctx) {
         if (heapName == null) {
             heapName = HeapLDT.BASE_HEAP_NAME;
         }
@@ -147,16 +147,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public TextualJMLSpecCase addClause(Clause clause, ParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(Clause clause, ParserRuleContext ctx) {
         return addClause(clause, new LabeledParserRuleContext(ctx));
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, ParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, ParserRuleContext ctx) {
         return addClause(clause, null, new LabeledParserRuleContext(ctx));
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
-            ParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
+                                                 ParserRuleContext ctx) {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
@@ -193,7 +193,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
             + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
@@ -217,44 +217,44 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             LabeledParserRuleContext abbreviatedTerm) {
     }
 
-    public Abbreviation[] getAbbreviations() {
+    public Abbreviation @NonNull [] getAbbreviations() {
         /* weigl: prepare for future use of generated abbreviations from JML specifications */
         return new Abbreviation[0];
     }
 
-    public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
         return getList(INFORMATION_FLOW);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getReturns() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getReturns() {
         return getList(RETURNS);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getContinues() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getContinues() {
         return getList(CONTINUES);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getBreaks() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getBreaks() {
         return getList(BREAKS);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getDiverges() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getDiverges() {
         return getList(DIVERGES);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getMeasuredBy() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getMeasuredBy() {
         return getList(MEASURED_BY);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getSignalsOnly() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getSignalsOnly() {
         return getList(SIGNALS_ONLY);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getRequires() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getRequires() {
         return getList(REQUIRES);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(Object key) {
+    private @NonNull ImmutableList<LabeledParserRuleContext> getList(Object key) {
         List<LabeledParserRuleContext> seq =
             clauses.stream().filter(it -> it.clauseType.equals(key)).map(it -> it.ctx)
                     .collect(Collectors.toList());
@@ -265,15 +265,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public ImmutableList<LabeledParserRuleContext> getAssignable() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ASSIGNABLE);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getEnsures() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getEnsures() {
         return getList(ENSURES);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getSignals() {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getSignals() {
         return getList(SIGNALS);
     }
     // endregion

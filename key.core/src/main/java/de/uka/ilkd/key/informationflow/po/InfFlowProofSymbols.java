@@ -19,6 +19,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
@@ -31,22 +32,22 @@ public class InfFlowProofSymbols {
 
     private boolean isFreshContract;
 
-    private ImmutableSet<Pair<Sort, Boolean>> sorts =
+    private @NonNull ImmutableSet<Pair<Sort, Boolean>> sorts =
         DefaultImmutableSet.nil();
 
-    private ImmutableSet<Pair<Function, Boolean>> predicates =
+    private @NonNull ImmutableSet<Pair<Function, Boolean>> predicates =
         DefaultImmutableSet.nil();
 
-    private ImmutableSet<Pair<Function, Boolean>> functions =
+    private @NonNull ImmutableSet<Pair<Function, Boolean>> functions =
         DefaultImmutableSet.nil();
 
-    private ImmutableSet<Pair<ProgramVariable, Boolean>> programVariables =
+    private @NonNull ImmutableSet<Pair<ProgramVariable, Boolean>> programVariables =
         DefaultImmutableSet.nil();
 
-    private ImmutableSet<Pair<SchemaVariable, Boolean>> schemaVariables =
+    private @NonNull ImmutableSet<Pair<SchemaVariable, Boolean>> schemaVariables =
         DefaultImmutableSet.nil();
 
-    private ImmutableSet<Pair<Taclet, Boolean>> taclets =
+    private @NonNull ImmutableSet<Pair<Taclet, Boolean>> taclets =
         DefaultImmutableSet.nil();
 
     /*
@@ -66,7 +67,7 @@ public class InfFlowProofSymbols {
      * s: tacletPrefixes) { if (name.startsWith(s)) { add(t); } } } }
      */
 
-    private InfFlowProofSymbols getLabeledSymbols() {
+    private @NonNull InfFlowProofSymbols getLabeledSymbols() {
         InfFlowProofSymbols symbols = new InfFlowProofSymbols();
         if (!isFreshContract()) {
             symbols.useProofSymbols();
@@ -80,7 +81,7 @@ public class InfFlowProofSymbols {
         return symbols;
     }
 
-    private ImmutableSet<Pair<Sort, Boolean>> getLabeledSorts() {
+    private @NonNull ImmutableSet<Pair<Sort, Boolean>> getLabeledSorts() {
         ImmutableSet<Pair<Sort, Boolean>> labeledSorts =
             DefaultImmutableSet.nil();
         for (Pair<Sort, Boolean> s : sorts) {
@@ -91,7 +92,7 @@ public class InfFlowProofSymbols {
         return labeledSorts;
     }
 
-    private ImmutableSet<Pair<Function, Boolean>> getLabeledPredicates() {
+    private @NonNull ImmutableSet<Pair<Function, Boolean>> getLabeledPredicates() {
         ImmutableSet<Pair<Function, Boolean>> labeledPredicates =
             DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> p : predicates) {
@@ -103,7 +104,7 @@ public class InfFlowProofSymbols {
         return labeledPredicates;
     }
 
-    private ImmutableSet<Pair<Function, Boolean>> getLabeledFunctions() {
+    private @NonNull ImmutableSet<Pair<Function, Boolean>> getLabeledFunctions() {
         ImmutableSet<Pair<Function, Boolean>> labeledFunctions =
             DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> f : functions) {
@@ -115,7 +116,7 @@ public class InfFlowProofSymbols {
         return labeledFunctions;
     }
 
-    private ImmutableSet<Pair<ProgramVariable, Boolean>> getLabeledProgramVariables() {
+    private @NonNull ImmutableSet<Pair<ProgramVariable, Boolean>> getLabeledProgramVariables() {
         ImmutableSet<Pair<ProgramVariable, Boolean>> labeledProgramVariables =
             DefaultImmutableSet.nil();
         for (Pair<ProgramVariable, Boolean> pv : programVariables) {
@@ -127,7 +128,7 @@ public class InfFlowProofSymbols {
         return labeledProgramVariables;
     }
 
-    private ImmutableSet<Pair<SchemaVariable, Boolean>> getLabeledSchemaVariables() {
+    private @NonNull ImmutableSet<Pair<SchemaVariable, Boolean>> getLabeledSchemaVariables() {
         ImmutableSet<Pair<SchemaVariable, Boolean>> labeledSchemaVariables =
             DefaultImmutableSet.nil();
         for (Pair<SchemaVariable, Boolean> sv : schemaVariables) {
@@ -139,7 +140,7 @@ public class InfFlowProofSymbols {
         return labeledSchemaVariables;
     }
 
-    private ImmutableSet<Pair<Taclet, Boolean>> getLabeledTaclets() {
+    private @NonNull ImmutableSet<Pair<Taclet, Boolean>> getLabeledTaclets() {
         ImmutableSet<Pair<Taclet, Boolean>> labeledTaclets =
             DefaultImmutableSet.nil();
         for (Pair<Taclet, Boolean> t : taclets) {
@@ -161,7 +162,7 @@ public class InfFlowProofSymbols {
         return false;
     }
 
-    private boolean containsPredicate(Function f) {
+    private boolean containsPredicate(@NonNull Function f) {
         ImmutableSet<Pair<Function, Boolean>> ps = DefaultImmutableSet
                 .<Pair<Function, Boolean>>nil().add(new Pair<>(f, true))
                 .add(new Pair<>(f, false));
@@ -238,13 +239,13 @@ public class InfFlowProofSymbols {
         }
     }
 
-    private boolean isPredicate(Operator f) {
+    private boolean isPredicate(@NonNull Operator f) {
         assert f != null;
         return f.name().toString().startsWith("RELATED_BY")
                 || f.name().toString().startsWith("EXECUTION_OF");
     }
 
-    private void addPredicate(Function p, boolean labeled) {
+    private void addPredicate(@NonNull Function p, boolean labeled) {
         if (!containsPredicate(p)) {
             predicates = predicates.add(new Pair<>(p, !labeled));
         }
@@ -256,7 +257,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    private void addFunc(JFunction f, boolean labeled) {
+    private void addFunc(@NonNull JFunction f, boolean labeled) {
         if (isPredicate(f)) {
             addPredicate(f, labeled);
         } else {
@@ -285,7 +286,7 @@ public class InfFlowProofSymbols {
         return this.isFreshContract;
     }
 
-    public static ProgramVariable searchPV(String s, Services services) {
+    public static @NonNull ProgramVariable searchPV(@NonNull String s, @NonNull Services services) {
         Namespace<IProgramVariable> ns = services.getNamespaces().programVariables();
         IProgramVariable n = ns.lookup(s);
         int i = 0;
@@ -296,7 +297,7 @@ public class InfFlowProofSymbols {
         return (ProgramVariable) n;
     }
 
-    public void add(Named symb) {
+    public void add(@NonNull Named symb) {
         assert symb != null;
         boolean l = false;
 
@@ -322,7 +323,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    public void addLabeled(Named symb) {
+    public void addLabeled(@NonNull Named symb) {
         assert symb != null;
         boolean l = true;
 
@@ -346,7 +347,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    public void add(Term t) {
+    public void add(@NonNull Term t) {
         assert t != null;
         t = TermBuilder.goBelowUpdates(t);
         if (!isPredicate(t.op())) {
@@ -359,7 +360,7 @@ public class InfFlowProofSymbols {
         add(t.op());
     }
 
-    public void addLabeled(Term t) {
+    public void addLabeled(@NonNull Term t) {
         assert t != null;
         t = TermBuilder.goBelowUpdates(t);
         if (t.arity() > 0) {
@@ -370,7 +371,7 @@ public class InfFlowProofSymbols {
         addLabeled(t.op());
     }
 
-    public InfFlowProofSymbols union(InfFlowProofSymbols symbols) {
+    public @NonNull InfFlowProofSymbols union(@NonNull InfFlowProofSymbols symbols) {
         assert symbols != null;
         InfFlowProofSymbols result = new InfFlowProofSymbols();
         if (!isFreshContract() || !symbols.isFreshContract()) {
@@ -385,7 +386,7 @@ public class InfFlowProofSymbols {
         return result;
     }
 
-    public InfFlowProofSymbols unionLabeled(InfFlowProofSymbols symbols) {
+    public @NonNull InfFlowProofSymbols unionLabeled(@NonNull InfFlowProofSymbols symbols) {
         assert symbols != null;
         symbols = symbols.getLabeledSymbols();
         InfFlowProofSymbols result = new InfFlowProofSymbols();
@@ -401,7 +402,7 @@ public class InfFlowProofSymbols {
         return result;
     }
 
-    public void addTotalTerm(Term t) {
+    public void addTotalTerm(@NonNull Term t) {
         assert t != null;
         if (t.op() instanceof UpdateApplication) {
             addTotalTerm(UpdateApplication.getUpdate(t));
@@ -419,7 +420,7 @@ public class InfFlowProofSymbols {
         add(t.op());
     }
 
-    public void addLabeledTotalTerm(Term t) {
+    public void addLabeledTotalTerm(@NonNull Term t) {
         assert t != null;
         if (t.op() instanceof UpdateApplication) {
             addLabeledTotalTerm(UpdateApplication.getUpdate(t));
@@ -437,7 +438,7 @@ public class InfFlowProofSymbols {
         addLabeled(t.op());
     }
 
-    private ImmutableSet<Sort> getSorts() {
+    private @NonNull ImmutableSet<Sort> getSorts() {
         ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
         for (Pair<Sort, Boolean> s : this.sorts) {
             sorts = sorts.add(s.first);
@@ -445,7 +446,7 @@ public class InfFlowProofSymbols {
         return sorts;
     }
 
-    private LinkedList<Sort> ensureRightOrderOfSorts(ImmutableSet<Sort> s) {
+    private @NonNull LinkedList<Sort> ensureRightOrderOfSorts(@NonNull ImmutableSet<Sort> s) {
         LinkedList<TreeSet<Sort>> sortContainers = new LinkedList<>();
         for (final Sort sort : s) {
             boolean added = false;
@@ -475,12 +476,12 @@ public class InfFlowProofSymbols {
         return sorts;
     }
 
-    private LinkedList<Sort> removeArraySorts(LinkedList<Sort> sorts) {
+    private @NonNull LinkedList<Sort> removeArraySorts(@NonNull LinkedList<Sort> sorts) {
         sorts.removeIf(s -> s instanceof ArraySort);
         return sorts;
     }
 
-    private ImmutableSet<Function> getPredicates() {
+    private @NonNull ImmutableSet<Function> getPredicates() {
         ImmutableSet<Function> predicates = DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> p : this.predicates) {
             predicates = predicates.add(p.first);
@@ -488,7 +489,7 @@ public class InfFlowProofSymbols {
         return predicates;
     }
 
-    private ImmutableSet<Function> getFunctions() {
+    private @NonNull ImmutableSet<Function> getFunctions() {
         ImmutableSet<Function> functions = DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> f : this.functions) {
             functions = functions.add(f.first);
@@ -496,7 +497,7 @@ public class InfFlowProofSymbols {
         return functions;
     }
 
-    private ImmutableSet<ProgramVariable> getProgramVariables() {
+    private @NonNull ImmutableSet<ProgramVariable> getProgramVariables() {
         ImmutableSet<ProgramVariable> programVariables = DefaultImmutableSet.nil();
         for (Pair<ProgramVariable, Boolean> pv : this.programVariables) {
             programVariables = programVariables.add(pv.first);
@@ -504,7 +505,7 @@ public class InfFlowProofSymbols {
         return programVariables;
     }
 
-    private ImmutableSet<SchemaVariable> getSchemaVariables() {
+    private @NonNull ImmutableSet<SchemaVariable> getSchemaVariables() {
         ImmutableSet<SchemaVariable> schemaVariables = DefaultImmutableSet.nil();
         for (Pair<SchemaVariable, Boolean> sv : this.schemaVariables) {
             schemaVariables = schemaVariables.add(sv.first);
@@ -512,7 +513,7 @@ public class InfFlowProofSymbols {
         return schemaVariables;
     }
 
-    private ImmutableSet<Taclet> getTaclets() {
+    private @NonNull ImmutableSet<Taclet> getTaclets() {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
         for (Pair<Taclet, Boolean> t : this.taclets) {
             taclets = taclets.add(t.first);
@@ -520,11 +521,11 @@ public class InfFlowProofSymbols {
         return taclets;
     }
 
-    private void printSpace(StringBuilder result) {
+    private void printSpace(@NonNull StringBuilder result) {
         result.append("\n\n");
     }
 
-    private void printSorts(StringBuilder result) {
+    private void printSorts(@NonNull StringBuilder result) {
         if (getSorts().isEmpty()) {
             return;
         }
@@ -556,7 +557,7 @@ public class InfFlowProofSymbols {
         result.append("}\n\n");
     }
 
-    private void printPredicate(StringBuilder result, Function f) {
+    private void printPredicate(@NonNull StringBuilder result, @NonNull Function f) {
         result.append(f.name());
         for (int i = 0; i < f.arity(); i++) {
             result.append(i == 0 ? "(" : ",");
@@ -566,7 +567,7 @@ public class InfFlowProofSymbols {
         result.append(";\n");
     }
 
-    private void printPredicates(StringBuilder result) {
+    private void printPredicates(@NonNull StringBuilder result) {
         if (getPredicates().isEmpty()) {
             return;
         }
@@ -578,7 +579,7 @@ public class InfFlowProofSymbols {
         result.append("}\n\n");
     }
 
-    private void printFunctions(StringBuilder result) {
+    private void printFunctions(@NonNull StringBuilder result) {
         if (getFunctions().isEmpty()) {
             return;
         }
@@ -591,7 +592,7 @@ public class InfFlowProofSymbols {
         result.append("}\n\n");
     }
 
-    private void printProgramVariables(StringBuilder result) {
+    private void printProgramVariables(@NonNull StringBuilder result) {
         if (getProgramVariables().isEmpty()) {
             return;
         }
@@ -606,7 +607,7 @@ public class InfFlowProofSymbols {
     }
 
     @SuppressWarnings("unused")
-    private void printSchemaVariables(StringBuilder result) {
+    private void printSchemaVariables(@NonNull StringBuilder result) {
         if (getSchemaVariables().isEmpty()) {
             return;
         }
@@ -625,7 +626,7 @@ public class InfFlowProofSymbols {
         result.append("}\n\n");
     }
 
-    private void printTaclets(StringBuilder result) {
+    private void printTaclets(@NonNull StringBuilder result) {
         if (getTaclets().isEmpty()) {
             return;
         }
@@ -644,7 +645,7 @@ public class InfFlowProofSymbols {
         result.append("\n\n");
     }
 
-    public String printProofSymbols() {
+    public @NonNull String printProofSymbols() {
         StringBuilder result = new StringBuilder();
 
         printSpace(result);

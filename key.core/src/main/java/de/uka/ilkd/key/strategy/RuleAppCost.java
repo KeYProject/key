@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents the costs of a rule. In the default case this is just an integral number, but in some
@@ -19,6 +20,7 @@ public interface RuleAppCost extends Comparable<RuleAppCost> {
      * Add the given costs to the costs that are represented by this object
      */
     @NonNull
+    @Nullable
     RuleAppCost add(@NonNull RuleAppCost cost2);
 
 

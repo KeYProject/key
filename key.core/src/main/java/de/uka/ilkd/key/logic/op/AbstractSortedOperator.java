@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Modifier;
@@ -78,7 +79,7 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
 
 
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+    public <T extends org.key_project.logic.Term> void validTopLevelException(@NonNull T term)
             throws TermCreationException {
         super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {

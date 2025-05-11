@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 
@@ -36,14 +37,14 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters params,
-            EngineState stateMap) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters params,
+                        EngineState stateMap) throws ScriptException, InterruptedException {
 
         if (!params.abbreviation.startsWith("@")) {
             throw new ScriptException(
@@ -104,7 +105,7 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "saveNewName";
     }
 }

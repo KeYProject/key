@@ -3,4 +3,7 @@
  * The various operators and literals are bundled in the corresponding
  * subpackages.
  */
+@NullMarked
 package de.uka.ilkd.key.java.expression;
+
+import org.jspecify.annotations.NullMarked;

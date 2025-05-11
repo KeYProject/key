@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -38,7 +39,7 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
 
     private static final TacletFilter FILTER = new TacletFilter() {
         @Override
-        protected boolean filter(Taclet taclet) {
+        protected boolean filter(@NonNull Taclet taclet) {
             return taclet.name().toString().matches(INSERT_HIDDEN_PATTERN);
         }
     };
@@ -48,13 +49,13 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
@@ -84,7 +85,7 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "unhide";
     }
 

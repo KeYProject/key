@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A factory class for {@link MergeWithPredicateAbstraction} which is itself a
@@ -62,14 +63,14 @@ public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbst
      *        generated from abstraction predicates.
      * @return A complete instance of {@link MergeWithPredicateAbstraction}.
      */
-    public MergeWithPredicateAbstraction instantiate(Iterable<AbstractionPredicate> predicates,
-            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-            LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices) {
+    public @NonNull MergeWithPredicateAbstraction instantiate(@NonNull Iterable<AbstractionPredicate> predicates,
+                                                              Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+                                                              LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices) {
         return new MergeWithPredicateAbstraction(predicates, latticeType, userChoices);
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "MergeByPredicateAbstraction";
     }
 

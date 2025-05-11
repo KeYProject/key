@@ -10,6 +10,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableMap;
@@ -35,11 +37,11 @@ public class Substitution {
         return varMap;
     }
 
-    public Term getSubstitutedTerm(QuantifiableVariable var) {
+    public @Nullable Term getSubstitutedTerm(@NonNull QuantifiableVariable var) {
         return varMap.get(var);
     }
 
-    public boolean isTotalOn(ImmutableSet<QuantifiableVariable> vars) {
+    public boolean isTotalOn(@NonNull ImmutableSet<QuantifiableVariable> vars) {
         for (QuantifiableVariable var : vars) {
             if (!varMap.containsKey(var)) {
                 return false;
@@ -65,7 +67,7 @@ public class Substitution {
     }
 
 
-    public Term apply(Term t, Services services) {
+    public Term apply(Term t, @NonNull Services services) {
         assert isGround() : "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
         final TermBuilder tb = services.getTermBuilder();
@@ -83,7 +85,7 @@ public class Substitution {
         return t;
     }
 
-    private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermBuilder tb) {
+    private @NonNull Term applySubst(@NonNull QuantifiableVariable var, @NonNull Term instance, @NonNull Term t, @NonNull TermBuilder tb) {
         final ClashFreeSubst subst = new ClashFreeSubst(var, instance, tb);
         return subst.apply(t);
     }
@@ -92,7 +94,7 @@ public class Substitution {
      * Try to apply the substitution to a term, introducing casts if necessary (may never be the
      * case any more, XXX)
      */
-    public Term applyWithoutCasts(Term t, Services services) {
+    public Term applyWithoutCasts(Term t, @NonNull Services services) {
         assert isGround() : "non-ground substitutions are not yet implemented: " + this;
         final TermBuilder tb = services.getTermBuilder();
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
@@ -132,7 +134,7 @@ public class Substitution {
         return String.valueOf(varMap);
     }
 
-    public boolean termContainsValue(Term term) {
+    public boolean termContainsValue(@NonNull Term term) {
         Iterator<Term> it = varMap.valueIterator();
         while (it.hasNext()) {
             if (recOccurCheck(it.next(), term)) {
@@ -145,7 +147,7 @@ public class Substitution {
     /**
      * check whether term "sub" is in term "term"
      */
-    private boolean recOccurCheck(Term sub, Term term) {
+    private boolean recOccurCheck(@NonNull Term sub, @NonNull Term term) {
         if (sub.equals(term)) {
             return true;
         }

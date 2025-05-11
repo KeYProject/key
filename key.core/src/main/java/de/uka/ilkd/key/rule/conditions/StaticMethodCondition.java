@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -46,8 +47,8 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
         this.args = args;
     }
 
-    private static ImmutableArray<Expression> toExpArray(
-            ImmutableArray<? extends ProgramElement> a) {
+    private static @NonNull ImmutableArray<Expression> toExpArray(
+            @NonNull ImmutableArray<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
         for (int i = 0; i < a.size(); i++) {
             result[i] = (Expression) a.get(i);
@@ -58,8 +59,8 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
+    public boolean check(SchemaVariable var, SyntaxElement subst, @NonNull SVInstantiations svInst,
+                         Services services) {
 
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
@@ -99,7 +100,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller + ", " + methname
             + ", " + args + ")";
     }

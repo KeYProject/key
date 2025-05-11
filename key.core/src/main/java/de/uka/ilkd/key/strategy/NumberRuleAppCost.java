@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.LRUCache;
 
 import org.jspecify.annotations.NonNull;
@@ -18,7 +19,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     private static final LRUCache<Integer, NumberRuleAppCost> cache =
         new LRUCache<>(255);
 
-    public static RuleAppCost getZeroCost() {
+    public static @NonNull RuleAppCost getZeroCost() {
         return ZERO_COST;
     }
 
@@ -76,7 +77,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
 
 
-    public int compareTo(NumberRuleAppCost c) {
+    public int compareTo(@NonNull NumberRuleAppCost c) {
         final long this_cost = getValue();
         final long other_cost = c.getValue();
         return (Long.compare(this_cost, other_cost));
@@ -96,7 +97,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return (int) getValue();
     }
 
-    public final RuleAppCost add(RuleAppCost cost2) {
+    public final @Nullable RuleAppCost add(RuleAppCost cost2) {
         if (cost2 instanceof NumberRuleAppCost) {
             return add((NumberRuleAppCost) cost2);
         } else if (cost2 instanceof TopRuleAppCost) {
@@ -108,7 +109,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         }
     }
 
-    public final RuleAppCost add(NumberRuleAppCost cost2) {
+    public final RuleAppCost add(@NonNull NumberRuleAppCost cost2) {
         if (getValue() == 0) {
             return cost2;
         } else if (cost2.getValue() == 0) {
@@ -119,7 +120,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return String.valueOf(getValue());
     }
 

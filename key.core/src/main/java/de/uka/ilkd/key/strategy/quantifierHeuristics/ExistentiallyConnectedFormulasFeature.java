@@ -10,6 +10,7 @@ import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Binary feature that return zero if two given projection term is CS-Releated.
@@ -23,11 +24,11 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         this.for1 = for1;
     }
 
-    public static Feature create(ProjectionToTerm for0, ProjectionToTerm for1) {
+    public static @NonNull Feature create(ProjectionToTerm for0, ProjectionToTerm for1) {
         return new ExistentiallyConnectedFormulasFeature(for0, for1);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final ClausesGraph graph = ClausesGraph.create(pos.sequentFormula().formula(),

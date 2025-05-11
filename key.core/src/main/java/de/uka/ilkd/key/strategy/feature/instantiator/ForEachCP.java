@@ -15,6 +15,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -34,7 +35,7 @@ public class ForEachCP implements Feature {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static Feature create(TermBuffer var, TermGenerator generator, Feature body) {
+    public static @NonNull Feature create(TermBuffer var, TermGenerator generator, Feature body) {
         return new ForEachCP(var, generator, body);
     }
 
@@ -45,7 +46,7 @@ public class ForEachCP implements Feature {
     }
 
     public RuleAppCost computeCost(final RuleApp app, final PosInOccurrence pos, final Goal goal,
-            MutableState mState) {
+                                   @NonNull MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
 
@@ -80,7 +81,7 @@ public class ForEachCP implements Feature {
                 return terms.hasNext();
             }
 
-            public CPBranch next() {
+            public @NonNull CPBranch next() {
                 final Term generatedTerm = terms.next();
                 return new CPBranch() {
                     public void choose() {
@@ -110,7 +111,7 @@ public class ForEachCP implements Feature {
             this.mState = mState;
         }
 
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
+        public @NonNull Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator(generator.generate(app, pos, goal, mState), oldApp, mState);
         }
     }

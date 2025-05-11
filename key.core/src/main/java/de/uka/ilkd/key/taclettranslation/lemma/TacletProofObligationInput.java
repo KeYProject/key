@@ -17,6 +17,7 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -37,12 +38,12 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     public static final String AXIOM_FILE = "axiomFile";
 
     private final String tacletName;
-    private ProofAggregate proofObligation;
+    private @Nullable ProofAggregate proofObligation;
     private Throwable ex;
 
     // The following may all possibly be null
-    private String definitionFile;
-    private String tacletFile;
+    private @Nullable String definitionFile;
+    private @Nullable String tacletFile;
     private String[] axiomFiles;
     private String baseDir;
 
@@ -51,7 +52,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      */
     private final TacletFilter filter = new TacletFilter() {
         @Override
-        public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
+        public @NonNull ImmutableSet<Taclet> filter(@NonNull List<TacletInfo> taclets) {
             Name name = new Name(tacletName);
             for (TacletInfo tacletInfo : taclets) {
                 if (tacletInfo.getTaclet().name().equals(name)) {
@@ -114,7 +115,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      * Fill in only the necessary info.
      */
     @Override
-    public Configuration createLoaderConfig() throws IOException {
+    public @NonNull Configuration createLoaderConfig() throws IOException {
         var c = new Configuration();
         c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
         c.set(IPersistablePO.PROPERTY_NAME, name());
@@ -138,7 +139,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     }
 
     @Override
-    public String name() {
+    public @NonNull String name() {
         return tacletName;
     }
 
@@ -173,12 +174,12 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
     }
 
-    private ProofEnvironment createProofEnvironment() {
+    private @NonNull ProofEnvironment createProofEnvironment() {
         return new ProofEnvironment(environmentConfig);
     }
 
 
-    private Collection<File> fileCollection(String[] strings) {
+    private @NonNull Collection<File> fileCollection(String @NonNull [] strings) {
         ArrayList<File> result = new ArrayList<>();
         for (String string : strings) {
             result.add(new File(baseDir, string));
@@ -190,7 +191,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      * just deliver the precalculated PO
      */
     @Override
-    public ProofAggregate getPO() throws ProofInputException {
+    public @NonNull ProofAggregate getPO() throws ProofInputException {
         assert proofObligation != null : "readProblem should have been called first";
         return proofObligation;
     }
@@ -200,7 +201,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         return this == po;
     }
 
-    void setLoadInfo(Configuration properties) {
+    void setLoadInfo(@NonNull Configuration properties) {
         final var pathname =
             Objects.requireNonNull(properties.getString(IPersistablePO.PROPERTY_FILENAME));
         this.baseDir = new File(pathname).getParent();
@@ -217,7 +218,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         this.axiomFiles = axioms.toArray(new String[0]);
     }
 
-    public void setLoadInfo(File tacletFile, File definitionFile, Collection<File> axiomFiles) {
+    public void setLoadInfo(@NonNull File tacletFile, @NonNull File definitionFile, @NonNull Collection<File> axiomFiles) {
         this.tacletFile = tacletFile.toString();
         this.definitionFile = definitionFile.toString();
         this.axiomFiles = new String[axiomFiles.size()];

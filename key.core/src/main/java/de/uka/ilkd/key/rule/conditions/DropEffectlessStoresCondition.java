@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -36,8 +38,8 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static Term dropEffectlessStoresHelper(Term heapTerm, TermServices services,
-            ImmutableSet<Pair<Term, Term>> overwrittenLocs, Function store) {
+    private static @Nullable Term dropEffectlessStoresHelper(@NonNull Term heapTerm, @NonNull TermServices services,
+                                                             @NonNull ImmutableSet<Pair<Term, Term>> overwrittenLocs, Function store) {
         if (heapTerm.op() == store) {
             final Term subHeapTerm = heapTerm.sub(0);
             final Term objTerm = heapTerm.sub(1);
@@ -59,7 +61,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static Term dropEffectlessStores(Term t, Services services) {
+    private static @Nullable Term dropEffectlessStores(@NonNull Term t, @NonNull Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert t.sort() == heapLDT.targetSort();
         return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.nil(),
@@ -68,9 +70,9 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
-            Services services) {
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+                                           @NonNull MatchConditions mc,
+                                           Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term hInst = (Term) svInst.getInstantiation(h);
         Term oInst = (Term) svInst.getInstantiation(o);
@@ -97,7 +99,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\dropEffectlessStores(" + h + ", " + o + ", " + f + ", " + x + ", " + result + ")";
     }
 }

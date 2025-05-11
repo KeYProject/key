@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This interface represents an iterator, iterating the nodes on the path between the root of a term
  * and a position within the term, given by a <code>PosInOccurrence</code>-object
@@ -29,6 +31,7 @@ public interface PIOPathIterator extends IntIterator {
      *         <code>next()</code>-call); this method satisfies
      *         <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
      */
+    @Nullable
     Term getSubTerm();
 
     /**

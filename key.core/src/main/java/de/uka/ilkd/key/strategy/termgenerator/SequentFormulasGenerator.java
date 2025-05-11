@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Term generator that enumerates the formulas of the current sequent/antecedent/succedent.
@@ -19,25 +20,25 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
 
     protected SequentFormulasGenerator() {}
 
-    public static SequentFormulasGenerator antecedent() {
+    public static @NonNull SequentFormulasGenerator antecedent() {
         return new SequentFormulasGenerator() {
-            protected Iterator<SequentFormula> generateForIt(Goal goal) {
+            protected @NonNull Iterator<SequentFormula> generateForIt(@NonNull Goal goal) {
                 return goal.sequent().antecedent().iterator();
             }
         };
     }
 
-    public static SequentFormulasGenerator succedent() {
+    public static @NonNull SequentFormulasGenerator succedent() {
         return new SequentFormulasGenerator() {
-            protected Iterator<SequentFormula> generateForIt(Goal goal) {
+            protected @NonNull Iterator<SequentFormula> generateForIt(@NonNull Goal goal) {
                 return goal.sequent().succedent().iterator();
             }
         };
     }
 
-    public static SequentFormulasGenerator sequent() {
+    public static @NonNull SequentFormulasGenerator sequent() {
         return new SequentFormulasGenerator() {
-            protected Iterator<SequentFormula> generateForIt(Goal goal) {
+            protected @NonNull Iterator<SequentFormula> generateForIt(@NonNull Goal goal) {
                 return goal.sequent().iterator();
             }
         };
@@ -45,8 +46,8 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
 
     protected abstract Iterator<SequentFormula> generateForIt(Goal goal);
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+                                            MutableState mState) {
         return new SFIterator(generateForIt(goal));
     }
 
@@ -57,7 +58,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
             return forIt.hasNext();
         }
 
-        public Term next() {
+        public @NonNull Term next() {
             return forIt.next().formula();
         }
 

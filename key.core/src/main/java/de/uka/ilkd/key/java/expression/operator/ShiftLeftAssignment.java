@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -29,7 +30,7 @@ public class ShiftLeftAssignment extends Assignment {
      * @param rhs an expression.
      */
 
-    public ShiftLeftAssignment(Expression lhs, Expression rhs) {
+    public ShiftLeftAssignment(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -40,7 +41,7 @@ public class ShiftLeftAssignment extends Assignment {
      *
      * @param children the children of this AST element as KeY classes.
      */
-    public ShiftLeftAssignment(ExtList children) {
+    public ShiftLeftAssignment(@NonNull ExtList children) {
         super(children);
     }
 
@@ -81,7 +82,7 @@ public class ShiftLeftAssignment extends Assignment {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnShiftLeftAssignment(this);
     }
 }

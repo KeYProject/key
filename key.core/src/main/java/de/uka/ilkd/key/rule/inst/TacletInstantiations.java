@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableMap;
 
 /**
@@ -33,7 +34,7 @@ public class TacletInstantiations {
         return instantiations;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return "rule: " + taclet() + "; instantiation: " + instantiations();
     }
 

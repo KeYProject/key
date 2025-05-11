@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -40,7 +41,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
     /**
      * Textual representation of the value as a decimal number (always ends with 'L').
      */
-    private final String valueStr;
+    private final @NonNull String valueStr;
 
     /**
      * The actual value of the literal.
@@ -82,19 +83,19 @@ public class LongLiteral extends AbstractIntegerLiteral {
      * @throws NumberFormatException if the given String does not represent a syntactically valid
      *         literal or represents a value out of long range
      */
-    public LongLiteral(ExtList children, String valStr) {
+    public LongLiteral(@NonNull ExtList children, String valStr) {
         super(children);
         this.value = parseFromString(valStr);
         this.valueStr = (Long.toString(value) + 'L').intern();
     }
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnLongLiteral(this);
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
     }
 
@@ -110,7 +111,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
      *         always ends with 'L' to indicate a long.
      */
     @Override
-    public String getValueString() {
+    public @NonNull String getValueString() {
         return valueStr;
     }
 

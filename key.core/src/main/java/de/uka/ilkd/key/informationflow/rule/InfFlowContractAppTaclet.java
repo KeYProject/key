@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.jspecify.annotations.NullMarked;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -26,6 +27,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * @author christoph
  */
+@NullMarked
 public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     public static final String USE_IF = "Use information flow contract for ";

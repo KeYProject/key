@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -43,13 +44,13 @@ import org.key_project.util.collection.ImmutableSet;
 
 public class TriggeredInstantiations implements TermGenerator {
 
-    public static TermGenerator create(boolean skipConditions) {
+    public static @NonNull TermGenerator create(boolean skipConditions) {
         return new TriggeredInstantiations(skipConditions);
     }
 
-    private Sequent last = Sequent.EMPTY_SEQUENT;
-    private Set<Term> lastCandidates = new HashSet<>();
-    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
+    private @NonNull Sequent last = Sequent.EMPTY_SEQUENT;
+    private @NonNull Set<Term> lastCandidates = new HashSet<>();
+    private @NonNull ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
 
     private final boolean checkConditions;
 
@@ -65,8 +66,8 @@ public class TriggeredInstantiations implements TermGenerator {
      * Generates all instances
      */
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public @NonNull Iterator<Term> generate(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+                                            MutableState mState) {
         if (app instanceof TacletApp tapp) {
 
             final Services services = goal.proof().getServices();
@@ -137,24 +138,24 @@ public class TriggeredInstantiations implements TermGenerator {
 
     }
 
-    private Term instantiateTerm(final Term term, final Services services,
-            SVInstantiations svInst) {
+    private @NonNull Term instantiateTerm(final @NonNull Term term, final @NonNull Services services,
+                                          @NonNull SVInstantiations svInst) {
         final SyntacticalReplaceVisitor syn = new SyntacticalReplaceVisitor(new TermLabelState(),
             null, null, svInst, null, null, null, services);
         term.execPostOrder(syn);
         return syn.getTerm();
     }
 
-    private void computeAxiomAndCandidateSets(final Sequent seq, final Set<Term> terms,
-            final Set<Term> axioms, Services services) {
+    private void computeAxiomAndCandidateSets(final @NonNull Sequent seq, final @NonNull Set<Term> terms,
+                                              final @NonNull Set<Term> axioms, @NonNull Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true, services);
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false, services);
     }
 
-    private void collectAxiomsAndCandidateTerms(final Set<Term> terms, final Set<Term> axioms,
-            final IntegerLDT integerLDT, Semisequent antecedent, boolean inAntecedent,
-            TermServices services) {
+    private void collectAxiomsAndCandidateTerms(final @NonNull Set<Term> terms, final @NonNull Set<Term> axioms,
+                                                final @NonNull IntegerLDT integerLDT, @NonNull Semisequent antecedent, boolean inAntecedent,
+                                                @NonNull TermServices services) {
 
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
@@ -175,9 +176,9 @@ public class TriggeredInstantiations implements TermGenerator {
         return cost == -1;
     }
 
-    private HashSet<Term> computeInstances(Services services, final Term comprehension,
-            final Metavariable mv, final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms,
-            TacletApp app) {
+    private @NonNull HashSet<Term> computeInstances(@NonNull Services services, final Term comprehension,
+                                                    final Metavariable mv, final Term trigger, @NonNull Set<Term> terms, ImmutableSet<Term> axioms,
+                                                    @NonNull TacletApp app) {
 
         final HashSet<Term> instances = new HashSet<>();
         final HashSet<Term> alreadyChecked = new HashSet<>();
@@ -208,8 +209,8 @@ public class TriggeredInstantiations implements TermGenerator {
         return instances;
     }
 
-    private ImmutableList<Term> instantiateConditions(Services services, TacletApp app,
-            final Term middle) {
+    private @NonNull ImmutableList<Term> instantiateConditions(@NonNull Services services, @NonNull TacletApp app,
+                                                               final @NonNull Term middle) {
         ImmutableList<Term> conditions;
         conditions = ImmutableSLList.nil();
         for (Term singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {
@@ -220,7 +221,7 @@ public class TriggeredInstantiations implements TermGenerator {
         return conditions;
     }
 
-    private void collectTerms(Term instanceCandidate, Set<Term> terms, IntegerLDT intLDT) {
+    private void collectTerms(@NonNull Term instanceCandidate, @NonNull Set<Term> terms, @NonNull IntegerLDT intLDT) {
         if (instanceCandidate.freeVars().isEmpty()
                 && !instanceCandidate.containsJavaBlockRecursive()) {
             terms.add(instanceCandidate);

@@ -8,6 +8,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +33,8 @@ public class PrintFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public @NonNull RuleAppCost computeCost(@NonNull RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
+                                            MutableState mState) {
         RuleAppCost cost = f.computeCost(app, pos, goal, mState);
         LOGGER.debug("{}:{}:{}{}", prefix, cost.toString(), pos != null ? pos.subTerm() + ":" : "",
             app.rule().name());

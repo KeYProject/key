@@ -22,6 +22,8 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -43,14 +45,14 @@ class BasicSnippetData {
     /**
      * Variables originally used during parsing.
      */
-    final StateVars origVars;
+    final @NonNull StateVars origVars;
 
     /**
      * TermBuilder used by the FactoryMethods.
      */
-    final TermBuilder tb;
+    final @NonNull TermBuilder tb;
 
-    final Services services;
+    final @NonNull Services services;
 
     /**
      * Unified contract content.
@@ -60,7 +62,7 @@ class BasicSnippetData {
         private static final long serialVersionUID = -8548805965130100236L;
 
         @Override
-        public Object put(Key key, Object value) {
+        public Object put(@NonNull Key key, @Nullable Object value) {
             assert value == null || key.getType().isInstance(value);
             return super.put(key, value);
         }
@@ -116,7 +118,7 @@ class BasicSnippetData {
     }
 
 
-    BasicSnippetData(FunctionalOperationContract contract, Services services) {
+    BasicSnippetData(@NonNull FunctionalOperationContract contract, @NonNull Services services) {
         this.hasMby = contract.hasMby();
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -134,8 +136,8 @@ class BasicSnippetData {
             contract.getExc(), heap);
     }
 
-    BasicSnippetData(LoopSpecification invariant, ExecutionContext context, Term guardTerm,
-            Services services) {
+    BasicSnippetData(@NonNull LoopSpecification invariant, ExecutionContext context, @NonNull Term guardTerm,
+                     @NonNull Services services) {
         this.hasMby = false;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -178,7 +180,7 @@ class BasicSnippetData {
     }
 
 
-    BasicSnippetData(InformationFlowContract contract, Services services) {
+    BasicSnippetData(@NonNull InformationFlowContract contract, @NonNull Services services) {
         this.hasMby = contract.hasMby();
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -199,7 +201,7 @@ class BasicSnippetData {
     }
 
 
-    BasicSnippetData(BlockContract contract, ExecutionContext context, Services services) {
+    BasicSnippetData(@NonNull BlockContract contract, ExecutionContext context, @NonNull Services services) {
         this.hasMby = false; // Mby of block contracts is not further considered
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -235,7 +237,7 @@ class BasicSnippetData {
     }
 
 
-    private ImmutableList<Term> toTermList(ImmutableSet<LocationVariable> vars) {
+    private @NonNull ImmutableList<Term> toTermList(@NonNull ImmutableSet<LocationVariable> vars) {
         ImmutableList<Term> result = ImmutableSLList.nil();
         for (ProgramVariable v : vars) {
             result = result.append(tb.var(v));

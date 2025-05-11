@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -27,12 +28,12 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "cut";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return """
                 CutCommand has as script command name "cut"
 
@@ -41,7 +42,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
@@ -55,7 +56,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
      */
     @Override
     @SuppressWarnings("override.param.invalid")
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args, @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
                 .lookupActiveTaclet(CUT_TACLET_NAME);

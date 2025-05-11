@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -21,7 +22,7 @@ public class ContainsQuantifierFeature extends AbstractBetaFeature {
     private ContainsQuantifierFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation(PosInOccurrence pos, @NonNull Term findTerm, @NonNull ServiceCaches caches) {
         return containsQuantifier(findTerm, caches) ? BinaryFeature.ZERO_COST
                 : BinaryFeature.TOP_COST;
     }

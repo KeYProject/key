@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -64,19 +65,19 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "rewrite";
     }
 
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args, @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Proof proof = state.getProof();
         assert proof != null;
@@ -101,7 +102,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     /**
      * get all TacletApps that are applicable on the formula term
      */
-    private ImmutableList<TacletApp> findAllTacletApps(Parameters p, EngineState state)
+    private @NonNull ImmutableList<TacletApp> findAllTacletApps(@NonNull Parameters p, @NonNull EngineState state)
             throws ScriptException {
         Services services = state.getProof().getServices();
         TacletFilter filter = TacletFilter.TRUE;
@@ -140,8 +141,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * Filter tacletapps: term = find && result = replace and execute taclet that matches the
      * conditions
      **/
-    private List<PosInOccurrence> findAndExecReplacement(Parameters p,
-            ImmutableList<TacletApp> list, EngineState state) {
+    private @NonNull List<PosInOccurrence> findAndExecReplacement(@NonNull Parameters p,
+                                                                  @NonNull ImmutableList<TacletApp> list, @NonNull EngineState state) {
 
         // Find taclet that transforms find term to replace term, when applied on find term
         for (TacletApp tacletApp : list) {
@@ -188,8 +189,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param goalold
      * @param rewriteResult
      */
-    private void executeRewriteTaclet(Parameters p, PosTacletApp pta, Goal goalold,
-            SequentFormula rewriteResult) {
+    private void executeRewriteTaclet(@NonNull Parameters p, @NonNull PosTacletApp pta, @NonNull Goal goalold,
+                                      @NonNull SequentFormula rewriteResult) {
         if (rewriteResult.formula().equals(p.replace)
                 || getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)) {
             failposInOccs.remove(pta.posInOccurrence());
@@ -209,7 +210,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pio PosInOccurrence of the to be returned term
      * @return term at pio
      */
-    public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
+    public Term getTermAtPos(@NonNull SequentFormula sf, @NonNull PosInOccurrence pio) {
         if (pio.isTopLevel()) {
             return sf.formula();
 
@@ -227,7 +228,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pit
      * @return subterm
      */
-    private Term getSubTerm(Term t, IntIterator pit) {
+    private Term getSubTerm(@NonNull Term t, @NonNull IntIterator pit) {
         if (pit.hasNext()) {
             int i = pit.next();
             return getSubTerm(t.sub(i), pit);

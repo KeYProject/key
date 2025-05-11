@@ -12,6 +12,8 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.prover.GoalChooser;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -23,7 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
 public class DefaultGoalChooser implements GoalChooser {
 
     /** the proof that is worked with */
-    protected Proof proof;
+    protected @Nullable Proof proof;
 
     /** list of goals on which the strategy should be applied */
     protected ImmutableList<Goal> goalList;
@@ -41,7 +43,7 @@ public class DefaultGoalChooser implements GoalChooser {
      */
     protected ImmutableList<Goal> selectedList;
 
-    protected Node currentSubtreeRoot = null;
+    protected @Nullable Node currentSubtreeRoot = null;
 
     public DefaultGoalChooser() {
     }
@@ -52,7 +54,7 @@ public class DefaultGoalChooser implements GoalChooser {
      * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof,
      * de.uka.ilkd.key.proof.IList<Goal>)
      */
-    public void init(Proof p_proof, ImmutableList<Goal> p_goals) {
+    public void init(@Nullable Proof p_proof, @Nullable ImmutableList<Goal> p_goals) {
         if (p_proof == null && !(p_goals == null || p_goals.isEmpty())) {
             throw new RuntimeException("A not existing proof has goals. This makes no sense.");
         }
@@ -70,7 +72,7 @@ public class DefaultGoalChooser implements GoalChooser {
         setupGoals(p_goals);
     }
 
-    protected void setupGoals(ImmutableList<Goal> p_goals) {
+    protected void setupGoals(@NonNull ImmutableList<Goal> p_goals) {
         goalList = ImmutableSLList.nil();
         selectedList = ImmutableSLList.nil();
         nextGoals = ImmutableSLList.nil();
@@ -103,7 +105,7 @@ public class DefaultGoalChooser implements GoalChooser {
          * words, that node should no longer have any children now. Any nodes that were not
          * descendants of that node are unaffected.
          */
-        public void proofPruned(ProofTreeEvent e) {
+        public void proofPruned(@NonNull ProofTreeEvent e) {
             currentSubtreeRoot = e.getNode();
             setupGoals(proof.getSubtreeGoals(proof.root()));
         }
@@ -117,7 +119,7 @@ public class DefaultGoalChooser implements GoalChooser {
      *
      * @see de.uka.ilkd.key.proof.IGoalChooser#getNextGoal()
      */
-    public Goal getNextGoal() {
+    public @Nullable Goal getNextGoal() {
         Goal result;
 
         if (allGoalsSatisfiable) {
@@ -164,7 +166,7 @@ public class DefaultGoalChooser implements GoalChooser {
      * @see de.uka.ilkd.key.proof.IGoalChooser#updateGoalList(de.uka.ilkd.key.proof.Node,
      * de.uka.ilkd.key.proof.IList<Goal>)
      */
-    public void updateGoalList(Node node, ImmutableList<Goal> newGoals) {
+    public void updateGoalList(Node node, @NonNull ImmutableList<Goal> newGoals) {
         if (newGoals.isEmpty() || (newGoals.tail().isEmpty() && newGoals.head().node() == node)) {
             // Goals (may) have been closed, remove them from the goal lists
             removeClosedGoals();
@@ -184,7 +186,7 @@ public class DefaultGoalChooser implements GoalChooser {
         }
     }
 
-    protected void updateGoalListHelp(Node node, ImmutableList<Goal> newGoals) {
+    protected void updateGoalListHelp(Node node, @NonNull ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 
@@ -214,8 +216,8 @@ public class DefaultGoalChooser implements GoalChooser {
         }
     }
 
-    protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
-            ImmutableList<Goal> prevGoalList) {
+    protected ImmutableList<Goal> insertNewGoals(@NonNull ImmutableList<Goal> newGoals,
+                                                 ImmutableList<Goal> prevGoalList) {
 
         for (final Goal g : newGoals) {
             if (proof.openGoals().contains(g)) {
@@ -230,7 +232,7 @@ public class DefaultGoalChooser implements GoalChooser {
     }
 
 
-    protected static ImmutableList<Goal> rotateList(ImmutableList<Goal> p_list) {
+    protected static @NonNull ImmutableList<Goal> rotateList(@NonNull ImmutableList<Goal> p_list) {
         if (p_list.isEmpty()) {
             return ImmutableSLList.nil();
         }
@@ -331,7 +333,7 @@ public class DefaultGoalChooser implements GoalChooser {
      *
      * PRECONDITION: all goals have satisfiable constraints
      */
-    protected void findMinimalSubtree(Node p_startNode) {
+    protected void findMinimalSubtree(@NonNull Node p_startNode) {
         while (!isSatisfiableSubtree(p_startNode)) {
             p_startNode = p_startNode.parent();
         }
@@ -342,7 +344,7 @@ public class DefaultGoalChooser implements GoalChooser {
     }
 
 
-    protected boolean isSatisfiableSubtree(Node p_root) {
+    protected boolean isSatisfiableSubtree(@NonNull Node p_root) {
         return !p_root.isClosed();
     }
 

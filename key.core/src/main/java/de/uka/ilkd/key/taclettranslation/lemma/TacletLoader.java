@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -78,7 +79,7 @@ public abstract class TacletLoader {
      *
      */
 
-    public void manageAvailableTaclets(InitConfig initConfig, Taclet tacletToProve) {
+    public void manageAvailableTaclets(@NonNull InitConfig initConfig, Taclet tacletToProve) {
         ImmutableList<Taclet> sysTaclets = initConfig.getTaclets();
 
         ImmutableList<Taclet> newTaclets = ImmutableSLList.nil();
@@ -99,7 +100,7 @@ public abstract class TacletLoader {
         initConfig.setTaclets(newTaclets.reverse());
     }
 
-    public ProofEnvironment getProofEnvForTaclets() {
+    public @NonNull ProofEnvironment getProofEnvForTaclets() {
         if (proofEnvironment == null) {
             EmptyEnvInput envInput = new EmptyEnvInput(profile);
             ProblemInitializer pi =
@@ -121,8 +122,8 @@ public abstract class TacletLoader {
         private final ProblemInitializer problemInitializer;
 
         public TacletFromFileLoader(ProgressMonitor pm, ProblemInitializerListener listener,
-                ProblemInitializer problemInitializer, File fileForTaclets,
-                Collection<File> filesForAxioms, InitConfig initConfig) {
+                                    ProblemInitializer problemInitializer, File fileForTaclets,
+                                    Collection<File> filesForAxioms, @NonNull InitConfig initConfig) {
             super(pm, listener, initConfig.getProfile());
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
@@ -139,20 +140,20 @@ public abstract class TacletLoader {
             this.problemInitializer = problemInitializer;
         }
 
-        public TacletFromFileLoader(TacletFromFileLoader loader, InitConfig initConfig) {
+        public TacletFromFileLoader(@NonNull TacletFromFileLoader loader, @NonNull InitConfig initConfig) {
             this(loader.monitor, loader.listener, makeProblemInitializer(loader, initConfig),
                 loader.profile, loader.fileForTaclets, loader.filesForAxioms);
             assert initConfig == null || loader.profile == initConfig.getProfile();
             this.initConfig = initConfig;
         }
 
-        private static ProblemInitializer makeProblemInitializer(TacletFromFileLoader loader,
-                InitConfig initConfig) {
+        private static @NonNull ProblemInitializer makeProblemInitializer(@NonNull TacletFromFileLoader loader,
+                                                                          @NonNull InitConfig initConfig) {
             return new ProblemInitializer(loader.monitor, initConfig.getServices(),
                 loader.listener);
         }
 
-        private void prepareKeYFile(File file) throws ProofInputException {
+        private void prepareKeYFile(@NonNull File file) throws ProofInputException {
             KeYFile keyFileDefs = new KeYFile(file.getName(), file, monitor, profile);
             if (initConfig != null) {
                 problemInitializer.readEnvInput(keyFileDefs, initConfig);
@@ -162,7 +163,7 @@ public abstract class TacletLoader {
         }
 
         @Override
-        public ImmutableList<Taclet> loadTaclets() throws ProofInputException {
+        public @NonNull ImmutableList<Taclet> loadTaclets() throws ProofInputException {
 
             // No axioms file:
             if (initConfig == null) {
@@ -179,7 +180,7 @@ public abstract class TacletLoader {
         }
 
         @Override
-        public ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
+        public @NonNull ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
             for (File f : filesForAxioms) {
                 prepareKeYFile(f);
@@ -190,7 +191,7 @@ public abstract class TacletLoader {
 
 
         @Override
-        public ProofOblInput getTacletFile(Proof proof) {
+        public @NonNull ProofOblInput getTacletFile(@NonNull Proof proof) {
             String name = proof.name().toString();
             assert name.startsWith("Taclet: ")
                     : "This depends (unfortunately) on the name of the proof";
@@ -201,7 +202,7 @@ public abstract class TacletLoader {
         }
 
         @Override
-        public ImmutableSet<Taclet> getTacletsAlreadyInUse() {
+        public @NonNull ImmutableSet<Taclet> getTacletsAlreadyInUse() {
             return DefaultImmutableSet.nil();
         }
 
@@ -215,17 +216,17 @@ public abstract class TacletLoader {
         }
 
         @Override
-        public ImmutableSet<Taclet> loadAxioms() {
+        public @NonNull ImmutableSet<Taclet> loadAxioms() {
             return DefaultImmutableSet.nil();
         }
 
         @Override
-        public ImmutableList<Taclet> loadTaclets() {
+        public @NonNull ImmutableList<Taclet> loadTaclets() {
             return getProofEnvForTaclets().getInitConfigForEnvironment().getTaclets();
         }
 
         @Override
-        public ProofOblInput getTacletFile(Proof proof) {
+        public @NonNull ProofOblInput getTacletFile(@NonNull Proof proof) {
             String name = proof.name().toString();
             assert name.startsWith("Taclet: ")
                     : "This depends (unfortunately) on the name of the proof";
@@ -234,7 +235,7 @@ public abstract class TacletLoader {
 
 
         @Override
-        public ImmutableSet<Taclet> getTacletsAlreadyInUse() {
+        public @NonNull ImmutableSet<Taclet> getTacletsAlreadyInUse() {
             return DefaultImmutableSet.nil();
         }
     }

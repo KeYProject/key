@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -22,8 +23,8 @@ public class FindDepthFeature implements Feature {
 
     private FindDepthFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
+                                   MutableState mState) {
         // assert pos != null : "Feature is only applicable to rules with find";
 
         return NumberRuleAppCost.create(pos == null ? 0 : pos.depth());

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.expression.operator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -22,11 +23,11 @@ public class LessOrEquals extends ComparativeOperator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public LessOrEquals(ExtList children) {
+    public LessOrEquals(@NonNull ExtList children) {
         super(children);
     }
 
-    public LessOrEquals(Expression lhs, Expression rhs) {
+    public LessOrEquals(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -47,7 +48,7 @@ public class LessOrEquals extends ComparativeOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnLessOrEquals(this);
     }
 }

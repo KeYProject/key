@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -41,7 +42,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * is a generic sort.
      */
     @Override
-    protected Operator replaceOp(Operator op, TermServices services) {
+    protected Operator replaceOp(Operator op, @NonNull TermServices services) {
 
         if (op instanceof SortDependingFunction sdf) {
             Sort sort = sdf.getSortDependingOn();
@@ -86,8 +87,8 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * @param services the services
      * @return the immutable set
      */
-    private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts,
-            TermServices services) {
+    private @NonNull ImmutableSet<Sort> replaceSorts(@NonNull ImmutableSet<Sort> extendsSorts,
+                                                     TermServices services) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
         for (Sort sort : extendsSorts) {
             result = result.add(replaceSort(sort, services));
