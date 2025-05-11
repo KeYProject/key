@@ -27,6 +27,8 @@ plugins {
     id "org.checkerframework" version "0.6.53"
 
     id("org.sonarqube") version "6.1.0.5360"
+
+    id 'org.jreleaser' version '1.18.0'
 }
 
 sonar {
@@ -531,6 +533,37 @@ task alldoc(type: Javadoc) {
     }
 }
 
+jreleaser {
+  signing {
+    active = 'ALWAYS'
+    armored = true
+  }
+  deploy {
+    maven {
+      mavenCentral {
+        'release-deploy' {
+          active = 'RELEASE'
+          url = 'https://central.sonatype.com/api/v1/publisher'
+          stagingRepository('target/staging-deploy')
+        }
+      }
+      nexus2 {
+        'snapshot-deploy' {
+          active = 'SNAPSHOT'
+          snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots'
+          applyMavenCentralRules = true
+          snapshotSupported = true
+          closeRepository = true
+          releaseRepository = true
+          stagingRepository('target/staging-deploy')
+        }
+      }
+    }
+  }
+}
+
+
+
 // Creates a jar file with the javadoc over all sub projects.
 task alldocJar(type: Zip) {
     dependsOn alldoc
@@ -570,3 +603,5 @@ def getChangedFiles() {
     // Return the list of touched files
     files
 }
+
+
