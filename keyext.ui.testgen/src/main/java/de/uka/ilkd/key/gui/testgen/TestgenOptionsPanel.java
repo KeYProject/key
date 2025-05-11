@@ -9,6 +9,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
+
 import org.jspecify.annotations.NonNull;
 
 public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvider {

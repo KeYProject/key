@@ -150,8 +150,9 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         Term guardAtPostSV = (poVars.pre.guard == poVars.post.guard) ? guardAtPreSV
                 : createTermSV(poVars.post.guard, schemaPrefix, services);
-        Term resAtPostSV = (poVars.post.resultTerm == null || poVars.post.resultTerm.op().equals(n)) ? null
-                : createTermSV(poVars.post.resultTerm, schemaPrefix, services);
+        Term resAtPostSV =
+            (poVars.post.resultTerm == null || poVars.post.resultTerm.op().equals(n)) ? null
+                    : createTermSV(poVars.post.resultTerm, schemaPrefix, services);
         Term excAtPostSV =
             (poVars.post.exception == null || poVars.post.exception.op().equals(n)) ? null
                     : createTermSV(poVars.post.exception, schemaPrefix, services);

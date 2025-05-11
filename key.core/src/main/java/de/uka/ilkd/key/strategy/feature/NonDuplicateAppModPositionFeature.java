@@ -8,8 +8,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -21,8 +22,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
     public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature();
 
     @Override
-    protected boolean comparePio(@NonNull TacletApp newApp, @NonNull TacletApp oldApp, @NonNull PosInOccurrence newPio,
-                                 @NonNull PosInOccurrence oldPio) {
+    protected boolean comparePio(@NonNull TacletApp newApp, @NonNull TacletApp oldApp,
+            @NonNull PosInOccurrence newPio,
+            @NonNull PosInOccurrence oldPio) {
         final Term newFocus = newPio.subTerm();
         final Term oldFocus = oldPio.subTerm();
         if (!newFocus.equalsModProperty(oldFocus, IRRELEVANT_TERM_LABELS_PROPERTY)) {

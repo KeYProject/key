@@ -7,11 +7,12 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateA
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Encapsulates intermediate information for constructing a {@link MergeRule} application.
@@ -49,10 +50,10 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
      *        chosen by the user
      */
     public MergeAppIntermediate(@NonNull String ruleName, Pair<Integer, PosInTerm> pos, int id,
-                                String joinProc, int nrPartners, ImmutableList<Name> newNames,
-                                String distinguishingFormula,
-                                Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
-                                String abstractionPredicates, String userChoices) {
+            String joinProc, int nrPartners, ImmutableList<Name> newNames,
+            String distinguishingFormula,
+            Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
+            String abstractionPredicates, String userChoices) {
         super(ruleName, pos, null, null, null, newNames);
 
         String mergeRuleName = MergeRule.INSTANCE.name().toString();

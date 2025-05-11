@@ -21,10 +21,11 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -221,7 +222,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-                                           ImmutableList<Term> paramTerms, Services services) {
+            ImmutableList<Term> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }

@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.NonNull;
 
 public class RightMouseClickToggleAction extends MainWindowAction {

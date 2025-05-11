@@ -8,6 +8,7 @@ import java.util.Set;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -19,7 +20,7 @@ class SelfcomposedExecutionSnippet extends ReplaceAndRegisterMethod
 
     @Override
     public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars1,
-                                 @NonNull ProofObligationVars poVars2) {
+            @NonNull ProofObligationVars poVars2) {
         BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, poVars2);
 

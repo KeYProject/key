@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**

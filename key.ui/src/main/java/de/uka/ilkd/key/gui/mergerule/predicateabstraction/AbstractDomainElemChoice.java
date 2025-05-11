@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.event;
 import java.util.EventObject;
 
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 
 /**

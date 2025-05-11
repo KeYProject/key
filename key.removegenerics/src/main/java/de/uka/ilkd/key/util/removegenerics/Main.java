@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.util.removegenerics.monitor.ConsoleGenericRemoverMonitor;
+
 import org.jspecify.annotations.NonNull;
 
 /**

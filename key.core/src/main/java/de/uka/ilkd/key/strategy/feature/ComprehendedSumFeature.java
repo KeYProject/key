@@ -14,6 +14,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -44,7 +45,7 @@ public class ComprehendedSumFeature implements Feature {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-                                   @NonNull MutableState mState) {
+            @NonNull MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
 
         final Iterator<Term> it = generator.generate(app, pos, goal, mState);

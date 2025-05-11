@@ -42,6 +42,7 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -267,7 +268,7 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     private void prepareDialog(@NonNull Collection<SMTProblem> smtproblems,
-                               @NonNull Collection<SolverType> solverTypes, final SolverLauncher launcher) {
+            @NonNull Collection<SolverType> solverTypes, final SolverLauncher launcher) {
         this.smtProblems = smtproblems;
         progressModel = new ProgressModel();
 
@@ -532,13 +533,14 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     private void storeTacletTranslation(@NonNull SMTSolver solver, @NonNull Goal goal,
-                                        @NonNull TacletSetTranslation translation) {
+            @NonNull TacletSetTranslation translation) {
         String path = settings.getPathForTacletTranslation();
         path = finalizePath(path, solver, goal);
         storeToFile(translation.toString(), path);
     }
 
-    private void storeSMTTranslation(@NonNull SMTSolver solver, @NonNull Goal goal, @NonNull String problemString) {
+    private void storeSMTTranslation(@NonNull SMTSolver solver, @NonNull Goal goal,
+            @NonNull String problemString) {
         String path = settings.getPathForSMTTranslation();
 
         String fileName = goal.proof().name() + "_" + goal.getTime() + "_" + solver.name() + ".smt";
@@ -559,7 +561,8 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private @NonNull String finalizePath(String path, @NonNull SMTSolver solver, @NonNull Goal goal) {
+    private @NonNull String finalizePath(String path, @NonNull SMTSolver solver,
+            @NonNull Goal goal) {
         Calendar c = Calendar.getInstance();
         String date =
             c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DATE);

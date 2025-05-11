@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -31,7 +32,7 @@ public class MergeRuleFeature implements Feature {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         final Term t = pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {
             return TopRuleAppCost.INSTANCE;

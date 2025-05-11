@@ -20,10 +20,11 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.
@@ -36,9 +37,10 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      */
     @Override
     public TermLabel keepLabel(@NonNull TermLabelState state, @NonNull Services services,
-                               @Nullable PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-                               Object hint, Term tacletTerm,
-                               @NonNull Term newTerm, TermLabel label) {
+            @Nullable PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+            Goal goal,
+            Object hint, Term tacletTerm,
+            @NonNull Term newTerm, TermLabel label) {
         // Maintain label if new Term is a predicate
         if (TruthValueTracingUtil.isPredicate(newTerm.op())
                 || TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())) {
@@ -152,7 +154,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * @param labels The {@link TermLabel}s to search in.
      * @return The found {@link FormulaTermLabel} or {@code null} if not available.
      */
-    public static @Nullable FormulaTermLabel searchFormulaTermLabel(@NonNull ImmutableArray<TermLabel> labels) {
+    public static @Nullable FormulaTermLabel searchFormulaTermLabel(
+            @NonNull ImmutableArray<TermLabel> labels) {
         TermLabel result =
             CollectionUtil.search(labels, element -> element instanceof FormulaTermLabel);
         return (FormulaTermLabel) result;

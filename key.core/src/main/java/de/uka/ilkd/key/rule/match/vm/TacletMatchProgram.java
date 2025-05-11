@@ -25,9 +25,10 @@ import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
+import org.key_project.util.collection.ImmutableArray;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Instances of this class represent programs for matching a term against a given pattern. The
@@ -102,7 +103,8 @@ public class TacletMatchProgram {
      * @param program the list of {@link MatchInstruction} to which the instructions for matching
      *        {@code pattern} are added.
      */
-    private static void createProgram(@NonNull Term pattern, @NonNull ArrayList<MatchInstruction> program) {
+    private static void createProgram(@NonNull Term pattern,
+            @NonNull ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
         final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
@@ -157,7 +159,8 @@ public class TacletMatchProgram {
      * @param services the {@link Services}
      * @return {@code null} if no match was found or the match result
      */
-    public @Nullable MatchConditions match(Term p_toMatch, MatchConditions p_matchCond, Services services) {
+    public @Nullable MatchConditions match(Term p_toMatch, MatchConditions p_matchCond,
+            Services services) {
 
         MatchConditions mc = p_matchCond;
 

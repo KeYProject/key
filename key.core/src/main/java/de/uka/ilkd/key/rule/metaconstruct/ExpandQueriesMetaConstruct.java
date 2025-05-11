@@ -14,8 +14,9 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**

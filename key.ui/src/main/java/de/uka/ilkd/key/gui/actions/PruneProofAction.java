@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**

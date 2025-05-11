@@ -15,10 +15,11 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Term generator that enumerates the subterms or subformulas of a given term. Similarly to
@@ -41,8 +42,9 @@ public abstract class SubtermGenerator implements TermGenerator {
      */
     public static @NonNull TermGenerator leftTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                                    MutableState mState) {
+            public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos,
+                    @NonNull Goal goal,
+                    MutableState mState) {
                 return new LeftIterator(getTermInst(app, pos, goal, mState), mState,
                     goal.proof().getServices());
             }
@@ -55,15 +57,17 @@ public abstract class SubtermGenerator implements TermGenerator {
      */
     public static @NonNull TermGenerator rightTraverse(ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator(cTerm, cond) {
-            public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                                    MutableState mState) {
+            public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos,
+                    @NonNull Goal goal,
+                    MutableState mState) {
                 return new RightIterator(getTermInst(app, pos, goal, mState), mState,
                     goal.proof().getServices());
             }
         };
     }
 
-    protected @Nullable Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected @Nullable Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return completeTerm.toTerm(app, pos, goal, mState);
     }
 

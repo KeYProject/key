@@ -10,9 +10,9 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

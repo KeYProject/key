@@ -12,10 +12,11 @@ import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
@@ -54,8 +55,9 @@ public class FocussedRuleApplicationManager
         this.onlyModifyFocussedFormula = onlyModifyFocussedFormula;
     }
 
-    public FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, @NonNull Goal goal,
-                                          @NonNull PosInOccurrence focussedSubterm) {
+    public FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate,
+            @NonNull Goal goal,
+            @NonNull PosInOccurrence focussedSubterm) {
         this(delegate, goal, goal.getFormulaTagManager().getTagForPos(focussedSubterm.topLevel()),
             focussedSubterm, true);
 
@@ -103,7 +105,8 @@ public class FocussedRuleApplicationManager
         }
     }
 
-    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule, @Nullable PosInOccurrence pos) {
+    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
+            @Nullable PosInOccurrence pos) {
         /*
          * filter the rule applications, only allow applications within the focussed subterm or to
          * other formulas that have been added after creation of the manager (we rely on the fact

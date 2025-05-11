@@ -13,10 +13,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +51,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @param innerLabel the ProgramElementName of the inner label
      */
     public WhileInvariantTransformation(@NonNull ProgramElement root, ProgramElementName outerLabel,
-                                        ProgramElementName innerLabel, ProgramVariable cont, ProgramVariable exc,
-                                        ProgramVariable excParam, ProgramVariable thrownException, ProgramVariable brk,
-                                        ProgramVariable rtrn, ProgramVariable returnExpr,
-                                        LinkedList<BreakToBeReplaced> breakList, @NonNull Services services) {
+            ProgramElementName innerLabel, ProgramVariable cont, ProgramVariable exc,
+            ProgramVariable excParam, ProgramVariable thrownException, ProgramVariable brk,
+            ProgramVariable rtrn, ProgramVariable returnExpr,
+            LinkedList<BreakToBeReplaced> breakList, @NonNull Services services) {
 
         super(root, outerLabel, innerLabel, services);
         this.cont = cont;
@@ -75,7 +75,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @param inst the SVInstantiations if available
      */
     public WhileInvariantTransformation(@NonNull ProgramElement root, SVInstantiations inst,
-                                        @NonNull Services services) {
+            @NonNull Services services) {
         super(root, inst, services);
         this.breakList = new LinkedList<>();
     }

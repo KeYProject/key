@@ -16,11 +16,12 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class UserDefinedSymbols {
     static class NamedComparator implements Comparator<Named> {
@@ -58,7 +59,7 @@ public class UserDefinedSymbols {
     }
 
     private <T extends Named> void addUserDefinedSymbol(T symbol, @NonNull Set<T> set,
-                                                        @NonNull Namespace<T> excludeNamespace) {
+            @NonNull Namespace<T> excludeNamespace) {
         if (!contains(symbol, set)) {
             if (symbol instanceof SchemaVariable
                     || excludeNamespace.lookup(symbol.name()) == null) {
@@ -115,7 +116,7 @@ public class UserDefinedSymbols {
     }
 
     private <T extends Named> void addSymbolsToNamespace(@NonNull Namespace<T> namespace,
-                                                         @NonNull Collection<T> symbols) {
+            @NonNull Collection<T> symbols) {
         for (T symbol : symbols) {
             namespace.addSafely(symbol);
         }

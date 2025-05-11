@@ -5,10 +5,10 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.LRUCache;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 

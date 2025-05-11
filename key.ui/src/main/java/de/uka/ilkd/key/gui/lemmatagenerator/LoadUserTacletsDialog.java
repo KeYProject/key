@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

@@ -24,10 +24,11 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -52,14 +53,14 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * used instead of the initial services form the InitConfig.
      */
     public BlockExecutionPO(InitConfig initConfig, @NonNull BlockContract contract,
-                            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-                            Services services) {
+            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
+            Services services) {
         this(initConfig, contract, symbExecVars, initiatingGoal, context);
         this.environmentServices = services;
     }
 
     public BlockExecutionPO(InitConfig initConfig, @NonNull BlockContract contract,
-                            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context) {
+            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context) {
         super(initConfig,
             ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
@@ -216,7 +217,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
 
     @Override
     protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-                                           ImmutableList<Term> paramTerms, Services services) {
+            ImmutableList<Term> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }

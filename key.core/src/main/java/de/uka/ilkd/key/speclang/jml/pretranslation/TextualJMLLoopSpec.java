@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -41,12 +41,13 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
      * clauses.add(new Entry(clause, ctx)); return this; }
      */
 
-    public @NonNull TextualJMLLoopSpec addClause(ClauseHd clause, @NonNull LabeledParserRuleContext ctx) {
+    public @NonNull TextualJMLLoopSpec addClause(ClauseHd clause,
+            @NonNull LabeledParserRuleContext ctx) {
         return addClause(clause, null, ctx);
     }
 
     public @NonNull TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName,
-                                                 @NonNull LabeledParserRuleContext ctx) {
+            @NonNull LabeledParserRuleContext ctx) {
         if (heapName == null) {
             heapName = HeapLDT.BASE_HEAP_NAME;
         }
@@ -126,7 +127,8 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return getMap(ClauseHd.INVARIANT);
     }
 
-    private @NonNull Map<String, ImmutableList<LabeledParserRuleContext>> getMapInit(@NonNull ClauseHd clause) {
+    private @NonNull Map<String, ImmutableList<LabeledParserRuleContext>> getMapInit(
+            @NonNull ClauseHd clause) {
         Name defaultHeap = HeapLDT.BASE_HEAP_NAME;
         Map<String, ImmutableList<LabeledParserRuleContext>> map = new HashMap<>();
         for (Entry entry : clauses) {
@@ -146,7 +148,8 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return map;
     }
 
-    private @NonNull Map<String, ImmutableList<LabeledParserRuleContext>> getMap(@NonNull ClauseHd clause) {
+    private @NonNull Map<String, ImmutableList<LabeledParserRuleContext>> getMap(
+            @NonNull ClauseHd clause) {
         Name defaultHeap = HeapLDT.BASE_HEAP_NAME;
         Map<String, ImmutableList<LabeledParserRuleContext>> map = new HashMap<>();
         for (Entry entry : clauses) {

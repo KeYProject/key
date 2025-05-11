@@ -16,10 +16,11 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
@@ -47,7 +48,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         private Term rhs1;
         private Term rhs2;
 
-        public ElementaryUpdateWrapper(@NonNull UpdateableOperator op, @NonNull TermServices services) {
+        public ElementaryUpdateWrapper(@NonNull UpdateableOperator op,
+                @NonNull TermServices services) {
             super();
             this.op = op;
             Term identity = services.getTermFactory().createTerm(op);
@@ -85,8 +87,9 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         return new TreeSet<>(Comparator.comparing(Named::name));
     }
 
-    private void collectSingleTerm(final @NonNull TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
-                                   @NonNull Term update, final boolean firstTerm, @NonNull TermServices services) {
+    private void collectSingleTerm(
+            final @NonNull TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
+            @NonNull Term update, final boolean firstTerm, @NonNull TermServices services) {
         ElementaryUpdate eu = (ElementaryUpdate) update.op();
         ElementaryUpdateWrapper euw = null;
         if (!map.containsKey(eu.lhs())) {
@@ -104,7 +107,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     private boolean collect(final @NonNull TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
-                            Term update, final boolean firstTerm, @NonNull TermServices services) {
+            Term update, final boolean firstTerm, @NonNull TermServices services) {
         LinkedList<Term> updates = new LinkedList<>();
         TreeSet<UpdateableOperator> collected = createTree();
         updates.add(update);
@@ -131,7 +134,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     }
 
-    private @Nullable Term simplify(@NonNull Term phi, Term u1, Term u2, @NonNull Term t, @NonNull TermServices services) {
+    private @Nullable Term simplify(@NonNull Term phi, Term u1, Term u2, @NonNull Term t,
+            @NonNull TermServices services) {
 
         TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map = createMap();
 
@@ -155,8 +159,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     @Override
     public @NonNull MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                          @NonNull MatchConditions mc,
-                                          Services services) {
+            @NonNull MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
 
         Term u1Inst = (Term) svInst.getInstantiation(u1);

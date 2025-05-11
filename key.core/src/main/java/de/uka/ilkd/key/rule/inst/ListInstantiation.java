@@ -5,8 +5,9 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 public class ListInstantiation extends InstantiationEntry<ImmutableList<Object>> {
 

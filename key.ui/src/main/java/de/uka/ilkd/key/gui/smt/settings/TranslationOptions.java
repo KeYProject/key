@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

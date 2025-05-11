@@ -15,6 +15,7 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.pp.PosInSequent;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

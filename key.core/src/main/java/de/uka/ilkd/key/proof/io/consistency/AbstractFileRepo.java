@@ -119,7 +119,8 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return true if copy was performed and false if not performed
      * @throws IOException if an I/O error occurs
      */
-    private static boolean copy(@Nullable InputStream source, @Nullable OutputStream target) throws IOException {
+    private static boolean copy(@Nullable InputStream source, @Nullable OutputStream target)
+            throws IOException {
         if (source != null && target != null) {
             byte[] buffer = new byte[1024];
             int read;
@@ -140,7 +141,8 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @param target path of the target file
      * @throws IOException if an I/O error occurs (e.g. user has no permission to write target)
      */
-    protected static void createDirsAndCopy(@NonNull Path source, @NonNull Path target) throws IOException {
+    protected static void createDirsAndCopy(@NonNull Path source, @NonNull Path target)
+            throws IOException {
         Files.createDirectories(target.getParent());
         Files.copy(source, target);
     }
@@ -305,7 +307,8 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @throws FileNotFoundException if the does not file exist, is a directory, or can not be
      *         opened
      */
-    protected abstract @Nullable InputStream getInputStreamInternal(Path p) throws FileNotFoundException;
+    protected abstract @Nullable InputStream getInputStreamInternal(Path p)
+            throws FileNotFoundException;
 
     /**
      * Rewrites the file references inside of .key/.proof files such that the point correctly to the

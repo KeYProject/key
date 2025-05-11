@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**

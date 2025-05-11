@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
 import org.jspecify.annotations.Nullable;
 
 class BreakToBeReplaced {

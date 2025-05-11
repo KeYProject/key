@@ -39,9 +39,10 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPostOrExcPostExceptionVariableResult;
 
+import org.key_project.util.collection.ImmutableList;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * The default implementation of {@link IExecutionOperationContract}.
@@ -147,8 +148,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @param services The {@link Services} to use.
      * @return The found self {@link Term} or {@code null} if not available.
      */
-    protected @Nullable Term searchConstructorSelfDefinition(@NonNull Term term, KeYJavaType staticType,
-                                                             @NonNull Services services) {
+    protected @Nullable Term searchConstructorSelfDefinition(@NonNull Term term,
+            KeYJavaType staticType,
+            @NonNull Services services) {
         if (term.op() == Junctor.NOT && term.sub(0).op() == Equality.EQUALS
                 && term.sub(0).sub(0).op() instanceof LocationVariable
                 && SymbolicExecutionUtil.isNullSort(term.sub(0).sub(1).sort(), services)
@@ -275,8 +277,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @param services The {@link Services}.
      * @return The found result {@link Term} or {@code null} otherwise.
      */
-    protected @Nullable Term searchResultTerm(@NonNull FunctionalOperationContract contract, @NonNull Instantiation inst,
-                                              @NonNull Services services) {
+    protected @Nullable Term searchResultTerm(@NonNull FunctionalOperationContract contract,
+            @NonNull Instantiation inst,
+            @NonNull Services services) {
         Term resultTerm = null;
         if (contract.hasResultVar()) {
             ProgramVariable resultVar =
@@ -299,8 +302,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @param services The {@link Services} to use.
      * @return The found {@link LocationVariable} or {@code null} if not found.
      */
-    protected static @Nullable LocationVariable extractResultVariableFromPostBranch(@NonNull Node node,
-                                                                                    @NonNull Services services) {
+    protected static @Nullable LocationVariable extractResultVariableFromPostBranch(
+            @NonNull Node node,
+            @NonNull Services services) {
         Term postModality = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node,
             node.getAppliedRuleApp().posInOccurrence(), node.child(0));
         postModality = TermBuilder.goBelowUpdates(postModality);

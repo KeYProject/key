@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

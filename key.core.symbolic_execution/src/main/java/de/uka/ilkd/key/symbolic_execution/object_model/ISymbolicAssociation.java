@@ -6,6 +6,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
+
 import org.jspecify.annotations.Nullable;
 
 /**

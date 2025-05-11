@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -31,7 +32,8 @@ public class FocusProjection implements ProjectionToTerm {
     }
 
     @Override
-    public @NonNull Term toTerm(RuleApp app, @NonNull PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public @NonNull Term toTerm(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;

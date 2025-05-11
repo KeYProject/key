@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 
 import de.uka.ilkd.key.rule.BuiltInRule;
+
 import org.jspecify.annotations.Nullable;
 
 

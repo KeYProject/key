@@ -15,10 +15,10 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     @Override
-    public SMTCommandArguments evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
+    public SMTCommandArguments evaluateArguments(@NonNull EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new SMTCommandArguments(), arguments);
     }
@@ -53,7 +54,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     @Override
-    public void execute(@NonNull SMTCommandArguments args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull SMTCommandArguments args)
+            throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
         ImmutableList<Goal> goals;
@@ -68,7 +70,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         }
     }
 
-    private void runSMT(@NonNull SMTCommandArguments args, @NonNull SolverTypeCollection su, @NonNull Goal goal) {
+    private void runSMT(@NonNull SMTCommandArguments args, @NonNull SolverTypeCollection su,
+            @NonNull Goal goal) {
         DefaultSMTSettings settings =
             new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
@@ -97,7 +100,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         }
     }
 
-    private @NonNull SolverTypeCollection computeSolvers(@NonNull String value) throws ScriptException {
+    private @NonNull SolverTypeCollection computeSolvers(@NonNull String value)
+            throws ScriptException {
         String[] parts = value.split(" *, *");
         List<SolverType> types = new ArrayList<>();
         for (String name : parts) {

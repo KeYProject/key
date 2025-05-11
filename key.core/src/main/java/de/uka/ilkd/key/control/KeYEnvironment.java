@@ -27,9 +27,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -87,7 +87,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param proofScript add an optional proof script
      */
     public KeYEnvironment(@NonNull U ui, InitConfig initConfig, @Nullable Proof loadedProof,
-                          @Nullable ProofScript proofScript, @Nullable ReplayResult replayResult) {
+            @Nullable ProofScript proofScript, @Nullable ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;

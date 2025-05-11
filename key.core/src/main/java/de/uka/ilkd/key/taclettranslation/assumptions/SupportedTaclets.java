@@ -11,6 +11,7 @@ import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -69,7 +70,7 @@ public final class SupportedTaclets {
         return newNode;
     }
 
-    public void selectTaclets(String @NonNull ... taclets) {
+    public void selectTaclets(String @NonNull... taclets) {
         for (String taclet : taclets) {
             TreeItem item = tacletNames.get(taclet);
             if (item != null) {
@@ -247,13 +248,14 @@ public final class SupportedTaclets {
         addTaclet(node, taclet, 0);
     }
 
-    private void addTaclet(@NonNull TreeItem node, String @NonNull ... taclets) {
+    private void addTaclet(@NonNull TreeItem node, String @NonNull... taclets) {
         for (String taclet : taclets) {
             addTaclet(node, taclet);
         }
     }
 
-    private void addTaclet(@NonNull TreeItem node, String taclet, boolean checked, int genericCount) {
+    private void addTaclet(@NonNull TreeItem node, String taclet, boolean checked,
+            int genericCount) {
         TreeItem child = new TreeItem(taclet, genericCount);
         if (!tacletNames.containsKey(child.toString())) {
             tacletNames.put(child.toString(), child);

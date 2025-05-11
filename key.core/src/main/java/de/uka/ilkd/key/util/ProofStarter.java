@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -31,8 +33,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
-
-import java.util.Objects;
 
 /**
  * This class encapsulates the registration of a proof for a given problem. It then starts a proof
@@ -255,8 +255,8 @@ public class ProofStarter {
             if (strategy == null) {
                 StrategyFactory factory = profile.getDefaultStrategyFactory();
                 StrategyProperties sp =
-                        Objects.requireNonNull(factory.getSettingsDefinition())
-                                .getDefaultPropertiesFactory().createDefaultStrategyProperties();
+                    Objects.requireNonNull(factory.getSettingsDefinition())
+                            .getDefaultPropertiesFactory().createDefaultStrategyProperties();
                 this.strategy = strategy = factory.create(proof, sp);
             }
 

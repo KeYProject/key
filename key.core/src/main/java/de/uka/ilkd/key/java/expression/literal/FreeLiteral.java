@@ -10,8 +10,9 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.FreeLDT;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 public class FreeLiteral extends Literal {
 

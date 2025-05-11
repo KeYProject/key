@@ -15,6 +15,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -46,7 +47,7 @@ public class ForEachCP implements Feature {
     }
 
     public RuleAppCost computeCost(final RuleApp app, final PosInOccurrence pos, final Goal goal,
-                                   @NonNull MutableState mState) {
+            @NonNull MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
 

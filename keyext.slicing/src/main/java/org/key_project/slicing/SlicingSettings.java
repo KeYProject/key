@@ -8,6 +8,7 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**

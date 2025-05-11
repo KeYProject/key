@@ -12,10 +12,11 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.prover.GoalChooser;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -217,7 +218,7 @@ public class DefaultGoalChooser implements GoalChooser {
     }
 
     protected ImmutableList<Goal> insertNewGoals(@NonNull ImmutableList<Goal> newGoals,
-                                                 ImmutableList<Goal> prevGoalList) {
+            ImmutableList<Goal> prevGoalList) {
 
         for (final Goal g : newGoals) {
             if (proof.openGoals().contains(g)) {

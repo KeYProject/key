@@ -12,9 +12,10 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.key_project.util.collection.ImmutableArray;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This instructions matches the variable below a binder (e.g. a quantifier).
@@ -40,7 +41,7 @@ public class BindVariablesInstruction implements MatchInstruction {
     private interface VariableBinderSubinstruction {
         @Nullable
         MatchConditions match(LogicVariable instantiationCandidate,
-                              MatchConditions matchCond, Services services);
+                MatchConditions matchCond, Services services);
     }
 
     private record LogicVariableBinder(LogicVariable templateVar)
@@ -51,7 +52,7 @@ public class BindVariablesInstruction implements MatchInstruction {
          * or have been assigned to the same abstract name and the sorts are equal.
          */
         public @Nullable MatchConditions match(@NonNull LogicVariable instantiationCandidate,
-                                               @NonNull MatchConditions matchCond, Services services) {
+                @NonNull MatchConditions matchCond, Services services) {
             final RenameTable rt = matchCond.renameTable();
             if (!rt.containsLocally(templateVar) && !rt.containsLocally(instantiationCandidate)) {
                 matchCond = matchCond.addRenaming(templateVar, instantiationCandidate);
@@ -76,7 +77,7 @@ public class BindVariablesInstruction implements MatchInstruction {
         }
 
         public @Nullable MatchConditions match(@NonNull LogicVariable instantiationCandidate,
-                                               @NonNull MatchConditions matchCond, @NonNull Services services) {
+                @NonNull MatchConditions matchCond, @NonNull Services services) {
             final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
                 final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
@@ -102,8 +103,9 @@ public class BindVariablesInstruction implements MatchInstruction {
     }
 
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition, MatchConditions matchConditions,
-                                           Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
+            MatchConditions matchConditions,
+            Services services) {
 
         ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =
             termPosition.getCurrentSubterm().boundVars();

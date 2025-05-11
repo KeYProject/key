@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -25,8 +26,8 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
      */
     @Override
     public boolean mergeLabels(SequentFormula existingSF, Term existingTerm,
-                               @Nullable TermLabel existingLabel, SequentFormula rejectedSF, Term rejectedTerm,
-                               TermLabel rejectedLabel, @NonNull List<TermLabel> mergedLabels) {
+            @Nullable TermLabel existingLabel, SequentFormula rejectedSF, Term rejectedTerm,
+            TermLabel rejectedLabel, @NonNull List<TermLabel> mergedLabels) {
         if (existingLabel != null) {
             FormulaTermLabel fExisting = (FormulaTermLabel) existingLabel;
             FormulaTermLabel fRejected = (FormulaTermLabel) rejectedLabel;

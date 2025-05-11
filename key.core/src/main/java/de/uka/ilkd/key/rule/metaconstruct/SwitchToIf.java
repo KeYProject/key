@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -47,7 +48,7 @@ public class SwitchToIf extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-                                                @NonNull SVInstantiations insts) {
+            @NonNull SVInstantiations insts) {
         Switch sw = (Switch) pe;
 
         VariableNamer varNamer = services.getVariableNamer();
@@ -112,7 +113,8 @@ public class SwitchToIf extends ProgramTransformer {
      * @return an if-statement that performs a null check
      */
 
-    private @NonNull If mkIfNullCheck(@NonNull Services services, @NonNull ProgramVariable var, @Nullable Statement elseBlock) {
+    private @NonNull If mkIfNullCheck(@NonNull Services services, @NonNull ProgramVariable var,
+            @Nullable Statement elseBlock) {
         final New exception = KeYJavaASTFactory.newOperator(
             services.getJavaInfo().getKeYJavaType("java.lang.NullPointerException"));
         Throw t = KeYJavaASTFactory.throwClause(exception);

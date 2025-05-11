@@ -11,9 +11,9 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 
 /**

@@ -22,12 +22,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,8 +101,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param innerLabel the ProgramElementName of the inner label
      * @param services services instance
      */
-    public WhileLoopTransformation(@NonNull ProgramElement root, @Nullable ProgramElementName outerLabel,
-                                   @Nullable ProgramElementName innerLabel, @NonNull Services services) {
+    public WhileLoopTransformation(@NonNull ProgramElement root,
+            @Nullable ProgramElementName outerLabel,
+            @Nullable ProgramElementName innerLabel, @NonNull Services services) {
         super(root, services);
         breakOuterLabel =
             (outerLabel == null ? null : KeYJavaASTFactory.breakStatement(outerLabel));
@@ -119,7 +120,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param inst the SVInstantiations if available
      * @param services services instance
      */
-    public WhileLoopTransformation(@NonNull ProgramElement root, @Nullable SVInstantiations inst, @NonNull Services services) {
+    public WhileLoopTransformation(@NonNull ProgramElement root, @Nullable SVInstantiations inst,
+            @NonNull Services services) {
         super(root, services);
         instantiations = (inst == null ? SVInstantiations.EMPTY_SVINSTANTIATIONS : inst);
         replaceBreakWithNoLabel = 0;
@@ -140,8 +142,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
-    private static Statement @NonNull [] getInnerBlockStatements(@Nullable IForUpdates updates, Statement body,
-                                                                 For remainder, final int updateSize) {
+    private static Statement @NonNull [] getInnerBlockStatements(@Nullable IForUpdates updates,
+            Statement body,
+            For remainder, final int updateSize) {
         Statement[] innerBlockStatements = new Statement[updateSize + 2];
         innerBlockStatements[0] = body;
         if (updates != null) {

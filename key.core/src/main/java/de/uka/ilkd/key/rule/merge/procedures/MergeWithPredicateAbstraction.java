@@ -16,10 +16,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,8 +68,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      *        generated from abstraction predicates.
      */
     public MergeWithPredicateAbstraction(@NonNull Iterable<AbstractionPredicate> predicates,
-                                         Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-                                         Map<ProgramVariable, AbstractDomainElement> userChoices) {
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+            Map<ProgramVariable, AbstractDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
                 this.predicates.put(pred.getArgSort(), new ArrayList<>());
@@ -94,7 +94,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     }
 
     @Override
-    public @Nullable AbstractDomainLattice getAbstractDomainForSort(final Sort s, final Services services) {
+    public @Nullable AbstractDomainLattice getAbstractDomainForSort(final Sort s,
+            final Services services) {
         return instantiateAbstractDomain(s, predicates.get(s), latticeType, services);
     }
 
@@ -109,9 +110,9 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * @return The corresponding {@link AbstractDomainLattice}.
      */
     public static AbstractDomainLattice instantiateAbstractDomain(final Sort s,
-                                                                  final @Nullable List<AbstractionPredicate> applicablePredicates,
-                                                                  @NonNull Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-                                                                  final Services services) {
+            final @Nullable List<AbstractionPredicate> applicablePredicates,
+            @NonNull Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+            final Services services) {
 
         if (applicablePredicates == null) {
             // A returned null value indicates to

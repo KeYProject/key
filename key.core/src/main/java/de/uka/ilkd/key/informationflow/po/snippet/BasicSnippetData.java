@@ -22,11 +22,12 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -136,8 +137,9 @@ class BasicSnippetData {
             contract.getExc(), heap);
     }
 
-    BasicSnippetData(@NonNull LoopSpecification invariant, ExecutionContext context, @NonNull Term guardTerm,
-                     @NonNull Services services) {
+    BasicSnippetData(@NonNull LoopSpecification invariant, ExecutionContext context,
+            @NonNull Term guardTerm,
+            @NonNull Services services) {
         this.hasMby = false;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -201,7 +203,8 @@ class BasicSnippetData {
     }
 
 
-    BasicSnippetData(@NonNull BlockContract contract, ExecutionContext context, @NonNull Services services) {
+    BasicSnippetData(@NonNull BlockContract contract, ExecutionContext context,
+            @NonNull Services services) {
         this.hasMby = false; // Mby of block contracts is not further considered
         this.services = services;
         this.tb = services.getTermBuilder();

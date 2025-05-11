@@ -164,11 +164,13 @@ public class DockingHelper {
      * @return a {@link DefaultSingleCDockable}
      * @see #createSingleDock(TabPanel)
      */
-    public static @NonNull SingleCDockable createSingleDock(String title, @NonNull JComponent component) {
+    public static @NonNull SingleCDockable createSingleDock(String title,
+            @NonNull JComponent component) {
         return createSingleDock(title, component, component.getClass().getName());
     }
 
-    public static @NonNull SingleCDockable createSingleDock(String title, JComponent component, @NonNull String id) {
+    public static @NonNull SingleCDockable createSingleDock(String title, JComponent component,
+            @NonNull String id) {
         return new DefaultSingleCDockable(id, title, component);
     }
 

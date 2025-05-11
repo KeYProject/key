@@ -6,8 +6,9 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 public interface IObserverFunction extends org.key_project.logic.op.SortedOperator, Operator {
 

@@ -34,8 +34,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * match conditions are returned, otherwise <tt>null</tt>. Such an addition can fail, e.g. if
      * already a pair <tt>(this,x)</tt> exists where <tt>x!=pe</tt>
      */
-    protected @Nullable MatchConditions addInstantiation(@NonNull ProgramElement pe, @NonNull MatchConditions matchCond,
-                                                         @NonNull Services services) {
+    protected @Nullable MatchConditions addInstantiation(@NonNull ProgramElement pe,
+            @NonNull MatchConditions matchCond,
+            @NonNull Services services) {
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
         final Object inMap = instantiations.getInstantiation(op);
@@ -68,8 +69,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(Operator instantiationCandidate, @NonNull MatchConditions matchConditions,
-                                           @NonNull Services services) {
+    public @Nullable MatchConditions match(Operator instantiationCandidate,
+            @NonNull MatchConditions matchConditions,
+            @NonNull Services services) {
         if (instantiationCandidate instanceof ProgramElement) {
             return match((ProgramElement) instantiationCandidate, matchConditions, services);
         }
@@ -80,8 +82,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull Term instantiationCandidate, @NonNull MatchConditions matchCond,
-                                           @NonNull Services services) {
+    public @Nullable MatchConditions match(@NonNull Term instantiationCandidate,
+            @NonNull MatchConditions matchCond,
+            @NonNull Services services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate)) {
@@ -95,8 +98,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull ProgramElement instantiationCandidate, @NonNull MatchConditions matchCond,
-                                           @NonNull Services services) {
+    public @Nullable MatchConditions match(@NonNull ProgramElement instantiationCandidate,
+            @NonNull MatchConditions matchCond,
+            @NonNull Services services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate,
@@ -112,8 +116,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition, @NonNull MatchConditions mc,
-                                           @NonNull Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
+            @NonNull MatchConditions mc,
+            @NonNull Services services) {
         MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();

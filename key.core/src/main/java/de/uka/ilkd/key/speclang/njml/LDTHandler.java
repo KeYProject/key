@@ -15,9 +15,9 @@ import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperatorHandle
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public abstract class LDTHandler implements JMLOperatorHandler {
@@ -50,7 +50,8 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         return jop;
     }
 
-    public @Nullable SLExpression build(JMLOperator jop, @NonNull SLExpression left, @NonNull SLExpression right)
+    public @Nullable SLExpression build(JMLOperator jop, @NonNull SLExpression left,
+            @NonNull SLExpression right)
             throws SLTranslationException {
         if (OverloadedOperatorHandler.UNARY_OPERATORS.contains(jop)) {
             return buildUnary(jop, left);

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui.plugins.caching.settings;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -9,8 +9,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

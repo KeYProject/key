@@ -5,8 +5,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A JML field declaration (ghost or model) in textual form.
@@ -17,7 +18,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
 
     public TextualJMLFieldDecl(@NonNull ImmutableList<JMLModifier> modifiers,
-                               JmlParser.@NonNull Field_declarationContext decl) {
+            JmlParser.@NonNull Field_declarationContext decl) {
         super(modifiers);
         assert decl != null;
         this.decl = decl;

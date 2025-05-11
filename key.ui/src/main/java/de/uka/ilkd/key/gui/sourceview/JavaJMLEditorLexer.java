@@ -16,6 +16,7 @@ import javax.swing.text.*;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
+
 import org.jspecify.annotations.NonNull;
 
 /**

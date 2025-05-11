@@ -5,8 +5,9 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  *

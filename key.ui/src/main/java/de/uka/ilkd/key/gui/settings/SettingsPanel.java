@@ -69,7 +69,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param info
      * @param components
      */
-    protected void addRowWithHelp(@Nullable String info, JComponent @NonNull ... components) {
+    protected void addRowWithHelp(@Nullable String info, JComponent @NonNull... components) {
         boolean hasInfo = info != null && !info.isEmpty();
         for (JComponent component : components) {
             component.setAlignmentX(LEFT_ALIGNMENT);
@@ -92,7 +92,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param <T>
      * @return
      */
-    protected <T> @NonNull JComboBox<T> createSelection(T @NonNull [] elements, @Nullable Validator<T> validator) {
+    protected <T> @NonNull JComboBox<T> createSelection(T @NonNull [] elements,
+            @Nullable Validator<T> validator) {
         JComboBox<T> comboBox = new JComboBox<>(elements);
         comboBox.addActionListener(e -> {
             try {
@@ -117,7 +118,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return
      */
     protected @NonNull JCheckBox addCheckBox(String title, String info, boolean value,
-                                             final Validator<Boolean> validator) {
+            final Validator<Boolean> validator) {
         JCheckBox checkBox = createCheckBox(title, value, validator);
         addRowWithHelp(info, new JLabel(), checkBox);
         return checkBox;
@@ -132,8 +133,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param validator
      * @return
      */
-    protected @NonNull JTextField addFileChooserPanel(String title, String file, String info, boolean isSave,
-                                                      final @Nullable Validator<String> validator) {
+    protected @NonNull JTextField addFileChooserPanel(String title, String file, String info,
+            boolean isSave,
+            final @Nullable Validator<String> validator) {
         JTextField textField = new JTextField(file);
         textField.addActionListener(e -> {
             try {
@@ -190,8 +192,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param <T> the type of the items
      * @return the combo box
      */
-    protected <T> @NonNull JComboBox<T> addComboBox(@Nullable String title, @Nullable String info, int selectionIndex,
-                                                    @Nullable Validator<T> validator, T @NonNull ... items) {
+    protected <T> @NonNull JComboBox<T> addComboBox(@Nullable String title, @Nullable String info,
+            int selectionIndex,
+            @Nullable Validator<T> validator, T @NonNull... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {
@@ -239,7 +242,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
     protected @NonNull JTextArea addTextAreaWithoutScroll(String title, String text, String info,
-                                                          final Validator<String> validator) {
+            final Validator<String> validator) {
         JTextArea field = createTextAreaWithoutScroll(text, validator);
         addTitledComponent(title, field, info);
         return field;
@@ -254,7 +257,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return
      */
     protected @NonNull JTextField addTextField(String title, String text, String info,
-                                               final Validator<String> validator) {
+            final Validator<String> validator) {
         JTextField field = createTextField(text, validator);
         addTitledComponent(title, field, info);
         return field;
@@ -262,7 +265,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
 
 
     protected @NonNull JTextField addTextField(String title, String text, String info,
-                                               final Validator<String> validator, JComponent additionalActions) {
+            final Validator<String> validator, JComponent additionalActions) {
         JTextField field = createTextField(text, validator);
         JLabel label = new JLabel(title);
         label.setLabelFor(field);
@@ -295,8 +298,10 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return the created JSpinner
      * @param <T> the class of the minimum value
      */
-    protected <T extends Number & Comparable<T>> @NonNull JSpinner addNumberField(String title, @NonNull T min,
-                                                                                  Comparable<T> max, @NonNull Number step, String info, final Validator<Number> validator) {
+    protected <T extends Number & Comparable<T>> @NonNull JSpinner addNumberField(String title,
+            @NonNull T min,
+            Comparable<T> max, @NonNull Number step, String info,
+            final Validator<Number> validator) {
         JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
         return field;
@@ -306,7 +311,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addRadioButtons(heading, Arrays.asList(alternatives), description);
     }
 
-    protected void addRadioButtons(String title, @NonNull List<?> alternatives, String description) {
+    protected void addRadioButtons(String title, @NonNull List<?> alternatives,
+            String description) {
         JPanel items = new JPanel(new GridLayout(alternatives.size(), 1));
         ButtonGroup bg = new ButtonGroup();
         for (Object alt : alternatives) {

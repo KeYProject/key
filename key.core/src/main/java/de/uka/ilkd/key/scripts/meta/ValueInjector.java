@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -60,7 +61,7 @@ public class ValueInjector {
      * @throws ConversionException an converter could not translate the given value in arguments
      */
     public static <T> @NonNull T injection(ProofScriptCommand<T> command, @NonNull T obj,
-                                           @NonNull Map<String, Object> arguments) throws ArgumentRequiredException,
+            @NonNull Map<String, Object> arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
     }
@@ -121,7 +122,8 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> @NonNull T inject(ProofScriptCommand<T> command, @NonNull T obj, @NonNull Map<String, Object> arguments)
+    public <T> @NonNull T inject(ProofScriptCommand<T> command, @NonNull T obj,
+            @NonNull Map<String, Object> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
         List<ProofScriptArgument<T>> meta =
@@ -156,7 +158,8 @@ public class ValueInjector {
     }
 
     @SuppressWarnings("unchecked")
-    private @NonNull Map<String, Object> getStringMap(@NonNull Object obj, @NonNull ProofScriptArgument<?> vararg)
+    private @NonNull Map<String, Object> getStringMap(@NonNull Object obj,
+            @NonNull ProofScriptArgument<?> vararg)
             throws InjectionReflectionException {
         try {
             Map<String, Object> map = (Map<String, Object>) vararg.getField().get(obj);
@@ -171,7 +174,8 @@ public class ValueInjector {
         }
     }
 
-    private void injectIntoField(@NonNull ProofScriptArgument<?> meta, @NonNull Map<String, Object> args, Object obj)
+    private void injectIntoField(@NonNull ProofScriptArgument<?> meta,
+            @NonNull Map<String, Object> args, Object obj)
             throws InjectionReflectionException, ArgumentRequiredException, ConversionException,
             NoSpecifiedConverterException {
         final var val = args.get(meta.getName());

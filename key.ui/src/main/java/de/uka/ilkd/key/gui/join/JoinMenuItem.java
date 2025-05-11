@@ -16,8 +16,9 @@ import de.uka.ilkd.key.proof.join.JoinProcessor.Listener;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The menu item for the "delayed-cut" join rule.
@@ -30,7 +31,7 @@ public class JoinMenuItem extends JMenuItem {
     private static final long serialVersionUID = -2602116358650063634L;
 
     public JoinMenuItem(final @NonNull List<ProspectivePartner> partner, final @NonNull Proof proof,
-                        final @NonNull KeYMediator mediator) {
+            final @NonNull KeYMediator mediator) {
         super();
 
         this.setText(toString());
@@ -52,7 +53,8 @@ public class JoinMenuItem extends JMenuItem {
         });
     }
 
-    private void start(ProspectivePartner partner, @NonNull Proof proof, final @NonNull KeYMediator mediator) {
+    private void start(ProspectivePartner partner, @NonNull Proof proof,
+            final @NonNull KeYMediator mediator) {
 
 
         JoinProcessor processor = new JoinProcessor(partner, proof);

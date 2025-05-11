@@ -6,10 +6,11 @@ package de.uka.ilkd.key.prover.impl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class for managing a list of goals on which rules are applied. The class provides methods
@@ -54,7 +55,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
      * return ImmSLList.<Goal>nil(); return p_list; }
      */
     protected ImmutableList<Goal> insertNewGoals(@NonNull ImmutableList<Goal> newGoals,
-                                                 ImmutableList<Goal> prevGoalList) {
+            ImmutableList<Goal> prevGoalList) {
 
         for (final Goal g : newGoals) {
             if (proof.openGoals().contains(g)) {

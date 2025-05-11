@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -40,8 +41,9 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, @NonNull TermLabelState termLabelState,
-                                    @NonNull SequentChangeInfo currentSequent, @NonNull PosInOccurrence posOfFind, @NonNull MatchConditions matchCond,
-                                    @NonNull Goal goal, @NonNull RuleApp ruleApp, @NonNull Services services) {
+            @NonNull SequentChangeInfo currentSequent, @NonNull PosInOccurrence posOfFind,
+            @NonNull MatchConditions matchCond,
+            @NonNull Goal goal, @NonNull RuleApp ruleApp, @NonNull Services services) {
         if (gt instanceof AntecSuccTacletGoalTemplate) {
             final Sequent replWith = ((AntecSuccTacletGoalTemplate) gt).replaceWith();
             replaceAtPos(replWith.antecedent(), termLabelState, currentSequent, posOfFind,
@@ -78,8 +80,10 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
      */
     @Override
     protected void applyAdd(@NonNull Sequent add, @NonNull TermLabelState termLabelState,
-                            @NonNull SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, @NonNull PosInOccurrence posOfFind,
-                            @NonNull MatchConditions matchCond, @NonNull Goal goal, @NonNull RuleApp ruleApp, @NonNull Services services) {
+            @NonNull SequentChangeInfo currentSequent, PosInOccurrence whereToAdd,
+            @NonNull PosInOccurrence posOfFind,
+            @NonNull MatchConditions matchCond, @NonNull Goal goal, @NonNull RuleApp ruleApp,
+            @NonNull Services services) {
         addToAntec(add.antecedent(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, whereToAdd,
             posOfFind, matchCond, goal, ruleApp, services);

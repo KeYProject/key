@@ -10,8 +10,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.Function;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -24,7 +25,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     private final @NonNull Function Z;
 
     private AtomsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
-                                    @NonNull IntegerLDT numbers) {
+            @NonNull IntegerLDT numbers) {
         super(numbers);
         this.left = left;
         this.right = right;
@@ -33,7 +34,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
 
 
     public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
-                                          @NonNull IntegerLDT numbers) {
+            @NonNull IntegerLDT numbers) {
         return new AtomsSmallerThanFeature(left, right, numbers);
     }
 
@@ -46,7 +47,8 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus, @NonNull Goal goal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus,
+            @NonNull Goal goal) {
         if (t1.op() == Z) {
             if (t2.op() != Z) {
                 return true;

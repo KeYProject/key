@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Simple class to measure the running time of various 'activities'.

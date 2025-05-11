@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+
 import org.jspecify.annotations.NonNull;
 
 public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
@@ -18,11 +19,12 @@ public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
     }
 
     public static @NonNull ProjectionToTerm create(ProjectionToTerm leftCoefficient,
-                                                   ProjectionToTerm polynomial) {
+            ProjectionToTerm polynomial) {
         return new MonomialColumnOp(leftCoefficient, polynomial);
     }
 
-    protected @NonNull Term divide(@NonNull Monomial numerator, @NonNull BigInteger denominator, @NonNull Services services) {
+    protected @NonNull Term divide(@NonNull Monomial numerator, @NonNull BigInteger denominator,
+            @NonNull Services services) {
         final BigInteger newRightCoeff =
             LexPathOrdering.divide(numerator.getCoefficient(), denominator);
         return numerator.setCoefficient(newRightCoeff).toTerm(services);

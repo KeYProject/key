@@ -9,8 +9,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.Nullable;
 
 public class ContainsLabelNameFeature extends BinaryFeature {
     private final Name labelName;
@@ -20,7 +21,8 @@ public class ContainsLabelNameFeature extends BinaryFeature {
     }
 
     @Override
-    protected boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return pos != null && pos.subTerm().getLabel(labelName) != null;
     }
 }

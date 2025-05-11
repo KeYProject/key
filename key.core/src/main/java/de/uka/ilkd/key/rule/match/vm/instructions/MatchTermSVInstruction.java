@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -21,13 +22,15 @@ public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermS
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull Term subst, @NonNull MatchConditions mc, @NonNull Services services) {
+    public @Nullable MatchConditions match(@NonNull Term subst, @NonNull MatchConditions mc,
+            @NonNull Services services) {
         return addInstantiation(subst, mc, services);
     }
 
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition, @NonNull MatchConditions mc,
-                                           @NonNull Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
+            @NonNull MatchConditions mc,
+            @NonNull Services services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();

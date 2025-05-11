@@ -7,8 +7,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**

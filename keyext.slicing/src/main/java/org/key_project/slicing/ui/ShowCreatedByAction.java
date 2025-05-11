@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
+
 import org.jspecify.annotations.NonNull;
 
 /**

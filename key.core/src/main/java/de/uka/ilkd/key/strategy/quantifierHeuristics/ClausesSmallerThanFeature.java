@@ -14,6 +14,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -38,7 +39,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
     }
 
     public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
-                                          IntegerLDT numbers) {
+            IntegerLDT numbers) {
         return new ClausesSmallerThanFeature(left, right, numbers);
     }
 
@@ -58,7 +59,8 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, @NonNull PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, @NonNull PosInOccurrence focus,
+            Goal goal) {
 
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);

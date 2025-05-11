@@ -289,9 +289,9 @@ public final class StrategyProperties extends Properties {
      * @param aliasChecks Do alias checks?
      */
     public static void setDefaultStrategyProperties(@NonNull StrategyProperties sp,
-                                                    boolean quantifierInstantiationWithSplitting, boolean methodTreatmentContract,
-                                                    boolean loopTreatmentInvariant, boolean blockTreatmentContract,
-                                                    boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
+            boolean quantifierInstantiationWithSplitting, boolean methodTreatmentContract,
+            boolean loopTreatmentInvariant, boolean blockTreatmentContract,
+            boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
         // TODO (DS, 2017-05-11): Would be great to also use the loop scope
         // invariant for the SED. For this, one would
         // however have to change the SED's

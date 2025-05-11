@@ -12,6 +12,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
@@ -36,7 +37,8 @@ public abstract class MainWindowAction extends KeyAction {
         KeyStrokeManager.registerAction(this);
     }
 
-    protected MainWindowAction(@NonNull MainWindow mainWindow, boolean onlyActiveWhenProofAvailable) {
+    protected MainWindowAction(@NonNull MainWindow mainWindow,
+            boolean onlyActiveWhenProofAvailable) {
         this(mainWindow);
         if (onlyActiveWhenProofAvailable) {
             LISTENER.addAction(this);

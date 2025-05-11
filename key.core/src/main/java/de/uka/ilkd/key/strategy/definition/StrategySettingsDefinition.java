@@ -10,8 +10,9 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -204,10 +205,10 @@ public class StrategySettingsDefinition {
      * @param properties Defines the controls to edit {@link StrategyProperties}.
      */
     public StrategySettingsDefinition(boolean showMaxRuleApplications,
-                                      String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
-                                      @NonNull IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
-                                      ArrayList<StrategySettingEntry> furtherDefaults,
-                                      AbstractStrategyPropertyDefinition... properties) {
+            String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
+            @NonNull IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
+            ArrayList<StrategySettingEntry> furtherDefaults,
+            AbstractStrategyPropertyDefinition... properties) {
         assert defaultPropertiesFactory != null;
         this.showMaxRuleApplications = showMaxRuleApplications;
         this.maxRuleApplicationsLabel = maxRuleApplicationsLabel;

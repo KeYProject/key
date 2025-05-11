@@ -8,8 +8,9 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.java.IOUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class AutoSave extends MainWindowAction {
     private static final long serialVersionUID = -2598146925208531491L;

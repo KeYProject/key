@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.meta.Option;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -29,7 +30,8 @@ public class SetEchoCommand extends AbstractCommand<SetEchoCommand.Parameters> {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args, @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         state.setEchoOn("on".equalsIgnoreCase(args.command));
     }

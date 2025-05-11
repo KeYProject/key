@@ -17,9 +17,10 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -109,7 +110,8 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param tac the taclet top apply (either hide_left or hide_right)
      * @param antec whether the formula is in the antecedent
      */
-    private void makeTacletApp(@NonNull Goal g, @NonNull SequentFormula toHide, @NonNull Taclet tac, boolean antec) {
+    private void makeTacletApp(@NonNull Goal g, @NonNull SequentFormula toHide, @NonNull Taclet tac,
+            boolean antec) {
 
         // hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();

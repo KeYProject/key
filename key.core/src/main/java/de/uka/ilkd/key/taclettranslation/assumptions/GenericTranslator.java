@@ -18,14 +18,15 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class GenericTranslator {
     private final VariablePool pool;
@@ -39,8 +40,9 @@ class GenericTranslator {
     /**
      * Translates generic variables.
      */
-    public @NonNull Collection<Term> translate(@NonNull Term term, @NonNull ImmutableSet<Sort> sorts, Taclet t,
-                                               @NonNull TacletConditions conditions, Services serv, int maxGeneric)
+    public @NonNull Collection<Term> translate(@NonNull Term term,
+            @NonNull ImmutableSet<Sort> sorts, Taclet t,
+            @NonNull TacletConditions conditions, Services serv, int maxGeneric)
             throws IllegalTacletException {
         this.services = serv;
 
@@ -86,7 +88,8 @@ class GenericTranslator {
      *         <code>instantiation</code> is of type {PrimitiveSort}.
      */
 
-    private @Nullable Term instantiateGeneric(@NonNull Term term, GenericSort generic, @NonNull Sort instantiation, Taclet t)
+    private @Nullable Term instantiateGeneric(@NonNull Term term, GenericSort generic,
+            @NonNull Sort instantiation, Taclet t)
             throws IllegalArgumentException, IllegalTacletException {
         Term[] subTerms = new Term[term.arity()];
         ImmutableArray<QuantifiableVariable> variables = term.boundVars();
@@ -195,7 +198,8 @@ class GenericTranslator {
      * @return <code>true</code> if <code>generic</code> can be instantiated with <code>inst</code>,
      *         otherwise <code>false</code>
      */
-    private boolean doInstantiation(GenericSort generic, Sort inst, @NonNull TacletConditions conditions) {
+    private boolean doInstantiation(GenericSort generic, Sort inst,
+            @NonNull TacletConditions conditions) {
 
         return !((inst instanceof GenericSort) || (inst.equals(JavaDLTheory.ANY))
                 || (conditions.containsIsReferenceCondition(generic) > 0
@@ -217,8 +221,10 @@ class GenericTranslator {
      *         generic variable the original term is returned.
      * @throws IllegalTacletException
      */
-    private @Nullable ImmutableList<Term> instantiateGeneric(Term term, @NonNull Set<GenericSort> genericSorts,
-                                                             @NonNull ImmutableSet<Sort> instSorts, Taclet t, @NonNull TacletConditions conditions, int maxGeneric)
+    private @Nullable ImmutableList<Term> instantiateGeneric(Term term,
+            @NonNull Set<GenericSort> genericSorts,
+            @NonNull ImmutableSet<Sort> instSorts, Taclet t, @NonNull TacletConditions conditions,
+            int maxGeneric)
             throws IllegalTacletException {
         ImmutableList<Term> instantiatedTerms = ImmutableSLList.nil();
         if (maxGeneric < genericSorts.size()) {

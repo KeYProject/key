@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -21,7 +22,7 @@ public class AgeFeature implements Feature {
     private AgeFeature() {}
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         return NumberRuleAppCost.create(goal.getTime());
         // return LongRuleAppCost.create ( goal.getTime() / goal.sequent ().size () );
         // return LongRuleAppCost.create ( (long)Math.sqrt ( goal.getTime () ) );

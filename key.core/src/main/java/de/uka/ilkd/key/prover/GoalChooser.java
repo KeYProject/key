@@ -7,8 +7,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface to be implemented by classes in order to customize the goal selection strategy of the

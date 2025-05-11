@@ -15,6 +15,7 @@ import javax.swing.event.AncestorListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

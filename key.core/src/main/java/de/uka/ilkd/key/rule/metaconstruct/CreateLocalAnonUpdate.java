@@ -13,10 +13,11 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Expects a loop body and creates the anonymizing update
@@ -32,7 +33,8 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public @Nullable Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
+    public @Nullable Term transform(@NonNull Term term, SVInstantiations svInst,
+            Services services) {
         final Term target = term.sub(0);
 
         // the target term should have a Java block
@@ -52,8 +54,9 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         return createLocalAnonUpdate(localOuts, services);
     }
 
-    private static @NonNull Term createLocalAnonUpdate(@NonNull ImmutableSet<LocationVariable> localOuts,
-                                                       @NonNull Services services) {
+    private static @NonNull Term createLocalAnonUpdate(
+            @NonNull ImmutableSet<LocationVariable> localOuts,
+            @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Term anonUpdate = tb.skip();
@@ -67,7 +70,8 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         return anonUpdate;
     }
 
-    private static @NonNull JFunction anonConstForPV(@NonNull ProgramVariable pv, @NonNull Services services) {
+    private static @NonNull JFunction anonConstForPV(@NonNull ProgramVariable pv,
+            @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
         final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);

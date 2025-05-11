@@ -4,6 +4,7 @@
  * EnvInput (provides a proof environment) and ProofOblInput (provides one or many
  * sequents whose validity is to be proven).
  */
-@NullMarked package de.uka.ilkd.key.proof.init;
+@NullMarked
+package de.uka.ilkd.key.proof.init;
 
 import org.jspecify.annotations.NullMarked;

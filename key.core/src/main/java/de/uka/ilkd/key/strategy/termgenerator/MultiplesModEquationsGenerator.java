@@ -21,9 +21,10 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Try to rewrite a monomial (term) <code>source</code> so that it becomes a multiple of another
@@ -54,7 +55,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
     }
 
     public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                            MutableState mState) {
+            MutableState mState) {
         final Services services = goal.proof().getServices();
 
         final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal, mState), services);
@@ -84,8 +85,9 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * <p>
      * This method will change the object <code>cofactorPolys</code>.
      */
-    private @NonNull ImmutableList<Term> computeMultiples(@NonNull Monomial sourceM, Monomial targetM,
-                                                          @NonNull List<CofactorPolynomial> cofactorPolys, @NonNull Services services) {
+    private @NonNull ImmutableList<Term> computeMultiples(@NonNull Monomial sourceM,
+            Monomial targetM,
+            @NonNull List<CofactorPolynomial> cofactorPolys, @NonNull Services services) {
         ImmutableList<Term> res = ImmutableSLList.nil();
 
         final List<CofactorItem> cofactorMonos = new ArrayList<>();
@@ -118,8 +120,9 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return res;
     }
 
-    private @NonNull ImmutableList<Term> addRes(@NonNull CofactorMonomial newMono, @NonNull Monomial sourceM,
-                                                @NonNull ImmutableList<Term> res, @NonNull Services services) {
+    private @NonNull ImmutableList<Term> addRes(@NonNull CofactorMonomial newMono,
+            @NonNull Monomial sourceM,
+            @NonNull ImmutableList<Term> res, @NonNull Services services) {
         final Monomial mono = newMono.mono;
         final Polynomial cofactor = newMono.cofactor;
 
@@ -141,7 +144,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * @return a list of polynomials, stored in objects of <code>CofactorPolynomial</code>. The
      *         initial cofactor is set to zero.
      */
-    private @NonNull List<CofactorPolynomial> extractPolys(@NonNull Goal goal, @NonNull Services services) {
+    private @NonNull List<CofactorPolynomial> extractPolys(@NonNull Goal goal,
+            @NonNull Services services) {
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
         final List<CofactorPolynomial> res = new ArrayList<>();
@@ -195,7 +199,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
          * Add <code>coeff</code> times <code>mono</code> to this polynomial, adjusting the cofactor
          * accordingly
          */
-        public @NonNull CofactorPolynomial add(@NonNull CofactorMonomial mono, @NonNull Monomial coeff) {
+        public @NonNull CofactorPolynomial add(@NonNull CofactorMonomial mono,
+                @NonNull Monomial coeff) {
             return new CofactorPolynomial(poly.add(mono.mono.multiply(coeff)),
                 cofactor.add(mono.cofactor.multiply(coeff)));
         }

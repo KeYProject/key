@@ -10,10 +10,11 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -38,8 +39,9 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // constructors
     // -------------------------------------------------------------------------
 
-    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, @Nullable PosInOccurrence pio, RuleAppCost cost,
-                                    @NonNull Goal goal) {
+    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, @Nullable PosInOccurrence pio,
+            RuleAppCost cost,
+            @NonNull Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
         positionTag = pio == null ? null : goal.getFormulaTagManager().getTagForPos(pio.topLevel());
@@ -96,7 +98,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static @NonNull RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
-                                                        @NonNull Goal goal) {
+            @NonNull Goal goal) {
         final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
         return new BuiltInRuleAppContainer(bir, pio, cost, goal);
     }

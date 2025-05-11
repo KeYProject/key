@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.notification;
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;
+
 import org.jspecify.annotations.NonNull;
 
 /**

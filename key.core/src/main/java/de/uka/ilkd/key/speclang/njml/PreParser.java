@@ -69,7 +69,8 @@ public class PreParser {
      * Parses a JML constructs which occurs inside methods (mostly JML statements) and returns a
      * parse tree.
      */
-    public @NonNull ImmutableList<TextualJMLConstruct> parseMethodLevel(@NonNull PositionedString positionedString) {
+    public @NonNull ImmutableList<TextualJMLConstruct> parseMethodLevel(
+            @NonNull PositionedString positionedString) {
         return parseMethodLevel(JmlFacade.createLexer(positionedString));
     }
 
@@ -92,8 +93,9 @@ public class PreParser {
     /**
      * Parse and interpret class level comments.
      */
-    public @NonNull ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull String concatenatedComment,
-                                                                       @Nullable URI fileName, @NonNull Position pos) {
+    public @NonNull ImmutableList<TextualJMLConstruct> parseClassLevel(
+            @NonNull String concatenatedComment,
+            @Nullable URI fileName, @NonNull Position pos) {
         return parseClassLevel(
             new PositionedString(concatenatedComment, new Location(fileName, pos)));
     }
@@ -101,7 +103,8 @@ public class PreParser {
     /**
      * Parse and interpret class level comments.
      */
-    private @NonNull ImmutableList<TextualJMLConstruct> parseClassLevel(@NonNull PositionedString positionedString) {
+    private @NonNull ImmutableList<TextualJMLConstruct> parseClassLevel(
+            @NonNull PositionedString positionedString) {
         JmlLexer lexer = JmlFacade.createLexer(positionedString);
         return parseClassLevel(lexer);
     }
@@ -110,7 +113,7 @@ public class PreParser {
      * Parse and interpret the given string as a method level construct.
      */
     public ImmutableList<TextualJMLConstruct> parseMethodLevel(@NonNull String concatenatedComment,
-                                                               @Nullable URI fileName, @NonNull Position position) {
+            @Nullable URI fileName, @NonNull Position position) {
         return parseMethodLevel(
             new PositionedString(concatenatedComment, new Location(fileName, position)));
     }

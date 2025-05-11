@@ -18,6 +18,7 @@ import javax.swing.table.TableRowSorter;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -66,7 +67,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
             @Override
             public @NonNull Component getTableCellRendererComponent(JTable table, Object value,
-                                                                    boolean isSelected, boolean hasFocus, int row, int column) {
+                    boolean isSelected, boolean hasFocus, int row, int column) {
                 Color c = (Color) value;
                 String s = ColorSettings.toHex(c);
                 JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, s, isSelected,
@@ -215,8 +216,9 @@ class HexColorCellEditor extends DefaultCellEditor {
     }
 
     @Override
-    public @NonNull Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                          int row, int column) {
+    public @NonNull Component getTableCellEditorComponent(JTable table, Object value,
+            boolean isSelected,
+            int row, int column) {
         Component txt = super.getTableCellEditorComponent(table, ColorSettings.toHex((Color) value),
             isSelected, row, column);
         Color c = (Color) value;

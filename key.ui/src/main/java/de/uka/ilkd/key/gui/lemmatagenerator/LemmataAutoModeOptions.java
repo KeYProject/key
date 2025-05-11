@@ -86,7 +86,8 @@ public class LemmataAutoModeOptions {
         // valid.
     }
 
-    public LemmataAutoModeOptions(@NonNull CommandLine cl, String internalVersion, String homePath) {
+    public LemmataAutoModeOptions(@NonNull CommandLine cl, String internalVersion,
+            String homePath) {
         this.internalVersion = internalVersion;
 
         if (cl.isSet(Main.JUSTIFY_RULES)) {

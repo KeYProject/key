@@ -19,10 +19,10 @@ import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
@@ -56,7 +56,8 @@ public class ProveRulesTest {
     }
 
 
-    public void loadTacletProof(String tacletName, @NonNull Taclet taclet, @NonNull File proofFile) throws Exception {
+    public void loadTacletProof(String tacletName, @NonNull Taclet taclet, @NonNull File proofFile)
+            throws Exception {
         assertNotNull(proofFile,
             "Taclet " + tacletName + " was annoted with \\lemma but no taclet proof was found.");
         assertNotNull(taclet, "Proof file " + proofFile

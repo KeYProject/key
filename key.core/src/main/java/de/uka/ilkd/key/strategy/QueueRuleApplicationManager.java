@@ -12,12 +12,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -161,7 +161,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Add a number of new rule apps to the heap
      */
     private static ImmutableHeap<RuleAppContainer> push(@NonNull Iterator<RuleAppContainer> it,
-                                                        ImmutableHeap<RuleAppContainer> sourceQueue) {
+            ImmutableHeap<RuleAppContainer> sourceQueue) {
         while (it.hasNext()) {
             sourceQueue = push(it.next(), sourceQueue);
         }
@@ -172,7 +172,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Add a new rule app to the heap, provided that the rule app is not infinitely expensive
      */
     private static @NonNull ImmutableHeap<RuleAppContainer> push(@NonNull RuleAppContainer c,
-                                                                 @NonNull ImmutableHeap<RuleAppContainer> sourceQueue) {
+            @NonNull ImmutableHeap<RuleAppContainer> sourceQueue) {
         if (c.getCost() == TopRuleAppCost.INSTANCE) {
             return sourceQueue;
         } else {

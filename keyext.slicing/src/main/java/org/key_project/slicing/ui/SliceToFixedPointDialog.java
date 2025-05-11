@@ -26,9 +26,9 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,8 +89,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
      * @param sliceButton function that slices the last loaded proof
      */
     public SliceToFixedPointDialog(@NonNull KeYMediator mediator, Window window,
-                                   @NonNull Function<Void, AnalysisResults> analyzeCallback,
-                                   Runnable sliceButton) {
+            @NonNull Function<Void, AnalysisResults> analyzeCallback,
+            Runnable sliceButton) {
         super(window, "Slice to fixed point");
 
         this.mediator = mediator;

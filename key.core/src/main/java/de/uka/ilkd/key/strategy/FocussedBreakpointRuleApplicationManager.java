@@ -14,10 +14,10 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,7 +39,8 @@ public class FocussedBreakpointRuleApplicationManager
 
     public FocussedBreakpointRuleApplicationManager(
             @Nullable AutomatedRuleApplicationManager delegate,
-            @NonNull Goal goal, @NonNull Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
+            @NonNull Goal goal, @NonNull Optional<PosInOccurrence> focussedSubterm,
+            Optional<String> breakpoint) {
         this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
                 .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
             breakpoint);

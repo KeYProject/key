@@ -37,12 +37,13 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.ArrayUtil;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -220,8 +221,8 @@ public class SymbolicExecutionTreeBuilder {
      *        conditions.
      */
     public SymbolicExecutionTreeBuilder(@NonNull Proof proof, boolean mergeBranchConditions,
-                                        boolean useUnicode, boolean usePrettyPrinting,
-                                        boolean variablesAreOnlyComputedFromUpdates, boolean simplifyConditions) {
+            boolean useUnicode, boolean usePrettyPrinting,
+            boolean variablesAreOnlyComputedFromUpdates, boolean simplifyConditions) {
         assert proof != null;
         this.proof = proof;
         this.isUninterpretedPredicateUsed =
@@ -366,7 +367,8 @@ public class SymbolicExecutionTreeBuilder {
      * @param label The {@link SymbolicExecutionTermLabel} which provides the ID.
      * @return The method call stack of the ID of the given {@link SymbolicExecutionTermLabel}.
      */
-    protected Map<Node, ImmutableList<Node>> getMethodCallStack(@NonNull SymbolicExecutionTermLabel label) {
+    protected Map<Node, ImmutableList<Node>> getMethodCallStack(
+            @NonNull SymbolicExecutionTermLabel label) {
         assert label != null : "No symbolic execuion term label provided";
         return getMethodCallStack(label.id());
     }
@@ -878,7 +880,8 @@ public class SymbolicExecutionTreeBuilder {
      *         identical to the given one (parentToAddTo).
      */
     protected AbstractExecutionNode<?> analyzeNode(@NonNull Node node,
-                                                   @NonNull AbstractExecutionNode<?> parentToAddTo, @NonNull SymbolicExecutionCompletions completions) {
+            @NonNull AbstractExecutionNode<?> parentToAddTo,
+            @NonNull SymbolicExecutionCompletions completions) {
         // Analyze node
         if (!shouldPrune(node)) { // Prune closed branches because they are invalid
             // Get required information
@@ -1033,7 +1036,8 @@ public class SymbolicExecutionTreeBuilder {
      * @return The new parent {@link AbstractExecutionNode}.
      */
     protected AbstractExecutionNode<?> addNodeToTreeAndUpdateParent(@NonNull Node node,
-                                                                    @NonNull AbstractExecutionNode<?> parentToAddTo, @Nullable AbstractExecutionNode<?> executionNode) {
+            @NonNull AbstractExecutionNode<?> parentToAddTo,
+            @Nullable AbstractExecutionNode<?> executionNode) {
         // Check if a new node was created
         if (executionNode != null) {
             // Add new node to symbolic execution tree
@@ -1107,7 +1111,8 @@ public class SymbolicExecutionTreeBuilder {
      *         ignored in the symbolic execution tree.
      */
     protected @Nullable AbstractExecutionNode<?> createExecutionTreeModelRepresentation(
-            AbstractExecutionNode<?> parent, @NonNull Node node, @Nullable SourceElement statement) {
+            AbstractExecutionNode<?> parent, @NonNull Node node,
+            @Nullable SourceElement statement) {
         AbstractExecutionNode<?> result = null;
         // Make sure that a statement (SourceElement) is available.
         if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
@@ -1187,7 +1192,8 @@ public class SymbolicExecutionTreeBuilder {
      * @param node The current {@link Node}.
      * @param blockStartNode The {@link AbstractExecutionNode} to add.
      */
-    protected void addToBlockMap(@NonNull Node node, @NonNull AbstractExecutionBlockStartNode<?> blockStartNode) {
+    protected void addToBlockMap(@NonNull Node node,
+            @NonNull AbstractExecutionBlockStartNode<?> blockStartNode) {
         Pair<Integer, SourceElement> secondPair =
             SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
         addToBlockMap(node, blockStartNode, secondPair.first, secondPair.second);
@@ -1201,8 +1207,9 @@ public class SymbolicExecutionTreeBuilder {
      * @param stackSize TODO
      * @param sourceElements TODO
      */
-    protected void addToBlockMap(@NonNull Node node, @NonNull AbstractExecutionBlockStartNode<?> blockStartNode,
-                                 int stackSize, SourceElement @Nullable ... sourceElements) {
+    protected void addToBlockMap(@NonNull Node node,
+            @NonNull AbstractExecutionBlockStartNode<?> blockStartNode,
+            int stackSize, SourceElement @Nullable... sourceElements) {
         boolean blockPossible = checkBlockPossibility(node, stackSize, sourceElements);
         if (blockPossible) {
             if (sourceElements != null && sourceElements.length >= 1) {
@@ -1243,7 +1250,7 @@ public class SymbolicExecutionTreeBuilder {
      *         be possible.
      */
     private boolean checkBlockPossibility(@Nullable Node node, int expectedStackSize,
-                                          SourceElement @Nullable ... expectedSourceElements) {
+            SourceElement @Nullable... expectedSourceElements) {
         if (node != null && expectedSourceElements != null && expectedSourceElements.length >= 1) {
             RuleApp ruleApp = null;
             boolean seNodeFound = false;
@@ -1310,7 +1317,8 @@ public class SymbolicExecutionTreeBuilder {
      * @return The found after block {@link Map} or {@code null} if not available.
      */
     protected @Nullable Map<JavaPair, ImmutableList<IExecutionNode<?>>> findAfterBlockMap(
-            @Nullable Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps, @Nullable Node node) {
+            @Nullable Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps,
+            @Nullable Node node) {
         if (afterBlockMaps != null) {
             Map<JavaPair, ImmutableList<IExecutionNode<?>>> result = null;
             while (result == null && node != null) {
@@ -1342,7 +1350,8 @@ public class SymbolicExecutionTreeBuilder {
      * @param id The ID.
      * @return The after block map of the given ID.
      */
-    protected @NonNull Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> getAfterBlockMaps(int id) {
+    protected @NonNull Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> getAfterBlockMaps(
+            int id) {
         synchronized (afterBlockMap) {
             Integer key = id;
             Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> result =
@@ -1358,8 +1367,9 @@ public class SymbolicExecutionTreeBuilder {
      * @param ruleApp The {@link RuleApp} to consider.
      * @return The now completed blocks.
      */
-    protected @NonNull Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(Node node,
-                                                                                           @NonNull RuleApp ruleApp) {
+    protected @NonNull Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(
+            Node node,
+            @NonNull RuleApp ruleApp) {
         Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks =
             new LinkedHashMap<>();
         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
@@ -1431,8 +1441,8 @@ public class SymbolicExecutionTreeBuilder {
      * @return {@code true} after block is reached, {@code false} after block is not reached.
      */
     protected boolean isAfterBlockReached(int currentStackSize,
-                                          MethodFrame currentInnerMostMethodFrame, SourceElement currentActiveStatement,
-                                          @NonNull JavaPair expectedPair) {
+            MethodFrame currentInnerMostMethodFrame, SourceElement currentActiveStatement,
+            @NonNull JavaPair expectedPair) {
         return isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame,
             currentActiveStatement, expectedPair.first, expectedPair.second.iterator());
     }
@@ -1449,8 +1459,8 @@ public class SymbolicExecutionTreeBuilder {
      * @return {@code true} after block is reached, {@code false} after block is not reached.
      */
     protected boolean isAfterBlockReached(int currentStackSize,
-                                          @Nullable MethodFrame currentInnerMostMethodFrame, SourceElement currentActiveStatement,
-                                          int expectedStackSize, @NonNull Iterator<SourceElement> expectedStatementsIterator) {
+            @Nullable MethodFrame currentInnerMostMethodFrame, SourceElement currentActiveStatement,
+            int expectedStackSize, @NonNull Iterator<SourceElement> expectedStatementsIterator) {
         boolean done = false;
         if (expectedStackSize > currentStackSize) {
             done = true;
@@ -1481,8 +1491,10 @@ public class SymbolicExecutionTreeBuilder {
      * @param completions The {@link SymbolicExecutionCompletions} to update.
      * @return The created {@link AbstractExecutionMethodReturn}.
      */
-    protected @Nullable AbstractExecutionMethodReturn<?> createMehtodReturn(AbstractExecutionNode<?> parent,
-                                                                            @NonNull Node node, @Nullable SourceElement statement, @NonNull SymbolicExecutionCompletions completions) {
+    protected @Nullable AbstractExecutionMethodReturn<?> createMehtodReturn(
+            AbstractExecutionNode<?> parent,
+            @NonNull Node node, @Nullable SourceElement statement,
+            @NonNull SymbolicExecutionCompletions completions) {
         AbstractExecutionMethodReturn<?> result = null;
         if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
             if (statement != null
@@ -1572,7 +1584,8 @@ public class SymbolicExecutionTreeBuilder {
      * @param childPIO The {@link PosInOccurrence} where the modality has a new symbolic execution
      *        label counter.
      */
-    protected void initNewMethodCallStack(@NonNull Node currentNode, @Nullable PosInOccurrence childPIO) {
+    protected void initNewMethodCallStack(@NonNull Node currentNode,
+            @Nullable PosInOccurrence childPIO) {
         Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =
@@ -1631,7 +1644,8 @@ public class SymbolicExecutionTreeBuilder {
          * @param root The {@link ProgramElement} to count the contained {@link MethodFrame}s.
          * @param services The {@link Services} to use.
          */
-        public MethodFrameCounterJavaASTVisitor(@NonNull ProgramElement root, @NonNull Services services) {
+        public MethodFrameCounterJavaASTVisitor(@NonNull ProgramElement root,
+                @NonNull Services services) {
             super(root, services);
         }
 
@@ -1774,7 +1788,8 @@ public class SymbolicExecutionTreeBuilder {
      * @param parent The parent to add to.
      * @param child The child to add.
      */
-    protected void addChild(@NonNull AbstractExecutionNode<?> parent, @NonNull AbstractExecutionNode<?> child) {
+    protected void addChild(@NonNull AbstractExecutionNode<?> parent,
+            @NonNull AbstractExecutionNode<?> child) {
         child.setParent(parent);
         parent.addChild(child);
     }

@@ -18,8 +18,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
@@ -84,7 +85,8 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
         }
     }
 
-    private @NonNull SequentFormula find(@NonNull SequentFormula sf, @NonNull Semisequent semiseq) throws ScriptException {
+    private @NonNull SequentFormula find(@NonNull SequentFormula sf, @NonNull Semisequent semiseq)
+            throws ScriptException {
         for (SequentFormula s : semiseq) {
             if (s.formula().equalsModProperty(sf.formula(), TERM_LABELS_PROPERTY)) {
                 return s;

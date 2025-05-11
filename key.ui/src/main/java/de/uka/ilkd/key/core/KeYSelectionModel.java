@@ -120,7 +120,7 @@ public class KeYSelectionModel {
      * @param sequent selected sequent
      */
     public synchronized void setSelectedSequentAndRuleApp(@NonNull Node node, Sequent sequent,
-                                                          RuleApp ruleApp) {
+            RuleApp ruleApp) {
         final Node previousNode = selectedNode;
         // switch proof if needed
         if (node.proof() != getSelectedProof()) {

@@ -115,7 +115,7 @@ public class ProofScriptEngine {
 
     @SuppressWarnings("unchecked")
     public void execute(@NonNull AbstractUserInterfaceControl uiControl,
-                        @NonNull List<KeYParser.ProofScriptCommandContext> commands)
+            @NonNull List<KeYParser.ProofScriptCommandContext> commands)
             throws InterruptedException, ScriptException {
         Location start = script.getStartLocation();
         Proof proof = stateMap.getProof();
@@ -195,7 +195,8 @@ public class ProofScriptEngine {
     }
 
 
-    public static @NonNull String prettyPrintCommand(KeYParser.@NonNull ProofScriptCommandContext ctx) {
+    public static @NonNull String prettyPrintCommand(
+            KeYParser.@NonNull ProofScriptCommandContext ctx) {
         return ctx.cmd.getText() +
             (ctx.proofScriptParameters() != null
                     ? " " + ctx.proofScriptParameters().proofScriptParameter().stream()
@@ -206,7 +207,8 @@ public class ProofScriptEngine {
     }
 
 
-    private @NonNull Map<String, Object> getArguments(KeYParser.@NonNull ProofScriptCommandContext commandContext) {
+    private @NonNull Map<String, Object> getArguments(
+            KeYParser.@NonNull ProofScriptCommandContext commandContext) {
         var map = new TreeMap<String, Object>();
         int i = KEY_START_INDEX_PARAMETER;
 

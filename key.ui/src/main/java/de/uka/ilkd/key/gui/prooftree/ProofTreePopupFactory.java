@@ -37,6 +37,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -72,7 +73,8 @@ public class ProofTreePopupFactory {
         return filterOss ? n -> true : ProofTreePopupFactory::ossPathFilter;
     }
 
-    public static @NonNull ProofTreeContext createContext(@NonNull ProofTreeView view, @NonNull TreePath selectedPath) {
+    public static @NonNull ProofTreeContext createContext(@NonNull ProofTreeView view,
+            @NonNull TreePath selectedPath) {
         ProofTreeContext context = new ProofTreeContext();
         context.proofTreeView = view;
         context.path = selectedPath;
@@ -141,7 +143,8 @@ public class ProofTreePopupFactory {
         menu.add(new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
     }
 
-    public static @NonNull JPopupMenu create(@NonNull ProofTreeView view, @NonNull TreePath selectedPath) {
+    public static @NonNull JPopupMenu create(@NonNull ProofTreeView view,
+            @NonNull TreePath selectedPath) {
         final String menuName = "Choose Action";
         JPopupMenu menu = new JPopupMenu(menuName);
         ProofTreeContext context = createContext(view, selectedPath);

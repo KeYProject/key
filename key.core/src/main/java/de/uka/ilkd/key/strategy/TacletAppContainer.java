@@ -15,11 +15,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Instances of this class are immutable
@@ -54,14 +55,16 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return instantiator.getResults();
     }
 
-    protected static @NonNull TacletAppContainer createContainer(NoPosTacletApp p_app, PosInOccurrence p_pio,
-                                                                 @NonNull Goal p_goal, boolean p_initial) {
+    protected static @NonNull TacletAppContainer createContainer(NoPosTacletApp p_app,
+            PosInOccurrence p_pio,
+            @NonNull Goal p_goal, boolean p_initial) {
         return createContainer(p_app, p_pio, p_goal,
             p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), p_initial);
     }
 
-    private static @NonNull TacletAppContainer createContainer(NoPosTacletApp p_app, @Nullable PosInOccurrence p_pio,
-                                                               @NonNull Goal p_goal, RuleAppCost p_cost, boolean p_initial) {
+    private static @NonNull TacletAppContainer createContainer(NoPosTacletApp p_app,
+            @Nullable PosInOccurrence p_pio,
+            @NonNull Goal p_goal, RuleAppCost p_cost, boolean p_initial) {
         // This relies on the fact that the method <code>Goal.getTime()</code>
         // never returns a value less than zero
         final long localage = p_initial ? -1 : p_goal.getTime();
@@ -108,7 +111,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * <code>instantiateApp</code> of the strategy) to <code>targetList</code>
      */
     private ImmutableList<RuleAppContainer> addInstances(@NonNull NoPosTacletApp app,
-                                                         ImmutableList<RuleAppContainer> targetList, @NonNull Goal p_goal) {
+            ImmutableList<RuleAppContainer> targetList, @NonNull Goal p_goal) {
         if (app.uninstantiatedVars().size() == 0) {
             return targetList;
         }
@@ -142,7 +145,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * <code>sufficientlyComplete</code>, and add the container to <code>targetList</code>
      */
     private @NonNull ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
-                                                                  @NonNull ImmutableList<RuleAppContainer> targetList, @NonNull Goal p_goal) {
+            @NonNull ImmutableList<RuleAppContainer> targetList, @NonNull Goal p_goal) {
         return targetList.prepend(
             TacletAppContainer.createContainer(app, getPosInOccurrence(p_goal), p_goal, false));
     }
@@ -152,7 +155,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * <code>sufficientlyComplete</code>, and add the container to <code>targetList</code>
      */
     private @NonNull ImmutableList<RuleAppContainer> addContainer(@NonNull NoPosTacletApp app,
-                                                                  @NonNull ImmutableList<RuleAppContainer> targetList, @NonNull Goal p_goal, RuleAppCost cost) {
+            @NonNull ImmutableList<RuleAppContainer> targetList, @NonNull Goal p_goal,
+            RuleAppCost cost) {
         if (!sufficientlyCompleteApp(app)) {
             return targetList;
         }
@@ -180,12 +184,14 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     /**
      * Create containers for NoFindTaclets.
      */
-    static @NonNull RuleAppContainer createAppContainers(@NonNull NoPosTacletApp p_app, @NonNull Goal p_goal) {
+    static @NonNull RuleAppContainer createAppContainers(@NonNull NoPosTacletApp p_app,
+            @NonNull Goal p_goal) {
         return createAppContainers(p_app, null, p_goal);
     }
 
     protected static @NonNull ImmutableList<RuleAppContainer> createInitialAppContainers(
-            @NonNull ImmutableList<NoPosTacletApp> p_app, PosInOccurrence p_pio, @NonNull Goal p_goal) {
+            @NonNull ImmutableList<NoPosTacletApp> p_app, PosInOccurrence p_pio,
+            @NonNull Goal p_goal) {
 
         List<RuleAppCost> costs = new LinkedList<>();
 
@@ -212,8 +218,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * @return list of containers for currently applicable TacletApps, the cost may be an instance
      *         of <code>TopRuleAppCost</code>.
      */
-    static @NonNull RuleAppContainer createAppContainers(@NonNull NoPosTacletApp p_app, @Nullable PosInOccurrence p_pio,
-                                                         @NonNull Goal p_goal) {
+    static @NonNull RuleAppContainer createAppContainers(@NonNull NoPosTacletApp p_app,
+            @Nullable PosInOccurrence p_pio,
+            @NonNull Goal p_goal) {
         if (!(p_pio == null ? p_app.taclet() instanceof NoFindTaclet
                 : p_app.taclet() instanceof FindTaclet))
         // faster than <code>assertTrue</code>

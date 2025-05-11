@@ -28,12 +28,12 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -121,7 +121,8 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public void startElement(String uri, String localName, String qName, @NonNull Attributes attributes)
+        public void startElement(String uri, String localName, String qName,
+                @NonNull Attributes attributes)
                 throws SAXException {
             Object parent = parentStack.peekFirst();
             if (isModel(uri, localName, qName)) {
@@ -458,7 +459,8 @@ public class SymbolicLayoutReader {
         /**
          * The symbolic equivalence classes.
          */
-        private @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses = ImmutableSLList.nil();
+        private @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses =
+            ImmutableSLList.nil();
 
         /**
          * {@inheritDoc}
@@ -602,7 +604,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public @Nullable ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                                                             boolean isArrayIndex, Term arrayIndex, Term condition) {
+                boolean isArrayIndex, Term arrayIndex, Term condition) {
             return null;
         }
 
@@ -610,8 +612,9 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public @Nullable ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                                                 Term arrayIndex, Term condition) {
+        public @Nullable ISymbolicValue getValue(IProgramVariable programVariable,
+                boolean isArrayIndex,
+                Term arrayIndex, Term condition) {
             return null;
         }
     }
@@ -691,7 +694,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public @Nullable ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                                                             boolean isArrayIndex, Term arrayIndex, Term condition) {
+                boolean isArrayIndex, Term arrayIndex, Term condition) {
             return null;
         }
 
@@ -699,8 +702,9 @@ public class SymbolicLayoutReader {
          * {@inheritDoc}
          */
         @Override
-        public @Nullable ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                                                 Term arrayIndex, Term condition) {
+        public @Nullable ISymbolicValue getValue(IProgramVariable programVariable,
+                boolean isArrayIndex,
+                Term arrayIndex, Term condition) {
             return null;
         }
     }

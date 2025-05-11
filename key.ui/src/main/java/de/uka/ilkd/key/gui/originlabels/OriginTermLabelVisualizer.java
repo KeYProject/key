@@ -31,13 +31,13 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
@@ -192,7 +192,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
      *        visualized.
      * @param services services.
      */
-    public OriginTermLabelVisualizer(@Nullable PosInOccurrence pos, @NonNull Node node, @NonNull Services services) {
+    public OriginTermLabelVisualizer(@Nullable PosInOccurrence pos, @NonNull Node node,
+            @NonNull Services services) {
         super(node,
             "Origin for node " + node.serialNr() + ": " + (pos == null ? "whole sequent"
                     : LogicPrinter.quickPrintTerm(pos.subTerm(), services).replaceAll("\\s+", " ")),
@@ -433,7 +434,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private void buildModel(TreeNode parentNode, @Nullable PosInOccurrence parentPos,
-                            @NonNull DefaultTreeModel treeModel) {
+            @NonNull DefaultTreeModel treeModel) {
         if (parentPos == null) {
             int index = 0;
 
@@ -563,8 +564,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         private static final long serialVersionUID = -7479404026154193661L;
 
         @Override
-        public @NonNull Component getTreeCellRendererComponent(@NonNull JTree tree, Object value, boolean selected,
-                                                               boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        public @NonNull Component getTreeCellRendererComponent(@NonNull JTree tree, Object value,
+                boolean selected,
+                boolean expanded, boolean leaf, int row, boolean hasFocus) {
             TreeNode node = (TreeNode) value;
 
             PosInOccurrence pio = node.pos;
@@ -647,7 +649,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
         private final PosInOccurrence pos;
 
-        TermViewLogicPrinter(PosInOccurrence pos, @NonNull NotationInfo ni, @NonNull Services services) {
+        TermViewLogicPrinter(PosInOccurrence pos, @NonNull NotationInfo ni,
+                @NonNull Services services) {
             super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
             this.pos = pos;
         }

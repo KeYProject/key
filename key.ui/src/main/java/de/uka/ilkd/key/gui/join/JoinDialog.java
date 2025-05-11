@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.join.LateApplicationCheck;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.PredicateEstimator.Result;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -37,7 +38,7 @@ public class JoinDialog extends StdDialog {
     private final @NonNull ContentPanel content;
 
     public JoinDialog(@NonNull List<ProspectivePartner> partnerList, @NonNull Proof proof,
-                      PredicateEstimator estimator, @NonNull Services services) {
+            PredicateEstimator estimator, @NonNull Services services) {
         super("Joining", 5, false);
         content = new ContentPanel(partnerList, proof, estimator,
             (input, valid, reason) -> getOkButton().setEnabled(valid), services);
@@ -75,7 +76,8 @@ public class JoinDialog extends StdDialog {
             final @NonNull CheckedUserInputInspector inspector;
             final boolean applicable;
 
-            public ContentItem(@NonNull ProspectivePartner partner, @NonNull Services services, boolean applicable) {
+            public ContentItem(@NonNull ProspectivePartner partner, @NonNull Services services,
+                    boolean applicable) {
                 super();
                 this.partner = partner;
                 this.inspector = new InspectorForDecisionPredicates(services,
@@ -121,9 +123,10 @@ public class JoinDialog extends StdDialog {
         }
 
 
-        public ContentPanel(@NonNull List<ProspectivePartner> partnerList, final @NonNull Proof proof,
-                            PredicateEstimator estimator, final @NonNull CheckedUserInputListener listener,
-                            @NonNull Services services) {
+        public ContentPanel(@NonNull List<ProspectivePartner> partnerList,
+                final @NonNull Proof proof,
+                PredicateEstimator estimator, final @NonNull CheckedUserInputListener listener,
+                @NonNull Services services) {
             super(BoxLayout.Y_AXIS);
 
             this.proof = proof;
@@ -148,7 +151,8 @@ public class JoinDialog extends StdDialog {
 
         }
 
-        private void fill(@NonNull List<ProspectivePartner> partnerList, @NonNull Services services) {
+        private void fill(@NonNull List<ProspectivePartner> partnerList,
+                @NonNull Services services) {
             Node node = partnerList.get(0).getNode(0);
             getHeadline().setText("<html><b>Join Goal " + node.serialNr() + "</b></html>");
             getSequentViewer1().setSequent(node.sequent(), proof.getServices());

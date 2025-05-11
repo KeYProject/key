@@ -18,9 +18,10 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -60,7 +61,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, @NonNull SVInstantiations svInst,
-                         Services services) {
+            Services services) {
 
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
         MethodName mn = (MethodName) svInst.getInstantiation(methname);

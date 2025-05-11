@@ -11,6 +11,7 @@ import javax.swing.ListSelectionModel;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
+
 import org.jspecify.annotations.NonNull;
 
 /**

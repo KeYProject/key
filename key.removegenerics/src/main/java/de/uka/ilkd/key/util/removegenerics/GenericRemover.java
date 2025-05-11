@@ -32,7 +32,8 @@ public class GenericRemover extends AbstractGenericRemover {
     }
 
     @Override
-    protected void saveModifiedCompilationUnit(@NonNull CompilationUnit cu, @NonNull String filename)
+    protected void saveModifiedCompilationUnit(@NonNull CompilationUnit cu,
+            @NonNull String filename)
             throws IOException {
         // determine target subdirectory with trailing '/'
         File targetdir;

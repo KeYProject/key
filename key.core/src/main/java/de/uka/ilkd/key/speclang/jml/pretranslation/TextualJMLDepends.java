@@ -24,7 +24,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
         new LinkedHashMap<>();
 
     public TextualJMLDepends(@NonNull ImmutableList<JMLModifier> modifiers, Name @NonNull [] heaps,
-                             @NonNull LabeledParserRuleContext depends) {
+            @NonNull LabeledParserRuleContext depends) {
         super(modifiers);
         setPosition(depends);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {

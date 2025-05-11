@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -22,7 +23,7 @@ public class SearchModeChangeAction extends MainWindowAction {
     private final SequentViewSearchBar.@NonNull SearchMode mode;
 
     public SearchModeChangeAction(@NonNull MainWindow mainWindow, SequentViewSearchBar searchBar,
-                                  SequentViewSearchBar.@NonNull SearchMode mode) {
+            SequentViewSearchBar.@NonNull SearchMode mode) {
         super(mainWindow);
         setName(mode.toString());
 

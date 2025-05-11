@@ -56,7 +56,8 @@ public class FilesChecker {
         return pathsConsistent(a, b, FilesChecker::collectBcpFiles);
     }
 
-    private static @NonNull List<Path> collectBcpFiles(@NonNull ProofBundleHandler pbh) throws IOException {
+    private static @NonNull List<Path> collectBcpFiles(@NonNull ProofBundleHandler pbh)
+            throws IOException {
         Path bcp = pbh.getBootclasspath();
         if (bcp == null) {
             return Collections.emptyList();
@@ -72,7 +73,7 @@ public class FilesChecker {
      * contain additional unique files.
      */
     private static boolean pathsConsistent(@NonNull Path a, @NonNull Path b,
-                                           @NonNull CheckedFunction<ProofBundleHandler, List<Path>> f) {
+            @NonNull CheckedFunction<ProofBundleHandler, List<Path>> f) {
         try (ProofBundleHandler pha = ProofBundleHandler.createBundleHandler(a);
                 ProofBundleHandler phb = ProofBundleHandler.createBundleHandler(b)) {
             List<Path> filesA = f.apply(pha);

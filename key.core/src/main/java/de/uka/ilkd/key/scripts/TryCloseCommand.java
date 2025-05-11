@@ -10,8 +10,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The script command tryclose" has two optional arguments:
@@ -28,13 +29,15 @@ public class TryCloseCommand extends AbstractCommand<TryCloseCommand.TryCloseArg
     }
 
     @Override
-    public TryCloseArguments evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
+    public TryCloseArguments evaluateArguments(@NonNull EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new TryCloseArguments(), arguments);
     }
 
     @Override
-    public void execute(@NonNull TryCloseArguments args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull TryCloseArguments args)
+            throws ScriptException, InterruptedException {
 
         TryCloseMacro macro =
             args.steps == null ? new TryCloseMacro() : new TryCloseMacro(args.steps);

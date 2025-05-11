@@ -11,9 +11,10 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.key_project.logic.Named;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Named;
 
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy

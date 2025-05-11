@@ -9,8 +9,9 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Redundant Parentheses. Modelled as a special "identity" unary "infix" operator.

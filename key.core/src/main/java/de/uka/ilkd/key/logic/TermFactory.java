@@ -83,8 +83,8 @@ public final class TermFactory {
     }
 
     public Term createTerm(Operator op, Term[] subs,
-                           @Nullable ImmutableArray<QuantifiableVariable> boundVars,
-                           @Nullable ImmutableArray<TermLabel> labels) {
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 

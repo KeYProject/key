@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.rule.Rule;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+
 import org.jspecify.annotations.NonNull;
 
 public class SkipCommand extends NoArgumentCommand {

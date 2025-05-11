@@ -15,10 +15,10 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.proof.*;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,7 +149,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * tree is updated automatically after this is set to false.
      */
     public synchronized void setBatchGoalStateChange(boolean value,
-                                                     @Nullable Collection<Node> nodesToUpdate) {
+            @Nullable Collection<Node> nodesToUpdate) {
         if (!value && batchGoalStateChange) {
             if (nodesToUpdate == null || nodesToUpdate.isEmpty()) {
                 updateTree((TreeNode) null);

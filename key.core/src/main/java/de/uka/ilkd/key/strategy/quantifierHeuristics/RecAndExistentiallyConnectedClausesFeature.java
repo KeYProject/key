@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
 import org.jspecify.annotations.NonNull;
 
 

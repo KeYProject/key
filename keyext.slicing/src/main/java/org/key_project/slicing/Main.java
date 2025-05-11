@@ -20,9 +20,9 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

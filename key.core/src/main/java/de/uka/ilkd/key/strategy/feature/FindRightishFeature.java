@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -33,7 +34,7 @@ public class FindRightishFeature implements Feature {
     }
 
     public RuleAppCost computeCost(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();

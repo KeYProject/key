@@ -21,8 +21,9 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -42,7 +43,8 @@ public class RootsGenerator implements TermGenerator {
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf(2);
 
-    public static @NonNull TermGenerator create(ProjectionToTerm powerRelation, @NonNull TermServices services) {
+    public static @NonNull TermGenerator create(ProjectionToTerm powerRelation,
+            @NonNull TermServices services) {
         return new RootsGenerator(powerRelation, services.getTermBuilder());
     }
 
@@ -53,7 +55,7 @@ public class RootsGenerator implements TermGenerator {
 
     @Override
     public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
-                                            MutableState mState) {
+            MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
@@ -99,7 +101,8 @@ public class RootsGenerator implements TermGenerator {
         return ImmutableSLList.<Term>nil().prepend(res).iterator();
     }
 
-    private @NonNull Term breakDownEq(@NonNull Term var, @NonNull BigInteger lit, int pow, TermServices services) {
+    private @NonNull Term breakDownEq(@NonNull Term var, @NonNull BigInteger lit, int pow,
+            TermServices services) {
         final Term zero = tb.zero();
 
         if ((pow % 2 == 0)) {
@@ -138,7 +141,8 @@ public class RootsGenerator implements TermGenerator {
         }
     }
 
-    private @NonNull Term breakDownGeq(@NonNull Term var, @NonNull BigInteger lit, int pow, TermServices services) {
+    private @NonNull Term breakDownGeq(@NonNull Term var, @NonNull BigInteger lit, int pow,
+            TermServices services) {
         if ((pow % 2 == 0)) {
             // the even case
 
@@ -159,7 +163,8 @@ public class RootsGenerator implements TermGenerator {
         }
     }
 
-    private @NonNull Term breakDownLeq(@NonNull Term var, @NonNull BigInteger lit, int pow, TermServices services) {
+    private @NonNull Term breakDownLeq(@NonNull Term var, @NonNull BigInteger lit, int pow,
+            TermServices services) {
         if ((pow % 2 == 0)) {
             // the even case
 

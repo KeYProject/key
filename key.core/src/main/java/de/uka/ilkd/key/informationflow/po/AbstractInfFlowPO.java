@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -33,8 +34,9 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
         return proof;
     }
 
-    public @NonNull InfFlowProof createProofObject(String proofName, String proofHeader, Term poTerm,
-                                                   InitConfig proofConfig) {
+    public @NonNull InfFlowProof createProofObject(String proofName, String proofHeader,
+            Term poTerm,
+            InitConfig proofConfig) {
         final InfFlowProof proof = new InfFlowProof(proofName, poTerm, proofHeader, proofConfig);
 
         return proof;

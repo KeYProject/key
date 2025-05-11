@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

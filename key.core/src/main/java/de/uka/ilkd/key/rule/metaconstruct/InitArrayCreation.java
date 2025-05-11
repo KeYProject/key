@@ -31,9 +31,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
@@ -62,7 +63,8 @@ public class InitArrayCreation extends InitArray {
      * @param services the Services offering access to the type model
      * @return an if statement throwing a NegativeArraySizeException if cond is evaluated to false
      */
-    private @NonNull If checkNegativeDimension(@NonNull Expression cond, @NonNull Services services) {
+    private @NonNull If checkNegativeDimension(@NonNull Expression cond,
+            @NonNull Services services) {
         final New exception = KeYJavaASTFactory.newOperator(
             services.getJavaInfo().getKeYJavaType("java.lang.NegativeArraySizeException"));
 
@@ -83,8 +85,9 @@ public class InitArrayCreation extends InitArray {
      * @param dimExpr the ArrayOf<Expression> which describe the array's dimensions
      * @param services the Services object
      */
-    private ProgramVariable @NonNull [] evaluateAndCheckDimensionExpressions(@NonNull LinkedList<Statement> bodyStmnts,
-                                                                             @NonNull ImmutableArray<Expression> dimExpr, @NonNull Services services) {
+    private ProgramVariable @NonNull [] evaluateAndCheckDimensionExpressions(
+            @NonNull LinkedList<Statement> bodyStmnts,
+            @NonNull ImmutableArray<Expression> dimExpr, @NonNull Services services) {
 
         Expression checkDimensions = BooleanLiteral.FALSE;
         ProgramVariable[] pvars = new ProgramVariable[dimExpr.size()];
@@ -132,8 +135,10 @@ public class InitArrayCreation extends InitArray {
     /**
      * creates an array of dimension <code>dimensions.length</code>
      */
-    private void createNDimensionalArray(@NonNull LinkedList<Statement> bodyStmnts, @NonNull Expression resultVar,
-                                         @NonNull KeYJavaType arrayType, ProgramVariable @NonNull [] dimensions, @NonNull Services services) {
+    private void createNDimensionalArray(@NonNull LinkedList<Statement> bodyStmnts,
+            @NonNull Expression resultVar,
+            @NonNull KeYJavaType arrayType, ProgramVariable @NonNull [] dimensions,
+            @NonNull Services services) {
         assert dimensions.length > 0;
         bodyStmnts.add(KeYJavaASTFactory.assign(resultVar,
             KeYJavaASTFactory.methodCall(arrayType, createArrayName, dimensions[0])));
@@ -174,8 +179,9 @@ public class InitArrayCreation extends InitArray {
     /**
      * executes an array creation without initializers involved
      */
-    private @NonNull ProgramElement arrayCreationWithoutInitializers(@NonNull Expression newObject, @NonNull NewArray na,
-                                                                     @NonNull Services services) {
+    private @NonNull ProgramElement arrayCreationWithoutInitializers(@NonNull Expression newObject,
+            @NonNull NewArray na,
+            @NonNull Services services) {
 
         final LinkedList<Statement> bodyStmnts = new LinkedList<>();
 
@@ -191,7 +197,7 @@ public class InitArrayCreation extends InitArray {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-                                                @NonNull SVInstantiations svInst) {
+            @NonNull SVInstantiations svInst) {
 
         final Expression array = (Expression) svInst.getInstantiation(newObjectSV);
 

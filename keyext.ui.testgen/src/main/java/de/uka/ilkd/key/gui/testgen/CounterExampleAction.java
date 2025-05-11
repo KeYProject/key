@@ -151,7 +151,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
          */
         @Override
         protected @NonNull SolverLauncherListener createSolverListener(DefaultSMTSettings settings,
-                                                                       Proof proof) {
+                Proof proof) {
             return new SolverListener(settings, proof);
         }
     }

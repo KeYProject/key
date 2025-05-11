@@ -10,9 +10,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  *
@@ -25,8 +26,8 @@ class InfFlowContractAppInOutRelationSnippet extends InfFlowInputOutputRelationS
     // proof obligation where we have to show that there is an isomorphism.
     @Override
     protected @NonNull Term buildObjectSensitivePostRelation(@NonNull InfFlowSpec infFlowSpec1,
-                                                             @NonNull InfFlowSpec infFlowSpec2, @NonNull BasicSnippetData d, ProofObligationVars vs1,
-                                                             ProofObligationVars vs2, @NonNull Term eqAtLocsTerm) {
+            @NonNull InfFlowSpec infFlowSpec2, @NonNull BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, @NonNull Term eqAtLocsTerm) {
         // build equalities for newObjects terms
         ImmutableList<Term> newObjEqs = ImmutableSLList.nil();
         Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();

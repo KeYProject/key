@@ -11,8 +11,9 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.speclang.Contract;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.proofmanagement.io.Logger;
+
+import org.jspecify.annotations.NonNull;
 
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 

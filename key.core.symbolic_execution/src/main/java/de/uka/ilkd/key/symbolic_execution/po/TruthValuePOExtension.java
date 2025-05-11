@@ -16,9 +16,10 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
+import org.key_project.util.collection.ImmutableArray;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Implementation of {@link POExtension} to support truth value evaluation.
@@ -38,9 +39,10 @@ public class TruthValuePOExtension implements POExtension {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
-                                        Services services, ProgramVariable selfTerm,
-                                        Term postTerm) {
+    public @NonNull Term modifyPostTerm(AbstractOperationPO abstractOperationPO,
+            InitConfig proofConfig,
+            Services services, ProgramVariable selfTerm,
+            Term postTerm) {
         if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
             return labelPostTerm(services, postTerm);
         } else {

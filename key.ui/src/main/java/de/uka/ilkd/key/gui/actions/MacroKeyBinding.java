@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -31,7 +32,8 @@ public class MacroKeyBinding extends AbstractAction {
     private final KeYMediator mediator;
     private final @NonNull ProofMacro macro;
 
-    public MacroKeyBinding(KeYMediator mediator, SequentView sequentView, @NonNull ProofMacro macro) {
+    public MacroKeyBinding(KeYMediator mediator, SequentView sequentView,
+            @NonNull ProofMacro macro) {
         super("Invoking macro " + macro.getClass());
         this.sequentView = sequentView;
         this.mediator = mediator;
@@ -66,7 +68,7 @@ public class MacroKeyBinding extends AbstractAction {
      * @param comp component to register key bindings in
      */
     public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView,
-                                                @NonNull JComponent comp) {
+            @NonNull JComponent comp) {
 
         for (final ProofMacro macro : ProofMacroMenu.REGISTERED_MACROS) {
             KeyStroke ks = KeyStrokeManager.get(macro);

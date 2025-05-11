@@ -38,14 +38,14 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +111,7 @@ public class MethodCall extends ProgramTransformer {
 
     /** gets an array of expression and returns a list of types */
     private @NonNull ImmutableList<KeYJavaType> getTypes(@NonNull ImmutableArray<Expression> args,
-                                                         @NonNull Services services) {
+            @NonNull Services services) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             Expression argument = args.get(i);
@@ -121,7 +121,8 @@ public class MethodCall extends ProgramTransformer {
         return result;
     }
 
-    private @Nullable KeYJavaType getStaticPrefixType(@Nullable ReferencePrefix refPrefix, @NonNull Services services) {
+    private @Nullable KeYJavaType getStaticPrefixType(@Nullable ReferencePrefix refPrefix,
+            @NonNull Services services) {
         if (refPrefix == null
                 || refPrefix instanceof ThisReference && refPrefix.getReferencePrefix() == null) {
             return execContext.getTypeReference().getKeYJavaType();
@@ -157,8 +158,9 @@ public class MethodCall extends ProgramTransformer {
      * @param services TODO
      * @return TODO
      */
-    protected @NonNull IProgramMethod getMethod(@NonNull KeYJavaType prefixType, @NonNull MethodReference mr,
-                                                @NonNull Services services) {
+    protected @NonNull IProgramMethod getMethod(@NonNull KeYJavaType prefixType,
+            @NonNull MethodReference mr,
+            @NonNull Services services) {
         IProgramMethod result;
         if (execContext != null) {
             result = mr.method(services, prefixType, execContext);
@@ -176,12 +178,14 @@ public class MethodCall extends ProgramTransformer {
         return result;
     }
 
-    private @NonNull IProgramMethod getSuperMethod(@NonNull ExecutionContext ex, @NonNull MethodReference mr,
-                                                   @NonNull Services services) {
+    private @NonNull IProgramMethod getSuperMethod(@NonNull ExecutionContext ex,
+            @NonNull MethodReference mr,
+            @NonNull Services services) {
         return mr.method(services, getSuperType(ex, services), ex);
     }
 
-    private @NonNull KeYJavaType getSuperType(@NonNull ExecutionContext ex, @NonNull Services services) {
+    private @NonNull KeYJavaType getSuperType(@NonNull ExecutionContext ex,
+            @NonNull Services services) {
         return services.getJavaInfo().getSuperclass(ex.getTypeReference().getKeYJavaType());
     }
 
@@ -194,7 +198,7 @@ public class MethodCall extends ProgramTransformer {
      */
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-                                                @NonNull SVInstantiations svInst) {
+            @NonNull SVInstantiations svInst) {
         LOGGER.trace("method-call: called for {}", pe);
         if (resultVar != null) {
             pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
@@ -358,7 +362,8 @@ public class MethodCall extends ProgramTransformer {
      * @param services The Services object.
      * @return TODO
      */
-    protected @NonNull Statement makeIfCascade(@NonNull ImmutableList<KeYJavaType> imps, @NonNull Services services) {
+    protected @NonNull Statement makeIfCascade(@NonNull ImmutableList<KeYJavaType> imps,
+            @NonNull Services services) {
         KeYJavaType currType = imps.head();
         if (imps.size() == 1) {
             return makeMbs(currType, services);
@@ -470,7 +475,8 @@ public class MethodCall extends ProgramTransformer {
         return paramDecl;
     }
 
-    private @NonNull ImmutableArray<Expression> getVariables(VariableSpecification @NonNull [] varspecs) {
+    private @NonNull ImmutableArray<Expression> getVariables(
+            VariableSpecification @NonNull [] varspecs) {
         Expression[] vars = new Expression[varspecs.length];
         for (int i = 0; i < varspecs.length; i++) {
             vars[i] = (Expression) varspecs[i].getProgramVariable();
@@ -492,7 +498,8 @@ public class MethodCall extends ProgramTransformer {
      * @param type type to check for
      * @return true iff exp is assign compatible with type
      */
-    private boolean assignmentCompatible(@NonNull Expression exp, @NonNull Type type, @NonNull Services services) {
+    private boolean assignmentCompatible(@NonNull Expression exp, @NonNull Type type,
+            @NonNull Services services) {
         Sort expSort = exp.getKeYJavaType(services, execContext).getSort();
         Sort typeSort = ((KeYJavaType) type).getSort();
         /* was: services.getJavaInfo().getKeYJavaType(type); */

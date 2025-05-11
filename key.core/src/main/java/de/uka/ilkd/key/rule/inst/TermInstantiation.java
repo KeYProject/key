@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
 import org.jspecify.annotations.NonNull;
 
 /**

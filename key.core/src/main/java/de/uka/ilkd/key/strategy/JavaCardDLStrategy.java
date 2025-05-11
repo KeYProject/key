@@ -60,9 +60,10 @@ import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
 
 /**
  * Strategy tailored to be used as long as a java program can be found in the sequent.
@@ -923,8 +924,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    private void setupFormulaNormalisation(@NonNull RuleSetDispatchFeature d, @NonNull IntegerLDT numbers,
-                                           LocSetLDT locSetLDT) {
+    private void setupFormulaNormalisation(@NonNull RuleSetDispatchFeature d,
+            @NonNull IntegerLDT numbers,
+            LocSetLDT locSetLDT) {
 
         bindRuleSet(d, "negationNormalForm", add(not(NotBelowBinderFeature.INSTANCE),
             longConst(-500), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10.0)));
@@ -1040,7 +1042,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero(FocusInAntecFeature.INSTANCE, longConst(-40), longConst(-20))));
     }
 
-    private @NonNull Feature clausesSmallerThan(@NonNull String smaller, @NonNull String bigger, IntegerLDT numbers) {
+    private @NonNull Feature clausesSmallerThan(@NonNull String smaller, @NonNull String bigger,
+            IntegerLDT numbers) {
         return ClausesSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
@@ -1287,7 +1290,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         ReduceMonomialsProjection.create(dividend, divisor)))))))));
     }
 
-    private void setupNewSymApproval(@NonNull RuleSetDispatchFeature d, @NonNull IntegerLDT numbers) {
+    private void setupNewSymApproval(@NonNull RuleSetDispatchFeature d,
+            @NonNull IntegerLDT numbers) {
         final TermBuffer antecFor = new TermBuffer();
         final Feature columnOpEq = applyTF(antecFor,
             opSub(tf.eq, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.polynomial));
@@ -1297,7 +1301,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             SequentFormulasGenerator.antecedent(), not(add(columnOpEq, biggerLeftSide)))));
     }
 
-    private void setupPullOutGcd(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet, boolean roundingUp) {
+    private void setupPullOutGcd(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet,
+            boolean roundingUp) {
         final TermBuffer gcd = new TermBuffer();
 
         final Feature instantiateDivs;
@@ -1444,7 +1449,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 return tOne;
             }
 
-            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
                 return tOne;
             }
         };
@@ -1457,7 +1463,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 return tTwo;
             }
 
-            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+            public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
                 return tTwo;
             }
         };
@@ -1590,7 +1597,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_neg", false);
     }
 
-    private void setupNonLinTermIsPosNeg(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet, boolean pos) {
+    private void setupNonLinTermIsPosNeg(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet,
+            boolean pos) {
         final TermBuffer divisor = new TermBuffer();
         final TermBuffer dividend = new TermBuffer();
         final TermBuffer quotient = new TermBuffer();
@@ -2055,7 +2063,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     @Override
     public @Nullable RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
-                                             MutableState mState) {
+            MutableState mState) {
         var time = System.nanoTime();
         try {
             return costComputationF.computeCost(app, pio, goal, mState);
@@ -2086,7 +2094,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     @Override
     protected @Nullable RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                                                   MutableState mState) {
+            MutableState mState) {
         var time = System.nanoTime();
         try {
             return instantiationF.computeCost(app, pio, goal, mState);

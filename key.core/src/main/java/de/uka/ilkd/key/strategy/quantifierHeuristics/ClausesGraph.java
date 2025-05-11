@@ -14,10 +14,11 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class describes the relation between different clauses in a CNF. If two clauses have the
@@ -35,7 +36,8 @@ public class ClausesGraph {
 
     private final ImmutableSet<Term> clauses;
 
-    static @NonNull ClausesGraph create(@NonNull Term quantifiedFormula, @NonNull ServiceCaches caches) {
+    static @NonNull ClausesGraph create(@NonNull Term quantifiedFormula,
+            @NonNull ServiceCaches caches) {
         final Map<Term, ClausesGraph> graphCache = caches.getGraphCache();
         ClausesGraph graph;
         synchronized (graphCache) {
@@ -76,7 +78,8 @@ public class ClausesGraph {
         } while (changed);
     }
 
-    private @NonNull ImmutableSet<Term> getTransitiveConnections(@NonNull ImmutableSet<Term> formulas) {
+    private @NonNull ImmutableSet<Term> getTransitiveConnections(
+            @NonNull ImmutableSet<Term> formulas) {
         for (Term formula : formulas) {
             formulas = formulas.union(getConnections(formula));
         }
@@ -194,8 +197,9 @@ public class ClausesGraph {
     /**
      * @return a set of quantifiableVariable which are belonged to both set0 and set1 have
      */
-    private @NonNull ImmutableSet<QuantifiableVariable> intersectQV(@NonNull ImmutableSet<QuantifiableVariable> set0,
-                                                                    @NonNull ImmutableSet<QuantifiableVariable> set1) {
+    private @NonNull ImmutableSet<QuantifiableVariable> intersectQV(
+            @NonNull ImmutableSet<QuantifiableVariable> set0,
+            @NonNull ImmutableSet<QuantifiableVariable> set1) {
         return TriggerUtils.intersect(set0, set1);
     }
 
@@ -206,7 +210,8 @@ public class ClausesGraph {
      * @param set1
      * @return a set of terms which are belonged to both set0 and set1.
      */
-    private @NonNull ImmutableSet<Term> intersect(@Nullable ImmutableSet<Term> set0, @Nullable ImmutableSet<Term> set1) {
+    private @NonNull ImmutableSet<Term> intersect(@Nullable ImmutableSet<Term> set0,
+            @Nullable ImmutableSet<Term> set1) {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
         if (set0 == null || set1 == null) {
             return res;

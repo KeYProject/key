@@ -18,9 +18,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.util.collection.ImmutableList;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This{@link SymbolicExecutionExceptionBreakpoint} represents an exception breakpoint and is
@@ -87,7 +88,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      */
     @Override
     public void updateState(int maxApplications, long timeout, @NonNull Proof proof, long startTime,
-                            int countApplied, @Nullable Goal goal) {
+            int countApplied, @Nullable Goal goal) {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
@@ -148,8 +149,9 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, @NonNull RuleApp ruleApp, Proof proof,
-                                   @NonNull Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, @NonNull RuleApp ruleApp,
+            Proof proof,
+            @NonNull Node node) {
         Node parent = null;
         for (Node parents : exceptionNodes) {
             if (isParentNode(node, parents)) {

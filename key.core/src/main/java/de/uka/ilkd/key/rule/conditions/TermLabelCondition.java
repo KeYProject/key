@@ -10,10 +10,11 @@ import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This variable condition checks if an instantiation for term labels contains a specific term
@@ -34,8 +35,9 @@ public class TermLabelCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, @NonNull SVInstantiations instMap,
-                         Services services) {
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull SVInstantiations instMap,
+            Services services) {
         assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
         ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);
         boolean hasLabel = hasLabel(tInsts, ln);

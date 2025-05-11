@@ -17,9 +17,10 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.key_project.util.collection.ImmutableList;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This action is one part of the previous UndoLastStepAction: It undoes the last rule application

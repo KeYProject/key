@@ -13,8 +13,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
@@ -56,7 +57,8 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
      */
     @Override
     @SuppressWarnings("override.param.invalid")
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args, @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
                 .lookupActiveTaclet(CUT_TACLET_NAME);

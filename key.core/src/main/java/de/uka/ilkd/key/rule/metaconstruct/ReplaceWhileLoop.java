@@ -16,9 +16,10 @@ import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.util.ExtList;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.ExtList;
 
 /**
  * This visitor is used to identify and replace the while loop in invariant rule.
@@ -56,7 +57,8 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      * @param root the ProgramElement where to begin
      *
      */
-    public ReplaceWhileLoop(@NonNull ProgramElement root, StatementBlock toInsert, @NonNull Services services) {
+    public ReplaceWhileLoop(@NonNull ProgramElement root, StatementBlock toInsert,
+            @NonNull Services services) {
         super(root, true, services);
         this.toInsert = toInsert;
         firstWhileFound = false;
@@ -68,8 +70,9 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      * @param root the ProgramElement where to begin
      * @param inst the SVInstantiations if available
      */
-    public ReplaceWhileLoop(@NonNull ProgramElement root, @Nullable SVInstantiations inst, StatementBlock toInsert,
-                            @NonNull Services services) {
+    public ReplaceWhileLoop(@NonNull ProgramElement root, @Nullable SVInstantiations inst,
+            StatementBlock toInsert,
+            @NonNull Services services) {
         super(root, true, services);
         this.toInsert = toInsert;
         firstWhileFound = false;

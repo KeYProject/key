@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
+
 import org.jspecify.annotations.NonNull;
 
 /** class builds RewriteTaclet objects. */
@@ -26,7 +27,8 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      */
     protected int applicationRestriction;
 
-    public @NonNull RewriteTacletBuilder<T> setApplicationRestriction(int p_applicationRestriction) {
+    public @NonNull RewriteTacletBuilder<T> setApplicationRestriction(
+            int p_applicationRestriction) {
         applicationRestriction = p_applicationRestriction;
         return this;
     }

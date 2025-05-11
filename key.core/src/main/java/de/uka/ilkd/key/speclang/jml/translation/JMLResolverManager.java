@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -22,8 +23,9 @@ import org.jspecify.annotations.Nullable;
  */
 public final class JMLResolverManager extends SLResolverManager {
 
-    public JMLResolverManager(@NonNull JavaInfo javaInfo, @NonNull KeYJavaType specInClass, LocationVariable selfVar,
-                              SLExceptionFactory eManager) {
+    public JMLResolverManager(@NonNull JavaInfo javaInfo, @NonNull KeYJavaType specInClass,
+            LocationVariable selfVar,
+            SLExceptionFactory eManager) {
         super(eManager, specInClass, selfVar, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
         addResolver(new SLAttributeResolver(javaInfo, this, specInClass));

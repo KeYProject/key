@@ -12,10 +12,11 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 public final class EqualUniqueCondition implements VariableCondition {
@@ -31,7 +32,8 @@ public final class EqualUniqueCondition implements VariableCondition {
     }
 
 
-    private static @Nullable Term equalUnique(@NonNull Term t1, @NonNull Term t2, @NonNull TermServices services) {
+    private static @Nullable Term equalUnique(@NonNull Term t1, @NonNull Term t2,
+            @NonNull TermServices services) {
         if (!(t1.op() instanceof JFunction && t2.op() instanceof JFunction
                 && ((Function) t1.op()).isUnique() && ((Function) t2.op()).isUnique())) {
             return null;
@@ -50,8 +52,8 @@ public final class EqualUniqueCondition implements VariableCondition {
 
     @Override
     public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                           @NonNull MatchConditions mc,
-                                           Services services) {
+            @NonNull MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term tInst = (Term) svInst.getInstantiation(t);
         Term t2Inst = (Term) svInst.getInstantiation(t2);

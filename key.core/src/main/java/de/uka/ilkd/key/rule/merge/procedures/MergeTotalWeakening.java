@@ -12,10 +12,11 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
@@ -51,9 +52,10 @@ public class MergeTotalWeakening extends MergeProcedure implements UnparametricM
     }
 
     @Override
-    public @NonNull ValuesMergeResult mergeValuesInStates(@NonNull Term v, SymbolicExecutionState state1,
-                                                          Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-                                                          Term distinguishingFormula, @NonNull Services services) {
+    public @NonNull ValuesMergeResult mergeValuesInStates(@NonNull Term v,
+            SymbolicExecutionState state1,
+            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
+            Term distinguishingFormula, @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 

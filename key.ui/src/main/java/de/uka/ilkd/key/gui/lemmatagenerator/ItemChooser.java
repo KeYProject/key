@@ -17,6 +17,7 @@ import javax.swing.table.TableRowSorter;
 import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
 import de.uka.ilkd.key.gui.lemmatagenerator.SelectionPanel.Side;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+
 import org.jspecify.annotations.NonNull;
 
 

@@ -14,11 +14,12 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers
@@ -67,7 +68,8 @@ public class Polynomial {
         return res;
     }
 
-    private static @NonNull Polynomial createHelp(@NonNull Term polynomial, @NonNull Services services) {
+    private static @NonNull Polynomial createHelp(@NonNull Term polynomial,
+            @NonNull Services services) {
         final Analyser a = new Analyser(services);
         a.analyse(polynomial);
         return new Polynomial(a.parts, a.constantPart);
@@ -299,7 +301,7 @@ public class Polynomial {
      *         multiplicity is treated as well here, so this is really difference of multisets
      */
     private static ImmutableList<Monomial> difference(ImmutableList<Monomial> a,
-                                                      @NonNull ImmutableList<Monomial> b) {
+            @NonNull ImmutableList<Monomial> b) {
         ImmutableList<Monomial> res = a;
         final Iterator<Monomial> it = b.iterator();
         while (it.hasNext() && !res.isEmpty()) {
@@ -308,7 +310,8 @@ public class Polynomial {
         return res;
     }
 
-    private static @NonNull ImmutableList<Monomial> addPart(@NonNull ImmutableList<Monomial> oldParts, @NonNull Monomial m) {
+    private static @NonNull ImmutableList<Monomial> addPart(
+            @NonNull ImmutableList<Monomial> oldParts, @NonNull Monomial m) {
         if (m.getCoefficient().signum() == 0) {
             return oldParts;
         }
@@ -319,8 +322,9 @@ public class Polynomial {
         return oldParts.prepend(m);
     }
 
-    private static @Nullable ImmutableList<Monomial> addPartHelp(@NonNull ImmutableList<Monomial> oldParts,
-                                                                 @NonNull Monomial m) {
+    private static @Nullable ImmutableList<Monomial> addPartHelp(
+            @NonNull ImmutableList<Monomial> oldParts,
+            @NonNull Monomial m) {
         if (oldParts.isEmpty()) {
             return null;
         }

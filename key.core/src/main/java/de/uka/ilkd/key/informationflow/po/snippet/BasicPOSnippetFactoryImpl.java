@@ -15,9 +15,9 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.TermCreationException;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -52,15 +52,16 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     }
 
 
-    BasicPOSnippetFactoryImpl(@NonNull FunctionalOperationContract contract, ProofObligationVars poVars,
-                              @NonNull Services services) {
+    BasicPOSnippetFactoryImpl(@NonNull FunctionalOperationContract contract,
+            ProofObligationVars poVars,
+            @NonNull Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
 
     BasicPOSnippetFactoryImpl(@NonNull LoopSpecification invariant, ProofObligationVars poVars,
-                              ExecutionContext context, @NonNull Term guardTerm, @NonNull Services services) {
+            ExecutionContext context, @NonNull Term guardTerm, @NonNull Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars = poVars;
         registerFactoryMethods();
@@ -68,7 +69,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     BasicPOSnippetFactoryImpl(@NonNull InformationFlowContract contract, ProofObligationVars poVars,
-                              @NonNull Services services) {
+            @NonNull Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
         registerFactoryMethods();
@@ -76,7 +77,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     BasicPOSnippetFactoryImpl(@NonNull BlockContract contract, ProofObligationVars poVars,
-                              ExecutionContext context, @NonNull Services services) {
+            ExecutionContext context, @NonNull Services services) {
         this.data = new BasicSnippetData(contract, context, services);
         this.poVars = poVars;
         registerFactoryMethods();

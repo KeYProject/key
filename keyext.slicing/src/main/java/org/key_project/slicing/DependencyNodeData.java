@@ -6,9 +6,10 @@ package org.key_project.slicing;
 import java.util.Collections;
 import java.util.List;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Stores the dependency graph nodes touched by a proof step.
@@ -38,8 +39,9 @@ public class DependencyNodeData {
      * @param outputs graph nodes created by the proof step
      * @param label label for this node
      */
-    public DependencyNodeData(@NonNull List<Pair<GraphNode, Boolean>> inputs, @NonNull List<GraphNode> outputs,
-                              String label) {
+    public DependencyNodeData(@NonNull List<Pair<GraphNode, Boolean>> inputs,
+            @NonNull List<GraphNode> outputs,
+            String label) {
         this.inputs = Collections.unmodifiableList(inputs);
         this.outputs = Collections.unmodifiableList(outputs);
         this.label = label;

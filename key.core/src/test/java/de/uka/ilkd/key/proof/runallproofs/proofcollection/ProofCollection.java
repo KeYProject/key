@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -91,7 +92,7 @@ public final class ProofCollection {
      *
      * @param groupNames a list of groups to be kept
      */
-    public void keep(String @NonNull ... groupNames) {
+    public void keep(String @NonNull... groupNames) {
         Arrays.sort(groupNames);
         Predicate<String> toBeKept = (String s) -> Arrays.binarySearch(groupNames, s) >= 0;
         Predicate<? super ProofCollectionUnit> pred =

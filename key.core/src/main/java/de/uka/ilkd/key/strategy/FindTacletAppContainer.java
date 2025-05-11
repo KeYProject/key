@@ -16,8 +16,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -44,8 +45,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * @param goal the goal to apply the taclet on
      * @param age the age
      */
-    FindTacletAppContainer(NoPosTacletApp app, @NonNull PosInOccurrence pio, RuleAppCost cost, @NonNull Goal goal,
-                           long age) {
+    FindTacletAppContainer(NoPosTacletApp app, @NonNull PosInOccurrence pio, RuleAppCost cost,
+            @NonNull Goal goal,
+            long age) {
         super(app, cost, age);
         applicationPosition = pio;
         positionTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
@@ -107,7 +109,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         formulas) and no indirect relationship exists which is established by a modification
      *         that occurred inside an update
      */
-    private boolean independentSubformulas(@NonNull PosInOccurrence changePos, @NonNull SequentFormula newFormula) {
+    private boolean independentSubformulas(@NonNull PosInOccurrence changePos,
+            @NonNull SequentFormula newFormula) {
         final PIOPathIterator changePIO = changePos.iterator();
         final PIOPathIterator appPIO = applicationPosition.iterator();
 

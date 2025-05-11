@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**

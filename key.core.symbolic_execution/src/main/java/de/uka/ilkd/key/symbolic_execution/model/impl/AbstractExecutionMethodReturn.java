@@ -22,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -67,7 +68,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
     public AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
-                                         @NonNull ExecutionMethodCall methodCall) {
+            @NonNull ExecutionMethodCall methodCall) {
         super(settings, proofNode);
         assert methodCall != null;
         this.methodCall = methodCall;

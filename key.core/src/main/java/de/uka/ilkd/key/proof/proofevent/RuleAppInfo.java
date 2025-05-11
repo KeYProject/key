@@ -7,8 +7,9 @@ package de.uka.ilkd.key.proof.proofevent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * More specific information about a rule application: the original proof node and the new proof

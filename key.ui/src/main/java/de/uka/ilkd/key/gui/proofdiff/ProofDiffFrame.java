@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import java.awt.*;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A highlight painter for drawing a squiggly line under the selection. Color and width of the line
@@ -42,7 +42,8 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     }
 
     @Override
-    public void paint(@NonNull Graphics g, int offs0, int offs1, @Nullable Shape bounds, @NonNull JTextComponent c) {
+    public void paint(@NonNull Graphics g, int offs0, int offs1, @Nullable Shape bounds,
+            @NonNull JTextComponent c) {
         // don't render if empty
         if (offs0 == offs1) {
             return;

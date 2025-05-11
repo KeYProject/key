@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -94,10 +95,11 @@ public class UndoHistoryButton {
      * @param pressedSelection callback if a dropdown entry is selected
      * @param actionSupplier callback that provides the list of actions to display
      */
-    public UndoHistoryButton(@NonNull MainWindow mainWindow, int iconSize, IconFontProvider actionIcon,
-                             String prefix,
-                             Consumer<UserAction> pressedAction, Consumer<UserAction> pressedSelection,
-                             Supplier<List<UserAction>> actionSupplier) {
+    public UndoHistoryButton(@NonNull MainWindow mainWindow, int iconSize,
+            IconFontProvider actionIcon,
+            String prefix,
+            Consumer<UserAction> pressedAction, Consumer<UserAction> pressedSelection,
+            Supplier<List<UserAction>> actionSupplier) {
         this.iconSize = iconSize;
         this.actionIcon = actionIcon;
         this.prefix = prefix;

@@ -10,8 +10,9 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NonNull;
 
 public class AllObjects extends Operator {
 

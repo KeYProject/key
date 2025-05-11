@@ -14,9 +14,10 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 import static org.key_project.util.collection.ImmutableSLList.nil;
 
@@ -153,8 +154,9 @@ public class TacletConditions {
         return false;
     }
 
-    private boolean containsComparisionCondition(@NonNull TypeComparisonCondition tcc, Sort s1, Sort s2,
-                                                 TypeComparisonCondition.Mode mode) {
+    private boolean containsComparisionCondition(@NonNull TypeComparisonCondition tcc, Sort s1,
+            Sort s2,
+            TypeComparisonCondition.Mode mode) {
 
         GenericSortResolver first = null, second = null;
 
@@ -180,7 +182,7 @@ public class TacletConditions {
     }
 
     public boolean containsIsSubtypeRelation(Sort gen, @NonNull Sort inst,
-                                             TypeComparisonCondition.Mode mode) {
+            TypeComparisonCondition.Mode mode) {
         for (TypeComparisonCondition tcc : comparisionCondition) {
             if (tcc.getMode() == mode) {
                 if (tcc.getSecondResolver() instanceof NonGenericSortResolver

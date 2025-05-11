@@ -10,10 +10,11 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Container for RuleApp instances with cost as determined by a given Strategy. Instances of this
@@ -66,8 +67,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return container for the currently applicable RuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    public static @Nullable RuleAppContainer createAppContainer(RuleApp p_app, PosInOccurrence p_pio,
-                                                                @NonNull Goal p_goal) {
+    public static @Nullable RuleAppContainer createAppContainer(RuleApp p_app,
+            PosInOccurrence p_pio,
+            @NonNull Goal p_goal) {
 
         if (p_app instanceof NoPosTacletApp) {
             return TacletAppContainer.createAppContainers((NoPosTacletApp) p_app, p_pio, p_goal);
@@ -90,7 +92,8 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      *         of <code>TopRuleAppCost</code>.
      */
     public static @NonNull ImmutableList<RuleAppContainer> createAppContainers(
-            @NonNull ImmutableList<? extends RuleApp> rules, PosInOccurrence pos, @NonNull Goal goal) {
+            @NonNull ImmutableList<? extends RuleApp> rules, PosInOccurrence pos,
+            @NonNull Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         if (rules.size() == 1) {

@@ -10,8 +10,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

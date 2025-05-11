@@ -20,10 +20,10 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,8 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     protected List<Contract> contracts;
 
-    public ConsoleProofObligationSelector(@NonNull ConsoleUserInterfaceControl ui, InitConfig initConfig) {
+    public ConsoleProofObligationSelector(@NonNull ConsoleUserInterfaceControl ui,
+            InitConfig initConfig) {
         this.ui = ui;
         this.mediator = ui.getMediator();
 

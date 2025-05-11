@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.pp.PosInSequent;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -27,7 +28,8 @@ import org.jspecify.annotations.Nullable;
 public class ShowHashcodesExtension implements KeYGuiExtension, KeYGuiExtension.Tooltip {
 
     @Override
-    public @NonNull List<String> getTooltipStrings(MainWindow mainWindow, @Nullable PosInSequent pos) {
+    public @NonNull List<String> getTooltipStrings(MainWindow mainWindow,
+            @Nullable PosInSequent pos) {
         if (pos == null || pos.isSequent()) {
             return Collections.emptyList();
         }

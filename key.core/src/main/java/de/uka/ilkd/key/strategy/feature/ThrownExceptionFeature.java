@@ -21,13 +21,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.logic.sort.Sort;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.sort.Sort;
 
 public class ThrownExceptionFeature extends BinaryFeature {
 
-    public static @NonNull Feature create(String @NonNull [] blockedExceptions, @NonNull Services services) {
+    public static @NonNull Feature create(String @NonNull [] blockedExceptions,
+            @NonNull Services services) {
         return new ThrownExceptionFeature(blockedExceptions, services);
     }
 
@@ -40,7 +42,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param p_filteredExceptions the String array with the types of the thrown exceptions
      * @param services the Services
      */
-    private ThrownExceptionFeature(String @NonNull [] p_filteredExceptions, @NonNull Services services) {
+    private ThrownExceptionFeature(String @NonNull [] p_filteredExceptions,
+            @NonNull Services services) {
         final List<Sort> filtered = new ArrayList<>();
 
         final JavaInfo javaInfo = services.getJavaInfo();
@@ -63,12 +66,14 @@ public class ThrownExceptionFeature extends BinaryFeature {
         return false;
     }
 
-    protected boolean filter(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         return app instanceof TacletApp && filter(pos.subTerm(), goal.proof().getServices(),
             ((TacletApp) app).instantiations().getExecutionContext());
     }
 
-    protected boolean filter(@NonNull Term term, @NonNull Services services, @NonNull ExecutionContext ec) {
+    protected boolean filter(@NonNull Term term, @NonNull Services services,
+            @NonNull ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw fstThrow && blockedExceptions(

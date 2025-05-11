@@ -20,6 +20,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -74,7 +75,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * @param additionalBranchLabel The optional additional branch label.
      */
     public ExecutionBranchCondition(@NonNull ITreeSettings settings, @NonNull Node proofNode,
-                                    String additionalBranchLabel) {
+            String additionalBranchLabel) {
         super(settings, proofNode);
         this.additionalBranchLabel = additionalBranchLabel;
     }

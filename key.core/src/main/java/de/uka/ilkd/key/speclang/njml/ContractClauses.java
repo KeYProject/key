@@ -13,9 +13,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 class ContractClauses {

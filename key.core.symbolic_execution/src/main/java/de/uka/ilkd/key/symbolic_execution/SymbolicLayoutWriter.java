@@ -18,6 +18,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.util.LinkedHashMap;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -127,7 +128,8 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param file The {@link File} to save to.
      * @throws IOException Occurred Exception.
      */
-    public void write(@NonNull ISymbolicLayout model, String encoding, @NonNull File file) throws IOException {
+    public void write(@NonNull ISymbolicLayout model, String encoding, @NonNull File file)
+            throws IOException {
         write(model, encoding, new FileOutputStream(file));
     }
 
@@ -140,7 +142,8 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      *        this method.
      * @throws IOException Occurred Exception.
      */
-    public void write(@NonNull ISymbolicLayout model, @Nullable String encoding, @Nullable OutputStream out) throws IOException {
+    public void write(@NonNull ISymbolicLayout model, @Nullable String encoding,
+            @Nullable OutputStream out) throws IOException {
         if (out != null) {
             try (out) {
                 Charset charset =
@@ -173,7 +176,8 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param model The {@link ISymbolicLayout} to append.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendModel(int level, @NonNull ISymbolicLayout model, @NonNull StringBuilder sb) {
+    protected void appendModel(int level, @NonNull ISymbolicLayout model,
+            @NonNull StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         appendStartTag(level, TAG_MODEL, attributeValues, sb);
         for (ISymbolicEquivalenceClass ec : model.getEquivalenceClasses()) {
@@ -195,7 +199,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendEquivalenceClass(int level, @NonNull ISymbolicEquivalenceClass ec,
-                                          @NonNull StringBuilder sb) {
+            @NonNull StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_REPRESENTATIVE, ec.getRepresentativeString());
         appendStartTag(level, TAG_EQUIVALENCE_CLASS, attributeValues, sb);
@@ -216,8 +220,9 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param state The {@link ISymbolicState} to append.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendState(int level, @NonNull ISymbolicLayout model, @NonNull ISymbolicState state,
-                               @NonNull StringBuilder sb) {
+    protected void appendState(int level, @NonNull ISymbolicLayout model,
+            @NonNull ISymbolicState state,
+            @NonNull StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, state.getName());
         appendStartTag(level, TAG_STATE, attributeValues, sb);
@@ -239,8 +244,9 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param object The {@link ISymbolicObject} to append.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendObject(int level, @NonNull ISymbolicLayout model, @NonNull ISymbolicObject object,
-                                @NonNull StringBuilder sb) {
+    protected void appendObject(int level, @NonNull ISymbolicLayout model,
+            @NonNull ISymbolicObject object,
+            @NonNull StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_XML_ID, computeObjectId(model, object));
         attributeValues.put(ATTRIBUTE_NAME, object.getNameString());
@@ -263,7 +269,8 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param value The {@link ISymbolicValue} to append.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendValue(int level, @NonNull ISymbolicValue value, @NonNull StringBuilder sb) {
+    protected void appendValue(int level, @NonNull ISymbolicValue value,
+            @NonNull StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, value.getName());
         attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, value.getProgramVariableString());
@@ -287,7 +294,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendAssociation(int level, @NonNull ISymbolicLayout model,
-                                     @NonNull ISymbolicAssociation association, @NonNull StringBuilder sb) {
+            @NonNull ISymbolicAssociation association, @NonNull StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, association.getName());
         attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, association.getProgramVariableString());
@@ -307,7 +314,8 @@ public class SymbolicLayoutWriter extends AbstractWriter {
      * @param object The {@link ISymbolicObject} to compute its unique ID.
      * @return The unique ID.
      */
-    protected @NonNull String computeObjectId(@NonNull ISymbolicLayout model, ISymbolicObject object) {
+    protected @NonNull String computeObjectId(@NonNull ISymbolicLayout model,
+            ISymbolicObject object) {
         int i = 0;
         int index = -1;
         Iterator<ISymbolicObject> iter = model.getObjects().iterator();

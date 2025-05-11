@@ -33,8 +33,6 @@ import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.slicing.graph.AddedRule;
@@ -48,6 +46,9 @@ import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Tracks proof steps as they are applied on the proof.
@@ -105,7 +106,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param node node corresponding to the rule application
      * @return all formulas used by the rule application
      */
-    private static @NonNull Set<PosInOccurrence> inputsOfRuleApp(@NonNull RuleApp ruleApp, @NonNull Node node) {
+    private static @NonNull Set<PosInOccurrence> inputsOfRuleApp(@NonNull RuleApp ruleApp,
+            @NonNull Node node) {
         Set<PosInOccurrence> inputs = new HashSet<>();
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
@@ -123,7 +125,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param removed formulas removed by this node
      * @return pairs of graph nodes and whether the graph node was removed
      */
-    private @NonNull List<Pair<GraphNode, Boolean>> inputsOfNode(@NonNull Node n, @NonNull Set<PosInOccurrence> removed) {
+    private @NonNull List<Pair<GraphNode, Boolean>> inputsOfNode(@NonNull Node n,
+            @NonNull Set<PosInOccurrence> removed) {
         RuleApp ruleApp = n.getAppliedRuleApp();
         List<Pair<GraphNode, Boolean>> input = new ArrayList<>();
 
@@ -221,7 +224,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param ruleAppInfo rule application info
      * @return formulas added
      */
-    private @NonNull List<Pair<PosInOccurrence, Integer>> outputsOfNode(@NonNull RuleAppInfo ruleAppInfo) {
+    private @NonNull List<Pair<PosInOccurrence, Integer>> outputsOfNode(
+            @NonNull RuleAppInfo ruleAppInfo) {
         List<Pair<PosInOccurrence, Integer>> outputs = new ArrayList<>();
         int sibling = ruleAppInfo.getReplacementNodes().size() - 1;
         for (NodeReplacement b : ruleAppInfo.getReplacementNodes()) {
@@ -450,7 +454,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param node graph node to center export around
      * @return DOT string
      */
-    public @NonNull String exportDotAround(boolean abbreviateFormulas, boolean omitBranch, @NonNull GraphNode node) {
+    public @NonNull String exportDotAround(boolean abbreviateFormulas, boolean omitBranch,
+            @NonNull GraphNode node) {
         return DotExporter.exportDotAround(
             graph, analysisResults, abbreviateFormulas, omitBranch, node);
     }
@@ -483,7 +488,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param pio a sequent formula
      * @return the node that added this formula, or null
      */
-    public @Nullable Node getNodeThatProduced(@NonNull Node currentNode, @NonNull PosInOccurrence pio) {
+    public @Nullable Node getNodeThatProduced(@NonNull Node currentNode,
+            @NonNull PosInOccurrence pio) {
         if (proof == null) {
             return null;
         }

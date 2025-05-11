@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -26,7 +27,8 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
     private DiffFindAndReplacewithFeature() {}
 
     @Override
-    protected boolean filter(@NonNull TacletApp app, @NonNull PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null && app.rule() instanceof RewriteTaclet
                 : "Feature is only applicable to rewrite taclets";
 

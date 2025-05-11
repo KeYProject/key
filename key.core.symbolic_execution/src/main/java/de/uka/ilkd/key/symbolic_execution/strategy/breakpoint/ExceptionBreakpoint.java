@@ -16,9 +16,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.util.collection.ImmutableList;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This{@link ExceptionBreakpoint} represents an exception breakpoint and is responsible to tell the
@@ -102,8 +103,9 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, @NonNull Proof proof,
-                                   Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp,
+            @NonNull Proof proof,
+            Node node) {
         Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
         if (activeStatement instanceof Throw throwStatement && isEnabled()) {
             for (int i = 0; i < throwStatement.getChildCount(); i++) {

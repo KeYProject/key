@@ -11,6 +11,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -22,9 +22,10 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerPropertyVisitor;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices;
 
+import org.key_project.util.collection.Pair;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.Pair;
 
 /**
  * This is the dialog for the new smt translation mechnism (newsmt2) which aims at a higher degree
@@ -125,28 +126,32 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
             implements SMTHandlerPropertyVisitor<Pair<String, JComponent>, Void> {
 
         @Override
-        public @Nullable Void visit(EnumProperty<?> enumProp, @NonNull Pair<String, JComponent> arg) {
+        public @Nullable Void visit(EnumProperty<?> enumProp,
+                @NonNull Pair<String, JComponent> arg) {
             JComboBox<?> box = (JComboBox<?>) arg.second;
             box.setSelectedItem(arg.first);
             return null;
         }
 
         @Override
-        public @Nullable Void visit(IntegerProperty integerProp, @NonNull Pair<String, JComponent> arg) {
+        public @Nullable Void visit(IntegerProperty integerProp,
+                @NonNull Pair<String, JComponent> arg) {
             JTextField field = (JTextField) arg.second;
             field.setText(arg.first);
             return null;
         }
 
         @Override
-        public @Nullable Void visit(BooleanProperty booleanProp, @NonNull Pair<String, JComponent> arg) {
+        public @Nullable Void visit(BooleanProperty booleanProp,
+                @NonNull Pair<String, JComponent> arg) {
             JCheckBox box = (JCheckBox) arg.second;
             box.setSelected(Boolean.parseBoolean(arg.first));
             return null;
         }
 
         @Override
-        public @Nullable Void visit(StringProperty stringProp, @NonNull Pair<String, JComponent> arg) {
+        public @Nullable Void visit(StringProperty stringProp,
+                @NonNull Pair<String, JComponent> arg) {
             JTextField field = (JTextField) arg.second;
             field.setText(arg.first);
             return null;

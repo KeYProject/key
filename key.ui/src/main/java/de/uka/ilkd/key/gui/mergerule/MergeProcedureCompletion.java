@@ -14,8 +14,9 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A completion class for merge procedures. Certain procedures, such as

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -26,7 +27,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
     public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator();
 
     public @NonNull Iterator<Term> generate(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
-                                            MutableState mState) {
+            MutableState mState) {
         return new ACPIterator(pos.sequentFormula().formula(), pos.isInAntec());
     }
 

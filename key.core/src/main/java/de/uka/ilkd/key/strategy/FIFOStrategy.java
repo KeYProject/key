@@ -10,9 +10,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.key_project.logic.Name;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
@@ -33,7 +34,7 @@ public class FIFOStrategy implements Strategy {
      *         all (it is discarded by the strategy).
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
-                                   MutableState mState) {
+            MutableState mState) {
         return NumberRuleAppCost.create(goal.getTime());
     }
 

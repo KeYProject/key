@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement.check;
 
-import org.jspecify.annotations.NonNull;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a node in a file tree where nodes contain Path objects.

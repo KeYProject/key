@@ -11,9 +11,10 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.key_project.logic.Name;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
 
 /**
  * A program model element representing primitive types.

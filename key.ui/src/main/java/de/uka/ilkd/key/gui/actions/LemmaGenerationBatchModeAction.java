@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
+
 import org.jspecify.annotations.NonNull;
 
 public class LemmaGenerationBatchModeAction extends MainWindowAction {

@@ -17,9 +17,10 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -75,9 +76,9 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      * @return The frame condition.
      */
     private static @Nullable Term createFrameCondition(final @NonNull LoopSpecification loopSpec,
-                                                       final boolean isTransaction,
-                                                       final @NonNull Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap,
-                                                       final @NonNull Services services) {
+            final boolean isTransaction,
+            final @NonNull Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap,
+            final @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
@@ -117,9 +118,11 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      *
      * @return A map from heap variables to a map from original terms to the pre-state terms.
      */
-    private @NonNull Map<LocationVariable, Map<Term, Term>> createHeapToBeforeLoopMap(boolean isTransaction,
-                                                                                      boolean isPermissions, @NonNull ProgramVariable heapBeforePV, @NonNull ProgramVariable savedHeapBeforePV,
-                                                                                      @NonNull ProgramVariable permissionsHeapBeforePV, @NonNull Services services) {
+    private @NonNull Map<LocationVariable, Map<Term, Term>> createHeapToBeforeLoopMap(
+            boolean isTransaction,
+            boolean isPermissions, @NonNull ProgramVariable heapBeforePV,
+            @NonNull ProgramVariable savedHeapBeforePV,
+            @NonNull ProgramVariable permissionsHeapBeforePV, @NonNull Services services) {
         final Map<LocationVariable, Map<Term, Term>> result = //
             new LinkedHashMap<>();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -140,8 +143,9 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         return result;
     }
 
-    private static void put(@NonNull Map<LocationVariable, Map<Term, Term>> map, LocationVariable key,
-                            Term t1, Term t2) {
+    private static void put(@NonNull Map<LocationVariable, Map<Term, Term>> map,
+            LocationVariable key,
+            Term t1, Term t2) {
         map.computeIfAbsent(key, k -> new LinkedHashMap<>());
         map.get(key).put(t1, t2);
     }

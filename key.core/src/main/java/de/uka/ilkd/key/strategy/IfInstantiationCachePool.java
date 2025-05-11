@@ -12,9 +12,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Direct-mapped cache of lists of formulas (potential instantiations of if-formulas of taclets)

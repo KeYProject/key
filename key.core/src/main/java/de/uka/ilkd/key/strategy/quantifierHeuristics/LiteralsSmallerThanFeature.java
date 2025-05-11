@@ -19,6 +19,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -38,7 +39,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
-                                          IntegerLDT numbers) {
+            IntegerLDT numbers) {
         return new LiteralsSmallerThanFeature(left, right, numbers);
     }
 
@@ -49,7 +50,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return compareTerms(leftTerm, rightTerm, pos, goal);
     }
 
-    protected boolean compareTerms(@NonNull Term leftTerm, @NonNull Term rightTerm, PosInOccurrence pos, Goal goal) {
+    protected boolean compareTerms(@NonNull Term leftTerm, @NonNull Term rightTerm,
+            PosInOccurrence pos, Goal goal) {
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final LiteralCollector m2 = new LiteralCollector();
@@ -62,7 +64,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, @NonNull PosInOccurrence focus, @NonNull Goal goal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, @NonNull PosInOccurrence focus,
+            @NonNull Goal goal) {
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);
 

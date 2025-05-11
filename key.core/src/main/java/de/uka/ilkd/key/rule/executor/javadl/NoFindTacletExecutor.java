@@ -20,8 +20,9 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
     public static final AtomicLong PERF_APPLY = new AtomicLong();
@@ -43,8 +44,9 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param matchCond the MatchConditions with all required instantiations
      */
     protected void applyAdd(@NonNull TermLabelState termLabelState, @NonNull Sequent add,
-                            @NonNull SequentChangeInfo currentSequent, @NonNull Services services, @NonNull MatchConditions matchCond,
-                            @NonNull Goal goal, @NonNull RuleApp ruleApp) {
+            @NonNull SequentChangeInfo currentSequent, @NonNull Services services,
+            @NonNull MatchConditions matchCond,
+            @NonNull Goal goal, @NonNull RuleApp ruleApp) {
         addToAntec(add.antecedent(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, null,
             matchCond, goal, ruleApp, services);
@@ -60,7 +62,8 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param services the Services encapsulating all java information
      * @param ruleApp the taclet application that is executed
      */
-    public @NonNull ImmutableList<Goal> apply(@NonNull Goal goal, @NonNull Services services, @NonNull RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(@NonNull Goal goal, @NonNull Services services,
+            @NonNull RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
 
         // Number without the if-goal eventually needed

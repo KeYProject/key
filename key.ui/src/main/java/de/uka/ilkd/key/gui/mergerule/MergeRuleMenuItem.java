@@ -16,6 +16,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -37,7 +38,7 @@ public class MergeRuleMenuItem extends JMenuItem {
      * @param mediator The KeY mediator.
      */
     public MergeRuleMenuItem(final @NonNull Goal goal, final @NonNull PosInOccurrence pio,
-                             final @NonNull KeYMediator mediator) {
+            final @NonNull KeYMediator mediator) {
         final Services services = goal.proof().getServices();
 
         this.setText(toString());

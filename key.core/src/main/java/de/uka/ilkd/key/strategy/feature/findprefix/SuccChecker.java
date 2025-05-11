@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+
 import org.jspecify.annotations.NonNull;
 
 /**

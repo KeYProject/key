@@ -20,10 +20,11 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -120,8 +121,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build the term forall o,f. o,f in dep@h' ==>
      * o.f@h' == o.f@h
      */
-    private @NonNull Term buildConditionDependency(@NonNull Term larger, @NonNull Term smaller, @NonNull DependencyContract contract,
-                                                   @NonNull Services services) {
+    private @NonNull Term buildConditionDependency(@NonNull Term larger, @NonNull Term smaller,
+            @NonNull DependencyContract contract,
+            @NonNull Services services) {
 
 
         TermBuilder tb = services.getTermBuilder();
@@ -154,8 +156,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
     /*
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build a1=a1' /\ ... /\ an=an'
      */
-    private @NonNull Term buildConditionSameParams(@NonNull DependencyContract contract, @NonNull Term term1, @NonNull Term term2,
-                                                   @NonNull Services services) {
+    private @NonNull Term buildConditionSameParams(@NonNull DependencyContract contract,
+            @NonNull Term term1, @NonNull Term term2,
+            @NonNull Services services) {
         TermBuilder tb = services.getTermBuilder();
         Term result = tb.tt();
 
@@ -173,8 +176,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build depContract_f_pre(h, a1, ..., an) by
      * instantiating that part of the contract.
      */
-    private @NonNull Term buildConditionPrecondition(@NonNull Term app, @NonNull DependencyContract contract,
-                                                     @NonNull Services services) {
+    private @NonNull Term buildConditionPrecondition(@NonNull Term app,
+            @NonNull DependencyContract contract,
+            @NonNull Services services) {
 
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         // static methods do not a self var ==> one argument less to ignore (#1672)
@@ -188,7 +192,8 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
     /*
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build forall o, o.created@h' ==> o.created@h
      */
-    private @NonNull Term buildConditionMonotonicHeap(@NonNull Term largerHeap, @NonNull Term smallerHeap, @NonNull Services services) {
+    private @NonNull Term buildConditionMonotonicHeap(@NonNull Term largerHeap,
+            @NonNull Term smallerHeap, @NonNull Services services) {
 
         LogicVariable var = new LogicVariable(new Name("_ov"),
             services.getJavaInfo().getJavaLangObject().getSort());

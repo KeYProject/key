@@ -9,8 +9,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**

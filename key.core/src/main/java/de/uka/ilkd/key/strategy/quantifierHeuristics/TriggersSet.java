@@ -25,10 +25,11 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to select and store <code>Trigger</code>s for a quantified formula in Prenex
@@ -122,7 +123,7 @@ public class TriggersSet {
      * @return a <code>Trigger</code> with <code>trigger</code> as its term
      */
     private @NonNull Trigger createUniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> qvs,
-                                              boolean isUnify, boolean isElement) {
+            boolean isUnify, boolean isElement) {
         Trigger t = termToTrigger.get(trigger);
         if (t == null) {
             t = new UniTrigger(trigger, qvs, isUnify, isElement, this);
@@ -139,7 +140,7 @@ public class TriggersSet {
      * @return the MultTrigger for the given triggers
      */
     private @NonNull Trigger createMultiTrigger(ImmutableSet<Trigger> trs, Term clause,
-                                                ImmutableSet<QuantifiableVariable> qvs) {
+            ImmutableSet<QuantifiableVariable> qvs) {
         return new MultiTrigger(trs, qvs, clause);
     }
 
@@ -223,7 +224,8 @@ public class TriggersSet {
             return true;
         }
 
-        private @NonNull Set<Term> expandIfThenElse(@NonNull Term t, @NonNull TermServices services) {
+        private @NonNull Set<Term> expandIfThenElse(@NonNull Term t,
+                @NonNull TermServices services) {
             final Set<Term>[] possibleSubs = new Set[t.arity()];
             boolean changed = false;
             for (int i = 0; i != t.arity(); ++i) {
@@ -249,8 +251,10 @@ public class TriggersSet {
             return res;
         }
 
-        private @NonNull Set<Term> combineSubterms(@NonNull Term oriTerm, Set<Term> @NonNull [] possibleSubs, Term @NonNull [] chosenSubs,
-                                                   @NonNull ImmutableArray<QuantifiableVariable> boundVars, int i, @NonNull TermServices services) {
+        private @NonNull Set<Term> combineSubterms(@NonNull Term oriTerm,
+                Set<Term> @NonNull [] possibleSubs, Term @NonNull [] chosenSubs,
+                @NonNull ImmutableArray<QuantifiableVariable> boundVars, int i,
+                @NonNull TermServices services) {
             final HashSet<Term> set = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {
                 final Term res = services.getTermFactory().createTerm(oriTerm.op(), chosenSubs,
@@ -345,7 +349,8 @@ public class TriggersSet {
          * @param ts elements of multi-triggers at the beginning
          * @return a set of triggers
          */
-        private @NonNull Set<ImmutableSet<Trigger>> setMultiTriggers(@NonNull Iterator<Trigger> ts) {
+        private @NonNull Set<ImmutableSet<Trigger>> setMultiTriggers(
+                @NonNull Iterator<Trigger> ts) {
             Set<ImmutableSet<Trigger>> res = new LinkedHashSet<>();
             if (ts.hasNext()) {
                 final Trigger trigger = ts.next();

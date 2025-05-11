@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
+
 import org.jspecify.annotations.Nullable;
 
 /**

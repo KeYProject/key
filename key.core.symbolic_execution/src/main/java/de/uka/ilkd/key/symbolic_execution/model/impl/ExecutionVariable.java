@@ -31,9 +31,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
+import org.key_project.util.collection.ImmutableList;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * The default implementation of {@link IExecutionVariable}.
@@ -65,8 +66,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionVariable(@NonNull IExecutionNode<?> parentNode, @NonNull Node proofNode,
-                             @NonNull PosInOccurrence modalityPIO, @NonNull IProgramVariable programVariable,
-                             Term additionalCondition) {
+            @NonNull PosInOccurrence modalityPIO, @NonNull IProgramVariable programVariable,
+            Term additionalCondition) {
         this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
     }
 
@@ -80,8 +81,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionVariable(@NonNull IExecutionNode<?> parentNode, @NonNull Node proofNode,
-                             @NonNull PosInOccurrence modalityPIO, ExecutionValue parentValue,
-                             @NonNull IProgramVariable programVariable, Term additionalCondition) {
+            @NonNull PosInOccurrence modalityPIO, ExecutionValue parentValue,
+            @NonNull IProgramVariable programVariable, Term additionalCondition) {
         super(parentNode.getSettings(), proofNode, programVariable, parentValue, null,
             additionalCondition, modalityPIO);
         assert programVariable != null;
@@ -101,8 +102,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionVariable(@NonNull IExecutionNode<?> parentNode, @NonNull Node proofNode,
-                             @NonNull PosInOccurrence modalityPIO, ExecutionValue parentValue, Term arrayIndex,
-                             ExecutionValue lengthValue, Term additionalCondition) {
+            @NonNull PosInOccurrence modalityPIO, ExecutionValue parentValue, Term arrayIndex,
+            ExecutionValue lengthValue, Term additionalCondition) {
         super(parentNode.getSettings(), proofNode, null, parentValue, arrayIndex,
             additionalCondition, modalityPIO);
         assert modalityPIO != null;
@@ -193,9 +194,11 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @return The created {@link ExecutionValue} instances.
      * @throws ProofInputException Occurred Exception.
      */
-    protected ExecutionValue @NonNull [] instantiateValuesFromSideProof(@NonNull InitConfig initConfig,
-                                                                        @NonNull Services services, @NonNull TermBuilder tb, @NonNull ApplyStrategyInfo info, Operator resultOperator,
-                                                                        Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
+    protected ExecutionValue @NonNull [] instantiateValuesFromSideProof(
+            @NonNull InitConfig initConfig,
+            @NonNull Services services, @NonNull TermBuilder tb, @NonNull ApplyStrategyInfo info,
+            Operator resultOperator,
+            Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
             new ArrayList<>(info.getProof().openGoals().size());
         // Group values of the branches
@@ -256,8 +259,10 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param services The {@link Services} to use.
      */
     protected void groupGoalsByValue(@NonNull ImmutableList<Goal> goals, Operator operator,
-                                     @Nullable Term siteProofSelectTerm, Term siteProofCondition, @NonNull Map<Term, List<Goal>> valueMap,
-                                     @NonNull List<Goal> unknownValues, @NonNull Services services) throws ProofInputException {
+            @Nullable Term siteProofSelectTerm, Term siteProofCondition,
+            @NonNull Map<Term, List<Goal>> valueMap,
+            @NonNull List<Goal> unknownValues, @NonNull Services services)
+            throws ProofInputException {
         for (Goal goal : goals) {
             // Extract value
             Term value = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, operator);
@@ -298,8 +303,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @return The combined path condition.
      * @throws ProofInputException Occurred Exception.
      */
-    protected @Nullable Term computeValueCondition(@NonNull TermBuilder tb, @NonNull List<Goal> valueGoals,
-                                                   @NonNull InitConfig initConfig) throws ProofInputException {
+    protected @Nullable Term computeValueCondition(@NonNull TermBuilder tb,
+            @NonNull List<Goal> valueGoals,
+            @NonNull InitConfig initConfig) throws ProofInputException {
         if (!valueGoals.isEmpty()) {
             List<Term> pathConditions = new LinkedList<>();
             Proof proof = null;

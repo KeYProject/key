@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+
 import org.jspecify.annotations.NonNull;
 
 public class ExtensionSettings extends AbstractPropertiesSettings {

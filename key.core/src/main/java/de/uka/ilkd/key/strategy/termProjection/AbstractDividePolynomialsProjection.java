@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm {
@@ -39,7 +40,8 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
     protected abstract Term divide(Monomial numerator, BigInteger denominator, Services services);
 
-    private Term quotient(BigInteger monoCoeff, @NonNull Term rightPoly, @NonNull Services services) {
+    private Term quotient(BigInteger monoCoeff, @NonNull Term rightPoly,
+            @NonNull Services services) {
         final JFunction add = services.getTypeConverter().getIntegerLDT().getAdd();
         if (rightPoly.op() == add) {
             final Term left = quotient(monoCoeff, rightPoly.sub(0), services);

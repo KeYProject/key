@@ -15,11 +15,11 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,8 +80,9 @@ public class ApplyStrategy extends AbstractProverCore {
      *
      * @return information whether the rule application was successful or not
      */
-    private synchronized @NonNull SingleRuleApplicationInfo applyAutomaticRule(final @NonNull GoalChooser goalChooser,
-                                                                               final @NonNull StopCondition stopCondition, boolean stopAtFirstNonClosableGoal) {
+    private synchronized @NonNull SingleRuleApplicationInfo applyAutomaticRule(
+            final @NonNull GoalChooser goalChooser,
+            final @NonNull StopCondition stopCondition, boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
         RuleApp app = null;
         Goal g;
@@ -126,7 +127,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * applies rules until this is no longer possible or the thread is interrupted.
      */
     private synchronized @NonNull ApplyStrategyInfo doWork(final @NonNull GoalChooser goalChooser,
-                                                           final @NonNull StopCondition stopCondition) {
+            final @NonNull StopCondition stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
 
@@ -219,7 +220,8 @@ public class ApplyStrategy extends AbstractProverCore {
      * org.key_project.util.collection.ImmutableList)
      */
     @Override
-    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals) {
+    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof,
+            ImmutableList<Goal> goals) {
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();
         return start(proof, goals, stratSet);
@@ -232,8 +234,9 @@ public class ApplyStrategy extends AbstractProverCore {
      * org.key_project.util.collection.ImmutableList, de.uka.ilkd.key.settings.StrategySettings)
      */
     @Override
-    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals,
-                                                         @NonNull StrategySettings stratSet) {
+    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof,
+            ImmutableList<Goal> goals,
+            @NonNull StrategySettings stratSet) {
 
         int maxSteps = stratSet.getMaxSteps();
         long timeout = stratSet.getTimeout();
@@ -251,8 +254,9 @@ public class ApplyStrategy extends AbstractProverCore {
      * org.key_project.util.collection.ImmutableList, int, long, boolean)
      */
     @Override
-    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals,
-                                                         int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
+    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof,
+            ImmutableList<Goal> goals,
+            int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
@@ -264,8 +268,9 @@ public class ApplyStrategy extends AbstractProverCore {
     }
 
 
-    private @NonNull ProofTreeListener prepareStrategy(@NonNull Proof proof, ImmutableList<Goal> goals, int maxSteps,
-                                                       long timeout) {
+    private @NonNull ProofTreeListener prepareStrategy(@NonNull Proof proof,
+            ImmutableList<Goal> goals, int maxSteps,
+            long timeout) {
         ProofTreeListener treeListener = new ProofTreeAdapter() {
             @Override
             public void proofGoalsAdded(@NonNull ProofTreeEvent e) {

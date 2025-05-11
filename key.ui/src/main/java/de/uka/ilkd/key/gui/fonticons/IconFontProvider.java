@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.*;
 import javax.swing.*;
+
+import org.jspecify.annotations.NonNull;
 
 public class IconFontProvider extends IconProvider {
     private final IconFont iconCode;

@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingProofReplayer;
@@ -26,6 +25,8 @@ import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.util.ExecutionTime;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Results of the dependency analysis algorithm.
@@ -164,7 +165,8 @@ public final class AnalysisResults {
             reduce(seq.succedent(), node, false));
     }
 
-    private @NonNull Semisequent reduce(@NonNull Semisequent semi, @NonNull Node node, boolean antec) {
+    private @NonNull Semisequent reduce(@NonNull Semisequent semi, @NonNull Node node,
+            boolean antec) {
         var semiList = new ArrayList<SequentFormula>();
         for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),

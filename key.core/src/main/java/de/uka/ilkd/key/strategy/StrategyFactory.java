@@ -7,8 +7,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for creating Strategy instances. The strategy name and the name of the strategy factory

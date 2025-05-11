@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -58,7 +59,8 @@ class StdPredicateEstimator implements PredicateEstimator {
     private static final String CUT_LABEL = "CUT:";
 
     @Override
-    public @NonNull Result estimate(@NonNull ProspectivePartner partner, final @NonNull Proof proof) {
+    public @NonNull Result estimate(@NonNull ProspectivePartner partner,
+            final @NonNull Proof proof) {
         final Node node = getFirstDifferentNode(partner);
         String branchLabel = node.getNodeInfo().getBranchLabel();
         if (branchLabel != null

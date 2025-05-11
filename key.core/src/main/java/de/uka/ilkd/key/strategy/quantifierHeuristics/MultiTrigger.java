@@ -9,14 +9,15 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class MultiTrigger implements Trigger {
 
@@ -34,8 +35,9 @@ class MultiTrigger implements Trigger {
     }
 
     @Override
-    public @NonNull ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerms,
-                                                                         Services services) {
+    public @NonNull ImmutableSet<Substitution> getSubstitutionsFromTerms(
+            ImmutableSet<Term> targetTerms,
+            Services services) {
         ImmutableList<Substitution> res = ImmutableSLList.nil();
 
         ImmutableSet<Substitution> mulsubs =
@@ -52,7 +54,7 @@ class MultiTrigger implements Trigger {
 
     /** help function for getMultiSubstitution */
     private ImmutableSet<Substitution> setMultiSubstitution(@NonNull Iterator<? extends Trigger> ts,
-                                                            ImmutableSet<Term> terms, Services services) {
+            ImmutableSet<Term> terms, Services services) {
         ImmutableList<Substitution> res = ImmutableSLList.nil();
         if (ts.hasNext()) {
             ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(terms, services);
@@ -79,7 +81,8 @@ class MultiTrigger implements Trigger {
      * unify two substitution, if same variable are bound with same term return a new substitution
      * with all universal quantifiable variables in two substituition, otherwise return null
      */
-    private @Nullable Substitution unifySubstitution(@NonNull Substitution sub0, @NonNull Substitution sub1) {
+    private @Nullable Substitution unifySubstitution(@NonNull Substitution sub0,
+            @NonNull Substitution sub1) {
         final ImmutableMap<QuantifiableVariable, Term> varMap1 = sub1.getVarMap();
         ImmutableMap<QuantifiableVariable, Term> resMap = varMap1;
 

@@ -8,9 +8,10 @@ import java.util.Objects;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.key_project.util.collection.ImmutableArray;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableArray;
 
 public class Access {
     /**
@@ -50,7 +51,7 @@ public class Access {
      *
      * @param dimensionExpressions The accessed array index.
      */
-    public Access(Term @NonNull ... dimensionExpressions) {
+    public Access(Term @NonNull... dimensionExpressions) {
         assert dimensionExpressions != null;
         this.programVariable = null;
         this.dimensionExpressions = new ImmutableArray<>(dimensionExpressions);

@@ -35,7 +35,6 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
@@ -46,6 +45,7 @@ import org.key_project.slicing.util.GraphvizDotExecutor;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

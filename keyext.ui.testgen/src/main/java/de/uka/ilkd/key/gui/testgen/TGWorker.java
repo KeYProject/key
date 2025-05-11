@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -109,7 +110,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      *        {@link MainWindow} or not.
      */
     public MainWindowTestGenerator(@NonNull KeYMediator mediator, @NonNull Proof originalProof,
-                                   boolean showInMainWindow) {
+            boolean showInMainWindow) {
         super(mediator.getUI(), originalProof);
         this.mediator = mediator;
         this.showInMainWindow = showInMainWindow;
@@ -141,7 +142,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      */
     @Override
     protected @NonNull Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName,
-                                         Sequent newSequent) throws ProofInputException {
+            Sequent newSequent) throws ProofInputException {
         if (showInMainWindow) {
             InitConfig initConfig = oldProof.getInitConfig().deepCopy();
             final Proof proof = new Proof(newName, newSequent, "", initConfig.createTacletIndex(),

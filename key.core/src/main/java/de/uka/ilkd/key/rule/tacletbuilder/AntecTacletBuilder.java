@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
+
 import org.jspecify.annotations.NonNull;
 
 /**

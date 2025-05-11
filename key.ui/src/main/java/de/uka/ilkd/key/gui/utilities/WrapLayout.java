@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.*;
 import javax.swing.*;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * FlowLayout subclass that fully supports wrapping of components.

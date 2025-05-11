@@ -7,6 +7,7 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.IntegerProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
+
 import org.jspecify.annotations.Nullable;
 
 /**

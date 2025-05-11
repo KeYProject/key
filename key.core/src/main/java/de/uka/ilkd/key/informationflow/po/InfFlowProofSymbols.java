@@ -19,7 +19,6 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
@@ -27,6 +26,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 public class InfFlowProofSymbols {
 

@@ -8,9 +8,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 
 public final class AddCast extends AbstractTermTransformer {

@@ -15,6 +15,7 @@ import java.util.List;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
+
 import org.jspecify.annotations.Nullable;
 
 /**

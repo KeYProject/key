@@ -11,6 +11,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -64,8 +65,9 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param condition The optional condition under which this association is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicAssociation(@NonNull Services services, Term arrayIndex, @NonNull ISymbolicObject target,
-                               Term condition, IModelSettings settings) {
+    public SymbolicAssociation(@NonNull Services services, Term arrayIndex,
+            @NonNull ISymbolicObject target,
+            Term condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert target != null;
@@ -90,7 +92,8 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicAssociation(@NonNull Services services, Term arrayIndex, Term arrayStartIndex,
-                               Term arrayEndIndex, @NonNull ISymbolicObject target, Term condition, IModelSettings settings) {
+            Term arrayEndIndex, @NonNull ISymbolicObject target, Term condition,
+            IModelSettings settings) {
         super(settings);
         assert services != null;
         assert target != null;
@@ -112,8 +115,9 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param condition The optional condition under which this association is valid.
      * @param settings The {@link IModelSettings} to use.
      */
-    public SymbolicAssociation(@NonNull Services services, @NonNull IProgramVariable programVariable,
-                               @NonNull ISymbolicObject target, Term condition, IModelSettings settings) {
+    public SymbolicAssociation(@NonNull Services services,
+            @NonNull IProgramVariable programVariable,
+            @NonNull ISymbolicObject target, Term condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert programVariable != null;

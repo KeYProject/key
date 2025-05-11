@@ -50,7 +50,7 @@ public final class JMLInfoExtractor {
      * Checks whether one of the passed comments is a JML comment containing "key" and not *bad*.
      */
     private static boolean checkForNotContaining(@NonNull String key, @NonNull String bad,
-                                                 @NonNull ImmutableList<Comment> coms) {
+            @NonNull ImmutableList<Comment> coms) {
         for (Comment c : coms) {
             if (checkFor(key, c.getText()) && !c.getText().contains(bad)) {
                 return true;
@@ -62,7 +62,8 @@ public final class JMLInfoExtractor {
     /**
      * Checks the passed comments for the spec math mode.
      */
-    private static @Nullable SpecMathMode checkForSpecMathMode(@NonNull ImmutableList<Comment> comments) {
+    private static @Nullable SpecMathMode checkForSpecMathMode(
+            @NonNull ImmutableList<Comment> comments) {
         // This is hacky but hard to do better
         // We exclude comments containing 'behaviour' since they can be from the method contract
         var specBigintMath = checkForNotContaining("spec_bigint_math", "behaviour", comments);
@@ -91,7 +92,8 @@ public final class JMLInfoExtractor {
         return coms;
     }
 
-    private static @NonNull ImmutableList<Comment> getJMLComments(@NonNull MethodDeclaration method) {
+    private static @NonNull ImmutableList<Comment> getJMLComments(
+            @NonNull MethodDeclaration method) {
         ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either method is attached to the method itself ...
@@ -126,7 +128,8 @@ public final class JMLInfoExtractor {
      * @param methodDeclaration the method declaration
      * @return modifiers
      */
-    public static MethodDeclaration.@NonNull JMLModifiers parseMethod(@NonNull MethodDeclaration methodDeclaration) {
+    public static MethodDeclaration.@NonNull JMLModifiers parseMethod(
+            @NonNull MethodDeclaration methodDeclaration) {
         var comments = getJMLComments(methodDeclaration);
 
         var pure = checkFor("pure", comments);
@@ -146,7 +149,7 @@ public final class JMLInfoExtractor {
      * @return
      */
     private static @NonNull ImmutableList<Comment> extractFieldModifiers(String fieldName,
-                                                                         @NonNull TypeDeclaration td) {
+            @NonNull TypeDeclaration td) {
         ImmutableList<Comment> comments = ImmutableSLList.nil();
         FieldDeclaration fd = null;
         int position = 0;
@@ -300,7 +303,8 @@ public final class JMLInfoExtractor {
      * Returns true iff the parameter of the given method is declared "nullable" (implicitly or
      * explicitly). Warning: weird things may happen if the parameter doesn't belong to the method.
      */
-    public static boolean parameterIsNullable(@NonNull IProgramMethod pm, @NonNull ParameterDeclaration pd) {
+    public static boolean parameterIsNullable(@NonNull IProgramMethod pm,
+            @NonNull ParameterDeclaration pd) {
         assert pm.getMethodDeclaration().getParameters().contains(pd)
                 : "parameter " + pd + " does not belong to method declaration " + pm;
         ImmutableList<Comment> comments = ImmutableSLList.nil();

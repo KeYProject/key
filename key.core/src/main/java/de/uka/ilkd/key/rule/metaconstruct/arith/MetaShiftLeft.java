@@ -5,8 +5,9 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 public class MetaShiftLeft extends MetaShift {
 

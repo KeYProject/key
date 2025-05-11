@@ -7,8 +7,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

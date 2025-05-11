@@ -9,9 +9,10 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Default implementation of {@link ISymbolicLayout}.
@@ -41,7 +42,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicLayout(IModelSettings settings,
-                          @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
+            @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
         super(settings);
         assert equivalenceClasses != null;
         this.equivalenceClasses = equivalenceClasses;

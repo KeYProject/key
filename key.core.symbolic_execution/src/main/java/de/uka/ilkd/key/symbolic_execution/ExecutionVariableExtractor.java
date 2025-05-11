@@ -20,11 +20,12 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extracts the current state and represents it as {@link IExecutionVariable}s.
@@ -74,7 +75,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception
      */
     public ExecutionVariableExtractor(@NonNull Node node, @NonNull PosInOccurrence modalityPio,
-                                      @NonNull IExecutionNode<?> executionNode, Term condition, boolean simplifyConditions)
+            @NonNull IExecutionNode<?> executionNode, Term condition, boolean simplifyConditions)
             throws ProofInputException {
         super(node, modalityPio);
         this.executionNode = executionNode;
@@ -139,8 +140,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @param childrenInfo the child locations.
      */
     protected void analyzeTreeStructure(@NonNull Set<ExecutionVariableValuePair> pairs,
-                                        @NonNull Map<LocationDef, List<ExecutionVariableValuePair>> topVariables,
-                                        @NonNull Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo) {
+            @NonNull Map<LocationDef, List<ExecutionVariableValuePair>> topVariables,
+            @NonNull Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo) {
         for (ExecutionVariableValuePair pair : pairs) {
             if (pair.isStateMember()) {
                 LocationDef locDef =
@@ -407,8 +408,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param additionalCondition An optional additional condition to consider.
          */
         public StateExecutionVariable(@NonNull IExecutionNode<?> parentNode, Node proofNode,
-                                      PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
-                                      Term additionalCondition) {
+                PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
+                Term additionalCondition) {
             super(parentNode.getSettings(), proofNode, programVariable, null, arrayIndex,
                 additionalCondition, modalityPIO);
         }
@@ -493,9 +494,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
          */
         public ExtractedExecutionVariable(@NonNull IExecutionNode<?> parentNode, Node proofNode,
-                                          PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
-                                          Term arrayStartIndex, Term arrayEndIndex, Term additionalCondition,
-                                          ExtractedExecutionValue parentValue) {
+                PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
+                Term arrayStartIndex, Term arrayEndIndex, Term additionalCondition,
+                ExtractedExecutionValue parentValue) {
             super(parentNode.getSettings(), proofNode, programVariable, parentValue, arrayIndex,
                 additionalCondition, modalityPIO);
             this.arrayStartIndex = arrayStartIndex;
@@ -614,7 +615,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param value The value.
          */
         public ExtractedExecutionValue(@NonNull IExecutionNode<?> parentNode, Node proofNode,
-                                       IExecutionVariable variable, Term condition, Term value) {
+                IExecutionVariable variable, Term condition, Term value) {
             super(parentNode.getSettings(), proofNode, variable, condition, value);
             this.parentNode = parentNode;
         }

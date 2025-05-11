@@ -23,9 +23,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.Name;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
 
 /**
  * An implementation of {@link IExecutionVariable} used to query all array indices at the same time.
@@ -66,8 +67,8 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionAllArrayIndicesVariable(@NonNull IExecutionNode<?> parentNode, Node proofNode,
-                                            PosInOccurrence modalityPIO, @NonNull ExecutionValue parentValue,
-                                            IProgramVariable arrayProgramVariable, Term additionalCondition) {
+            PosInOccurrence modalityPIO, @NonNull ExecutionValue parentValue,
+            IProgramVariable arrayProgramVariable, Term additionalCondition) {
         super(parentNode, proofNode, modalityPIO, parentValue, arrayProgramVariable,
             additionalCondition);
         assert parentValue != null;

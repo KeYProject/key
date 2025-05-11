@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.rule.RuleApp;
+
 import org.jspecify.annotations.NonNull;
 
 /**

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.settings.StrategySettings;
+
 import org.jspecify.annotations.Nullable;
 
 /**

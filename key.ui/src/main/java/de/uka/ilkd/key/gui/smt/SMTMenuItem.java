@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.smt;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+
 import org.jspecify.annotations.NonNull;
 
 public class SMTMenuItem extends JMenuItem {

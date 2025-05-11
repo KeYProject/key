@@ -6,6 +6,7 @@ package org.key_project.slicing.graph;
 import java.util.Objects;
 
 import de.uka.ilkd.key.proof.BranchLocation;
+
 import org.jspecify.annotations.NonNull;
 
 /**

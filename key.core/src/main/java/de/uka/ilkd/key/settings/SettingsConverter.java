@@ -437,8 +437,9 @@ public final class SettingsConverter {
      * @return the value of the read enum constant
      * @param <T> the enum which the read constant belongs to
      */
-    public static <T extends Enum<?>> @NonNull T read(Properties props, String key, @NonNull T defaultValue,
-                                                      T[] values) {
+    public static <T extends Enum<?>> @NonNull T read(Properties props, String key,
+            @NonNull T defaultValue,
+            T[] values) {
         int ord = read(props, key, defaultValue.ordinal());
         for (T value : values) {
             if (ord == value.ordinal()) {

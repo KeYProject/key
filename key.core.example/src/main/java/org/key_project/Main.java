@@ -19,9 +19,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NullMarked;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class Main {
     /// sets up the environment with the Java project described by its location
     ///
     /// @param location the File with the path to the source directory of the Java project
-    ///        to be verified
+    /// to be verified
     /// @return the [KeYEnvironment] that provides the context for all following verification tasks
     /// @throws ProblemLoaderException if the setup fails
     private static KeYEnvironment<?> setupEnvironment(File location) throws ProblemLoaderException {
@@ -163,7 +163,7 @@ public class Main {
             // Show proof result
             boolean closed = proof.openGoals().isEmpty();
             LOGGER.info("Contract '{}' of {} is {}.", contract.getDisplayName(),
-                    contract.getTarget(), closed ? "verified" : "still open");
+                contract.getTarget(), closed ? "verified" : "still open");
         } catch (ProofInputException e) {
             LOGGER.error("Exception at {} of {}", contract.getDisplayName(),
                 contract.getTarget());

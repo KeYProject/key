@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -77,7 +78,8 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
         }
     };
 
-    protected boolean filter(TacletApp app, @NonNull PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return checkPosition(pos);
     }

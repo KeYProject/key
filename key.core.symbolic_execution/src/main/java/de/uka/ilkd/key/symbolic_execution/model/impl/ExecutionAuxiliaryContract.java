@@ -31,8 +31,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Named;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The default implementation of {@link IExecutionAuxiliaryContract}.
@@ -166,8 +167,8 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * @param remembranceLocalVariables The {@link Map} to fill.
      */
     protected void collectRemembranceVariables(@NonNull Term term,
-                                               @NonNull Map<LocationVariable, Term> remembranceHeaps,
-                                               @NonNull Map<LocationVariable, Term> remembranceLocalVariables) {
+            @NonNull Map<LocationVariable, Term> remembranceHeaps,
+            @NonNull Map<LocationVariable, Term> remembranceLocalVariables) {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term sub : term.subs()) {
                 collectRemembranceVariables(sub, remembranceHeaps, remembranceLocalVariables);

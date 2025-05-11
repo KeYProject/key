@@ -10,8 +10,9 @@ import java.util.Objects;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.Strings;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Default implementation of {@link IProofReference}.

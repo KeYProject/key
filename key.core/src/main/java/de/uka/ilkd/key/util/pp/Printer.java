@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.pp;
 
-import org.jspecify.annotations.NonNull;
-
 import java.util.ArrayList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The intermediate layer of the pretty printing library. Using the block size information provided

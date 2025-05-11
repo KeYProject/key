@@ -5,6 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
+
 import org.jspecify.annotations.Nullable;
 
 /**

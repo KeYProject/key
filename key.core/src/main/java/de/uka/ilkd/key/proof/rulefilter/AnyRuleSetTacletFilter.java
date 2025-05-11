@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.rulefilter;
 
 import de.uka.ilkd.key.rule.Taclet;
+
 import org.jspecify.annotations.NonNull;
 
 /**

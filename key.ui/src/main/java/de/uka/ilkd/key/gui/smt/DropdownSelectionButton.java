@@ -14,6 +14,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

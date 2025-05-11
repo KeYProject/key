@@ -26,10 +26,10 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +78,8 @@ public class MediatorProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void startAutoMode(Proof proof, @NonNull ImmutableList<Goal> goals, ProverTaskListener ptl) {
+    public void startAutoMode(Proof proof, @NonNull ImmutableList<Goal> goals,
+            ProverTaskListener ptl) {
         if (goals.isEmpty()) {
             ui.notify(new GeneralInformationEvent("No enabled goals available."));
             return;
@@ -162,7 +163,7 @@ public class MediatorProofControl extends AbstractProofControl {
         private ApplyStrategyInfo info;
 
         public AutoModeWorker(final @NonNull Proof proof, final @NonNull ImmutableList<Goal> goals,
-                              @Nullable ProverTaskListener ptl) {
+                @Nullable ProverTaskListener ptl) {
             this.proof = proof;
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
@@ -203,8 +204,9 @@ public class MediatorProofControl extends AbstractProofControl {
             }
         }
 
-        protected void emitInteractiveAutoMode(@NonNull List<Node> initialGoals, @NonNull Proof proof,
-                                               @NonNull ApplyStrategyInfo info) {
+        protected void emitInteractiveAutoMode(@NonNull List<Node> initialGoals,
+                @NonNull Proof proof,
+                @NonNull ApplyStrategyInfo info) {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 

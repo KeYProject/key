@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -209,7 +210,8 @@ public abstract class ProofTreeViewFilter {
     private static class HideIntermediateFilter extends NodeFilter {
 
         @Override
-        protected boolean countChild(@NonNull GUIProofTreeNode node, @NonNull TreeNode parent, int pos) {
+        protected boolean countChild(@NonNull GUIProofTreeNode node, @NonNull TreeNode parent,
+                int pos) {
             if (pos == parent.getChildCount() - 1) {
                 return true;
             }
@@ -252,7 +254,8 @@ public abstract class ProofTreeViewFilter {
     private static class OnlyInteractiveFilter extends NodeFilter {
 
         @Override
-        protected boolean countChild(@NonNull GUIProofTreeNode node, @NonNull TreeNode parent, int pos) {
+        protected boolean countChild(@NonNull GUIProofTreeNode node, @NonNull TreeNode parent,
+                int pos) {
             if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) {
                 return true;
             }

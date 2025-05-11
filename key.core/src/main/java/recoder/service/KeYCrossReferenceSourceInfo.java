@@ -72,7 +72,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
     public static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceSourceInfo.class);
 
-    private @Nullable HashMap<String, recoder.java.declaration.VariableSpecification> names2vars = null;
+    private @Nullable HashMap<String, recoder.java.declaration.VariableSpecification> names2vars =
+        null;
     private PrimitiveType locsetType;
     private PrimitiveType seqType;
     private PrimitiveType freeType;

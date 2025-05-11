@@ -9,8 +9,9 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Filter that selects taclets using the method <code>admissible</code> of the <code>Taclet</code>

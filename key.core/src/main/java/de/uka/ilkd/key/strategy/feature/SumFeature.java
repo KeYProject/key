@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.util.Debug;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -47,7 +48,7 @@ public class SumFeature implements Feature {
         }
     }
 
-    public static Feature createSum(Feature @NonNull ... fs) {
+    public static Feature createSum(Feature @NonNull... fs) {
         Debug.assertFalse(fs.length == 0, "Cannot compute the sum of zero features");
 
         if (fs.length == 1) {

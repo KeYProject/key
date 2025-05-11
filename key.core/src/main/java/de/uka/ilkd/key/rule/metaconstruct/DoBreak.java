@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -65,7 +66,7 @@ public class DoBreak extends ProgramTransformer {
      */
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
-                                                SVInstantiations insts) {
+            SVInstantiations insts) {
         // get label of break
         // ContextInstantiationEntry ctx = insts.getContextInstantiation();
         // Break breakStmnt = (Break) PosInProgram.

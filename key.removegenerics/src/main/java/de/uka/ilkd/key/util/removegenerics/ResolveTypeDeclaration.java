@@ -171,7 +171,8 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      * @param localSign this is the signature of the method after removal of TV
      * @param superSig this is the target signature of the supertype.
      */
-    private void addMethod(@NonNull Method origMethod, @NonNull List<Type> localSign, @NonNull List<Type> superSig) {
+    private void addMethod(@NonNull Method origMethod, @NonNull List<Type> localSign,
+            @NonNull List<Type> superSig) {
         ProgramFactory programFactory = getProgramFactory();
 
         //
@@ -257,7 +258,8 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         debugOut("Method added", methodDecl.toSource());
     }
 
-    private @NonNull ASTList<DeclarationSpecifier> getDeclarationSpecifiers(@NonNull Method origMethod) {
+    private @NonNull ASTList<DeclarationSpecifier> getDeclarationSpecifiers(
+            @NonNull Method origMethod) {
         ASTList<DeclarationSpecifier> ret = new ASTArrayList<>();
         ProgramFactory programFactory = getProgramFactory();
         if (origMethod.isFinal()) {

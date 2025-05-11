@@ -5,8 +5,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A JML represents clause in textual form.
@@ -17,7 +18,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
 
 
     public TextualJMLRepresents(@NonNull ImmutableList<JMLModifier> modifiers,
-                                @NonNull LabeledParserRuleContext represents) {
+            @NonNull LabeledParserRuleContext represents) {
         super(modifiers);
         assert represents != null;
         this.represents = represents;
@@ -25,7 +26,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
     }
 
     public TextualJMLRepresents(@NonNull ImmutableList<JMLModifier> modifiers,
-                                @NonNull LabeledParserRuleContext represents, String name) {
+            @NonNull LabeledParserRuleContext represents, String name) {
         this(modifiers, represents);
         this.name = name;
     }

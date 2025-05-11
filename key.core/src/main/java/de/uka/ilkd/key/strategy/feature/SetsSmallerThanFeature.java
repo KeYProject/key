@@ -11,8 +11,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 
 public class SetsSmallerThanFeature extends SmallerThanFeature {
@@ -30,7 +31,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
 
     public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
-                                          LocSetLDT locSetLDT) {
+            LocSetLDT locSetLDT) {
         return new SetsSmallerThanFeature(left, right, locSetLDT);
     }
 
@@ -44,7 +45,8 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     }
 
 
-    protected boolean origLessThan(@NonNull Term leftTerm, @NonNull Term rightTerm, PosInOccurrence pos, Goal goal) {
+    protected boolean origLessThan(@NonNull Term leftTerm, @NonNull Term rightTerm,
+            PosInOccurrence pos, Goal goal) {
         // TODO: Why is this method needed?
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);

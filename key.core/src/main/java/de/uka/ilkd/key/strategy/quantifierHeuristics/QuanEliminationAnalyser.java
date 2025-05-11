@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+
 import org.jspecify.annotations.NonNull;
 
 public class QuanEliminationAnalyser {
@@ -111,7 +112,7 @@ public class QuanEliminationAnalyser {
      * <code>ex</code> is true/false)
      */
     public boolean isEliminableVariableSomePaths(QuantifiableVariable var, @NonNull Term matrix,
-                                                 boolean ex) {
+            boolean ex) {
         if (!matrix.freeVars().contains(var)) {
             return true;
         }
@@ -139,7 +140,8 @@ public class QuanEliminationAnalyser {
      * The variable <code>var</code> is eliminable on all conjunctive/disjunctive paths through
      * <code>matrix</code> (depending on whether <code>ex</code> is true/false)
      */
-    public boolean isEliminableVariableAllPaths(QuantifiableVariable var, @NonNull Term matrix, boolean ex) {
+    public boolean isEliminableVariableAllPaths(QuantifiableVariable var, @NonNull Term matrix,
+            boolean ex) {
         final Operator op = matrix.op();
 
         if (op == (ex ? Junctor.OR : Junctor.AND)) {

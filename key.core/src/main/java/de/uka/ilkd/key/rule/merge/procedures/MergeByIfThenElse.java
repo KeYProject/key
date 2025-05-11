@@ -14,10 +14,11 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
@@ -66,9 +67,10 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     @Override
-    public @NonNull ValuesMergeResult mergeValuesInStates(Term v, @NonNull SymbolicExecutionState state1,
-                                                          Term valueInState1, @NonNull SymbolicExecutionState state2, Term valueInState2,
-                                                          Term distinguishingFormula, @NonNull Services services) {
+    public @NonNull ValuesMergeResult mergeValuesInStates(Term v,
+            @NonNull SymbolicExecutionState state1,
+            Term valueInState1, @NonNull SymbolicExecutionState state2, Term valueInState2,
+            Term distinguishingFormula, @NonNull Services services) {
 
         return new ValuesMergeResult(DefaultImmutableSet.nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
@@ -101,8 +103,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         are the path conditions of stateI.
      */
     public static @NonNull Term createIfThenElseTerm(final @NonNull SymbolicExecutionState state1,
-                                                     final @NonNull SymbolicExecutionState state2, final Term ifTerm, final Term elseTerm,
-                                                     @Nullable Term distinguishingFormula, final @NonNull Services services) {
+            final @NonNull SymbolicExecutionState state2, final Term ifTerm, final Term elseTerm,
+            @Nullable Term distinguishingFormula, final @NonNull Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -149,7 +151,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         component).
      */
     static @NonNull DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
-            @NonNull LocationVariable v, @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2,
+            @NonNull LocationVariable v, @NonNull SymbolicExecutionState state1,
+            @NonNull SymbolicExecutionState state2,
             @NonNull Services services) {
 
         TermBuilder tb = services.getTermBuilder();
@@ -193,7 +196,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         component).
      */
     static @NonNull DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
-            @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2, Term ifTerm,
+            @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2,
+            Term ifTerm,
             Term elseTerm, @NonNull Services services) {
 
         // We only need the distinguishing subformula; the equal part

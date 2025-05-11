@@ -18,11 +18,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
@@ -41,7 +42,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(@NonNull RuleApp ruleCmp, @NonNull TacletApp newApp, @Nullable PosInOccurrence newPio) {
+    protected boolean sameApplication(@NonNull RuleApp ruleCmp, @NonNull TacletApp newApp,
+            @Nullable PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -86,7 +88,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         return equalInterestingInsts(newApp.instantiations(), cmp.instantiations());
     }
 
-    private boolean equalInterestingInsts(@NonNull SVInstantiations inst0, @NonNull SVInstantiations inst1) {
+    private boolean equalInterestingInsts(@NonNull SVInstantiations inst0,
+            @NonNull SVInstantiations inst1) {
         if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
             return false;
         }
@@ -99,7 +102,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     }
 
     private boolean subset(@NonNull ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
-                           @NonNull ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
+            @NonNull ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
 
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
             if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
@@ -123,7 +126,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * soon as we have reached a point where the formula containing the focus no longer occurs in
      * the sequent
      */
-    protected boolean noDuplicateFindTaclet(@NonNull TacletApp app, PosInOccurrence pos, @NonNull Goal goal) {
+    protected boolean noDuplicateFindTaclet(@NonNull TacletApp app, PosInOccurrence pos,
+            @NonNull Goal goal) {
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();

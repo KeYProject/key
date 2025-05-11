@@ -299,7 +299,8 @@ public class MergeRuleTests {
         }
     }
 
-    public static @NonNull Proof loadProof(@NonNull String directory, @NonNull String proofFileName) {
+    public static @NonNull Proof loadProof(@NonNull String directory,
+            @NonNull String proofFileName) {
         return loadProof(new File(directory), proofFileName);
     }
 

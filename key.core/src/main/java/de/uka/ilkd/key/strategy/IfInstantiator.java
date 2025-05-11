@@ -22,11 +22,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool.IfInstantiationCache;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class implements custom instantiation of if-formulas.
@@ -200,9 +201,9 @@ public class IfInstantiator {
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(@NonNull ImmutableList<SequentFormula> p_ifSeqTail,
-                                                 @Nullable ImmutableList<SequentFormula> p_ifSeqTail2nd,
-                                                 @NonNull ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
-                                                 @NonNull MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
+            @Nullable ImmutableList<SequentFormula> p_ifSeqTail2nd,
+            @NonNull ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
+            @NonNull MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
 
         while (p_ifSeqTail.isEmpty()) {
             if (p_ifSeqTail2nd == null) {
@@ -242,7 +243,7 @@ public class IfInstantiator {
     }
 
     private @NonNull NoPosTacletApp setAllInstantiations(@NonNull MatchConditions p_matchCond,
-                                                         @NonNull ImmutableList<IfFormulaInstantiation> p_alreadyMatched) {
+            @NonNull ImmutableList<IfFormulaInstantiation> p_alreadyMatched) {
         return NoPosTacletApp.createNoPosTacletApp(getTaclet(), p_matchCond.getInstantiations(),
             p_alreadyMatched, getServices());
     }

@@ -12,6 +12,7 @@ import javax.swing.text.*;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -531,7 +532,8 @@ public class JavaDocument extends DefaultStyledDocument {
     }
 
     @Override
-    public void insertString(int offs, @NonNull String str, AttributeSet a) throws BadLocationException {
+    public void insertString(int offs, @NonNull String str, AttributeSet a)
+            throws BadLocationException {
         // insert the unformatted string as a placeholder
         super.insertString(offs, str, normal);
         int strLen = str.length();

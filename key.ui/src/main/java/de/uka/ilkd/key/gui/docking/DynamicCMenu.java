@@ -76,7 +76,7 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
         }
 
         public <V> V createView(ViewTarget<V> target, @NonNull ActionViewConverter converter,
-                                Dockable dockable) {
+                Dockable dockable) {
             return converter.createView(ActionType.MENU, this, target, dockable);
         }
 

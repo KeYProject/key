@@ -16,12 +16,13 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
+
+import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeature {
 

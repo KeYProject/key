@@ -6,11 +6,12 @@ package org.key_project.proofmanagement.check;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
 import org.key_project.proofmanagement.check.dependency.DependencyNode;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
+
+import org.jspecify.annotations.NonNull;
 
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
@@ -102,7 +103,8 @@ public class DependencyChecker implements Checker {
         data.print(LogLevel.INFO, "Dependency checks completed!");
     }
 
-    private boolean hasUnprovenDependencies(@NonNull DependencyGraph graph, @NonNull CheckerData data)
+    private boolean hasUnprovenDependencies(@NonNull DependencyGraph graph,
+            @NonNull CheckerData data)
             throws ProofManagementException {
         // needs replay (to ensure that proof can be closed)
         KeYFacade.ensureProofsReplayed(data);

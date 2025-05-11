@@ -13,10 +13,11 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
 import org.key_project.slicing.analysis.AnalysisResults;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Dialog that displays the results of the dependency analysis algorithm.

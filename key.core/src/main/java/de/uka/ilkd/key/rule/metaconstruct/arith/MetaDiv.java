@@ -12,9 +12,10 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 
 
@@ -28,7 +29,8 @@ public final class MetaDiv extends AbstractTermTransformer {
     /**
      * checks whether the result is consistent with the axiom div_axiom
      */
-    private boolean checkResult(@NonNull BigInteger a, @NonNull BigInteger b, @NonNull BigInteger result) {
+    private boolean checkResult(@NonNull BigInteger a, @NonNull BigInteger b,
+            @NonNull BigInteger result) {
 
         // (gt(b,0) -> (leq(0,sub(a,mul(result,b))) & lt(sub(a,mul(result,b)),b)) )
         if (b.compareTo(BigInteger.ZERO) > 0) {

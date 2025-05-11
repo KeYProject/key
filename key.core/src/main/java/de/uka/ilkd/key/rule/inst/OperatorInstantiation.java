@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.logic.op.Operator;
+
 import org.jspecify.annotations.NonNull;
 
 /**

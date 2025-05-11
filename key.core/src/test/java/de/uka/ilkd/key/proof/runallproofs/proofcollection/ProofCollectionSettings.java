@@ -287,7 +287,8 @@ public class ProofCollectionSettings implements Serializable {
     /**
      * Static method for creation of {@link ProofCollectionSettings} entries.
      */
-    public static @NonNull Entry<String, String> getSettingsEntry(final @NonNull String key, final @NonNull String value) {
+    public static @NonNull Entry<String, String> getSettingsEntry(final @NonNull String key,
+            final @NonNull String value) {
         return new Entry<>() {
             @Override
             public @NonNull String getKey() {

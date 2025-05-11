@@ -7,11 +7,11 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.logic.PosInTerm;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Encapsulates intermediate information for constructing a taclet application.
@@ -39,8 +39,8 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @param newNames New names registered during taclet application.
      */
     public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
-                                 LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,
-                                 ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
+            LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,
+            ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
         this.tacletName = tacletName.intern();
         this.posInfo = posInfo;

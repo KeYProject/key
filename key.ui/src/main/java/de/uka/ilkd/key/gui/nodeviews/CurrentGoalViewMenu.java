@@ -51,10 +51,11 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
@@ -103,9 +104,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param builtInList with all applicable BuiltInRules
      * @param pos the PosInSequent
      */
-    CurrentGoalViewMenu(@NonNull CurrentGoalView sequentView, @NonNull ImmutableList<TacletApp> findList,
-                        @NonNull ImmutableList<TacletApp> rewriteList, @NonNull ImmutableList<TacletApp> noFindList,
-                        @NonNull ImmutableList<BuiltInRule> builtInList, @NonNull PosInSequent pos) {
+    CurrentGoalViewMenu(@NonNull CurrentGoalView sequentView,
+            @NonNull ImmutableList<TacletApp> findList,
+            @NonNull ImmutableList<TacletApp> rewriteList,
+            @NonNull ImmutableList<TacletApp> noFindList,
+            @NonNull ImmutableList<BuiltInRule> builtInList, @NonNull PosInSequent pos) {
         super(sequentView, pos);
         this.mediator = sequentView.getMediator();
 
@@ -136,7 +139,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param list from where the RewriteTaclet are removed
      * @return list without RewriteTaclets
      */
-    public static @NonNull ImmutableList<TacletApp> removeRewrites(@NonNull ImmutableList<TacletApp> list) {
+    public static @NonNull ImmutableList<TacletApp> removeRewrites(
+            @NonNull ImmutableList<TacletApp> list) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
         for (TacletApp tacletApp : list) {
@@ -161,8 +165,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      *
      * @param control the action listener.
      */
-    private void createMenu(@NonNull ImmutableList<TacletApp> find, @NonNull ImmutableList<TacletApp> noFind,
-                            @NonNull ImmutableList<BuiltInRule> builtInList, MenuControl control) {
+    private void createMenu(@NonNull ImmutableList<TacletApp> find,
+            @NonNull ImmutableList<TacletApp> noFind,
+            @NonNull ImmutableList<BuiltInRule> builtInList, MenuControl control) {
         addActionListener(control);
 
         ImmutableList<TacletApp> toAdd = sort(find, comp);
@@ -211,7 +216,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private void createBuiltInRuleMenu(@NonNull ImmutableList<BuiltInRule> builtInList,
-                                       MenuControl control) {
+            MenuControl control) {
 
         if (!builtInList.isEmpty()) {
             addSeparator();
@@ -333,7 +338,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * This method is also used by the KeYIDE has to be static and public.
      */
     public static @NonNull ImmutableList<TacletApp> sort(@NonNull ImmutableList<TacletApp> finds,
-                                                         TacletAppComparator comp) {
+            TacletAppComparator comp) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
         List<TacletApp> list = new ArrayList<>(finds.size());

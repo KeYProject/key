@@ -23,9 +23,9 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -53,7 +53,8 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
     }
 
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc) {
         if (goals == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
@@ -84,9 +85,10 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
     }
 
     @Override
-    public @NonNull ProofMacroFinishedInfo applyTo(@NonNull UserInterfaceControl uic, @NonNull Proof proof,
-                                                   @NonNull ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
-                                                   @Nullable ProverTaskListener listener)
+    public @NonNull ProofMacroFinishedInfo applyTo(@NonNull UserInterfaceControl uic,
+            @NonNull Proof proof,
+            @NonNull ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
             (LoopInvariantBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
 import org.jspecify.annotations.NonNull;
 
 

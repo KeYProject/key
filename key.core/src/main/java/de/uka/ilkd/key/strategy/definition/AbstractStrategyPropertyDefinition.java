@@ -5,8 +5,9 @@ package de.uka.ilkd.key.strategy.definition;
 
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Provides the basic function definition of user interface controls to edit a single key-value-pair

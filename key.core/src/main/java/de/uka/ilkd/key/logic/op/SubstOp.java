@@ -6,12 +6,13 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Standard first-order substitution operator, resolving clashes but not preventing (usually

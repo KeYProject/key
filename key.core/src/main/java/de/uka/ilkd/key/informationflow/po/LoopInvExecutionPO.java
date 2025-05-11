@@ -25,10 +25,11 @@ import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
 
@@ -53,16 +54,16 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
      * used instead of the initial services form the InitConfig.
      */
     public LoopInvExecutionPO(InitConfig initConfig, @NonNull LoopSpecification loopInv,
-                              ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-                              Term guardTerm, Services services) {
+            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
+            Term guardTerm, Services services) {
         this(initConfig, loopInv, symbExecVars, initiatingGoal, context, guardTerm);
         this.environmentServices = services;
     }
 
 
     public LoopInvExecutionPO(InitConfig initConfig, @NonNull LoopSpecification loopInv,
-                              ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-                              Term guardTerm) {
+            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
+            Term guardTerm) {
         super(initConfig,
             ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
                 loopInv.getTarget(), loopInv.getTarget().getContainerType(),
@@ -218,7 +219,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-                                           ImmutableList<Term> paramTerms, Services services) {
+            ImmutableList<Term> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }

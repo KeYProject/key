@@ -14,8 +14,9 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class completes the instantiation for a merge rule application. The user is queried for
@@ -35,7 +36,8 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
     }
 
     @Override
-    public @NonNull IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal, boolean forced) {
+    public @NonNull IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal,
+            boolean forced) {
 
         final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) app;
         final PosInOccurrence pio = mergeApp.posInOccurrence();

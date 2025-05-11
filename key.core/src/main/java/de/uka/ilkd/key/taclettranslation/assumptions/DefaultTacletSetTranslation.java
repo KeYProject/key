@@ -21,13 +21,14 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public final class DefaultTacletSetTranslation
         implements TacletSetTranslation, TranslationListener {
@@ -87,7 +88,8 @@ public final class DefaultTacletSetTranslation
 
 
     @Override
-    public @NonNull ImmutableList<TacletFormula> getTranslation(@Nullable ImmutableSet<Sort> sorts) {
+    public @NonNull ImmutableList<TacletFormula> getTranslation(
+            @Nullable ImmutableSet<Sort> sorts) {
 
         // only translate once.
         if (!translate) {

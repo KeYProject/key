@@ -23,11 +23,12 @@ import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFea
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -87,8 +88,9 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
     @Override
-    protected UseInformationFlowContractMacro.@NonNull PropExpansionStrategy createStrategy(Proof proof,
-                                                                                            PosInOccurrence posInOcc) {
+    protected UseInformationFlowContractMacro.@NonNull PropExpansionStrategy createStrategy(
+            Proof proof,
+            PosInOccurrence posInOcc) {
         return new UseInformationFlowContractMacro.PropExpansionStrategy(getAdmittedRuleNames());
     }
 
@@ -184,7 +186,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(@NonNull RuleApp ruleApp, PosInOccurrence pio, Goal goal,
-                                       MutableState mState) {
+                MutableState mState) {
             // first try to apply
             // - impLeft on previous information flow contract application
             // formula, else
@@ -212,7 +214,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(@NonNull RuleApp app, PosInOccurrence pio, @NonNull Goal goal) {
+        public boolean isApprovedApp(@NonNull RuleApp app, PosInOccurrence pio,
+                @NonNull Goal goal) {
             // abort if
             // - the parent.parent rule application is an information
             // flow contract rule application,

@@ -33,7 +33,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
-import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
@@ -41,6 +40,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
 
+import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -1779,7 +1779,7 @@ public class MergeRuleUtils {
          * @return The target collection with inserted terms.
          */
         public static <T extends Collection<Term>> @NonNull T toTermList(@NonNull T target,
-                                                                         Iterable<TermWrapper> wrappedCollection) {
+                Iterable<TermWrapper> wrappedCollection) {
 
             for (TermWrapper termWrapper : wrappedCollection) {
                 target.add(termWrapper.term());

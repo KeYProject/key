@@ -10,12 +10,13 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class BasicMatching {
 
@@ -28,7 +29,8 @@ class BasicMatching {
      * @param targetTerm a gound term
      * @return all substitution found from this matching
      */
-    static @NonNull ImmutableSet<Substitution> getSubstitutions(@NonNull Term trigger, @NonNull Term targetTerm) {
+    static @NonNull ImmutableSet<Substitution> getSubstitutions(@NonNull Term trigger,
+            @NonNull Term targetTerm) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         if (targetTerm.freeVars().size() > 0 || targetTerm.op() instanceof Quantifier) {
             return allsubs;
@@ -65,7 +67,8 @@ class BasicMatching {
      * match the pattern to instance recursively.
      */
     private static @Nullable ImmutableMap<QuantifiableVariable, Term> matchRec(
-            @NonNull ImmutableMap<QuantifiableVariable, Term> varMap, @NonNull Term pattern, @NonNull Term instance) {
+            @NonNull ImmutableMap<QuantifiableVariable, Term> varMap, @NonNull Term pattern,
+            @NonNull Term instance) {
         final Operator patternOp = pattern.op();
 
         if (patternOp instanceof QuantifiableVariable) {
@@ -91,7 +94,8 @@ class BasicMatching {
      *         before.
      */
     private static @Nullable ImmutableMap<QuantifiableVariable, Term> mapVarWithCheck(
-            @NonNull ImmutableMap<QuantifiableVariable, Term> varMap, @NonNull QuantifiableVariable var,
+            @NonNull ImmutableMap<QuantifiableVariable, Term> varMap,
+            @NonNull QuantifiableVariable var,
             Term instance) {
         final Term oldTerm = varMap.get(var);
         if (oldTerm == null) {

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

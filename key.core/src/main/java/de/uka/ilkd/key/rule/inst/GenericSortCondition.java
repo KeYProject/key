@@ -11,9 +11,10 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
+import org.key_project.logic.sort.Sort;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.sort.Sort;
 
 
 /**
@@ -33,7 +34,7 @@ public abstract class GenericSortCondition {
      *         sorts that don't match)
      */
     public static GenericSortCondition createCondition(@NonNull SchemaVariable sv,
-                                                       InstantiationEntry<?> p_entry) {
+            InstantiationEntry<?> p_entry) {
 
         if (!(p_entry instanceof TermInstantiation ti)) {
             return null;
@@ -50,7 +51,7 @@ public abstract class GenericSortCondition {
      * @return the resulting condition; null if the symbols are either incompatible or equal
      */
     public static @Nullable GenericSortCondition createCondition(@NonNull SortDependingFunction p0,
-                                                                 @NonNull SortDependingFunction p1) {
+            @NonNull SortDependingFunction p1) {
 
         if (!p0.isSimilar(p1)) {
             return null;
@@ -78,7 +79,8 @@ public abstract class GenericSortCondition {
      *         always compatible (no generic sorts) or never compatible (e.g. non generic sorts that
      *         don't match)
      */
-    protected static GenericSortCondition createCondition(Sort s0, @NonNull Sort s1, boolean p_identity) {
+    protected static GenericSortCondition createCondition(Sort s0, @NonNull Sort s1,
+            boolean p_identity) {
         while (s0 instanceof ArraySort) {
             // Currently the sort hierarchy is not inherited by
             // collection sorts; therefore identity has to be ensured
@@ -127,7 +129,8 @@ public abstract class GenericSortCondition {
      * @return a condition that specifies the given generic sort to be instantiated with a supersort
      *         of the given concrete sort
      */
-    public static @NonNull GenericSortCondition createSupersortCondition(GenericSort p_gs, Sort p_s) {
+    public static @NonNull GenericSortCondition createSupersortCondition(GenericSort p_gs,
+            Sort p_s) {
         return new GSCSupersort(p_gs, p_s);
     }
 
@@ -135,7 +138,8 @@ public abstract class GenericSortCondition {
      * @return a condition that specifies the given generic sort to be instantiated (exactly) with
      *         the given concrete sort
      */
-    public static @NonNull GenericSortCondition createIdentityCondition(GenericSort p_gs, Sort p_s) {
+    public static @NonNull GenericSortCondition createIdentityCondition(GenericSort p_gs,
+            Sort p_s) {
         return new GSCIdentity(p_gs, p_s);
     }
 
@@ -146,7 +150,7 @@ public abstract class GenericSortCondition {
      *        GenericSortInstantiations)
      */
     public static @NonNull GenericSortCondition createForceInstantiationCondition(GenericSort p_gs,
-                                                                                  boolean p_maximum) {
+            boolean p_maximum) {
         return new GSCForceInstantiation(p_gs, p_maximum);
     }
 

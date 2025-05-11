@@ -9,6 +9,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -25,7 +26,8 @@ public class SubTermFeature implements TermFeature {
         this.arityMismatchCost = arityMismatchCost;
     }
 
-    public static @NonNull TermFeature create(TermFeature @NonNull [] fs, RuleAppCost arityMismatchCost) {
+    public static @NonNull TermFeature create(TermFeature @NonNull [] fs,
+            RuleAppCost arityMismatchCost) {
         final TermFeature[] fsCopy = new TermFeature[fs.length];
         System.arraycopy(fs, 0, fsCopy, 0, fs.length);
         return new SubTermFeature(fsCopy, arityMismatchCost);

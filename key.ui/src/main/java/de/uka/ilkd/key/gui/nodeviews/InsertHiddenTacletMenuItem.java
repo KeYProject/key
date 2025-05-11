@@ -12,8 +12,9 @@ import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This item groups all insert hidden taclets and offers a more convienient user interface to add

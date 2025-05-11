@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
+
 import org.jspecify.annotations.NonNull;
 
 @SuppressWarnings("serial")

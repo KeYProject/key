@@ -9,8 +9,9 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Instanceof.

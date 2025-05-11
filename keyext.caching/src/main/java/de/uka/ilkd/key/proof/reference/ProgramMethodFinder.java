@@ -6,8 +6,9 @@ package de.uka.ilkd.key.proof.reference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Visitor;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Simple visitor to find instances of non-model {@link ProgramMethod} in terms.

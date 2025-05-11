@@ -169,8 +169,10 @@ public final class IconFactory {
     private static final @Nullable Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
     private static final @Nullable Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
-    private static final @Nullable Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
-    private static final @Nullable Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
+    private static final @Nullable Image keyLogoSmall =
+        getImage("images/key-color-icon-square.gif");
+    private static final @Nullable Image oneStepSimplifier =
+        getImage("images/toolbar/oneStepSimplifier.png");
 
     private static final @Nullable Image junit = getImage("images/toolbar/junit_logo.png");
     private static final @Nullable Image jml = getImage("images/toolbar/jml.png");

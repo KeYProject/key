@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
+
 import org.jspecify.annotations.Nullable;
 
 /**

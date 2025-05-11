@@ -13,6 +13,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
+
 import org.jspecify.annotations.NonNull;
 
 public class UnicodeToggleAction extends MainWindowAction {

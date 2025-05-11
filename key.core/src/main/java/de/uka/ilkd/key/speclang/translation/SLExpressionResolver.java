@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.PackageReference;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -28,7 +29,7 @@ public abstract class SLExpressionResolver {
     protected final @NonNull KeYJavaType specInClass;
 
     public SLExpressionResolver(@NonNull JavaInfo javaInfo, @NonNull SLResolverManager manager,
-                                @NonNull KeYJavaType specInClass) {
+            @NonNull KeYJavaType specInClass) {
         assert javaInfo != null;
         assert manager != null;
         assert specInClass != null;
@@ -80,8 +81,9 @@ public abstract class SLExpressionResolver {
     /**
      * Helper for isVisible().
      */
-    private final boolean isVisibleHelper(@NonNull MemberDeclaration md, @NonNull KeYJavaType containingType,
-                                          @NonNull KeYJavaType inType) {
+    private final boolean isVisibleHelper(@NonNull MemberDeclaration md,
+            @NonNull KeYJavaType containingType,
+            @NonNull KeYJavaType inType) {
         // use spec visibility
         VisibilityModifier mod = manager.getSpecVisibility(md);
 
@@ -113,7 +115,8 @@ public abstract class SLExpressionResolver {
     /**
      * Checks whether the passed member, contained in the passed type, is visible in specInClass.
      */
-    protected final boolean isVisible(@NonNull MemberDeclaration md, @NonNull KeYJavaType containingType) {
+    protected final boolean isVisible(@NonNull MemberDeclaration md,
+            @NonNull KeYJavaType containingType) {
         // visible in specInClass directly?
         KeYJavaType inType = specInClass;
         boolean result = isVisibleHelper(md, containingType, inType);
@@ -143,10 +146,11 @@ public abstract class SLExpressionResolver {
      * @throws SLTranslationException
      */
     protected abstract @Nullable SLExpression doResolving(SLExpression receiver, String name,
-                                                          SLParameters parameters) throws SLTranslationException;
+            SLParameters parameters) throws SLTranslationException;
 
 
-    public final @Nullable SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
+    public final @Nullable SLExpression resolve(SLExpression receiver, String name,
+            SLParameters parameters)
             throws SLTranslationException {
         if (!canHandleReceiver(receiver)) {
             return null;

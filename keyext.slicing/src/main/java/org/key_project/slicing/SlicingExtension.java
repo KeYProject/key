@@ -28,13 +28,13 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Proof slicing extension.

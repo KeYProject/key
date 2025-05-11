@@ -2,6 +2,7 @@
  * @author Alexander Weigl
  * @version 1 (5/11/25)
  */
-@NullMarked package de.uka.ilkd.key.proof_references.reference;
+@NullMarked
+package de.uka.ilkd.key.proof_references.reference;
 
 import org.jspecify.annotations.NullMarked;

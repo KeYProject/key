@@ -37,11 +37,11 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -220,7 +220,7 @@ public final class Main {
     }
 
     public static void loadCommandLineFiles(@NonNull AbstractMediatorUserInterfaceControl ui,
-                                            @NonNull List<File> fileArguments) {
+            @NonNull List<File> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
@@ -606,7 +606,8 @@ public final class Main {
 
     }
 
-    public static void printUsageAndExit(boolean printUsage, @Nullable String offending, int exitValue) {
+    public static void printUsageAndExit(boolean printUsage, @Nullable String offending,
+            int exitValue) {
         PrintStream ps = exitValue == 0 ? System.out : System.err;
         if (offending != null) {
             ps.println(offending);

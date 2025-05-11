@@ -24,10 +24,11 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Abstract base class for all default implementations of the sub-interfaces of
@@ -1664,7 +1665,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contract the contract whose free precondition to add.
          * @param heap the heap to use.
          */
-        private void addFreePreconditionFrom(final @NonNull T contract, final LocationVariable heap) {
+        private void addFreePreconditionFrom(final @NonNull T contract,
+                final LocationVariable heap) {
             final Term freePrecondition = contract.getFreePrecondition(heap,
                 placeholderVariables.self, placeholderVariables.remembranceHeaps, services);
             if (freePrecondition != null) {
@@ -1714,7 +1716,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contract the contract whose modifiable clause to add.
          * @param heap the heap to use.
          */
-        private void addModifiableClauseFrom(final @NonNull T contract, final LocationVariable heap) {
+        private void addModifiableClauseFrom(final @NonNull T contract,
+                final LocationVariable heap) {
             final Term additionalModifiableClause =
                 contract.getModifiableClause(heap, placeholderVariables.self, services);
             if (additionalModifiableClause != null) {
@@ -1730,7 +1733,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param heap
          *        the heap to use.
          */
-        private void addFreeModifiableClauseFrom(final @NonNull T contract, final LocationVariable heap) {
+        private void addFreeModifiableClauseFrom(final @NonNull T contract,
+                final LocationVariable heap) {
             final Term additionalModifiableClause =
                 contract.getModifiableClause(heap, placeholderVariables.self, services);
             if (additionalModifiableClause != null) {

@@ -13,9 +13,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.sort.Sort;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.sort.Sort;
 
 /**
  * The default implementation of {@link IExecutionTermination}.
@@ -52,7 +53,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
      *        requested the first time (normal or exceptional termination only).
      */
     public ExecutionTermination(@NonNull ITreeSettings settings, @NonNull Node proofNode,
-                                IProgramVariable exceptionVariable, TerminationKind terminationKind) {
+            IProgramVariable exceptionVariable, TerminationKind terminationKind) {
         super(settings, proofNode);
         this.exceptionVariable = exceptionVariable;
         this.terminationKind = terminationKind;

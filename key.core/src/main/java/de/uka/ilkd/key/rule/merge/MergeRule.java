@@ -36,7 +36,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
@@ -47,6 +46,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
@@ -308,7 +308,8 @@ public class MergeRule implements BuiltInRule {
     @SuppressWarnings("unused")
     /* For deactivated equiv check */
     protected @NonNull MergeStateEntry mergeStates(
-            @NonNull MergeProcedure mergeRule, @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2,
+            @NonNull MergeProcedure mergeRule, @NonNull SymbolicExecutionState state1,
+            @NonNull SymbolicExecutionState state2,
             @NonNull Term programCounter, Term distinguishingFormula, @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
@@ -465,9 +466,10 @@ public class MergeRule implements BuiltInRule {
      * @return A merged heap term.
      */
     protected @NonNull ValuesMergeResult mergeHeaps(final @NonNull MergeProcedure mergeRule,
-                                                    final LocationVariable heapVar, final @NonNull Term heap1, final @NonNull Term heap2,
-                                                    final @NonNull SymbolicExecutionState state1, final @NonNull SymbolicExecutionState state2,
-                                                    Term distinguishingFormula, final @NonNull Services services) {
+            final LocationVariable heapVar, final @NonNull Term heap1, final @NonNull Term heap2,
+            final @NonNull SymbolicExecutionState state1,
+            final @NonNull SymbolicExecutionState state2,
+            Term distinguishingFormula, final @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
@@ -606,7 +608,7 @@ public class MergeRule implements BuiltInRule {
      * @return true iff a suitable top level formula for merging.
      */
     public static boolean isOfAdmissibleForm(@NonNull Goal goal, @Nullable PosInOccurrence pio,
-                                             boolean doMergePartnerCheck) {
+            boolean doMergePartnerCheck) {
         // We admit top level formulas of the form \<{ ... }\> phi
         // and U \<{ ... }\> phi, where U must be an update
         // in normal form, i.e. a parallel update of elementary
@@ -669,8 +671,9 @@ public class MergeRule implements BuiltInRule {
      * @param pio Position of update-program counter formula in goal.
      * @return A list of suitable merge partners. May be empty if none exist.
      */
-    public static @NonNull ImmutableList<MergePartner> findPotentialMergePartners(@NonNull Goal goal,
-                                                                                  @NonNull PosInOccurrence pio) {
+    public static @NonNull ImmutableList<MergePartner> findPotentialMergePartners(
+            @NonNull Goal goal,
+            @NonNull PosInOccurrence pio) {
 
         final Services services = goal.proof().getServices();
 

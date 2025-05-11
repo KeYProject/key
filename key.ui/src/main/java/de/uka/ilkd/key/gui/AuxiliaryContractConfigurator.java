@@ -11,6 +11,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
+
 import org.jspecify.annotations.NonNull;
 
 /**

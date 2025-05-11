@@ -13,9 +13,10 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Creates an <tt>Type::instance(..)</tt> term for the component type of the array. The component

@@ -10,6 +10,7 @@ import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.settings.ViewSettings.SYNTAX_HIGHLIGHTING;

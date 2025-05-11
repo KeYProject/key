@@ -7,11 +7,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to create metavariables for every universal variables in quantified formula
@@ -23,7 +24,8 @@ class ReplacerOfQuanVariablesWithMetavariables {
 
     private ReplacerOfQuanVariablesWithMetavariables() {}
 
-    public static @NonNull Substitution createSubstitutionForVars(Term allTerm, @NonNull TermServices services) {
+    public static @NonNull Substitution createSubstitutionForVars(Term allTerm,
+            @NonNull TermServices services) {
         ImmutableMap<QuantifiableVariable, Term> res =
             DefaultImmutableMap.nilMap();
         Term t = allTerm;

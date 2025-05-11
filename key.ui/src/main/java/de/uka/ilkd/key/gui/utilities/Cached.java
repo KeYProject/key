@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.Objects;
 import java.util.function.Function;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Caches a computation using a single value cache

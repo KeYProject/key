@@ -35,12 +35,12 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +107,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param differingLocVars Location variables the values of which differ in the merge partner
      *        states.
      */
-    public AbstractionPredicatesChoiceDialog(Goal goal, @NonNull List<LocationVariable> differingLocVars) {
+    public AbstractionPredicatesChoiceDialog(Goal goal,
+            @NonNull List<LocationVariable> differingLocVars) {
         this();
         this.goal = goal;
         differingLocVars.forEach(
@@ -490,7 +491,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return The parsed abstraction predicate.
      * @throws ParserException If there is a mistake in the input.
      */
-    private @NonNull AbstractionPredicate parsePredicate(@NonNull String input, @NonNull NamespaceSet localNamespaces)
+    private @NonNull AbstractionPredicate parsePredicate(@NonNull String input,
+            @NonNull NamespaceSet localNamespaces)
             throws ParserException {
         return MergeRuleUtils.parsePredicate(input, registeredPlaceholders, localNamespaces,
             goal.proof().getServices());
@@ -553,7 +555,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     // /////// STATIC METHODS ////// //
     // ///////////////////////////// //
 
-    private static @Nullable URL getURLForResourceFile(@NonNull Class<?> cl, @NonNull String filename) {
+    private static @Nullable URL getURLForResourceFile(@NonNull Class<?> cl,
+            @NonNull String filename) {
         URL url = cl.getResource(filename);
         LOGGER.debug("Load Resource:" + filename + " of class " + cl);
         if (url == null && cl.getSuperclass() != null) {
@@ -594,8 +597,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             new LinkedHashMap<>();
 
         public Result(ArrayList<AbstractionPredicate> registeredPredicates,
-                      Class<? extends AbstractPredicateAbstractionLattice> latticeType,
-                      @NonNull List<AbstractDomainElemChoice> userChoices) {
+                Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+                @NonNull List<AbstractDomainElemChoice> userChoices) {
             this.registeredPredicates = registeredPredicates;
             this.latticeType = latticeType;
 
@@ -660,7 +663,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 @SuppressWarnings("unchecked")
                 @Override
                 public @NonNull Component getListCellRendererComponent(JList<?> list, Object value,
-                                                                       int index, boolean isSelected, boolean cellHasFocus) {
+                        int index, boolean isSelected, boolean cellHasFocus) {
                     final DefaultListCellRenderer result = //
                         (DefaultListCellRenderer) super.getListCellRendererComponent(list, value,
                             index, isSelected, cellHasFocus);
@@ -694,7 +697,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
                 @Override
                 public @NonNull Component getTableCellRendererComponent(JTable table, Object value,
-                                                                        boolean isSelected, boolean hasFocus, int row, int column) {
+                        boolean isSelected, boolean hasFocus, int row, int column) {
                     final DefaultTableCellRenderer result = //
                         (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value,
                             isSelected, hasFocus, row, column);

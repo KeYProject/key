@@ -28,10 +28,11 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extracts called methods.
@@ -43,7 +44,8 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
      * {@inheritDoc}
      */
     @Override
-    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node,
+            Services services) {
         String name = MiscTools.getRuleName(node);
         if (name != null && name.toLowerCase().contains("methodcall")) {
             NodeInfo info = node.getNodeInfo();

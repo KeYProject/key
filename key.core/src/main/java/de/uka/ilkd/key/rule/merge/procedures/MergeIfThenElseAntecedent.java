@@ -14,11 +14,12 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two locations are
@@ -56,9 +57,11 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
     }
 
     @Override
-    public @NonNull ValuesMergeResult mergeValuesInStates(@NonNull Term v, @NonNull SymbolicExecutionState state1,
-                                                          @NonNull Term valueInState1, @NonNull SymbolicExecutionState state2, @NonNull Term valueInState2,
-                                                          Term distinguishingFormula, @NonNull Services services) {
+    public @NonNull ValuesMergeResult mergeValuesInStates(@NonNull Term v,
+            @NonNull SymbolicExecutionState state1,
+            @NonNull Term valueInState1, @NonNull SymbolicExecutionState state2,
+            @NonNull Term valueInState2,
+            Term distinguishingFormula, @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -96,9 +99,11 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
      * @return A list of if-then-else constraints for the given constrained term, states and if/else
      *         terms.
      */
-    private static @NonNull ImmutableSet<Term> getIfThenElseConstraints(@NonNull Term constrained, @NonNull Term ifTerm,
-                                                                        @NonNull Term elseTerm, @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2,
-                                                                        @Nullable Term distinguishingFormula, @NonNull Services services) {
+    private static @NonNull ImmutableSet<Term> getIfThenElseConstraints(@NonNull Term constrained,
+            @NonNull Term ifTerm,
+            @NonNull Term elseTerm, @NonNull SymbolicExecutionState state1,
+            @NonNull SymbolicExecutionState state2,
+            @Nullable Term distinguishingFormula, @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<Term> result = DefaultImmutableSet.nil();

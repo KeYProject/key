@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.Component;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
+
+import org.jspecify.annotations.NonNull;
 
 public class InfoDialog {
     private JTextPane infoText;

@@ -14,12 +14,13 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -131,7 +132,8 @@ public abstract class SLResolverManager {
      * Tries to resolve a name as a property call on an explicitly given receiver, by calling the
      * registered resolvers.
      */
-    private @Nullable SLExpression resolveExplicit(SLExpression receiver, String name, SLParameters params)
+    private @Nullable SLExpression resolveExplicit(SLExpression receiver, String name,
+            SLParameters params)
             throws SLTranslationException {
         for (SLExpressionResolver resolver : resolvers) {
             SLExpression result = resolver.resolve(receiver, name, params);
@@ -147,7 +149,8 @@ public abstract class SLResolverManager {
     /**
      * Helper for resolve().
      */
-    private @Nullable SLExpression resolveIt(@Nullable SLExpression receiver, @NonNull String name, SLParameters parameters)
+    private @Nullable SLExpression resolveIt(@Nullable SLExpression receiver, @NonNull String name,
+            SLParameters parameters)
             throws SLTranslationException {
         SLExpression result;
 
@@ -179,7 +182,8 @@ public abstract class SLResolverManager {
      * @param parameters actual parameters of the property call, or null
      * @return corresponding term, type or collection if successful, null otherwise
      */
-    public @Nullable SLExpression resolve(SLExpression receiver, @NonNull String name, SLParameters parameters)
+    public @Nullable SLExpression resolve(SLExpression receiver, @NonNull String name,
+            SLParameters parameters)
             throws SLTranslationException {
         String shortName = name;
 
@@ -233,7 +237,7 @@ public abstract class SLResolverManager {
      * Puts a list of local variables into the topmost namespace on the stack.
      */
     public void putIntoTopLocalVariablesNamespace(@NonNull ImmutableList<LogicVariable> pvs,
-                                                  KeYJavaType kjt) {
+            KeYJavaType kjt) {
         for (LogicVariable pv : pvs) {
             putIntoTopLogicVariablesNamespace(pv, kjt);
         }
@@ -243,7 +247,8 @@ public abstract class SLResolverManager {
     /**
      * Puts a list of local variables into the topmost namespace on the stack.
      */
-    public void putIntoTopLocalVariablesNamespace(@NonNull ImmutableList<? extends LocationVariable> pvs) {
+    public void putIntoTopLocalVariablesNamespace(
+            @NonNull ImmutableList<? extends LocationVariable> pvs) {
         for (var pv : pvs) {
             putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
         }

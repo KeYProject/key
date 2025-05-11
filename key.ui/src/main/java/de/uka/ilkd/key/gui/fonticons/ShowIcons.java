@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
-import org.jspecify.annotations.NonNull;
-
 import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.*;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl

@@ -18,9 +18,9 @@ import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

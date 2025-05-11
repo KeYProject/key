@@ -11,12 +11,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -259,8 +259,9 @@ public class TestApplyUpdateOnRigidCondition {
      * @return the original formula or term if the update cannot be applied; else, the updated
      *         formula or term is returned
      */
-    private @Nullable Term instantiateAndCheck(@NonNull Term term, @NonNull UpdateSV u, @NonNull SchemaVariable tOrPhi,
-                                               @NonNull SchemaVariable result) {
+    private @Nullable Term instantiateAndCheck(@NonNull Term term, @NonNull UpdateSV u,
+            @NonNull SchemaVariable tOrPhi,
+            @NonNull SchemaVariable result) {
         Term update = term.sub(0);
         Term arg = term.sub(1);
 

@@ -13,8 +13,9 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Creates the wellformedness condition for the given anonymizing heap terms if they apply for the
@@ -55,8 +56,9 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
      * @return The wellformedness condition.
      */
     private @NonNull Term createWellformedCond(boolean isTransaction, boolean isPermissions,
-                                               @NonNull Term anonHeapTerm, @NonNull Term anonSavedHeapTerm, @NonNull Term anonPermissionsHeapTerm,
-                                               @NonNull Services services) {
+            @NonNull Term anonHeapTerm, @NonNull Term anonSavedHeapTerm,
+            @NonNull Term anonPermissionsHeapTerm,
+            @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Term result = tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);

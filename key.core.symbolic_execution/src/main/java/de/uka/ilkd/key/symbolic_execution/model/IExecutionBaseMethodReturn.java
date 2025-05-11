@@ -6,6 +6,7 @@ package de.uka.ilkd.key.symbolic_execution.model;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+
 import org.jspecify.annotations.Nullable;
 
 /**

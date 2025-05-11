@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+
 import org.jspecify.annotations.NonNull;
 
 public abstract class CompareCostsFeature extends BinaryFeature {

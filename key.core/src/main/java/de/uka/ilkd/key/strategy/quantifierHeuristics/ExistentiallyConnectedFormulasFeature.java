@@ -10,6 +10,7 @@ import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -28,7 +29,8 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         return new ExistentiallyConnectedFormulasFeature(for0, for1);
     }
 
-    protected boolean filter(TacletApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final ClausesGraph graph = ClausesGraph.create(pos.sequentFormula().formula(),

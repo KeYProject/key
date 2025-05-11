@@ -15,9 +15,10 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Replaces a local variable declaration <code> #t #v[]; </code> with <code>#t[] #v;</code>
@@ -32,7 +33,7 @@ public class ArrayPostDecl extends ProgramTransformer {
 
     @Override
     public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
-                                                SVInstantiations svInst) {
+            SVInstantiations svInst) {
 
         final LocalVariableDeclaration declaration = (LocalVariableDeclaration) pe;
         final ImmutableArray<Modifier> modifiers = declaration.getModifiers();

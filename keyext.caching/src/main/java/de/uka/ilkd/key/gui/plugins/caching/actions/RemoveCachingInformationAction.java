@@ -9,6 +9,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
+
 import org.jspecify.annotations.NonNull;
 
 /**

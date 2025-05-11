@@ -137,7 +137,8 @@ public class SettingsManager {
      * @param providers
      * @param mainWindow
      */
-    private void initializeProviders(@NonNull List<SettingsProvider> providers, MainWindow mainWindow) {
+    private void initializeProviders(@NonNull List<SettingsProvider> providers,
+            MainWindow mainWindow) {
         providers.forEach(it -> it.getPanel(mainWindow));
         providers.forEach(it -> initializeProviders(it.getChildren(), mainWindow));
     }

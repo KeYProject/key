@@ -18,9 +18,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.Option;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -60,7 +60,8 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         state.setGoal(g);
     }
 
-    private @NonNull Goal findGoalWith(String branchTitle, @NonNull Proof proof) throws ScriptException {
+    private @NonNull Goal findGoalWith(String branchTitle, @NonNull Proof proof)
+            throws ScriptException {
         return findGoalWith(node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
                 .orElse("").equals(branchTitle),
             node -> getFirstSubtreeGoal(node, proof), proof);
@@ -88,13 +89,15 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return null;
     }
 
-    private @NonNull Goal findGoalWith(@NonNull Term formula, @NonNull Proof proof) throws ScriptException {
+    private @NonNull Goal findGoalWith(@NonNull Term formula, @NonNull Proof proof)
+            throws ScriptException {
         return findGoalWith(node -> node.leaf() && contains(node.sequent(), formula),
             node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
-    private @NonNull Goal findGoalWith(@NonNull Function<Node, Boolean> filter, @NonNull Function<Node, Goal> goalRetriever,
-                                       @NonNull Proof proof) throws ScriptException {
+    private @NonNull Goal findGoalWith(@NonNull Function<Node, Boolean> filter,
+            @NonNull Function<Node, Goal> goalRetriever,
+            @NonNull Proof proof) throws ScriptException {
         Deque<Node> choices = new LinkedList<>();
         Node node = proof.root();
 

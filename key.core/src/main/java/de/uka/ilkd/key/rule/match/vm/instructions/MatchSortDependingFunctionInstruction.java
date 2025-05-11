@@ -12,9 +12,10 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.key_project.logic.sort.Sort;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.sort.Sort;
 
 public class MatchSortDependingFunctionInstruction extends Instruction<SortDependingFunction> {
 
@@ -39,8 +40,9 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      * @return <code>null</code> if failed the resulting match conditions otherwise the resulting
      *         {@link MatchConditions}
      */
-    private @Nullable MatchConditions matchSorts(Sort dependingSortToMatch, @NonNull MatchConditions matchConditions,
-                                                 Services services) {
+    private @Nullable MatchConditions matchSorts(Sort dependingSortToMatch,
+            @NonNull MatchConditions matchConditions,
+            Services services) {
         // This restriction has been dropped for free generic sorts to prove taclets correct
         // assert !(s2 instanceof GenericSort)
         // : "Sort s2 is not allowed to be of type generic.";
@@ -75,8 +77,9 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      * @param services the {@link Services}
      */
     @Override
-    public final @Nullable MatchConditions match(@NonNull Term instantiationCandidate, @NonNull MatchConditions matchConditions,
-                                                 Services services) {
+    public final @Nullable MatchConditions match(@NonNull Term instantiationCandidate,
+            @NonNull MatchConditions matchConditions,
+            Services services) {
         MatchConditions result = null;
         if (instantiationCandidate.op() instanceof SortDependingFunction sdp) {
             if (op.isSimilar(sdp)) {
@@ -91,8 +94,9 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition, @NonNull MatchConditions mc,
-                                           Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
+            @NonNull MatchConditions mc,
+            Services services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNext();

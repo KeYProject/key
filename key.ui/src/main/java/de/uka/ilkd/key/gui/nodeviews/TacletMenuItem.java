@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.event.ActionListener;
 
 import de.uka.ilkd.key.rule.TacletApp;
+
 import org.jspecify.annotations.Nullable;
 
 /**

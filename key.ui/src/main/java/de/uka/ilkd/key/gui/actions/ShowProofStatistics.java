@@ -32,10 +32,10 @@ import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,7 +147,7 @@ public class ShowProofStatistics extends MainWindowAction {
     }
 
     private static @NonNull String getHTMLStatisticsMessage(int openGoals, int cachedGoals,
-                                                            @NonNull Statistics statistics) {
+            @NonNull Statistics statistics) {
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
             + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");

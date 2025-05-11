@@ -37,9 +37,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.util.java.StringUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.java.StringUtil;
 
 /**
  * The default implementation of {@link IExecutionMethodReturn}.
@@ -72,7 +73,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
     public ExecutionMethodReturn(ITreeSettings settings, Node proofNode,
-                                 @NonNull ExecutionMethodCall methodCall) {
+            @NonNull ExecutionMethodCall methodCall) {
         super(settings, proofNode, methodCall);
     }
 
@@ -231,7 +232,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @return The return value.
      * @throws ProofInputException Occurred Exception.
      */
-    protected IExecutionMethodReturnValue @NonNull [] lazyComputeReturnValues() throws ProofInputException {
+    protected IExecutionMethodReturnValue @NonNull [] lazyComputeReturnValues()
+            throws ProofInputException {
         InitConfig initConfig = getInitConfig();
         if (initConfig != null) { // Otherwise proof is disposed.
             final Services services = initConfig.getServices();
@@ -376,7 +378,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * @param methodName The name of the method that is completely executed.
      * @return The created human readable name.
      */
-    public static @NonNull String createMethodReturnName(@Nullable Object returnValue, String methodName) {
+    public static @NonNull String createMethodReturnName(@Nullable Object returnValue,
+            String methodName) {
         return INTERNAL_NODE_NAME_START + "return"
             + (returnValue != null ? " " + returnValue + "as result" : "")
             + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")

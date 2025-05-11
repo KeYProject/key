@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -36,8 +37,9 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      *        {@link IExecutionNode}.
      * @param term The {@link Term} representing the constraint.
      */
-    public ExecutionConstraint(@NonNull ITreeSettings settings, @NonNull Node proofNode, @NonNull PosInOccurrence modalityPIO,
-                               @NonNull Term term) {
+    public ExecutionConstraint(@NonNull ITreeSettings settings, @NonNull Node proofNode,
+            @NonNull PosInOccurrence modalityPIO,
+            @NonNull Term term) {
         super(settings, proofNode);
         assert term != null;
         assert modalityPIO != null;

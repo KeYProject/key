@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
 import org.jspecify.annotations.NonNull;
 
 /**

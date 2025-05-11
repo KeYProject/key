@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -58,7 +59,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @param value The value.
      */
     public AbstractExecutionValue(@NonNull ITreeSettings settings, @NonNull Node proofNode,
-                                  IExecutionVariable variable, Term condition, Term value) {
+            IExecutionVariable variable, Term condition, Term value) {
         super(settings, proofNode);
         this.variable = variable;
         this.condition = condition;
@@ -129,7 +130,8 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @param term The initial {@link Term}.
      * @param toFill The {@link Set} of relevant {@link Term}s to fill.
      */
-    protected void fillRelevantTerms(@NonNull Services services, @Nullable Term term, @NonNull Set<Term> toFill) {
+    protected void fillRelevantTerms(@NonNull Services services, @Nullable Term term,
+            @NonNull Set<Term> toFill) {
         if (term != null) {
             if (term.op() instanceof ProgramVariable
                     || SymbolicExecutionUtil.isSelect(services, term)) {

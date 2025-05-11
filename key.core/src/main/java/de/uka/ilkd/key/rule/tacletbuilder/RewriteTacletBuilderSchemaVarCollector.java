@@ -13,8 +13,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Visitor;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**

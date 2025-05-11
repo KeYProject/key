@@ -20,12 +20,13 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extracts used {@link ClassAxiom} and {@link ClassInvariant}s.
@@ -37,7 +38,8 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
      * {@inheritDoc}
      */
     @Override
-    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
+    public @Nullable LinkedHashSet<IProofReference<?>> computeReferences(Node node,
+            Services services) {
         String name = MiscTools.getRuleName(node);
         if (name != null
                 && (name.toLowerCase().contains("axiom_for")

@@ -26,10 +26,10 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     public InnerNodeView(@NonNull Proof proof, Node node, RuleApp ruleApp, @NonNull Sequent sequent,
-                         @NonNull MainWindow mainWindow) {
+            @NonNull MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
         this.ruleApp = ruleApp;

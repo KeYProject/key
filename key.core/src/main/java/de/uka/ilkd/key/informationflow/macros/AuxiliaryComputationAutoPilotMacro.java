@@ -8,6 +8,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SequentialOnLastGoalProofMacro;
 import de.uka.ilkd.key.macros.SequentialProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

@@ -14,10 +14,11 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Variable condition that enforces a given generic sort to be instantiated with the type of a field
@@ -31,7 +32,8 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     private final @NonNull SchemaVariable exprOrTypeSV;
     private final GenericSort sort;
 
-    public FieldTypeToSortCondition(final @NonNull OperatorSV exprOrTypeSV, final GenericSort sort) {
+    public FieldTypeToSortCondition(final @NonNull OperatorSV exprOrTypeSV,
+            final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         assert checkSortedSV(exprOrTypeSV);
@@ -46,7 +48,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
 
     @Override
     public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
-                                           MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, Services services) {
 
         if (var != exprOrTypeSV) {
             return matchCond;

@@ -32,10 +32,10 @@ import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -409,13 +409,15 @@ public class SendFeedbackAction extends AbstractAction {
     }
 
 
-    private void saveMetaDataToFile(@NonNull File zipFile, @NonNull String message) throws IOException {
+    private void saveMetaDataToFile(@NonNull File zipFile, @NonNull String message)
+            throws IOException {
         try (FileOutputStream fos = new FileOutputStream(zipFile)) {
             saveMetaData(fos, message);
         }
     }
 
-    private void saveMetaData(@NonNull OutputStream os, @NonNull String message) throws IOException {
+    private void saveMetaData(@NonNull OutputStream os, @NonNull String message)
+            throws IOException {
         try (ZipOutputStream stream = new ZipOutputStream(new BufferedOutputStream(os))) {
             for (SendFeedbackItem item : items) {
                 if (item.isSelected() && item.isEnabled()) {

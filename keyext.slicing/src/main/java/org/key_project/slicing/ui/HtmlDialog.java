@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -28,7 +29,7 @@ public class HtmlDialog extends JDialog {
      * @param linkPressedCallback if the user clicks on a link, this callback receives the URL
      */
     public HtmlDialog(Window window, String title, String html,
-                      @Nullable Consumer<String> linkPressedCallback) {
+            @Nullable Consumer<String> linkPressedCallback) {
         super(window, title);
 
         setLayout(new BorderLayout());

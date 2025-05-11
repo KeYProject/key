@@ -8,9 +8,9 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.proof.Proof;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

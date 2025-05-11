@@ -14,8 +14,9 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.smt.model.*;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 public class CETree {
     /**
@@ -99,7 +100,8 @@ public class CETree {
      * @param ov
      * @param object
      */
-    private void addObjectProperties(@NonNull ObjectVal ov, @NonNull DefaultMutableTreeNode object) {
+    private void addObjectProperties(@NonNull ObjectVal ov,
+            @NonNull DefaultMutableTreeNode object) {
         String sortName = computeSortName(ov);
         // General properties
         List<Pair<String, String>> objectProperties = computeObjectProperties(ov, sortName);
@@ -166,7 +168,7 @@ public class CETree {
     }
 
     public static @NonNull List<Pair<String, String>> computeObjectProperties(@NonNull ObjectVal ov,
-                                                                              String sortName) {
+            String sortName) {
         List<Pair<String, String>> result = new LinkedList<>();
         // Type
         sortName = Model.removePipes(sortName);
@@ -210,7 +212,8 @@ public class CETree {
      * @param ls
      * @param locset
      */
-    private void addLocSetProperties(@NonNull LocationSet ls, @NonNull DefaultMutableTreeNode locset) {
+    private void addLocSetProperties(@NonNull LocationSet ls,
+            @NonNull DefaultMutableTreeNode locset) {
         List<String> locationNames = computeLocationSetProperties(ls);
         for (String locationName : locationNames) {
             DefaultMutableTreeNode locationNode = new DefaultMutableTreeNode(locationName);
@@ -248,7 +251,8 @@ public class CETree {
      * @param s
      * @param sequence
      */
-    private void addSequenceProperties(@NonNull Sequence s, @NonNull DefaultMutableTreeNode sequence) {
+    private void addSequenceProperties(@NonNull Sequence s,
+            @NonNull DefaultMutableTreeNode sequence) {
         List<String> labels = computeSequenceProperties(s);
         for (String label : labels) {
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);

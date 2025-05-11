@@ -8,10 +8,11 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -69,7 +70,8 @@ public class ProgramSVInstantiation {
      * @param prgElement the JavaProgramElement The SchemaVariable is instantiated with
      * @return ProgramSVInstantiation the new ProgramSVInstantiation containing the given pair
      */
-    public @NonNull ProgramSVInstantiation replace(SchemaVariable sv, JavaProgramElement prgElement) {
+    public @NonNull ProgramSVInstantiation replace(SchemaVariable sv,
+            JavaProgramElement prgElement) {
         ImmutableList<ProgramSVEntry> result =
             ImmutableSLList.<ProgramSVEntry>nil().prepend(new ProgramSVEntry(sv, prgElement));
         for (final ProgramSVEntry entry : list) {

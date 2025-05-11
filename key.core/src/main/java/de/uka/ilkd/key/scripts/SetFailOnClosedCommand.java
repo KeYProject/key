@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.meta.Option;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -34,7 +35,8 @@ public class SetFailOnClosedCommand extends AbstractCommand<SetFailOnClosedComma
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args, @NonNull EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         state.setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
     }

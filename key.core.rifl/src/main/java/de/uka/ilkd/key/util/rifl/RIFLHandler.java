@@ -3,21 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.rifl;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.util.LinkedHashMap;
+
+import org.key_project.util.collection.KeYCollections;
+import org.key_project.util.collection.Pair;
+
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.key_project.util.collection.KeYCollections;
-import org.key_project.util.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 import static de.uka.ilkd.key.util.rifl.SpecificationEntity.*;
 

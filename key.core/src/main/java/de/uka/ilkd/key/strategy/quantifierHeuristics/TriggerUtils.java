@@ -11,9 +11,10 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 class TriggerUtils {
 
@@ -50,7 +51,8 @@ class TriggerUtils {
      * @return a set of quantifiableVariable which are belonged to both set0 and set1 have
      */
     public static @NonNull ImmutableSet<QuantifiableVariable> intersect(
-            @NonNull ImmutableSet<QuantifiableVariable> set0, @NonNull ImmutableSet<QuantifiableVariable> set1) {
+            @NonNull ImmutableSet<QuantifiableVariable> set0,
+            @NonNull ImmutableSet<QuantifiableVariable> set1) {
         ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.nil();
         for (QuantifiableVariable aSet0 : set0) {
             final QuantifiableVariable el = aSet0;

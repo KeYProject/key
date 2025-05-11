@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import de.uka.ilkd.key.scripts.meta.Option;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -25,7 +26,7 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
 
     @Override
     public Parameters evaluateArguments(@NonNull EngineState state,
-                                        Map<String, Object> arguments) throws Exception {
+            Map<String, Object> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(),
             arguments);
     }

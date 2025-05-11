@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -21,8 +22,9 @@ public final class ArgumentsLifter {
     private ArgumentsLifter() {
     }
 
-    public static <T> @NonNull List<ProofScriptArgument<T>> inferScriptArguments(@NonNull Class<?> clazz,
-                                                                                 ProofScriptCommand<T> command) {
+    public static <T> @NonNull List<ProofScriptArgument<T>> inferScriptArguments(
+            @NonNull Class<?> clazz,
+            ProofScriptCommand<T> command) {
         List<ProofScriptArgument<T>> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isFinal(field.getModifiers())) {
@@ -59,7 +61,8 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static <T> @NonNull ProofScriptArgument<T> lift(@NonNull Option option, @NonNull Field field) {
+    private static <T> @NonNull ProofScriptArgument<T> lift(@NonNull Option option,
+            @NonNull Field field) {
         ProofScriptArgument<T> arg = new ProofScriptArgument<>();
         arg.setName(option.value());
         arg.setRequired(option.required());

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+
 import org.jspecify.annotations.NonNull;
 
 /**

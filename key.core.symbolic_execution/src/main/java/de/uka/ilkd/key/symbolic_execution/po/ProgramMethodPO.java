@@ -31,11 +31,12 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -85,8 +86,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param pm The {@link IProgramMethod} to execute code parts from.
      * @param precondition An optional precondition to use.
      */
-    public ProgramMethodPO(@NonNull InitConfig initConfig, @NonNull String name, @NonNull IProgramMethod pm,
-                           String precondition) {
+    public ProgramMethodPO(@NonNull InitConfig initConfig, @NonNull String name,
+            @NonNull IProgramMethod pm,
+            String precondition) {
         super(initConfig, name);
         assert pm != null;
         this.pm = pm;
@@ -105,9 +107,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
-    public ProgramMethodPO(@NonNull InitConfig initConfig, @NonNull String name, @NonNull IProgramMethod pm,
-                           String precondition, boolean addUninterpretedPredicate,
-                           boolean addSymbolicExecutionLabel) {
+    public ProgramMethodPO(@NonNull InitConfig initConfig, @NonNull String name,
+            @NonNull IProgramMethod pm,
+            String precondition, boolean addUninterpretedPredicate,
+            boolean addSymbolicExecutionLabel) {
         super(initConfig, name, addUninterpretedPredicate, addSymbolicExecutionLabel);
         assert pm != null;
         this.pm = pm;
@@ -160,7 +163,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected @NonNull Term generateMbyAtPreDef(LocationVariable selfVar,
-                                                ImmutableList<LocationVariable> paramVars, Services services) {
+            ImmutableList<LocationVariable> paramVars, Services services) {
         return tb.tt();
     }
 
@@ -169,8 +172,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected @NonNull Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
-                                   ImmutableList<LocationVariable> paramVars,
-                                   Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         if (precondition != null && !precondition.isEmpty()) {
             var context = Context.inMethod(getProgramMethod(), services.getTermBuilder());
             JmlIO io = new JmlIO(services).context(context).parameters(paramVars);
@@ -187,9 +190,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     @Override
     protected @NonNull Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
-                                    ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                                    LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
-                                    Services services) {
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         return tb.tt();
     }
 
@@ -287,7 +290,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @param includeType Include the container type?
      * @return The human-readable method signature.
      */
-    public static @NonNull String getProgramMethodSignature(@NonNull IProgramMethod pm, boolean includeType) {
+    public static @NonNull String getProgramMethodSignature(@NonNull IProgramMethod pm,
+            boolean includeType) {
         PosTableLayouter l = PosTableLayouter.pure();
         l.beginC(0);
         if (includeType) {
@@ -310,7 +314,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * @throws IOException Occurred Exception if it was not possible to find the
      *         {@link IProgramMethod}.
      */
-    public static @NonNull IProgramMethod getProgramMethod(@NonNull InitConfig initConfig, @NonNull Configuration properties)
+    public static @NonNull IProgramMethod getProgramMethod(@NonNull InitConfig initConfig,
+            @NonNull Configuration properties)
             throws IOException {
         // Get container class and method signature
         String value = properties.getString("method");

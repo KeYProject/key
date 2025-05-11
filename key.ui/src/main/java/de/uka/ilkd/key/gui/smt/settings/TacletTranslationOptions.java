@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+
 import org.jspecify.annotations.NonNull;
 
 public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {

@@ -24,11 +24,12 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractFeatureStrategy extends StaticFeatureCollection implements Strategy {
 
@@ -55,7 +56,8 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature);
     }
 
-    protected @NonNull Feature ifHeuristics(String @NonNull [] heuristics, Feature thenFeature, Feature elseFeature) {
+    protected @NonNull Feature ifHeuristics(String @NonNull [] heuristics, Feature thenFeature,
+            Feature elseFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature,
             elseFeature);
     }
@@ -93,11 +95,13 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         bindRuleSet(d, ruleSet, longConst(cost));
     }
 
-    protected void bindRuleSet(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet, Feature f) {
+    protected void bindRuleSet(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet,
+            Feature f) {
         bindRuleSet(d, getHeuristic(ruleSet), f);
     }
 
-    protected void bindRuleSet(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet, long cost) {
+    protected void bindRuleSet(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet,
+            long cost) {
         bindRuleSet(d, getHeuristic(ruleSet), longConst(cost));
     }
 
@@ -105,13 +109,14 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         d.clear(ruleSet);
     }
 
-    protected void clearRuleSetBindings(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet) {
+    protected void clearRuleSetBindings(@NonNull RuleSetDispatchFeature d,
+            @NonNull String ruleSet) {
         d.clear(getHeuristic(ruleSet));
     }
 
 
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                               @NonNull RuleAppCostCollector collector) {
+            @NonNull RuleAppCostCollector collector) {
         final MutableState mState = new MutableState();
         final BackTrackingManager btManager = mState.getBacktrackingManager();
         btManager.setup(app);
@@ -128,8 +133,9 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         } while (btManager.backtrack());
     }
 
-    protected abstract @Nullable RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                                                            MutableState mState);
+    protected abstract @Nullable RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
+            Goal goal,
+            MutableState mState);
 
     protected @NonNull Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
         return ForEachCP.create(x, gen, body);

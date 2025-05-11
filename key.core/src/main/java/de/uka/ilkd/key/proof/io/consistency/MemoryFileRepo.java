@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
+
 import org.jspecify.annotations.Nullable;
 
 /**

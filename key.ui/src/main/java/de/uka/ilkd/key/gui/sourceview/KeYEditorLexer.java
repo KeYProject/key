@@ -120,7 +120,7 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
         addAll(MODALITIES, MODALITY);
     }
 
-    private static void addAll(@NonNull BitSet bitSet, int @NonNull ... values) {
+    private static void addAll(@NonNull BitSet bitSet, int @NonNull... values) {
         for (int value : values) {
             bitSet.set(value);
         }

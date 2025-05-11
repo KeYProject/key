@@ -7,6 +7,7 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
+
 import org.jspecify.annotations.NonNull;
 
 /**

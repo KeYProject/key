@@ -24,9 +24,10 @@ import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.*;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * For the loop scope rule, if a local program variable that may be altered by the loop body appears
@@ -69,7 +70,7 @@ public class NewLocalVarsCondition implements VariableCondition {
 
     @Override
     public @NonNull MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                          @NonNull MatchConditions matchCond, Services services) {
+            @NonNull MatchConditions matchCond, Services services) {
         SVInstantiations svInst = matchCond.getInstantiations();
         if (svInst.getInstantiation(varDeclsSV) != null) {
             return matchCond;

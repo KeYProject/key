@@ -36,14 +36,15 @@ import de.uka.ilkd.key.symbolic_execution.rule.ResultsAndCondition;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides utility methods for side proofs.
@@ -67,7 +68,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The general initial {@link Sequent}.
      */
     public static @NonNull Sequent computeGeneralSequentToProve(@NonNull Sequent goalSequent,
-                                                                SequentFormula currentSF) {
+            SequentFormula currentSF) {
         Sequent sequentToProve = Sequent.EMPTY_SEQUENT;
         for (SequentFormula sf : goalSequent.antecedent()) {
             if (sf != currentSF) {
@@ -107,10 +108,12 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    public static @NonNull List<Pair<Term, Node>> computeResults(@NonNull Services services, Proof proof,
-                                                                 @NonNull ProofEnvironment sideProofEnvironment, @NonNull Sequent sequentToProve, @NonNull TermLabel label,
-                                                                 String description, String methodTreatment, String loopTreatment, String queryTreatment,
-                                                                 String splittingOption, boolean addNamesToServices) throws ProofInputException {
+    public static @NonNull List<Pair<Term, Node>> computeResults(@NonNull Services services,
+            Proof proof,
+            @NonNull ProofEnvironment sideProofEnvironment, @NonNull Sequent sequentToProve,
+            @NonNull TermLabel label,
+            String description, String methodTreatment, String loopTreatment, String queryTreatment,
+            String splittingOption, boolean addNamesToServices) throws ProofInputException {
         // Execute side proof
         ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve,
             methodTreatment, loopTreatment, queryTreatment, splittingOption);
@@ -173,8 +176,10 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static @NonNull List<ResultsAndCondition> computeResultsAndConditions(
             @NonNull Services services,
-            Proof proof, @NonNull ProofEnvironment sideProofEnvironment, @NonNull Sequent sequentToProve,
-            @NonNull Operator operator, String description, String methodTreatment, String loopTreatment,
+            Proof proof, @NonNull ProofEnvironment sideProofEnvironment,
+            @NonNull Sequent sequentToProve,
+            @NonNull Operator operator, String description, String methodTreatment,
+            String loopTreatment,
             String queryTreatment, String splittingOption, boolean addNamesToServices)
             throws ProofInputException {
         // Execute side proof
@@ -256,13 +261,15 @@ public final class SymbolicExecutionSideProofUtil {
         }
     }
 
-    private static Term constructResultIfContained(@NonNull Services services, @NonNull SequentFormula sf,
-                                                   @NonNull Operator operator) {
+    private static Term constructResultIfContained(@NonNull Services services,
+            @NonNull SequentFormula sf,
+            @NonNull Operator operator) {
         return constructResultIfContained(services, sf.formula(), operator);
     }
 
-    private static @Nullable Term constructResultIfContained(@NonNull Services services, @NonNull Term term,
-                                                             @NonNull Operator operator) {
+    private static @Nullable Term constructResultIfContained(@NonNull Services services,
+            @NonNull Term term,
+            @NonNull Operator operator) {
         if (Operator.opEquals(term.op(), operator)) {
             return term.sub(0);
         } else {
@@ -289,7 +296,8 @@ public final class SymbolicExecutionSideProofUtil {
         }
     }
 
-    private static boolean isOperatorASequentFormula(@NonNull Sequent sequent, final @NonNull Operator operator) {
+    private static boolean isOperatorASequentFormula(@NonNull Sequent sequent,
+            final @NonNull Operator operator) {
         return CollectionUtil.search(sequent,
             element -> Operator.opEquals(element.formula().op(), operator)) != null;
     }
@@ -381,7 +389,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The found relevant things.
      */
     public static @NonNull Set<Operator> extractRelevantThings(final @NonNull Services services,
-                                                               @NonNull Sequent sequentToProve) {
+            @NonNull Sequent sequentToProve) {
         final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
             sf.formula().execPreOrder((DefaultVisitor) visited -> {
@@ -433,7 +441,7 @@ public final class SymbolicExecutionSideProofUtil {
      *         {@link SequentFormula} is not a relevant condition.
      */
     public static boolean isIrrelevantCondition(Services services, @NonNull Sequent initialSequent,
-                                                Set<Operator> relevantThingsInSequentToProve, @NonNull SequentFormula sf) {
+            Set<Operator> relevantThingsInSequentToProve, @NonNull SequentFormula sf) {
         return initialSequent.antecedent().contains(sf) || initialSequent.succedent().contains(sf)
                 || containsModalityOrQuery(sf) // isInOrOfAntecedent(initialSequent, sf) ||
                 || containsIrrelevantThings(services, sf, relevantThingsInSequentToProve);
@@ -477,7 +485,7 @@ public final class SymbolicExecutionSideProofUtil {
      *         {@link SequentFormula} contains no irrelevant things.
      */
     public static boolean containsIrrelevantThings(Services services, @NonNull SequentFormula sf,
-                                                   Set<Operator> relevantThings) {
+            Set<Operator> relevantThings) {
         ContainsIrrelevantThingsVisitor visitor =
             new ContainsIrrelevantThingsVisitor(services, relevantThings);
         sf.formula().execPostOrder(visitor);
@@ -554,7 +562,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @throws ProofInputException Occurred Exception
      */
     public static @NonNull ApplyStrategyInfo startSideProof(Proof proof,
-                                                            @NonNull ProofEnvironment sideProofEnvironment, @NonNull Sequent sequentToProve)
+            @NonNull ProofEnvironment sideProofEnvironment, @NonNull Sequent sequentToProve)
             throws ProofInputException {
         return startSideProof(proof, sideProofEnvironment, sequentToProve,
             StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
@@ -571,8 +579,9 @@ public final class SymbolicExecutionSideProofUtil {
      * @throws ProofInputException Occurred Exception
      */
     public static @NonNull ApplyStrategyInfo startSideProof(Proof proof,
-                                                            @NonNull ProofEnvironment sideProofEnvironment, @NonNull Sequent sequentToProve, String methodTreatment,
-                                                            String loopTreatment, String queryTreatment, String splittingOption)
+            @NonNull ProofEnvironment sideProofEnvironment, @NonNull Sequent sequentToProve,
+            String methodTreatment,
+            String loopTreatment, String queryTreatment, String splittingOption)
             throws ProofInputException {
         ProofStarter starter = createSideProof(sideProofEnvironment, sequentToProve, null);
         return startSideProof(proof, starter, methodTreatment, loopTreatment, queryTreatment,
@@ -589,8 +598,9 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The created {@link ProofStarter} with the site proof.
      * @throws ProofInputException Occurred Exception.
      */
-    public static @NonNull ProofStarter createSideProof(@NonNull ProofEnvironment sideProofEnvironment,
-                                                        @NonNull Sequent sequentToProve, @NonNull String proofName) throws ProofInputException {
+    public static @NonNull ProofStarter createSideProof(
+            @NonNull ProofEnvironment sideProofEnvironment,
+            @NonNull Sequent sequentToProve, @NonNull String proofName) throws ProofInputException {
         return SideProofUtil.createSideProof(sideProofEnvironment, sequentToProve, proofName);
     }
 
@@ -602,9 +612,10 @@ public final class SymbolicExecutionSideProofUtil {
      * @param splittingOption The splitting option to use.
      * @return The site proof result.
      */
-    public static @NonNull ApplyStrategyInfo startSideProof(@Nullable Proof proof, @NonNull ProofStarter starter,
-                                                            String methodTreatment, String loopTreatment, String queryTreatment,
-                                                            String splittingOption) {
+    public static @NonNull ApplyStrategyInfo startSideProof(@Nullable Proof proof,
+            @NonNull ProofStarter starter,
+            String methodTreatment, String loopTreatment, String queryTreatment,
+            String splittingOption) {
         assert starter != null;
         starter.setMaxRuleApplications(10000);
         StrategyProperties sp = proof != null && !proof.isDisposed()
@@ -718,8 +729,9 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The created {@link ProofEnvironment} which is a copy of the environment of the given
      *         {@link Proof} but with its own {@link OneStepSimplifier} instance.
      */
-    public static @NonNull ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final @NonNull Proof source,
-                                                                                          final boolean useSimplifyTermProfile) {
+    public static @NonNull ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(
+            final @NonNull Proof source,
+            final boolean useSimplifyTermProfile) {
         assert source != null;
         assert !source.isDisposed();
         return cloneProofEnvironmentWithOwnOneStepSimplifier(source.getInitConfig(),

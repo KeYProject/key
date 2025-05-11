@@ -5,6 +5,7 @@ package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NonNull;
 
 /**

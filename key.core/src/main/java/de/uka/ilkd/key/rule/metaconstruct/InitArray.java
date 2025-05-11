@@ -18,9 +18,10 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.ImmutableArray;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
@@ -36,7 +37,8 @@ public abstract class InitArray extends ProgramTransformer {
     /**
      * Extract the variable initializers from the array initializer
      */
-    protected @Nullable ImmutableArray<Expression> extractInitializers(NewArray p_creationExpression) {
+    protected @Nullable ImmutableArray<Expression> extractInitializers(
+            NewArray p_creationExpression) {
 
         Debug.assertTrue(p_creationExpression instanceof NewArray, "Don't know how to handle ",
             p_creationExpression);
@@ -89,7 +91,7 @@ public abstract class InitArray extends ProgramTransformer {
      * created by inserting the new-operator)
      */
     protected ProgramVariable @NonNull [] evaluateInitializers(Statement[] p_stmnts,
-                                                               NewArray p_creationExpression, @NonNull Services services) {
+            NewArray p_creationExpression, @NonNull Services services) {
 
         ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
 
@@ -118,8 +120,8 @@ public abstract class InitArray extends ProgramTransformer {
      * inserting the new-operator)
      */
     protected void createArrayAssignments(int p_start, Statement[] p_statements,
-                                          ProgramVariable @Nullable [] p_initializers, @NonNull ReferencePrefix p_array,
-                                          @NonNull NewArray p_creationExpression) {
+            ProgramVariable @Nullable [] p_initializers, @NonNull ReferencePrefix p_array,
+            @NonNull NewArray p_creationExpression) {
 
         if (p_initializers == null || p_initializers.length == 0) {
             return;
@@ -142,7 +144,8 @@ public abstract class InitArray extends ProgramTransformer {
      * created by inserting the new-operator)
      */
     protected @NonNull Statement createAssignment(@NonNull ReferencePrefix p_array, int p_index,
-                                                  Expression p_initializer, @NonNull KeYJavaType p_elementType, @NonNull TypeReference p_baseType) {
+            Expression p_initializer, @NonNull KeYJavaType p_elementType,
+            @NonNull TypeReference p_baseType) {
         if (p_initializer instanceof ArrayInitializer) {
             Debug.assertTrue(p_elementType.getJavaType() instanceof ArrayType,
                 "Very strange are arrays of type ", p_elementType.getJavaType());

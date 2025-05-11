@@ -14,9 +14,10 @@ import java.net.URL;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.key_project.util.java.SwingUtil;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.java.SwingUtil;
 
 /**
  * Open the KeY project homepage in the system default browser. May be inactive if Java 6 Desktop

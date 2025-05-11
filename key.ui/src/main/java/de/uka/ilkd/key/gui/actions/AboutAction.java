@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.UnicodeHelper;
+
 import org.jspecify.annotations.NonNull;
 
 public class AboutAction extends MainWindowAction {

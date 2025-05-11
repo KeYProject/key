@@ -19,6 +19,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;

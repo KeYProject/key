@@ -26,9 +26,10 @@ import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.logic.Name;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.Name;
 
 /**
  * {@link Strategy} to use for symbolic execution.
@@ -121,7 +122,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         globalF = add(globalF, ifZero(not(new BinaryFeature() {
             @Override
             protected boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
-                                     MutableState mState) {
+                    MutableState mState) {
                 return pos != null
                         && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
             }

@@ -27,7 +27,8 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
-    public @NonNull ImmutableList<LabeledParserRuleContext> getRequiresFree(@NonNull Name toString) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getRequiresFree(
+            @NonNull Name toString) {
         return getList(REQUIRES_FREE, toString);
     }
 
@@ -39,12 +40,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * The name 'assignable' is kept here for legacy reasons.
      * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
-    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignableFree(@NonNull Name toString) {
+    public @NonNull ImmutableList<LabeledParserRuleContext> getAssignableFree(
+            @NonNull Name toString) {
         return getList(ASSIGNABLE_FREE, toString);
     }
 
     private @NonNull ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
-                                                                     @NonNull Name heap) {
+            @NonNull Name heap) {
         List<LabeledParserRuleContext> seq =
             clauses.stream().filter(it -> it.clauseType.equals(clause))
                     .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
@@ -117,7 +119,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(@NonNull ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
+    public TextualJMLSpecCase(@NonNull ImmutableList<JMLModifier> modifiers,
+            @NonNull Behavior behavior) {
         super(modifiers);
         if (behavior == null) {
             throw new IllegalArgumentException();
@@ -125,7 +128,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         this.behavior = behavior;
     }
 
-    public @NonNull TextualJMLSpecCase addClause(Clause clause, @NonNull LabeledParserRuleContext ctx) {
+    public @NonNull TextualJMLSpecCase addClause(Clause clause,
+            @NonNull LabeledParserRuleContext ctx) {
         if (clauses.isEmpty()) {
             setPosition(ctx);
         }
@@ -138,7 +142,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
-                                                 LabeledParserRuleContext ctx) {
+            LabeledParserRuleContext ctx) {
         if (heapName == null) {
             heapName = HeapLDT.BASE_HEAP_NAME;
         }
@@ -156,7 +160,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public @NonNull TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
-                                                 @NonNull ParserRuleContext ctx) {
+            @NonNull ParserRuleContext ctx) {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 

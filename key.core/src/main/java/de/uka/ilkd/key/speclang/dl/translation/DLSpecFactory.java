@@ -31,10 +31,11 @@ import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -69,7 +70,8 @@ public final class DLSpecFactory {
     }
 
 
-    private @Nullable LocationVariable extractHeapAtPre(@NonNull Term fma) throws ProofInputException {
+    private @Nullable LocationVariable extractHeapAtPre(@NonNull Term fma)
+            throws ProofInputException {
         if (fma.sub(1).op() instanceof UpdateApplication) {
             final Term update = fma.sub(1).sub(0);
             assert update.sort() == JavaDLTheory.UPDATE;
@@ -116,7 +118,8 @@ public final class DLSpecFactory {
     }
 
 
-    private @NonNull IProgramMethod extractProgramMethod(UseOperationContractRule.@NonNull Instantiation inst)
+    private @NonNull IProgramMethod extractProgramMethod(
+            UseOperationContractRule.@NonNull Instantiation inst)
             throws ProofInputException {
         return inst.pm;
     }
@@ -129,7 +132,8 @@ public final class DLSpecFactory {
     }
 
 
-    private @NonNull LocationVariable extractSelfVar(UseOperationContractRule.@NonNull Instantiation inst)
+    private @NonNull LocationVariable extractSelfVar(
+            UseOperationContractRule.@NonNull Instantiation inst)
             throws ProofInputException {
         if (inst.actualSelf == null) {
             assert inst.pm.isStatic();
@@ -158,7 +162,8 @@ public final class DLSpecFactory {
     }
 
 
-    private @NonNull LocationVariable extractResultVar(UseOperationContractRule.@NonNull Instantiation inst)
+    private @NonNull LocationVariable extractResultVar(
+            UseOperationContractRule.@NonNull Instantiation inst)
             throws ProofInputException {
         if (inst.actualResult == null) {
             return null;
@@ -186,8 +191,9 @@ public final class DLSpecFactory {
     /**
      * Creates a class invariant from a formula and a designated "self".
      */
-    public @NonNull ClassInvariant createDLClassInvariant(@NonNull String name, @Nullable String displayName,
-                                                          @NonNull LocationVariable selfVar, @NonNull Term inv) throws ProofInputException {
+    public @NonNull ClassInvariant createDLClassInvariant(@NonNull String name,
+            @Nullable String displayName,
+            @NonNull LocationVariable selfVar, @NonNull Term inv) throws ProofInputException {
         assert name != null;
         if (displayName == null) {
             displayName = name;
@@ -207,8 +213,9 @@ public final class DLSpecFactory {
      * heap} [#catchAll(java.lang.Throwable exc){m();}]post", (where the update and/or the #catchAll
      * may be omitted) and a modifiable clause.
      */
-    public @NonNull FunctionalOperationContract createDLOperationContract(@NonNull String name, @NonNull Term fma,
-                                                                          @NonNull Term modifiable) throws ProofInputException {
+    public @NonNull FunctionalOperationContract createDLOperationContract(@NonNull String name,
+            @NonNull Term fma,
+            @NonNull Term modifiable) throws ProofInputException {
         assert name != null;
         assert fma != null;
         assert modifiable != null;

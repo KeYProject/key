@@ -15,10 +15,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class DLEmbeddedExpression extends Operator {
 
@@ -83,7 +84,8 @@ public class DLEmbeddedExpression extends Operator {
         v.performActionOnDLEmbeddedExpression(this);
     }
 
-    public void check(@NonNull Services javaServ, @NonNull KeYJavaType containingClass) throws ConvertException {
+    public void check(@NonNull Services javaServ, @NonNull KeYJavaType containingClass)
+            throws ConvertException {
 
         if (functionSymbol == null) {
             throw new ConvertException("null function symbol");
@@ -133,7 +135,8 @@ public class DLEmbeddedExpression extends Operator {
         return javaServ.getTypeConverter().getHeapLDT().targetSort();
     }
 
-    private static @Nullable KeYJavaType getKeYJavaType(@NonNull Services javaServ, @NonNull Sort argSort) {
+    private static @Nullable KeYJavaType getKeYJavaType(@NonNull Services javaServ,
+            @NonNull Sort argSort) {
         // JavaInfo returns wrong data for sort integer! We need to find it over
         // other paths.
         JavaInfo javaInfo = javaServ.getJavaInfo();
@@ -145,7 +148,8 @@ public class DLEmbeddedExpression extends Operator {
         }
     }
 
-    public @NonNull Term makeTerm(@NonNull LocationVariable heap, Term @NonNull [] subs, @NonNull Services services) {
+    public @NonNull Term makeTerm(@NonNull LocationVariable heap, Term @NonNull [] subs,
+            @NonNull Services services) {
         JFunction f = getFunctionSymbol();
         // we silently assume that check has been called earlier
 

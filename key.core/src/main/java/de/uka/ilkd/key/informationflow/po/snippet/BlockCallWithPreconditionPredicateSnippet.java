@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.jspecify.annotations.NonNull;
 
 
@@ -21,7 +22,7 @@ class BlockCallWithPreconditionPredicateSnippet extends TwoStateMethodPredicateS
     @Override
     @NonNull
     String generatePredicateName(@NonNull IProgramMethod pm, @NonNull StatementBlock block,
-                                 LoopSpecification loopInv) {
+            LoopSpecification loopInv) {
         final String nameString = MiscTools.toValidTacletName("EXECUTION_OF_BLOCK_" + "at_line_"
             + block.getStartPosition().line() + "_in_" + pm.getUniqueName() + "_WITH_PRE")
                 .toString();

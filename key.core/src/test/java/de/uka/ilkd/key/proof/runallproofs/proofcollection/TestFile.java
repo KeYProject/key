@@ -22,10 +22,10 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +94,7 @@ public class TestFile implements Serializable {
     }
 
     public static @NonNull TestFile createInstance(TestProperty testProperty, String path,
-                                                   ProofCollectionSettings settings) throws IOException {
+            ProofCollectionSettings settings) throws IOException {
         return new TestFile(testProperty, path, settings);
     }
 
@@ -121,7 +121,8 @@ public class TestFile implements Serializable {
         return keyFile;
     }
 
-    private @NonNull TestResult getRunAllProofsTestResult(@NonNull OutputCatcher catcher, boolean success)
+    private @NonNull TestResult getRunAllProofsTestResult(@NonNull OutputCatcher catcher,
+            boolean success)
             throws IOException {
         String closing = String.format("%s: Verifying property \"%s\"%sfor file: %s",
             success ? "pass" : "FAIL", testProperty.toString().toLowerCase(),
@@ -247,7 +248,8 @@ public class TestFile implements Serializable {
     /**
      * Override this method in order to change reload behaviour.
      */
-    protected void reload(boolean verbose, @NonNull File proofFile, @NonNull Proof loadedProof, boolean success)
+    protected void reload(boolean verbose, @NonNull File proofFile, @NonNull Proof loadedProof,
+            boolean success)
             throws Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
@@ -263,8 +265,9 @@ public class TestFile implements Serializable {
      * By overriding this method we can change the way how we invoke automode, for instance if we
      * want to use a different strategy.
      */
-    protected void autoMode(@NonNull KeYEnvironment<DefaultUserInterfaceControl> env, @NonNull Proof loadedProof,
-                            KeyAst.@Nullable ProofScript script) throws Exception {
+    protected void autoMode(@NonNull KeYEnvironment<DefaultUserInterfaceControl> env,
+            @NonNull Proof loadedProof,
+            KeyAst.@Nullable ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -279,7 +282,8 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private @NonNull Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(@NonNull File keyFile)
+    private @NonNull Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(
+            @NonNull File keyFile)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());

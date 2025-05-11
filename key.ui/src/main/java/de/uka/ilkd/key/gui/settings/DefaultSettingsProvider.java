@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
+
 import org.jspecify.annotations.NonNull;
 
 /**

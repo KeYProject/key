@@ -17,11 +17,11 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,7 +218,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         this.axiomFiles = axioms.toArray(new String[0]);
     }
 
-    public void setLoadInfo(@NonNull File tacletFile, @NonNull File definitionFile, @NonNull Collection<File> axiomFiles) {
+    public void setLoadInfo(@NonNull File tacletFile, @NonNull File definitionFile,
+            @NonNull Collection<File> axiomFiles) {
         this.tacletFile = tacletFile.toString();
         this.definitionFile = definitionFile.toString();
         this.axiomFiles = new String[axiomFiles.size()];
