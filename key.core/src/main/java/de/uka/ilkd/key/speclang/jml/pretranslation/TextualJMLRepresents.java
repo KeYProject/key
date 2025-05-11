@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -12,19 +13,19 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class TextualJMLRepresents extends TextualJMLConstruct {
 
-    private final LabeledParserRuleContext represents;
+    private final @NonNull LabeledParserRuleContext represents;
 
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
-            LabeledParserRuleContext represents) {
+    public TextualJMLRepresents(@NonNull ImmutableList<JMLModifier> modifiers,
+                                @NonNull LabeledParserRuleContext represents) {
         super(modifiers);
         assert represents != null;
         this.represents = represents;
         setPosition(represents);
     }
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> modifiers,
-            LabeledParserRuleContext represents, String name) {
+    public TextualJMLRepresents(@NonNull ImmutableList<JMLModifier> modifiers,
+                                @NonNull LabeledParserRuleContext represents, String name) {
         this(modifiers, represents);
         this.name = name;
     }

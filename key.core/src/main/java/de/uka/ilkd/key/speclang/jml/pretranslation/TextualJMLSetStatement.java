@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -12,11 +13,11 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
-    private final JmlParser.Set_statementContext assignment;
+    private final JmlParser.@NonNull Set_statementContext assignment;
 
 
-    public TextualJMLSetStatement(ImmutableList<JMLModifier> modifiers,
-            JmlParser.Set_statementContext assignment) {
+    public TextualJMLSetStatement(@NonNull ImmutableList<JMLModifier> modifiers,
+                                  JmlParser.@NonNull Set_statementContext assignment) {
         super(modifiers);
         assert assignment != null;
         this.assignment = assignment;

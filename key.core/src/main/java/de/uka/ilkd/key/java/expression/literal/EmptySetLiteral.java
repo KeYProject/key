@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 
@@ -28,18 +29,18 @@ public class EmptySetLiteral extends Literal {
         return System.identityHashCode(this);
     }
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnEmptySetLiteral(this);
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         PrimitiveType type = PrimitiveType.JAVA_LOCSET;
         return javaServ.getJavaInfo().getKeYJavaType(type);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return LocSetLDT.NAME;
     }
 }

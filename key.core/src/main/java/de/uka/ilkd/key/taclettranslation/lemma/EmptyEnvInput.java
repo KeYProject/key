@@ -11,17 +11,18 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.speclang.PositionedString;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 public class EmptyEnvInput extends AbstractEnvInput {
 
-    public EmptyEnvInput(Profile profile) {
+    public EmptyEnvInput(@NonNull Profile profile) {
         super("empty dummy environment", null, Collections.emptyList(), null, profile, null);
     }
 
     @Override
-    public ImmutableSet<PositionedString> read() throws ProofInputException {
+    public @NonNull ImmutableSet<PositionedString> read() throws ProofInputException {
         return DefaultImmutableSet.nil();
     }
 

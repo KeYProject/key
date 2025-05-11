@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.settings.StrategySettings;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -85,6 +86,7 @@ public interface StopCondition {
      * @param goal The current {@link Goal} on which the next rule will be applied.
      * @return description of the reason why automatic proof search has stopped
      */
+    @Nullable
     String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal);
 

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
+import org.jspecify.annotations.NonNull;
 
 /**
  * class builds Schematic Theory Specific Rules (Taclets) with find part int antecedent.
@@ -21,7 +22,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
      *
      * @return this AntecTacletBuilder
      */
-    public AntecTacletBuilder setFind(Term findTerm) {
+    public @NonNull AntecTacletBuilder setFind(@NonNull Term findTerm) {
         if (findTerm.sort() == JavaDLTheory.FORMULA) {
             find = findTerm;
         }
@@ -50,7 +51,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
      * semisequents. No specification for the interactive or recursive flags imply that the flags
      * are not set. No specified find part causes an IllegalStateException.
      */
-    public AntecTaclet getTaclet() {
+    public @NonNull AntecTaclet getTaclet() {
         return getAntecTaclet();
     }
 
@@ -64,7 +65,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if and find or an
      * InvalidPrefixException if the building of the Taclet Prefix fails.
      */
-    public AntecTaclet getAntecTaclet() {
+    public @NonNull AntecTaclet getAntecTaclet() {
         if (find == null) {
             throw new TacletBuilderException(this, "No find part specified");
 

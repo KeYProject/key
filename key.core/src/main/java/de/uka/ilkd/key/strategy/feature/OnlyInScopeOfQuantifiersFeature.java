@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -21,7 +22,7 @@ public class OnlyInScopeOfQuantifiersFeature extends BinaryTacletAppFeature {
 
     private OnlyInScopeOfQuantifiersFeature() {}
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, @NonNull PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final PIOPathIterator it = pos.iterator();

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import de.uka.ilkd.key.scripts.meta.Option;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Halts the script if some condition is not met.
@@ -23,14 +24,14 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-            Map<String, Object> arguments) throws Exception {
+    public Parameters evaluateArguments(@NonNull EngineState state,
+                                        Map<String, Object> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(),
             arguments);
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
         if (args.goals == null) {
             throw new ScriptException("No parameter specified!");
         }
@@ -42,7 +43,7 @@ public class AssertCommand extends AbstractCommand<AssertCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "assert";
     }
 

@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class StaticInitialisation extends ProgramTransformer {
 
@@ -25,8 +27,8 @@ public class StaticInitialisation extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations insts) {
+    public ProgramElement @Nullable [] transform(ProgramElement pe, @NonNull Services services,
+                                                 @NonNull SVInstantiations insts) {
         KeYJavaType typeToBeInitialised = null;
         if (pe instanceof FieldReference) {
             final ProgramVariable pv = ((FieldReference) pe).getProgramVariable();

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -28,12 +29,12 @@ public class ExactInstanceof extends TypeOperator {
      *        reference.
      */
 
-    public ExactInstanceof(ExtList children) {
+    public ExactInstanceof(@NonNull ExtList children) {
         super(children);
     }
 
 
-    public ExactInstanceof(Expression unaryChild, TypeReference typeref) {
+    public ExactInstanceof(@NonNull Expression unaryChild, TypeReference typeref) {
         super(unaryChild, typeref);
     }
 
@@ -54,7 +55,7 @@ public class ExactInstanceof extends TypeOperator {
         return result;
     }
 
-    public SourceElement getLastElement() {
+    public @NonNull SourceElement getLastElement() {
         return typeReference;
     }
 
@@ -66,7 +67,7 @@ public class ExactInstanceof extends TypeOperator {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
-    public ProgramElement getChildAt(int index) {
+    public @NonNull ProgramElement getChildAt(int index) {
         int len;
         if (children != null) {
             len = children.size();
@@ -119,7 +120,7 @@ public class ExactInstanceof extends TypeOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnExactInstanceof(this);
     }
 }

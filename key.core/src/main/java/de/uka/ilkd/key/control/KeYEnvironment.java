@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
@@ -41,7 +42,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      */
-    private final U ui;
+    private final @NonNull U ui;
 
     /**
      * The loaded project.
@@ -74,7 +75,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      * @param initConfig The loaded project.
      */
-    public KeYEnvironment(U ui, InitConfig initConfig) {
+    public KeYEnvironment(@NonNull U ui, InitConfig initConfig) {
         this(ui, initConfig, null, null, null);
     }
 
@@ -85,8 +86,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param initConfig The loaded project.
      * @param proofScript add an optional proof script
      */
-    public KeYEnvironment(U ui, InitConfig initConfig, @Nullable Proof loadedProof,
-            @Nullable ProofScript proofScript, @Nullable ReplayResult replayResult) {
+    public KeYEnvironment(@NonNull U ui, InitConfig initConfig, @Nullable Proof loadedProof,
+                          @Nullable ProofScript proofScript, @Nullable ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
@@ -99,7 +100,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      *
      * @return The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      */
-    public U getUi() {
+    public @NonNull U getUi() {
         return ui;
     }
 

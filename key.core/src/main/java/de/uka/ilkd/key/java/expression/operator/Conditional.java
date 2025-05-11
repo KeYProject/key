@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /** The most weird ternary C operator ?: */
@@ -25,7 +26,7 @@ public class Conditional extends Operator {
      *        then expression and the last one the else expr.
      */
 
-    public Conditional(ExtList children) {
+    public Conditional(@NonNull ExtList children) {
         super(children);
     }
 
@@ -76,11 +77,11 @@ public class Conditional extends Operator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnConditional(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
         final KeYJavaType type1 = tc.getKeYJavaType(getExpressionAt(1), ec);
         final KeYJavaType type2 = tc.getKeYJavaType(getExpressionAt(2), ec);

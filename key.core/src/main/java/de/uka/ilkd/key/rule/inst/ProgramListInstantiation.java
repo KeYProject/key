@@ -5,6 +5,7 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.java.ProgramElement;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -18,7 +19,7 @@ public class ProgramListInstantiation extends InstantiationEntry<ImmutableArray<
      *
      * @param pes the ProgramElement array the SchemaVariable is instantiated with
      */
-    ProgramListInstantiation(ImmutableArray<ProgramElement> pes) {
+    ProgramListInstantiation(@NonNull ImmutableArray<ProgramElement> pes) {
         super(pes);
     }
 }

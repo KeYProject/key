@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
 
@@ -18,7 +19,7 @@ public class SortExtendsTransTermFeature extends BinaryTermFeature {
 
     private final Sort sort;
 
-    public static TermFeature create(Sort sort) {
+    public static @NonNull TermFeature create(Sort sort) {
         return new SortExtendsTransTermFeature(sort);
     }
 
@@ -27,7 +28,7 @@ public class SortExtendsTransTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         return term.sort().extendsTrans(sort);
     }
 

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Term feature for checking whether the top operator of a term has an instance of a certain class
@@ -19,12 +20,12 @@ public class OperatorClassTF extends BinaryTermFeature {
         this.opClass = op;
     }
 
-    public static TermFeature create(Class<? extends Operator> op) {
+    public static @NonNull TermFeature create(Class<? extends Operator> op) {
         return new OperatorClassTF(op);
     }
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         return opClass.isInstance(term.op());
     }
 }

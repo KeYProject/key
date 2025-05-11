@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -27,11 +28,11 @@ public abstract class ComparativeOperator extends Operator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public ComparativeOperator(ExtList children) {
+    public ComparativeOperator(@NonNull ExtList children) {
         super(children);
     }
 
-    public ComparativeOperator(Expression lhs, Expression rhs) {
+    public ComparativeOperator(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -56,11 +57,11 @@ public abstract class ComparativeOperator extends Operator {
         return INFIX;
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
         return getKeYJavaType(services);
     }
 
-    public KeYJavaType getKeYJavaType(Services services) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services services) {
         return services.getTypeConverter().getBooleanType();
     }
 

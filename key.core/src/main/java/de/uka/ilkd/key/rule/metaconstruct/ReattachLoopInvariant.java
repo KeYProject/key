@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Construct for re-attaching a loop invariant that otherwise would get lost after a transformation,
@@ -28,8 +29,8 @@ public class ReattachLoopInvariant extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
+                                                @NonNull SVInstantiations svInst) {
         final ProgramElement context = //
             svInst.getContextInstantiation().contextProgram();
 

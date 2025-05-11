@@ -23,6 +23,8 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
@@ -34,7 +36,7 @@ import org.key_project.util.collection.ImmutableList;
 public class SymbolicExecutionPO extends AbstractInfFlowPO
         implements ContractPO, InfFlowCompositePO {
 
-    private final InformationFlowContract contract;
+    private final @NonNull InformationFlowContract contract;
     private final ProofObligationVars symbExecVars;
     private final Goal initiatingGoal;
 
@@ -42,21 +44,21 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * For saving and loading Information-Flow proofs, we need to remember the according taclets,
      * program variables, functions and such.
      */
-    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
+    private @NonNull InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
     /**
      * To be used only for auxiliary proofs where the services object of the actual proof has to be
      * used instead of the initial services form the InitConfig.
      */
-    public SymbolicExecutionPO(InitConfig initConfig, InformationFlowContract contract,
-            ProofObligationVars symbExecVars, Goal initiatingGoal, Services services) {
+    public SymbolicExecutionPO(InitConfig initConfig, @NonNull InformationFlowContract contract,
+                               ProofObligationVars symbExecVars, Goal initiatingGoal, Services services) {
         this(initConfig, contract, symbExecVars, initiatingGoal);
         this.environmentServices = services;
     }
 
 
-    public SymbolicExecutionPO(InitConfig initConfig, InformationFlowContract contract,
-            ProofObligationVars symbExecVars, Goal initiatingGoal) {
+    public SymbolicExecutionPO(InitConfig initConfig, @NonNull InformationFlowContract contract,
+                               ProofObligationVars symbExecVars, Goal initiatingGoal) {
         super(initConfig,
             ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
@@ -103,7 +105,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
 
     @Override
-    public Term getMbyAtPre() {
+    public @Nullable Term getMbyAtPre() {
         if (contract.hasMby()) {
             return symbExecVars.pre.mbyAtPre;
         } else {
@@ -116,7 +118,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * {@inheritDoc}
      */
     @Override
-    protected String buildPOName(boolean transactionFlag) {
+    protected @NonNull String buildPOName(boolean transactionFlag) {
         return getContract().getName();
     }
 
@@ -125,7 +127,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * {@inheritDoc}
      */
     @Override
-    protected IProgramMethod getProgramMethod() {
+    protected @NonNull IProgramMethod getProgramMethod() {
         return contract.getTarget();
     }
 
@@ -143,7 +145,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * {@inheritDoc}
      */
     @Override
-    protected KeYJavaType getCalleeKeYJavaType() {
+    protected @NonNull KeYJavaType getCalleeKeYJavaType() {
         return contract.getKJT();
     }
 
@@ -152,7 +154,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * {@inheritDoc}
      */
     @Override
-    protected Modality.JavaModalityKind getTerminationMarker() {
+    protected Modality.@NonNull JavaModalityKind getTerminationMarker() {
         return getContract().getModalityKind();
     }
 
@@ -174,51 +176,51 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * @return
      */
     @Override
-    public Configuration createLoaderConfig() {
+    public @NonNull Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         c.set("Non-interference contract", contract.getName());
         return c;
     }
 
     @Override
-    public InfFlowProofSymbols getIFSymbols() {
+    public @NonNull InfFlowProofSymbols getIFSymbols() {
         assert infFlowSymbols != null;
         return infFlowSymbols;
     }
 
     @Override
-    public void addIFSymbol(Term t) {
+    public void addIFSymbol(@NonNull Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
 
     @Override
-    public void addIFSymbol(Named n) {
+    public void addIFSymbol(@NonNull Named n) {
         assert n != null;
         infFlowSymbols.add(n);
     }
 
     @Override
-    public void addLabeledIFSymbol(Term t) {
+    public void addLabeledIFSymbol(@NonNull Term t) {
         assert t != null;
         infFlowSymbols.addLabeled(t);
     }
 
     @Override
-    public void addLabeledIFSymbol(Named n) {
+    public void addLabeledIFSymbol(@NonNull Named n) {
         assert n != null;
         infFlowSymbols.addLabeled(n);
     }
 
     @Override
-    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+    public void unionLabeledIFSymbols(@NonNull InfFlowProofSymbols symbols) {
         assert symbols != null;
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+                                           ImmutableList<Term> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }
@@ -226,7 +228,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
 
     @Override
-    public AbstractInfFlowPO getChildPO() {
+    public @NonNull AbstractInfFlowPO getChildPO() {
         Proof initiatingProof = getInitiatingGoal().proof();
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =

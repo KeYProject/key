@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A feature that computes the sum of two given features (faster than the more general class
@@ -15,7 +16,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
  */
 public class BinarySumTermFeature implements TermFeature {
 
-    public RuleAppCost compute(Term term, MutableState mState, Services services) {
+    public @NonNull RuleAppCost compute(Term term, MutableState mState, Services services) {
         RuleAppCost f0Cost = f0.compute(term, mState, services);
         if (f0Cost instanceof TopRuleAppCost) {
             return f0Cost;
@@ -28,7 +29,7 @@ public class BinarySumTermFeature implements TermFeature {
         this.f1 = f1;
     }
 
-    public static TermFeature createSum(TermFeature f0, TermFeature f1) {
+    public static @NonNull TermFeature createSum(TermFeature f0, TermFeature f1) {
         return new BinarySumTermFeature(f0, f1);
     }
 

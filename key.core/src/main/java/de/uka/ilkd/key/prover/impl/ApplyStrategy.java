@@ -15,6 +15,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -38,7 +40,7 @@ public class ApplyStrategy extends AbstractProverCore {
     /**
      * the proof that is worked with
      */
-    private Proof proof;
+    private @Nullable Proof proof;
     /** the maximum of allowed rule applications */
     private int maxApplications;
 
@@ -78,8 +80,8 @@ public class ApplyStrategy extends AbstractProverCore {
      *
      * @return information whether the rule application was successful or not
      */
-    private synchronized SingleRuleApplicationInfo applyAutomaticRule(final GoalChooser goalChooser,
-            final StopCondition stopCondition, boolean stopAtFirstNonClosableGoal) {
+    private synchronized @NonNull SingleRuleApplicationInfo applyAutomaticRule(final @NonNull GoalChooser goalChooser,
+                                                                               final @NonNull StopCondition stopCondition, boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
         RuleApp app = null;
         Goal g;
@@ -123,8 +125,8 @@ public class ApplyStrategy extends AbstractProverCore {
     /**
      * applies rules until this is no longer possible or the thread is interrupted.
      */
-    private synchronized ApplyStrategyInfo doWork(final GoalChooser goalChooser,
-            final StopCondition stopCondition) {
+    private synchronized @NonNull ApplyStrategyInfo doWork(final @NonNull GoalChooser goalChooser,
+                                                           final @NonNull StopCondition stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
 
@@ -206,7 +208,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * de.uka.ilkd.key.proof.Goal)
      */
     @Override
-    public synchronized ApplyStrategyInfo start(Proof proof, Goal goal) {
+    public synchronized ApplyStrategyInfo start(@NonNull Proof proof, Goal goal) {
         return start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
     }
 
@@ -217,7 +219,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * org.key_project.util.collection.ImmutableList)
      */
     @Override
-    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+    public synchronized ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals) {
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();
         return start(proof, goals, stratSet);
@@ -230,8 +232,8 @@ public class ApplyStrategy extends AbstractProverCore {
      * org.key_project.util.collection.ImmutableList, de.uka.ilkd.key.settings.StrategySettings)
      */
     @Override
-    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals,
-            StrategySettings stratSet) {
+    public synchronized ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals,
+                                                @NonNull StrategySettings stratSet) {
 
         int maxSteps = stratSet.getMaxSteps();
         long timeout = stratSet.getTimeout();
@@ -249,8 +251,8 @@ public class ApplyStrategy extends AbstractProverCore {
      * org.key_project.util.collection.ImmutableList, int, long, boolean)
      */
     @Override
-    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals,
-            int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
+    public synchronized @NonNull ApplyStrategyInfo start(@NonNull Proof proof, ImmutableList<Goal> goals,
+                                                         int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
@@ -262,11 +264,11 @@ public class ApplyStrategy extends AbstractProverCore {
     }
 
 
-    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
-            long timeout) {
+    private @NonNull ProofTreeListener prepareStrategy(@NonNull Proof proof, ImmutableList<Goal> goals, int maxSteps,
+                                                       long timeout) {
         ProofTreeListener treeListener = new ProofTreeAdapter() {
             @Override
-            public void proofGoalsAdded(ProofTreeEvent e) {
+            public void proofGoalsAdded(@NonNull ProofTreeEvent e) {
                 ImmutableList<Goal> newGoals = e.getGoals();
                 // Check for a closed goal ...
                 if (newGoals.size() == 0) {
@@ -281,7 +283,7 @@ public class ApplyStrategy extends AbstractProverCore {
         return treeListener;
     }
 
-    private ApplyStrategyInfo executeStrategy(ProofTreeListener treeListener) {
+    private @NonNull ApplyStrategyInfo executeStrategy(@NonNull ProofTreeListener treeListener) {
         assert proof != null;
 
         ProofListener pl = new ProofListener();
@@ -297,7 +299,7 @@ public class ApplyStrategy extends AbstractProverCore {
         return result;
     }
 
-    private void finishStrategy(ApplyStrategyInfo result) {
+    private void finishStrategy(@NonNull ApplyStrategyInfo result) {
         assert result != null; // CS
         proof.addAutoModeTime(result.getTime());
         fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
@@ -312,7 +314,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * @param proof The {@link Proof} for which an {@link GoalChooser} is required.
      * @return The {@link GoalChooser} to use.
      */
-    private GoalChooser getGoalChooserForProof(Proof proof) {
+    private GoalChooser getGoalChooserForProof(@Nullable Proof proof) {
         GoalChooser chooser = null;
         if (proof != null) {
             chooser = proof.getSettings().getStrategySettings().getCustomApplyStrategyGoalChooser();

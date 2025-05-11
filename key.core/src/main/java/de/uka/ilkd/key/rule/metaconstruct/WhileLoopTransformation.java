@@ -22,6 +22,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -43,9 +45,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /** the replacement element */
     protected ProgramElement replacement;
     /** break outerlabel */
-    protected Break breakOuterLabel;
+    protected @Nullable Break breakOuterLabel;
     /** break innerlabel */
-    protected Break breakInnerLabel;
+    protected @Nullable Break breakInnerLabel;
     /**  */
     protected final ExtList labelList = new ExtList();
     /**  */
@@ -80,12 +82,12 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**
      * if run in check mode there are normally schemavaribles, so we need the instantiations of them
      */
-    protected SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+    protected @NonNull SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     /**
      * the result of the transformation
      */
-    protected ProgramElement result = null;
+    protected @Nullable ProgramElement result = null;
 
     protected final ArrayDeque<Label> labelStack = new ArrayDeque<>();
 
@@ -99,8 +101,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param innerLabel the ProgramElementName of the inner label
      * @param services services instance
      */
-    public WhileLoopTransformation(ProgramElement root, ProgramElementName outerLabel,
-            ProgramElementName innerLabel, Services services) {
+    public WhileLoopTransformation(@NonNull ProgramElement root, @Nullable ProgramElementName outerLabel,
+                                   @Nullable ProgramElementName innerLabel, @NonNull Services services) {
         super(root, services);
         breakOuterLabel =
             (outerLabel == null ? null : KeYJavaASTFactory.breakStatement(outerLabel));
@@ -117,14 +119,14 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param inst the SVInstantiations if available
      * @param services services instance
      */
-    public WhileLoopTransformation(ProgramElement root, SVInstantiations inst, Services services) {
+    public WhileLoopTransformation(@NonNull ProgramElement root, @Nullable SVInstantiations inst, @NonNull Services services) {
         super(root, services);
         instantiations = (inst == null ? SVInstantiations.EMPTY_SVINSTANTIATIONS : inst);
         replaceBreakWithNoLabel = 0;
         runMode = CHECK;
     }
 
-    private static Guard getForGuard(For x, ExtList changeList) {
+    private static @NonNull Guard getForGuard(@NonNull For x, @NonNull ExtList changeList) {
         Guard guard;
         if (x.getGuard() != null) {
             guard = (Guard) changeList.removeFirst();
@@ -138,8 +140,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
-    private static Statement[] getInnerBlockStatements(IForUpdates updates, Statement body,
-            For remainder, final int updateSize) {
+    private static Statement @NonNull [] getInnerBlockStatements(@Nullable IForUpdates updates, Statement body,
+                                                                 For remainder, final int updateSize) {
         Statement[] innerBlockStatements = new Statement[updateSize + 2];
         innerBlockStatements[0] = body;
         if (updates != null) {
@@ -202,7 +204,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
     }
 
-    public ProgramElement result() {
+    public @Nullable ProgramElement result() {
         return result;
     }
 
@@ -291,7 +293,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.declare(changeList);
             }
         };
@@ -302,7 +305,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnStatementBlock(final StatementBlock x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 StatementBlock newBlock = KeYJavaASTFactory.block(changeList);
                 ImmutableSet<BlockContract> bcs =
                     services.getSpecificationRepository().getBlockContracts(x);
@@ -328,7 +332,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    protected boolean replaceJumpStatement(LabelJumpStatement x) {
+    protected boolean replaceJumpStatement(@NonNull LabelJumpStatement x) {
         if (replaceBreakWithNoLabel == 0 && x.getProgramElementName() == null) {
             return true;
         }
@@ -668,7 +672,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnIf(If x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.ifStatement(changeList);
             }
         };
@@ -679,7 +684,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnSwitch(Switch x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.switchBlock(changeList);
             }
         };
@@ -690,7 +696,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnTry(Try x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.tryBlock(changeList);
             }
         };
@@ -739,7 +746,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.synchronizedBlock(changeList);
             }
         };
@@ -751,7 +759,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnCopyAssignment(CopyAssignment x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.assign(changeList);
             }
         };
@@ -762,7 +771,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnThen(Then x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.thenBlock(changeList);
             }
         };
@@ -774,7 +784,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnElse(Else x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.elseBlock(changeList);
             }
         };
@@ -803,7 +814,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnCatch(Catch x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.catchClause(changeList);
             }
         };
@@ -815,7 +827,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnDefault(Default x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.defaultBlock(changeList);
             }
         };
@@ -827,7 +840,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     public void performActionOnFinally(Finally x) {
         DefaultAction def = new DefaultAction() {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            @NonNull
+            ProgramElement createNewElement(@NonNull ExtList changeList) {
                 return KeYJavaASTFactory.finallyBlock(changeList);
             }
         };
@@ -856,7 +870,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             changed();
         }
 
-        public void doAction(ProgramElement x) {
+        public void doAction(@NonNull ProgramElement x) {
             ExtList changeList = stack.peek();
             if (changeList.size() > 0 && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();

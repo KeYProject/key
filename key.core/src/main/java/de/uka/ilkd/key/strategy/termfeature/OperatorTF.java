@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Term feature for checking whether the top operator of a term is identical to a given one
@@ -19,11 +20,11 @@ public class OperatorTF extends BinaryTermFeature {
         this.op = op;
     }
 
-    public static TermFeature create(Operator op) {
+    public static @NonNull TermFeature create(Operator op) {
         return new OperatorTF(op);
     }
 
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         return op == term.op();
     }
 }

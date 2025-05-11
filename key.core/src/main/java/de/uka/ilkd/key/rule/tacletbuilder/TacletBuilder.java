@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.*;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -33,10 +35,10 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected Taclet taclet;
 
     protected Name name = NONAME;
-    protected Sequent ifseq = Sequent.EMPTY_SEQUENT;
-    protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
-    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
-    protected ImmutableList<NewDependingOn> varsNewDependingOn =
+    protected @NonNull Sequent ifseq = Sequent.EMPTY_SEQUENT;
+    protected @NonNull ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
+    protected @NonNull ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
+    protected @NonNull ImmutableList<NewDependingOn> varsNewDependingOn =
         ImmutableSLList.nil();
     protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.nil();
     protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
@@ -45,9 +47,9 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * List of additional generic conditions on the instantiations of schema variables.
      */
-    protected ImmutableList<VariableCondition> variableConditions =
+    protected @NonNull ImmutableList<VariableCondition> variableConditions =
         ImmutableSLList.nil();
-    protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
+    protected @Nullable HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
     protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
         DefaultImmutableSet.nil();
@@ -57,7 +59,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         this.tacletAnnotations = tacletAnnotations;
     }
 
-    private static boolean containsFreeVarSV(Term t) {
+    private static boolean containsFreeVarSV(@NonNull Term t) {
         for (final QuantifiableVariable var : t.freeVars()) {
             if (var instanceof VariableSV) {
                 return true;
@@ -66,7 +68,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         return false;
     }
 
-    private static boolean containsFreeVarSV(Sequent sequent) {
+    private static boolean containsFreeVarSV(@NonNull Sequent sequent) {
         for (final SequentFormula cf : sequent) {
             if (containsFreeVarSV(cf.formula())) {
                 return true;
@@ -75,14 +77,14 @@ public abstract class TacletBuilder<T extends Taclet> {
         return false;
     }
 
-    static void checkContainsFreeVarSV(Sequent seq, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(@NonNull Sequent seq, Name tacletName, String str) {
         if (containsFreeVarSV(seq)) {
             throw new TacletBuilderException(tacletName,
                 "Free Variable in " + str + " in Taclet / sequent: " + seq);
         }
     }
 
-    static void checkContainsFreeVarSV(Term t, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(@NonNull Term t, Name tacletName, String str) {
         if (containsFreeVarSV(t)) {
             throw new TacletBuilderException(tacletName,
                 "Free Variable found in " + str + " in Taclet / Term: " + t);
@@ -94,7 +96,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * sets the trigger
      */
-    public void setTrigger(Trigger trigger) {
+    public void setTrigger(@NonNull Trigger trigger) {
         attrs.setTrigger(trigger);
     }
 
@@ -128,7 +130,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * sets the ifseq of the Taclet to be built
      */
-    public void setIfSequent(Sequent seq) {
+    public void setIfSequent(@NonNull Sequent seq) {
         checkContainsFreeVarSV(seq, getName(), "sequent");
         this.ifseq = seq;
     }
@@ -143,7 +145,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         goal2Choices.put(gt, soc);
     }
 
-    public HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
+    public @Nullable HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
         return goal2Choices;
     }
 
@@ -160,7 +162,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a new <I>new</I> variable to the variable conditions of the Taclet: v is new and has the
      * same type as peerSV
      */
-    public void addVarsNew(SchemaVariable v, SchemaVariable peerSV) {
+    public void addVarsNew(@NonNull SchemaVariable v, @NonNull SchemaVariable peerSV) {
         addVarsNew(new NewVarcond(v, peerSV));
     }
 
@@ -168,7 +170,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a new <I>new</I> variable to the variable conditions of the Taclet: v is new and has the
      * given type
      */
-    public void addVarsNew(SchemaVariable v, KeYJavaType type) {
+    public void addVarsNew(@NonNull SchemaVariable v, @NonNull KeYJavaType type) {
         if (type == null) {
             throw new NullPointerException("given type is null");
         }
@@ -178,7 +180,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * adds a new <I>new</I> variable to the variable conditions of the Taclet: v is new.
      */
-    public void addVarsNew(NewVarcond nv) {
+    public void addVarsNew(@NonNull NewVarcond nv) {
         if (!(nv.getSchemaVariable() instanceof ProgramSV)) {
             throw new TacletBuilderException(this, "Tried to add condition:" + nv
                 + "to new vars-list. That can" + "match more than program" + " variables.");
@@ -190,7 +192,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a list of <I>new</I> variables to the variable conditions of the Taclet: v is new for
      * all v's in the given list
      */
-    public void addVarsNew(ImmutableList<NewVarcond> list) {
+    public void addVarsNew(@NonNull ImmutableList<NewVarcond> list) {
         for (NewVarcond aList : list) {
             addVarsNew(aList);
         }
@@ -200,13 +202,13 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a new <I>NotFreeIn</I> variable pair to the variable conditions of the Taclet: v0 is not
      * free in v1.
      */
-    public void addVarsNotFreeIn(SchemaVariable v0, SchemaVariable v1) {
+    public void addVarsNotFreeIn(@NonNull SchemaVariable v0, @NonNull SchemaVariable v1) {
         varsNotFreeIn = varsNotFreeIn.prepend(new NotFreeIn(v0, v1));
     }
 
 
-    public void addVarsNotFreeIn(Iterable<? extends SchemaVariable> v0,
-            Iterable<? extends SchemaVariable> v1) {
+    public void addVarsNotFreeIn(@NonNull Iterable<? extends SchemaVariable> v0,
+                                 @NonNull Iterable<? extends SchemaVariable> v1) {
         for (SchemaVariable boundSV : v0) {
             for (SchemaVariable schemaVar : v1) {
                 addVarsNotFreeIn(boundSV, schemaVar);
@@ -215,7 +217,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
 
-    public void addVarsNotFreeIn(Iterable<? extends SchemaVariable> v0, SchemaVariable... v1) {
+    public void addVarsNotFreeIn(@NonNull Iterable<? extends SchemaVariable> v0, SchemaVariable @NonNull ... v1) {
         for (SchemaVariable boundSV : v0) {
             for (SchemaVariable schemaVar : v1) {
                 addVarsNotFreeIn(boundSV, schemaVar);
@@ -228,7 +230,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a list of <I>NotFreeIn</I> variable pairs to the variable conditions of the Taclet: v0
      * is not free in v1 for all entries (v0,v1) in the given list.
      */
-    public void addVarsNotFreeIn(ImmutableList<NotFreeIn> list) {
+    public void addVarsNotFreeIn(@NonNull ImmutableList<NotFreeIn> list) {
         varsNotFreeIn = varsNotFreeIn.prepend(list);
     }
 
@@ -237,7 +239,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * Add a "v0 depending on v1"-statement. "v0" may not occur within the if sequent or the find
      * formula/term, however, this is not checked
      */
-    public void addVarsNewDependingOn(SchemaVariable v0, SchemaVariable v1) {
+    public void addVarsNewDependingOn(@NonNull SchemaVariable v0, @NonNull SchemaVariable v1) {
         varsNewDependingOn = varsNewDependingOn.prepend(new NewDependingOn(v0, v1));
     }
 
@@ -278,7 +280,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         return goals;
     }
 
-    public Iterator<NotFreeIn> varsNotFreeIn() {
+    public @NonNull Iterator<NotFreeIn> varsNotFreeIn() {
         return varsNotFreeIn.iterator();
     }
 
@@ -297,7 +299,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     public abstract T getTaclet();
 
-    public T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
+    public @Nullable T getTacletWithoutInactiveGoalTemplates(@NonNull Set<Choice> active) {
         if (goal2Choices == null || goals.isEmpty()) {
             return getTaclet();
         } else {
@@ -339,12 +341,12 @@ public abstract class TacletBuilder<T extends Taclet> {
             this.errorMessage = errorMessage;
         }
 
-        public TacletBuilderException(TacletBuilder<?> tb, String errorMessage) {
+        public TacletBuilderException(@NonNull TacletBuilder<?> tb, String errorMessage) {
             this(tb.getName(), errorMessage);
         }
 
 
-        public String getMessage() {
+        public @NonNull String getMessage() {
             String message = (tacletname == null ? "(unknown taclet name)" : tacletname.toString());
             return message + ": " + errorMessage;
         }

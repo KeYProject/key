@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 
 
@@ -54,7 +55,7 @@ public final class FinalReferenceCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negation ? " \\not " : "") + "\\final(" + reference + ")";
     }
 }

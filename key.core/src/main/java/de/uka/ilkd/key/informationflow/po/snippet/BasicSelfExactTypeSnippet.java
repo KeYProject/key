@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -19,7 +20,7 @@ import org.key_project.logic.sort.Sort;
 class BasicSelfExactTypeSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
             throws UnsupportedOperationException {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -99,8 +100,8 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         this(null, methodName, args, negation);
     }
 
-    private static ImmutableArray<Expression> toExpArray(
-            ImmutableArray<? extends ProgramElement> a) {
+    private static @NonNull ImmutableArray<Expression> toExpArray(
+            @NonNull ImmutableArray<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
         for (int i = 0; i < a.size(); i++) {
             result[i] = (Expression) a.get(i);
@@ -112,7 +113,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
+                         @NonNull Services services) {
         Map<String, String> tacletOptions =
             services.getProof().getSettings().getChoiceSettings().getDefaultChoices();
 
@@ -167,7 +168,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         return negation ^ cannotBeOverriden(method, services);
     }
 
-    private boolean cannotBeOverriden(IProgramMethod method, Services services) {
+    private boolean cannotBeOverriden(@NonNull IProgramMethod method, Services services) {
 
         if (method.isStatic() || method.isPrivate() || method.isFinal()) {
             return true;
@@ -191,7 +192,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negation ? "\\not " : "") + NAME + "(" + receiver + ", " + methname + ", " + args
             + ")";
     }

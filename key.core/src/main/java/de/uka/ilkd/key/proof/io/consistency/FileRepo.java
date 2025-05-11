@@ -15,6 +15,7 @@ import java.util.List;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This interface provides access to files. In addition, it can be used to save a consistent zip
@@ -33,6 +34,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @throws FileNotFoundException if the file does not exist
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
+    @Nullable
     InputStream getInputStream(Path path) throws FileNotFoundException, IOException;
 
     /**
@@ -45,6 +47,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an InputStream of the RuleSource, or <code>null</code>
      * @throws IOException on IO errors
      */
+    @Nullable
     InputStream getInputStream(RuleSource ruleSource) throws IOException;
 
     /**
@@ -57,6 +60,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an InputStream to the file identified by the URL, or <code>null</code>
      * @throws IOException on IO errors
      */
+    @Nullable
     InputStream getInputStream(URL url) throws IOException;
 
     /**
@@ -67,6 +71,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an OutputStream to the file in the FileRepo
      * @throws FileNotFoundException if a file with the given path exists
      */
+    @Nullable
     OutputStream createOutputStream(Path path) throws FileNotFoundException;
 
     /**

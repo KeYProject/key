@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -21,7 +22,7 @@ public class CountMaxDPathFeature extends AbstractBetaFeature {
     private CountMaxDPathFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation(@NonNull PosInOccurrence pos, @NonNull Term findTerm, @NonNull ServiceCaches caches) {
         return NumberRuleAppCost.create(maxDPath(findTerm, !pos.isInAntec(), caches));
     }
 

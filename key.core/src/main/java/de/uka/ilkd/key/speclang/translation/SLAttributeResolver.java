@@ -15,6 +15,8 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableList;
 
@@ -23,13 +25,13 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class SLAttributeResolver extends SLExpressionResolver {
 
-    public SLAttributeResolver(JavaInfo javaInfo, SLResolverManager manager,
-            KeYJavaType specInClass) {
+    public SLAttributeResolver(@NonNull JavaInfo javaInfo, SLResolverManager manager,
+                               KeYJavaType specInClass) {
         super(javaInfo, manager, specInClass);
     }
 
 
-    private ProgramVariable lookupVisibleAttribute(String name, KeYJavaType containingType) {
+    private @Nullable ProgramVariable lookupVisibleAttribute(String name, @NonNull KeYJavaType containingType) {
         assert containingType.getJavaType() instanceof TypeDeclaration
                 : "type " + containingType + " is primitive, lookup for " + name;
         final TypeDeclaration td = (TypeDeclaration) containingType.getJavaType();
@@ -62,13 +64,13 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
 
     @Override
-    protected boolean canHandleReceiver(SLExpression receiver) {
+    protected boolean canHandleReceiver(@Nullable SLExpression receiver) {
         return receiver != null;
     }
 
 
     @Override
-    protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
+    protected SLExpression doResolving(@NonNull SLExpression receiver, @NonNull String name, @Nullable SLParameters parameters)
             throws SLTranslationException {
 
         if (parameters != null) {

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -58,7 +59,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      *        created.
      * @return whether any refactorings should be applied on an application of the given rule.
      */
-    static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
+    static boolean shouldRefactorOnBuiltInRule(Rule rule, @Nullable Goal goal, Object hint) {
         if (goal != null) {
             Proof proof = goal.proof();
             if ((rule instanceof WhileInvariantRule

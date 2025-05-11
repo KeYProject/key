@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -24,16 +25,16 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
     @Deprecated
     private final Constraint metavariableInst;
 
-    public ConstraintAwareSyntacticalReplaceVisitor(TermLabelState termLabelState,
-            Services services, Constraint metavariableInst,
-            PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
-            TacletLabelHint labelHint, Goal goal) {
+    public ConstraintAwareSyntacticalReplaceVisitor(@NonNull TermLabelState termLabelState,
+                                                    @NonNull Services services, Constraint metavariableInst,
+                                                    @NonNull PosInOccurrence applicationPosInOccurrence, @NonNull Rule rule, @NonNull RuleApp ruleApp,
+                                                    @NonNull TacletLabelHint labelHint, @NonNull Goal goal) {
         super(termLabelState, labelHint, applicationPosInOccurrence, goal, rule, ruleApp, services,
             services.getTermBuilder(false));
         this.metavariableInst = metavariableInst;
     }
 
-    protected Term toTerm(Term t) {
+    protected @NonNull Term toTerm(Term t) {
         if (!EqualityConstraint.metaVars(t, services).isEmpty() && !metavariableInst.isBottom()) {
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
@@ -47,7 +48,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
         }
     }
 
-    public void visited(Term visited) {
+    public void visited(@NonNull Term visited) {
         if (visited.op() instanceof Metavariable mv &&
                 metavariableInst.getInstantiation(mv, services).op() != visited.op()) {
             pushNew(metavariableInst.getInstantiation(mv, services));

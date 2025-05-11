@@ -5,6 +5,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Generate term "self != null".
@@ -14,7 +15,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicPreconditionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.PRECONDITION) == null) {
             throw new UnsupportedOperationException(

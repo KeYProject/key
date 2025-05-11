@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 
 /**
@@ -33,8 +34,8 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-            Services services) {
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate, @NonNull SVInstantiations instMap,
+                         Services services) {
         final Object o = instMap.getInstantiation(field);
         if (!(o instanceof Term f)) {
             return false;
@@ -59,7 +60,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negated ? "\\not" : "") + "\\isStaticField(" + field + ")";
     }
 }

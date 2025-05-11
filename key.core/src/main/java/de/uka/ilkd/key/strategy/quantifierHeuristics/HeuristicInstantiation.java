@@ -16,6 +16,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 
@@ -26,8 +28,8 @@ public class HeuristicInstantiation implements TermGenerator {
     private HeuristicInstantiation() {}
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public @NonNull Iterator<Term> generate(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+                                            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term qf = pos.sequentFormula().formula();
@@ -43,13 +45,13 @@ public class HeuristicInstantiation implements TermGenerator {
 
         private final QuantifiableVariable quantifiedVar;
 
-        private final Sort quantifiedVarSort;
-        private final JFunction quantifiedVarSortCast;
+        private final @NonNull Sort quantifiedVarSort;
+        private final @NonNull JFunction quantifiedVarSortCast;
 
-        private Term nextInst = null;
+        private @Nullable Term nextInst = null;
         private final TermServices services;
 
-        private HIIterator(Iterator<Term> it, QuantifiableVariable var, Services services) {
+        private HIIterator(Iterator<Term> it, QuantifiableVariable var, @NonNull Services services) {
             this.instances = it;
             this.quantifiedVar = var;
             this.services = services;

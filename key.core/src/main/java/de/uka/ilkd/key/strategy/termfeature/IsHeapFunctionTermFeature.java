@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.Function;
 
 
@@ -20,12 +21,12 @@ public final class IsHeapFunctionTermFeature extends BinaryTermFeature {
         this.heapLDT = heapLDT;
     }
 
-    public static IsHeapFunctionTermFeature create(HeapLDT heapLDT) {
+    public static @NonNull IsHeapFunctionTermFeature create(HeapLDT heapLDT) {
         return new IsHeapFunctionTermFeature(heapLDT);
     }
 
     @Override
-    protected boolean filter(Term t, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term t, MutableState mState, Services services) {
         if (t.op() instanceof JFunction) {
             Function op = t.op(JFunction.class);
             return op.arity() == 0 && op.sort() == heapLDT.targetSort();

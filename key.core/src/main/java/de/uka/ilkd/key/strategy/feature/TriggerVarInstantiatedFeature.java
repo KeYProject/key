@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
+import org.jspecify.annotations.NonNull;
 
 public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 
@@ -15,7 +16,7 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
     private TriggerVarInstantiatedFeature() {
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert app.taclet().hasTrigger();
 
         SVInstantiationProjection instProj = SVInstantiationProjection

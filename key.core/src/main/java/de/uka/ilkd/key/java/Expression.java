@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -15,5 +16,6 @@ public interface Expression extends ProgramElement {
     /**
      * returns the {@link KeYJavaType} of an expression
      */
+    @Nullable
     KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
 }

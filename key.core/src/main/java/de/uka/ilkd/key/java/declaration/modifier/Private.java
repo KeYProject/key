@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration.modifier;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 
@@ -35,7 +36,7 @@ public class Private extends VisibilityModifier {
      *
      * @return the string.
      */
-    protected String getSymbol() {
+    protected @NonNull String getSymbol() {
         return "private";
     }
 

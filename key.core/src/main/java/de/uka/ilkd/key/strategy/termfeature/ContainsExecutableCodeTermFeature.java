@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -28,11 +29,11 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
         new ContainsExecutableCodeTermFeature(true);
 
     @Override
-    protected boolean filter(Term t, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term t, MutableState mState, Services services) {
         return containsExec(t, mState, services);
     }
 
-    private boolean containsExec(Term t, MutableState mState, Services services) {
+    private boolean containsExec(@NonNull Term t, MutableState mState, Services services) {
         if (t.isRigid()) {
             return false;
         }

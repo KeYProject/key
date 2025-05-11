@@ -47,7 +47,7 @@ public class AppNodeIntermediate extends NodeIntermediate {
         this.notes = notes;
     }
 
-    public String getNotes() {
+    public @Nullable String getNotes() {
         return notes;
     }
 }

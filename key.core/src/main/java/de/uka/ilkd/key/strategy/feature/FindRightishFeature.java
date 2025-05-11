@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Walking from the root of a formula down to the focus of a rule application, count how often we
@@ -20,19 +21,19 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
  */
 public class FindRightishFeature implements Feature {
 
-    private final Operator add;
+    private final @NonNull Operator add;
     private final static RuleAppCost one = NumberRuleAppCost.create(1);
 
-    public static Feature create(IntegerLDT numbers) {
+    public static @NonNull Feature create(@NonNull IntegerLDT numbers) {
         return new FindRightishFeature(numbers);
     }
 
-    private FindRightishFeature(IntegerLDT numbers) {
+    private FindRightishFeature(@NonNull IntegerLDT numbers) {
         add = numbers.getAdd();
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
+                                   MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();

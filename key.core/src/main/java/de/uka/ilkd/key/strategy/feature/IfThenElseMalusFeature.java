@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.LRUCache;
 
 
@@ -26,8 +28,8 @@ public class IfThenElseMalusFeature implements Feature {
 
     private IfThenElseMalusFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, @Nullable PosInOccurrence pos, @NonNull Goal goal,
+                                   MutableState mState) {
         if (pos == null) {
             return NumberRuleAppCost.getZeroCost();
         }

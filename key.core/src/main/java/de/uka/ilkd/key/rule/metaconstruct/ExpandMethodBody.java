@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -39,8 +40,8 @@ public class ExpandMethodBody extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
+                                                SVInstantiations svInst) {
 
         MethodBodyStatement mbs = (MethodBodyStatement) pe;
         // MethodReference mr = mbs.getMethodReference();

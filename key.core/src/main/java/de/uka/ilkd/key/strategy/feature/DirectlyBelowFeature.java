@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This feature returns zero if and only if the focus of the given rule application exists, is not
@@ -26,7 +27,7 @@ public abstract class DirectlyBelowFeature extends BinaryFeature {
         this.index = index;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
         if (pos == null) {
             return false;
         }

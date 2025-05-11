@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.definition;
 
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -20,7 +21,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
     /**
      * The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
-    private final ImmutableArray<StrategyPropertyValueDefinition> values;
+    private final @NonNull ImmutableArray<StrategyPropertyValueDefinition> values;
 
     /**
      * Defines optionally how many columns are shown per row. A negative value means unlimited

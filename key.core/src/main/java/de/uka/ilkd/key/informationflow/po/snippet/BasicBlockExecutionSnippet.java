@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -31,7 +32,7 @@ import org.key_project.util.collection.ImmutableSLList;
 class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.nil();
         if (poVars.post.self != null) {
@@ -53,8 +54,8 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
         return prog;
     }
 
-    private Term buildProgramTerm(BasicSnippetData d, ProofObligationVars vs, Term postTerm,
-            TermBuilder tb) {
+    private @NonNull Term buildProgramTerm(@NonNull BasicSnippetData d, @NonNull ProofObligationVars vs, @NonNull Term postTerm,
+                                           @NonNull TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a " + "contract without modality.");
@@ -91,7 +92,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
     }
 
 
-    private JavaBlock buildJavaBlock(BasicSnippetData d, ProofObligationVars poVars) {
+    private @NonNull JavaBlock buildJavaBlock(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars) {
         final ExecutionContext context =
             (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
         final ProgramVariable exceptionParameter =

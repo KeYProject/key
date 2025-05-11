@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.*;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.*;
 
 public class TacletPrefixBuilder {
@@ -24,14 +26,14 @@ public class TacletPrefixBuilder {
         DefaultImmutableSet.nil();
     private final TacletBuilder<? extends Taclet> tacletBuilder;
 
-    protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
+    protected @NonNull ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
         DefaultImmutableMap.nilMap();
 
     public TacletPrefixBuilder(TacletBuilder<? extends Taclet> tacletBuilder) {
         this.tacletBuilder = tacletBuilder;
     }
 
-    private void addVarsBoundHere(Term visited, int subTerm) {
+    private void addVarsBoundHere(@NonNull Term visited, int subTerm) {
         ImmutableArray<QuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
         for (int i = 0; i < bdVars.size(); i++) {
             QuantifiableVariable boundVar = bdVars.get(i);
@@ -41,8 +43,8 @@ public class TacletPrefixBuilder {
         }
     }
 
-    private void setPrefixOfOccurrence(SchemaVariable sv,
-            ImmutableSet<SchemaVariable> relevantBoundVars) {
+    private void setPrefixOfOccurrence(@NonNull SchemaVariable sv,
+                                       @NonNull ImmutableSet<SchemaVariable> relevantBoundVars) {
         prefixMap = prefixMap.put(sv, new TacletPrefix(relevantBoundVars, false));
     }
 
@@ -62,7 +64,7 @@ public class TacletPrefixBuilder {
         return result;
     }
 
-    private void visit(Term t) {
+    private void visit(@NonNull Term t) {
         if (t.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV msv) {
             // TODO: Is false correct?
             prefixMap.put(msv, new TacletPrefix(ImmutableSet.empty(), false));
@@ -102,13 +104,13 @@ public class TacletPrefixBuilder {
         }
     }
 
-    private void visit(Sequent s) {
+    private void visit(@NonNull Sequent s) {
         for (final SequentFormula cf : s) {
             visit(cf.formula());
         }
     }
 
-    private void visit(TacletGoalTemplate templ) {
+    private void visit(@NonNull TacletGoalTemplate templ) {
         visit(templ.sequent());
         if (templ instanceof RewriteTacletGoalTemplate) {
             visit(((RewriteTacletGoalTemplate) templ).replaceWith());
@@ -136,7 +138,7 @@ public class TacletPrefixBuilder {
     }
 
 
-    private void checkPrefixInAddRules(Taclet addRule) {
+    private void checkPrefixInAddRules(@NonNull Taclet addRule) {
         final ImmutableMap<SchemaVariable, TacletPrefix> addRuleSV2PrefixMap = addRule.prefixMap();
         for (final ImmutableMapEntry<SchemaVariable, TacletPrefix> entry : prefixMap) {
             final TacletPrefix addRulePrefix = addRuleSV2PrefixMap.get(entry.key());
@@ -175,7 +177,7 @@ public class TacletPrefixBuilder {
         return true;
     }
 
-    private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
+    private boolean occurrsOnlyInFindOrRepl(@NonNull SchemaVariable sv) {
         @SuppressWarnings("unchecked")
         RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder =
             (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
@@ -206,7 +208,7 @@ public class TacletPrefixBuilder {
         }
     }
 
-    public ImmutableMap<SchemaVariable, TacletPrefix> getPrefixMap() {
+    public @NonNull ImmutableMap<SchemaVariable, TacletPrefix> getPrefixMap() {
         considerContext();
         return prefixMap;
     }
@@ -214,8 +216,8 @@ public class TacletPrefixBuilder {
     public static class InvalidPrefixException extends IllegalStateException {
         private static final long serialVersionUID = 5855187579027274363L;
 
-        InvalidPrefixException(String tacletName, SchemaVariable sv, TacletPrefix prefix,
-                ImmutableSet<SchemaVariable> sndPrefixVar) {
+        InvalidPrefixException(String tacletName, SchemaVariable sv, @Nullable TacletPrefix prefix,
+                               ImmutableSet<SchemaVariable> sndPrefixVar) {
             super("Schema variable " + sv + "occurs at different places " + "in taclet "
                 + tacletName + " with different prefixes.\n" + "Prefix P1:"
                 + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix())

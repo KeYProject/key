@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -14,11 +15,11 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * A JML class invariant declaration in textual form.
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
-    private final ParserRuleContext inv;
+    private final @NonNull ParserRuleContext inv;
     private final boolean free;
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers, ParserRuleContext inv,
-            String name, boolean free) {
+    public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers, @NonNull ParserRuleContext inv,
+                              String name, boolean free) {
         super(modifiers, name);
         assert inv != null;
         this.inv = inv;
@@ -28,7 +29,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
     }
 
     public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers,
-            JmlParser.Class_invariantContext inv, boolean free) {
+                              JmlParser.@NonNull Class_invariantContext inv, boolean free) {
         this(modifiers, inv, null, free);
     }
 

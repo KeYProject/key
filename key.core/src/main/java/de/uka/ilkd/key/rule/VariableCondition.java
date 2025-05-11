@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 
 
@@ -31,6 +32,7 @@ public interface VariableCondition {
      * @return modified match results if the condition can be satisfied, or <code>null</code>
      *         otherwise
      */
+    @Nullable
     MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond,
             Services services);

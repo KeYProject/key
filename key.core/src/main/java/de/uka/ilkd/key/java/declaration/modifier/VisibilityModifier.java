@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java.declaration.modifier;
 
 import de.uka.ilkd.key.java.declaration.Modifier;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 
 
@@ -46,7 +47,7 @@ public abstract class VisibilityModifier extends Modifier
     }
 
     /** Whether it represents at least default (package-private) visibility. */
-    public static boolean isPackageVisible(VisibilityModifier vm) {
+    public static boolean isPackageVisible(@Nullable VisibilityModifier vm) {
         assert sane(vm) : "Unknown visibility modifier: " + vm;
         return vm == null || vm instanceof Public || vm instanceof Protected;
     }
@@ -57,7 +58,7 @@ public abstract class VisibilityModifier extends Modifier
         return vm instanceof Private;
     }
 
-    private static boolean sane(VisibilityModifier vm) {
+    private static boolean sane(@Nullable VisibilityModifier vm) {
         return vm == null || vm instanceof Public || vm instanceof Protected
                 || vm instanceof Private;
     }

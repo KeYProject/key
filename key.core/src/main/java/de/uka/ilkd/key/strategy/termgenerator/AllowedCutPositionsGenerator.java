@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Enumerate potential subformulas of a formula that could be used for a cut (taclet cut_direct).
@@ -24,19 +25,19 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
 
     public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator();
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public @NonNull Iterator<Term> generate(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
+                                            MutableState mState) {
         return new ACPIterator(pos.sequentFormula().formula(), pos.isInAntec());
     }
 
     private static class ACPIterator implements Iterator<Term> {
         private final ArrayDeque<Object> termStack = new ArrayDeque<>();
 
-        public ACPIterator(Term t, boolean negated) {
+        public ACPIterator(@NonNull Term t, boolean negated) {
             push(t, negated);
         }
 
-        private void push(Term t, boolean negated) {
+        private void push(@NonNull Term t, boolean negated) {
             termStack.push(t);
             termStack.push(negated);
         }
@@ -45,7 +46,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
             return !termStack.isEmpty();
         }
 
-        public Term next() {
+        public @NonNull Term next() {
             final boolean negated = (Boolean) termStack.pop();
             final Term res = (Term) termStack.pop();
             final Operator op = res.op();

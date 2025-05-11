@@ -18,6 +18,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
@@ -75,8 +76,8 @@ public class QueryExpandCost implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+                                   MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Term t = pos.subTerm();
@@ -118,7 +119,7 @@ public class QueryExpandCost implements Feature {
      * @return Cost that is computed base on the integer literals occurring in the numerical
      *         arguments of the query t.
      */
-    private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv) {
+    private static int maxIntliteralInArgumentsTimesTwo(@NonNull Term t, @NonNull IntegerLDT iLDT, @NonNull Services serv) {
         final Namespace<Sort> sorts = serv.getNamespaces().sorts();
         final Sort intSort = sorts.lookup(IntegerLDT.NAME);
         int cost = 0;
@@ -142,7 +143,7 @@ public class QueryExpandCost implements Feature {
      *         The sum is modified by extrapolating negative numbers from zero by one. The cost of a
      *         query f(n-1) a slightly higher cost than the cost of f(n+1).
      */
-    private static int sumOfAbsLiteralsTimesTwo(Term t, IntegerLDT iLDT, Services serv) {
+    private static int sumOfAbsLiteralsTimesTwo(@NonNull Term t, @NonNull IntegerLDT iLDT, @NonNull Services serv) {
         if (t.op() == iLDT.getNumberSymbol()) {
             String strVal = AbstractTermTransformer.convertToDecimalString(t, serv);
             int val = Integer.parseInt(strVal);
@@ -171,7 +172,7 @@ public class QueryExpandCost implements Feature {
      * @param goal The goal.
      * @return The number of repetitive rule applications.
      */
-    protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected int queryExpandAlreadyAppliedAtPos(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal) {
         int count = 0;
         ImmutableList<RuleApp> appliedRuleApps = goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
@@ -202,7 +203,7 @@ public class QueryExpandCost implements Feature {
      * @param goal the current proof goal
      * @return a boolean saying whether the goal belongs to a step case
      */
-    protected static boolean isStepCaseBranch(Goal goal) {
+    protected static boolean isStepCaseBranch(@NonNull Goal goal) {
         Node node = goal.node();
         while (node != null) {
             NodeInfo ni = node.getNodeInfo();

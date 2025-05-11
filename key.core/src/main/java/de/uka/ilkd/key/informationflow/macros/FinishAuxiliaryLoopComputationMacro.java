@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
@@ -46,9 +47,9 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
-            @Nullable ProverTaskListener listener) {
+    public @NonNull ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final @NonNull Proof proof,
+                                                   ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+                                                   @Nullable ProverTaskListener listener) {
         final ProofOblInput poForProof =
             proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;

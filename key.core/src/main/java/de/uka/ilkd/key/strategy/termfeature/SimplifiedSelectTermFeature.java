@@ -9,24 +9,25 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 
 public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
 
     private final HeapLDT heapLDT;
-    private final PrimitiveHeapTermFeature primitiveHeapTermFeature;
+    private final @NonNull PrimitiveHeapTermFeature primitiveHeapTermFeature;
 
     private SimplifiedSelectTermFeature(HeapLDT heapLDT) {
         this.heapLDT = heapLDT;
         this.primitiveHeapTermFeature = PrimitiveHeapTermFeature.create(heapLDT);
     }
 
-    public static TermFeature create(HeapLDT heapLDT) {
+    public static @NonNull TermFeature create(HeapLDT heapLDT) {
         return new SimplifiedSelectTermFeature(heapLDT);
     }
 
     @Override
-    protected boolean filter(Term t, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term t, MutableState mState, Services services) {
         boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
         return // either the operator is not a select operator
         !isSelectOp ||

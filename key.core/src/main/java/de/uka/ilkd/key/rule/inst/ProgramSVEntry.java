@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.jspecify.annotations.NonNull;
 
 /**
  * this class encapsulates a SchemaVariable and its corresponding instantiation if it is a
@@ -75,7 +76,7 @@ public class ProgramSVEntry implements Serializable {
     }
 
     /** toString */
-    public String toString() {
+    public @NonNull String toString() {
         return "{" + key + "<--" + value + "}";
     }
 

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -36,8 +37,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(RuleApp ruleApp, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+                                   MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
@@ -63,7 +64,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     }
 
 
-    private boolean isSubFormula(Term f1, Term f2) {
+    private boolean isSubFormula(Term f1, @NonNull Term f2) {
         SubFormulaVisitor v = new SubFormulaVisitor(f1);
         f2.execPreOrder(v);
         return v.getIsSubFormula();
@@ -83,7 +84,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
 
         @Override
-        public void visit(Term visited) {
+        public void visit(@NonNull Term visited) {
             isSubFormula |= visited.equalsModProperty(potentialSub, RENAMING_TERM_PROPERTY);
         }
 

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 
 /**
@@ -29,5 +30,6 @@ public interface StrategyFactory extends Named {
      *
      * @return The {@link StrategySettingsDefinition} which describes the user interface.
      */
+    @Nullable
     StrategySettingsDefinition getSettingsDefinition();
 }

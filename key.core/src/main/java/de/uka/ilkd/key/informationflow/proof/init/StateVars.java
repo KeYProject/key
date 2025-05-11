@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -31,6 +33,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * @author christoph
  *         <p/>
  */
+@NullMarked
 public class StateVars {
 
     public final ImmutableList<Term> termList;
@@ -43,7 +46,7 @@ public class StateVars {
 
     public final ImmutableList<Term> localVars;
 
-    public final Term result;
+    public final Term resultTerm;
 
     public final Term exception;
 
@@ -57,7 +60,7 @@ public class StateVars {
         this.self = self;
         this.guard = guard;
         this.localVars = localVars;
-        this.result = result;
+        this.resultTerm = result;
         this.exception = exception;
         this.heap = heap;
         this.mbyAtPre = mbyAtPre;
@@ -135,7 +138,7 @@ public class StateVars {
         this(copyVariable(orig.self, postfix, services),
             copyVariable(orig.guard, postfix, services),
             copyVariables(orig.localVars, postfix, services),
-            copyVariable(orig.result, postfix, services),
+            copyVariable(orig.resultTerm, postfix, services),
             copyVariable(orig.exception, postfix, services),
             copyHeapSymbol(orig.heap, postfix, services),
             copyFunction(orig.mbyAtPre, postfix, services));
@@ -271,8 +274,8 @@ public class StateVars {
                 : copyVariable(origPostVars.self, postfix, services);
         Term guard = (origPreVars.guard == origPostVars.guard) ? preVars.guard
                 : copyVariable(origPostVars.guard, postfix, services);
-        Term result = (origPreVars.result == origPostVars.result) ? preVars.result
-                : copyVariable(origPostVars.result, postfix, services);
+        Term result = (origPreVars.resultTerm == origPostVars.resultTerm) ? preVars.resultTerm
+                : copyVariable(origPostVars.resultTerm, postfix, services);
         Term exception = (origPreVars.exception == origPostVars.exception) ? preVars.exception
                 : copyVariable(origPostVars.exception, postfix, services);
         Term heap = (origPreVars.heap == origPostVars.heap) ? preVars.heap
@@ -294,8 +297,8 @@ public class StateVars {
     }
 
 
-    private static Term buildSelfVar(Services services, IProgramMethod pm, KeYJavaType kjt,
-            String postfix) {
+    private static @Nullable Term buildSelfVar(Services services, IProgramMethod pm, KeYJavaType kjt,
+                                               String postfix) {
         if (pm.isStatic()) {
             return null;
         }
@@ -315,7 +318,7 @@ public class StateVars {
     }
 
 
-    private static Term buildResultVar(IProgramMethod pm, Services services, String postfix) {
+    private static @Nullable Term buildResultVar(IProgramMethod pm, Services services, String postfix) {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         }

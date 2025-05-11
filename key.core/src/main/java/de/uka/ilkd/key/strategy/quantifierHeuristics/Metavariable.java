@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -26,7 +27,7 @@ public final class Metavariable extends AbstractSortedOperator
         serial = maxSerial++;
     }
 
-    private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
+    private Metavariable(@NonNull Name name, @NonNull Sort sort, boolean isTemporaryVariable) {
         super(name, sort, true);
         if (sort == JavaDLTheory.FORMULA) {
             throw new RuntimeException("Attempt to create metavariable of type formula");
@@ -36,17 +37,17 @@ public final class Metavariable extends AbstractSortedOperator
         // assert false : "metavariables are disabled";
     }
 
-    public Metavariable(Name name, Sort sort) {
+    public Metavariable(@NonNull Name name, @NonNull Sort sort) {
         this(name, sort, false);
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return name() + ":" + sort();
     }
 
     @Override
-    public int compareTo(Metavariable p_mr) {
+    public int compareTo(@NonNull Metavariable p_mr) {
         if (p_mr == this) {
             return 0;
         }

@@ -1778,8 +1778,8 @@ public class MergeRuleUtils {
          * @param wrappedCollection Iterable to transform.
          * @return The target collection with inserted terms.
          */
-        public static <T extends Collection<Term>> T toTermList(T target,
-                Iterable<TermWrapper> wrappedCollection) {
+        public static <T extends Collection<Term>> @NonNull T toTermList(@NonNull T target,
+                                                                         Iterable<TermWrapper> wrappedCollection) {
 
             for (TermWrapper termWrapper : wrappedCollection) {
                 target.add(termWrapper.term());

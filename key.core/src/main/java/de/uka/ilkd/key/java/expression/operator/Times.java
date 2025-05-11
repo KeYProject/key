@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.expression.operator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -23,7 +24,7 @@ public class Times extends BinaryOperator {
      * @param rhs an expression.
      */
 
-    public Times(Expression lhs, Expression rhs) {
+    public Times(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -35,7 +36,7 @@ public class Times extends BinaryOperator {
      *
      * @param children the children of this AST element as KeY classes.
      */
-    public Times(ExtList children) {
+    public Times(@NonNull ExtList children) {
         super(children);
     }
 
@@ -67,7 +68,7 @@ public class Times extends BinaryOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnTimes(this);
     }
 

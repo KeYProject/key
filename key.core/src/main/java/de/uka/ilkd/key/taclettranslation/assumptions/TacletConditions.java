@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -25,11 +26,11 @@ import org.key_project.util.collection.ImmutableSLList;
 class TacletConditions {
 
     //
-    private ImmutableList<TypeComparisonCondition> comparisionCondition = ImmutableSLList.nil();
-    private ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
-    private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition =
+    private @NonNull ImmutableList<TypeComparisonCondition> comparisionCondition = ImmutableSLList.nil();
+    private @NonNull ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
+    private @NonNull ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition =
         ImmutableSLList.nil();
-    private ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition =
+    private @NonNull ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition =
         ImmutableSLList.nil();
 
 
@@ -40,7 +41,7 @@ class TacletConditions {
 
 
 
-    public TacletConditions(Taclet t) throws IllegalTacletException {
+    public TacletConditions(@NonNull Taclet t) throws IllegalTacletException {
 
 
         for (final VariableCondition cond : t.getVariableConditions()) {
@@ -174,8 +175,8 @@ class TacletConditions {
         return false;
     }
 
-    private boolean containsComparisionCondition(TypeComparisonCondition tcc, Sort s1, Sort s2,
-            TypeComparisonCondition.Mode mode) {
+    private boolean containsComparisionCondition(@NonNull TypeComparisonCondition tcc, Sort s1, Sort s2,
+                                                 TypeComparisonCondition.Mode mode) {
 
         GenericSortResolver first = null, second = null;
 
@@ -200,8 +201,8 @@ class TacletConditions {
 
     }
 
-    public boolean containsIsSubtypeRelation(Sort gen, Sort inst,
-            TypeComparisonCondition.Mode mode) {
+    public boolean containsIsSubtypeRelation(Sort gen, @NonNull Sort inst,
+                                             TypeComparisonCondition.Mode mode) {
         for (TypeComparisonCondition tcc : comparisionCondition) {
             if (tcc.getMode() == mode) {
                 if (tcc.getSecondResolver() instanceof NonGenericSortResolver

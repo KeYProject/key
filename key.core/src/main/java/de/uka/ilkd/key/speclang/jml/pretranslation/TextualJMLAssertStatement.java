@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.nparser.KeyAst;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.antlr.v4.runtime.RuleContext;
@@ -14,9 +15,9 @@ import org.antlr.v4.runtime.RuleContext;
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
     private final KeyAst.Expression context;
-    private final Kind kind;
+    private final @NonNull Kind kind;
 
-    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause) {
+    public TextualJMLAssertStatement(@NonNull Kind kind, KeyAst.Expression clause) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
@@ -35,7 +36,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
      * @param builder The StringBuilder to insert the text into
      * @param context The RuleContext to transform
      */
-    public static void ruleContextToText(StringBuilder builder, RuleContext context) {
+    public static void ruleContextToText(@NonNull StringBuilder builder, @NonNull RuleContext context) {
         for (int i = 0; i < context.getChildCount(); i++) {
             if (i > 0) {
                 builder.append(' ');
@@ -50,7 +51,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         }
     }
 
-    public String getClauseText() {
+    public @NonNull String getClauseText() {
         return context.getText();
         /*
          * var builder = new StringBuilder();

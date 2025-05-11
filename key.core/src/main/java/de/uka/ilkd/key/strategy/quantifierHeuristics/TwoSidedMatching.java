@@ -10,6 +10,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
@@ -27,10 +29,10 @@ import org.key_project.util.collection.ImmutableSet;
 class TwoSidedMatching {
 
     private final UniTrigger trigger;
-    private final Term triggerWithMVs;
-    private final Substitution targetSubstWithMVs;
+    private final @Nullable Term triggerWithMVs;
+    private final @NonNull Substitution targetSubstWithMVs;
     private final Substitution triggerSubstWithMVs;
-    private final Term targetWithMVs;
+    private final @Nullable Term targetWithMVs;
 
     /**
      * creates an instance of a two sided matching
@@ -39,7 +41,7 @@ class TwoSidedMatching {
      * @param targetTerm the term to match
      * @param services the Services
      */
-    TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
+    TwoSidedMatching(@NonNull UniTrigger trigger, Term targetTerm, @NonNull Services services) {
         this.trigger = trigger;
         this.targetSubstWithMVs = ReplacerOfQuanVariablesWithMetavariables
                 .createSubstitutionForVars(targetTerm, services);
@@ -72,7 +74,7 @@ class TwoSidedMatching {
         return getAllSubstitutions(targetWithMVs, services);
     }
 
-    private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
+    private @NonNull ImmutableSet<Substitution> getAllSubstitutions(@NonNull Term target, Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         Substitution sub = match(triggerWithMVs, target, services);
         if (sub != null
@@ -92,7 +94,7 @@ class TwoSidedMatching {
     }
 
     /** find a substitution in a allterm by using unification */
-    private Substitution match(Term triggerTerm, Term targetTerm, Services services) {
+    private @Nullable Substitution match(Term triggerTerm, Term targetTerm, Services services) {
         final Constraint c = Constraint.BOTTOM.unify(targetTerm, triggerTerm, services);
         if (c.isSatisfiable()) {
             ImmutableMap<QuantifiableVariable, Term> sub =
@@ -115,7 +117,7 @@ class TwoSidedMatching {
         return null;
     }
 
-    private boolean isGround(Term t) {
+    private boolean isGround(@NonNull Term t) {
         return !triggerSubstWithMVs.termContainsValue(t)
                 && !targetSubstWithMVs.termContainsValue(t);
     }

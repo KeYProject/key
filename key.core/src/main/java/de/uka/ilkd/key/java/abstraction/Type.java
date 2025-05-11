@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import de.uka.ilkd.key.java.expression.Literal;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A program model element representing types.
@@ -18,6 +19,7 @@ public interface Type extends ProgramModelElement {
      *
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
+    @Nullable
     Literal getDefaultValue();
 
 }

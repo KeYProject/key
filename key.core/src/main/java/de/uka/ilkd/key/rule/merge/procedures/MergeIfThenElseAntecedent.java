@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -32,9 +34,9 @@ import org.key_project.util.collection.ImmutableSet;
 public class MergeIfThenElseAntecedent extends MergeProcedure
         implements UnparametricMergeProcedure {
 
-    private static MergeIfThenElseAntecedent INSTANCE = null;
+    private static @Nullable MergeIfThenElseAntecedent INSTANCE = null;
 
-    public static MergeIfThenElseAntecedent instance() {
+    public static @NonNull MergeIfThenElseAntecedent instance() {
         if (INSTANCE == null) {
             INSTANCE = new MergeIfThenElseAntecedent();
         }
@@ -54,9 +56,9 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public @NonNull ValuesMergeResult mergeValuesInStates(@NonNull Term v, @NonNull SymbolicExecutionState state1,
+                                                          @NonNull Term valueInState1, @NonNull SymbolicExecutionState state2, @NonNull Term valueInState2,
+                                                          Term distinguishingFormula, @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -94,9 +96,9 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
      * @return A list of if-then-else constraints for the given constrained term, states and if/else
      *         terms.
      */
-    private static ImmutableSet<Term> getIfThenElseConstraints(Term constrained, Term ifTerm,
-            Term elseTerm, SymbolicExecutionState state1, SymbolicExecutionState state2,
-            Term distinguishingFormula, Services services) {
+    private static @NonNull ImmutableSet<Term> getIfThenElseConstraints(@NonNull Term constrained, @NonNull Term ifTerm,
+                                                                        @NonNull Term elseTerm, @NonNull SymbolicExecutionState state1, @NonNull SymbolicExecutionState state2,
+                                                                        @Nullable Term distinguishingFormula, @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<Term> result = DefaultImmutableSet.nil();
@@ -136,7 +138,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return DISPLAY_NAME;
     }
 }

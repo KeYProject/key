@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
@@ -21,7 +22,7 @@ public class DoubleHandler extends LDTHandler {
 
     private final Map<JMLOperator, TypedOperator> opMap = new EnumMap<>(JMLOperator.class);
 
-    public DoubleHandler(Services services) {
+    public DoubleHandler(@NonNull Services services) {
         super(services);
 
         DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
@@ -40,7 +41,7 @@ public class DoubleHandler extends LDTHandler {
     }
 
     @Override
-    protected @Nullable TypedOperator getOperator(Type promotedType, JMLOperator op) {
+    protected @Nullable TypedOperator getOperator(@NonNull Type promotedType, JMLOperator op) {
         if (promotedType.equals(PrimitiveType.JAVA_DOUBLE)) {
             return LDTHandler.getOperatorFromMap(this.opMap, op);
         } else {

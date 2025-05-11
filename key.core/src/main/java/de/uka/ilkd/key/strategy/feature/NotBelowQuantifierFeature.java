@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -23,7 +25,7 @@ public class NotBelowQuantifierFeature extends BinaryFeature {
 
     private NotBelowQuantifierFeature() {}
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
         return !belowQuantifier(pos);
@@ -32,7 +34,7 @@ public class NotBelowQuantifierFeature extends BinaryFeature {
     /**
      * @return true iff the given position is in the scope of a quantifier
      */
-    private boolean belowQuantifier(PosInOccurrence pos) {
+    private boolean belowQuantifier(@NonNull PosInOccurrence pos) {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {

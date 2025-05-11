@@ -6,6 +6,7 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import de.uka.ilkd.key.java.reference.TypeReference;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A program model element representing array types.
@@ -29,6 +30,7 @@ public interface ArrayType extends Type {
     /**
      * name of the array type
      */
+    @Nullable
     String getName();
 
     /**

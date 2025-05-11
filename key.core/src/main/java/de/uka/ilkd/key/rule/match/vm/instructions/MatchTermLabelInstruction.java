@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -25,8 +27,8 @@ public class MatchTermLabelInstruction implements MatchInstruction {
         this.labels = labels;
     }
 
-    private MatchConditions match(TermLabelSV sv, Term instantiationCandidate,
-            MatchConditions matchCond, Services services) {
+    private @Nullable MatchConditions match(@NonNull TermLabelSV sv, @NonNull Term instantiationCandidate,
+                                            @NonNull MatchConditions matchCond, Services services) {
 
         final SVInstantiations svInsts = matchCond.getInstantiations();
         final TermLabelInstantiationEntry inst =
@@ -49,8 +51,8 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-            Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition, MatchConditions matchConditions,
+                                           Services services) {
         final Term term = termPosition.getCurrentSubterm();
         MatchConditions result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels

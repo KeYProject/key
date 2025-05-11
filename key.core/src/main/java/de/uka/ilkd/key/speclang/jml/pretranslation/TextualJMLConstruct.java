@@ -26,8 +26,8 @@ import org.jspecify.annotations.NonNull;
  */
 public abstract class TextualJMLConstruct {
 
-    protected final ImmutableList<JMLModifier> modifiers;
-    private Location location = new Location(null, Position.UNDEFINED);
+    protected final @NonNull ImmutableList<JMLModifier> modifiers;
+    private @NonNull Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
     /**
@@ -35,12 +35,12 @@ public abstract class TextualJMLConstruct {
      */
     protected String name;
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
+    public TextualJMLConstruct(@NonNull ImmutableList<JMLModifier> specModifiers) {
         assert specModifiers != null;
         this.modifiers = specModifiers;
     }
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+    public TextualJMLConstruct(@NonNull ImmutableList<JMLModifier> specModifiers, String name) {
         this(specModifiers);
         this.name = name;
     }
@@ -81,17 +81,17 @@ public abstract class TextualJMLConstruct {
      *
      * @param ps set position of the construct
      */
-    protected void setPosition(PositionedString ps) {
+    protected void setPosition(@NonNull PositionedString ps) {
         if (location == null) {
             location = ps.location;
         }
     }
 
-    protected void setPosition(ParserRuleContext ps) {
+    protected void setPosition(@NonNull ParserRuleContext ps) {
         location = Location.fromToken(ps.start);
     }
 
-    protected void setPosition(LabeledParserRuleContext ps) {
+    protected void setPosition(@NonNull LabeledParserRuleContext ps) {
         setPosition(ps.first);
     }
 
@@ -101,8 +101,8 @@ public abstract class TextualJMLConstruct {
      * @deprecated
      */
     @Deprecated
-    protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
-            @NonNull LabeledParserRuleContext ps) {
+    protected void addGeneric(@NonNull Map<String, ImmutableList<LabeledParserRuleContext>> item,
+                              @NonNull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
         if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());

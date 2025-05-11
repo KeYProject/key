@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -79,8 +80,8 @@ public class ForToWhile extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(@NonNull ProgramElement pe, @NonNull Services services,
+                                                @NonNull SVInstantiations svInst) {
 
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
             (ProgramElementName) svInst.getInstantiation(outerLabel),
@@ -97,7 +98,7 @@ public class ForToWhile extends ProgramTransformer {
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override
-    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+    public @NonNull ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
 
         if (innerLabel != null) {

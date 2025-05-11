@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
@@ -18,7 +21,7 @@ import java.nio.file.Paths;
  */
 public class SimpleFileRepo extends AbstractFileRepo {
     @Override
-    protected Path getSaveName(Path path) {
+    protected @Nullable Path getSaveName(@NonNull Path path) {
         // we have to return paths that are relative!
 
         Path norm = path.normalize(); // TODO: is this necessary?
@@ -40,7 +43,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         return null;
     }
 
-    private Path getJavaFilePath(Path javaFile) {
+    private @Nullable Path getJavaFilePath(@NonNull Path javaFile) {
         // assumes that javaFile is an actual *.java file, path has to be absolute and normalized
         // return value: the path of the file relative to its proof bundle root
 
@@ -68,7 +71,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         return null;
     }
 
-    private Path getKeyFilePath(Path keyFile) {
+    private @NonNull Path getKeyFilePath(@NonNull Path keyFile) {
         if (keyFile.isAbsolute()) {
             // compute the relative target path (top level in repo)
             return getBaseDir().relativize(keyFile);
@@ -78,13 +81,13 @@ public class SimpleFileRepo extends AbstractFileRepo {
         }
     }
 
-    private Path getZipFilePath(Path zipFile) {
+    private @NonNull Path getZipFilePath(@NonNull Path zipFile) {
         // zip/jar may only occur in classpath
         Path rel = zipFile.getFileName();
         return Paths.get("classpath").resolve(rel);
     }
 
-    private Path getClassFilePath(Path classFile) {
+    private @Nullable Path getClassFilePath(@NonNull Path classFile) {
         // copy to classpath folder (*.class files may only occur in classpath)
 
         // class file may be in subdirectories
@@ -105,7 +108,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    protected InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
+    protected @NonNull InputStream getInputStreamInternal(@NonNull Path p) throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> directly read
             concrete = p.normalize();
@@ -122,7 +125,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public InputStream getInputStream(URL url) throws IOException {
+    public InputStream getInputStream(@NonNull URL url) throws IOException {
         String protocol = url.getProtocol();
 
         // currently, we support only two protocols: file and zip/jar
@@ -147,7 +150,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         }
     }
 
-    private InputStream copyAndOpenInputStream(Path path) throws IOException {
+    private @NonNull InputStream copyAndOpenInputStream(@NonNull Path path) throws IOException {
         // this method assumes that the path exists and is a valid path
         // (w/o protocol part as in URL!)
 
@@ -162,7 +165,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException {
+    public @NonNull OutputStream createOutputStream(@NonNull Path path) throws FileNotFoundException {
         if (path.isAbsolute()) {
             // programming error!
             throw new IllegalArgumentException("The path is not relative: " + path);

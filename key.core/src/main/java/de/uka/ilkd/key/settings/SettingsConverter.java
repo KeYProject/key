@@ -437,8 +437,8 @@ public final class SettingsConverter {
      * @return the value of the read enum constant
      * @param <T> the enum which the read constant belongs to
      */
-    public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue,
-            T[] values) {
+    public static <T extends Enum<?>> @NonNull T read(Properties props, String key, @NonNull T defaultValue,
+                                                      T[] values) {
         int ord = read(props, key, defaultValue.ordinal());
         for (T value : values) {
             if (ord == value.ordinal()) {
@@ -456,7 +456,7 @@ public final class SettingsConverter {
      * @param value the enum constant of enum T which is to store
      * @param <T> the enum which the stored constant belongs to
      */
-    public static <T extends Enum<?>> void store(Properties props, String key, T value) {
+    public static <T extends Enum<?>> void store(Properties props, String key, @NonNull T value) {
         store(props, key, value.ordinal());
     }
 }

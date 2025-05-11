@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
@@ -127,7 +128,7 @@ class LabeledTermImpl extends TermImpl {
             return true;
         }
 
-        if (o instanceof final LabeledTermImpl cmp) {
+        if (o instanceof final @NonNull LabeledTermImpl cmp) {
             if (labels.size() != cmp.labels.size()) {
                 return false;
             }

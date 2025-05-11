@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
@@ -25,7 +27,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
     public static final AtomicLong PERF_TERM_LABELS = new AtomicLong();
 
-    public FindTacletExecutor(TacletKind taclet) {
+    public FindTacletExecutor(@NonNull TacletKind taclet) {
         super(taclet);
     }
 
@@ -81,7 +83,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param ruleApp the taclet application that is executed.
      */
     @Override
-    public final ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public final @NonNull ImmutableList<Goal> apply(@NonNull Goal goal, @NonNull Services services, @NonNull RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         // Number without the if-goal eventually needed
         final int numberOfNewGoals = taclet.goalTemplates().size();
@@ -168,8 +170,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param currentSequent the current sequent (the one of the new goal)
      * @return the PosInOccurrence object describing where to add the formula
      */
-    private PosInOccurrence updatePositionInformation(TacletApp tacletApp, TacletGoalTemplate gt,
-            SequentChangeInfo currentSequent) {
+    private @Nullable PosInOccurrence updatePositionInformation(@NonNull TacletApp tacletApp, @NonNull TacletGoalTemplate gt,
+                                                                @NonNull SequentChangeInfo currentSequent) {
         PosInOccurrence result = tacletApp.posInOccurrence();
 
         if (result != null && gt.replaceWithExpressionAsObject() != null) {

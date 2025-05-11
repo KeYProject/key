@@ -35,7 +35,7 @@ public class ProofScriptArgument<T> {
         return command;
     }
 
-    public ProofScriptArgument<T> setCommand(ProofScriptCommand<T> command) {
+    public @NonNull ProofScriptArgument<T> setCommand(ProofScriptCommand<T> command) {
         this.command = command;
         return this;
     }
@@ -44,7 +44,7 @@ public class ProofScriptArgument<T> {
         return name;
     }
 
-    public ProofScriptArgument<T> setName(String name) {
+    public @NonNull ProofScriptArgument<T> setName(String name) {
         this.name = name;
         return this;
     }
@@ -53,7 +53,7 @@ public class ProofScriptArgument<T> {
         return type;
     }
 
-    public ProofScriptArgument<T> setType(Class<@NonNull ?> type) {
+    public @NonNull ProofScriptArgument<T> setType(Class<@NonNull ?> type) {
         this.type = type;
         return this;
     }
@@ -62,7 +62,7 @@ public class ProofScriptArgument<T> {
         return required;
     }
 
-    public ProofScriptArgument<T> setRequired(boolean required) {
+    public @NonNull ProofScriptArgument<T> setRequired(boolean required) {
         this.required = required;
         return this;
     }
@@ -71,7 +71,7 @@ public class ProofScriptArgument<T> {
         return flag;
     }
 
-    public ProofScriptArgument<T> setFlag(boolean flag) {
+    public @NonNull ProofScriptArgument<T> setFlag(boolean flag) {
         this.flag = flag;
         return this;
     }
@@ -135,12 +135,12 @@ public class ProofScriptArgument<T> {
      * @param documentation a string
      * @return this
      */
-    public ProofScriptArgument<T> setDocumentation(String documentation) {
+    public @NonNull ProofScriptArgument<T> setDocumentation(String documentation) {
         this.documentation = documentation;
         return this;
     }
 
-    public ProofScriptArgument<T> setVariableArguments(boolean hasVariableArguments) {
+    public @NonNull ProofScriptArgument<T> setVariableArguments(boolean hasVariableArguments) {
         this.variableArguments = hasVariableArguments;
         return this;
     }

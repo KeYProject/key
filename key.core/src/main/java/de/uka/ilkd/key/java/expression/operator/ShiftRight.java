@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -31,7 +32,7 @@ public class ShiftRight extends Operator {
      * @param lhs an expression.
      * @param rhs an expression.
      */
-    public ShiftRight(Expression lhs, Expression rhs) {
+    public ShiftRight(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -42,7 +43,7 @@ public class ShiftRight extends Operator {
      *
      * @param children the children of this AST element as KeY classes.
      */
-    public ShiftRight(ExtList children) {
+    public ShiftRight(@NonNull ExtList children) {
         super(children);
     }
 
@@ -83,12 +84,12 @@ public class ShiftRight extends Operator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnShiftRight(this);
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
         return tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec));
     }

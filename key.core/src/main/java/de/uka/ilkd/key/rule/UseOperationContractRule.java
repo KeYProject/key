@@ -61,6 +61,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -335,7 +336,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         PosInProgram result = PosInProgram.TOP;
 
-        if (pe instanceof ProgramPrefix curPrefix) {
+        if (pe instanceof @Nullable ProgramPrefix curPrefix) {
 
             final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();

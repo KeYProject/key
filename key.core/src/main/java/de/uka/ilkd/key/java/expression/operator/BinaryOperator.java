@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -19,11 +20,11 @@ import org.key_project.util.ExtList;
  */
 public abstract class BinaryOperator extends Operator {
 
-    public BinaryOperator(ExtList children) {
+    public BinaryOperator(@NonNull ExtList children) {
         super(children);
     }
 
-    public BinaryOperator(Expression lhs, Expression rhs) {
+    public BinaryOperator(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -36,7 +37,7 @@ public abstract class BinaryOperator extends Operator {
         return 2;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
         try {
             return tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec),

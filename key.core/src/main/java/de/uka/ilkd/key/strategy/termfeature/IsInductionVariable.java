@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -25,7 +26,7 @@ public class IsInductionVariable extends BinaryTermFeature {
     private IsInductionVariable() {}
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         // this has been copied from the former InductionVariableCondition
         // TODO: use termlabels instead of names?
         final String name = term.op().toString();

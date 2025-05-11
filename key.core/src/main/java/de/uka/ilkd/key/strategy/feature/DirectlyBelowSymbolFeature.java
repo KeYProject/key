@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.op.Operator;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This feature returns zero if and only if the focus of the given rule application exists, is not
@@ -20,11 +21,11 @@ public class DirectlyBelowSymbolFeature extends DirectlyBelowFeature {
         super(badSymbol, index);
     }
 
-    public static Feature create(Operator badSymbol) {
+    public static @NonNull Feature create(Operator badSymbol) {
         return new DirectlyBelowSymbolFeature(badSymbol, -1);
     }
 
-    public static Feature create(Operator badSymbol, int index) {
+    public static @NonNull Feature create(Operator badSymbol, int index) {
         return new DirectlyBelowSymbolFeature(badSymbol, index);
     }
 

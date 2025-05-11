@@ -13,6 +13,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -36,8 +37,8 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
-            EngineState stateMap) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Map<String, Object> args,
+                        @NonNull EngineState stateMap) throws ScriptException, InterruptedException {
 
         AbbrevMap abbrMap = stateMap.getAbbreviations();
         for (Map.Entry<String, Object> entry : args.entrySet()) {
@@ -83,7 +84,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "saveInst";
     }
 }

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 
 /**
@@ -25,7 +27,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     /**
      * Type reference.
      */
-    protected final TypeReference typeReference;
+    protected final @Nullable TypeReference typeReference;
 
 
     /**
@@ -35,7 +37,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      *        (the referred type) 2 of Expression (the first Expression as left hand side, the
      *        second as right hand side), Comments
      */
-    public TypeOperator(ExtList children) {
+    public TypeOperator(@NonNull ExtList children) {
         super(children);
         typeReference = children.get(TypeReference.class);
     }
@@ -47,17 +49,17 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      *        (the referred type) 2 of Expression (the first Expression as left hand side, the
      *        second as right hand side), Comments
      */
-    public TypeOperator(ExtList children, PositionInfo pi) {
+    public TypeOperator(@NonNull ExtList children, PositionInfo pi) {
         super(children);
         typeReference = children.get(TypeReference.class);
     }
 
-    public TypeOperator(Expression unaryChild, TypeReference typeref) {
+    public TypeOperator(@NonNull Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
         typeReference = typeref;
     }
 
-    public TypeOperator(Expression[] arguments, TypeReference typeref) {
+    public TypeOperator(Expression @NonNull [] arguments, TypeReference typeref) {
         super(arguments);
         typeReference = typeref;
     }
@@ -86,7 +88,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
 
-    public TypeReference getTypeReferenceAt(int index) {
+    public @NonNull TypeReference getTypeReferenceAt(int index) {
         if (typeReference != null && index == 0) {
             return typeReference;
         }
@@ -98,11 +100,11 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      *
      * @return the type reference.
      */
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return typeReference;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 

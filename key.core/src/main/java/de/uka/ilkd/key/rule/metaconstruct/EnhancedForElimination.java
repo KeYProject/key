@@ -46,6 +46,8 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -138,7 +140,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * Execution context.
      */
-    private ExecutionContext execContext;
+    private @Nullable ExecutionContext execContext;
 
     /**
      * Creates a new enhaced for-loop elimination.
@@ -189,8 +191,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      *      SVInstantiations)
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
+                                                @NonNull SVInstantiations svInst) {
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";
 
         EnhancedFor enhancedFor = (EnhancedFor) pe;
@@ -265,7 +267,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param services the services for lookups
      * @return true, if expression's type is a subtype of Iterable
      */
-    private boolean isArrayType(Expression expression, Services services) {
+    private boolean isArrayType(@NonNull Expression expression, @NonNull Services services) {
         return expression.getKeYJavaType(services, execContext).getSort() instanceof ArraySort;
     }
 
@@ -273,7 +275,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * Transform an enhanced for-loop over an array to a regular for-loop. for(T v : exp) body -->
      * arr = exp; for(int i = 0; i < arr.length; i++) body;
      */
-    private ProgramElement makeArrayForLoop(EnhancedFor enhancedFor, Services services) {
+    private @NonNull ProgramElement makeArrayForLoop(@NonNull EnhancedFor enhancedFor, @NonNull Services services) {
         Expression expression = enhancedFor.getGuardExpression();
         Statement body = enhancedFor.getBody();
 
@@ -323,7 +325,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "{ ; while(<itguard>) <block> } "
      */
-    private ProgramElement makeIterableForLoop(EnhancedFor enhancedFor, Services services) {
+    private @NonNull ProgramElement makeIterableForLoop(@NonNull EnhancedFor enhancedFor, @NonNull Services services) {
         final Expression iterableExpr = enhancedFor.getGuardExpression();
         final KeYJavaType iterableType = iterableExpr.getKeYJavaType(services, execContext);
         final IProgramMethod iteratorMethod =
@@ -371,8 +373,8 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "; <body>"
      */
-    private StatementBlock makeBlock(ProgramVariable itVar, ProgramVariable valuesVar,
-            LocalVariableDeclaration lvd, Statement body) {
+    private @NonNull StatementBlock makeBlock(@NonNull ProgramVariable itVar, @NonNull ProgramVariable valuesVar,
+                                              @NonNull LocalVariableDeclaration lvd, Statement body) {
         // create the variable declaration <Type> lvd = itVar.next();
         final VariableSpecification varSpec = lvd.getVariableSpecifications().get(0);
         final LocalVariableDeclaration varDecl = KeYJavaASTFactory
@@ -387,7 +389,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * <values> = \seq_concat(<values>, \seq_singleton(<lvd>));
      */
-    private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd) {
+    private @NonNull Statement makeValuesUpdate(@NonNull ProgramVariable valuesVar, @NonNull LocalVariableDeclaration lvd) {
         final VariableSpecification var = lvd.getVariables().get(0);
         final IProgramVariable element = var.getProgramVariable();
         assert element instanceof ProgramVariable
@@ -406,8 +408,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param transformed transformed loop.
      * @param services services.
      */
-    private void setInvariant(EnhancedFor original, LoopStatement transformed,
-            ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar, Services services) {
+    private void setInvariant(@NonNull EnhancedFor original, @NonNull LoopStatement transformed,
+                              @NonNull ProgramVariable loopIdxVar, @NonNull Optional<ProgramVariable> valuesVar, @NonNull Services services) {
         LoopSpecification li = services.getSpecificationRepository().getLoopSpec(original);
         if (li != null) {
             li = li.setLoop(transformed);
@@ -429,9 +431,9 @@ public class EnhancedForElimination extends ProgramTransformer {
      *
      * @return The updated {@link LoopSpecification}, or null if the supplied invariant is null.
      */
-    private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
-            ProgramVariable loopIdxVar, Optional<ProgramVariable> maybeValuesVar,
-            Services services) {
+    private @Nullable LoopSpecification instantiateIndexValues(@Nullable LoopSpecification rawInv,
+                                                               @NonNull ProgramVariable loopIdxVar, @NonNull Optional<ProgramVariable> maybeValuesVar,
+                                                               @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         if (rawInv == null) {
@@ -470,8 +472,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param replaceWith The program variable from which to create the replacement term.
      * @param services The {@link Services} object.
      */
-    private void updateInvs(final Map<LocationVariable, Term> invs, final Term termToReplace,
-            final ProgramVariable replaceWith, final Services services) {
+    private void updateInvs(final @NonNull Map<LocationVariable, Term> invs, final @NonNull Term termToReplace,
+                            final @NonNull ProgramVariable replaceWith, final @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
         invs.entrySet().stream().filter(entry -> entry.getValue() != null)
                 .map(entry -> new Pair<>(entry.getKey(),

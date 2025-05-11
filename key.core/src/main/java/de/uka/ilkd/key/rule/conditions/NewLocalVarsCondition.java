@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.*;
 
@@ -67,8 +68,8 @@ public class NewLocalVarsCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
+    public @NonNull MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+                                          @NonNull MatchConditions matchCond, Services services) {
         SVInstantiations svInst = matchCond.getInstantiations();
         if (svInst.getInstantiation(varDeclsSV) != null) {
             return matchCond;
@@ -104,7 +105,7 @@ public class NewLocalVarsCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\newLocalVars(" + varDeclsSV + ", " + updateBeforeSV + ", " + updateFrameSV + ", "
             + bodySV + ")";
     }

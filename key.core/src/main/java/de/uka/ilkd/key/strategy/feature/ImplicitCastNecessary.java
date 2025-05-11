@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
 public class ImplicitCastNecessary extends BinaryFeature {
@@ -19,7 +20,7 @@ public class ImplicitCastNecessary extends BinaryFeature {
         this.projection = projection;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @NonNull PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null && pos.depth() >= 1;
 
         int subPos = pos.getIndex();
@@ -28,7 +29,7 @@ public class ImplicitCastNecessary extends BinaryFeature {
         return projection.toTerm(app, pos, goal, mState).sort().extendsTrans(maxSort);
     }
 
-    public static Feature create(ProjectionToTerm s1) {
+    public static @NonNull Feature create(ProjectionToTerm s1) {
         return new ImplicitCastNecessary(s1);
     }
 

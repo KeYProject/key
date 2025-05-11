@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
@@ -70,7 +71,7 @@ public class PerfScope {
         }
     }
 
-    public static String formatTime(long dt) {
+    public static @NonNull String formatTime(long dt) {
         String unit;
         double time;
         if (dt < 1000000) {

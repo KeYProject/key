@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -35,8 +36,8 @@ import org.key_project.util.ExtList;
 
 public class ForToWhileTransformation extends WhileLoopTransformation {
 
-    public ForToWhileTransformation(ProgramElement root, ProgramElementName outerLabel,
-            ProgramElementName innerLabel, Services services) {
+    public ForToWhileTransformation(@NonNull ProgramElement root, ProgramElementName outerLabel,
+                                    ProgramElementName innerLabel, @NonNull Services services) {
         super(root, outerLabel, innerLabel, services);
     }
 

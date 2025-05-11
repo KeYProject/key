@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -37,8 +38,8 @@ public class SpecialConstructorCall extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
+                                                SVInstantiations svInst) {
 
         SpecialConstructorReference constructorReference = (SpecialConstructorReference) pe;
 

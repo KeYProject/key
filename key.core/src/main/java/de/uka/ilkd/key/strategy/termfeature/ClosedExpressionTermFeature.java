@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * return zero cost if given term does not contain any free variables.
@@ -16,7 +17,7 @@ public class ClosedExpressionTermFeature extends BinaryTermFeature {
 
     private ClosedExpressionTermFeature() {}
 
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         return term.freeVars().size() == 0;
     }
 }

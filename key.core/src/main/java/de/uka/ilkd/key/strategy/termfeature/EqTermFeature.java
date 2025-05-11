@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -21,7 +22,7 @@ public class EqTermFeature extends BinaryTermFeature {
 
     private final TermBuffer pattern;
 
-    public static TermFeature create(TermBuffer pattern) {
+    public static @NonNull TermFeature create(TermBuffer pattern) {
         return new EqTermFeature(pattern);
     }
 
@@ -30,7 +31,7 @@ public class EqTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, @NonNull MutableState mState, Services services) {
         return term.equalsModProperty(pattern.getContent(mState), RENAMING_TERM_PROPERTY);
     }
 }

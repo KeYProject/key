@@ -6,6 +6,7 @@ package de.uka.ilkd.key.prover.impl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
@@ -71,13 +72,13 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     }
 
     @Override
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 
     // display message for the status bar
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         if (proof.isDisposed()) {
             return "Proof disposed";
         }

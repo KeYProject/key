@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -19,7 +20,7 @@ class TriggerUtils {
     /**
      * remove all the quantifiable variable bounded in the top level of a given formula.
      */
-    public static Term discardQuantifiers(Term qterm) {
+    public static @NonNull Term discardQuantifiers(Term qterm) {
         Term t = qterm;
         while (t.op() instanceof Quantifier) {
             t = t.sub(0);
@@ -30,11 +31,11 @@ class TriggerUtils {
     /**
      * @return set of terms that are that the term splite d through the operator <code>op</code>
      */
-    public static Iterator<Term> iteratorByOperator(Term term, Operator op) {
+    public static @NonNull Iterator<Term> iteratorByOperator(@NonNull Term term, Operator op) {
         return setByOperator(term, op).iterator();
     }
 
-    public static ImmutableSet<Term> setByOperator(Term term, Operator op) {
+    public static @NonNull ImmutableSet<Term> setByOperator(@NonNull Term term, Operator op) {
         if (term.op() == op) {
             return setByOperator(term.sub(0), op).union(setByOperator(term.sub(1), op));
         }
@@ -48,8 +49,8 @@ class TriggerUtils {
      * @param set1
      * @return a set of quantifiableVariable which are belonged to both set0 and set1 have
      */
-    public static ImmutableSet<QuantifiableVariable> intersect(
-            ImmutableSet<QuantifiableVariable> set0, ImmutableSet<QuantifiableVariable> set1) {
+    public static @NonNull ImmutableSet<QuantifiableVariable> intersect(
+            @NonNull ImmutableSet<QuantifiableVariable> set0, @NonNull ImmutableSet<QuantifiableVariable> set1) {
         ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.nil();
         for (QuantifiableVariable aSet0 : set0) {
             final QuantifiableVariable el = aSet0;
@@ -60,7 +61,7 @@ class TriggerUtils {
         return res;
     }
 
-    public static boolean isTrueOrFalse(Term res) {
+    public static boolean isTrueOrFalse(@NonNull Term res) {
         final Operator op = res.op();
         return op == Junctor.TRUE || op == Junctor.FALSE;
     }

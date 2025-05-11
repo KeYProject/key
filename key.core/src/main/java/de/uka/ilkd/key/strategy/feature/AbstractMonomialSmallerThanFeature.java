@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.LRUCache;
@@ -25,16 +26,16 @@ import org.key_project.util.collection.ImmutableMapEntry;
 public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeature {
 
     private static final Name newSymRuleSetName = new Name("polySimp_newSmallSym");
-    private final Function add, mul, Z;
+    private final @NonNull Function add, mul, Z;
 
 
-    protected AbstractMonomialSmallerThanFeature(IntegerLDT numbers) {
+    protected AbstractMonomialSmallerThanFeature(@NonNull IntegerLDT numbers) {
         this.add = numbers.getAdd();
         this.mul = numbers.getMul();
         this.Z = numbers.getNumberSymbol();
     }
 
-    protected int introductionTime(Operator op, Goal goal) {
+    protected int introductionTime(Operator op, @NonNull Goal goal) {
         if (op == add || op == mul || op == Z) {
             return -1;
         }
@@ -57,7 +58,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         return res;
     }
 
-    private int introductionTimeHelp(Operator op, Goal goal) {
+    private int introductionTimeHelp(Operator op, @NonNull Goal goal) {
         ImmutableList<RuleApp> appliedRules = goal.appliedRuleApps();
         while (!appliedRules.isEmpty()) {
             final RuleApp app = appliedRules.head();
@@ -77,7 +78,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         return -1;
     }
 
-    private boolean introducesSkolemSymbol(TacletApp tapp, Operator op) {
+    private boolean introducesSkolemSymbol(@NonNull TacletApp tapp, Operator op) {
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             tapp.instantiations().pairIterator();
         while (it.hasNext()) {
@@ -92,7 +93,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         return false;
     }
 
-    private boolean inNewSmallSymRuleSet(TacletApp tapp) {
+    private boolean inNewSmallSymRuleSet(@NonNull TacletApp tapp) {
         ImmutableList<RuleSet> ruleSets = tapp.taclet().getRuleSets();
         while (!ruleSets.isEmpty()) {
             final RuleSet rs = ruleSets.head();
@@ -104,14 +105,14 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         return false;
     }
 
-    protected ImmutableList<Term> collectAtoms(Term t) {
+    protected ImmutableList<Term> collectAtoms(@NonNull Term t) {
         final AtomCollector m = new AtomCollector();
         m.collect(t);
         return m.getResult();
     }
 
     private class AtomCollector extends Collector {
-        protected void collect(Term te) {
+        protected void collect(@NonNull Term te) {
             if (te.op() == mul) {
                 collect(te.sub(0));
                 collect(te.sub(1));

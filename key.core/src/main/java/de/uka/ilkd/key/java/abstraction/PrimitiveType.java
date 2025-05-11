@@ -11,6 +11,8 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
 /**
@@ -60,10 +62,10 @@ public final class PrimitiveType implements Type {
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 
-    private ProgramElementName arrayElementName = null;
+    private @Nullable ProgramElementName arrayElementName = null;
 
 
-    public static PrimitiveType getPrimitiveType(String name) {
+    public static PrimitiveType getPrimitiveType(@NonNull String name) {
         if (!typeMap.containsKey(name) && name.startsWith("\\dl_")) {
             var pt = new PrimitiveType(name, null, null);
             typeMap.put(name, pt);
@@ -76,11 +78,11 @@ public final class PrimitiveType implements Type {
         return ldtMap.get(ldtName);
     }
 
-    private final String name;
+    private final @NonNull String name;
     private final Literal defaultValue;
-    private final Name ldtName;
+    private final @Nullable Name ldtName;
 
-    private PrimitiveType(String name, Literal defaultValue, Name ldtName) {
+    private PrimitiveType(@NonNull String name, Literal defaultValue, @Nullable Name ldtName) {
         this.defaultValue = defaultValue;
         this.name = name.intern();
         this.ldtName = ldtName;
@@ -97,7 +99,7 @@ public final class PrimitiveType implements Type {
      * @return the name of this type.
      */
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return name;
     }
 
@@ -128,7 +130,7 @@ public final class PrimitiveType implements Type {
      * @return the full name of this program model element.
      */
     @Override
-    public String getFullName() {
+    public @NonNull String getFullName() {
         return name;
     }
 
@@ -138,7 +140,7 @@ public final class PrimitiveType implements Type {
      * @return the full name of this program model element.
      */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return name;
     }
 
@@ -146,7 +148,7 @@ public final class PrimitiveType implements Type {
     /**
      * Returns the specific name of this primitive type used in array types.
      */
-    public ProgramElementName getArrayElementName() {
+    public @NonNull ProgramElementName getArrayElementName() {
         if (arrayElementName == null) {
             if (this.getName().equals("byte")) {
                 arrayElementName = new ProgramElementName("[B");

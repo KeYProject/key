@@ -23,7 +23,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
     private final Map<Name, ImmutableList<LabeledParserRuleContext>> depends =
         new LinkedHashMap<>();
 
-    public TextualJMLDepends(ImmutableList<JMLModifier> modifiers, Name[] heaps,
+    public TextualJMLDepends(ImmutableList<JMLModifier> modifiers, Name @NonNull [] heaps,
             @NonNull LabeledParserRuleContext depends) {
         super(modifiers);
         setPosition(depends);

@@ -9,6 +9,8 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -22,7 +24,7 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp p_app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertTrue(pos != null,
             "NoSelfApplicationFeature: Need to know the position of the application of the taclet");
 

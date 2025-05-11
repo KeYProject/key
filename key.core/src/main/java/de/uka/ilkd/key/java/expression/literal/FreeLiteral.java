@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.FreeLDT;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 public class FreeLiteral extends Literal {
@@ -36,12 +37,12 @@ public class FreeLiteral extends Literal {
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return FreeLDT.NAME;
     }
 

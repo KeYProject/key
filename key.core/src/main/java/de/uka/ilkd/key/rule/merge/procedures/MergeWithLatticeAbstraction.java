@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -42,7 +44,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
      * @return The abstract domain lattice suitable for the given sort. Return null if there is no
      *         abstract domain for that sort; in this case, an if-then-else merge will be performed.
      */
-    protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s, Services services);
+    protected abstract @Nullable AbstractDomainLattice getAbstractDomainForSort(Sort s, Services services);
 
     /**
      * @return Manually chosen lattice elements for program variables.
@@ -60,9 +62,9 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
     }
 
     @Override
-    public ValuesMergeResult mergeValuesInStates(Term v, SymbolicExecutionState state1,
-            Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
-            Term distinguishingFormula, Services services) {
+    public ValuesMergeResult mergeValuesInStates(@NonNull Term v, @NonNull SymbolicExecutionState state1,
+                                                 @NonNull Term valueInState1, @NonNull SymbolicExecutionState state2, @NonNull Term valueInState2,
+                                                 Term distinguishingFormula, @NonNull Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -12,11 +13,11 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
-    private final JmlParser.Field_declarationContext decl;
+    private final JmlParser.@NonNull Field_declarationContext decl;
 
 
-    public TextualJMLFieldDecl(ImmutableList<JMLModifier> modifiers,
-            JmlParser.Field_declarationContext decl) {
+    public TextualJMLFieldDecl(@NonNull ImmutableList<JMLModifier> modifiers,
+                               JmlParser.@NonNull Field_declarationContext decl) {
         super(modifiers);
         assert decl != null;
         this.decl = decl;

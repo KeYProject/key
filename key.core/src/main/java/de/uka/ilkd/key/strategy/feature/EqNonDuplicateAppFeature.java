@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -20,7 +21,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     private EqNonDuplicateAppFeature() {}
 
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public boolean filter(@NonNull TacletApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         if (!app.ifInstsComplete()) {
@@ -30,8 +31,8 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return noDuplicateFindTaclet(app, pos, goal);
     }
 
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
-            PosInOccurrence oldPio) {
+    protected boolean comparePio(TacletApp newApp, TacletApp oldApp, @NonNull PosInOccurrence newPio,
+                                 @NonNull PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
     }
 }

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -23,7 +24,7 @@ public class LetFeature implements Feature {
     private final ProjectionToTerm value;
     private final Feature body;
 
-    public static Feature create(TermBuffer var, ProjectionToTerm value, Feature body) {
+    public static @NonNull Feature create(TermBuffer var, ProjectionToTerm value, Feature body) {
         return new LetFeature(var, value, body);
     }
 
@@ -34,7 +35,7 @@ public class LetFeature implements Feature {
     }
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+                                   @NonNull MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
 
         var.setContent(value.toTerm(app, pos, goal, mState), mState);

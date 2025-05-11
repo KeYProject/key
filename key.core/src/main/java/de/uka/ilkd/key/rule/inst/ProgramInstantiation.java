@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.java.ProgramElement;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to store the instantiation of a schemavarible if it is a ProgramElement.
@@ -15,7 +16,7 @@ public class ProgramInstantiation extends InstantiationEntry<ProgramElement> {
      *
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      */
-    ProgramInstantiation(ProgramElement pe) {
+    ProgramInstantiation(@NonNull ProgramElement pe) {
         super(pe);
     }
 }

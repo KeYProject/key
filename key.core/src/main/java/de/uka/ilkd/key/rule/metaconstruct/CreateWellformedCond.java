@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -29,7 +30,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         final Term anonHeapTerm = term.sub(1);
         final Term anonSavedHeapTerm = term.sub(2);
         final Term anonPermissionsHeapTerm = term.sub(3);
@@ -53,9 +54,9 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
      * @param services The {@link Services} object.
      * @return The wellformedness condition.
      */
-    private Term createWellformedCond(boolean isTransaction, boolean isPermissions,
-            Term anonHeapTerm, Term anonSavedHeapTerm, Term anonPermissionsHeapTerm,
-            Services services) {
+    private @NonNull Term createWellformedCond(boolean isTransaction, boolean isPermissions,
+                                               @NonNull Term anonHeapTerm, @NonNull Term anonSavedHeapTerm, @NonNull Term anonPermissionsHeapTerm,
+                                               @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Term result = tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);

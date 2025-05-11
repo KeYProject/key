@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -17,9 +18,9 @@ import org.key_project.logic.Name;
  */
 public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 
-    private final ProjectionToTerm instProj;
+    private final @NonNull ProjectionToTerm instProj;
 
-    public static Feature create(Name svName) {
+    public static @NonNull Feature create(Name svName) {
         return new InstantiatedSVFeature(svName);
     }
 

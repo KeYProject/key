@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.MapLDT;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 public class EmptyMapLiteral extends Literal {
@@ -30,17 +31,17 @@ public class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnEmptyMapLiteral(this);
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_MAP);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return MapLDT.NAME;
     }
 

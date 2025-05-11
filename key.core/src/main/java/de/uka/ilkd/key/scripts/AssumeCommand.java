@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 /**
@@ -26,18 +27,18 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
     }
 
     @Override
-    public FormulaParameter evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public FormulaParameter evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "assume";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return """
                 The assume command is an unsound taclet rule and takes one argument:
 
@@ -46,7 +47,7 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
     }
 
     @Override
-    public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
+    public void execute(@NonNull FormulaParameter parameter) throws ScriptException, InterruptedException {
         Taclet cut =
             Objects.requireNonNull(state).getProof().getEnv().getInitConfigForEnvironment()
                     .lookupActiveTaclet(TACLET_NAME);

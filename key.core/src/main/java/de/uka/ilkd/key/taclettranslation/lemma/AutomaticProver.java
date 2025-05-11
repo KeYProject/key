@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -80,7 +81,7 @@ public class AutomaticProver {
             this.maxNumberOfRules = maxNumberOfRules;
         }
 
-        private LinkedList<Goal> copyGoals(ImmutableList<Goal> goals) {
+        private @NonNull LinkedList<Goal> copyGoals(@NonNull ImmutableList<Goal> goals) {
             LinkedList<Goal> result = new LinkedList<>();
             for (Goal goal : goals) {
                 result.add(goal);
@@ -128,7 +129,7 @@ public class AutomaticProver {
             }
         }
 
-        private RuleApp getNextApp(Goal goal) {
+        private RuleApp getNextApp(@NonNull Goal goal) {
             RuleApp app = goal.getRuleAppManager().next();
             if (app == null) {
                 goal.ruleAppIndex().scanBuiltInRules(goal);

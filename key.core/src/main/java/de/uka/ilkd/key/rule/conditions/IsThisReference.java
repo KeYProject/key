@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
 
@@ -21,9 +22,9 @@ import org.key_project.logic.SyntaxElement;
 public final class IsThisReference extends VariableConditionAdapter {
 
     private final boolean negated;
-    private final ParsableVariable var;
+    private final @NonNull ParsableVariable var;
 
-    public IsThisReference(ParsableVariable var, boolean negation) {
+    public IsThisReference(@NonNull ParsableVariable var, boolean negation) {
         this.negated = negation;
         this.var = var;
         assert ((ProgramSV) var).sort() == ProgramSVSort.VARIABLE;
@@ -48,7 +49,7 @@ public final class IsThisReference extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String prefix = negated ? "\\not" : "";
         return prefix + "\\isThisReference (" + var + ")";
     }

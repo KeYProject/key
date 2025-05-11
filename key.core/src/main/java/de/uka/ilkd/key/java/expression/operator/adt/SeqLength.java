@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -21,7 +22,7 @@ import org.key_project.util.ExtList;
  */
 public class SeqLength extends Operator {
 
-    public SeqLength(ExtList children) {
+    public SeqLength(@NonNull ExtList children) {
         super(children);
     }
 
@@ -32,7 +33,7 @@ public class SeqLength extends Operator {
     }
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSeqLength(this);
     }
 
@@ -44,7 +45,7 @@ public class SeqLength extends Operator {
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
     }
 

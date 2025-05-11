@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.SeqLDT;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 
 
@@ -30,17 +31,17 @@ public class EmptySeqLiteral extends Literal {
         return System.identityHashCode(this);
     }
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnEmptySeqLiteral(this);
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return SeqLDT.NAME;
     }
 }

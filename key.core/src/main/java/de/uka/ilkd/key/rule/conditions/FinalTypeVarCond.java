@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
@@ -60,7 +61,7 @@ public final class FinalTypeVarCond extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String prefix = negated ? "\\not" : "";
         return prefix + "\\isFinal (" + resolver + ")";
     }

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.CharListLDT;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
@@ -34,7 +35,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
      * @param children an ExtList with children(here:comments)
      * @param value a string.
      */
-    public StringLiteral(ExtList children, String value) {
+    public StringLiteral(@NonNull ExtList children, String value) {
         super(children);
         this.value = value;
     }
@@ -65,7 +66,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnStringLiteral(this);
     }
 
@@ -75,20 +76,20 @@ public class StringLiteral extends Literal implements ReferencePrefix {
      *
      * @author VK
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @NonNull ReferencePrefix getReferencePrefix() {
         return null;
     }
 
-    public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
+    public @NonNull ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType("java.lang.String");
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return CharListLDT.NAME;
     }
 }

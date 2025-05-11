@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Projection for computing a subterm of a given term. The position of the subterm within the
@@ -19,7 +20,7 @@ public class SubtermProjection implements ProjectionToTerm {
     private final PosInTerm pit;
     private final ProjectionToTerm completeTerm;
 
-    public static ProjectionToTerm create(ProjectionToTerm completeTerm, PosInTerm pit) {
+    public static @NonNull ProjectionToTerm create(ProjectionToTerm completeTerm, PosInTerm pit) {
         return new SubtermProjection(completeTerm, pit);
     }
 
@@ -28,7 +29,7 @@ public class SubtermProjection implements ProjectionToTerm {
         this.pit = pit;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
     }
 }

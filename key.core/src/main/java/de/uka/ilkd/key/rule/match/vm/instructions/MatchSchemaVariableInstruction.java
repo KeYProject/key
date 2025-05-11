@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +24,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
 
-    public MatchSchemaVariableInstruction(SV op) {
+    public MatchSchemaVariableInstruction(@NonNull SV op) {
         super(op);
     }
 
@@ -32,8 +34,8 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * schemavariable has been already matched to a term <tt>t2</tt> which is not unifiable with the
      * given term.
      */
-    protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
-            Services services) {
+    protected final @Nullable MatchConditions addInstantiation(@NonNull Term term, @NonNull MatchConditions matchCond,
+                                                               @NonNull Services services) {
 
         if (op.isRigid() && !term.isRigid()) {
             return null;
@@ -69,8 +71,8 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair ({@link SchemaVariable}, {@link ProgramElement}) added
      */
-    public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc,
-            Services services) {
+    public @Nullable MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc,
+                                           Services services) {
         return null;
     }
 

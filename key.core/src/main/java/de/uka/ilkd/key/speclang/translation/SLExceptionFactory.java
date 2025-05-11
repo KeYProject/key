@@ -15,6 +15,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ import static java.text.MessageFormat.format;
 public class SLExceptionFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(SLExceptionFactory.class);
 
-    private URI fileName;
+    private @Nullable URI fileName;
     private final int offsetLine, offsetColumn;
     /**
      * line, 1-based
@@ -47,7 +48,7 @@ public class SLExceptionFactory {
     // constructors
     // -------------------------------------------------------------------------
 
-    public SLExceptionFactory(@NonNull Parser parser, URI fileName, Position offsetPos) {
+    public SLExceptionFactory(@NonNull Parser parser, URI fileName, @NonNull Position offsetPos) {
         this.line = parser.getInputStream().LT(1).getLine();
         this.column = parser.getInputStream().LT(1).getCharPositionInLine();
         this.fileName = fileName;
@@ -63,7 +64,7 @@ public class SLExceptionFactory {
         this.column = 0;
     }
 
-    public SLExceptionFactory updatePosition(Token start) {
+    public @NonNull SLExceptionFactory updatePosition(@NonNull Token start) {
         fileName = MiscTools.getURIFromTokenSource(start.getTokenSource());
         line = start.getLine();
         column = start.getCharPositionInLine();
@@ -73,7 +74,7 @@ public class SLExceptionFactory {
     // -------------------------------------------------------------------------
     // internal methods
     // -------------------------------------------------------------------------
-    private Location createAbsolutePosition(int relativeLine, int relativeColumn) {
+    private @NonNull Location createAbsolutePosition(int relativeLine, int relativeColumn) {
         int absoluteLine = offsetLine + relativeLine - 1;
         int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn;
         return new Location(fileName, Position.fromOneZeroBased(absoluteLine, absoluteColumn));
@@ -96,7 +97,7 @@ public class SLExceptionFactory {
         addWarning(msg);
     }
 
-    public void addIgnoreWarning(String feature, Token t) {
+    public void addIgnoreWarning(String feature, @NonNull Token t) {
         String msg = feature + " is not supported and has been silently ignored.";
         addWarning(msg, t);
     }
@@ -114,7 +115,7 @@ public class SLExceptionFactory {
         addWarning(msg);
     }
 
-    public void addUnderspecifiedWarning(Token t) {
+    public void addUnderspecifiedWarning(@NonNull Token t) {
         String msg =
             format("{0} is not supported and translated to an underspecified term or formula.",
                 t.getText());
@@ -125,22 +126,22 @@ public class SLExceptionFactory {
         addWarning("deprecated syntax: " + feature);
     }
 
-    public void addWarning(String msg) {
+    public void addWarning(@NonNull String msg) {
         LOGGER.debug("JML translator warning: " + msg);
         warnings.add(new PositionedString(msg));
     }
 
-    public void addWarning(String msg, Token t) {
+    public void addWarning(@NonNull String msg, @NonNull Token t) {
         LOGGER.debug("JML translator warning: " + msg);
         warnings.add(createPositionedString(msg, t));
     }
 
-    public List<PositionedString> getWarnings() {
+    public @NonNull List<PositionedString> getWarnings() {
         return warnings;
     }
     // endregion
 
-    public PositionedString createPositionedString(String msg, Token t) {
+    public @NonNull PositionedString createPositionedString(@NonNull String msg, @NonNull Token t) {
         return new PositionedString(msg,
             createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
@@ -148,7 +149,7 @@ public class SLExceptionFactory {
     /**
      * Creates an SLTranslationException with current absolute position information.
      */
-    public SLTranslationException createException(String message) {
+    public @NonNull SLTranslationException createException(String message) {
         return new SLTranslationException(message, createAbsolutePosition(this.line, this.column));
     }
 
@@ -156,7 +157,7 @@ public class SLExceptionFactory {
     /**
      * Creates an SLTranslationException with the position information of the passed token.
      */
-    public SLTranslationException createException(String message, Token t) {
+    public @NonNull SLTranslationException createException(String message, @NonNull Token t) {
         return new SLTranslationException(message,
             createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
@@ -164,25 +165,25 @@ public class SLExceptionFactory {
     /**
      * Creates an SLTranslationException with current absolute position information.
      */
-    public SLTranslationException createException(String message, Throwable cause) {
+    public @NonNull SLTranslationException createException(String message, Throwable cause) {
         SLTranslationException result = createException(message);
         result.initCause(cause);
         return result;
     }
 
-    public RuntimeException createException0(String s) {
+    public @NonNull RuntimeException createException0(String s) {
         return new RuntimeException(createException(s));
     }
 
-    public RuntimeException createException0(String s, Throwable t) {
+    public @NonNull RuntimeException createException0(String s, Throwable t) {
         return new RuntimeException(createException(s, t));
     }
 
-    public RuntimeException createException0(String s, Token t) {
+    public @NonNull RuntimeException createException0(String s, @NonNull Token t) {
         return new RuntimeException(createException(s, t));
     }
 
-    public RuntimeException createException0(String s, Token t, Throwable cause) {
+    public @NonNull RuntimeException createException0(String s, @NonNull Token t, Throwable cause) {
         return new RuntimeException(createException(s, t, cause));
     }
 
@@ -191,7 +192,7 @@ public class SLExceptionFactory {
      *
      * @param cause the exception which causes the new exception to be created.
      */
-    public SLTranslationException createException(String message, Token t, Throwable cause) {
+    public @NonNull SLTranslationException createException(String message, @NonNull Token t, Throwable cause) {
         SLTranslationException result = createException(message, t);
         result.initCause(cause);
         return result;

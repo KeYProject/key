@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -23,13 +25,13 @@ public class AllowedCutPositionFeature extends BinaryFeature {
 
     private AllowedCutPositionFeature() {}
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
         return onlyBelowRightJunctors(pos);
     }
 
-    private boolean onlyBelowRightJunctors(PosInOccurrence pos) {
+    private boolean onlyBelowRightJunctors(@NonNull PosInOccurrence pos) {
         boolean negated = pos.isInAntec();
         final PIOPathIterator it = pos.iterator();
 

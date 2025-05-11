@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A feature that returns a constant value
@@ -21,7 +22,7 @@ public class ConstFeature implements Feature {
         val = p_val;
     }
 
-    public static Feature createConst(RuleAppCost p_val) {
+    public static @NonNull Feature createConst(RuleAppCost p_val) {
         return new ConstFeature(p_val);
     }
 

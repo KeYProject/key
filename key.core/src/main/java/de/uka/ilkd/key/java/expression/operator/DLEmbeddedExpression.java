@@ -15,6 +15,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -29,7 +31,7 @@ public class DLEmbeddedExpression extends Operator {
         return functionSymbol;
     }
 
-    public DLEmbeddedExpression(JFunction f, ExtList children) {
+    public DLEmbeddedExpression(JFunction f, @NonNull ExtList children) {
         super(children);
         this.functionSymbol = f;
     }
@@ -53,7 +55,7 @@ public class DLEmbeddedExpression extends Operator {
      * de.uka.ilkd.key.java.reference.ExecutionContext)
      */
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
 
         Sort sort = functionSymbol.sort();
 
@@ -77,11 +79,11 @@ public class DLEmbeddedExpression extends Operator {
     }
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnDLEmbeddedExpression(this);
     }
 
-    public void check(Services javaServ, KeYJavaType containingClass) throws ConvertException {
+    public void check(@NonNull Services javaServ, @NonNull KeYJavaType containingClass) throws ConvertException {
 
         if (functionSymbol == null) {
             throw new ConvertException("null function symbol");
@@ -127,11 +129,11 @@ public class DLEmbeddedExpression extends Operator {
     }
 
 
-    private static Sort getHeapSort(Services javaServ) {
+    private static @NonNull Sort getHeapSort(@NonNull Services javaServ) {
         return javaServ.getTypeConverter().getHeapLDT().targetSort();
     }
 
-    private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
+    private static @Nullable KeYJavaType getKeYJavaType(@NonNull Services javaServ, @NonNull Sort argSort) {
         // JavaInfo returns wrong data for sort integer! We need to find it over
         // other paths.
         JavaInfo javaInfo = javaServ.getJavaInfo();
@@ -143,7 +145,7 @@ public class DLEmbeddedExpression extends Operator {
         }
     }
 
-    public Term makeTerm(LocationVariable heap, Term[] subs, Services services) {
+    public @NonNull Term makeTerm(@NonNull LocationVariable heap, Term @NonNull [] subs, @NonNull Services services) {
         JFunction f = getFunctionSymbol();
         // we silently assume that check has been called earlier
 

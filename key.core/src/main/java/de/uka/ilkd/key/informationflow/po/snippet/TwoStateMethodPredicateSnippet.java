@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -32,7 +33,7 @@ import org.key_project.util.collection.ImmutableSLList;
 abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
             throws UnsupportedOperationException {
 
         IObserverFunction targetMethod =
@@ -48,8 +49,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 
-    protected Sort[] generateContApplArgumentSorts(ImmutableList<Term> termList,
-            IProgramMethod pm) {
+    protected Sort @NonNull [] generateContApplArgumentSorts(@NonNull ImmutableList<Term> termList,
+                                                             IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
         // ImmutableArray<Sort> pmSorts = pm.argSorts();
@@ -64,9 +65,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private JFunction generateContApplPredicate(String nameString, Sort[] argSorts,
-            TermBuilder tb,
-            Services services) {
+    private JFunction generateContApplPredicate(@NonNull String nameString, Sort[] argSorts,
+                                                TermBuilder tb,
+                                                @NonNull Services services) {
         final Name name = new Name(nameString);
         Namespace<JFunction> functionNS = services.getNamespaces().functions();
 
@@ -88,8 +89,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private Term instantiateContApplPredicate(JFunction pred, ImmutableList<Term> termList,
-            TermBuilder tb) {
+    private @NonNull Term instantiateContApplPredicate(@NonNull JFunction pred, @NonNull ImmutableList<Term> termList,
+                                                       @NonNull TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         Term[] predArgs = new Term[predArgSorts.length];
@@ -115,8 +116,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * @param poVars The proof obligation variables.
      * @return
      */
-    private ImmutableList<Term> extractTermListForPredicate(IProgramMethod pm,
-            ProofObligationVars poVars, boolean hasMby) {
+    private @NonNull ImmutableList<Term> extractTermListForPredicate(@NonNull IProgramMethod pm,
+                                                                     @NonNull ProofObligationVars poVars, boolean hasMby) {
         ImmutableList<Term> relevantPreVars = ImmutableSLList.nil();
         ImmutableList<Term> relevantPostVars = ImmutableSLList.nil();
 

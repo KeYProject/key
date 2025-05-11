@@ -12,6 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -28,7 +29,7 @@ public class IfInstantiationCachePool {
 
     public final LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
 
-    public IfInstantiationCache getCache(Node n) {
+    public @NonNull IfInstantiationCache getCache(Node n) {
         IfInstantiationCache cache;
         synchronized (cacheMgr) {
             cache = cacheMgr.get(n);

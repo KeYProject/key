@@ -11,6 +11,8 @@ import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Change this file if you want to change the set of taclets that can be used for external provers.
@@ -36,7 +38,7 @@ public final class SupportedTaclets {
 
     }
 
-    public SupportedTaclets(String[] selected) {
+    public SupportedTaclets(String @NonNull [] selected) {
         copy(REFERENCE);
 
         for (String taclet : selected) {
@@ -48,7 +50,7 @@ public final class SupportedTaclets {
         this.validateSelectionModes();
     }
 
-    private void copy(SupportedTaclets reference) {
+    private void copy(@NonNull SupportedTaclets reference) {
 
         TreeItem root = copy((TreeItem) reference.getTreeModel().getRoot());
         model = new DefaultTreeModel(root);
@@ -56,7 +58,7 @@ public final class SupportedTaclets {
 
 
 
-    private TreeItem copy(TreeItem reference) {
+    private @NonNull TreeItem copy(@NonNull TreeItem reference) {
         TreeItem newNode = reference.clone();
         tacletNames.put(newNode.text, newNode);
         Enumeration<?> en = reference.children();
@@ -67,7 +69,7 @@ public final class SupportedTaclets {
         return newNode;
     }
 
-    public void selectTaclets(String... taclets) {
+    public void selectTaclets(String @NonNull ... taclets) {
         for (String taclet : taclets) {
             TreeItem item = tacletNames.get(taclet);
             if (item != null) {
@@ -77,7 +79,7 @@ public final class SupportedTaclets {
         validateSelectionMode((TreeItem) model.getRoot());
     }
 
-    public String[] getNamesOfSelectedTaclets() {
+    public String @NonNull [] getNamesOfSelectedTaclets() {
         List<String> list = new LinkedList<>();
         Enumeration<?> en = ((TreeItem) model.getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
@@ -100,7 +102,7 @@ public final class SupportedTaclets {
 
 
 
-    private TreeModel model = null;
+    private @Nullable TreeModel model = null;
 
 
 
@@ -115,7 +117,7 @@ public final class SupportedTaclets {
     /**
      * @return returns all taclets that are supported wrapped by {@link TreeItem}
      */
-    public Collection<TreeItem> getTreeItems() {
+    public @NonNull Collection<TreeItem> getTreeItems() {
         return tacletNames.values();
     }
 
@@ -127,12 +129,12 @@ public final class SupportedTaclets {
     /**
     *
     */
-    public HashSet<String> getTacletNamesAsHash() {
+    public @NonNull HashSet<String> getTacletNamesAsHash() {
         HashSet<String> names = new LinkedHashSet<>(tacletNames.keySet());
         return names;
     }
 
-    public Collection<String> getTacletNames() {
+    public @NonNull Collection<String> getTacletNames() {
         return tacletNames.keySet();
     }
 
@@ -163,7 +165,7 @@ public final class SupportedTaclets {
         validateSelectionModes();
     }
 
-    private boolean selectCategory(Category cat, TreeItem node) {
+    private boolean selectCategory(Category cat, @NonNull TreeItem node) {
         if (node.getCategory() == cat) {
             selectAll(node);
             return true;
@@ -176,7 +178,7 @@ public final class SupportedTaclets {
         return false;
     }
 
-    private void selectAll(TreeItem node) {
+    private void selectAll(@NonNull TreeItem node) {
         node.setMode(TreeItem.SelectionMode.all);
         for (int i = 0; i < node.getChildCount(); i++) {
             selectAll((TreeItem) node.getChildAt(i));
@@ -187,7 +189,7 @@ public final class SupportedTaclets {
         validateSelectionMode((TreeItem) getTreeModel().getRoot());
     }
 
-    private TreeItem.SelectionMode validateSelectionMode(TreeItem node) {
+    private TreeItem.SelectionMode validateSelectionMode(@NonNull TreeItem node) {
 
         if (node.isLeaf()) {
             if (node.getMode() == TreeItem.SelectionMode.all) {
@@ -231,7 +233,7 @@ public final class SupportedTaclets {
 
     }
 
-    private void addTaclet(TreeItem node, String taclet, int genericCount) {
+    private void addTaclet(@NonNull TreeItem node, String taclet, int genericCount) {
         addTaclet(node, taclet, true, genericCount);
     }
 
@@ -241,17 +243,17 @@ public final class SupportedTaclets {
      * @param node the TreeNode the taclet belongs to.
      * @param taclet the name of the taclet.
      */
-    private void addTaclet(TreeItem node, String taclet) {
+    private void addTaclet(@NonNull TreeItem node, String taclet) {
         addTaclet(node, taclet, 0);
     }
 
-    private void addTaclet(TreeItem node, String... taclets) {
+    private void addTaclet(@NonNull TreeItem node, String @NonNull ... taclets) {
         for (String taclet : taclets) {
             addTaclet(node, taclet);
         }
     }
 
-    private void addTaclet(TreeItem node, String taclet, boolean checked, int genericCount) {
+    private void addTaclet(@NonNull TreeItem node, String taclet, boolean checked, int genericCount) {
         TreeItem child = new TreeItem(taclet, genericCount);
         if (!tacletNames.containsKey(child.toString())) {
             tacletNames.put(child.toString(), child);
@@ -267,7 +269,7 @@ public final class SupportedTaclets {
      * @param text the description of the node.
      * @return returns the created node.
      */
-    private TreeItem newNode(TreeItem root, String text, Category cat) {
+    private @NonNull TreeItem newNode(@NonNull TreeItem root, String text, Category cat) {
         TreeItem node = new TreeItem(text, cat);
         root.add(node);
 
@@ -293,7 +295,7 @@ public final class SupportedTaclets {
      *
      * @return returns the tree model that contains all supported taclets.
      */
-    public TreeModel getTreeModel() {
+    public @NonNull TreeModel getTreeModel() {
 
         if (model != null) {
             return model;
@@ -467,12 +469,12 @@ public final class SupportedTaclets {
         return model;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         String s = "+";
         return toString((TreeItem) getTreeModel().getRoot(), s);
     }
 
-    private String toString(TreeItem node, String s) {
+    private @NonNull String toString(@NonNull TreeItem node, String s) {
         StringBuilder result;
 
         result = new StringBuilder("\n" + s + node.toComplexString());
@@ -488,7 +490,7 @@ public final class SupportedTaclets {
      *         method only for testing. It uses only simple data structure, so that the necessary
      *         time is in O(n^2)
      */
-    public Collection<String> getMissingTaclets(Collection<Taclet> taclets) {
+    public @NonNull Collection<String> getMissingTaclets(@NonNull Collection<Taclet> taclets) {
         LinkedList<String> list = new LinkedList<>();
 
         for (String name : this.tacletNames.keySet()) {
@@ -541,7 +543,7 @@ public final class SupportedTaclets {
 
         }
 
-        public TreeItem clone() {
+        public @NonNull TreeItem clone() {
             return new TreeItem(text, mode, selectedChildCount, genericCount, category);
         }
 
@@ -585,7 +587,7 @@ public final class SupportedTaclets {
             this.mode = mode;
         }
 
-        public String toComplexString() {
+        public @NonNull String toComplexString() {
             return mode.name() + ";" + category.name() + ";" + text;
         }
 

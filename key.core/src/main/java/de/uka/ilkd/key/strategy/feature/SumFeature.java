@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A feature that computes the sum of a given list (vector) of features
@@ -36,7 +37,7 @@ public class SumFeature implements Feature {
         features = p_features;
     }
 
-    static void flatten(Feature[] sumF, LinkedHashSet<Feature> p_features) {
+    static void flatten(Feature @NonNull [] sumF, @NonNull LinkedHashSet<Feature> p_features) {
         for (Feature f : sumF) {
             if (f instanceof SumFeature) {
                 flatten(((SumFeature) f).features, p_features);
@@ -46,7 +47,7 @@ public class SumFeature implements Feature {
         }
     }
 
-    public static Feature createSum(Feature... fs) {
+    public static Feature createSum(Feature @NonNull ... fs) {
         Debug.assertFalse(fs.length == 0, "Cannot compute the sum of zero features");
 
         if (fs.length == 1) {
@@ -61,7 +62,7 @@ public class SumFeature implements Feature {
     private final Feature[] features;
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "SumFeature: " + Arrays.toString(features);
     }
 }

@@ -8,13 +8,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 
 public class SortComparisonFeature extends BinaryFeature {
 
     public final static int SUBSORT = 0;
 
-    public static Feature create(ProjectionToTerm s1, ProjectionToTerm s2, int cmp) {
+    public static @NonNull Feature create(ProjectionToTerm s1, ProjectionToTerm s2, int cmp) {
         return new SortComparisonFeature(s1, s2, cmp);
     }
 
@@ -42,7 +43,7 @@ public class SortComparisonFeature extends BinaryFeature {
      * @param sort1
      * @param sort2
      */
-    protected boolean compare(final Sort sort1, final Sort sort2) {
+    protected boolean compare(final @NonNull Sort sort1, final @NonNull Sort sort2) {
         if (comparator == SUBSORT) {
             return sort1.extendsTrans(sort2);
         }

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.expression.operator;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -21,7 +22,7 @@ public class PreIncrement extends Assignment {
      * @param children an ExtList with all children of this node
      */
 
-    public PreIncrement(ExtList children) {
+    public PreIncrement(@NonNull ExtList children) {
         super(children);
     }
 
@@ -62,7 +63,7 @@ public class PreIncrement extends Assignment {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnPreIncrement(this);
     }
 }

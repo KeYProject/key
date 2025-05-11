@@ -5,11 +5,12 @@ package de.uka.ilkd.key.informationflow.macros;
 
 import de.uka.ilkd.key.macros.AlternativeMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
+import org.jspecify.annotations.NonNull;
 
 public class FinishAuxiliaryComputationMacro extends AlternativeMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Finish auxiliary computation";
     }
 
@@ -19,17 +20,17 @@ public class FinishAuxiliaryComputationMacro extends AlternativeMacro {
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Finish auxiliary computation";
     }
 
     @Override
-    public String getScriptCommandName() {
+    public @NonNull String getScriptCommandName() {
         return "aux-finish";
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
+    protected ProofMacro @NonNull [] createProofMacroArray() {
         return new ProofMacro[] { new FinishAuxiliaryMethodComputationMacro(),
             new FinishAuxiliaryLoopComputationMacro(), new FinishAuxiliaryBlockComputationMacro() };
     }

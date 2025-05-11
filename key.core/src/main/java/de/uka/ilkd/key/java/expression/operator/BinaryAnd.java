@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -20,7 +21,7 @@ public class BinaryAnd extends BinaryOperator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public BinaryAnd(ExtList children) {
+    public BinaryAnd(@NonNull ExtList children) {
         super(children);
     }
 
@@ -60,7 +61,7 @@ public class BinaryAnd extends BinaryOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnBinaryAnd(this);
     }
 

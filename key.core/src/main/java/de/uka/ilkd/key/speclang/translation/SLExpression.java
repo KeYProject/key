@@ -8,14 +8,15 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents the translation of an expression of an arbitrary specification language,
  * which in the KeY world is either a term or a type.
  */
 public final class SLExpression {
-    private final Term term;
-    private final KeYJavaType type;
+    private final @Nullable Term term;
+    private final @Nullable KeYJavaType type;
     private final boolean isTerm;
 
 
@@ -72,7 +73,7 @@ public final class SLExpression {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         if (isTerm()) {
             return term + "(type: " + type + ")";
         } else {

@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableSet;
@@ -70,9 +72,9 @@ public final class SameObserverCondition implements VariableCondition {
 
     // explanation see class javadoc.
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
-            Services services) {
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+                                           @NonNull MatchConditions mc,
+                                           Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         final Term term1 = (Term) svInst.getInstantiation(schema1);
         final Term term2 = (Term) svInst.getInstantiation(schema2);
@@ -112,7 +114,7 @@ public final class SameObserverCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\sameObserver (" + schema1 + ", " + schema2 + ")";
     }
 }

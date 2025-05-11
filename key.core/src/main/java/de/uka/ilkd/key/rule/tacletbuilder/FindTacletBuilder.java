@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.BoundUniquenessChecker;
 import de.uka.ilkd.key.rule.FindTaclet;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Superclass of TacletBuilder objects that have a non-empty find clause. This should be all of them
@@ -14,7 +15,7 @@ import de.uka.ilkd.key.rule.FindTaclet;
 
 public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuilder<T> {
 
-    protected Term find = null;
+    protected @Nullable Term find = null;
 
     /**
      * checks that a SchemaVariable that is used to match pure variables (this means bound
@@ -33,7 +34,7 @@ public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuil
      * Get the `find' term. This could be a term or a formula for a RewriteTaclet, but only a
      * formula for an Antec/Succ Taclet.
      */
-    public Term getFind() {
+    public @Nullable Term getFind() {
         return find;
     }
 

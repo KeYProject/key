@@ -12,6 +12,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Feature for invoking a term feature on the instantiation of a schema variable
@@ -38,17 +39,17 @@ public class ApplyTFFeature implements Feature {
         this.demandInst = demandInst;
     }
 
-    public static Feature createNonStrict(ProjectionToTerm proj, TermFeature tf,
-            RuleAppCost noInstCost) {
+    public static @NonNull Feature createNonStrict(ProjectionToTerm proj, TermFeature tf,
+                                                   RuleAppCost noInstCost) {
         return new ApplyTFFeature(proj, tf, noInstCost, false);
     }
 
-    public static Feature create(ProjectionToTerm proj, TermFeature tf) {
+    public static @NonNull Feature create(ProjectionToTerm proj, TermFeature tf) {
         return new ApplyTFFeature(proj, tf, TopRuleAppCost.INSTANCE, true);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+                                   MutableState mState) {
         final Term te = proj.toTerm(app, pos, goal, mState);
         if (te == null) {
             Debug.assertFalse(demandInst, "ApplyTFFeature: got undefined argument (null)");

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
@@ -49,13 +50,13 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
     }
 
     @Override
-    public void execute(Parameters s) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters s) throws ScriptException, InterruptedException {
         Sequent toKeep = s.toKeep;
         hideAll(toKeep);
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "focus";
     }
 
@@ -65,7 +66,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param toKeep sequent containing formulas to keep
      * @throws ScriptException if no goal is currently open
      */
-    private void hideAll(Sequent toKeep) throws ScriptException {
+    private void hideAll(@NonNull Sequent toKeep) throws ScriptException {
         Goal goal = Objects.requireNonNull(state).getFirstOpenAutomaticGoal();
         assert goal != null : "not null by contract of the method";
 
@@ -94,7 +95,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
     }
 
     // determine where formula in sequent and apply either hide_left or hide_right
-    private Taclet getHideTaclet(String pos) {
+    private @NonNull Taclet getHideTaclet(String pos) {
         String ruleName = "hide_" + pos;
         return Objects.requireNonNull(proof).getEnv().getInitConfigForEnvironment()
                 .lookupActiveTaclet(new Name(ruleName));
@@ -108,7 +109,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param tac the taclet top apply (either hide_left or hide_right)
      * @param antec whether the formula is in the antecedent
      */
-    private void makeTacletApp(Goal g, SequentFormula toHide, Taclet tac, boolean antec) {
+    private void makeTacletApp(@NonNull Goal g, @NonNull SequentFormula toHide, @NonNull Taclet tac, boolean antec) {
 
         // hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();

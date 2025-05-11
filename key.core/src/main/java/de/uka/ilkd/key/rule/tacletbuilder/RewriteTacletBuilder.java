@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
+import org.jspecify.annotations.NonNull;
 
 /** class builds RewriteTaclet objects. */
 public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T> {
@@ -25,7 +26,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      */
     protected int applicationRestriction;
 
-    public RewriteTacletBuilder<T> setApplicationRestriction(int p_applicationRestriction) {
+    public @NonNull RewriteTacletBuilder<T> setApplicationRestriction(int p_applicationRestriction) {
         applicationRestriction = p_applicationRestriction;
         return this;
     }
@@ -44,7 +45,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      *
      * @return this RewriteTacletBuilder
      */
-    public RewriteTacletBuilder<T> setFind(Term findTerm) {
+    public @NonNull RewriteTacletBuilder<T> setFind(@NonNull Term findTerm) {
         checkContainsFreeVarSV(findTerm, this.getName(), "find term");
         find = findTerm;
         return this;
@@ -61,7 +62,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      * InvalidPrefixException if the building of the Taclet Prefix fails.
      */
     @SuppressWarnings("unchecked")
-    public T getRewriteTaclet() {
+    public @NonNull T getRewriteTaclet() {
         if (find == null) {
             throw new TacletBuilderException(this, "No find part specified");
         }
@@ -93,7 +94,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
     }
 
 
-    public void addGoalTerm(Term goalTerm) {
+    public void addGoalTerm(@NonNull Term goalTerm) {
         final TacletGoalTemplate axiomTemplate = new RewriteTacletGoalTemplate(goalTerm);
         addTacletGoalTemplate(axiomTemplate);
     }
@@ -108,7 +109,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      * are not set. No specified find part causes an IllegalStateException.
      */
     @Override
-    public T getTaclet() {
+    public @NonNull T getTaclet() {
         return getRewriteTaclet();
     }
 }

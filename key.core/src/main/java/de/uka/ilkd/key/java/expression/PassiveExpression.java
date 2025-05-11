@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.expression;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 
@@ -35,7 +36,7 @@ public class PassiveExpression extends ParenthesizedExpression {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnPassiveExpression(this);
     }
 }

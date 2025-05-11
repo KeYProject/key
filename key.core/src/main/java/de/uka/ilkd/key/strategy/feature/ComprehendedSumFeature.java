@@ -14,6 +14,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A feature that computes the sum of the values of a feature term when a given variable ranges over
@@ -31,7 +32,7 @@ public class ComprehendedSumFeature implements Feature {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static Feature create(TermBuffer var, TermGenerator generator, Feature body) {
+    public static @NonNull Feature create(TermBuffer var, TermGenerator generator, Feature body) {
         return new ComprehendedSumFeature(var, generator, body);
     }
 
@@ -43,7 +44,7 @@ public class ComprehendedSumFeature implements Feature {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+                                   @NonNull MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
 
         final Iterator<Term> it = generator.generate(app, pos, goal, mState);

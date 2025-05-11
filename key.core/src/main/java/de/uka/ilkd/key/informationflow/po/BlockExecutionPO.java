@@ -24,6 +24,8 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
@@ -34,7 +36,7 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
 
-    private final BlockContract contract;
+    private final @NonNull BlockContract contract;
     private final ProofObligationVars symbExecVars;
     private final Goal initiatingGoal;
     private final ExecutionContext context;
@@ -49,15 +51,15 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * To be used only for auxiliary proofs where the services object of the actual proof has to be
      * used instead of the initial services form the InitConfig.
      */
-    public BlockExecutionPO(InitConfig initConfig, BlockContract contract,
-            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-            Services services) {
+    public BlockExecutionPO(InitConfig initConfig, @NonNull BlockContract contract,
+                            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
+                            Services services) {
         this(initConfig, contract, symbExecVars, initiatingGoal, context);
         this.environmentServices = services;
     }
 
-    public BlockExecutionPO(InitConfig initConfig, BlockContract contract,
-            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context) {
+    public BlockExecutionPO(InitConfig initConfig, @NonNull BlockContract contract,
+                            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context) {
         super(initConfig,
             ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
@@ -109,7 +111,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * {@inheritDoc}
      */
     @Override
-    protected String buildPOName(boolean transactionFlag) {
+    protected @NonNull String buildPOName(boolean transactionFlag) {
         return contract.getName();
     }
 
@@ -118,7 +120,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * {@inheritDoc}
      */
     @Override
-    protected IProgramMethod getProgramMethod() {
+    protected @NonNull IProgramMethod getProgramMethod() {
         return contract.getTarget();
     }
 
@@ -136,7 +138,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * {@inheritDoc}
      */
     @Override
-    protected KeYJavaType getCalleeKeYJavaType() {
+    protected @NonNull KeYJavaType getCalleeKeYJavaType() {
         return contract.getKJT();
     }
 
@@ -145,7 +147,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * {@inheritDoc}
      */
     @Override
-    protected Modality.JavaModalityKind getTerminationMarker() {
+    protected Modality.@NonNull JavaModalityKind getTerminationMarker() {
         return contract.getModalityKind();
     }
 
@@ -170,51 +172,51 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * @return
      */
     @Override
-    public Configuration createLoaderConfig() {
+    public @NonNull Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         c.set("Non-interference contract", contract.getUniqueName());
         return c;
     }
 
     @Override
-    public InfFlowProofSymbols getIFSymbols() {
+    public @NonNull InfFlowProofSymbols getIFSymbols() {
         assert infFlowSymbols != null;
         return infFlowSymbols;
     }
 
     @Override
-    public void addIFSymbol(Term t) {
+    public void addIFSymbol(@NonNull Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
 
     @Override
-    public void addIFSymbol(Named n) {
+    public void addIFSymbol(@NonNull Named n) {
         assert n != null;
         infFlowSymbols.add(n);
     }
 
     @Override
-    public void addLabeledIFSymbol(Term t) {
+    public void addLabeledIFSymbol(@NonNull Term t) {
         assert t != null;
         infFlowSymbols.addLabeled(t);
     }
 
     @Override
-    public void addLabeledIFSymbol(Named n) {
+    public void addLabeledIFSymbol(@NonNull Named n) {
         assert n != null;
         infFlowSymbols.addLabeled(n);
     }
 
     @Override
-    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+    public void unionLabeledIFSymbols(@NonNull InfFlowProofSymbols symbols) {
         assert symbols != null;
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+                                           ImmutableList<Term> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }
@@ -222,7 +224,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
 
 
     @Override
-    public AbstractInfFlowPO getChildPO() {
+    public @NonNull AbstractInfFlowPO getChildPO() {
         Proof initiatingProof = getInitiatingGoal().proof();
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -20,7 +21,7 @@ import org.key_project.util.ExtList;
  */
 public class SeqIndexOf extends Operator {
 
-    public SeqIndexOf(ExtList children) {
+    public SeqIndexOf(@NonNull ExtList children) {
         super(children);
     }
 
@@ -31,7 +32,7 @@ public class SeqIndexOf extends Operator {
     }
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSeqIndexOf(this);
     }
 
@@ -43,7 +44,7 @@ public class SeqIndexOf extends Operator {
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         return javaServ.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
     }
 

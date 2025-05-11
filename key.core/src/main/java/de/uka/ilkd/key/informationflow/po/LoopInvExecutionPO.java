@@ -25,12 +25,14 @@ import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
 public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
 
-    private final LoopSpecification loopInvariant;
+    private final @NonNull LoopSpecification loopInvariant;
 
     private final ProofObligationVars symbExecVars;
 
@@ -50,17 +52,17 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
      * To be used only for auxiliary proofs where the services object of the actual proof has to be
      * used instead of the initial services form the InitConfig.
      */
-    public LoopInvExecutionPO(InitConfig initConfig, LoopSpecification loopInv,
-            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-            Term guardTerm, Services services) {
+    public LoopInvExecutionPO(InitConfig initConfig, @NonNull LoopSpecification loopInv,
+                              ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
+                              Term guardTerm, Services services) {
         this(initConfig, loopInv, symbExecVars, initiatingGoal, context, guardTerm);
         this.environmentServices = services;
     }
 
 
-    public LoopInvExecutionPO(InitConfig initConfig, LoopSpecification loopInv,
-            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-            Term guardTerm) {
+    public LoopInvExecutionPO(InitConfig initConfig, @NonNull LoopSpecification loopInv,
+                              ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
+                              Term guardTerm) {
         super(initConfig,
             ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
                 loopInv.getTarget(), loopInv.getTarget().getContainerType(),
@@ -140,7 +142,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     }
 
     @Override
-    protected IProgramMethod getProgramMethod() {
+    protected @NonNull IProgramMethod getProgramMethod() {
         return loopInvariant.getTarget();
     }
 
@@ -156,12 +158,12 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     }
 
     @Override
-    protected Modality.JavaModalityKind getTerminationMarker() {
+    protected Modality.@NonNull JavaModalityKind getTerminationMarker() {
         return Modality.JavaModalityKind.BOX;
     }
 
     @Override
-    protected String buildPOName(boolean transactionFlag) {
+    protected @NonNull String buildPOName(boolean transactionFlag) {
         return loopInvariant.getName();
     }
 
@@ -171,7 +173,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
      * @return
      */
     @Override
-    public Configuration createLoaderConfig() {
+    public @NonNull Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         c.set("Non-interference contract", loopInvariant.getUniqueName());
         return c;
@@ -179,44 +181,44 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
 
     @Override
-    public InfFlowProofSymbols getIFSymbols() {
+    public @NonNull InfFlowProofSymbols getIFSymbols() {
         assert infFlowSymbols != null;
         return infFlowSymbols;
     }
 
     @Override
-    public void addIFSymbol(Term t) {
+    public void addIFSymbol(@NonNull Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
 
     @Override
-    public void addIFSymbol(Named n) {
+    public void addIFSymbol(@NonNull Named n) {
         assert n != null;
         infFlowSymbols.add(n);
     }
 
     @Override
-    public void addLabeledIFSymbol(Term t) {
+    public void addLabeledIFSymbol(@NonNull Term t) {
         assert t != null;
         infFlowSymbols.addLabeled(t);
     }
 
     @Override
-    public void addLabeledIFSymbol(Named n) {
+    public void addLabeledIFSymbol(@NonNull Named n) {
         assert n != null;
         infFlowSymbols.addLabeled(n);
     }
 
     @Override
-    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+    public void unionLabeledIFSymbols(@NonNull InfFlowProofSymbols symbols) {
         assert symbols != null;
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected @Nullable Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+                                           ImmutableList<Term> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }
@@ -224,7 +226,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
 
     @Override
-    public AbstractInfFlowPO getChildPO() {
+    public @NonNull AbstractInfFlowPO getChildPO() {
         Proof initiatingProof = getInitiatingGoal().proof();
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =

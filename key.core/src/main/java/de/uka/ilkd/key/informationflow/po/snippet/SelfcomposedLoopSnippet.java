@@ -8,14 +8,15 @@ import java.util.Set;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import org.jspecify.annotations.NonNull;
 
 
 public class SelfcomposedLoopSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars1,
-            ProofObligationVars poVars2) {
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars1,
+                                 @NonNull ProofObligationVars poVars2) {
         BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, poVars2);
         final Term exec1 = f1.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC_WITH_INV);

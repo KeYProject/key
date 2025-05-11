@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -25,11 +26,11 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
         this.b = b;
     }
 
-    public static Feature create(ProjectionToTerm a, ProjectionToTerm b) {
+    public static @NonNull Feature create(ProjectionToTerm a, ProjectionToTerm b) {
         return new TrivialMonomialLCRFeature(a, b);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal, mState), services);
         final Monomial bMon = Monomial.create(b.toTerm(app, pos, goal, mState), services);

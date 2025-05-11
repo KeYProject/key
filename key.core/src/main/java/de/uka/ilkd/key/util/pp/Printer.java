@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.pp;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.ArrayList;
 
 /**
@@ -69,7 +71,7 @@ class Printer<M> {
     }
 
     /** write the String <code>s</code> to <code>out</code> */
-    void print(String s) {
+    void print(@NonNull String s) {
         back.print(s);
         pos += s.length();
     }

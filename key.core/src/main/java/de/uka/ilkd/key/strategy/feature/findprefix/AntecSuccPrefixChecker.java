@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Checks, whether the position in occurrence has antecedent/succedent polarity.
@@ -55,7 +56,7 @@ class AntecSuccPrefixChecker implements Checker {
     }
 
     @Override
-    public boolean check(PosInOccurrence pio) {
+    public boolean check(@NonNull PosInOccurrence pio) {
         int pol = pio.isInAntec() ? -1 : 1;
         if (pio.posInTerm() != null) {
             final PIOPathIterator it = pio.iterator();

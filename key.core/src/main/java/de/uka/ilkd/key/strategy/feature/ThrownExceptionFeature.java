@@ -21,15 +21,17 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 public class ThrownExceptionFeature extends BinaryFeature {
 
-    public static Feature create(String[] blockedExceptions, Services services) {
+    public static @NonNull Feature create(String @NonNull [] blockedExceptions, @NonNull Services services) {
         return new ThrownExceptionFeature(blockedExceptions, services);
     }
 
-    private final Sort[] filteredExceptions;
+    private final Sort @NonNull [] filteredExceptions;
 
     /**
      * creates a feature filtering first active throw statements where the thrown exception is of
@@ -38,7 +40,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param p_filteredExceptions the String array with the types of the thrown exceptions
      * @param services the Services
      */
-    private ThrownExceptionFeature(String[] p_filteredExceptions, Services services) {
+    private ThrownExceptionFeature(String @NonNull [] p_filteredExceptions, @NonNull Services services) {
         final List<Sort> filtered = new ArrayList<>();
 
         final JavaInfo javaInfo = services.getJavaInfo();
@@ -52,7 +54,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
         filteredExceptions = filtered.toArray(new Sort[0]);
     }
 
-    private boolean blockedExceptions(Sort excType) {
+    private boolean blockedExceptions(@NonNull Sort excType) {
         for (Sort filteredException : filteredExceptions) {
             if (excType.extendsTrans(filteredException)) {
                 return true;
@@ -61,12 +63,12 @@ public class ThrownExceptionFeature extends BinaryFeature {
         return false;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         return app instanceof TacletApp && filter(pos.subTerm(), goal.proof().getServices(),
             ((TacletApp) app).instantiations().getExecutionContext());
     }
 
-    protected boolean filter(Term term, Services services, ExecutionContext ec) {
+    protected boolean filter(@NonNull Term term, @NonNull Services services, @NonNull ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw fstThrow && blockedExceptions(
@@ -81,7 +83,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param term the Term with the program at top level
      * @return the first executable statement
      */
-    private ProgramElement getFirstExecutableStatement(Term term) {
+    private @Nullable ProgramElement getFirstExecutableStatement(@NonNull Term term) {
         if (term.javaBlock().isEmpty()) {
             return null;
         }

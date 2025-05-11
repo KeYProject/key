@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.Proof;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.checkerframework.checker.nullness.qual.KeyFor;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class ProofScriptEngine {
 
     private Consumer<Message> commandMonitor;
 
-    public ProofScriptEngine(Path file) throws IOException {
+    public ProofScriptEngine(@NonNull Path file) throws IOException {
         this(ParsingFacade.parseScript(file), null);
     }
 
@@ -75,7 +76,7 @@ public class ProofScriptEngine {
     }
 
     @SuppressWarnings("dereference.of.nullable")
-    private static Map<String, ProofScriptCommand<?>> loadCommands() {
+    private static @NonNull Map<String, ProofScriptCommand<?>> loadCommands() {
         Map<String, ProofScriptCommand<?>> result = new HashMap<>();
         var loader = ServiceLoader.load(ProofScriptCommand.class);
 
@@ -86,7 +87,7 @@ public class ProofScriptEngine {
         return result;
     }
 
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
+    public void execute(@NonNull AbstractUserInterfaceControl uiControl, @NonNull Proof proof)
             throws IOException, InterruptedException, ScriptException {
         var ctx = ParsingFacade.getParseRuleContext(script);
         stateMap = new EngineState(proof, this);
@@ -113,8 +114,8 @@ public class ProofScriptEngine {
     }
 
     @SuppressWarnings("unchecked")
-    public void execute(AbstractUserInterfaceControl uiControl,
-            List<KeYParser.ProofScriptCommandContext> commands)
+    public void execute(@NonNull AbstractUserInterfaceControl uiControl,
+                        @NonNull List<KeYParser.ProofScriptCommandContext> commands)
             throws InterruptedException, ScriptException {
         Location start = script.getStartLocation();
         Proof proof = stateMap.getProof();
@@ -194,7 +195,7 @@ public class ProofScriptEngine {
     }
 
 
-    public static String prettyPrintCommand(KeYParser.ProofScriptCommandContext ctx) {
+    public static @NonNull String prettyPrintCommand(KeYParser.@NonNull ProofScriptCommandContext ctx) {
         return ctx.cmd.getText() +
             (ctx.proofScriptParameters() != null
                     ? " " + ctx.proofScriptParameters().proofScriptParameter().stream()
@@ -205,7 +206,7 @@ public class ProofScriptEngine {
     }
 
 
-    private Map<String, Object> getArguments(KeYParser.ProofScriptCommandContext commandContext) {
+    private @NonNull Map<String, Object> getArguments(KeYParser.@NonNull ProofScriptCommandContext commandContext) {
         var map = new TreeMap<String, Object>();
         int i = KEY_START_INDEX_PARAMETER;
 

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.ExtList;
 
 /**
@@ -24,7 +25,7 @@ public class Positive extends Operator {
      *
      * @param expr the Expression
      */
-    public Positive(Expression expr) {
+    public Positive(@NonNull Expression expr) {
         super(expr);
     }
 
@@ -33,7 +34,7 @@ public class Positive extends Operator {
      *
      * @param children an ExtList with all children of this node
      */
-    public Positive(ExtList children) {
+    public Positive(@NonNull ExtList children) {
         super(children);
     }
 
@@ -84,11 +85,11 @@ public class Positive extends Operator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnPositive(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services services, ExecutionContext ec) {
         return services.getTypeConverter()
                 .getPromotedType(getExpressionAt(0).getKeYJavaType(services, ec));
     }
