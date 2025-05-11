@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -23,7 +24,7 @@ public class MethodFrame extends JavaStatement
     /**
      * result
      */
-    private final IProgramVariable resultVar;
+    private final @Nullable IProgramVariable resultVar;
 
     /**
      * Body.
@@ -46,8 +47,8 @@ public class MethodFrame extends JavaStatement
      * @param resultVar the ProgramVariable the return value is assigned to
      * @param body a Statement containing the method body of the called method
      */
-    public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
-            StatementBlock body) {
+    public MethodFrame(@Nullable IProgramVariable resultVar, IExecutionContext execContext,
+                       StatementBlock body) {
         this.resultVar = resultVar;
         this.body = body;
         this.execContext = execContext;

@@ -3,20 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.List;
-
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
-import org.jspecify.annotations.NonNull;
+
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.List;
 
 /**
  * This FileRepo does not cache any files but writes to / reads from the original files on disk. It
@@ -26,24 +20,24 @@ import org.jspecify.annotations.NonNull;
  */
 public class TrivialFileRepo implements FileRepo {
     @Override
-    public InputStream getInputStream(@NonNull Path path) throws IOException {
+    public InputStream getInputStream(Path path) throws IOException {
 
         // wrap path into URL for uniform treatment
         return getInputStream(path.toUri().toURL());
     }
 
     @Override
-    public @NonNull InputStream getInputStream(@NonNull RuleSource ruleSource) {
+    public InputStream getInputStream(RuleSource ruleSource) {
         return ruleSource.getNewStream();
     }
 
     @Override
-    public InputStream getInputStream(@NonNull URL url) throws IOException {
+    public InputStream getInputStream(URL url) throws IOException {
         return url.openStream();
     }
 
     @Override
-    public @NonNull OutputStream createOutputStream(@NonNull Path path) throws FileNotFoundException {
+    public OutputStream createOutputStream(Path path) throws FileNotFoundException {
         return new FileOutputStream(path.toFile());
     }
 

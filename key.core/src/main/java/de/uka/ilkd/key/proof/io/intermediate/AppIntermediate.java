@@ -31,7 +31,7 @@ public abstract class AppIntermediate {
     /**
      * @return The line number of this application in the loaded proof file.
      */
-    public @NonNull String getLineNr() {
+    public String getLineNr() {
         return String.valueOf(lineNr);
     }
 

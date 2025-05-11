@@ -53,8 +53,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
-        if (poVars.post.result != null) {
-            posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
+        if (poVars.post.resultTerm != null) {
+            posts = posts.append(d.tb.equals(poVars.post.resultTerm, poVars.pre.resultTerm));
         }
         posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
@@ -76,7 +76,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         // create java block
         final JavaBlock jb = buildJavaBlock(d, vs.formalParams,
             vs.pre.self != null ? vs.pre.self.op(ProgramVariable.class) : null,
-            vs.pre.result != null ? vs.pre.result.op(ProgramVariable.class) : null,
+            vs.pre.resultTerm != null ? vs.pre.resultTerm.op(ProgramVariable.class) : null,
             vs.pre.exception != null ? vs.pre.exception.op(ProgramVariable.class) : null,
             vs.exceptionParameter.op(LocationVariable.class));
 

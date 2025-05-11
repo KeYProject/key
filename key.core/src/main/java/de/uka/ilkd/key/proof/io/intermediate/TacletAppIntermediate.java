@@ -20,12 +20,12 @@ import org.key_project.util.collection.Pair;
  */
 public class TacletAppIntermediate extends AppIntermediate {
 
-    private @Nullable String tacletName = null;
-    private @Nullable Pair<Integer, PosInTerm> posInfo = null;
-    private @Nullable LinkedList<String> insts = null;
-    private @Nullable ImmutableList<String> ifSeqFormulaList = null;
-    private @Nullable ImmutableList<String> ifDirectFormulaList = null;
-    private @Nullable ImmutableList<Name> newNames = null;
+    private final String tacletName;
+    private final @Nullable Pair<Integer, PosInTerm> posInfo;
+    private final @Nullable LinkedList<String> insts;
+    private final @Nullable ImmutableList<String> ifSeqFormulaList;
+    private final @Nullable ImmutableList<String> ifDirectFormulaList;
+    private final @Nullable ImmutableList<Name> newNames;
 
     /**
      * Constructs a new intermediate taclet application.
@@ -38,7 +38,7 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @param ifDirectFormulaList
      * @param newNames New names registered during taclet application.
      */
-    public TacletAppIntermediate(@NonNull String tacletName, Pair<Integer, PosInTerm> posInfo,
+    public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
                                  LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,
                                  ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
@@ -76,7 +76,7 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
      */
     @Override
-    public ImmutableList<Name> getNewNames() {
+    public @Nullable ImmutableList<Name> getNewNames() {
         return newNames;
     }
 

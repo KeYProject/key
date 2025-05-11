@@ -82,8 +82,9 @@ public final class TermFactory {
         return createTerm(op, createSubtermArray(subs), null, null);
     }
 
-    public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+    public Term createTerm(Operator op, Term[] subs,
+                           @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+                           @Nullable ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 
@@ -112,8 +113,8 @@ public final class TermFactory {
     // private interface
     // -------------------------------------------------------------------------
 
-    private ImmutableArray<Term> createSubtermArray(Term[] subs) {
-        return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<>(subs);
+    private ImmutableArray<Term> createSubtermArray(Term @Nullable [] subs) {
+        return (subs == null || subs.length == 0) ? NO_SUBTERMS : new ImmutableArray<>(subs);
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
