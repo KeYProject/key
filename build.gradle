@@ -1,3 +1,4 @@
+//file:noinspection GroovyAssignabilityCheck
 import groovy.transform.Memoized
 
 plugins {
@@ -27,16 +28,14 @@ plugins {
     id "org.checkerframework" version "0.6.53"
 
     id("org.sonarqube") version "6.1.0.5360"
-
-    id 'org.jreleaser' version '1.18.0'
 }
 
 sonar {
-  properties {
-    property "sonar.projectKey", "KeYProject_key"
-    property "sonar.organization", "keyproject"
-    property "sonar.host.url", "https://sonarcloud.io"
-  }
+    properties {
+        property "sonar.projectKey", "KeYProject_key"
+        property "sonar.organization", "keyproject"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 
@@ -106,23 +105,23 @@ subprojects {
         testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
         testImplementation(platform("org.junit:junit-bom:5.12.2"))
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-api")
-        testImplementation ("org.junit.jupiter:junit-jupiter-params")
-        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
-        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+        testImplementation("org.junit.jupiter:junit-jupiter-api")
+        testImplementation("org.junit.jupiter:junit-jupiter-api")
+        testImplementation("org.junit.jupiter:junit-jupiter-params")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testImplementation project(':key.util')
 
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
     }
 
-    tasks.withType(Javadoc) {
+    tasks.withType(Javadoc).configureEach {
         failOnError = false
         options.addBooleanOption 'Xdoclint:none', true
         //options.verbose()
@@ -130,12 +129,13 @@ subprojects {
         options.addBooleanOption('html5', true)
     }
 
-    tasks.withType(Test) {//Configure all tests
+    tasks.withType(Test).configureEach {//Configure all tests
         systemProperty "test-resources", "src/test/resources"
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
-        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+        systemProperty "RUNALLPROOFS_DIR", layout.buildDirectory.dir("/report/runallproves")
+
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
@@ -144,7 +144,7 @@ subprojects {
         maxParallelForks = 1 // weigl: test on master
     }
 
-    tasks.withType(Test) {
+    tasks.withType(Test).configureEach {
         useJUnitPlatform {
             includeEngines 'junit-vintage'
             includeEngines 'junit-jupiter'
@@ -172,7 +172,7 @@ subprojects {
         }
     }
 
-    task testFast(type: Test) {
+    tasks.register('testFast', Test) {
         group = "verification"
         useJUnitPlatform {
             excludeTags "slow", "performance", "interactive"
@@ -198,14 +198,14 @@ subprojects {
     // The following two tasks can be used to execute main methods from the project
     // The main class is set via "gradle -DmainClass=... execute --args ..."
     // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
-    task execute(type: JavaExec) {
+    tasks.register('execute', JavaExec) {
         description = 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
         group = "application"
         mainClass.set(System.getProperty('mainClass'))
         classpath = sourceSets.main.runtimeClasspath
     }
 
-    task executeInTests(type: JavaExec) {
+    tasks.register('executeInTests', JavaExec) {
         description = 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
         group = "application"
         mainClass.set(System.getProperty('mainClass'))
@@ -222,7 +222,7 @@ subprojects {
         ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
     }
 
-    task pmdMainChanged(type: Pmd) {
+    tasks.register('pmdMainChanged', Pmd) {
         // Specify all files that should be checked
         def changedFiles = getChangedFiles()
         source pmdMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
@@ -248,7 +248,7 @@ subprojects {
     }
 
 
-    task checkstyleMainChanged(type: Checkstyle) {
+    tasks.register('checkstyleMainChanged', Checkstyle) {
         // Specify all files that should be checked
         def changedFiles = getChangedFiles()
         source checkstyleMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
@@ -276,20 +276,20 @@ subprojects {
     //         html.enabled = true
     //     }
     // }
-    tasks.withType(Pmd) {
+    tasks.withType(Pmd).configureEach {
         reports {
             xml.getRequired().set(true)
             html.getRequired().set(true)
         }
     }
 
-    task sourcesJar(type: Jar) {
+    tasks.register('sourcesJar', Jar) {
         description = 'Create a jar file with the sources from this project'
         from sourceSets.main.allJava
         archiveClassifier = 'sources'
     }
 
-    task javadocJar(type: Jar) {
+    tasks.register('javadocJar', Jar) {
         description = 'Create a jar file with the javadocs from this project'
         from javadoc
         archiveClassifier = 'javadoc'
@@ -382,19 +382,6 @@ subprojects {
         }
     }
 
-//    checkerFramework {
-//        checkers = [
-//            "org.checkerframework.checker.nullness.NullnessChecker",
-//        ]
-//        extraJavacArgs = [
-//            "-AonlyDefs=^org\\.key_project\\.util",
-//            "-Xmaxerrs", "10000",
-//            "-Astubs=$projectDir/src/main/checkerframework",
-//            "-Werror",
-//            "-Aversion",
-//        ]
-//    }
-
     afterEvaluate { // required so project.description is non-null as set by sub build.gradle
         publishing {
             publications {
@@ -451,19 +438,24 @@ subprojects {
                      */
                     if (project.version.endsWith("-SNAPSHOT")) {
                         name = "mavenSnapshot"
-                        url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                        url = "https://central.sonatype.com/repository/maven-snapshots"
                         credentials(PasswordCredentials) {
                             username = project.properties.getOrDefault("ossrhUsername", "")
                             password = project.properties.getOrDefault("ossrhPassword", "")
                         }
                     } else {
                         name = "mavenStaging"
-                        url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                        url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
                         credentials(PasswordCredentials) {
                             username = project.properties.getOrDefault("ossrhUsername", "")
                             password = project.properties.getOrDefault("ossrhPassword", "")
                         }
                     }
+                }
+
+                maven {
+                    name = "localRepo"
+                    url = "$rootDir/localRepo" // Replace with your desired folder
                 }
             }
         }
@@ -475,7 +467,7 @@ subprojects {
     }
 }
 
-task start {
+tasks.register('start'){
     description = "Use :key.ui:run instead"
     doFirst {
         println "Use :key.ui:run instead"
@@ -483,14 +475,14 @@ task start {
 }
 
 // Generation of a JavaDoc across sub projects.
-task alldoc(type: Javadoc) {
+tasks.register('alldoc', Javadoc){
     group = "documentation"
     description = "Generate a JavaDoc across sub projects"
     def projects = subprojects
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
-    destinationDir = file("${buildDir}/docs/javadoc")
+    destinationDir = layout.buildDirectory.file("docs/javadoc").get()
 
     if (JavaVersion.current().isJava9Compatible()) {
         //notworking on jenkins
@@ -514,66 +506,8 @@ task alldoc(type: Javadoc) {
     }
 }
 
-                    
-jreleaser {
-   project {
-        authors = ['KeY Developers']
-        license = 'GPL-v2.0'
-        links {
-            homepage = "https://www.key-project.org/"           
-//            issueTracker = 'https://github.com/keyproject/key/issues'
-//            scm          = 'https://github.com/keyproject/key.git' 
-        }
-        inceptionYear = '2025'
-    }
-
-    release {
-        github {
-            repoOwner = 'keyproject'
-            overwrite = true
-        }
-    }
-    distributions {
-        app {
-           artifact {
-               path = 'build/distributions/{{distributionName}}-{{projectVersion}}.zip'
-           }
-        }
-    }
-
-  signing {
-    active = 'ALWAYS'
-    armored = true
-  }
-  deploy {
-    maven {
-      mavenCentral {
-        'release-deploy' {
-          active = 'RELEASE'
-          url = 'https://central.sonatype.com/api/v1/publisher'
-          //releaseRepository = false
-          stagingRepository('target/staging-deploy')
-        }
-      }
-      nexus2 {
-        'snapshot-deploy' {
-          active = 'SNAPSHOT'
-          snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots'
-          applyMavenCentralRules = true
-          snapshotSupported = true
-          closeRepository = true
-          releaseRepository = true
-          stagingRepository('target/staging-deploy')
-        }
-      }
-    }
-  }
-}
-
-
-
 // Creates a jar file with the javadoc over all sub projects.
-task alldocJar(type: Zip) {
+tasks.register('alldocJar', Zip){
     dependsOn alldoc
     description = 'Create a jar file with the javadoc over all sub projects'
     from alldoc
