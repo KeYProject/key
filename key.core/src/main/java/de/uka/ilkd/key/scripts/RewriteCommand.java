@@ -21,7 +21,6 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.PosInTerm;
-import org.key_project.logic.Term;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -123,7 +122,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null) {
-                Term term = sf.formula();
+                Term term = (Term) sf.formula();
                 if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     continue;
                 }
@@ -135,7 +134,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // filter taclets that are applicable on the given formula in the succedent
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null) {
-                Term term = sf.formula();
+                Term term = (Term) sf.formula();
                 if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     continue;
                 }
@@ -223,11 +222,11 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      */
     public Term getTermAtPos(SequentFormula sf, PosInOccurrence pio) {
         if (pio.isTopLevel()) {
-            return sf.formula();
+            return (Term) sf.formula();
 
         } else {
             PosInTerm pit = pio.posInTerm();
-            return getSubTerm(sf.formula(), pit.iterator());
+            return getSubTerm((Term) sf.formula(), pit.iterator());
         }
 
     }
