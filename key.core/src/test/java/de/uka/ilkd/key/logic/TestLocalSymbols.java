@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Program variables are now introduced locally.
- *
+ * <br>
  * These tests check that this is done correctly.
  *
  * @author mulbrich
