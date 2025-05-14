@@ -4,6 +4,11 @@ dependencies {
     implementation("org.jspecify:jspecify:1.0.0")
 }
 
+test {
+    jvmArgs("-javaagent:/home/weigl/work/nonull-rac/build/libs/nonnull-0.1.0-SNAPSHOT-all.jar=org.key_project")
+//    jvmArgs("-Dde.matul.nonnull.debug=true")
+}
+
 checkerFramework {
     if(System.getProperty("ENABLE_NULLNESS")) {
         checkers = [
