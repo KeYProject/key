@@ -138,6 +138,11 @@ subprojects {
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
 
+        // RAC non-null references.
+        jvmArgs("-javaagent:$rootDir/nonnull-0.1.0-SNAPSHOT-all.jar=org.key_project,de.uka")
+        //    jvmArgs("-Dde.matul.nonnull.debug=true")
+
+
         forkEvery = 0 //default
         maxParallelForks = 1 // weigl: test on master
     }
