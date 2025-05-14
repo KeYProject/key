@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.executor.javadl.SuccTacletExecutor;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -19,6 +18,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A SuccTaclet represents a taclet whose find part has to match a top level formula in the
