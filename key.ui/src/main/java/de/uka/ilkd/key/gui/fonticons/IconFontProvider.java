@@ -6,8 +6,6 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import javax.swing.*;
 
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
 public class IconFontProvider extends IconProvider {
     private final IconFont iconCode;
     private final Color lightModeColor;
@@ -29,17 +27,13 @@ public class IconFontProvider extends IconProvider {
 
     @Override
     Icon load(float size) {
-        Color color = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode()
-                ? darkModeColor
-                : lightModeColor;
-        return IconFontSwing.buildIcon(iconCode, size, color);
+        Icon darkMode = IconFontSwing.buildIcon(iconCode, size, darkModeColor);
+        Icon lightMode = IconFontSwing.buildIcon(iconCode, size, lightModeColor);
+        return new LightDarkIcon(lightMode, darkMode);
     }
 
     @Override
     String getKey(float size) {
-        Color color = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode()
-                ? darkModeColor
-                : lightModeColor;
-        return iconCode.toString() + color + size;
+        return iconCode.toString() + size;
     }
 }
