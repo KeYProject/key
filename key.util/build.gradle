@@ -4,7 +4,6 @@ dependencies {
     implementation("org.jspecify:jspecify:1.0.0")
 }
 
-
 checkerFramework {
     if(System.getProperty("ENABLE_NULLNESS")) {
         checkers = [
