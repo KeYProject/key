@@ -31,12 +31,12 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Instances of this class represent programs for matching a term against a given pattern. The
  * programs are specialised for a certain pattern.
- *
+ * <br>
  * To create such a program use the static method {@link #createProgram(Term)} and provide as
  * argument the pattern for which you want to get a matcher.
- *
+ * <br>
  * The program is executed by invoking
- * {@link TacletMatchProgram#match(Term, MatchConditions, Services)}.
+ * {@link TacletMatchProgram#match(Term, MatchConditions, LogicServices)}.
  */
 public class TacletMatchProgram {
 
