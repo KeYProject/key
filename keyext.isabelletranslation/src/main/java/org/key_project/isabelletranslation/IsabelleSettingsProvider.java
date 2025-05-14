@@ -30,13 +30,14 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         """
                 Choose where the isabelle translation files are stored.
                 """;
-    private static final String infoIsabellePathPanel =
-        """
-                Specify the absolute path of the Isabelle folder.
-                Currently supports Isabelle2024-RC1.
-                """;
 
-    private static final Collection<String> SUPPORTED_VERSIONS_TEXT = List.of("Isabelle2023", "Isabelle2024-RC1", "Isabelle2024");
+    private static final Collection<String> SUPPORTED_VERSIONS_TEXT = List.of("Isabelle2023", "Isabelle2024-RC1", "Isabelle2024", "Isabelle2025");
+
+    private static final String infoIsabellePathPanel = String.format(
+            """
+                    Specify the absolute path of the Isabelle folder.
+                    %s.
+                    """, createSupportedVersionText());
 
     private enum IsabelleSupportState{SUPPORTED, NOT_SUPPORTED, NO_ISABELLE}
 
@@ -150,7 +151,7 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         return txt;
     }
 
-    private String createSupportedVersionText() {
+    private static String createSupportedVersionText() {
         String supportText = "Supports these Isabelle versions: ";
         supportText = supportText + String.join(", ", SUPPORTED_VERSIONS_TEXT);
         return supportText;
