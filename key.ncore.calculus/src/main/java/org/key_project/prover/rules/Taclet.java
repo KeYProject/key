@@ -5,7 +5,6 @@ package org.key_project.prover.rules;
 
 import java.util.Iterator;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -22,6 +21,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static org.key_project.util.Strings.formatAsList;
 
@@ -229,7 +229,7 @@ public abstract class Taclet implements Rule {
      * @param var the SchemaVariable to look for
      * @return the sort of the SV to match or the SV it shares the same match-sort with
      */
-    public@Nullable NewVarcond varDeclaredNew(SchemaVariable var) {
+    public @Nullable NewVarcond varDeclaredNew(SchemaVariable var) {
         for (final NewVarcond nv : varsNew) {
             if (nv.getSchemaVariable() == var) {
                 return nv;
@@ -481,7 +481,7 @@ public abstract class Taclet implements Rule {
     }
 
     public @NonNull <G extends ProofGoal<@NonNull G>> TacletExecutor<@NonNull G, ?> getExecutor() {
-        //noinspection unchecked
+        // noinspection unchecked
         return (TacletExecutor<@NonNull G, ?>) executor;
     }
 
