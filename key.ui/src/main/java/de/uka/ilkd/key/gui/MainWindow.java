@@ -410,6 +410,7 @@ public final class MainWindow extends JFrame {
 
         if (instance == null) {
             updateLookAndFeel();
+            instance = new MainWindow();
             final var viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
             final PropertyChangeListener propertyChangeListener = (evt) -> updateLookAndFeel();
             viewSettings.addPropertyChangeListener(
@@ -417,7 +418,6 @@ public final class MainWindow extends JFrame {
             viewSettings.addPropertyChangeListener(
                 ViewSettings.PROP_LOOK_AND_FEEL, propertyChangeListener);
 
-            instance = new MainWindow();
             if (ensureIsVisible) {
                 instance.setVisible(true);
             }
@@ -439,6 +439,14 @@ public final class MainWindow extends JFrame {
             // enable custom window decorations
             JFrame.setDefaultLookAndFeelDecorated(viewSettings.isDefaultLookAndFeelDecorated());
             JDialog.setDefaultLookAndFeelDecorated(viewSettings.isDefaultLookAndFeelDecorated());
+        }
+
+        for (Window w : Window.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(w);
+        }
+
+        if (instance != null) {
+            // SwingUtilities.updateComponentTreeUI(instance);
         }
     }
 

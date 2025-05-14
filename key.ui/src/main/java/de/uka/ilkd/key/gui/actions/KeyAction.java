@@ -102,7 +102,7 @@ public abstract class KeyAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, toolTip);
     }
 
-    public void setIcon(Icon icon) {
+    protected void setIcon(Icon icon) {
         putValue(SMALL_ICON, icon);
     }
 
