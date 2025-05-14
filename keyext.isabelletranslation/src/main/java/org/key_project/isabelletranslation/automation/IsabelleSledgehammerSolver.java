@@ -338,7 +338,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
                                          val (result, (outcome, step)) = results;
                                        in
                                          (result, (""" + sledgehammer + """
-                            .short_string_of_sledgehammer_outcome outcome, [YXML.content_of step]))
+                            .short_string_of_sledgehammer_outcome outcome, [(YXML.parse_body #> XML.content_of) step]))
                                        end;
                                 in
                                   Timeout.apply (Time.fromSeconds\s
