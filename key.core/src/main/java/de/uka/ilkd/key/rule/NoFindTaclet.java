@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -16,6 +15,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet is not attached to
