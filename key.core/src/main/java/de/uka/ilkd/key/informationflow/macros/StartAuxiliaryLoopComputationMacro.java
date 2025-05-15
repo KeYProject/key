@@ -11,18 +11,18 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -50,12 +50,15 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
     }
 
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (goals == null || goals.isEmpty() || goals.head().node() == null
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
+        if (posInOcc == null || goals == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
         }
-        if (posInOcc == null || posInOcc.subTerm() == null) {
+
+        Term term = (Term) posInOcc.subTerm();
+        if (term == null) {
             return false;
         }
         final Services services = proof.getServices();
@@ -77,7 +80,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
-        return posInOcc.subTerm().equalsModProperty(selfComposedExec, RENAMING_TERM_PROPERTY);
+        return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, selfComposedExec);
     }
 
     @Override

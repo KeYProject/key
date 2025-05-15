@@ -226,8 +226,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             }
         });
 
-        sliceProof.setAlignmentX(Component.LEFT_ALIGNMENT);
-        sliceProofFixedPoint.setAlignmentX(Component.LEFT_ALIGNMENT);
+        sliceProof.setAlignmentX(LEFT_ALIGNMENT);
+        sliceProofFixedPoint.setAlignmentX(LEFT_ALIGNMENT);
         panel3.add(sliceProof);
         panel3.add(sliceProofFixedPoint);
 
@@ -236,19 +236,19 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         timings.setBorder(new TitledBorder("Execution timings"));
         timings.setVisible(false);
 
-        panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel3.setAlignmentX(Component.LEFT_ALIGNMENT);
-        timings.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel1.setAlignmentX(LEFT_ALIGNMENT);
+        panel2.setAlignmentX(LEFT_ALIGNMENT);
+        panel3.setAlignmentX(LEFT_ALIGNMENT);
+        timings.setAlignmentX(LEFT_ALIGNMENT);
         mainPanel.add(panel1, gridBagConstraints(0));
         mainPanel.add(panel2, gridBagConstraints(1));
         mainPanel.add(panel3, gridBagConstraints(2));
         mainPanel.add(timings, gridBagConstraints(3));
 
-        mainPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainPanel.setAlignmentX(LEFT_ALIGNMENT);
         JScrollPane scrollPane = new JScrollPane(mainPanel);
-        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        scrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
+        scrollPane.setAlignmentX(LEFT_ALIGNMENT);
+        scrollPane.setAlignmentY(TOP_ALIGNMENT);
         add(scrollPane);
         add(Box.createVerticalGlue());
     }
@@ -313,10 +313,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         graphEdges = new JLabel();
         resetGraphLabels();
 
-        abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
-        abbreviateChains.setAlignmentX(Component.LEFT_ALIGNMENT);
-        dotExport.setAlignmentX(Component.LEFT_ALIGNMENT);
-        showGraphRendering.setAlignmentX(Component.LEFT_ALIGNMENT);
+        abbreviateFormulas.setAlignmentX(LEFT_ALIGNMENT);
+        abbreviateChains.setAlignmentX(LEFT_ALIGNMENT);
+        dotExport.setAlignmentX(LEFT_ALIGNMENT);
+        showGraphRendering.setAlignmentX(LEFT_ALIGNMENT);
 
         panel1.add(graphNodes);
         panel1.add(graphEdges);

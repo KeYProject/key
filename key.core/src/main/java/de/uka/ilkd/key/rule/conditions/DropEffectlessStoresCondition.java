@@ -7,14 +7,15 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
@@ -70,13 +71,14 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions mc,
-            Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
-        Term hInst = (Term) svInst.getInstantiation(h);
-        Term oInst = (Term) svInst.getInstantiation(o);
-        Term fInst = (Term) svInst.getInstantiation(f);
-        Term xInst = (Term) svInst.getInstantiation(x);
-        Term resultInst = (Term) svInst.getInstantiation(result);
+            LogicServices p_services) {
+        final Services services = (Services) p_services;
+        var svInst = (SVInstantiations) mc.getInstantiations();
+        Term hInst = svInst.getInstantiation(h);
+        Term oInst = svInst.getInstantiation(o);
+        Term fInst = svInst.getInstantiation(f);
+        Term xInst = svInst.getInstantiation(x);
+        Term resultInst = svInst.getInstantiation(result);
         if (hInst == null || oInst == null || fInst == null || xInst == null) {
             return mc;
         }

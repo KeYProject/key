@@ -12,11 +12,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.Settings;
+
+import org.key_project.logic.Choice;
 
 /**
  *
@@ -132,7 +133,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
     private JComponent generateJTable(Properties properties) {
         String[] columnNames = { "Name", "Value" };
-        Object[][] data = new Object[properties.entrySet().size()][2];
+        Object[][] data = new Object[properties.size()][2];
 
         int i = 0;
         for (Entry<Object, Object> entry : properties.entrySet()) {

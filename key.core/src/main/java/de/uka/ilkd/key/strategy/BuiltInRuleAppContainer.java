@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -36,7 +38,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // constructors
     // -------------------------------------------------------------------------
 
-    private BuiltInRuleAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio, RuleAppCost cost,
+    private BuiltInRuleAppContainer(IBuiltInRuleApp bir,
+            PosInOccurrence pio, RuleAppCost cost,
             Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
@@ -59,7 +62,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         if (applicationPosition == null) {
             return bir.rule().isApplicable(goal, null);
         } else {
-            final PosInOccurrence topPos = goal.getFormulaTagManager().getPosForTag(positionTag);
+            final PosInOccurrence topPos =
+                goal.getFormulaTagManager().getPosForTag(positionTag);
             if (topPos == null) {
                 // the formula does not exist anymore, bail out
                 return false;
@@ -74,11 +78,12 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * Copied from FindTaclet.
      */
     private PosInOccurrence getPosInOccurrence(Goal p_goal) {
-        final PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
+        final PosInOccurrence topPos =
+            p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
         assert topPos != null;
 
-        return applicationPosition.replaceConstrainedFormula(topPos.sequentFormula());
+        return applicationPosition.replaceSequentFormula(topPos.sequentFormula());
     }
 
 
@@ -93,7 +98,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * @return container for the currently applicable BuiltInRuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    static RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
+    static RuleAppContainer createAppContainer(IBuiltInRuleApp bir,
+            PosInOccurrence pio,
             Goal goal) {
         final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
         return new BuiltInRuleAppContainer(bir, pio, cost, goal);
@@ -106,7 +112,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static ImmutableList<RuleAppContainer> createInitialAppContainers(
-            ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio, Goal goal) {
+            ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio,
+            Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         for (IBuiltInRuleApp bir : birs) {
@@ -149,7 +156,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         IBuiltInRuleApp app = rule.createApp(pio, goal.proof().getServices());
 
         if (!app.complete()) {
-            app = app.setIfInsts(bir.ifInsts());
+            app = app.setAssumesInsts(bir.assumesInsts());
             // TODO: check for force ?
             final boolean force = true;
             app = force ? app.forceInstantiate(goal) : app.tryToInstantiate(goal);

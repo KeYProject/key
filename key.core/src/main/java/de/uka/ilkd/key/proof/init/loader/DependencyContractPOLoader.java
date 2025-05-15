@@ -24,10 +24,11 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
     /**
      * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link de.uka.ilkd.key.proof.init.InitConfig}.
+     * @param initConfig The already load {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
+    @Override
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
         String contractName = Objects.requireNonNull(properties.getString("contract"));

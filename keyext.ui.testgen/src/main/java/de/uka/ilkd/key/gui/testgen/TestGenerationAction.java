@@ -36,8 +36,8 @@ public class TestGenerationAction extends MainWindowAction implements PropertyCh
 
     public TestGenerationAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName(TestGenerationAction.NAME);
-        setTooltip(TestGenerationAction.TOOLTIP);
+        setName(NAME);
+        setTooltip(TOOLTIP);
         Icon icon = IconFactory.testGeneration(MainWindow.TOOLBAR_ICON_SIZE);
         putValue(SMALL_ICON, icon);
         setMenuPath("Proof");

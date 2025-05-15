@@ -45,7 +45,8 @@ public abstract class ApplyTacletDialog extends JDialog {
     protected final TacletInstantiationModel[] model;
     private JTextArea statusArea;
 
-    public ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model, KeYMediator mediator) {
+    protected ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model,
+            KeYMediator mediator) {
 
         super(parent, "Choose Taclet Instantiation", false);
 
@@ -121,7 +122,7 @@ public abstract class ApplyTacletDialog extends JDialog {
             false);
         tacletSB.append(tp.result());
 
-        panel.setAlignmentY(Component.TOP_ALIGNMENT);
+        panel.setAlignmentY(TOP_ALIGNMENT);
         // show taclet
         JScrollPane scroll = new JScrollPane();
         int nolines = countLines(model[0].taclet().toString()) + 1;
@@ -170,7 +171,7 @@ public abstract class ApplyTacletDialog extends JDialog {
 
         c.gridx = 1;
         panel.add(applyButton, c);
-        panel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        panel.setAlignmentY(BOTTOM_ALIGNMENT);
 
         return panel;
     }

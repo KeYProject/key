@@ -5,11 +5,12 @@ package de.uka.ilkd.key.core;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

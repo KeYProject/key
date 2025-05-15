@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui.proofdiff;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.gui.proofdiff.ProofDifference.Levensthein.calculate;
@@ -33,7 +32,7 @@ public class ProofDifferenceTest {
     public void testPairs(List<String> seq1, List<String> seq2, String exp) {
         List<ProofDifference.Matching> pairs =
             ProofDifference.findPairs(new ArrayList<>(seq1), new ArrayList<>(seq2));
-        Assertions.assertEquals(exp, pairs.toString());
+        assertEquals(exp, pairs.toString());
     }
 
     @Test

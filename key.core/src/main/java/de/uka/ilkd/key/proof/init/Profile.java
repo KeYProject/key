@@ -6,14 +6,18 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.prover.GoalChooserBuilder;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.engine.GoalChooserFactory;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -90,7 +94,7 @@ public interface Profile {
     /**
      * returns the default builder for a goal chooser
      */
-    GoalChooserBuilder getDefaultGoalChooserBuilder();
+    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getDefaultGoalChooserBuilder();
 
     /**
      * sets the user selected goal chooser builder to be used as prototype
@@ -103,7 +107,7 @@ public interface Profile {
     /**
      * returns a new builder instance for the selected goal choooser
      */
-    GoalChooserBuilder getSelectedGoalChooserBuilder();
+    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getSelectedGoalChooserBuilder();
 
     /** returns the (default) justification for the given rule */
     RuleJustification getJustification(Rule r);

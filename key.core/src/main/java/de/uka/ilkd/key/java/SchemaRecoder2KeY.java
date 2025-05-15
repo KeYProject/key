@@ -13,13 +13,16 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import recoder.ParserException;
+import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -86,7 +89,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
      * @return the enclosing recoder.java.CompilationUnit
      */
     protected recoder.java.CompilationUnit embedClass(
-            recoder.java.declaration.ClassDeclaration classDecl, Context context) {
+            ClassDeclaration classDecl, Context context) {
 
         recoder.java.CompilationUnit cUnit = context.getCompilationUnitContext();
 
@@ -131,7 +134,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
             } finally {
                 br.close();
             }
-        } catch (recoder.ParserException e) {
+        } catch (ParserException e) {
             LOGGER.debug(
                 "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the " + "exception:\n", e);
             throw new ConvertException("Parsing: \n **** BEGIN ****\n " + block
@@ -151,7 +154,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     /**
      * there is no need to parse special classes in this case, so this is empty
      *
-     * @see de.uka.ilkd.key.java.Recoder2KeY#parseSpecialClasses()
+     * @see Recoder2KeY#parseSpecialClasses()
      */
     public void parseSpecialClasses() {
     }

@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
@@ -474,8 +473,8 @@ public class ContractFactory {
                     // check if the other modifiable is the same as the one in the uniform store.
                     // To obtain meaningful results, check for equality ignoring all term labels!
                     if (uniformModifiable.containsKey(h)) {
-                        if (!uniformModifiable.get(h).equalsModProperty(modifiable2,
-                            TERM_LABELS_PROPERTY)) {
+                        if (!TERM_LABELS_PROPERTY.equalsModThisProperty(uniformModifiable.get(h),
+                            modifiable2)) {
                             uniformModifiable.remove(h);
                         } else {
                             // merge term labels (in particular origin labels) of both modifiable

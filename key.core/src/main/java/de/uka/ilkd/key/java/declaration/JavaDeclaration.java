@@ -41,17 +41,17 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     /**
      * Java declaration.
      */
-    public JavaDeclaration() {
+    protected JavaDeclaration() {
         modArray = null;
     }
 
 
-    public JavaDeclaration(Modifier[] mods) {
+    protected JavaDeclaration(Modifier[] mods) {
         modArray = new ImmutableArray<>(mods);
     }
 
 
-    public JavaDeclaration(ImmutableArray<Modifier> mods) {
+    protected JavaDeclaration(ImmutableArray<Modifier> mods) {
         modArray = mods;
     }
 
@@ -62,7 +62,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * @param children the children of this AST element as KeY classes. May include: several
      *        Modifier (taken as modifiers of the declaration), a Comment
      */
-    public JavaDeclaration(ExtList children) {
+    protected JavaDeclaration(ExtList children) {
         super(children);
         modArray = new ImmutableArray<>(children.collect(Modifier.class));
     }

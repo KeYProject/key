@@ -3,25 +3,26 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.*;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletPrefix;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.Taclet.ApplicationRestriction;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -66,7 +67,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
-            public void visit(Term visited) {
+            public void visit(org.key_project.logic.Term visited) {
                 String res = checkForIllegalOps(visited, taclet, true);
                 if (res != null) {
                     failureOccurred(res);
@@ -77,9 +78,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             public String visit(Taclet taclet, boolean visitAddrules) {
 
                 if (taclet instanceof RewriteTaclet rwTaclet) {
-                    Sequent assumptions = rwTaclet.ifSequent();
-                    int appRestr = rwTaclet.getApplicationRestriction();
-                    if (!assumptions.isEmpty() && appRestr == 0) {
+                    Sequent assumptions = rwTaclet.assumesSequent();
+                    var appRestr = rwTaclet.applicationRestriction();
+                    if (!assumptions.isEmpty()
+                            && Objects.equals(appRestr, ApplicationRestriction.NONE)) {
                         // any restriction is fine. The polarity switches are equiv
                         // to"inSequentState" in this respect.
                         failureOccurred("The given taclet " + taclet.name()
@@ -103,7 +105,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         return null;
     }
 
-    public static String checkForIllegalOps(Term formula, Taclet owner,
+    public static String checkForIllegalOps(org.key_project.logic.Term formula, Taclet owner,
             boolean schemaVarsAreAllowed) {
         if ((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable)
                 || formula.op() instanceof Modality
@@ -112,7 +114,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             return "The given taclet " + owner.name()
                 + " contains a operator that is not allowed:\n" + formula.op().name();
         }
-        for (Term sub : formula.subs()) {
+        for (final var sub : formula.subs()) {
             String s = checkForIllegalOps(sub, owner, schemaVarsAreAllowed);
             if (s != null) {
                 return s;
@@ -160,18 +162,18 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     }
 
     private Term createInstantiation(Taclet owner, SchemaVariable sv, TermServices services) {
-        if (sv instanceof VariableSV) {
-            return createInstantiation(owner, (VariableSV) sv, services);
+        if (sv instanceof VariableSV varSV) {
+            return createInstantiation(owner, varSV, services);
         }
-        if (sv instanceof TermSV) {
-            return createInstantiation(owner, (TermSV) sv, services);
+        if (sv instanceof TermSV termSV) {
+            return createInstantiation(owner, termSV, services);
         }
-        if (sv instanceof FormulaSV) {
-            return createInstantiation(owner, (FormulaSV) sv, services);
+        if (sv instanceof FormulaSV formulaSV) {
+            return createInstantiation(owner, formulaSV, services);
         }
         throw new IllegalTacletException("The taclet contains a schema variable which"
-            + "is not supported.\n" + "Taclet: " + owner.name().toString() + "\n"
-            + "SchemaVariable: " + sv.name().toString() + "\n");
+            + "is not supported.\n" + "Taclet: " + owner.name() + "\n"
+            + "SchemaVariable: " + sv.name() + "\n");
     }
 
     /**
@@ -184,7 +186,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * @return a term that can be used for instantiating the schema variable.
      */
     private Term createInstantiation(Taclet owner, VariableSV sv, TermServices services) {
-        Name name = createUniqueName(services, "v_" + sv.name().toString());
+        Name name = createUniqueName(services, "v_" + sv.name());
         Sort sort = replaceSort(sv.sort(), services);
         LogicVariable variable = new LogicVariable(name, sort);
         return services.getTermFactory().createTerm(variable);
@@ -213,13 +215,13 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * schema variables.
      */
     private Term createSimpleInstantiation(Taclet owner, OperatorSV sv, TermServices services) {
-        ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv).prefix();
+        ImmutableSet<SchemaVariable> prefix = ((TacletPrefix) owner.getPrefix(sv)).prefix();
 
         Sort[] argSorts = computeArgSorts(prefix, services);
         Term[] args = computeArgs(owner, prefix, services);
-        Name name = createUniqueName(services, "f_" + sv.name().toString());
+        Name name = createUniqueName(services, "f_" + sv.name());
 
-        JFunction function =
+        Function function =
             new JFunction(name, replaceSort(sv.sort(), services), argSorts);
         return services.getTermBuilder().func(function, args);
     }

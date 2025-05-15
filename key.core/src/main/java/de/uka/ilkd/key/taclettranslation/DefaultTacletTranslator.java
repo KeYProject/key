@@ -6,7 +6,6 @@ package de.uka.ilkd.key.taclettranslation;
 
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -18,8 +17,10 @@ import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.prover.rules.Taclet.ApplicationRestriction;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -189,8 +190,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                     "Not AntecTaclet, not SuccTaclet, not RewriteTaclet, not NoFindTaclet");
             }
         }
-        if (taclet.ifSequent() != null) {
-            if ((assum = translate(taclet.ifSequent(), services)) == null) {
+        if (taclet.assumesSequent() != null) {
+            if ((assum = translate(taclet.assumesSequent(), services)) == null) {
                 assum = TacletSections.ASSUM.getDefaultValue(services);
             }
         }
@@ -219,10 +220,10 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     }
 
     private int getPolarity(RewriteTaclet rwTaclet) {
-        int restr = rwTaclet.getApplicationRestriction();
-        if ((restr & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+        var restr = rwTaclet.applicationRestriction();
+        if (restr.matches(ApplicationRestriction.ANTECEDENT_POLARITY)) {
             return -1;
-        } else if ((restr & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+        } else if (restr.matches(ApplicationRestriction.SUCCEDENT_POLARITY)) {
             return +1;
         } else {
             return 0;

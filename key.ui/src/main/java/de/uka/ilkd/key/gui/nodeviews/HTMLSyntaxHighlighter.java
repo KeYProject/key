@@ -355,9 +355,9 @@ public class HTMLSyntaxHighlighter {
         public String run() {
             var ref = node.get();
             if (useHtml && ref != null) {
-                return HTMLSyntaxHighlighter.process(text, ref);
+                return process(text, ref);
             } else {
-                return HTMLSyntaxHighlighter.toHTML(text);
+                return toHTML(text);
             }
         }
     }

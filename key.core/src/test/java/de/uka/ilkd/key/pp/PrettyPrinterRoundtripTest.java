@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.logic.Choice;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -112,7 +113,8 @@ public class PrettyPrinterRoundtripTest {
     }
 
     private void assertEqualModAlpha(Term expected, Term actual) {
-        var value = expected.equalsModProperty(actual, RenamingTermProperty.RENAMING_TERM_PROPERTY);
+        var value =
+            RenamingTermProperty.RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, actual);
         if (!value) {
             System.err.println("Expected: " + expected);
             System.err.println("Actual  : " + actual);

@@ -4,14 +4,15 @@
 package de.uka.ilkd.key.smt.counterexample;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+
+import org.key_project.logic.Choice;
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * Implementation of {@link AbstractCounterExampleGenerator} which instantiates the new

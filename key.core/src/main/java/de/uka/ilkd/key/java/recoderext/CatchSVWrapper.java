@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.OperatorSV;
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
+import recoder.java.Statement;
 import recoder.java.statement.Catch;
 
 public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrapper {
@@ -46,11 +47,11 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public int getChildPositionCode(recoder.java.ProgramElement pe) {
+    public int getChildPositionCode(ProgramElement pe) {
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    public boolean replaceChild(recoder.java.ProgramElement p1, recoder.java.ProgramElement p2) {
+    public boolean replaceChild(ProgramElement p1, ProgramElement p2) {
         return false;
     }
 
@@ -58,7 +59,7 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
         return 0;
     }
 
-    public recoder.java.Statement getStatementAt(int s) {
+    public Statement getStatementAt(int s) {
         throw new ArrayIndexOutOfBoundsException();
     }
 
