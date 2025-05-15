@@ -54,7 +54,7 @@ public abstract class SMTTestCommons {
             SMTSolverResult.ThreeValuedTruth expected,
             @NonNull String filepath)
             throws ProblemLoaderException {
-        Assumptions.assumeTrue(toolInstalled());
+        SmtTestUtils.assumeSmtIsInstalled(toolInstalled());
         return checkFile(expected, filepath).isValid();
     }
 
