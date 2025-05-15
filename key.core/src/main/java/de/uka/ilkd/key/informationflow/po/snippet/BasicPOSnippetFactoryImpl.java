@@ -17,6 +17,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.TermCreationException;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -51,31 +52,32 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     }
 
 
-    BasicPOSnippetFactoryImpl(FunctionalOperationContract contract, ProofObligationVars poVars,
-            Services services) {
+    BasicPOSnippetFactoryImpl(@NonNull FunctionalOperationContract contract,
+            ProofObligationVars poVars,
+            @NonNull Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
 
-    BasicPOSnippetFactoryImpl(LoopSpecification invariant, ProofObligationVars poVars,
-            ExecutionContext context, Term guardTerm, Services services) {
+    BasicPOSnippetFactoryImpl(@NonNull LoopSpecification invariant, ProofObligationVars poVars,
+            ExecutionContext context, @NonNull Term guardTerm, @NonNull Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
 
 
-    BasicPOSnippetFactoryImpl(InformationFlowContract contract, ProofObligationVars poVars,
-            Services services) {
+    BasicPOSnippetFactoryImpl(@NonNull InformationFlowContract contract, ProofObligationVars poVars,
+            @NonNull Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
 
 
-    BasicPOSnippetFactoryImpl(BlockContract contract, ProofObligationVars poVars,
-            ExecutionContext context, Services services) {
+    BasicPOSnippetFactoryImpl(@NonNull BlockContract contract, ProofObligationVars poVars,
+            ExecutionContext context, @NonNull Services services) {
         this.data = new BasicSnippetData(contract, context, services);
         this.poVars = poVars;
         registerFactoryMethods();
@@ -97,7 +99,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     @Override
-    public Term create(Snippet snippet) throws UnsupportedOperationException {
+    public Term create(@NonNull Snippet snippet) throws UnsupportedOperationException {
         try {
             FactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {

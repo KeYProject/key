@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Visitor;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  *
@@ -31,7 +33,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
     }
 
 
-    public Set<SchemaVariable> collectSchemaVariables() {
+    public @NonNull Set<SchemaVariable> collectSchemaVariables() {
 
         Set<SchemaVariable> result = new LinkedHashSet<>(collectSchemaVariables(rtb.ifSequent()));
 
@@ -50,7 +52,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
     }
 
 
-    private Set<SchemaVariable> collectSchemaVariables(Term t) {
+    private @NonNull Set<SchemaVariable> collectSchemaVariables(@NonNull Term t) {
         final Set<SchemaVariable> result = new LinkedHashSet<>();
 
         t.execPreOrder(new Visitor<Term>() {
@@ -60,7 +62,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
             }
 
             @Override
-            public void visit(Term visited) {
+            public void visit(@NonNull Term visited) {
                 if (visited.op() instanceof SchemaVariable) {
                     result.add((SchemaVariable) visited.op());
                 }
@@ -83,7 +85,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
     }
 
 
-    private Set<SchemaVariable> collectSchemaVariables(Sequent s) {
+    private @NonNull Set<SchemaVariable> collectSchemaVariables(@NonNull Sequent s) {
         Set<SchemaVariable> result = new LinkedHashSet<>();
 
         for (final SequentFormula cf : s) {
@@ -94,7 +96,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
     }
 
 
-    private Set<SchemaVariable> collectSchemaVariables(TacletGoalTemplate templ) {
+    private @NonNull Set<SchemaVariable> collectSchemaVariables(@NonNull TacletGoalTemplate templ) {
 
         Set<SchemaVariable> result = new LinkedHashSet<>(collectSchemaVariables(templ.sequent()));
         if (templ instanceof RewriteTacletGoalTemplate) {

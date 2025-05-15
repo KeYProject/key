@@ -11,6 +11,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Binary feature that returns zero iff the find-formula of the concerned rule app was introduced by
@@ -24,11 +26,12 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
         filter = p_filter;
     }
 
-    public static Feature create(RuleFilter p_filter) {
+    public static @NonNull Feature create(RuleFilter p_filter) {
         return new FormulaAddedByRuleFeature(p_filter);
     }
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public boolean filter(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final SequentFormula cfma = pos.sequentFormula();

@@ -5,6 +5,8 @@ package de.uka.ilkd.key.proof.rulefilter;
 
 import de.uka.ilkd.key.rule.Rule;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Inversion of a rule filter
  */
@@ -20,7 +22,7 @@ public class NotRuleFilter implements RuleFilter {
         return !a.filter(rule);
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return "Not:" + a;
     }
 

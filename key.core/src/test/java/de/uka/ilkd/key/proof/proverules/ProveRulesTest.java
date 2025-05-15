@@ -21,6 +21,8 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
@@ -46,7 +48,7 @@ public class ProveRulesTest {
     /*
      * File object pointing to directory key/key.core.test
      */
-    private static final File PROOF_DIRECTORY;
+    private static final @Nullable File PROOF_DIRECTORY;
 
 
     static {
@@ -54,7 +56,8 @@ public class ProveRulesTest {
     }
 
 
-    public void loadTacletProof(String tacletName, Taclet taclet, File proofFile) throws Exception {
+    public void loadTacletProof(String tacletName, @NonNull Taclet taclet, @NonNull File proofFile)
+            throws Exception {
         assertNotNull(proofFile,
             "Taclet " + tacletName + " was annoted with \\lemma but no taclet proof was found.");
         assertNotNull(taclet, "Proof file " + proofFile
@@ -78,7 +81,7 @@ public class ProveRulesTest {
         env.dispose();
     }
 
-    private static List<File> getFilesRecursive(File directory) {
+    private static @NonNull List<File> getFilesRecursive(@NonNull File directory) {
         assert directory.isDirectory()
                 : "Expecting a directory as input parameter but found: " + directory;
         List<File> list = new LinkedList<>();

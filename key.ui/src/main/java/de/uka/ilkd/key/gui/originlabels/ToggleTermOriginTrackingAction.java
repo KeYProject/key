@@ -15,6 +15,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Action to toggle {@link TermLabelSettings#getUseOriginLabels()}.
  *
@@ -26,7 +28,7 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public ToggleTermOriginTrackingAction(MainWindow mainWindow) {
+    public ToggleTermOriginTrackingAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
 
         setName("Toggle Term Origin Tracking");

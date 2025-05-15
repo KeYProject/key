@@ -16,6 +16,8 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Represents the LDT .key files as a whole. Special treatment of these files is necessary because
@@ -31,10 +33,10 @@ public class LDTInput implements EnvInput {
     private static final String NAME = "language data types";
 
     private final KeYFile[] keyFiles;
-    private final LDTInputListener listener;
     private final Profile profile;
 
-    private InitConfig initConfig = null;
+    private final @Nullable LDTInputListener listener;
+    private @Nullable InitConfig initConfig = null;
 
     /**
      * creates a representation of the LDT files to be used as input to the KeY prover.
@@ -43,7 +45,7 @@ public class LDTInput implements EnvInput {
      * @param listener an LDTInputListener for stsus reports while loading
      * @param profile the Profile for which the LDTs are load
      */
-    public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
+    public LDTInput(KeYFile[] keyFiles, @Nullable LDTInputListener listener, Profile profile) {
         assert profile != null;
         this.keyFiles = keyFiles;
         this.listener = listener;
@@ -101,7 +103,7 @@ public class LDTInput implements EnvInput {
 
     // no class path elements here
     @Override
-    public File readBootClassPath() {
+    public @Nullable File readBootClassPath() {
         return null;
     }
 
@@ -145,7 +147,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof LDTInput li)) {
             return false;
         }
@@ -190,7 +192,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public File getInitialFile() {
+    public @Nullable File getInitialFile() {
         return null;
     }
 }

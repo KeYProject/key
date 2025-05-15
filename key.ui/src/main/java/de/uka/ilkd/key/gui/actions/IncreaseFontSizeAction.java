@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NonNull;
+
 public class IncreaseFontSizeAction extends MainWindowAction implements ConfigChangeListener {
 
     /**
@@ -23,7 +25,7 @@ public class IncreaseFontSizeAction extends MainWindowAction implements ConfigCh
      *
      * @param mainWindow the main window
      */
-    public IncreaseFontSizeAction(MainWindow mainWindow) {
+    public IncreaseFontSizeAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
 
         setName("Larger");

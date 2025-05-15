@@ -7,13 +7,16 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+
 public class FocusInAntecFeature extends BinaryFeature {
 
     private FocusInAntecFeature() {}
 
     public static final Feature INSTANCE = new FocusInAntecFeature();
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return pos.isInAntec();
     }

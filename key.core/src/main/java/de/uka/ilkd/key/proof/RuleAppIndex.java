@@ -39,7 +39,7 @@ public final class RuleAppIndex {
 
     private final BuiltInRuleAppIndex builtInRuleAppIndex;
 
-    private NewRuleListener ruleListener = null;
+    private @Nullable NewRuleListener ruleListener = null;
 
     /**
      * The current mode of the index: For <code>autoMode==true</code>, the index

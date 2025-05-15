@@ -35,6 +35,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author christoph
@@ -42,7 +45,7 @@ import org.key_project.util.collection.ImmutableSLList;
 class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
             throws UnsupportedOperationException {
         assert poVars.exceptionParameter.op() instanceof LocationVariable
                 : "Something is wrong with the catch variable";
@@ -51,8 +54,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
-        if (poVars.post.result != null) {
-            posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
+        if (poVars.post.resultTerm != null) {
+            posts = posts.append(d.tb.equals(poVars.post.resultTerm, poVars.pre.resultTerm));
         }
         posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
@@ -60,8 +63,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         return prog;
     }
 
-    private Term buildProgramTerm(BasicSnippetData d, ProofObligationVars vs, Term postTerm,
-            TermBuilder tb) {
+    private @NonNull Term buildProgramTerm(@NonNull BasicSnippetData d,
+            @NonNull ProofObligationVars vs, @NonNull Term postTerm,
+            @NonNull TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a contract without modality.");
@@ -74,7 +78,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         // create java block
         final JavaBlock jb = buildJavaBlock(d, vs.formalParams,
             vs.pre.self != null ? vs.pre.self.op(ProgramVariable.class) : null,
-            vs.pre.result != null ? vs.pre.result.op(ProgramVariable.class) : null,
+            vs.pre.resultTerm != null ? vs.pre.resultTerm.op(ProgramVariable.class) : null,
             vs.pre.exception != null ? vs.pre.exception.op(ProgramVariable.class) : null,
             vs.exceptionParameter.op(LocationVariable.class));
 
@@ -102,9 +106,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         return tb.apply(update, programTerm);
     }
 
-    private JavaBlock buildJavaBlock(BasicSnippetData d, ImmutableList<Term> formalPars,
-            ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable exceptionVar,
-            LocationVariable eVar) {
+    private @NonNull JavaBlock buildJavaBlock(@NonNull BasicSnippetData d,
+            @NonNull ImmutableList<Term> formalPars,
+            @NonNull ProgramVariable selfVar, @Nullable ProgramVariable resultVar,
+            @NonNull ProgramVariable exceptionVar,
+            @NonNull LocationVariable eVar) {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod pm)) {
@@ -154,7 +160,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
     }
 
 
-    private ProgramVariable[] extractProgramVariables(ImmutableList<Term> formalPars)
+    private ProgramVariable @NonNull [] extractProgramVariables(
+            @NonNull ImmutableList<Term> formalPars)
             throws IllegalArgumentException {
         ProgramVariable[] formalParVars = new ProgramVariable[formalPars.size()];
         int i = 0;

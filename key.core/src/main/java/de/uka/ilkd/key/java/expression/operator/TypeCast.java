@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Type cast.
@@ -29,7 +31,7 @@ public class TypeCast extends TypeOperator {
      * case, but the order in the superclass TypeOperator. However, getASTChildren yields them in
      * the right order.
      */
-    public TypeCast(Expression child, TypeReference typeref) {
+    public TypeCast(@NonNull Expression child, TypeReference typeref) {
         super(child, typeref);
     }
 
@@ -38,7 +40,7 @@ public class TypeCast extends TypeOperator {
      *
      * @param children the children of this AST element as KeY classes.
      */
-    public TypeCast(ExtList children) {
+    public TypeCast(@NonNull ExtList children) {
         super(children);
     }
 
@@ -68,7 +70,7 @@ public class TypeCast extends TypeOperator {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
-    public ProgramElement getChildAt(int index) {
+    public @NonNull ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
             if (index == 0) {
@@ -131,7 +133,7 @@ public class TypeCast extends TypeOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnTypeCast(this);
     }
 }

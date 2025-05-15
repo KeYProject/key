@@ -7,6 +7,8 @@ import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.rule.BuiltInRule;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * equal to TacletMenuItem but for BuiltInRules
@@ -27,11 +29,11 @@ class DefaultBuiltInRuleMenuItem extends JMenuItem implements BuiltInRuleMenuIte
         this.forced = forced;
     }
 
-    public DefaultBuiltInRuleMenuItem(BuiltInRule connectedTo, boolean forced) {
+    public DefaultBuiltInRuleMenuItem(@NonNull BuiltInRule connectedTo, boolean forced) {
         this(connectedTo.toString(), connectedTo, forced);
     }
 
-    public DefaultBuiltInRuleMenuItem(BuiltInRule connectedTo) {
+    public DefaultBuiltInRuleMenuItem(@NonNull BuiltInRule connectedTo) {
         this(connectedTo, false);
     }
 

@@ -14,6 +14,8 @@ import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This singleton class implements a general conditional operator
@@ -72,7 +74,7 @@ public final class IfThenElse extends AbstractOperator implements Operator {
         }
     }
 
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+    public <T extends org.key_project.logic.Term> void validTopLevelException(@NonNull T term)
             throws TermCreationException {
         super.validTopLevelException(term);
 

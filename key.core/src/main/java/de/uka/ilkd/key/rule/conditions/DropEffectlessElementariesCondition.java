@@ -21,6 +21,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {
     private final UpdateSV u;
@@ -34,8 +37,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
 
-    private static Term dropEffectlessElementariesHelper(Term update,
-            Set<LocationVariable> relevantVars, TermServices services) {
+    private static @Nullable Term dropEffectlessElementariesHelper(@NonNull Term update,
+            @NonNull Set<LocationVariable> relevantVars, @NonNull TermServices services) {
         if (update.op() instanceof ElementaryUpdate eu) {
             LocationVariable lhs = (LocationVariable) eu.lhs();
             if (relevantVars.contains(lhs)) {
@@ -74,7 +77,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
 
-    private static Term dropEffectlessElementaries(Term update, Term target, Services services) {
+    private static @Nullable Term dropEffectlessElementaries(@NonNull Term update,
+            @NonNull Term target, @NonNull Services services) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);
         Set<LocationVariable> varsInTarget = collector.result();
@@ -86,8 +90,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);
@@ -112,7 +116,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\dropEffectlessElementaries(" + u + ", " + x + ", " + result + ")";
     }
 }

@@ -18,6 +18,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
  * is obtained from the program prefix.
@@ -34,8 +36,8 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
+    public @NonNull MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
+            @NonNull MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);
@@ -58,7 +60,7 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return String.format("\\varcond (%s\\isLabeled(%s)", negated ? "\\not" : "", stmtSV);
     }
 }

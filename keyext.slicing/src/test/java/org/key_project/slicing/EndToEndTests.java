@@ -23,6 +23,8 @@ import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -38,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class EndToEndTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(EndToEndTests.class);
 
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final @Nullable File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     /**
      * Load and slice a proof after analyzing it using the dependency analysis algorithm.
@@ -243,7 +245,7 @@ class EndToEndTests {
         Files.delete(iteration1.second.toPath());
     }
 
-    private Proof sliceProof(String filename, int expectedTotal,
+    private @Nullable Proof sliceProof(@NonNull String filename, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         Pair<Proof, File> it =
@@ -253,7 +255,7 @@ class EndToEndTests {
         return it.first;
     }
 
-    private Proof sliceProofOffline(String filename, int expectedTotal,
+    private @Nullable Proof sliceProofOffline(@NonNull String filename, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         Pair<Proof, File> it =
@@ -263,7 +265,8 @@ class EndToEndTests {
         return it.first;
     }
 
-    private Pair<Proof, File> sliceProofFullFilename(File proofFile, int expectedTotal,
+    private @NonNull Pair<Proof, File> sliceProofFullFilename(@NonNull File proofFile,
+            int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis,
             boolean doDeduplicateRuleApps, boolean trackOnline) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;

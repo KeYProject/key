@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * creates an assignment instantiationOf(#newObjectsV).<initialized> = true
  */
@@ -46,8 +48,8 @@ public class PostWork extends ProgramTransformer {
      * @return the transformated program
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
+            @NonNull SVInstantiations svInst) {
         final ProgramVariable newObject =
             schema ? (ProgramVariable) svInst.getInstantiation((SchemaVariable) body())
                     : (ProgramVariable) body();

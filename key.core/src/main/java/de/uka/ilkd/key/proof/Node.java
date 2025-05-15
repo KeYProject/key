@@ -3,15 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
@@ -23,13 +15,10 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 import org.key_project.util.lookup.Lookup;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -49,23 +38,27 @@ public class Node implements Iterable<Node> {
 
     private static final String NODES = "nodes";
 
-    /** the proof the node belongs to */
+    /**
+     * the proof the node belongs to
+     */
     private final Proof proof;
 
-    /** The parent node. **/
+    /**
+     * The parent node.
+     **/
     private @Nullable Node parent = null;
     /**
      * The branch location of this proof node.
      */
-    private BranchLocation branchLocation = null;
+    private @Nullable BranchLocation branchLocation = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 
-    private RuleApp appliedRuleApp;
+    private @Nullable RuleApp appliedRuleApp;
 
-    private NameRecorder nameRecorder;
+    private @Nullable NameRecorder nameRecorder;
 
     /**
      * a linked list of the locally generated program variables. It extends the list of the parent
@@ -81,8 +74,10 @@ public class Node implements Iterable<Node> {
 
     private boolean closed = false;
 
-    /** contains non-logical content, used for user feedback */
-    private NodeInfo nodeInfo;
+    /**
+     * contains non-logical content, used for user feedback
+     */
+    private @Nullable NodeInfo nodeInfo;
 
     /**
      * Serial number of this proof node.
@@ -106,9 +101,9 @@ public class Node implements Iterable<Node> {
      */
     private int siblingNr = -1;
 
-    private ImmutableList<RenamingTable> renamings;
+    private @Nullable ImmutableList<RenamingTable> renamings;
 
-    private String cachedName = null;
+    private @Nullable String cachedName = null;
 
     private @Nullable Lookup userData = null;
 
@@ -161,7 +156,9 @@ public class Node implements Iterable<Node> {
         this.seq = seq;
     }
 
-    /** returns the sequent of this node */
+    /**
+     * returns the sequent of this node
+     */
     public Sequent sequent() {
         return seq;
     }
@@ -172,16 +169,22 @@ public class Node implements Iterable<Node> {
      * @return the NodeInfo containing non-logical information
      */
     public NodeInfo getNodeInfo() {
+        if (nodeInfo == null) {
+            var ni = this.nodeInfo = new NodeInfo(this);
+            return ni;
+        }
         return nodeInfo;
     }
 
-    /** returns the proof the Node belongs to */
+    /**
+     * returns the proof the Node belongs to
+     */
     public Proof proof() {
         return proof;
     }
 
-    public void setAppliedRuleApp(RuleApp ruleApp) {
-        this.nodeInfo.updateNoteInfo();
+    public void setAppliedRuleApp(@Nullable RuleApp ruleApp) {
+        this.getNodeInfo().updateNoteInfo();
         this.appliedRuleApp = ruleApp;
         clearNameCache();
     }
@@ -204,7 +207,7 @@ public class Node implements Iterable<Node> {
         }
     }
 
-    public NameRecorder getNameRecorder() {
+    public @Nullable NameRecorder getNameRecorder() {
         return nameRecorder;
     }
 
@@ -216,15 +219,18 @@ public class Node implements Iterable<Node> {
         renamings = list;
     }
 
-    public ImmutableList<RenamingTable> getRenamingTable() {
+    public @Nullable ImmutableList<RenamingTable> getRenamingTable() {
         return renamings;
     }
 
-    public RuleApp getAppliedRuleApp() {
+    @Pure
+    public @Nullable RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
 
-    /** Returns the set of NoPosTacletApps at this node */
+    /**
+     * Returns the set of NoPosTacletApps at this node
+     */
     public Iterable<NoPosTacletApp> getLocalIntroducedRules() {
         return localIntroducedRules;
     }
@@ -248,7 +254,7 @@ public class Node implements Iterable<Node> {
 
     /**
      * Returns the set of freshly created function symbols known to this node.
-     *
+     * <p>
      * In the resulting list, the newest additions come first.
      *
      * @return a non-null immutable list of function symbols.
@@ -275,6 +281,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
+    @Pure
     public @Nullable Node parent() {
         return parent;
     }
@@ -470,16 +477,18 @@ public class Node implements Iterable<Node> {
         return new SubtreeIterator(this);
     }
 
-    /** @return number of children */
+    /**
+     * @return number of children
+     */
     public int childrenCount() {
         return children.size();
     }
 
     /**
-     *
      * @param i an index (starting at 0).
      * @return the i-th child of this node.
      */
+    @Pure
     public Node child(int i) {
         return children.get(i);
     }
@@ -648,7 +657,10 @@ public class Node implements Iterable<Node> {
      */
     public boolean sanityCheckDoubleLinks() {
         if (!root()) {
-            if (!parent().children.contains(this)) {
+            if (parent == null)
+                return true;
+
+            if (!parent.children.contains(this)) {
                 return false;
             }
             if (parent.proof() != proof()) {
@@ -666,7 +678,9 @@ public class Node implements Iterable<Node> {
         return true;
     }
 
-    /** marks a node as closed */
+    /**
+     * marks a node as closed
+     */
     Node close() {
         closed = true;
         Node tmp = parent;
@@ -683,7 +697,7 @@ public class Node implements Iterable<Node> {
     /**
      * Opens a previously closed node and all its closed parents.
      * <p>
-     *
+     * <p>
      * This is, for instance, needed for the {@link MergeRule}: In a situation where a merge node
      * and its associated partners have been closed and the merge node is then pruned away, the
      * partners have to be reopened again. Otherwise, we have a soundness issue.
@@ -698,7 +712,9 @@ public class Node implements Iterable<Node> {
         clearNameCache();
     }
 
-    /** @return true iff this inner node is closeable */
+    /**
+     * @return true iff this inner node is closeable
+     */
     private boolean isCloseable() {
         assert childrenCount() > 0;
         for (Node child : children) {
@@ -764,14 +780,14 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Retrieves a user-defined data.
+     * Retrieves a user-defined datum.
      *
-     * @param service the class for which the data were registered
+     * @param service the class for which the datum were registered
      * @param <T> any class
-     * @return null or the previous data
+     * @return null or the previous datum
      * @see #register(Object, Class)
      */
-    public <T> T lookup(Class<T> service) {
+    public <T> @Nullable T lookup(Class<T> service) {
         try {
             if (userData == null) {
                 return null;
@@ -789,7 +805,7 @@ public class Node implements Iterable<Node> {
      * @param service the key under it should be registered
      * @param <T>
      */
-    public <T> void register(T obj, Class<T> service) {
+    public <T extends @NonNull Object> void register(T obj, Class<T> service) {
         getUserData().register(obj, service);
     }
 
@@ -800,7 +816,9 @@ public class Node implements Iterable<Node> {
      * @param service the key under which the data was registered
      * @param <T> arbitray object
      */
-    public <T> void deregister(T obj, Class<T> service) {
+    public <T> void deregister(@Nullable T obj, Class<T> service) {
+        if (obj == null)
+            return;
         if (userData != null) {
             userData.deregister(obj, service);
         }

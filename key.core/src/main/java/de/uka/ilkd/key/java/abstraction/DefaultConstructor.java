@@ -5,6 +5,9 @@ package de.uka.ilkd.key.java.abstraction;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default constructor of class types.
  *
@@ -13,12 +16,12 @@ import org.key_project.util.ExtList;
 @Deprecated
 public class DefaultConstructor implements Constructor {
 
-    protected final String name;
+    protected final @Nullable String name;
     protected final boolean parentIsPublic;
 
 
     // ???use ProgramElementName instead of name?????
-    public DefaultConstructor(ExtList children) {
+    public DefaultConstructor(@NonNull ExtList children) {
         name = children.get(String.class);
         parentIsPublic = children.get(Boolean.class);
     }
@@ -124,7 +127,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return the signature of this constructor.
      */
-    public Type[] getSignature() {
+    public Type @NonNull [] getSignature() {
         return new Type[0];
     }
 
@@ -133,7 +136,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return the return type of this method.
      */
-    public Type getReturnType() {
+    public @Nullable Type getReturnType() {
         return null;
     }
 
@@ -142,7 +145,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return the (empty) exception list of this constructor.
      */
-    public ClassType[] getExceptions() {
+    public ClassType @NonNull [] getExceptions() {
         return new ClassType[0];
     }
 
@@ -151,7 +154,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return the package of this element.
      */
-    public Package getPackage() {
+    public @Nullable Package getPackage() {
         return null;
     }
 
@@ -161,7 +164,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return a list of contained class types.
      */
-    public ClassType[] getTypes() {
+    public ClassType @NonNull [] getTypes() {
         return new ClassType[0];
     }
 
@@ -170,7 +173,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return the name of this element.
      */
-    public String getName() {
+    public @NonNull String getName() {
         return name;
     }
 
@@ -179,7 +182,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return the name of this element.
      */
-    public String getFullName() {
+    public @Nullable String getFullName() {
         return name;
     }
 }

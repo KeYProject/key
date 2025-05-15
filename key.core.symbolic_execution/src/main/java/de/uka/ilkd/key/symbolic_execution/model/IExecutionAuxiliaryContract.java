@@ -10,6 +10,8 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAuxiliaryContract;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A node in the symbolic execution tree which represents a use block/loop contract application.
@@ -29,6 +31,7 @@ public interface IExecutionAuxiliaryContract extends IExecutionNode<SourceElemen
      *
      * @return The applied {@link AuxiliaryContract}.
      */
+    @Nullable
     AuxiliaryContract getContract();
 
     /**
@@ -36,6 +39,7 @@ public interface IExecutionAuxiliaryContract extends IExecutionNode<SourceElemen
      *
      * @return The {@link StatementBlock} at which the {@link BlockContract} is applied.
      */
+    @Nullable
     StatementBlock getBlock();
 
     /**

@@ -18,6 +18,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link IExecutionStart}.
  *
@@ -28,7 +31,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * The up to know discovered {@link IExecutionTermination}s.
      */
-    private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+    private @NonNull ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
 
     /**
      * Constructor.
@@ -37,7 +40,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public ExecutionStart(ITreeSettings settings, Node proofNode) {
+    public ExecutionStart(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -45,7 +48,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() {
+    protected @NonNull String lazyComputeName() {
         return DEFAULT_START_NODE_NAME;
     }
 
@@ -53,7 +56,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -61,7 +64,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Start";
     }
 
@@ -78,7 +81,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      *
      * @param termination The {@link IExecutionTermination} to register.
      */
-    public void addTermination(IExecutionTermination termination) {
+    public void addTermination(@Nullable IExecutionTermination termination) {
         if (termination != null) {
             terminations = terminations.append(termination);
         }
@@ -97,7 +100,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public SourceElement getActiveStatement() {
+    public @Nullable SourceElement getActiveStatement() {
         Term modalityTerm = getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);

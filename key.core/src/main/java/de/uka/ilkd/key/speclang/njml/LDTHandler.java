@@ -17,6 +17,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public abstract class LDTHandler implements JMLOperatorHandler {
@@ -49,7 +50,8 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         return jop;
     }
 
-    public @Nullable SLExpression build(JMLOperator jop, SLExpression left, SLExpression right)
+    public @Nullable SLExpression build(JMLOperator jop, @NonNull SLExpression left,
+            @NonNull SLExpression right)
             throws SLTranslationException {
         if (OverloadedOperatorHandler.UNARY_OPERATORS.contains(jop)) {
             return buildUnary(jop, left);
@@ -73,7 +75,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         }
     }
 
-    private SLExpression buildUnary(JMLOperator jop, SLExpression left) {
+    private @Nullable SLExpression buildUnary(JMLOperator jop, @NonNull SLExpression left) {
         KeYJavaType type = left.getType();
         TypedOperator top = getOperator(type.getJavaType(), jop);
         if (top == null) {
@@ -83,7 +85,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         return new SLExpression(resultTerm, top.type);
     }
 
-    private Term promote(Term term, KeYJavaType resultType) {
+    private @NonNull Term promote(@NonNull Term term, @NonNull KeYJavaType resultType) {
         Sort targetSort = resultType.getSort();
         if (term.sort() != targetSort) {
             return services.getTermBuilder().cast(targetSort, term);

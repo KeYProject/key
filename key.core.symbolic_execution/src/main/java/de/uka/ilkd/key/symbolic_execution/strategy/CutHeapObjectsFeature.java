@@ -19,6 +19,8 @@ import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * <p>
  * This {@link BinaryFeature} checks if a cut with an equality for an alias check should be done or
@@ -37,7 +39,8 @@ public class CutHeapObjectsFeature extends BinaryFeature {
      * {@inheritDoc}
      */
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         Term cutFormula =
             SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal,
                 mState);

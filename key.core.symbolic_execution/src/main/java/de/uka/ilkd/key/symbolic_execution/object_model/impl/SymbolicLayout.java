@@ -12,6 +12,8 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Default implementation of {@link ISymbolicLayout}.
  *
@@ -21,7 +23,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
     /**
      * The contained {@link ISymbolicEquivalenceClass}.
      */
-    private final ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses;
+    private final @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses;
 
     /**
      * The {@link ISymbolicState}.
@@ -31,7 +33,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
     /**
      * The contained {@link ISymbolicObject}s.
      */
-    private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
+    private @NonNull ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
 
     /**
      * Constructor.
@@ -40,7 +42,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicLayout(IModelSettings settings,
-            ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
+            @NonNull ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
         super(settings);
         assert equivalenceClasses != null;
         this.equivalenceClasses = equivalenceClasses;

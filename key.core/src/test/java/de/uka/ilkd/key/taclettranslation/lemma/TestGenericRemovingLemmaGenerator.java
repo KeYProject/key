@@ -18,6 +18,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,7 @@ public class TestGenericRemovingLemmaGenerator {
         Assertions.assertTrue(found, "There is a proxy sort of the name 'G'");
     }
 
-    private void collectSorts(Term term, Set<Sort> sorts) {
+    private void collectSorts(@NonNull Term term, @NonNull Set<Sort> sorts) {
         for (Term t : term.subs()) {
             collectSorts(t, sorts);
         }

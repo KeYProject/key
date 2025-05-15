@@ -18,6 +18,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
  *
@@ -55,7 +57,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     protected abstract boolean allowOSS();
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(proof.getActiveStrategy(), getAdmittedRuleNames(),
             allowOSS());
     }

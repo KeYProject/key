@@ -10,6 +10,8 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.settings.StrategySettings;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Implementation of this interface are used in {@link ApplyStrategy} to determine if the strategy
@@ -85,6 +87,7 @@ public interface StopCondition {
      * @param goal The current {@link Goal} on which the next rule will be applied.
      * @return description of the reason why automatic proof search has stopped
      */
+    @Nullable
     String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal);
 
@@ -122,6 +125,7 @@ public interface StopCondition {
      * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
      * @return The human-readable message which explains the stop reason.
      */
+    @Nullable
     String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
 }

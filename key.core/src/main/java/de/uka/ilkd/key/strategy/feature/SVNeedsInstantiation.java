@@ -10,9 +10,11 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 public class SVNeedsInstantiation extends InstantiatedSVFeature {
 
-    public static Feature create(String svName) {
+    public static @NonNull Feature create(@NonNull String svName) {
         return new SVNeedsInstantiation(new Name(svName));
     }
 
@@ -24,7 +26,8 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         boolean res = super.filter(app, pos, goal, mState);
         if (!res) {
             for (SchemaVariable sv : app.uninstantiatedVars()) {

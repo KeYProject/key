@@ -8,6 +8,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This feature checks if a rule may be applied automatically. Currently this does not apply to
  * rules which are not member of any rule set.
@@ -18,7 +20,8 @@ public class AutomatedRuleFeature extends BinaryTacletAppFeature {
 
     private AutomatedRuleFeature() {}
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return AnyRuleSetTacletFilter.INSTANCE.filter(app.rule());
     }
 

@@ -32,6 +32,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides the basic functionality to extract values from updates.
  *
@@ -41,12 +44,12 @@ public abstract class AbstractUpdateExtractor {
     /**
      * Contains the {@link Node} of KeY's proof tree to compute memory layouts for.
      */
-    protected final Node node;
+    protected final @NonNull Node node;
 
     /**
      * The {@link PosInOccurrence} of the modality or its updates.
      */
-    protected final PosInOccurrence modalityPio;
+    protected final @NonNull PosInOccurrence modalityPio;
 
     /**
      * An incremented number used to give each pre value an unique name.
@@ -59,7 +62,7 @@ public abstract class AbstractUpdateExtractor {
      * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
      * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
      */
-    public AbstractUpdateExtractor(Node node, PosInOccurrence modalityPio) {
+    public AbstractUpdateExtractor(@NonNull Node node, @NonNull PosInOccurrence modalityPio) {
         assert node != null;
         assert modalityPio != null;
         this.node = node;
@@ -74,7 +77,7 @@ public abstract class AbstractUpdateExtractor {
      * @return The new path condition without conditions which uses implicit
      *         {@link IProgramVariable}s.
      */
-    protected Term removeImplicitSubTermsFromPathCondition(Term pathCondition) {
+    protected @NonNull Term removeImplicitSubTermsFromPathCondition(@NonNull Term pathCondition) {
         if (Junctor.AND == pathCondition.op()) {
             // Path condition with multiple terms combined via AND
             List<Term> newTerms = new LinkedList<>();
@@ -101,7 +104,7 @@ public abstract class AbstractUpdateExtractor {
      * @return {@code true} {@link Term} contains implicit {@link IProgramVariable}, {@code false}
      *         {@link Term} contains no implicit {@link IProgramVariable}.
      */
-    protected boolean containsImplicitProgramVariable(Term term) {
+    protected boolean containsImplicitProgramVariable(@NonNull Term term) {
         if (term.op() instanceof ProgramVariable
                 && isImplicitProgramVariable((ProgramVariable) term.op())) {
             return true;
@@ -121,7 +124,7 @@ public abstract class AbstractUpdateExtractor {
      * @return {@code true} {@link ProgramVariable} is implicit, {@code false}
      *         {@link ProgramVariable} is not implicit or {@code null}.
      */
-    protected boolean isImplicitProgramVariable(ProgramVariable var) {
+    protected boolean isImplicitProgramVariable(@Nullable ProgramVariable var) {
         return var != null && var.isImplicit();
     }
 
@@ -138,7 +141,7 @@ public abstract class AbstractUpdateExtractor {
      * @param ignoreOldStateVariables Ignore old state variables?
      * @return The objects to ignore.
      */
-    protected Set<Term> computeInitialObjectsToIgnore(boolean ignoreExceptionVariable,
+    protected @NonNull Set<Term> computeInitialObjectsToIgnore(boolean ignoreExceptionVariable,
             boolean ignoreOldStateVariables) {
         Set<Term> result = new LinkedHashSet<>();
         if (ignoreExceptionVariable) {
@@ -169,7 +172,8 @@ public abstract class AbstractUpdateExtractor {
      * @param term The current {@link Term}.
      * @param toFill The {@link Set} with {@link Term}s to ignore to fill.
      */
-    protected void fillInitialObjectsToIgnoreRecursively(Term term, Set<Term> toFill) {
+    protected void fillInitialObjectsToIgnoreRecursively(@NonNull Term term,
+            @NonNull Set<Term> toFill) {
         if (term.op() instanceof UpdateApplication) {
             Term updateTerm = UpdateApplication.getUpdate(term);
             fillInitialObjectsToIgnoreRecursively(updateTerm, toFill);
@@ -206,8 +210,9 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected void collectLocationsFromUpdates(Sequent sequent,
-            Set<ExtractLocationParameter> locationsToFill, Set<Term> updateCreatedObjectsToFill,
-            Set<Term> updateValueObjectsToFill, Set<Term> objectsToIgnore)
+            @NonNull Set<ExtractLocationParameter> locationsToFill,
+            @NonNull Set<Term> updateCreatedObjectsToFill,
+            @NonNull Set<Term> updateValueObjectsToFill, @NonNull Set<Term> objectsToIgnore)
             throws ProofInputException {
         // Go up in parent hierarchy and collect updates on all update applications
         PosInOccurrence pio = modalityPio;
@@ -247,9 +252,10 @@ public abstract class AbstractUpdateExtractor {
      * @param objectsToIgnore The objects to ignore.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void collectLocationsFromTerm(Term updateTerm,
-            Set<ExtractLocationParameter> locationsToFill, Set<Term> updateCreatedObjectsToFill,
-            Set<Term> updateValueObjectsToFill, Set<Term> objectsToIgnore)
+    protected void collectLocationsFromTerm(@NonNull Term updateTerm,
+            @NonNull Set<ExtractLocationParameter> locationsToFill,
+            @NonNull Set<Term> updateCreatedObjectsToFill,
+            @NonNull Set<Term> updateValueObjectsToFill, @NonNull Set<Term> objectsToIgnore)
             throws ProofInputException {
         if (updateTerm.op() instanceof UpdateJunctor) {
             for (Term sub : updateTerm.subs()) {
@@ -305,9 +311,10 @@ public abstract class AbstractUpdateExtractor {
      *        fill.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void collectLocationsFromHeapUpdate(Term term,
-            Set<ExtractLocationParameter> locationsToFill, Set<Term> updateCreatedObjectsToFill,
-            Set<Term> updateValueObjectsToFill) throws ProofInputException {
+    protected void collectLocationsFromHeapUpdate(@NonNull Term term,
+            @NonNull Set<ExtractLocationParameter> locationsToFill,
+            @NonNull Set<Term> updateCreatedObjectsToFill,
+            @NonNull Set<Term> updateValueObjectsToFill) throws ProofInputException {
         final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
         if (term.op() == heapLDT.getStore()) {
             // Add select object term to result
@@ -416,7 +423,7 @@ public abstract class AbstractUpdateExtractor {
      * @param term The {@link Term} to check.
      * @return {@code true} has free variables, {@code false} does not have free variables.
      */
-    protected boolean hasFreeVariables(Term term) {
+    protected boolean hasFreeVariables(@Nullable Term term) {
         return term != null && !term.freeVars().isEmpty();
     }
 
@@ -431,8 +438,9 @@ public abstract class AbstractUpdateExtractor {
      * @return The found locations.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Set<ExtractLocationParameter> extractLocationsFromSequent(Sequent sequent,
-            Set<Term> objectsToIgnore) throws ProofInputException {
+    protected @NonNull Set<ExtractLocationParameter> extractLocationsFromSequent(
+            @NonNull Sequent sequent,
+            @NonNull Set<Term> objectsToIgnore) throws ProofInputException {
         Set<ExtractLocationParameter> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             result.addAll(extractLocationsFromTerm(
@@ -452,8 +460,8 @@ public abstract class AbstractUpdateExtractor {
      * @return The found locations.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Set<ExtractLocationParameter> extractLocationsFromTerm(Term term,
-            Set<Term> objectsToIgnore) throws ProofInputException {
+    protected @NonNull Set<ExtractLocationParameter> extractLocationsFromTerm(Term term,
+            @NonNull Set<Term> objectsToIgnore) throws ProofInputException {
         Set<ExtractLocationParameter> result = new LinkedHashSet<>();
         collectLocationsFromTerm(result, term, objectsToIgnore);
         return result;
@@ -468,8 +476,9 @@ public abstract class AbstractUpdateExtractor {
      * @param objectsToIgnore The objects to ignore.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void collectLocationsFromTerm(Set<ExtractLocationParameter> toFill, Term term,
-            Set<Term> objectsToIgnore) throws ProofInputException {
+    protected void collectLocationsFromTerm(@NonNull Set<ExtractLocationParameter> toFill,
+            Term term,
+            @NonNull Set<Term> objectsToIgnore) throws ProofInputException {
         term = OriginTermLabel.removeOriginLabels(term, getServices());
         final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
         if (term.op() instanceof ProgramVariable) {
@@ -509,8 +518,10 @@ public abstract class AbstractUpdateExtractor {
      * @param objectsToIgnore The objects to ignore.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void collectLocationsFromHeapTerms(Term selectTerm, Term variableTerm,
-            HeapLDT heapLDT, Set<ExtractLocationParameter> toFill, Set<Term> objectsToIgnore)
+    protected void collectLocationsFromHeapTerms(@NonNull Term selectTerm,
+            @NonNull Term variableTerm,
+            @NonNull HeapLDT heapLDT, @NonNull Set<ExtractLocationParameter> toFill,
+            @NonNull Set<Term> objectsToIgnore)
             throws ProofInputException {
         if (!objectsToIgnore.contains(selectTerm)
                 && !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
@@ -553,8 +564,8 @@ public abstract class AbstractUpdateExtractor {
      * @return The created {@link Term} which computes the values of the given
      *         {@link ExtractLocationParameter}s.
      */
-    protected Term createLocationPredicateAndTerm(
-            Set<ExtractLocationParameter> valueSelectParameter) {
+    protected @NonNull Term createLocationPredicateAndTerm(
+            @NonNull Set<ExtractLocationParameter> valueSelectParameter) {
         List<Term> argumentsList = new LinkedList<>();
         int argumentIndex = -1;
         for (ExtractLocationParameter param : valueSelectParameter) {
@@ -582,7 +593,7 @@ public abstract class AbstractUpdateExtractor {
      *
      * @return The {@link Proof} of the analyzed {@link Node}.
      */
-    protected Proof getProof() {
+    protected @NonNull Proof getProof() {
         return node.proof();
     }
 
@@ -591,7 +602,7 @@ public abstract class AbstractUpdateExtractor {
      *
      * @return The root {@link Node} of the proof.
      */
-    protected Node getRoot() {
+    protected @NonNull Node getRoot() {
         return getProof().root();
     }
 
@@ -600,7 +611,7 @@ public abstract class AbstractUpdateExtractor {
      *
      * @return The {@link Services} of the analyzed {@link Node}.
      */
-    protected Services getServices() {
+    protected @NonNull Services getServices() {
         return getProof().getServices();
     }
 
@@ -621,28 +632,28 @@ public abstract class AbstractUpdateExtractor {
         /**
          * The {@link ProgramVariable} or {@code null} if an array index is used instead.
          */
-        private final ProgramVariable programVariable;
+        private final @Nullable ProgramVariable programVariable;
 
         /**
          * The array index or {@code null} if not used.
          */
-        private final Term arrayIndex;
+        private final @Nullable Term arrayIndex;
 
         /**
          * The array start index or {@code null} if not used.
          */
-        private final Term arrayStartIndex;
+        private final @Nullable Term arrayStartIndex;
 
         /**
          * The array end index or {@code null} if not used.
          */
-        private final Term arrayEndIndex;
+        private final @Nullable Term arrayEndIndex;
 
         /**
          * An optional parent object represented as {@link Term}. If it is {@code null} an
          * {@link IProgramVariable} of the state is represented.
          */
-        private final Term parentTerm;
+        private final @NonNull Term parentTerm;
 
         /**
          * The index of the parent argument in the predicate used in side proof to compute the
@@ -671,12 +682,12 @@ public abstract class AbstractUpdateExtractor {
         /**
          * The constant used to query an array range.
          */
-        private final Term arrayRangeConstant;
+        private final @Nullable Term arrayRangeConstant;
 
         /**
          * The constant representing the fact that no value is available.
          */
-        private final Term notAValue;
+        private final @Nullable Term notAValue;
 
         /**
          * Constructor for cloning purpose.
@@ -684,7 +695,8 @@ public abstract class AbstractUpdateExtractor {
          * @param original The original {@link ExtractLocationParameter} to clone.
          * @param newParent The new parent {@link Term} to be used instead of the original one.
          */
-        public ExtractLocationParameter(ExtractLocationParameter original, Term newParent) {
+        public ExtractLocationParameter(@NonNull ExtractLocationParameter original,
+                @NonNull Term newParent) {
             this.programVariable = original.programVariable;
             this.arrayIndex = original.arrayIndex;
             this.parentTerm = OriginTermLabel.removeOriginLabels(newParent, getServices());
@@ -705,7 +717,8 @@ public abstract class AbstractUpdateExtractor {
          * @param stateMember Defines if this location should explicitly be shown on the state.
          * @throws ProofInputException Occurred Exception.
          */
-        public ExtractLocationParameter(ProgramVariable programVariable, boolean stateMember)
+        public ExtractLocationParameter(@NonNull ProgramVariable programVariable,
+                boolean stateMember)
                 throws ProofInputException {
             this(programVariable, null, stateMember);
         }
@@ -717,7 +730,8 @@ public abstract class AbstractUpdateExtractor {
          * @param parentTerm The parent object represented as {@link Term}.
          * @throws ProofInputException Occurred Exception.
          */
-        public ExtractLocationParameter(ProgramVariable programVariable, Term parentTerm)
+        public ExtractLocationParameter(@NonNull ProgramVariable programVariable,
+                @NonNull Term parentTerm)
                 throws ProofInputException {
             this(programVariable, parentTerm, false);
         }
@@ -730,7 +744,8 @@ public abstract class AbstractUpdateExtractor {
          * @param stateMember Defines if this location should explicitly be shown on the state.
          * @throws ProofInputException Occurred Exception.
          */
-        protected ExtractLocationParameter(ProgramVariable programVariable, Term parentTerm,
+        protected ExtractLocationParameter(@NonNull ProgramVariable programVariable,
+                @NonNull Term parentTerm,
                 boolean stateMember) throws ProofInputException {
             assert programVariable != null;
             this.programVariable = programVariable;
@@ -752,7 +767,7 @@ public abstract class AbstractUpdateExtractor {
          * @param parentTerm The parent object represented as {@link Term}.
          * @throws ProofInputException Occurred Exception.
          */
-        public ExtractLocationParameter(Term arrayIndex, Term parentTerm)
+        public ExtractLocationParameter(@NonNull Term arrayIndex, @NonNull Term parentTerm)
                 throws ProofInputException {
             assert parentTerm != null;
             this.programVariable = null;
@@ -775,7 +790,8 @@ public abstract class AbstractUpdateExtractor {
          * @param parentTerm The parent object represented as {@link Term}.
          * @throws ProofInputException Occurred Exception.
          */
-        public ExtractLocationParameter(Term arrayStartIndex, Term arrayEndIndex, Term parentTerm)
+        public ExtractLocationParameter(@NonNull Term arrayStartIndex, @NonNull Term arrayEndIndex,
+                @NonNull Term parentTerm)
                 throws ProofInputException {
             assert arrayStartIndex != null;
             assert arrayEndIndex != null;
@@ -808,7 +824,8 @@ public abstract class AbstractUpdateExtractor {
          * @return The created {@link LocationVariable}.
          * @throws ProofInputException Occurred Exception.
          */
-        protected LocationVariable createLocationVariable(String name, Sort sort)
+        protected @NonNull LocationVariable createLocationVariable(@NonNull String name,
+                @NonNull Sort sort)
                 throws ProofInputException {
             return new LocationVariable(new ProgramElementName(name), sort);
         }
@@ -899,7 +916,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The right side of the update created by {@link #createPreUpdate()}.
          */
-        public Term getPreUpdateTarget() {
+        public @NonNull Term getPreUpdateTarget() {
             return parentTerm != null ? parentTerm
                     : getServices().getTermBuilder().var(programVariable);
         }
@@ -911,7 +928,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The created {@link Term} with the pre update.
          */
-        public Term createPreUpdate() {
+        public @NonNull Term createPreUpdate() {
             Term originalTerm = getPreUpdateTarget();
             return getServices().getTermBuilder().elementary(preVariable, originalTerm);
         }
@@ -921,7 +938,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The {@link Term} to compute the parent object with help of the pre update.
          */
-        public Term createPreParentTerm() {
+        public @NonNull Term createPreParentTerm() {
             return getServices().getTermBuilder().var(preVariable);
         }
 
@@ -930,7 +947,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The {@link Term} to compute the value with help of the pre update.
          */
-        public Term createPreValueTerm() {
+        public @NonNull Term createPreValueTerm() {
             final TermBuilder tb = getServices().getTermBuilder();
             if (parentTerm != null) {
                 if (isArrayRange()) {
@@ -1031,7 +1048,7 @@ public abstract class AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             if (isArrayRange()) {
                 return "[" + arrayStartIndex + " to " + arrayEndIndex + "] "
                     + (parentTerm != null ? " of " + parentTerm : "");
@@ -1046,7 +1063,7 @@ public abstract class AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof ExtractLocationParameter other) {
                 return Objects.equals(arrayIndex, other.arrayIndex)
                         && stateMember == other.stateMember
@@ -1092,8 +1109,10 @@ public abstract class AbstractUpdateExtractor {
      * @return The computed {@link ExecutionVariableValuePair}s.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Set<ExecutionVariableValuePair> computeVariableValuePairs(Term layoutCondition,
-            Term layoutTerm, Set<ExtractLocationParameter> locations, boolean currentLayout,
+    protected @Nullable Set<ExecutionVariableValuePair> computeVariableValuePairs(
+            Term layoutCondition,
+            @NonNull Term layoutTerm, @NonNull Set<ExtractLocationParameter> locations,
+            boolean currentLayout,
             boolean simplifyConditions) throws ProofInputException {
         // Get original updates
         ImmutableList<Term> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
@@ -1244,7 +1263,7 @@ public abstract class AbstractUpdateExtractor {
      *
      * @return The additional updates.
      */
-    protected List<Term> collectAdditionalUpdates() {
+    protected @NonNull List<Term> collectAdditionalUpdates() {
         return Collections.emptyList();
     }
 
@@ -1255,7 +1274,7 @@ public abstract class AbstractUpdateExtractor {
      * @param currentLayout Is current layout?
      * @return The original updates.
      */
-    protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence pio,
+    protected @Nullable ImmutableList<Term> computeOriginalUpdates(@NonNull PosInOccurrence pio,
             boolean currentLayout) {
         ImmutableList<Term> originalUpdates;
         if (!currentLayout) {
@@ -1303,8 +1322,8 @@ public abstract class AbstractUpdateExtractor {
      *         consisting of only required splits.
      * @throws ProofInputException Occurred Exception
      */
-    protected Map<Goal, Term> computeValueConditions(Set<Goal> valueGoals,
-            Map<Node, Term> branchConditionCache, boolean simplifyConditions)
+    protected @NonNull Map<Goal, Term> computeValueConditions(@NonNull Set<Goal> valueGoals,
+            @NonNull Map<Node, Term> branchConditionCache, boolean simplifyConditions)
             throws ProofInputException {
         Comparator<NodeGoal> comparator = (o1, o2) -> {
             return o2.getSerialNr() - o1.getSerialNr(); // Descending order
@@ -1373,7 +1392,8 @@ public abstract class AbstractUpdateExtractor {
      * @return {@code true} All {@link NodeGoal}s have passed the given {@link Node}, {@code false}
      *         if at least one {@link NodeGoal} has not passed the given {@link Node}.
      */
-    protected boolean isParentReachedOnAllChildGoals(Node currentNode, List<NodeGoal> branchLeafs) {
+    protected boolean isParentReachedOnAllChildGoals(@NonNull Node currentNode,
+            @NonNull List<NodeGoal> branchLeafs) {
         if (!branchLeafs.isEmpty()) {
             return branchLeafs.get(0).getSerialNr() <= currentNode.serialNr();
         } else {
@@ -1391,7 +1411,8 @@ public abstract class AbstractUpdateExtractor {
      * @return The first found parent with at least two open child branches or {@code null} if the
      *         root has been reached.
      */
-    protected NodeGoal iterateBackOnParents(NodeGoal nodeToStartAt, boolean force) {
+    protected @Nullable NodeGoal iterateBackOnParents(@NonNull NodeGoal nodeToStartAt,
+            boolean force) {
         // Go back to parent with at least two open branches
         Node child = force ? nodeToStartAt.getParent() : nodeToStartAt.getCurrentNode();
         Node parent = child.parent();
@@ -1413,7 +1434,7 @@ public abstract class AbstractUpdateExtractor {
      * @param node The {@link Node} to count its open children.
      * @return The number of open child {@link Node}s.
      */
-    protected int countOpenChildren(Node node) {
+    protected int countOpenChildren(@NonNull Node node) {
         int openChildCount = 0;
         for (int i = 0; i < node.childrenCount(); i++) {
             Node child = node.child(i);
@@ -1447,7 +1468,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @param goal The current {@link Goal} to start backward iteration at.
          */
-        public NodeGoal(Goal goal) {
+        public NodeGoal(@NonNull Goal goal) {
             this(goal.node(), ImmutableSLList.<Goal>nil().prepend(goal));
         }
 
@@ -1476,7 +1497,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The parent of {@link #getCurrentNode()}.
          */
-        public Node getParent() {
+        public @Nullable Node getParent() {
             return currentNode.parent();
         }
 
@@ -1502,7 +1523,7 @@ public abstract class AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             final StringBuilder sb = new StringBuilder();
             sb.append(currentNode.serialNr());
             sb.append(" starting from goals ");
@@ -1523,7 +1544,8 @@ public abstract class AbstractUpdateExtractor {
      * @return The computed branch condition.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Term computeBranchCondition(Node node, Map<Node, Term> branchConditionCache,
+    protected Term computeBranchCondition(@NonNull Node node,
+            @NonNull Map<Node, Term> branchConditionCache,
             boolean simplifyConditions) throws ProofInputException {
         Term result = branchConditionCache.get(node);
         if (result == null) {
@@ -1552,22 +1574,22 @@ public abstract class AbstractUpdateExtractor {
         /**
          * The {@link ProgramVariable} or {@code null} if an array index is used instead.
          */
-        private final ProgramVariable programVariable;
+        private final @Nullable ProgramVariable programVariable;
 
         /**
          * The array index or {@code null} if not used.
          */
-        private final Term arrayIndex;
+        private final @Nullable Term arrayIndex;
 
         /**
          * The array start index or {@code null} if not used.
          */
-        private final Term arrayStartIndex;
+        private final @Nullable Term arrayStartIndex;
 
         /**
          * The array end index or {@code null} if not used.
          */
-        private final Term arrayEndIndex;
+        private final @Nullable Term arrayEndIndex;
 
         /**
          * An optional parent object or {@code null} if it is a value/association of the state.
@@ -1577,7 +1599,7 @@ public abstract class AbstractUpdateExtractor {
         /**
          * The value or association target.
          */
-        private final Term value;
+        private final @NonNull Term value;
 
         /**
          * Defines if this location should explicitly be shown on the state.
@@ -1604,7 +1626,8 @@ public abstract class AbstractUpdateExtractor {
          * @param condition An optional condition under which the value is valid.
          * @param stateMember Defines if this location should explicitly be shown on the state.
          */
-        public ExecutionVariableValuePair(ProgramVariable programVariable, Term parent, Term value,
+        public ExecutionVariableValuePair(@NonNull ProgramVariable programVariable, Term parent,
+                @NonNull Term value,
                 Term condition, boolean stateMember, Node goalNode) {
             assert programVariable != null;
             assert value != null;
@@ -1628,7 +1651,8 @@ public abstract class AbstractUpdateExtractor {
          * @param condition An optional condition under which the value is valid.
          * @param stateMember Defines if this location should explicitly be shown on the state.
          */
-        public ExecutionVariableValuePair(Term arrayIndex, Term parent, Term value, Term condition,
+        public ExecutionVariableValuePair(Term arrayIndex, @NonNull Term parent,
+                @NonNull Term value, Term condition,
                 boolean stateMember, Node goalNode) {
             assert parent != null;
             assert value != null;
@@ -1655,7 +1679,7 @@ public abstract class AbstractUpdateExtractor {
          * @param stateMember Defines if this location should explicitly be shown on the state.
          */
         public ExecutionVariableValuePair(Term arrayStartIndex, Term arrayEndIndex,
-                Term arrayRangeConstant, Term parent, Term value, Term condition,
+                Term arrayRangeConstant, @NonNull Term parent, @NonNull Term value, Term condition,
                 boolean stateMember, Node goalNode) {
             assert parent != null;
             assert value != null;
@@ -1675,7 +1699,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The {@link ProgramVariable} or {@code null} if an array index is used instead.
          */
-        public ProgramVariable getProgramVariable() {
+        public @Nullable ProgramVariable getProgramVariable() {
             return programVariable;
         }
 
@@ -1695,7 +1719,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The value or association target.
          */
-        public Term getValue() {
+        public @NonNull Term getValue() {
             return value;
         }
 
@@ -1722,7 +1746,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The array index.
          */
-        public Term getArrayIndex() {
+        public @Nullable Term getArrayIndex() {
             return arrayIndex;
         }
 
@@ -1731,7 +1755,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The array start index.
          */
-        public Term getArrayStartIndex() {
+        public @Nullable Term getArrayStartIndex() {
             return arrayStartIndex;
         }
 
@@ -1740,7 +1764,7 @@ public abstract class AbstractUpdateExtractor {
          *
          * @return The array end index.
          */
-        public Term getArrayEndIndex() {
+        public @Nullable Term getArrayEndIndex() {
             return arrayEndIndex;
         }
 
@@ -1775,7 +1799,7 @@ public abstract class AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof ExecutionVariableValuePair other) {
                 return isArrayRange()
                         ? (getArrayStartIndex().equals(other.getArrayStartIndex())
@@ -1820,7 +1844,7 @@ public abstract class AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             if (isArrayRange()) {
                 return "[" + getArrayIndex() + "]" + " between " + getArrayStartIndex() + " and "
                     + getArrayEndIndex() + (getParent() != null ? " of " + getParent() : "")

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This variable condition checks if the instantiation of a schemavariable (of type Field) refers to
  * a Java field declared as "static".
@@ -33,7 +35,8 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull SVInstantiations instMap,
             Services services) {
         final Object o = instMap.getInstantiation(field);
         if (!(o instanceof Term f)) {
@@ -59,7 +62,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negated ? "\\not" : "") + "\\isStaticField(" + field + ")";
     }
 }

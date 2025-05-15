@@ -16,6 +16,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A normal RewriteTaclet except that the formula which is added by this taclet is also added to the
@@ -26,6 +28,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * @author christoph
  */
+@NullMarked
 public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     public static final String USE_IF = "Use information flow contract for ";

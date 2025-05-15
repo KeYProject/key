@@ -7,21 +7,23 @@ import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
+import org.jspecify.annotations.NonNull;
+
 public class SMTMenuItem extends JMenuItem {
     private static final long serialVersionUID = 1L;
-    private final SolverTypeCollection solverUnion;
+    private final @NonNull SolverTypeCollection solverUnion;
 
-    public SMTMenuItem(SolverTypeCollection solverUnion) {
+    public SMTMenuItem(@NonNull SolverTypeCollection solverUnion) {
         super();
         this.solverUnion = solverUnion;
         this.setText(solverUnion.toString());
     }
 
-    public SolverTypeCollection getSolverUnion() {
+    public @NonNull SolverTypeCollection getSolverUnion() {
         return solverUnion;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return solverUnion.toString();
     }
 }

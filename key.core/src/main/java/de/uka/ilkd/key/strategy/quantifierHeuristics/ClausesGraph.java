@@ -17,6 +17,9 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class describes the relation between different clauses in a CNF. If two clauses have the
  * same existential quantifiable variable, we say they are connected. And this property is
@@ -33,7 +36,8 @@ public class ClausesGraph {
 
     private final ImmutableSet<Term> clauses;
 
-    static ClausesGraph create(Term quantifiedFormula, ServiceCaches caches) {
+    static @NonNull ClausesGraph create(@NonNull Term quantifiedFormula,
+            @NonNull ServiceCaches caches) {
         final Map<Term, ClausesGraph> graphCache = caches.getGraphCache();
         ClausesGraph graph;
         synchronized (graphCache) {
@@ -48,7 +52,7 @@ public class ClausesGraph {
         return graph;
     }
 
-    private ClausesGraph(Term quantifiedFormula) {
+    private ClausesGraph(@NonNull Term quantifiedFormula) {
         exVars = existentialVars(quantifiedFormula);
         clauses = computeClauses(TriggerUtils.discardQuantifiers(quantifiedFormula));
         buildInitialGraph();
@@ -74,7 +78,8 @@ public class ClausesGraph {
         } while (changed);
     }
 
-    private ImmutableSet<Term> getTransitiveConnections(ImmutableSet<Term> formulas) {
+    private @NonNull ImmutableSet<Term> getTransitiveConnections(
+            @NonNull ImmutableSet<Term> formulas) {
         for (Term formula : formulas) {
             formulas = formulas.union(getConnections(formula));
         }
@@ -87,7 +92,7 @@ public class ClausesGraph {
      * @param formula1
      * @return ture if clause of formula0 and clause of formula1 are connected.
      */
-    boolean connected(Term formula0, Term formula1) {
+    boolean connected(@NonNull Term formula0, @NonNull Term formula1) {
         final ImmutableSet<Term> subFormulas1 = computeClauses(formula1);
         for (Term term : computeClauses(formula0)) {
             if (intersect(getConnections(term), subFormulas1).size() > 0) {
@@ -130,7 +135,7 @@ public class ClausesGraph {
      * @param formula
      * @return set of term that connect to formula.
      */
-    private ImmutableSet<Term> directConnections(Term formula) {
+    private @NonNull ImmutableSet<Term> directConnections(@NonNull Term formula) {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (Term clause1 : clauses) {
             final Term clause = clause1;
@@ -146,7 +151,7 @@ public class ClausesGraph {
      * @param set
      * @return ture if set contains one or more exists varaible that are also in exVars
      */
-    private boolean containsExistentialVariables(ImmutableSet<QuantifiableVariable> set) {
+    private boolean containsExistentialVariables(@NonNull ImmutableSet<QuantifiableVariable> set) {
         return intersectQV(set, exVars).size() > 0;
     }
 
@@ -155,7 +160,7 @@ public class ClausesGraph {
      * @param formula1
      * @return true if formula0 and formula1 have one or more exists varaible that are the same.
      */
-    private boolean directlyConnected(Term formula0, Term formula1) {
+    private boolean directlyConnected(@NonNull Term formula0, @NonNull Term formula1) {
         return containsExistentialVariables(intersectQV(formula0.freeVars(), formula1.freeVars()));
     }
 
@@ -164,7 +169,7 @@ public class ClausesGraph {
      * @return retrun set of terms of all clauses under the formula
      */
 
-    private ImmutableSet<Term> computeClauses(Term formula) {
+    private ImmutableSet<Term> computeClauses(@NonNull Term formula) {
         final Operator op = formula.op();
         if (op == Junctor.NOT) {
             return computeClauses(formula.sub(0));
@@ -178,7 +183,7 @@ public class ClausesGraph {
     /**
      * return the exists variables bound in the top level of a given cnf formula.
      */
-    private ImmutableSet<QuantifiableVariable> existentialVars(Term formula) {
+    private ImmutableSet<QuantifiableVariable> existentialVars(@NonNull Term formula) {
         final Operator op = formula.op();
         if (op == Quantifier.ALL) {
             return existentialVars(formula.sub(0));
@@ -192,8 +197,9 @@ public class ClausesGraph {
     /**
      * @return a set of quantifiableVariable which are belonged to both set0 and set1 have
      */
-    private ImmutableSet<QuantifiableVariable> intersectQV(ImmutableSet<QuantifiableVariable> set0,
-            ImmutableSet<QuantifiableVariable> set1) {
+    private @NonNull ImmutableSet<QuantifiableVariable> intersectQV(
+            @NonNull ImmutableSet<QuantifiableVariable> set0,
+            @NonNull ImmutableSet<QuantifiableVariable> set1) {
         return TriggerUtils.intersect(set0, set1);
     }
 
@@ -204,7 +210,8 @@ public class ClausesGraph {
      * @param set1
      * @return a set of terms which are belonged to both set0 and set1.
      */
-    private ImmutableSet<Term> intersect(ImmutableSet<Term> set0, ImmutableSet<Term> set1) {
+    private @NonNull ImmutableSet<Term> intersect(@Nullable ImmutableSet<Term> set0,
+            @Nullable ImmutableSet<Term> set1) {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
         if (set0 == null || set1 == null) {
             return res;

@@ -3,11 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Field;
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Parameter;
@@ -69,7 +66,8 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 
     @Override
     public String field(String inPackage, String inClass, String name, Type type) {
-        return field2domain.get(new Field(name, inPackage, inClass, type));
+        return Objects.requireNonNull(field2domain.get(new Field(name, inPackage, inClass, type)),
+            "Could not find field");
     }
 
     @Override
@@ -83,8 +81,10 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
     @Override
     public String parameter(String inPackage, String inClass, String methodName,
             String[] paramTypes, int index, Type type) {
-        return param2domain
-                .get(new Parameter(index, methodName, paramTypes, inPackage, inClass, type));
+        return Objects.requireNonNull(
+            param2domain
+                    .get(new Parameter(index, methodName, paramTypes, inPackage, inClass, type)),
+            "Parameter not found");
     }
 
     @Override
@@ -97,7 +97,9 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
     @Override
     public String returnValue(String inPackage, String inClass, String methodName,
             String[] paramTypes, Type type) {
-        return return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass, type));
+        return Objects.requireNonNull(
+            return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass, type)),
+            "Return value not found");
     }
 
     @Override

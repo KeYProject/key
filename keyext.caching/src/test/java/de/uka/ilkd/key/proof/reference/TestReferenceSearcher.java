@@ -17,12 +17,13 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestReferenceSearcher {
-    private static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    private static final @Nullable File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
     void testFindsReferenceInSameProof() throws Exception {

@@ -14,6 +14,9 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
     public SetCommand() {
@@ -21,13 +24,13 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
         if (args.key == null ^ args.value == null) {
             throw new IllegalArgumentException(
                 "When using key or value in a set command, you have to use both.");
@@ -61,7 +64,7 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
      * quite complicated implementation, which is inspired by StrategySelectionView.
      */
 
-    private void updateStrategySettings(StrategyProperties p) {
+    private void updateStrategySettings(@NonNull StrategyProperties p) {
         final Proof proof = state.getProof();
         final Strategy strategy = getStrategy(p);
 
@@ -86,30 +89,34 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
         // (DS, 2020-04-08) This should not happen -- we already have a proof with that
         // strategy, there should be a factory for it.
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "set";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /** One Step Simplification parameter */
         @Option(value = "oss", required = false)
+        @Nullable
         public Boolean oneStepSimplification;
 
         /** Maximum number of proof steps parameter */
         @Option(value = "steps", required = false)
+        @Nullable
         public Integer proofSteps;
 
         /** Normal key-value setting -- key */
         @Option(value = "key", required = false)
+        @Nullable
         public String key;
 
         /** Normal key-value setting -- value */
         @Option(value = "value", required = false)
+        @Nullable
         public String value;
     }
 }

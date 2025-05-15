@@ -13,6 +13,8 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Costs for the {@link DeleteMergePointRuleFeature}; incredibly cheap if the previous rule
  * application was
@@ -30,7 +32,7 @@ public class DeleteMergePointRuleFeature implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
             MutableState mState) {
         return goal.node().parent().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                 ? NumberRuleAppCost.create(-50000)

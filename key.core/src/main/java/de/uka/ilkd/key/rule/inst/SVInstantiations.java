@@ -13,18 +13,19 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
@@ -36,7 +37,9 @@ import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRE
  * this means changing its content results in creating a new object.
  */
 public class SVInstantiations implements EqualsModProofIrrelevancy {
-    /** the empty instantiation */
+    /**
+     * the empty instantiation
+     */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
 
     /**
@@ -51,7 +54,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         }, false); // just a dummy SV for context
 
 
-    /** the map with the instantiations to logic terms */
+    /**
+     * the map with the instantiations to logic terms
+     */
     private final ImmutableMap<SchemaVariable, InstantiationEntry<?>> map;
 
     /**
@@ -66,14 +71,20 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      */
     private final ImmutableList<UpdateLabelPair> updateContext;
 
-    /** instantiations of generic sorts */
+    /**
+     * instantiations of generic sorts
+     */
     private GenericSortInstantiations genericSortInstantiations =
         GenericSortInstantiations.EMPTY_INSTANTIATIONS;
 
-    /** additional conditions for the generic sorts */
+    /**
+     * additional conditions for the generic sorts
+     */
     private final ImmutableList<GenericSortCondition> genericSortConditions;
 
-    /** creates a new SVInstantions object with an empty map */
+    /**
+     * creates a new SVInstantions object with an empty map
+     */
     private SVInstantiations() {
         genericSortConditions = ImmutableSLList.nil();
         updateContext = ImmutableSLList.nil();
@@ -124,21 +135,25 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param subst the Term the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, Term subst, Services services) {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, @NonNull Term subst,
+            Services services) {
         return add(sv, new TermInstantiation(sv, subst), services);
     }
 
 
-    public SVInstantiations addInteresting(SchemaVariable sv, Term subst, Services services) {
+    public @NonNull SVInstantiations addInteresting(@NonNull SchemaVariable sv, @NonNull Term subst,
+            Services services) {
         return addInteresting(sv, new TermInstantiation(sv, subst), services);
     }
 
 
-    public SVInstantiations add(SchemaVariable sv, ProgramList pes, Services services) {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, @NonNull ProgramList pes,
+            Services services) {
         return add(sv, new ProgramListInstantiation(pes.getList()), services);
     }
 
-    public SVInstantiations add(SchemaVariable sv, ImmutableArray<TermLabel> labels,
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv,
+            @NonNull ImmutableArray<TermLabel> labels,
             Services services) {
         return add(sv, new TermLabelInstantiationEntry(labels), services);
     }
@@ -146,17 +161,18 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * Add the given additional condition for the generic sort instantiations
      */
-    public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind,
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv,
+            Modality.@NonNull JavaModalityKind kind,
             Services services) throws SortException {
         return add(sv, new InstantiationEntry<>(kind) {
         }, services);
     }
 
-    public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
+    public @NonNull SVInstantiations addList(@NonNull SchemaVariable sv, Object[] list,
+            Services services) {
         return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
             services);
     }
-
 
 
     /**
@@ -167,22 +183,23 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, ProgramElement pe, Services services) {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, @NonNull ProgramElement pe,
+            Services services) {
         return add(sv, new ProgramInstantiation(pe), services);
     }
 
 
-    public SVInstantiations addInteresting(SchemaVariable sv, ProgramElement pe,
+    public @NonNull SVInstantiations addInteresting(@NonNull SchemaVariable sv,
+            @NonNull ProgramElement pe,
             Services services) {
         return addInteresting(sv, new ProgramInstantiation(pe), services);
     }
 
-    public SVInstantiations addInterestingList(SchemaVariable sv, Object[] list,
+    public @NonNull SVInstantiations addInterestingList(@NonNull SchemaVariable sv, Object[] list,
             Services services) {
         return addInteresting(sv,
             new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)), services);
     }
-
 
 
     /**
@@ -195,7 +212,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param pe the ProgramElement the context positions are related to
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
+    public @NonNull SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
             ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
         return add(CONTEXTSV,
             new ContextInstantiationEntry(prefix, postfix, activeStatementContext, pe), services);
@@ -214,7 +231,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     private static final SortException UNSOLVABLE_SORT_CONDITIONS_EXCEPTION = new SortException(
         "Conditions for sorts" + " cannot be satisfied\n" + "(This exception object is static)");
 
-    private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
+    private @NonNull SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
             boolean p_forceRebuild, Services services) {
         if (p_sv instanceof OperatorSV asv) {
             Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
@@ -231,7 +248,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         return this;
     }
 
-    private SVInstantiations checkCondition(GenericSortCondition p_c, boolean p_forceRebuild,
+    private @NonNull SVInstantiations checkCondition(@NonNull GenericSortCondition p_c,
+            boolean p_forceRebuild,
             Services services) {
         Boolean b = getGenericSortInstantiations().checkCondition(p_c);
 
@@ -246,7 +264,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         return this;
     }
 
-    private SVInstantiations rebuildSorts(Services services) {
+    private @NonNull SVInstantiations rebuildSorts(Services services) {
         genericSortInstantiations =
             GenericSortInstantiations.create(map.iterator(), getGenericSortConditions(), services);
         return this;
@@ -260,13 +278,15 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param entry the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, Services services) {
+    public @NonNull SVInstantiations add(@NonNull SchemaVariable sv, InstantiationEntry<?> entry,
+            Services services) {
         return new SVInstantiations(map.put(sv, entry), interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions()).checkSorts(sv, entry, false,
                 services);
     }
 
-    public SVInstantiations addInteresting(SchemaVariable sv, InstantiationEntry<?> entry,
+    public @NonNull SVInstantiations addInteresting(@NonNull SchemaVariable sv,
+            InstantiationEntry<?> entry,
             Services services) {
         return new SVInstantiations(map.put(sv, entry), interesting().put(sv, entry),
             getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions())
@@ -274,7 +294,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
 
-    public SVInstantiations addInteresting(SchemaVariable sv, Name name, Services services) {
+    public @NonNull SVInstantiations addInteresting(@NonNull SchemaVariable sv, @NonNull Name name,
+            Services services) {
         SchemaVariable existingSV = lookupVar(sv.name());
         Name oldValue = (Name) getInstantiation(existingSV);
         if (name.equals(oldValue)) {
@@ -296,7 +317,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param sv the SchemaVariable to be instantiated
      * @param entry the InstantiationEntry the SchemaVariable is instantiated with
      */
-    public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
+    public @NonNull SVInstantiations replace(@NonNull SchemaVariable sv,
+            InstantiationEntry<?> entry,
             Services services) {
         return new SVInstantiations(map.remove(sv).put(sv, entry), interesting(),
             getUpdateContext(), getGenericSortConditions()).checkSorts(sv, entry, true, services);
@@ -307,7 +329,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      *
      * @throws IllegalInstantiationException, if sv has not yet been instantiated
      */
-    public SVInstantiations makeInteresting(SchemaVariable sv, Services services) {
+    public @NonNull SVInstantiations makeInteresting(@NonNull SchemaVariable sv,
+            Services services) {
         final InstantiationEntry<?> entry = getInstantiationEntry(sv);
 
         if (entry == null) {
@@ -328,7 +351,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param sv the SchemaVariable to be instantiated
      * @param term the Term the SchemaVariable is instantiated with
      */
-    public SVInstantiations replace(SchemaVariable sv, Term term, Services services) {
+    public @NonNull SVInstantiations replace(@NonNull SchemaVariable sv, @NonNull Term term,
+            Services services) {
         return replace(sv, new TermInstantiation(sv, term), services);
     }
 
@@ -339,7 +363,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param sv the SchemaVariable to be instantiated
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      */
-    public SVInstantiations replace(SchemaVariable sv, ProgramElement pe, Services services) {
+    public @NonNull SVInstantiations replace(@NonNull SchemaVariable sv, @NonNull ProgramElement pe,
+            Services services) {
         return replace(sv, new ProgramInstantiation(pe), services);
     }
 
@@ -350,7 +375,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param sv the SchemaVariable to be instantiated
      * @param pes the ArrayOf<t> the SchemaVariable is instantiated with
      */
-    public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes,
+    public @NonNull SVInstantiations replace(@NonNull SchemaVariable sv,
+            @NonNull ImmutableArray<ProgramElement> pes,
             Services services) {
         return replace(sv, new ProgramListInstantiation(pes), services);
     }
@@ -366,7 +392,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @param activeStatementContext the ExecutionContext of the first active statement
      * @param pe the ProgramElement the context positions are related to
      */
-    public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
+    public @NonNull SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
             ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
         return replace(CONTEXTSV,
             new ContextInstantiationEntry(prefix, postfix, activeStatementContext, pe), services);
@@ -378,7 +404,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      *
      * @return true iff the sv has been instantiated already
      */
-    public boolean isInstantiated(SchemaVariable sv) {
+    public boolean isInstantiated(@NonNull SchemaVariable sv) {
         return map.containsKey(sv);
     }
 
@@ -389,7 +415,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      *         no
      *         instantiation is stored
      */
-    public InstantiationEntry<?> getInstantiationEntry(SchemaVariable sv) {
+    public @Nullable InstantiationEntry<?> getInstantiationEntry(@NonNull SchemaVariable sv) {
         return map.get(sv);
     }
 
@@ -399,7 +425,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
      *         stored
      */
-    public Object getInstantiation(SchemaVariable sv) {
+    public @Nullable Object getInstantiation(@NonNull SchemaVariable sv) {
         final InstantiationEntry<?> entry = getInstantiationEntry(sv);
         return entry == null ? null : entry.getInstantiation();
     }
@@ -411,7 +437,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
      *         stored
      */
-    public Term getTermInstantiation(SchemaVariable sv, ExecutionContext ec, Services services) {
+    public @Nullable Term getTermInstantiation(@NonNull SchemaVariable sv,
+            @NonNull ExecutionContext ec, @NonNull Services services) {
         final Object inst = getInstantiation(sv);
         if (inst == null) {
             return null;
@@ -429,7 +456,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      *
      * @param updateApplicationlabels the TermLabels attached to the application operator term
      */
-    public SVInstantiations addUpdate(Term update,
+    public @NonNull SVInstantiations addUpdate(@NonNull Term update,
             ImmutableArray<TermLabel> updateApplicationlabels) {
         assert update.sort() == JavaDLTheory.UPDATE;
         return new SVInstantiations(map, interesting(),
@@ -439,7 +466,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     public record UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof UpdateLabelPair) {
                 return update.equals(((UpdateLabelPair) obj).update()) && updateApplicationlabels
                         .equals(((UpdateLabelPair) obj).updateApplicationlabels());
@@ -454,7 +481,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         }
     }
 
-    public SVInstantiations addUpdateList(ImmutableList<UpdateLabelPair> updates) {
+    public @NonNull SVInstantiations addUpdateList(
+            @NonNull ImmutableList<UpdateLabelPair> updates) {
         if (updates.isEmpty() && updateContext.isEmpty()) {
             // avoid unnecessary creation of SVInstantiations
             return this;
@@ -464,7 +492,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
 
-    public SVInstantiations clearUpdateContext() {
+    public @NonNull SVInstantiations clearUpdateContext() {
         if (updateContext.isEmpty()) {
             // avoid unnecessary creation of SVInstantiations
             return this;
@@ -476,7 +504,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * returns the instantiation entry for the context "schema variable" or null if non such exists
      */
-    public ContextInstantiationEntry getContextInstantiation() {
+    public @Nullable ContextInstantiationEntry getContextInstantiation() {
         final InstantiationEntry<?> entry = getInstantiationEntry(CONTEXTSV);
         return (ContextInstantiationEntry) entry;
     }
@@ -486,7 +514,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      *
      * @return the Iterator<SchemaVariable>
      */
-    public Iterator<SchemaVariable> svIterator() {
+    public @NonNull Iterator<SchemaVariable> svIterator() {
         return map.keyIterator();
     }
 
@@ -495,7 +523,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      *
      * @return the Iterator
      */
-    public Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> pairIterator() {
+    public @NonNull Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> pairIterator() {
         return map.iterator();
     }
 
@@ -531,7 +559,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      *
      * @return true if the given object and this one have the same mappings
      */
-    public boolean equals(Object obj) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         final SVInstantiations cmp;
         if (!(obj instanceof SVInstantiations)) {
             return false;
@@ -613,7 +642,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         return this.size(); // not used currently
     }
 
-    public SVInstantiations union(SVInstantiations other, Services services) {
+    public @NonNull SVInstantiations union(@NonNull SVInstantiations other, Services services) {
         ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
 
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry : other.map) {
@@ -642,7 +671,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder result = new StringBuilder("SV Instantiations: ");
         return (result.append(map.toString())).toString();
     }
@@ -650,13 +679,14 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     /**
      * Add the given additional condition for the generic sort instantiations
      */
-    public SVInstantiations add(GenericSortCondition p_c, Services services) throws SortException {
+    public @NonNull SVInstantiations add(@NonNull GenericSortCondition p_c, Services services)
+            throws SortException {
         return new SVInstantiations(map, interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
                 .checkCondition(p_c, false, services);
     }
 
-    public ExecutionContext getExecutionContext() {
+    public @Nullable ExecutionContext getExecutionContext() {
         final ContextInstantiationEntry cte = getContextInstantiation();
         if (cte != null) {
             return cte.activeStatementContext();
@@ -665,7 +695,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         }
     }
 
-    public ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(Name name) {
+    public @Nullable ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(
+            Name name) {
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e : map) {
             if (e.key().name().equals(name)) {
                 return e;
@@ -674,12 +705,12 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         return null; // handle this better!
     }
 
-    public SchemaVariable lookupVar(Name name) {
+    public @Nullable SchemaVariable lookupVar(Name name) {
         final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = lookupEntryForSV(name);
         return e == null ? null : e.key(); // handle this better!
     }
 
-    public Object lookupValue(Name name) {
+    public @Nullable Object lookupValue(Name name) {
         final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = lookupEntryForSV(name);
         return e == null ? null : e.value().getInstantiation();
     }

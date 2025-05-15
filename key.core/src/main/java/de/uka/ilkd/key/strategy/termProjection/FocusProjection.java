@@ -9,6 +9,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Projection of a rule application to its focus (the term or formula that the rule operates on,
  * that for taclets is described using <code>\find</code>, and that can be modified by the rule).
@@ -25,12 +27,13 @@ public class FocusProjection implements ProjectionToTerm {
         this.stepsUpwards = stepsUpwards;
     }
 
-    public static ProjectionToTerm create(int stepsUpwards) {
+    public static @NonNull ProjectionToTerm create(int stepsUpwards) {
         return new FocusProjection(stepsUpwards);
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public @NonNull Term toTerm(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;

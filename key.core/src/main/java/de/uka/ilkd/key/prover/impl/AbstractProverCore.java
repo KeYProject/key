@@ -11,6 +11,8 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Common class for provers which takes care of listener registration and task event propagation
  *
@@ -25,7 +27,7 @@ public abstract class AbstractProverCore implements ProverCore {
      * We use an immutable list to store listeners to allow for addition/removal within listener
      * code without causing a deadlock
      */
-    private ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
+    private @NonNull ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
 
 
     /**

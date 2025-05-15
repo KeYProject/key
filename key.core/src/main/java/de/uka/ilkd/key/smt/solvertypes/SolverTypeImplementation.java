@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * Final SolverType implementation that uses building blocks for the various methods. This can be
  * used to modify a ModifiableSolverType object using .props files only, for example (see
  * {@link SolverPropertiesLoader}).
- *
+ * <p>
  * The building blocks that can be modified on creation are: - The various String parameters such as
  * default command, params and the name - The solver type's default timeout - The message delimiters
  * used by solver processes of the created solver type - The {@link AbstractSolverSocket} used to
@@ -137,7 +137,7 @@ public final class SolverTypeImplementation implements SolverType {
      * The versionParameter of the solver type at hand, returned by the actual program using the
      * {@link #versionParameter} cmd parameter.
      */
-    private String installedVersion;
+    private @Nullable String installedVersion;
 
     /**
      * The names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used by the
@@ -165,7 +165,7 @@ public final class SolverTypeImplementation implements SolverType {
     /**
      * The preamble String for the created {@link SMTTranslator}, may be null.
      */
-    private final @Nullable String preamble;
+    private final String preamble;
 
     /**
      * Used for creation of new sockets as well as modifying problem Strings. Should not be returned
@@ -433,7 +433,7 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     @Override
-    public String getInstalledVersion() {
+    public @Nullable String getInstalledVersion() {
         return installedVersion;
     }
 
@@ -465,10 +465,10 @@ public final class SolverTypeImplementation implements SolverType {
      * is a temporary solution as it may lead to weird behaviour, for example shorter Strings will
      * be before longer Strings and 1.14.1 will be before 1.8.10 even though they have the same
      * length.
-     *
+     * <p>
      * If that lexicographical comparison is not possible, you may have to modify the
      * SolverTypeImplementation class and change SolverPropertiesLoader accordingly.
-     *
+     * <p>
      * TODO Find better solution
      */
     @Override

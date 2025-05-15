@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Binary feature that returns zero iff the focus of a rule contains a quantifier
@@ -21,7 +23,8 @@ public class ContainsQuantifierFeature extends AbstractBetaFeature {
     private ContainsQuantifierFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation(PosInOccurrence pos, @NonNull Term findTerm,
+            @NonNull ServiceCaches caches) {
         return containsQuantifier(findTerm, caches) ? BinaryFeature.ZERO_COST
                 : BinaryFeature.TOP_COST;
     }

@@ -24,6 +24,9 @@ import de.uka.ilkd.key.speclang.BlockContract;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author christoph
@@ -47,8 +50,9 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
+    public @NonNull ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener) {
         assert canApplyTo(proof, goals, posInOcc);
 
         final ProofOblInput poForProof =
@@ -106,8 +110,9 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
      * @return the created taclet
      */
     private Taclet buildBlockInfFlowUnfoldTaclet(final Services services,
-            final BlockContractInternalBuiltInRuleApp blockRuleApp, final BlockContract contract,
-            IFProofObligationVars ifVars, final Term result) {
+            final @NonNull BlockContractInternalBuiltInRuleApp blockRuleApp,
+            final BlockContract contract,
+            @NonNull IFProofObligationVars ifVars, final Term result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
             new BlockInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(contract);

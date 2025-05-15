@@ -23,6 +23,9 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.
  *
@@ -33,10 +36,11 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * {@inheritDoc}
      */
     @Override
-    public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+    public TermLabel keepLabel(@NonNull TermLabelState state, @NonNull Services services,
+            @Nullable PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+            Goal goal,
             Object hint, Term tacletTerm,
-            Term newTerm, TermLabel label) {
+            @NonNull Term newTerm, TermLabel label) {
         // Maintain label if new Term is a predicate
         if (TruthValueTracingUtil.isPredicate(newTerm.op())
                 || TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())) {
@@ -135,7 +139,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * @param visitStack The taclet {@link Term} stack.
      * @return {@code true} is below if-then-else, {@code false} otherwise.
      */
-    protected boolean isBelowIfThenElse(Deque<Term> visitStack) {
+    protected boolean isBelowIfThenElse(@Nullable Deque<Term> visitStack) {
         if (visitStack != null) {
             return CollectionUtil.search(visitStack,
                 element -> element.op() == IfThenElse.IF_THEN_ELSE) != null;
@@ -150,7 +154,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * @param labels The {@link TermLabel}s to search in.
      * @return The found {@link FormulaTermLabel} or {@code null} if not available.
      */
-    public static FormulaTermLabel searchFormulaTermLabel(ImmutableArray<TermLabel> labels) {
+    public static @Nullable FormulaTermLabel searchFormulaTermLabel(
+            @NonNull ImmutableArray<TermLabel> labels) {
         TermLabel result =
             CollectionUtil.search(labels, element -> element instanceof FormulaTermLabel);
         return (FormulaTermLabel) result;
@@ -163,7 +168,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * @param tacletTerm The taclet {@link Term} to check.
      * @return {@code true} is top level, {@code false} is not top level.
      */
-    protected boolean isTopLevel(TacletLabelHint tacletHint, Term tacletTerm) {
+    protected boolean isTopLevel(@NonNull TacletLabelHint tacletHint, Term tacletTerm) {
         if (TacletOperation.REPLACE_TERM.equals(tacletHint.getTacletOperation())) {
             return tacletHint.getTerm() == tacletTerm;
         } else {

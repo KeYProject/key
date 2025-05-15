@@ -7,6 +7,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Abstract constraint interface for constraints offering unification of terms and joins. There are
  * no public constructors to build up a new Constraint use the BOTTOM constraint (static final class
@@ -152,7 +154,8 @@ public interface Constraint {
          * @return the instantiation of the metavariable
          */
         @Override
-        public Term getInstantiation(Metavariable p_mv, Services services) {
+        public @NonNull Term getInstantiation(@NonNull Metavariable p_mv,
+                @NonNull Services services) {
             // As there is in fact no instantiation satisfying this
             // constraint, we could return everything
             return services.getTermBuilder().var(p_mv);
@@ -165,19 +168,19 @@ public interface Constraint {
          * @return always this
          */
         @Override
-        public Constraint unify(Term t1, Term t2, Services services) {
+        public @NonNull Constraint unify(Term t1, Term t2, Services services) {
             return this;
         }
 
         @Override
-        public Constraint unify(Term t1, Term t2, Services services,
-                BooleanContainer unchanged) {
+        public @NonNull Constraint unify(Term t1, Term t2, Services services,
+                @NonNull BooleanContainer unchanged) {
             unchanged.setVal(true);
             return this;
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             return (obj instanceof Top);
         }
 
@@ -200,7 +203,7 @@ public interface Constraint {
          * @return this
          */
         @Override
-        public Constraint join(Constraint co, Services services) {
+        public @NonNull Constraint join(Constraint co, Services services) {
             return this;
         }
 
@@ -210,7 +213,8 @@ public interface Constraint {
          * @return this
          */
         @Override
-        public Constraint join(Constraint co, Services services, BooleanContainer c) {
+        public @NonNull Constraint join(Constraint co, Services services,
+                @NonNull BooleanContainer c) {
             c.setVal(true);
             return this;
         }
@@ -229,7 +233,7 @@ public interface Constraint {
          * @return String representing the TOP constraint
          */
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "TOP";
         }
 

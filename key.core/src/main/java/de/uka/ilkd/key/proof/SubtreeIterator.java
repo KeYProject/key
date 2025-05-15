@@ -6,6 +6,8 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Iterator over subtree. Current implementation iteratively traverses the tree depth-first.
  *
@@ -23,7 +25,7 @@ class SubtreeIterator implements Iterator<Node> {
         this.root = root;
     }
 
-    private Node nextSibling(Node m) {
+    private @Nullable Node nextSibling(Node m) {
         Node p = m.parent();
         while (p != null && m != root) {
             final int c = p.childrenCount();

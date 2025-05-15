@@ -6,6 +6,8 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.GoalChooserBuilder;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This {@link GoalChooserBuilder} creates a special {@link GoalChooser} for symbolic execution.
  *
@@ -22,7 +24,7 @@ public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder {
      * {@inheritDoc}
      */
     @Override
-    public GoalChooser create() {
+    public @NonNull GoalChooser create() {
         return new SymbolicExecutionGoalChooser();
     }
 
@@ -30,7 +32,7 @@ public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder {
      * {@inheritDoc}
      */
     @Override
-    public GoalChooserBuilder copy() {
+    public @NonNull GoalChooserBuilder copy() {
         return new SymbolicExecutionGoalChooserBuilder();
     }
 
@@ -38,7 +40,7 @@ public class SymbolicExecutionGoalChooserBuilder implements GoalChooserBuilder {
      * {@inheritDoc}
      */
     @Override
-    public String name() {
+    public @NonNull String name() {
         return NAME;
     }
 }

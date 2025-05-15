@@ -8,6 +8,8 @@ import java.io.Serializable;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * this class encapsulates a SchemaVariable and its corresponding instantiation if it is a
  * JavaProgramElement. The class MapFrom...cannot be used because of the different packages of the
@@ -50,7 +52,8 @@ public class ProgramSVEntry implements Serializable {
      *
      * @return true iff the keys and the mapped values are equal
      */
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof ProgramSVEntry cmp)) {
             return false;
         }
@@ -74,7 +77,7 @@ public class ProgramSVEntry implements Serializable {
     }
 
     /** toString */
-    public String toString() {
+    public @NonNull String toString() {
         return "{" + key + "<--" + value + "}";
     }
 

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Settings for the proof slicing extension.
@@ -55,12 +56,12 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
     private static final String DOT_EXECUTABLE_INFO =
         "Path to dot executable from the graphviz package.";
 
-    private final JCheckBox alwaysTrack;
+    private final @NonNull JCheckBox alwaysTrack;
     /**
      * Checkbox for first option.
      */
-    private final JCheckBox aggressiveDeduplicate;
-    private final JTextField dotExecutable;
+    private final @NonNull JCheckBox aggressiveDeduplicate;
+    private final @NonNull JTextField dotExecutable;
 
     /**
      * Construct a new settings provider.
@@ -83,20 +84,20 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Proof Slicing";
     }
 
     /**
      * @return the settings managed by this provider
      */
-    public static SlicingSettings getSlicingSettings() {
+    public static @NonNull SlicingSettings getSlicingSettings() {
         ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(SLICING_SETTINGS);
         return SLICING_SETTINGS;
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         SlicingSettings ss = getSlicingSettings();
         alwaysTrack.setSelected(ss.getAlwaysTrack());
         dotExecutable.setText(ss.getDotExecutable());

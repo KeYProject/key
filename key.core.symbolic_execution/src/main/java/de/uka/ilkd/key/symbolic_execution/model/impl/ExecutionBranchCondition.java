@@ -21,6 +21,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link IExecutionBranchCondition}.
  *
@@ -41,7 +44,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     /**
      * The human readable branch condition.
      */
-    private String formatedBranchCondition;
+    private @Nullable String formatedBranchCondition;
 
     /**
      * The path condition to reach this node.
@@ -51,7 +54,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     /**
      * The human readable path condition to reach this node.
      */
-    private String formatedPathCondition;
+    private @Nullable String formatedPathCondition;
 
     /**
      * Merged branch conditions.
@@ -71,7 +74,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      *        {@link IExecutionNode}.
      * @param additionalBranchLabel The optional additional branch label.
      */
-    public ExecutionBranchCondition(ITreeSettings settings, Node proofNode,
+    public ExecutionBranchCondition(@NonNull ITreeSettings settings, @NonNull Node proofNode,
             String additionalBranchLabel) {
         super(settings, proofNode);
         this.additionalBranchLabel = additionalBranchLabel;
@@ -89,7 +92,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Branch Condition";
     }
 
@@ -237,7 +240,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public Node[] getMergedProofNodes() {
+    public Node @NonNull [] getMergedProofNodes() {
         return mergedProofNodes != null
                 ? mergedProofNodes.toArray(new Node[0])
                 : new Node[0];
@@ -260,7 +263,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      *
      * @throws ProofInputException Occurred Exception
      */
-    protected Term[] lazyComputeMergedBranchCondtions() throws ProofInputException {
+    protected Term @NonNull [] lazyComputeMergedBranchCondtions() throws ProofInputException {
         if (isMergedBranchCondition()) {
             Term[] result = new Term[mergedProofNodes.size()];
             Iterator<Node> iter = mergedProofNodes.iterator();
@@ -294,7 +297,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -311,7 +314,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public SourceElement getActiveStatement() {
+    public @Nullable SourceElement getActiveStatement() {
         Term modalityTerm = getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);

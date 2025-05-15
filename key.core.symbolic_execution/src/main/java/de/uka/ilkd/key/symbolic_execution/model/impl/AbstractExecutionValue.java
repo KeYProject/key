@@ -18,6 +18,9 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides a basic implementation of {@link IExecutionValue}.
  *
@@ -55,7 +58,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @param condition The condition.
      * @param value The value.
      */
-    public AbstractExecutionValue(ITreeSettings settings, Node proofNode,
+    public AbstractExecutionValue(@NonNull ITreeSettings settings, @NonNull Node proofNode,
             IExecutionVariable variable, Term condition, Term value) {
         super(settings, proofNode);
         this.variable = variable;
@@ -83,7 +86,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @return The related {@link IExecutionConstraint}s.
      * @throws ProofInputException Occurred Exception
      */
-    protected IExecutionConstraint[] lazyComputeConstraints() throws ProofInputException {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() throws ProofInputException {
         if (!isDisposed() && !isValueUnknown()) {
             List<IExecutionConstraint> constraints = new LinkedList<>();
             IExecutionConstraint[] allConstraints = getNodeConstraints();
@@ -114,7 +117,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @param term The initial {@link Term}.
      * @return The relevant {@link Term}s.
      */
-    protected Set<Term> collectRelevantTerms(Services services, Term term) {
+    protected @NonNull Set<Term> collectRelevantTerms(@NonNull Services services, Term term) {
         final Set<Term> terms = new HashSet<>();
         fillRelevantTerms(services, term, terms);
         return terms;
@@ -127,7 +130,8 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @param term The initial {@link Term}.
      * @param toFill The {@link Set} of relevant {@link Term}s to fill.
      */
-    protected void fillRelevantTerms(Services services, Term term, Set<Term> toFill) {
+    protected void fillRelevantTerms(@NonNull Services services, @Nullable Term term,
+            @NonNull Set<Term> toFill) {
         if (term != null) {
             if (term.op() instanceof ProgramVariable
                     || SymbolicExecutionUtil.isSelect(services, term)) {
@@ -148,7 +152,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @return {@code true} at least one {@link Term} is contained, {@code false} none of the
      *         {@link Term}s is contained.
      */
-    protected boolean containsTerm(Term term, Set<Term> toSearch) {
+    protected boolean containsTerm(@NonNull Term term, @NonNull Set<Term> toSearch) {
         if (toSearch.contains(OriginTermLabel.removeOriginLabels(term, getServices()))) {
             return true;
         } else {
@@ -195,7 +199,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Value";
     }
 

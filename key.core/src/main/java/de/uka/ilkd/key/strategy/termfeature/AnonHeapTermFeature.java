@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 
 public final class AnonHeapTermFeature extends BinaryTermFeature {
 
@@ -18,7 +20,7 @@ public final class AnonHeapTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(Term t, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term t, MutableState mState, Services services) {
         return // the heap term is an anon heap symbol
                // (for instance an anonHeap function)
         t.hasLabels() && t.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)

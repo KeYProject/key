@@ -18,6 +18,9 @@ import de.uka.ilkd.key.util.properties.Properties;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class InfFlowContractAppTacletExecutor
         extends RewriteTacletExecutor<InfFlowContractAppTaclet> {
     /**

@@ -27,6 +27,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * For the loop scope rule, if a local program variable that may be altered by the loop body appears
  * in the frame condition,
@@ -67,8 +69,8 @@ public class NewLocalVarsCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
+    public @NonNull MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull MatchConditions matchCond, Services services) {
         SVInstantiations svInst = matchCond.getInstantiations();
         if (svInst.getInstantiation(varDeclsSV) != null) {
             return matchCond;
@@ -104,7 +106,7 @@ public class NewLocalVarsCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\newLocalVars(" + varDeclsSV + ", " + updateBeforeSV + ", " + updateFrameSV + ", "
             + bodySV + ")";
     }

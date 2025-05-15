@@ -17,6 +17,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
@@ -74,7 +77,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @return the term of the update <code>u</code> applied on all subterms of <code>phi</code> and
      *         possible renaming
      */
-    private static Term applyUpdateOnRigid(Term u, Term phi, TermServices services) {
+    private static @NonNull Term applyUpdateOnRigid(@NonNull Term u, @NonNull Term phi,
+            @NonNull TermServices services) {
         // If there are no free variables in u, we don't have to check for name collisions
         if (u.freeVars().isEmpty()) {
             final TermBuilder tb = services.getTermBuilder();
@@ -106,7 +110,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @return the term of the update <code>u</code> applied on all subterms of <code>phi</code> and
      *         possible renaming
      */
-    private static Term applyUpdateOnRigidClashAware(Term u, Term phi, TermServices services) {
+    private static @NonNull Term applyUpdateOnRigidClashAware(@NonNull Term u, @NonNull Term phi,
+            @NonNull TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Set<Name> freeVarNamesInU = new HashSet<>();
@@ -159,8 +164,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @param services the {@link TermServices} to help create terms
      * @return a non-colliding {@link Name} for <code>var</code>
      */
-    private static Name createNonCollidingNameFor(QuantifiableVariable var, Term u, Term phi,
-            TermServices services) {
+    private static @NonNull Name createNonCollidingNameFor(@NonNull QuantifiableVariable var,
+            @NonNull Term u, @NonNull Term phi,
+            @NonNull TermServices services) {
         ClashFreeSubst.VariableCollectVisitor vcv = new ClashFreeSubst.VariableCollectVisitor();
         ImmutableSet<QuantifiableVariable> usedVars = u.freeVars();
         phi.execPostOrder(vcv);
@@ -188,8 +194,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @param services the {@link TermServices} to help create terms
      * @return true iff <code>name</code> is already used in <code>qvars</code>
      */
-    private static boolean nameIsAlreadyUsed(Name name, ImmutableSet<QuantifiableVariable> qvars,
-            TermServices services) {
+    private static boolean nameIsAlreadyUsed(@NonNull Name name,
+            @NonNull ImmutableSet<QuantifiableVariable> qvars,
+            @NonNull TermServices services) {
         for (QuantifiableVariable qvar : qvars) {
             if (qvar.name().equals(name)) {
                 return true;
@@ -199,8 +206,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);
@@ -226,7 +233,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\applyUpdateOnRigid(" + u + ", " + phi + ", " + result + ")";
     }
 }

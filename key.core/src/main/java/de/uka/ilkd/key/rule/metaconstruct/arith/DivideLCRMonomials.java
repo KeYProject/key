@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Metaoperator for computing the result of dividing one monomial by another
  */
@@ -21,7 +23,7 @@ public final class DivideLCRMonomials extends AbstractTermTransformer {
 
 
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         final Term arg1 = term.sub(0);
         final Term arg2 = term.sub(1);
 

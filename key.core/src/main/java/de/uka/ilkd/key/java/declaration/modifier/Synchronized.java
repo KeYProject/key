@@ -7,6 +7,8 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Synchronized.
  *
@@ -38,7 +40,7 @@ public class Synchronized extends Modifier {
      * @return the string.
      */
 
-    protected String getSymbol() {
+    protected @NonNull String getSymbol() {
         return "synchronized";
     }
 }

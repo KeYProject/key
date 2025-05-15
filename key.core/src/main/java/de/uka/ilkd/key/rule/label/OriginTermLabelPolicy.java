@@ -13,6 +13,9 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Policy for {@link OriginTermLabel}s.
  *
@@ -23,10 +26,10 @@ import de.uka.ilkd.key.rule.Rule;
 public class OriginTermLabelPolicy implements TermLabelPolicy {
 
     @Override
-    public TermLabel keepLabel(TermLabelState state, Services services,
+    public @Nullable TermLabel keepLabel(TermLabelState state, @NonNull Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm,
-            Term newTerm, TermLabel label) {
+            @NonNull Term newTerm, TermLabel label) {
         if (services.getProof() == null) {
             return label;
         }

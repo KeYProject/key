@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Binary feature that returns zero iff the hyper-tableaux simplification method approves the given
@@ -21,7 +23,8 @@ public class SimplifyBetaCandidateFeature extends AbstractBetaFeature {
     private SimplifyBetaCandidateFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation(@NonNull PosInOccurrence pos, @NonNull Term findTerm,
+            @NonNull ServiceCaches caches) {
         return isBetaCandidate(findTerm, pos.isInAntec(), caches) ? BinaryFeature.ZERO_COST
                 : BinaryFeature.TOP_COST;
     }

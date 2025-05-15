@@ -18,6 +18,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -55,7 +56,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param info
      * @return
      */
-    protected static JTextArea createInfoArea(String info) {
+    protected static @NonNull JTextArea createInfoArea(String info) {
         JTextArea textArea = new JTextArea(info);
         // textArea.setBackground(this.getBackground());
         textArea.setEditable(false);
@@ -68,7 +69,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param info
      * @param components
      */
-    protected void addRowWithHelp(String info, JComponent... components) {
+    protected void addRowWithHelp(@Nullable String info, JComponent @NonNull... components) {
         boolean hasInfo = info != null && !info.isEmpty();
         for (JComponent component : components) {
             component.setAlignmentX(LEFT_ALIGNMENT);
@@ -91,7 +92,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param <T>
      * @return
      */
-    protected <T> JComboBox<T> createSelection(T[] elements, Validator<T> validator) {
+    protected <T> @NonNull JComboBox<T> createSelection(T @NonNull [] elements,
+            @Nullable Validator<T> validator) {
         JComboBox<T> comboBox = new JComboBox<>(elements);
         comboBox.addActionListener(e -> {
             try {
@@ -115,7 +117,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param validator
      * @return
      */
-    protected JCheckBox addCheckBox(String title, String info, boolean value,
+    protected @NonNull JCheckBox addCheckBox(String title, String info, boolean value,
             final Validator<Boolean> validator) {
         JCheckBox checkBox = createCheckBox(title, value, validator);
         addRowWithHelp(info, new JLabel(), checkBox);
@@ -131,8 +133,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param validator
      * @return
      */
-    protected JTextField addFileChooserPanel(String title, String file, String info, boolean isSave,
-            final Validator<String> validator) {
+    protected @NonNull JTextField addFileChooserPanel(String title, String file, String info,
+            boolean isSave,
+            final @Nullable Validator<String> validator) {
         JTextField textField = new JTextField(file);
         textField.addActionListener(e -> {
             try {
@@ -189,8 +192,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param <T> the type of the items
      * @return the combo box
      */
-    protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
-            @Nullable Validator<T> validator, T... items) {
+    protected <T> @NonNull JComboBox<T> addComboBox(@Nullable String title, @Nullable String info,
+            int selectionIndex,
+            @Nullable Validator<T> validator, T @NonNull... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {
@@ -237,7 +241,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         return (JTextArea) field.getViewport().getView();
     }
 
-    protected JTextArea addTextAreaWithoutScroll(String title, String text, String info,
+    protected @NonNull JTextArea addTextAreaWithoutScroll(String title, String text, String info,
             final Validator<String> validator) {
         JTextArea field = createTextAreaWithoutScroll(text, validator);
         addTitledComponent(title, field, info);
@@ -252,7 +256,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param validator
      * @return
      */
-    protected JTextField addTextField(String title, String text, String info,
+    protected @NonNull JTextField addTextField(String title, String text, String info,
             final Validator<String> validator) {
         JTextField field = createTextField(text, validator);
         addTitledComponent(title, field, info);
@@ -260,7 +264,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     }
 
 
-    protected JTextField addTextField(String title, String text, String info,
+    protected @NonNull JTextField addTextField(String title, String text, String info,
             final Validator<String> validator, JComponent additionalActions) {
         JTextField field = createTextField(text, validator);
         JLabel label = new JLabel(title);
@@ -294,8 +298,10 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return the created JSpinner
      * @param <T> the class of the minimum value
      */
-    protected <T extends Number & Comparable<T>> JSpinner addNumberField(String title, T min,
-            Comparable<T> max, Number step, String info, final Validator<Number> validator) {
+    protected <T extends Number & Comparable<T>> @NonNull JSpinner addNumberField(String title,
+            @NonNull T min,
+            Comparable<T> max, @NonNull Number step, String info,
+            final Validator<Number> validator) {
         JSpinner field = createNumberTextField(min, max, step, validator);
         addTitledComponent(title, field, info);
         return field;
@@ -305,7 +311,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addRadioButtons(heading, Arrays.asList(alternatives), description);
     }
 
-    protected void addRadioButtons(String title, List<?> alternatives, String description) {
+    protected void addRadioButtons(String title, @NonNull List<?> alternatives,
+            String description) {
         JPanel items = new JPanel(new GridLayout(alternatives.size(), 1));
         ButtonGroup bg = new ButtonGroup();
         for (Object alt : alternatives) {
@@ -343,7 +350,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param <T> arbitrary
      * @return non-null
      */
-    protected <T> Validator<T> emptyValidator() {
+    protected <T> @NonNull Validator<T> emptyValidator() {
         return s -> {
         };
     }

@@ -10,6 +10,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This class offers a simple solution for receiving checked user input. It describes a panel
@@ -33,6 +36,7 @@ public class CheckedUserInput extends JPanel {
          * @return <code>null</code> if the user input is valid, otherwise a string describing the
          *         error.
          */
+        @Nullable
         String check(String toBeChecked);
 
 
@@ -114,7 +118,7 @@ public class CheckedUserInput extends JPanel {
     }
 
 
-    private TrafficLight getTrafficLight() {
+    private @NonNull TrafficLight getTrafficLight() {
         if (trafficLight == null) {
             trafficLight = new TrafficLight(10);
         }
@@ -188,12 +192,12 @@ public class CheckedUserInput extends JPanel {
         return getInputFieldForFormula().getText();
     }
 
-    public void setInput(String input) {
+    public void setInput(@Nullable String input) {
         getInputFieldForFormula().setText((input == null) ? "" : input);
         checkInput();
     }
 
-    private void setValid(String result) {
+    private void setValid(@Nullable String result) {
         getInfoBox().clear();
         if (result != null) {
             String[] segments = result.split("#");
@@ -204,7 +208,8 @@ public class CheckedUserInput extends JPanel {
 
     }
 
-    public static String showAsDialog(String title, String description, final String helpText,
+    public static @Nullable String showAsDialog(String title, @Nullable String description,
+            final @Nullable String helpText,
             String defaultInput, CheckedUserInputInspector inspector, boolean showInformation
 
     ) {

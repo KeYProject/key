@@ -17,6 +17,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An {@link IBreakpointStopCondition} which can be used during symbolic execution.
  *
@@ -34,7 +37,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
      *
      * @param breakpoints The {@link IBreakpoint} to use.
      */
-    public SymbolicExecutionBreakpointStopCondition(IBreakpoint... breakpoints) {
+    public SymbolicExecutionBreakpointStopCondition(IBreakpoint @Nullable... breakpoints) {
         super(Integer.MAX_VALUE);
         if (breakpoints != null) {
             Collections.addAll(this.breakpoints, breakpoints);
@@ -67,7 +70,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
      */
     @Override
     protected void handleNodeLimitNotExceeded(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
+            long startTime, int countApplied, Goal goal, Node node, @NonNull RuleApp ruleApp,
             Integer executedNumberOfSetNodes) {
         super.handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime, countApplied,
             goal, node, ruleApp, executedNumberOfSetNodes);
@@ -119,7 +122,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
      * {@inheritDoc}
      */
     @Override
-    public Set<IBreakpoint> getBreakpoints() {
+    public @NonNull Set<IBreakpoint> getBreakpoints() {
         return breakpoints;
     }
 }

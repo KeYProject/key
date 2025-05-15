@@ -34,7 +34,7 @@ public interface AutomatedRuleApplicationManager extends NewRuleListener {
     /**
      * Set the goal <code>this</code> is the rule app manager for
      */
-    void setGoal(Goal p_goal);
+    void setGoal(Goal goal);
 
     AutomatedRuleApplicationManager copy();
 

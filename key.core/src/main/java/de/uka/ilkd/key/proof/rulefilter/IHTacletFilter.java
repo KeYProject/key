@@ -11,6 +11,8 @@ import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Filter that selects taclets using the method <code>admissible</code> of the <code>Taclet</code>
  * class, i.e. with respect to active heuristics and the <code>interactive</code> flag. If the
@@ -36,7 +38,7 @@ public class IHTacletFilter extends TacletFilter {
     /**
      * @return true iff <code>taclet</code> should be included in the result
      */
-    public boolean filter(Taclet taclet) {
+    public boolean filter(@NonNull Taclet taclet) {
         if (!interactive) {
             Boolean b = filterCache.get(taclet);
             if (b == null) {

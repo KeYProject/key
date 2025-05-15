@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof_references;
 
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
@@ -174,7 +175,7 @@ public final class ProofReferenceUtil {
         LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
         if (node != null && analysts != null) {
             for (IProofReferencesAnalyst analyst : analysts) {
-                LinkedHashSet<IProofReference<?>> analystResult =
+                Set<IProofReference<?>> analystResult =
                     analyst.computeReferences(node, services);
                 if (analystResult != null) {
                     merge(result, analystResult);
@@ -190,8 +191,7 @@ public final class ProofReferenceUtil {
      * @param target The target to add to.
      * @param toAdd The {@link IProofReference}s to add.
      */
-    public static void merge(LinkedHashSet<IProofReference<?>> target,
-            LinkedHashSet<IProofReference<?>> toAdd) {
+    public static void merge(Set<IProofReference<?>> target, Set<IProofReference<?>> toAdd) {
         for (IProofReference<?> reference : toAdd) {
             merge(target, reference);
         }
@@ -203,7 +203,7 @@ public final class ProofReferenceUtil {
      * @param target The target to add to.
      * @param reference The {@link IProofReference} to add.
      */
-    public static void merge(LinkedHashSet<IProofReference<?>> target,
+    public static void merge(Set<IProofReference<?>> target,
             final IProofReference<?> reference) {
         if (!target.add(reference)) {
             // Reference exists before, so merge nodes of both references.

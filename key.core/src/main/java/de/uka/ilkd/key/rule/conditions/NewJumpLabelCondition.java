@@ -22,13 +22,16 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This variable condition ensures that no other label of the same name exists in the context
  * program or one of the schemavariable instantiations.
  */
 public final class NewJumpLabelCondition implements VariableCondition {
 
-    private final ProgramSV labelSV;
+    private final @NonNull ProgramSV labelSV;
 
     public NewJumpLabelCondition(SchemaVariable sv) {
         if (!(sv instanceof ProgramSV psv) || psv.sort() != ProgramSVSort.LABEL) {
@@ -41,7 +44,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond, Services services) {
         if (var != labelSV && matchCond.getInstantiations().isInstantiated(labelSV)) {
             var = labelSV;
@@ -61,7 +64,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
         return matchCond;
     }
 
-    private List<ProgramElement> collect(SVInstantiations inst) {
+    private @NonNull List<ProgramElement> collect(@NonNull SVInstantiations inst) {
         final List<ProgramElement> result = new LinkedList<>();
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             inst.pairIterator();
@@ -75,7 +78,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
         return result;
     }
 
-    private boolean isUnique(Label label, List<ProgramElement> programs, Services services) {
+    private boolean isUnique(@NonNull Label label, @NonNull List<ProgramElement> programs,
+            @NonNull Services services) {
         for (final ProgramElement pe : programs) {
             final LabelCollector lc = new LabelCollector(pe, services);
             lc.start();
@@ -88,7 +92,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\newLabel (" + labelSV + ")";
     }
 }

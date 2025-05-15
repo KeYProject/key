@@ -10,6 +10,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Returns zero iff the position of a rule application is not below any operators that bind
@@ -21,13 +24,14 @@ public class NotBelowBinderFeature extends BinaryFeature {
 
     private NotBelowBinderFeature() {}
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public boolean filter(RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
         return !belowBinder(pos);
     }
 
-    private boolean belowBinder(PosInOccurrence pos) {
+    private boolean belowBinder(@NonNull PosInOccurrence pos) {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {

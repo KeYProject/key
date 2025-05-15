@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.nparser;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -49,9 +50,10 @@ public class KeyIO {
 
     private final Services services;
     private final NamespaceSet nss;
-    private @Nullable Namespace<SchemaVariable> schemaNamespace;
     private List<BuildingIssue> warnings = new LinkedList<>();
-    private AbbrevMap abbrevMap;
+
+    private @Nullable Namespace<SchemaVariable> schemaNamespace;
+    private @Nullable AbbrevMap abbrevMap;
 
 
     public KeyIO(@NonNull Services services, @NonNull NamespaceSet nss) {
@@ -137,11 +139,7 @@ public class KeyIO {
      * @return
      */
     public Loader load(Path file) {
-        try {
-            return new Loader(file.toUri().toURL());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        return new Loader(file.toUri());
     }
 
 
@@ -160,8 +158,16 @@ public class KeyIO {
      * @param u
      * @return
      */
-    public Loader load(URL u) {
+    public Loader load(URI u) {
         return new Loader(u);
+    }
+
+    public Loader load(URL u) {
+        try {
+            return new Loader(u.toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -206,7 +212,7 @@ public class KeyIO {
         this.abbrevMap = abbrevMap;
     }
 
-    public AbbrevMap getAbbrevMap() {
+    public @Nullable AbbrevMap getAbbrevMap() {
         return abbrevMap;
     }
 
@@ -214,7 +220,7 @@ public class KeyIO {
         return warnings;
     }
 
-    public @Nullable List<BuildingIssue> resetWarnings() {
+    public List<BuildingIssue> resetWarnings() {
         var w = warnings;
         warnings = new LinkedList<>();
         return w;
@@ -227,21 +233,21 @@ public class KeyIO {
      * Little sister of {@link ProblemInitializer}.
      */
     public class Loader {
-        private final URL resource;
-        private final CharStream content;
+        private final @Nullable URI resource;
+        private final @Nullable CharStream content;
         private List<KeyAst.File> ctx = new LinkedList<>();
-        private Namespace<SchemaVariable> schemaNamespace;
+        private @Nullable Namespace<SchemaVariable> schemaNamespace;
 
-        Loader(URL resource) {
+        Loader(URI resource) {
             this(null, resource);
         }
 
-        Loader(CharStream content, URL url) {
+        Loader(@Nullable CharStream content, URI url) {
             resource = url;
             this.content = content;
         }
 
-        public Namespace<SchemaVariable> getSchemaNamespace() {
+        public @Nullable Namespace<SchemaVariable> getSchemaNamespace() {
             return schemaNamespace;
         }
 
@@ -276,11 +282,10 @@ public class KeyIO {
                 return this;
             }
             long start = System.currentTimeMillis();
-            if (resource != null) {
+            if(resource!=null) {
                 ctx = parseFiles(resource);
-            } else {
-                KeyAst.File c = ParsingFacade.parseFile(content);
-                ctx.add(c);
+            }else{
+                ctx.add(ParsingFacade.parseFile(content));
             }
             long stop = System.currentTimeMillis();
             LOGGER.info("Parsing took {} ms", stop - start);

@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This variable condition can be used to check whether an assignment expression occurs as a
@@ -26,7 +28,7 @@ import org.key_project.logic.SyntaxElement;
 public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableConditionAdapter {
 
     /* the schemavariable matched agains an expression */
-    private final SchemaVariable expression;
+    private final @NonNull SchemaVariable expression;
 
     /*
      * indicates whether the variable condition is used in its negated form, i.e., to check for the
@@ -79,7 +81,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
     }
 
 
-    public String toString() {
+    public @NonNull String toString() {
         return (negated ? "\\not " : "") + "\\containsAssignment( " + expression.name() + " )";
     }
 
@@ -92,7 +94,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
         private boolean result = false;
 
 
-        public ContainsAssignment(ProgramElement root, Services services) {
+        public ContainsAssignment(@NonNull ProgramElement root, @NonNull Services services) {
             super(root, services);
         }
 

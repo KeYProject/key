@@ -7,6 +7,8 @@ import de.uka.ilkd.key.java.ProgramElement;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class is used to store the instantiation of a schemavariable if it is a ProgramElement.
  */
@@ -18,7 +20,7 @@ public class ProgramListInstantiation extends InstantiationEntry<ImmutableArray<
      *
      * @param pes the ProgramElement array the SchemaVariable is instantiated with
      */
-    ProgramListInstantiation(ImmutableArray<ProgramElement> pes) {
+    ProgramListInstantiation(@NonNull ImmutableArray<ProgramElement> pes) {
         super(pes);
     }
 }

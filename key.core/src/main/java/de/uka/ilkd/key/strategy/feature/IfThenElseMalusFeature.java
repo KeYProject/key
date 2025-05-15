@@ -15,6 +15,9 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 
 import org.key_project.util.LRUCache;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Feature that counts the IfThenElse operators above the focus of a rule application. When
@@ -26,7 +29,7 @@ public class IfThenElseMalusFeature implements Feature {
 
     private IfThenElseMalusFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, @Nullable PosInOccurrence pos, @NonNull Goal goal,
             MutableState mState) {
         if (pos == null) {
             return NumberRuleAppCost.getZeroCost();

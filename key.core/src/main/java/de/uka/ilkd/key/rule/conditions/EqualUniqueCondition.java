@@ -15,6 +15,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 public final class EqualUniqueCondition implements VariableCondition {
     private final TermSV t;
@@ -29,7 +32,8 @@ public final class EqualUniqueCondition implements VariableCondition {
     }
 
 
-    private static Term equalUnique(Term t1, Term t2, TermServices services) {
+    private static @Nullable Term equalUnique(@NonNull Term t1, @NonNull Term t2,
+            @NonNull TermServices services) {
         if (!(t1.op() instanceof JFunction && t2.op() instanceof JFunction
                 && ((Function) t1.op()).isUnique() && ((Function) t2.op()).isUnique())) {
             return null;
@@ -47,8 +51,8 @@ public final class EqualUniqueCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term tInst = (Term) svInst.getInstantiation(t);
@@ -73,7 +77,7 @@ public final class EqualUniqueCondition implements VariableCondition {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\equalUnique (" + t + ", " + t2 + ", " + res + ")";
     }
 }

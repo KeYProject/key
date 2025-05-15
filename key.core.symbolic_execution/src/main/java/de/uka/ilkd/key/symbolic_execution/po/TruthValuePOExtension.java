@@ -18,6 +18,9 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Implementation of {@link POExtension} to support truth value evaluation.
  *
@@ -36,7 +39,8 @@ public class TruthValuePOExtension implements POExtension {
      * {@inheritDoc}
      */
     @Override
-    public Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
+    public @NonNull Term modifyPostTerm(AbstractOperationPO abstractOperationPO,
+            InitConfig proofConfig,
             Services services, ProgramVariable selfTerm,
             Term postTerm) {
         if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
@@ -54,7 +58,7 @@ public class TruthValuePOExtension implements POExtension {
      * @param term The {@link Term} to label.
      * @return The labeled {@link Term}.
      */
-    protected Term labelPostTerm(Services services, Term term) {
+    protected @Nullable Term labelPostTerm(@NonNull Services services, @Nullable Term term) {
         if (term != null) {
             final TermFactory tf = services.getTermFactory();
             // Label children of operator

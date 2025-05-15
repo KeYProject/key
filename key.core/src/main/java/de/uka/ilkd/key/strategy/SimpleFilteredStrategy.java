@@ -14,6 +14,8 @@ import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp. A TacletFilter is used to filter out RuleApps.
@@ -34,7 +36,7 @@ public class SimpleFilteredStrategy implements Strategy {
         ruleFilter = p_ruleFilter;
     }
 
-    public Name name() {
+    public @NonNull Name name() {
         return NAME;
     }
 
@@ -45,7 +47,7 @@ public class SimpleFilteredStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
             MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
             return TopRuleAppCost.INSTANCE;

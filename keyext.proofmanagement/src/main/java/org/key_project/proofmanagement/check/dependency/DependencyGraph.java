@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 import org.key_project.proofmanagement.io.Logger;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a graph of dependencies between contracts/proofs, i.e. which proof depends on
  * which contracts to be proven.
@@ -64,7 +67,7 @@ public class DependencyGraph {
             this.id = id;
         }
 
-        public Set<DependencyNode> getNodes() {
+        public @NonNull Set<DependencyNode> getNodes() {
             return nodes;
         }
 
@@ -87,7 +90,7 @@ public class DependencyGraph {
          * @param node the start node of the edge
          * @return all edges of node inside the SCC
          */
-        public Map<DependencyNode, EdgeType> internalEdges(DependencyNode node) {
+        public @NonNull Map<DependencyNode, EdgeType> internalEdges(@NonNull DependencyNode node) {
             return node.getDependencies()
                     .keySet()
                     .stream()
@@ -96,7 +99,7 @@ public class DependencyGraph {
         }
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             StringBuilder result = new StringBuilder("SCC #" + id + ": {" + System.lineSeparator());
             for (DependencyNode node : getNodes()) {
                 result.append("    ").append(node.getContract().getName());
@@ -118,7 +121,7 @@ public class DependencyGraph {
      * <code>null</code> indicates that it is invalid an has to be (re-)computed by calling
      * {@link #recalculateSCCs()}.
      */
-    private Set<SCC> allSCCs = null;
+    private @Nullable Set<SCC> allSCCs = null;
 
     /** maps each dependency node to the SCC it corresponds to */
     private final Map<DependencyNode, SCC> node2SCC = new HashMap<>();
@@ -136,11 +139,11 @@ public class DependencyGraph {
     DependencyGraph() {
     }
 
-    public Map<DependencyNode, SCC> getNode2SCC() {
+    public @NonNull Map<DependencyNode, SCC> getNode2SCC() {
         return node2SCC;
     }
 
-    public Set<DependencyNode> getNodes() {
+    public @NonNull Set<DependencyNode> getNodes() {
         return nodes;
     }
 
@@ -150,7 +153,7 @@ public class DependencyGraph {
      *
      * @param node the DependencyNode to add
      */
-    public void addNode(DependencyNode node) {
+    public void addNode(@NonNull DependencyNode node) {
         if (!nodes.contains(node)) {
             nodes.add(node);
             name2Node.put(node.getContract().getName(), node);
@@ -214,7 +217,7 @@ public class DependencyGraph {
      *
      * @param node the node to start from
      */
-    private void calculateSCCForNode(DependencyNode node) {
+    private void calculateSCCForNode(@NonNull DependencyNode node) {
         // each SCC is identified by its first visited node (lowlink)
         // each node has a unique index
 
@@ -248,7 +251,7 @@ public class DependencyGraph {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder result = new StringBuilder();
         for (DependencyNode currentNode : nodes) {
             result.append(currentNode).append("\n");

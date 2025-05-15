@@ -19,6 +19,8 @@ import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * User action to apply the results of running SMT solvers.
  * Closes zero or more goals.
@@ -29,7 +31,7 @@ public class ProofSMTApplyUserAction extends UserAction {
     /**
      * Results of running the SMT solvers (one entry for each open goal).
      */
-    private final Collection<SolverListener.InternSMTProblem> smtProblems;
+    private final @NonNull Collection<SolverListener.InternSMTProblem> smtProblems;
     /**
      * The nodes closed by applying this action.
      * Populated in {@link #apply()}.
@@ -41,7 +43,7 @@ public class ProofSMTApplyUserAction extends UserAction {
     private final int numberOfGoalsClosed;
 
     public ProofSMTApplyUserAction(KeYMediator mediator, Proof proof,
-            Collection<SolverListener.InternSMTProblem> smtProblems) {
+            @NonNull Collection<SolverListener.InternSMTProblem> smtProblems) {
         super(mediator, proof);
         this.smtProblems = smtProblems;
         this.numberOfGoalsClosed = (int) smtProblems.stream()
@@ -51,7 +53,7 @@ public class ProofSMTApplyUserAction extends UserAction {
     }
 
     @Override
-    public String name() {
+    public @NonNull String name() {
         return String.format("Close: %d goals by SMT", numberOfGoalsClosed);
     }
 
@@ -95,7 +97,7 @@ public class ProofSMTApplyUserAction extends UserAction {
         return goalsClosed.stream().allMatch(g -> proof.find(g.node()));
     }
 
-    private String getTitle(SMTProblem p) {
+    private @NonNull String getTitle(@NonNull SMTProblem p) {
         StringBuilder title = new StringBuilder();
         Iterator<SMTSolver> it = p.getSolvers().iterator();
         while (it.hasNext()) {

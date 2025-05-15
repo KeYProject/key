@@ -25,6 +25,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An implementation of {@link IExecutionVariable} used to query all array indices at the same time.
  * This supports also arrays where the length is symbolic and not a concrete number.
@@ -50,7 +53,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
     /**
      * The constant representing the fact that no value is available.
      */
-    private final Term notAValue;
+    private final @NonNull Term notAValue;
 
     /**
      * Constructor.
@@ -63,8 +66,8 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      * @param arrayProgramVariable The {@link IProgramVariable} of the array.
      * @param additionalCondition An optional additional condition to consider.
      */
-    public ExecutionAllArrayIndicesVariable(IExecutionNode<?> parentNode, Node proofNode,
-            PosInOccurrence modalityPIO, ExecutionValue parentValue,
+    public ExecutionAllArrayIndicesVariable(@NonNull IExecutionNode<?> parentNode, Node proofNode,
+            PosInOccurrence modalityPIO, @NonNull ExecutionValue parentValue,
             IProgramVariable arrayProgramVariable, Term additionalCondition) {
         super(parentNode, proofNode, modalityPIO, parentValue, arrayProgramVariable,
             additionalCondition);
@@ -79,7 +82,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() throws ProofInputException {
+    protected @NonNull String lazyComputeName() throws ProofInputException {
         // Ensure that constant is defined
         if (constant == null) {
             getValues();
@@ -94,7 +97,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      *
      * @throws ProofInputException Occurred Exception.
      */
-    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
+    protected ExecutionValue @Nullable [] lazyComputeValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
         if (initConfig != null) { // Otherwise proof is disposed.
             // New OneStepSimplifier is required because it has an internal state and the default
@@ -171,7 +174,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
      * {@inheritDoc}
      */
     @Override
-    public Term createSelectTerm() {
+    public @NonNull Term createSelectTerm() {
         assert constant != null : "Call getValues() before calling createSelectTerm().";
         return getServices().getTermBuilder().dotArr(createArrayTerm(), constant);
     }

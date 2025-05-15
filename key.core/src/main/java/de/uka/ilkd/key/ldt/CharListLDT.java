@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -56,7 +58,8 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public CharListLDT(TermServices services) {
-        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
+        super(NAME, Objects.requireNonNull(services.getNamespaces().sorts().lookup(SeqLDT.NAME)),
+            services);
         clIndexOfChar = addFunction(services, "clIndexOfChar");
         clIndexOfCl = addFunction(services, "clIndexOfCl");
         clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");
@@ -98,7 +101,7 @@ public final class CharListLDT extends LDT {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
-            return printLastFirst(t.sub(0)).append(t.op().name().toString());
+            return printLastFirst(t.sub(0)).append(t.op().name());
         }
     }
 
@@ -186,7 +189,7 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public @Nullable Term translateLiteral(Literal lit, Services services) {
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         final TermBuilder tb = services.getTermBuilder();
         final Term term_empty = tb.func(seqLDT.getSeqEmpty());
@@ -219,8 +222,7 @@ public final class CharListLDT extends LDT {
     @Override
     public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 
@@ -244,8 +246,7 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Type getType(Term t) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override

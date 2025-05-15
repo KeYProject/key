@@ -9,6 +9,8 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Represents a variable of an {@link ISymbolicState} or {@link ISymbolicObject} which contains a
@@ -41,6 +43,7 @@ public interface ISymbolicValue extends ISymbolicElement {
      *
      * @return The represented array index or {@code null} if a program variable is represented..
      */
+    @Nullable
     Term getArrayIndex();
 
     /**
@@ -57,6 +60,7 @@ public interface ISymbolicValue extends ISymbolicElement {
      * @return The represented {@link IProgramVariable} or {@code null} if an array index is
      *         represented.
      */
+    @Nullable
     IProgramVariable getProgramVariable();
 
     /**
@@ -73,6 +77,7 @@ public interface ISymbolicValue extends ISymbolicElement {
      *
      * @return The value of the represented variable.
      */
+    @Nullable
     Term getValue();
 
     /**
@@ -87,6 +92,7 @@ public interface ISymbolicValue extends ISymbolicElement {
      *
      * @return The type of the value.
      */
+    @Nullable
     Sort getType();
 
     /**
@@ -107,6 +113,7 @@ public interface ISymbolicValue extends ISymbolicElement {
      *
      * @return The optional condition under which this value is valid.
      */
+    @Nullable
     Term getCondition();
 
     /**

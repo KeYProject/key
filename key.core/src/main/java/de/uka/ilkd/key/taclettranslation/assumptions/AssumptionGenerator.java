@@ -24,6 +24,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 interface VariablePool {
     LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv);
 
@@ -36,7 +39,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     protected final Collection<TranslationListener> listener = new LinkedList<>();
 
-    protected TacletConditions conditions;
+    protected @Nullable TacletConditions conditions;
     private final Services services;
 
     private final GenericTranslator genericTranslator = new GenericTranslator(this);
@@ -46,7 +49,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     }
 
-    public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts, int maxGeneric)
+    public @NonNull TacletFormula translate(@NonNull Taclet t, @NonNull ImmutableSet<Sort> sorts,
+            int maxGeneric)
             throws IllegalTacletException {
 
         // determine the variable conditions.
@@ -93,7 +97,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * @return returns the new term.
      */
 
-    private Term rebuildTerm(Term term) {
+    private @NonNull Term rebuildTerm(@NonNull Term term) {
 
         Term[] subTerms = new Term[term.arity()];
 
@@ -120,7 +124,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         return term;
     }
 
-    public LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv) {
+    public @NonNull LogicVariable getInstantiationOfLogicVar(@NonNull Sort instantiation,
+            @NonNull LogicVariable lv) {
         LogicVariable res = getLogicVariable(
             new Name(instantiation.name().toString() + "__" + lv.name().toString()), instantiation);
         for (TranslationListener l : listener) {
@@ -129,7 +134,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         return res;
     }
 
-    public static boolean isAbstractOrInterface(Sort sort, Services services) {
+    public static boolean isAbstractOrInterface(@NonNull Sort sort, @NonNull Services services) {
         if (!isReferenceSort(sort, services)) {
             return false;
         }
@@ -137,19 +142,20 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     }
 
-    public static boolean isReferenceSort(Sort sort, Services services) {
+    public static boolean isReferenceSort(@NonNull Sort sort, @NonNull Services services) {
         return (sort.extendsTrans(services.getJavaInfo().objectSort())
                 && !(sort instanceof NullSort));
 
     }
 
-    public static Set<GenericSort> collectGenerics(Term term) {
+    public static @NonNull Set<GenericSort> collectGenerics(@NonNull Term term) {
         HashSet<GenericSort> genericSorts = new LinkedHashSet<>();
         collectGenerics(term, genericSorts);
         return genericSorts;
     }
 
-    private static void collectGenerics(Term term, HashSet<GenericSort> genericSorts) {
+    private static void collectGenerics(@NonNull Term term,
+            @NonNull HashSet<GenericSort> genericSorts) {
 
         if (term.op() instanceof SortDependingFunction func) {
             if (func.getSortDependingOn() instanceof GenericSort) {
@@ -215,7 +221,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * Checks the referenceTable whether there are rows that are not allowed. For example: the
      * notSame-Condition is hurted.
      */
-    public static void checkTable(byte[][] referenceTable, Sort[] instTable, Sort[] genericTable,
+    public static void checkTable(byte[][] referenceTable,
+            Sort[] instTable,
+            Sort[] genericTable,
             TacletConditions conditions, Services services) {
 
         for (int r = 0; r < referenceTable.length; r++) {
@@ -283,7 +291,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * @param term the term to be quantify.
      * @return the quantified term.
      */
-    protected static Term quantifyTerm(Term term, TermServices services)
+    protected static @NonNull Term quantifyTerm(@NonNull Term term, @NonNull TermServices services)
             throws IllegalTacletException {
         TermBuilder tb = services.getTermBuilder();
         // Quantify over all free variables.
@@ -308,7 +316,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * @param sort sort of the logic variable.
      * @return logic variable with the given name and sort.
      */
-    public LogicVariable getLogicVariable(Name name, Sort sort) {
+    public @NonNull LogicVariable getLogicVariable(Name name, @NonNull Sort sort) {
         name = new Name(eliminateSpecialChars(name.toString()));
 
         LogicVariable l = usedVariables.get(name.toString());
@@ -325,7 +333,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     /**
      * eliminates all special chars.
      */
-    protected static String eliminateSpecialChars(String name) {
+    protected static @NonNull String eliminateSpecialChars(@NonNull String name) {
         var toReturn = new StringBuilder(name);
 
         // build the replacement pairs
@@ -349,8 +357,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         return toReturn.toString();
     }
 
-    private static StringBuilder removeIllegalChars(StringBuilder template,
-            ArrayList<String> toReplace, ArrayList<String> replacement) {
+    private static @NonNull StringBuilder removeIllegalChars(@NonNull StringBuilder template,
+            @NonNull ArrayList<String> toReplace, @NonNull ArrayList<String> replacement) {
         // replace one String
         for (int i = 0; i < toReplace.size(); i++) {
             String toRep = toReplace.get(i);
@@ -371,7 +379,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
      * @param term the term to be changed.
      * @return the new term.
      */
-    protected Term changeTerm(Term term) {
+    protected @NonNull Term changeTerm(@NonNull Term term) {
 
         TermBuilder tb = services.getTermBuilder();
 

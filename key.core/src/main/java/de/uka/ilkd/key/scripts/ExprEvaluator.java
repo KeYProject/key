@@ -10,6 +10,8 @@ import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,37 +38,37 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitBoolean_literal(Boolean_literalContext ctx) {
+    public @NonNull Object visitBoolean_literal(@NonNull Boolean_literalContext ctx) {
         return Boolean.parseBoolean(ctx.getText());
     }
 
     @Override
-    public Object visitChar_literal(KeYParser.Char_literalContext ctx) {
+    public @NonNull Object visitChar_literal(KeYParser.@NonNull Char_literalContext ctx) {
         return ctx.getText().charAt(1); // skip "'"
     }
 
     @Override
-    public Object visitInteger(IntegerContext ctx) {
+    public @NonNull Object visitInteger(@NonNull IntegerContext ctx) {
         return Integer.parseInt(ctx.getText());
     }
 
     @Override
-    public Object visitFloatLiteral(KeYParser.FloatLiteralContext ctx) {
+    public @NonNull Object visitFloatLiteral(KeYParser.@NonNull FloatLiteralContext ctx) {
         return Float.parseFloat(ctx.getText());
     }
 
     @Override
-    public Object visitDoubleLiteral(DoubleLiteralContext ctx) {
+    public @NonNull Object visitDoubleLiteral(@NonNull DoubleLiteralContext ctx) {
         return Double.parseDouble(ctx.getText());
     }
 
     @Override
-    public String visitString_literal(String_literalContext ctx) {
+    public @NonNull String visitString_literal(@NonNull String_literalContext ctx) {
         return trim(ctx.getText(), '"');
     }
 
     @Override
-    public Sequent visitSeq(SeqContext ctx) {
+    public @NonNull Sequent visitSeq(@NonNull SeqContext ctx) {
         var expressionBuilder =
             new ExpressionBuilder(state.getProof().getServices(), state.getCurrentNamespaces());
         expressionBuilder.setAbbrevMap(state.getAbbreviations());
@@ -79,16 +81,16 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSimple_ident(Simple_identContext ctx) {
+    public @NonNull Object visitSimple_ident(Simple_identContext ctx) {
         return evaluateExpression(ctx);
     }
 
     @Override
-    public Object visitTerm(KeYParser.TermContext ctx) {
+    public @NonNull Object visitTerm(KeYParser.TermContext ctx) {
         return evaluateExpression(ctx);
     }
 
-    private Object evaluateExpression(ParserRuleContext ctx) {
+    private @NonNull Object evaluateExpression(@NonNull ParserRuleContext ctx) {
         var expressionBuilder =
             new ExpressionBuilder(state.getProof().getServices(), state.getCurrentNamespaces());
         expressionBuilder.setAbbrevMap(state.getAbbreviations());
@@ -100,7 +102,7 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    protected Object aggregateResult(Object aggregate, Object nextResult) {
+    protected Object aggregateResult(Object aggregate, @Nullable Object nextResult) {
         return nextResult == null ? aggregate : nextResult;
     }
 }

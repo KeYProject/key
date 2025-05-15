@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Comparator;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -32,7 +32,7 @@ import org.jspecify.annotations.NonNull;
  * @author Hubert Schmid
  */
 
-public record Location(URI fileUri, Position position) implements Comparable<Location> {
+public record Location(@Nullable URI fileUri, Position position) implements Comparable<Location> {
     public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
 
     /**
@@ -45,11 +45,11 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
      * @deprecated Use {@link #Location(URI, Position)} instead.
      */
     @Deprecated
-    public static Location fromFileName(String filename, Position position) {
+    public static Location fromFileName(@Nullable String filename, Position position) {
         try {
-            return new Location(filename == null ? null : MiscTools.parseURL(filename).toURI(),
+            return new Location(filename == null ? null : MiscTools.parseURL(filename),
                 position);
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
@@ -77,7 +77,7 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())

@@ -15,6 +15,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Creates the wellformedness condition for the given anonymizing heap terms if they apply for the
  * current profile and modality type. At least generates the "wellFormed(anon_heap_LOOP)" condition
@@ -29,7 +31,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         final Term anonHeapTerm = term.sub(1);
         final Term anonSavedHeapTerm = term.sub(2);
         final Term anonPermissionsHeapTerm = term.sub(3);
@@ -53,9 +55,10 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
      * @param services The {@link Services} object.
      * @return The wellformedness condition.
      */
-    private Term createWellformedCond(boolean isTransaction, boolean isPermissions,
-            Term anonHeapTerm, Term anonSavedHeapTerm, Term anonPermissionsHeapTerm,
-            Services services) {
+    private @NonNull Term createWellformedCond(boolean isTransaction, boolean isPermissions,
+            @NonNull Term anonHeapTerm, @NonNull Term anonSavedHeapTerm,
+            @NonNull Term anonPermissionsHeapTerm,
+            @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Term result = tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);

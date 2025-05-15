@@ -17,11 +17,14 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public final class DependencyContractFeature extends BinaryFeature {
 
-    private void removePreviouslyUsedSteps(Term focus, Goal goal, List<PosInOccurrence> steps) {
+    private void removePreviouslyUsedSteps(@NonNull Term focus, @NonNull Goal goal,
+            @NonNull List<PosInOccurrence> steps) {
         for (RuleApp app : goal.appliedRuleApps()) {
             if (app.rule() instanceof UseDependencyContractRule
                     && app.posInOccurrence().subTerm().equalsModProperty(focus,
@@ -35,7 +38,8 @@ public final class DependencyContractFeature extends BinaryFeature {
     }
 
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
         final Term focus = pos.subTerm();
 

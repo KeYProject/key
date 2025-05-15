@@ -15,6 +15,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Ordering used to sort the clauses in a quantified formula. This ordering should only be applied
  * if at least one of the two clauses contains more than one literal (otherwise, use
@@ -26,7 +28,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
     private final QuanEliminationAnalyser quanAnalyser = new QuanEliminationAnalyser();
 
-    private final LiteralsSmallerThanFeature litComparator;
+    private final @NonNull LiteralsSmallerThanFeature litComparator;
 
     private ClausesSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
             IntegerLDT numbers) {
@@ -36,7 +38,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
             (LiteralsSmallerThanFeature) LiteralsSmallerThanFeature.create(left, right, numbers);
     }
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+    public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
             IntegerLDT numbers) {
         return new ClausesSmallerThanFeature(left, right, numbers);
     }
@@ -57,7 +59,8 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, @NonNull PosInOccurrence focus,
+            Goal goal) {
 
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);
@@ -85,7 +88,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
     }
 
     private static class ClauseCollector extends Collector {
-        protected void collect(Term te) {
+        protected void collect(@NonNull Term te) {
             final Operator op = te.op();
             if (op == Junctor.AND) {
                 collect(te.sub(0));

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +41,9 @@ public class LemmataAutoModeOptions {
      */
     private int maxRules = DEFAULT_MAXRULES;
 
-    private String pathOfResult = "";
+    private @NonNull String pathOfResult = "";
 
-    private String pathOfDefinitionFile = "";
+    private @NonNull String pathOfDefinitionFile = "";
 
     /**
      * Contains the internal version of KeY. It is needed for saving proofs.
@@ -57,7 +58,7 @@ public class LemmataAutoModeOptions {
 
     private String homePath;
 
-    public LemmataAutoModeOptions(CommandLine cl, String internalVersion) {
+    public LemmataAutoModeOptions(@NonNull CommandLine cl, String internalVersion) {
         super();
         try {
             if (cl.isSet(Main.JUSTIFY_RULES)) {
@@ -85,7 +86,8 @@ public class LemmataAutoModeOptions {
         // valid.
     }
 
-    public LemmataAutoModeOptions(CommandLine cl, String internalVersion, String homePath) {
+    public LemmataAutoModeOptions(@NonNull CommandLine cl, String internalVersion,
+            String homePath) {
         this.internalVersion = internalVersion;
 
         if (cl.isSet(Main.JUSTIFY_RULES)) {
@@ -98,7 +100,7 @@ public class LemmataAutoModeOptions {
         checkForValidity();
     }
 
-    private void read(CommandLine cl) {
+    private void read(@NonNull CommandLine cl) {
         if (cl.isSet(Main.JMAX_RULES)) {
             try {
                 cl.getInteger(Main.JMAX_RULES, DEFAULT_MAXRULES);
@@ -133,7 +135,7 @@ public class LemmataAutoModeOptions {
         }
     }
 
-    private boolean readBoolean(String value, boolean def) {
+    private boolean readBoolean(@NonNull String value, boolean def) {
         if (value.equals("true")) {
             return true;
         } else if (value.equals("false")) {
@@ -142,7 +144,7 @@ public class LemmataAutoModeOptions {
         return def;
     }
 
-    public String getPathOfDefinitionFile() {
+    public @NonNull String getPathOfDefinitionFile() {
         return pathOfDefinitionFile;
     }
 
@@ -170,7 +172,7 @@ public class LemmataAutoModeOptions {
         return internalVersion;
     }
 
-    public String createProofPath(Proof p) {
+    public @NonNull String createProofPath(@NonNull Proof p) {
         return pathOfResult + File.separator + p.name() + PROOF_POSTFIX;
     }
 
@@ -194,7 +196,7 @@ public class LemmataAutoModeOptions {
         throw new IllegalArgumentException(error);
     }
 
-    private String generatePath(String path, String reference) {
+    private @NonNull String generatePath(@NonNull String path, @NonNull String reference) {
         if (path.isEmpty()) {
             File temp = new File(reference);
             int index = temp.getAbsolutePath().lastIndexOf(File.separator);
@@ -203,7 +205,7 @@ public class LemmataAutoModeOptions {
         return path;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return String.format(
             """
                     path of rule file: %s
@@ -214,7 +216,7 @@ public class LemmataAutoModeOptions {
             pathOfRuleFile, pathOfResult, maxRules, timeout, saveResultsToFile);
     }
 
-    public Collection<String> getFilesForAxioms() {
+    public @NonNull Collection<String> getFilesForAxioms() {
         return filesForAxioms;
     }
 

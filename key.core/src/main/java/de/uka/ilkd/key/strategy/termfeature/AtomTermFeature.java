@@ -12,13 +12,15 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 public class AtomTermFeature extends BinaryTermFeature {
 
     public static final TermFeature INSTANCE = new AtomTermFeature();
 
     private AtomTermFeature() {}
 
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         final Operator op = term.op();
         return !(op instanceof Junctor || op == Equality.EQV || op instanceof IfThenElse
                 || op instanceof Quantifier);

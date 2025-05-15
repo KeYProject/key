@@ -23,7 +23,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
     private final Map<Name, ImmutableList<LabeledParserRuleContext>> depends =
         new LinkedHashMap<>();
 
-    public TextualJMLDepends(ImmutableList<JMLModifier> modifiers, Name[] heaps,
+    public TextualJMLDepends(@NonNull ImmutableList<JMLModifier> modifiers, Name @NonNull [] heaps,
             @NonNull LabeledParserRuleContext depends) {
         super(modifiers);
         setPosition(depends);
@@ -51,7 +51,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLDepends a)) {
             return false;
         }

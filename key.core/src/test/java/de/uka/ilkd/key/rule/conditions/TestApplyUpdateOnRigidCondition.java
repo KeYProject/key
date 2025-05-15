@@ -15,6 +15,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -217,7 +219,7 @@ public class TestApplyUpdateOnRigidCondition {
      * @return the original formula if the update cannot be applied; else, the updated formula is
      *         returned
      */
-    private Term applyUpdateOnFormula(Term term) {
+    private @Nullable Term applyUpdateOnFormula(@NonNull Term term) {
         UpdateSV u = SchemaVariableFactory.createUpdateSV(new Name("u"));
         SchemaVariable phi = SchemaVariableFactory.createFormulaSV(new Name("phi"));
         SchemaVariable result = SchemaVariableFactory.createFormulaSV(new Name("result"));
@@ -233,7 +235,7 @@ public class TestApplyUpdateOnRigidCondition {
      * @param term the {@link Term} that must be an update applied on a formula
      * @return the original term if the update cannot be applied; else, the updated term is returned
      */
-    private Term applyUpdateOnTerm(Term term) {
+    private @Nullable Term applyUpdateOnTerm(@NonNull Term term) {
         Sort sort = term.sub(1).sort();
 
         UpdateSV u = SchemaVariableFactory.createUpdateSV(new Name("u"));
@@ -257,8 +259,9 @@ public class TestApplyUpdateOnRigidCondition {
      * @return the original formula or term if the update cannot be applied; else, the updated
      *         formula or term is returned
      */
-    private Term instantiateAndCheck(Term term, UpdateSV u, SchemaVariable tOrPhi,
-            SchemaVariable result) {
+    private @Nullable Term instantiateAndCheck(@NonNull Term term, @NonNull UpdateSV u,
+            @NonNull SchemaVariable tOrPhi,
+            @NonNull SchemaVariable result) {
         Term update = term.sub(0);
         Term arg = term.sub(1);
 

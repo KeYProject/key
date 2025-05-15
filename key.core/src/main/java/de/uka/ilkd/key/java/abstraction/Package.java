@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.abstraction;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A program model element representing packages.
  *
@@ -27,7 +30,7 @@ public class Package implements ClassTypeContainer {
      *
      * @return the name of this package.
      */
-    public String getName() {
+    public @NonNull String getName() {
         return name;
     }
 
@@ -36,7 +39,7 @@ public class Package implements ClassTypeContainer {
      *
      * @return the full name of this program model element.
      */
-    public String getFullName() {
+    public @NonNull String getFullName() {
         return getName();
     }
 
@@ -45,7 +48,7 @@ public class Package implements ClassTypeContainer {
      *
      * @return <CODE>null</CODE>.
      */
-    public ClassTypeContainer getContainer() {
+    public @Nullable ClassTypeContainer getContainer() {
         return null;
     }
 
@@ -54,7 +57,7 @@ public class Package implements ClassTypeContainer {
      *
      * @return <CODE>null</CODE>.
      */
-    public Package getPackage() {
+    public @NonNull Package getPackage() {
         return this;
     }
 

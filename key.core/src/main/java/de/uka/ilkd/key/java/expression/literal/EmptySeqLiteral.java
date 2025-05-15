@@ -12,6 +12,8 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 
 
 public class EmptySeqLiteral extends Literal {
@@ -21,7 +23,7 @@ public class EmptySeqLiteral extends Literal {
     private EmptySeqLiteral() {}
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         return o == this;
     }
 
@@ -30,17 +32,17 @@ public class EmptySeqLiteral extends Literal {
         return System.identityHashCode(this);
     }
 
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnEmptySeqLiteral(this);
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return SeqLDT.NAME;
     }
 }

@@ -11,6 +11,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 
 
 public final class MemberPVToField extends AbstractTermTransformer {
@@ -21,7 +23,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
 
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(@NonNull Term term, SVInstantiations svInst, @NonNull Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
 
@@ -32,8 +34,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
         } else if (heapLDT.getSortOfSelect(op) != null) {
             return term.sub(0).sub(2);
         } else {
-            assert false;
-            return null;
+            throw new RuntimeException("Not Implemented");
         }
     }
 }

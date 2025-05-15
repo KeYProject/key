@@ -14,6 +14,8 @@ import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The macro FinishSymbolicExecutionMacro continues automatic rule application until there is no
  * more modality on the sequent.
@@ -71,7 +73,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(proof.getActiveStrategy());
     }
 

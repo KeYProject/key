@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Generate term "self != null".
@@ -18,7 +20,8 @@ import de.uka.ilkd.key.util.MiscTools;
 class BlockCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
-    String generatePredicateName(IProgramMethod pm, StatementBlock block,
+    @NonNull
+    String generatePredicateName(@NonNull IProgramMethod pm, @NonNull StatementBlock block,
             LoopSpecification loopInv) {
         final String nameString =
             MiscTools

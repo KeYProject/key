@@ -14,6 +14,8 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The statement inserted by KeY if a method call is executed.
  */
@@ -23,7 +25,7 @@ public class MethodFrame extends JavaStatement
     /**
      * result
      */
-    private final IProgramVariable resultVar;
+    private final @Nullable IProgramVariable resultVar;
 
     /**
      * Body.
@@ -46,7 +48,7 @@ public class MethodFrame extends JavaStatement
      * @param resultVar the ProgramVariable the return value is assigned to
      * @param body a Statement containing the method body of the called method
      */
-    public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
+    public MethodFrame(@Nullable IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body) {
         this.resultVar = resultVar;
         this.body = body;

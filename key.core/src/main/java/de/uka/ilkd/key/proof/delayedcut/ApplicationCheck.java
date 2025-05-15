@@ -15,6 +15,9 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Determines conflicts relevant for a delayed cut application.
  *
@@ -28,6 +31,7 @@ public interface ApplicationCheck {
      * @return A String representation of a possible conflict affecting a delayed cut application
      *         for the given node and cut formula or null if there is no conflict.
      */
+    @Nullable
     String check(Node cutNode, Term cutFormula);
 
     /**
@@ -56,7 +60,7 @@ public interface ApplicationCheck {
                     as required by the corresponding rule definitions.""";
 
         @Override
-        public String check(Node cutNode, Term cutFormula) {
+        public @Nullable String check(@NonNull Node cutNode, @NonNull Term cutFormula) {
             if (cutNode == null) {
                 throw new IllegalArgumentException("cutNode is null");
             }
@@ -91,11 +95,11 @@ public interface ApplicationCheck {
             }
         }
 
-        private String checkFormula(Term formula) {
+        private @Nullable String checkFormula(@NonNull Term formula) {
             final List<String> newSymbols = new LinkedList<>();
             formula.execPreOrder(new DefaultVisitor() {
                 @Override
-                public void visit(Term visited) {
+                public void visit(@NonNull Term visited) {
                     String name = visited.op().name().toString();
                     if (names.contains(name)) {
                         newSymbols.add(name);
@@ -124,7 +128,7 @@ public interface ApplicationCheck {
         }
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return "NoNewSymbolsCheck [node=" + node.serialNr() + ", names=" + names + "]";
         }
     }

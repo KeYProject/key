@@ -17,13 +17,16 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     private final Name ruleSetName;
     private final Name schemaVar;
     private final ProjectionToTerm term;
 
-    public static Feature create(ProjectionToTerm termWithTopLevelOpToCheck, String ruleSetName,
-            String schemaVar) {
+    public static @NonNull Feature create(ProjectionToTerm termWithTopLevelOpToCheck,
+            @NonNull String ruleSetName,
+            @NonNull String schemaVar) {
         return new IntroducedSymbolBy(termWithTopLevelOpToCheck, new Name(ruleSetName),
             new Name(schemaVar));
     }
@@ -36,7 +39,8 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Node root = goal.proof().root();
 
         Node n = goal.node();

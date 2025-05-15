@@ -15,6 +15,9 @@ import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
  * (within a goal). The real work is delegated to a second manager (delegate pattern), this class
@@ -52,8 +55,9 @@ public class FocussedRuleApplicationManager
         this.onlyModifyFocussedFormula = onlyModifyFocussedFormula;
     }
 
-    public FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, Goal goal,
-            PosInOccurrence focussedSubterm) {
+    public FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate,
+            @NonNull Goal goal,
+            @NonNull PosInOccurrence focussedSubterm) {
         this(delegate, goal, goal.getFormulaTagManager().getTagForPos(focussedSubterm.topLevel()),
             focussedSubterm, true);
 
@@ -66,12 +70,12 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public AutomatedRuleApplicationManager copy() {
+    public @NonNull AutomatedRuleApplicationManager copy() {
         return (AutomatedRuleApplicationManager) clone();
     }
 
     @Override
-    public Object clone() {
+    public @NonNull Object clone() {
         return new FocussedRuleApplicationManager(delegate.copy(), null, focussedFormula,
             focussedSubterm, onlyModifyFocussedFormula);
     }
@@ -89,9 +93,9 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public void setGoal(Goal p_goal) {
-        goal = p_goal;
-        delegate.setGoal(p_goal);
+    public void setGoal(Goal goal) {
+        this.goal = goal;
+        delegate.setGoal(goal);
     }
 
     @Override
@@ -101,7 +105,8 @@ public class FocussedRuleApplicationManager
         }
     }
 
-    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule, PosInOccurrence pos) {
+    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
+            @Nullable PosInOccurrence pos) {
         /*
          * filter the rule applications, only allow applications within the focussed subterm or to
          * other formulas that have been added after creation of the manager (we rely on the fact
@@ -127,7 +132,7 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+    public void rulesAdded(@NonNull ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = ImmutableSLList.nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
@@ -138,12 +143,12 @@ public class FocussedRuleApplicationManager
         delegate.rulesAdded(applicableRules, pos);
     }
 
-    private boolean isSameFormula(PosInOccurrence pio1, PosInOccurrence pio2) {
+    private boolean isSameFormula(@NonNull PosInOccurrence pio1, @NonNull PosInOccurrence pio2) {
         return pio2.isInAntec() == pio1.isInAntec()
                 && pio2.sequentFormula().equals(pio1.sequentFormula());
     }
 
-    private PosInOccurrence getPIOForFocussedSubterm() {
+    private @Nullable PosInOccurrence getPIOForFocussedSubterm() {
         final PosInOccurrence formula = goal.getFormulaTagManager().getPosForTag(focussedFormula);
 
         if (formula == null) {
@@ -153,7 +158,7 @@ public class FocussedRuleApplicationManager
         return focussedSubterm.replaceConstrainedFormula(formula.sequentFormula());
     }
 
-    private boolean isBelow(PosInOccurrence over, PosInOccurrence under) {
+    private boolean isBelow(@NonNull PosInOccurrence over, @NonNull PosInOccurrence under) {
         final PIOPathIterator overIt = over.iterator();
         final PIOPathIterator underIt = under.iterator();
 

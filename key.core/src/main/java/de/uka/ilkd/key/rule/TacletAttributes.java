@@ -4,16 +4,18 @@
 package de.uka.ilkd.key.rule;
 
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * class contains optional attributes of a Taclet.
  */
 public final class TacletAttributes {
 
-    private String displayName;
-    private String helpText;
+    private @Nullable String displayName;
+    private @Nullable String helpText;
 
     /** trigger related information */
-    private Trigger trigger;
+    private @Nullable Trigger trigger;
 
 
 
@@ -23,22 +25,22 @@ public final class TacletAttributes {
     }
 
 
-    public String displayName() {
+    public @Nullable String displayName() {
         return displayName;
     }
 
-    public String helpText() {
+    public @Nullable String helpText() {
         return helpText;
     }
 
     /**
      * sets an optional display name (presented to the user)
      */
-    public void setDisplayName(String s) {
+    public void setDisplayName(@Nullable String s) {
         displayName = s;
     }
 
-    public void setHelpText(String s) {
+    public void setHelpText(@Nullable String s) {
         helpText = s;
     }
 

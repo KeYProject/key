@@ -22,6 +22,9 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a {@link FormulaTermLabel} on
  * applied loop invariants or operation contracts.
@@ -109,7 +112,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * {@inheritDoc}
      */
     @Override
-    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
+    public @NonNull RefactoringScope defineRefactoringScope(@NonNull TermLabelState state,
+            Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
@@ -143,9 +147,10 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * {@inheritDoc}
      */
     @Override
-    public void refactorLabels(TermLabelState state, Services services,
+    public void refactorLabels(@NonNull TermLabelState state, @NonNull Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, LabelCollection labels) {
+            Object hint, @NonNull Term tacletTerm, @NonNull Term term,
+            @NonNull LabelCollection labels) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
             refactorSpecificationApplication(term, services, labels, hint);
         } else if (isParentRefactoringRequired(state)) {
@@ -167,8 +172,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      *        applied right now.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    private void refactorSpecificationApplication(Term term, Services services,
-            LabelCollection labels, Object hint) {
+    private void refactorSpecificationApplication(@NonNull Term term, @NonNull Services services,
+            @NonNull LabelCollection labels, Object hint) {
         if (TruthValueTracingUtil.isPredicate(term)
                 || (CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint)
                         && TruthValueTracingUtil.isLogicOperator(term))) {
@@ -192,8 +197,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      *        applied right now.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    private void refactorInCaseOfNewIdRequired(TermLabelState state, Goal goal, Term term,
-            Services services, LabelCollection labels) {
+    private void refactorInCaseOfNewIdRequired(@NonNull TermLabelState state, @Nullable Goal goal,
+            @NonNull Term term,
+            @NonNull Services services, @NonNull LabelCollection labels) {
         if (goal != null && !isInnerMostParentRefactored(state, goal)) {
             TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
             if (existingLabel instanceof FormulaTermLabel pLabel) {
@@ -215,8 +221,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param term The {@link Term} which is now refactored.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    private void refactorBelowUpdates(PosInOccurrence applicationPosInOccurrence, Term term,
-            LabelCollection labels) {
+    private void refactorBelowUpdates(@Nullable PosInOccurrence applicationPosInOccurrence,
+            @NonNull Term term,
+            @NonNull LabelCollection labels) {
         Term applicationTerm =
             applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
         FormulaTermLabel applicationLabel = applicationTerm != null
@@ -246,8 +253,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param term The {@link Term} which is now refactored.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    private void refactorSequentFormulas(TermLabelState state, Services services, final Term term,
-            LabelCollection labels) {
+    private void refactorSequentFormulas(@NonNull TermLabelState state, @NonNull Services services,
+            final @NonNull Term term,
+            @NonNull LabelCollection labels) {
         Set<SequentFormula> sequentFormulas = getSequentFormulasToRefactor(state);
         if (CollectionUtil.search(sequentFormulas, element -> element.formula() == term) != null) {
             FormulaTermLabel termLabel = (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
@@ -269,7 +277,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      *        the other {@link Term}.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    private void refactorSubstitution(Term term, Term tacletTerm, LabelCollection labels) {
+    private void refactorSubstitution(@NonNull Term term, @NonNull Term tacletTerm,
+            @NonNull LabelCollection labels) {
         FormulaTermLabel tacletLabel =
             (FormulaTermLabel) tacletTerm.getLabel(FormulaTermLabel.NAME);
         if (tacletLabel != null) {
@@ -307,7 +316,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param goal The {@link Goal} to check.
      * @return {@code true} already refactored, {@code false} not refactored yet.
      */
-    public static boolean isInnerMostParentRefactored(TermLabelState state, Goal goal) {
+    public static boolean isInnerMostParentRefactored(@NonNull TermLabelState state,
+            @NonNull Goal goal) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         return labelState.containsKey(INNER_MOST_PARENT_REFACTORED_PREFIX + goal.node().serialNr());
     }
@@ -319,7 +329,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param goal The {@link Goal} to check.
      * @param refactored {@code true} already refactored, {@code false} not refactored yet.
      */
-    public static void setInnerMostParentRefactored(TermLabelState state, Goal goal,
+    public static void setInnerMostParentRefactored(@NonNull TermLabelState state,
+            @NonNull Goal goal,
             boolean refactored) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         labelState.put(INNER_MOST_PARENT_REFACTORED_PREFIX + goal.node().serialNr(),
@@ -332,7 +343,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param state The {@link TermLabelState} to read from.
      * @return {@code true} refactoring required, {@code false} refactoring is not required.
      */
-    public static boolean isUpdateRefactoringRequired(TermLabelState state) {
+    public static boolean isUpdateRefactoringRequired(@NonNull TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         Object value = labelState.get(UPDATE_REFACTORING_REQUIRED);
         return value instanceof Boolean && (Boolean) value;
@@ -344,7 +355,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param state The {@link TermLabelState} to modify.
      * @param required {@code true} refactoring required, {@code false} refactoring is not required.
      */
-    public static void setUpdateRefactoringRequired(TermLabelState state, boolean required) {
+    public static void setUpdateRefactoringRequired(@NonNull TermLabelState state,
+            boolean required) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         labelState.put(UPDATE_REFACTORING_REQUIRED, required);
     }
@@ -355,7 +367,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param state The {@link TermLabelState} to read from.
      * @return {@code true} refactoring required, {@code false} refactoring is not required.
      */
-    public static boolean isParentRefactoringRequired(TermLabelState state) {
+    public static boolean isParentRefactoringRequired(@NonNull TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         Object value = labelState.get(PARENT_REFACTORING_REQUIRED);
         return value instanceof Boolean && (Boolean) value;
@@ -367,7 +379,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param state The {@link TermLabelState} to modify.
      * @param required {@code true} refactoring required, {@code false} refactoring is not required.
      */
-    public static void setParentRefactoringRequired(TermLabelState state, boolean required) {
+    public static void setParentRefactoringRequired(@NonNull TermLabelState state,
+            boolean required) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         labelState.put(PARENT_REFACTORING_REQUIRED, required);
     }
@@ -379,7 +392,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @return {@code true} at least one {@link SequentFormula} needs to be refactored,
      *         {@code false} refactoring is not required.
      */
-    public static boolean containsSequentFormulasToRefactor(TermLabelState state) {
+    public static boolean containsSequentFormulasToRefactor(@NonNull TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
         Set<SequentFormula> sfSet =
@@ -393,7 +406,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param state The {@link TermLabelState} to read from.
      * @return The {@link SequentFormula}s to refactor.
      */
-    public static Set<SequentFormula> getSequentFormulasToRefactor(TermLabelState state) {
+    public static Set<SequentFormula> getSequentFormulasToRefactor(@NonNull TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
         Set<SequentFormula> sfSet =
@@ -407,7 +420,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param state The {@link TermLabelState} to modify.
      * @param sf The {@link SequentFormula} to add.
      */
-    public static void addSequentFormulaToRefactor(TermLabelState state, SequentFormula sf) {
+    public static void addSequentFormulaToRefactor(@NonNull TermLabelState state,
+            SequentFormula sf) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
         Set<SequentFormula> sfSet =

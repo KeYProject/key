@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
@@ -17,32 +16,25 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+
+import static org.key_project.util.collection.ImmutableSLList.nil;
 
 /**
  * This class is used for wrapping all variable conditions of a taclet in one object.
  */
-class TacletConditions {
-
-    //
-    private ImmutableList<TypeComparisonCondition> comparisionCondition = ImmutableSLList.nil();
-    private ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
-    private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition =
-        ImmutableSLList.nil();
-    private ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition =
-        ImmutableSLList.nil();
-
-
-
+public class TacletConditions {
     public final static int FALSE = 0;
     public final static int NULL_LEGAL = 1;
     public final static int NULL_ILLEGAL = 2;
 
-
+    private ImmutableList<TypeComparisonCondition> comparisionCondition = nil();
+    private ImmutableList<TypeCondition> typeCondition = nil();
+    private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition = nil();
+    private ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition = nil();
 
     public TacletConditions(Taclet t) throws IllegalTacletException {
-
-
         for (final VariableCondition cond : t.getVariableConditions()) {
             boolean supported = false;
 
@@ -70,18 +62,6 @@ class TacletConditions {
             }
         }
 
-    }
-
-    public boolean containsIsReferenceArray(Term t) {
-
-        for (ArrayComponentTypeCondition cond : arrayComponentCondition) {
-
-            if (cond.isCheckReferenceType()) {
-                return true;
-            }
-
-        }
-        return false;
     }
 
     /**
@@ -174,7 +154,8 @@ class TacletConditions {
         return false;
     }
 
-    private boolean containsComparisionCondition(TypeComparisonCondition tcc, Sort s1, Sort s2,
+    private boolean containsComparisionCondition(@NonNull TypeComparisonCondition tcc, Sort s1,
+            Sort s2,
             TypeComparisonCondition.Mode mode) {
 
         GenericSortResolver first = null, second = null;
@@ -200,7 +181,7 @@ class TacletConditions {
 
     }
 
-    public boolean containsIsSubtypeRelation(Sort gen, Sort inst,
+    public boolean containsIsSubtypeRelation(Sort gen, @NonNull Sort inst,
             TypeComparisonCondition.Mode mode) {
         for (TypeComparisonCondition tcc : comparisionCondition) {
             if (tcc.getMode() == mode) {

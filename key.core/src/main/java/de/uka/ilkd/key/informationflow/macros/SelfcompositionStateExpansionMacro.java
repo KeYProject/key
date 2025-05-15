@@ -26,6 +26,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract the self-composed states
  * after the merge of the symbolic execution goals which is included in the proof obligation
@@ -38,12 +40,12 @@ import org.key_project.util.collection.ImmutableList;
 public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExpansionMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Self-composition state expansion";
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Extract the self-composed states after the merge of the "
             + "symbolic execution goals which is included in the proof "
             + "obligation generation from information flow contracts.";
@@ -57,17 +59,17 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     @Override
-    protected Set<String> getAdmittedRuleNames() {
+    protected @NonNull Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULES_SET;
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected @NonNull Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 
     @Override
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
+    protected boolean ruleApplicationInContextAllowed(@NonNull RuleApp ruleApp, PosInOccurrence pio,
             Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
         return !"andLeft".equals(ruleName)
@@ -119,12 +121,13 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return NAME;
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(@NonNull RuleApp ruleApp, @NonNull PosInOccurrence pio,
+                @NonNull Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))

@@ -9,6 +9,9 @@ import de.uka.ilkd.key.macros.SequentialOnLastGoalProofMacro;
 import de.uka.ilkd.key.macros.SequentialProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  *
@@ -17,7 +20,7 @@ import de.uka.ilkd.key.macros.TryCloseMacro;
 public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Auxiliary Computation Auto Pilot";
     }
 
@@ -27,13 +30,14 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "<html><ol><li>Start auxiliary computation" + "<li>Finish symbolic execution"
             + "<li>Try to close as many goals as possible</ol>";
     }
 
 
     @Override
+    @NonNull
     ProofMacro getProofMacro() {
         return new SequentialOnLastGoalProofMacro() {
             /**
@@ -44,34 +48,34 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                 Integer.getInteger("key.autopilot.closesteps", 1000);
 
             @Override
-            public String getName() { return ""; }
+            public @NonNull String getName() { return ""; }
 
             @Override
             public String getCategory() { return null; }
 
             @Override
-            public String getDescription() { return "Anonymous Macro"; }
+            public @NonNull String getDescription() { return "Anonymous Macro"; }
 
             @Override
-            protected ProofMacro[] createProofMacroArray() {
+            protected ProofMacro @NonNull [] createProofMacroArray() {
                 // The FinishSymbolicExecutionMacro and the TryCloseMacro shall be
                 // started at the same node. Therefore they are encapsulated in an
                 // own (anonymous) SequentialProofMacro.
                 SequentialProofMacro finishSymbExecAndTryToClose = new SequentialProofMacro() {
                     @Override
-                    protected ProofMacro[] createProofMacroArray() {
+                    protected ProofMacro @NonNull [] createProofMacroArray() {
                         return new ProofMacro[] { new FinishSymbolicExecutionMacro(),
                             new TryCloseMacro(NUMBER_OF_TRY_STEPS) };
                     }
 
                     @Override
-                    public String getName() { return ""; }
+                    public @NonNull String getName() { return ""; }
 
                     @Override
-                    public String getCategory() { return null; }
+                    public @Nullable String getCategory() { return null; }
 
                     @Override
-                    public String getDescription() { return "Anonymous Macro"; }
+                    public @NonNull String getDescription() { return "Anonymous Macro"; }
                 };
 
                 return new ProofMacro[] { new StartAuxiliaryComputationMacro(),

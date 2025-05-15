@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.jspecify.annotations.NonNull;
+
 public class MatchProgramInstruction implements MatchInstruction {
 
     private final ProgramElement pe;
@@ -18,8 +20,9 @@ public class MatchProgramInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-            Services services) {
+    public @NonNull MatchConditions match(@NonNull TermNavigator termPosition,
+            @NonNull MatchConditions matchConditions,
+            @NonNull Services services) {
         final MatchConditions result = pe.match(
             new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1, services),
             matchConditions);

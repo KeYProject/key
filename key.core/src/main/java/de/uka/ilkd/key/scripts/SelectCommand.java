@@ -20,7 +20,11 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -28,13 +32,13 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
         Goal g;
         if (args.number != null && args.formula == null && args.branch == null) {
             ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
@@ -56,13 +60,14 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         state.setGoal(g);
     }
 
-    private Goal findGoalWith(String branchTitle, Proof proof) throws ScriptException {
+    private @NonNull Goal findGoalWith(String branchTitle, @NonNull Proof proof)
+            throws ScriptException {
         return findGoalWith(node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
                 .orElse("").equals(branchTitle),
             node -> getFirstSubtreeGoal(node, proof), proof);
     }
 
-    private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
+    private static @Nullable Goal getFirstSubtreeGoal(@NonNull Node node, @NonNull Proof proof) {
         Goal goal;
         if (node.leaf() && //
                 (goal = EngineState.getGoal(proof.openGoals(), node)) != null) {
@@ -84,13 +89,15 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return null;
     }
 
-    private Goal findGoalWith(Term formula, Proof proof) throws ScriptException {
+    private @NonNull Goal findGoalWith(@NonNull Term formula, @NonNull Proof proof)
+            throws ScriptException {
         return findGoalWith(node -> node.leaf() && contains(node.sequent(), formula),
             node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
-    private Goal findGoalWith(Function<Node, Boolean> filter, Function<Node, Goal> goalRetriever,
-            Proof proof) throws ScriptException {
+    private @NonNull Goal findGoalWith(@NonNull Function<Node, Boolean> filter,
+            @NonNull Function<Node, Goal> goalRetriever,
+            @NonNull Proof proof) throws ScriptException {
         Deque<Node> choices = new LinkedList<>();
         Node node = proof.root();
 
@@ -129,11 +136,11 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         throw new ScriptException("There is no such goal");
     }
 
-    private boolean contains(Sequent seq, Term formula) {
+    private boolean contains(@NonNull Sequent seq, @NonNull Term formula) {
         return contains(seq.antecedent(), formula) || contains(seq.succedent(), formula);
     }
 
-    private boolean contains(Semisequent semiseq, Term formula) {
+    private boolean contains(@NonNull Semisequent semiseq, @NonNull Term formula) {
         for (SequentFormula sf : semiseq.asList()) {
             if (sf.formula().equalsModProperty(formula, RENAMING_TERM_PROPERTY)) {
                 return true;
@@ -143,10 +150,11 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "select";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)

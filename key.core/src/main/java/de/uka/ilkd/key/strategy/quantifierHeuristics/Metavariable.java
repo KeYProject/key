@@ -11,6 +11,8 @@ import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 @Deprecated
 public final class Metavariable extends AbstractSortedOperator
         implements ParsableVariable, Comparable<Metavariable>, TerminalSyntaxElement {
@@ -26,7 +28,7 @@ public final class Metavariable extends AbstractSortedOperator
         serial = maxSerial++;
     }
 
-    private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
+    private Metavariable(@NonNull Name name, @NonNull Sort sort, boolean isTemporaryVariable) {
         super(name, sort, true);
         if (sort == JavaDLTheory.FORMULA) {
             throw new RuntimeException("Attempt to create metavariable of type formula");
@@ -36,17 +38,17 @@ public final class Metavariable extends AbstractSortedOperator
         // assert false : "metavariables are disabled";
     }
 
-    public Metavariable(Name name, Sort sort) {
+    public Metavariable(@NonNull Name name, @NonNull Sort sort) {
         this(name, sort, false);
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return name() + ":" + sort();
     }
 
     @Override
-    public int compareTo(Metavariable p_mr) {
+    public int compareTo(@NonNull Metavariable p_mr) {
         if (p_mr == this) {
             return 0;
         }
@@ -73,7 +75,7 @@ public final class Metavariable extends AbstractSortedOperator
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof Metavariable)) {
             return false;
         }

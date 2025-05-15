@@ -24,6 +24,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Checks whether a loop has an invariant (either normal or "free").
  *
@@ -39,8 +41,8 @@ public class HasLoopInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
+    public @NonNull MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull MatchConditions matchCond, @NonNull Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
@@ -79,7 +81,7 @@ public class HasLoopInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\hasInvariant(" + loopStmtSV + "," + modalitySV + ")";
     }
 }

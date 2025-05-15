@@ -17,4 +17,7 @@
  * de.uka.ilkd.key.logic.op.SchemaVariable}s for {@link
  * de.uka.ilkd.key.rule.Taclet}s.
  */
+@NullMarked
 package de.uka.ilkd.key.logic.op;
+
+import org.jspecify.annotations.NullMarked;

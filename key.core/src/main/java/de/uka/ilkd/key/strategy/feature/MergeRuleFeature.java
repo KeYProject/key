@@ -15,6 +15,8 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
  * a {@link MergePointStatement}, otherwise, infinitely expensive.
@@ -29,7 +31,7 @@ public class MergeRuleFeature implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Term t = pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {

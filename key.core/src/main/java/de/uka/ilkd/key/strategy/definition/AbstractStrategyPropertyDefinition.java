@@ -7,6 +7,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Provides the basic function definition of user interface controls to edit a single key-value-pair
  * in {@link StrategyProperties}.
@@ -34,7 +36,7 @@ public abstract class AbstractStrategyPropertyDefinition {
      * Optional children which edits related properties to this. They might be shown different in
      * the user interface.
      */
-    private final ImmutableArray<AbstractStrategyPropertyDefinition> subProperties;
+    private final @NonNull ImmutableArray<AbstractStrategyPropertyDefinition> subProperties;
 
     /**
      * Constructor.
@@ -85,7 +87,7 @@ public abstract class AbstractStrategyPropertyDefinition {
      *
      * @return The children if available or an empty {@link ImmutableArray} otherwise.
      */
-    public ImmutableArray<AbstractStrategyPropertyDefinition> getSubProperties() {
+    public @NonNull ImmutableArray<AbstractStrategyPropertyDefinition> getSubProperties() {
         return subProperties;
     }
 }

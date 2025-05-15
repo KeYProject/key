@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Binary features that returns zero iff the if-formulas of a Taclet are instantiated or the Taclet
  * does not have any if-formulas.
@@ -17,7 +19,8 @@ public final class MatchedIfFeature extends BinaryTacletAppFeature {
 
     private MatchedIfFeature() {}
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         return app.ifInstsComplete();
     }
 

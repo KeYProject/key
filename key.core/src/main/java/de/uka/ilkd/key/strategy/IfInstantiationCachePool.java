@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Direct-mapped cache of lists of formulas (potential instantiations of if-formulas of taclets)
  * that were modified after a certain point of time
@@ -28,7 +30,7 @@ public class IfInstantiationCachePool {
 
     public final LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
 
-    public IfInstantiationCache getCache(Node n) {
+    public @NonNull IfInstantiationCache getCache(Node n) {
         IfInstantiationCache cache;
         synchronized (cacheMgr) {
             cache = cacheMgr.get(n);

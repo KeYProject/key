@@ -13,6 +13,7 @@ import java.util.Map;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
 
+import org.jspecify.annotations.NonNull;
 import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.MapModelAdaptor;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
@@ -37,7 +38,7 @@ public final class HTMLReport {
      * @throws IOException if an error occurs when accessing to the target path or the string
      *         template resources
      */
-    public static void print(CheckerData data, Path target) throws IOException {
+    public static void print(@NonNull CheckerData data, @NonNull Path target) throws IOException {
 
         ST st = prepareStringTemplate();
 
@@ -83,7 +84,7 @@ public final class HTMLReport {
         // (needed to access some KeY properties, e.g. Proof.name()
         group.registerModelAdaptor(Object.class, new ObjectModelAdaptor<>() {
             @Override
-            public synchronized Object getProperty(Interpreter interp, ST self, Object o,
+            public synchronized Object getProperty(Interpreter interp, ST self, @NonNull Object o,
                     Object property, String propertyName)
                     throws STNoSuchPropertyException {
                 Method m = tryGetMethod(o.getClass(), propertyName);
@@ -102,7 +103,8 @@ public final class HTMLReport {
         Class<Map<?, ?>> mapClass = (Class<Map<?, ?>>) (Class) Map.class;
         group.registerModelAdaptor(mapClass, new MapModelAdaptor() {
             @Override
-            public Object getProperty(Interpreter interp, ST self, Map<?, ?> map, Object property,
+            public Object getProperty(Interpreter interp, ST self, @NonNull Map<?, ?> map,
+                    @NonNull Object property,
                     String propertyName)
                     throws STNoSuchPropertyException {
                 if (property.equals("entrySet")) {
@@ -122,7 +124,7 @@ public final class HTMLReport {
         group.registerModelAdaptor(mapEntryClass, new ObjectModelAdaptor<>() {
             @Override
             public synchronized Object getProperty(Interpreter interp, ST self,
-                    Map.Entry<?, ?> entry, Object property,
+                    Map.@NonNull Entry<?, ?> entry, @NonNull Object property,
                     String propertyName)
                     throws STNoSuchPropertyException {
                 if (property.equals("value")) {
@@ -142,22 +144,22 @@ public final class HTMLReport {
         // register listeners to get error output on console
         group.setListener(new STErrorListener() {
             @Override
-            public void compileTimeError(STMessage msg) {
+            public void compileTimeError(@NonNull STMessage msg) {
                 throw new RuntimeException(msg.toString(), msg.cause);
             }
 
             @Override
-            public void runTimeError(STMessage msg) {
+            public void runTimeError(@NonNull STMessage msg) {
                 throw new RuntimeException(msg.toString(), msg.cause);
             }
 
             @Override
-            public void IOError(STMessage msg) {
+            public void IOError(@NonNull STMessage msg) {
                 throw new RuntimeException(msg.toString(), msg.cause);
             }
 
             @Override
-            public void internalError(STMessage msg) {
+            public void internalError(@NonNull STMessage msg) {
                 throw new RuntimeException(msg.toString(), msg.cause);
             }
         });

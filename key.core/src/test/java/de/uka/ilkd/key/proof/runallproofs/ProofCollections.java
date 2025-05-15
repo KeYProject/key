@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSetting
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 
 /**
@@ -30,7 +31,7 @@ public class ProofCollections {
 
     public static final String ENV_KEY_RAP_FUN_KEEP = "KEY_RAP_FUN_KEEP";
 
-    public static ProofCollection automaticJavaDL() throws IOException {
+    public static @NonNull ProofCollection automaticJavaDL() throws IOException {
         var settings = new ProofCollectionSettings(new Date());
         /*
          * Defines a base directory.
@@ -1006,7 +1007,7 @@ public class ProofCollections {
     }
 
 
-    public static ProofCollection automaticInfFlow() throws IOException {
+    public static @NonNull ProofCollection automaticInfFlow() throws IOException {
         var settings = new ProofCollectionSettings(new Date());
         var c = new ProofCollection(settings);
         /*
@@ -2026,7 +2027,7 @@ public class ProofCollections {
     }
 
 
-    private static String loadFromFile(String name) throws IOException {
+    private static @NonNull String loadFromFile(@NonNull String name) throws IOException {
         var stream = ProofCollections.class.getResourceAsStream(name);
         Assertions.assertNotNull(stream, "Failed to find " + name);
         return IOUtil.readFrom(stream);

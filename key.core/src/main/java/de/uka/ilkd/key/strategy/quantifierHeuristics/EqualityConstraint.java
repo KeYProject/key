@@ -27,6 +27,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 
 
@@ -51,9 +54,9 @@ public class EqualityConstraint implements Constraint {
     private final HashMap<Metavariable, Term> map;
 
     /** cache for return values of getInstantiation */
-    private HashMap<Metavariable, Term> instantiationCache = null;
+    private @Nullable HashMap<Metavariable, Term> instantiationCache = null;
 
-    private Integer hashCode = null;
+    private @Nullable Integer hashCode = null;
 
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
@@ -65,7 +68,7 @@ public class EqualityConstraint implements Constraint {
     }
 
 
-    public static ImmutableSet<Metavariable> metaVars(Term t, Services services) {
+    public static ImmutableSet<Metavariable> metaVars(@NonNull Term t, @NonNull Services services) {
 
         var mvCache = services.getCaches().getMVCache();
 
@@ -94,7 +97,7 @@ public class EqualityConstraint implements Constraint {
         return metaVars;
     }
 
-    protected synchronized Object clone() {
+    protected synchronized @NonNull Object clone() {
         EqualityConstraint res = new EqualityConstraint((HashMap<Metavariable, Term>) map.clone());
         res.instantiationCache = instantiationCache == null ? null
                 : (HashMap<Metavariable, Term>) instantiationCache.clone();
@@ -125,7 +128,7 @@ public class EqualityConstraint implements Constraint {
     /**
      * @return list of metavariables, instantiations of which may restricted by this constraint
      */
-    public Iterator<Metavariable> restrictedMetavariables() {
+    public @NonNull Iterator<Metavariable> restrictedMetavariables() {
         return Collections.unmodifiableSet(map.keySet()).iterator();
     }
 
@@ -148,7 +151,8 @@ public class EqualityConstraint implements Constraint {
      * @param services the Services
      * @return a term the given metavariable can be instantiated with
      */
-    public synchronized Term getInstantiation(Metavariable p_mv, Services services) {
+    public synchronized @NonNull Term getInstantiation(@NonNull Metavariable p_mv,
+            @NonNull Services services) {
         Term t = null;
         if (instantiationCache == null) {
             instantiationCache = new LinkedHashMap<>();
@@ -170,7 +174,7 @@ public class EqualityConstraint implements Constraint {
         return t;
     }
 
-    private synchronized Term getInstantiationIfExisting(Metavariable p_mv) {
+    private synchronized @Nullable Term getInstantiationIfExisting(Metavariable p_mv) {
         if (instantiationCache == null) {
             return null;
         }
@@ -184,7 +188,7 @@ public class EqualityConstraint implements Constraint {
      * @param p the Term p to be instantiated
      * @return the instantiated term
      */
-    private Term instantiate(Term p, Services services) {
+    private @NonNull Term instantiate(@NonNull Term p, @NonNull Services services) {
         ConstraintAwareSyntacticalReplaceVisitor srVisitor =
             new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(), services, this, null,
                 null, null, null, null);
@@ -202,7 +206,8 @@ public class EqualityConstraint implements Constraint {
      *        introducing intersection sorts)
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
-    public Constraint unify(Term t1, Term t2, Services services) {
+    public @NonNull Constraint unify(@NonNull Term t1, @NonNull Term t2,
+            @NonNull Services services) {
         return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
 
@@ -218,7 +223,8 @@ public class EqualityConstraint implements Constraint {
      * @return TOP if not possible, else a new constraint unifying t1 and t2 ( == this iff this
      *         subsumes the unification )
      */
-    public Constraint unify(Term t1, Term t2, Services services, BooleanContainer unchanged) {
+    public @NonNull Constraint unify(@NonNull Term t1, @NonNull Term t2, @NonNull Services services,
+            @NonNull BooleanContainer unchanged) {
         final Constraint newConstraint = unifyHelp(t1, t2, false, services);
 
         if (!newConstraint.isSatisfiable()) {
@@ -244,8 +250,8 @@ public class EqualityConstraint implements Constraint {
      * @param cmpBoundVars variables bound above the current position
      */
     private static boolean compareBoundVariables(QuantifiableVariable ownVar,
-            QuantifiableVariable cmpVar, ImmutableList<QuantifiableVariable> ownBoundVars,
-            ImmutableList<QuantifiableVariable> cmpBoundVars) {
+            QuantifiableVariable cmpVar, @NonNull ImmutableList<QuantifiableVariable> ownBoundVars,
+            @NonNull ImmutableList<QuantifiableVariable> cmpBoundVars) {
 
         final int ownNum = indexOf(ownVar, ownBoundVars);
         final int cmpNum = indexOf(cmpVar, cmpBoundVars);
@@ -267,7 +273,8 @@ public class EqualityConstraint implements Constraint {
      * @return the index of the first occurrence of <code>var</code> in <code>list</code>, or
      *         <code>-1</code> if the variable is not an element of the list
      */
-    private static int indexOf(QuantifiableVariable var, ImmutableList<QuantifiableVariable> list) {
+    private static int indexOf(QuantifiableVariable var,
+            @NonNull ImmutableList<QuantifiableVariable> list) {
         int res = 0;
         while (!list.isEmpty()) {
             if (list.head() == var) {
@@ -300,9 +307,10 @@ public class EqualityConstraint implements Constraint {
      *         <code>!modifyThis</code> a new object is created, and <code>this</code> is never
      *         modified. <code>Constraint.TOP</code> is always returned for ununifiable terms
      */
-    private Constraint unifyHelp(Term t0, Term t1, ImmutableList<QuantifiableVariable> ownBoundVars,
-            ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
-            boolean modifyThis, Services services) {
+    private Constraint unifyHelp(@NonNull Term t0, @NonNull Term t1,
+            @NonNull ImmutableList<QuantifiableVariable> ownBoundVars,
+            @NonNull ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
+            boolean modifyThis, @NonNull Services services) {
 
         if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
             return this;
@@ -370,7 +378,8 @@ public class EqualityConstraint implements Constraint {
      * @param services
      * @return the constraint
      */
-    private Constraint introduceNewMV(Term t0, Term t1, boolean modifyThis, Services services) {
+    private @NonNull Constraint introduceNewMV(Term t0, Term t1, boolean modifyThis,
+            Services services) {
         /*
          * if (services == null) return Constraint.TOP;
          *
@@ -411,7 +420,8 @@ public class EqualityConstraint implements Constraint {
      */
     private static final NameAbstractionTable FAILED = new NameAbstractionTable();
 
-    private static NameAbstractionTable handleJava(Term t0, Term t1, NameAbstractionTable nat) {
+    private static NameAbstractionTable handleJava(@NonNull Term t0, @NonNull Term t1,
+            NameAbstractionTable nat) {
 
 
         if (!t0.javaBlock().isEmpty() || !t1.javaBlock().isEmpty()) {
@@ -436,10 +446,10 @@ public class EqualityConstraint implements Constraint {
         return nat;
     }
 
-    private Constraint descendRecursively(Term t0, Term t1,
+    private @NonNull Constraint descendRecursively(@NonNull Term t0, @NonNull Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
-            boolean modifyThis, Services services) {
+            boolean modifyThis, @NonNull Services services) {
         Constraint newConstraint = this;
 
         for (int i = 0; i < t0.arity(); i++) {
@@ -472,15 +482,16 @@ public class EqualityConstraint implements Constraint {
         return newConstraint;
     }
 
-    private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
+    private static @NonNull NameAbstractionTable checkNat(@Nullable NameAbstractionTable nat) {
         if (nat == null) {
             return new NameAbstractionTable();
         }
         return nat;
     }
 
-    private Constraint handleTwoMetavariables(Term t0, Term t1, boolean modifyThis,
-            Services services) {
+    private Constraint handleTwoMetavariables(@NonNull Term t0, @NonNull Term t1,
+            boolean modifyThis,
+            @NonNull Services services) {
         final Metavariable mv0 = (Metavariable) t0.op();
         final Metavariable mv1 = (Metavariable) t1.op();
         final Sort mv0S = mv0.sort();
@@ -503,9 +514,9 @@ public class EqualityConstraint implements Constraint {
         return introduceNewMV(t0, t1, modifyThis, services);
     }
 
-    private Constraint handleQuantifiableVariable(Term t0, Term t1,
-            ImmutableList<QuantifiableVariable> ownBoundVars,
-            ImmutableList<QuantifiableVariable> cmpBoundVars) {
+    private @NonNull Constraint handleQuantifiableVariable(@NonNull Term t0, @NonNull Term t1,
+            @NonNull ImmutableList<QuantifiableVariable> ownBoundVars,
+            @NonNull ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
                     (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
@@ -527,7 +538,8 @@ public class EqualityConstraint implements Constraint {
      *         <code>!modifyThis</code> a new object is created, and <code>this</code> is never
      *         modified. <code>Constraint.TOP</code> is always returned for ununifiable terms
      */
-    private Constraint unifyHelp(Term t1, Term t2, boolean modifyThis, Services services) {
+    private Constraint unifyHelp(@NonNull Term t1, @NonNull Term t2, boolean modifyThis,
+            @NonNull Services services) {
         return unifyHelp(t1, t2, ImmutableSLList.nil(),
             ImmutableSLList.nil(), null, modifyThis, services);
     }
@@ -544,8 +556,8 @@ public class EqualityConstraint implements Constraint {
      * @param services the Services providing access to the type model
      * @return the resulting Constraint ( == this iff this subsumes the new constraint )
      */
-    private Constraint normalize(Metavariable mv, Term t, boolean modifyThis,
-            Services services) {
+    private Constraint normalize(Metavariable mv, @NonNull Term t, boolean modifyThis,
+            @NonNull Services services) {
         // MV cycles are impossible if the orders of MV pairs are
         // correct
 
@@ -568,7 +580,7 @@ public class EqualityConstraint implements Constraint {
         return newConstraint;
     }
 
-    private EqualityConstraint getMutableConstraint(boolean modifyThis) {
+    private @NonNull EqualityConstraint getMutableConstraint(boolean modifyThis) {
         if (modifyThis) {
             return this;
         }
@@ -579,7 +591,8 @@ public class EqualityConstraint implements Constraint {
      * checks equality of constraints by subsuming relation (only equal if no new sorts need to be
      * introduced for subsumption)
      */
-    public boolean equals(Object obj) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (this == obj) {
             return true;
         }
@@ -635,7 +648,7 @@ public class EqualityConstraint implements Constraint {
      * @param co Constraint to be joined with this one
      * @return the joined constraint
      */
-    public Constraint join(Constraint co, Services services) {
+    public Constraint join(@NonNull Constraint co, @NonNull Services services) {
         return join(co, services, CONSTRAINTBOOLEANCONTAINER);
     }
 
@@ -650,8 +663,8 @@ public class EqualityConstraint implements Constraint {
      * @param unchanged the BooleanContainers value set true, if this constraint is as strong as co
      * @return the joined constraint
      */
-    public synchronized Constraint join(Constraint co, Services services,
-            BooleanContainer unchanged) {
+    public synchronized Constraint join(@NonNull Constraint co, @NonNull Services services,
+            @NonNull BooleanContainer unchanged) {
         if (co.isBottom() || co == this) {
             unchanged.setVal(true);
             return this;
@@ -704,7 +717,8 @@ public class EqualityConstraint implements Constraint {
     }
 
 
-    private Constraint joinHelp(EqualityConstraint co, Services services) {
+    private @NonNull Constraint joinHelp(@NonNull EqualityConstraint co,
+            @NonNull Services services) {
         Constraint newConstraint = this;
         boolean newCIsNew = false;
         for (Map.Entry<Metavariable, Term> entry : co.map.entrySet()) {
@@ -727,7 +741,7 @@ public class EqualityConstraint implements Constraint {
      * @param term The Term
      * @return a boolean that is true iff. adding a mapping (mv,term) would cause a cycle
      */
-    private boolean hasCycle(Metavariable mv, Term term, Services services) {
+    private boolean hasCycle(Metavariable mv, Term term, @NonNull Services services) {
         ImmutableList<Metavariable> body = ImmutableSLList.nil();
         ImmutableList<Term> fringe = ImmutableSLList.nil();
         Term checkForCycle = term;
@@ -763,7 +777,8 @@ public class EqualityConstraint implements Constraint {
         }
     }
 
-    private boolean hasCycleByInst(Metavariable mv, Term term, Services services) {
+    private boolean hasCycleByInst(Metavariable mv, @NonNull Term term,
+            @NonNull Services services) {
 
         for (Metavariable metavariable : metaVars(term, services)) {
             if (metavariable == mv) {
@@ -814,14 +829,15 @@ public class EqualityConstraint implements Constraint {
         private Constraint second;
         private int hash;
 
-        public boolean equals(Object o) {
+        @Override
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (!(o instanceof ECPair e)) {
                 return false;
             }
             return first == e.first && second == e.second;
         }
 
-        public void set(Constraint first, Constraint second) {
+        public void set(@NonNull Constraint first, @NonNull Constraint second) {
             this.first = first;
             this.second = second;
             this.hash = first.hashCode() + second.hashCode();
@@ -831,7 +847,7 @@ public class EqualityConstraint implements Constraint {
             return hash;
         }
 
-        public ECPair copy() {
+        public @NonNull ECPair copy() {
             return new ECPair(first, second, hash);
         }
 
@@ -846,8 +862,8 @@ public class EqualityConstraint implements Constraint {
 
     // the methods using these caches seem not to be used anymore otherwise refactor and move it
     // into ServiceCaches
-    private static Map<ECPair, Constraint> joinCache = new LRUCache<>(0);
-    private static Map<ECPair, Constraint> joinCacheOld = new LRUCache<>(0);
+    private static @NonNull Map<ECPair, Constraint> joinCache = new LRUCache<>(0);
+    private static @NonNull Map<ECPair, Constraint> joinCacheOld = new LRUCache<>(0);
 
     private static final ECPair ecPair0 = new ECPair(null, null, 0);
 

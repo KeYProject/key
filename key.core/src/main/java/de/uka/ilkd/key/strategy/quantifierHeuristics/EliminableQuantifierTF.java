@@ -12,6 +12,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
+
 public class EliminableQuantifierTF extends BinaryTermFeature {
 
     public static final TermFeature INSTANCE = new EliminableQuantifierTF();
@@ -21,7 +23,7 @@ public class EliminableQuantifierTF extends BinaryTermFeature {
     private EliminableQuantifierTF() {}
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         final Operator op = term.op();
         assert op == Quantifier.ALL || op == Quantifier.EX;
 

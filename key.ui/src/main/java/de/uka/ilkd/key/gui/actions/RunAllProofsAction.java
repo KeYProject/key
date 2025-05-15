@@ -56,7 +56,7 @@ public class RunAllProofsAction extends MainWindowAction {
     /**
      * Path to the directory of built-in examples.
      */
-    private final File exampleDir;
+    private final @NonNull File exampleDir;
 
     /**
      * Files to loaded
@@ -93,7 +93,7 @@ public class RunAllProofsAction extends MainWindowAction {
         }
     }
 
-    public RunAllProofsAction(MainWindow mainWindow) {
+    public RunAllProofsAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
 
         Main.ensureExamplesAvailable();

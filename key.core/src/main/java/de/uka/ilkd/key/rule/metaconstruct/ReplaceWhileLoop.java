@@ -18,6 +18,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This visitor is used to identify and replace the while loop in invariant rule.
  *
@@ -30,23 +33,23 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
 
     private boolean firstWhileFound = false;
     private boolean replaced = false;
-    private StatementBlock toInsert = null;
-    private LoopStatement theLoop = null;
+    private @Nullable StatementBlock toInsert = null;
+    private @Nullable LoopStatement theLoop = null;
     private int lastMethodFrameBeforeLoop = -1;
 
-    private KeYJavaType returnType = null;
+    private @Nullable KeYJavaType returnType = null;
 
     private int currentMethodFrame = -1;
     private int firstLoopPos = -1;
     /**
      * if run in check mode there are normally schemavaribles, so we need the instantiations of them
      */
-    protected SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+    protected @NonNull SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     /**
      * the result of the transformation
      */
-    protected ProgramElement result = null;
+    protected @Nullable ProgramElement result = null;
 
     /**
      * creates the WhileLoopTransformation for the transformation mode
@@ -54,7 +57,8 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      * @param root the ProgramElement where to begin
      *
      */
-    public ReplaceWhileLoop(ProgramElement root, StatementBlock toInsert, Services services) {
+    public ReplaceWhileLoop(@NonNull ProgramElement root, StatementBlock toInsert,
+            @NonNull Services services) {
         super(root, true, services);
         this.toInsert = toInsert;
         firstWhileFound = false;
@@ -66,8 +70,9 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      * @param root the ProgramElement where to begin
      * @param inst the SVInstantiations if available
      */
-    public ReplaceWhileLoop(ProgramElement root, SVInstantiations inst, StatementBlock toInsert,
-            Services services) {
+    public ReplaceWhileLoop(@NonNull ProgramElement root, @Nullable SVInstantiations inst,
+            StatementBlock toInsert,
+            @NonNull Services services) {
         super(root, true, services);
         this.toInsert = toInsert;
         firstWhileFound = false;
@@ -101,16 +106,16 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
         result = (ProgramElement) stack.peek().get(i);
     }
 
-    public ProgramElement result() {
+    public @Nullable ProgramElement result() {
         return result;
     }
 
 
-    public KeYJavaType returnType() {
+    public @Nullable KeYJavaType returnType() {
         return returnType;
     }
 
-    public Statement getTheLoop() {
+    public @Nullable Statement getTheLoop() {
         return theLoop;
     }
 

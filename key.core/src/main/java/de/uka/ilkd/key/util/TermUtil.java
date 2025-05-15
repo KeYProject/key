@@ -33,7 +33,7 @@ public class TermUtil {
         Queue<Term> queue = new LinkedList<>();
         queue.add(term);
         while (!queue.isEmpty()) {
-            Term current = queue.poll();
+            Term current = queue.remove();
             if (current.op() == op) {
                 return true;
             }

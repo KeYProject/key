@@ -149,7 +149,7 @@ public final class Immutables {
      */
     public static <T extends @Nullable Object> ImmutableSet<T> createSetFrom(
             Iterable<? extends T> iterable) {
-        return DefaultImmutableSet.fromImmutableList(createListFrom(iterable));
+        return DefaultImmutableSet.<T>fromImmutableList(createListFrom(iterable));
     }
 
     /**

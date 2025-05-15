@@ -13,6 +13,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public final class EditMostRecentFileAction extends MainWindowAction
 
     private static final long serialVersionUID = -6214327707255790570L;
 
-    public EditMostRecentFileAction(MainWindow mainWindow) {
+    public EditMostRecentFileAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
 
         setName("Edit Last Opened File");

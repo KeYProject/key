@@ -8,6 +8,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Swing highlighter that highlights the current line in a JTextComponent.
  *
@@ -46,7 +48,7 @@ public class CurrentLineHighlighter implements Highlighter {
     }
 
     @Override
-    public void paint(Graphics graphics) {
+    public void paint(@NonNull Graphics graphics) {
         delegate.paint(graphics);
         if (component != null) {
             int caretPosition = component.getCaretPosition();

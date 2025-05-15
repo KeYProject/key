@@ -26,6 +26,9 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Refactoring for {@link OriginTermLabel}s.
  *
@@ -36,12 +39,12 @@ import org.key_project.util.collection.ImmutableList;
 public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
-    public ImmutableList<Name> getSupportedRuleNames() {
+    public @Nullable ImmutableList<Name> getSupportedRuleNames() {
         return null;
     }
 
     @Override
-    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
+    public @NonNull RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         if (rule instanceof BuiltInRule
@@ -55,9 +58,9 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     @Override
-    public void refactorLabels(TermLabelState state, Services services,
+    public void refactorLabels(TermLabelState state, @NonNull Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, LabelCollection labels) {
+            Object hint, Term tacletTerm, @NonNull Term term, @NonNull LabelCollection labels) {
         if (services.getProof() == null) {
             return;
         }
@@ -102,7 +105,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
     }
 
-    private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms, Set<Origin> result) {
+    private @NonNull Set<Origin> collectSubtermOrigins(@NonNull ImmutableArray<Term> terms,
+            @NonNull Set<Origin> result) {
         for (Term term : terms) {
             collectSubtermOrigins(term, result);
         }
@@ -119,13 +123,14 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
      *
      * @see TermLabelRefactoring#shouldRefactorOnBuiltInRule(Rule, Goal, Object)
      */
-    private boolean shouldRefactorOnTaclet(Taclet taclet) {
+    private boolean shouldRefactorOnTaclet(@NonNull Taclet taclet) {
         return !taclet.name().toString().startsWith("arrayLength")
                 && taclet.goalTemplates().size() <= 1;
     }
 
     @SuppressWarnings("unchecked")
-    private Set<Origin> collectSubtermOrigins(Term term, Set<Origin> result) {
+    private @NonNull Set<Origin> collectSubtermOrigins(@NonNull Term term,
+            @NonNull Set<Origin> result) {
         TermLabel label = term.getLabel(OriginTermLabel.NAME);
 
         if (label != null) {

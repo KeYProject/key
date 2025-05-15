@@ -21,6 +21,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <strong>The worker must be started using method {@link TGWorker#start()} and not
  * via the standard {@link #execute()}</strong>.
@@ -28,8 +31,8 @@ import de.uka.ilkd.key.smt.testgen.StopRequest;
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener, StopRequest {
     private final TGInfoDialog tgInfoDialog;
     private boolean stop;
-    private final MainWindowTestGenerator testGenerator;
-    private Proof originalProof;
+    private final @NonNull MainWindowTestGenerator testGenerator;
+    private @Nullable Proof originalProof;
 
     public TGWorker(TGInfoDialog tgInfoDialog) {
         this.tgInfoDialog = tgInfoDialog;
@@ -45,7 +48,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
     }
 
     @Override
-    public Void doInBackground() {
+    public @Nullable Void doInBackground() {
         testGenerator.generateTestCases(this, tgInfoDialog.getLogger());
         return null;
     }
@@ -68,11 +71,11 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
         testGenerator.stopSMTLauncher();
     }
 
-    private KeYMediator getMediator() {
+    private @NonNull KeYMediator getMediator() {
         return MainWindow.getInstance().getMediator();
     }
 
-    public Proof getOriginalProof() {
+    public @Nullable Proof getOriginalProof() {
         return originalProof;
     }
 
@@ -96,7 +99,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      */
     private final boolean showInMainWindow;
 
-    private final KeYMediator mediator;
+    private final @NonNull KeYMediator mediator;
 
     /**
      * Constructor.
@@ -106,7 +109,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      * @param showInMainWindow Defines if created {@link Proof}s are visible in the
      *        {@link MainWindow} or not.
      */
-    public MainWindowTestGenerator(KeYMediator mediator, Proof originalProof,
+    public MainWindowTestGenerator(@NonNull KeYMediator mediator, @NonNull Proof originalProof,
             boolean showInMainWindow) {
         super(mediator.getUI(), originalProof);
         this.mediator = mediator;
@@ -138,7 +141,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      * {@inheritDoc}
      */
     @Override
-    protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName,
+    protected @NonNull Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName,
             Sequent newSequent) throws ProofInputException {
         if (showInMainWindow) {
             InitConfig initConfig = oldProof.getInitConfig().deepCopy();

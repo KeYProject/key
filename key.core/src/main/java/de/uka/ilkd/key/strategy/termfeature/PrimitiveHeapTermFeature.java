@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 
 public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
 
@@ -20,12 +22,12 @@ public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
         this.heapLDT = heapLDT;
     }
 
-    public static PrimitiveHeapTermFeature create(HeapLDT heapLDT) {
+    public static @NonNull PrimitiveHeapTermFeature create(HeapLDT heapLDT) {
         return new PrimitiveHeapTermFeature(heapLDT);
     }
 
     @Override
-    protected boolean filter(Term t, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term t, MutableState mState, Services services) {
         // t.op() is the base heap or another primitive heap variable
         boolean isPrimitive = false;
         Iterator<LocationVariable> it = heapLDT.getAllHeaps().iterator();

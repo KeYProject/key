@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Feature that returns the maximum number of positive literals occurring within a d-path of the
@@ -22,7 +24,8 @@ public class CountPosDPathFeature extends AbstractBetaFeature {
     private CountPosDPathFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected @NonNull RuleAppCost doComputation(@NonNull PosInOccurrence pos,
+            @NonNull Term findTerm, @NonNull ServiceCaches caches) {
         return NumberRuleAppCost.create(maxPosPath(findTerm, !pos.isInAntec(), caches));
     }
 

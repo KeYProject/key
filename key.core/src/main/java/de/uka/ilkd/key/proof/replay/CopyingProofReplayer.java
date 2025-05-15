@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Replayer that copies proof steps from one proof to another.
  *
@@ -39,7 +41,7 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
      * @param skippedNodes nodes to skip when copying
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    public void copy(Node originalNode, Goal newNode, Set<Node> skippedNodes)
+    public void copy(Node originalNode, @NonNull Goal newNode, @NonNull Set<Node> skippedNodes)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         newNode.proof().reOpenGoal(newNode);
         newNode.proof().register(this, CopyingProofReplayer.class);
