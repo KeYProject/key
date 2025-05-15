@@ -133,12 +133,12 @@ public class MasterHandlerTest {
      * This class contains the information about the test fixtures that is loaded
      * via the YAML.
      *
-     * @param contains    a list of strings that are expected in the SMT translation
+     * @param contains a list of strings that are expected in the SMT translation
      * @param smtSettings required key/values in the smt settings.
-     * @param expected    expected output of Z3
-     * @param state       state of the test
-     * @param javaSrc     path to necessary java sources
-     * @param keySrc      contents of the key file to be loaded.
+     * @param expected expected output of Z3
+     * @param state state of the test
+     * @param javaSrc path to necessary java sources
+     * @param keySrc contents of the key file to be loaded.
      */
     public record TestData(List<String> contains,
             Properties smtSettings,
@@ -165,15 +165,16 @@ public class MasterHandlerTest {
             Sequent sequent = proof.root().sequent();
 
             SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                    proof.getSettings().getNewSMTSettings(), proof);
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                proof.getSettings().getNewSMTSettings(), proof);
 
             if (smtSettings != null) {
                 settings.getNewSettings().readSettings(smtSettings);
             }
 
             ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-            var translation = translator.translateProblem(sequent, env.getServices(), settings).toString();
+            var translation =
+                translator.translateProblem(sequent, env.getServices(), settings).toString();
             env.dispose();
             return new LoadedTestData(name, this, translation);
         }
