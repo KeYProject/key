@@ -44,11 +44,6 @@ import org.slf4j.LoggerFactory;
 public class TaskTree extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6084969108377936099L;
-
     private final JTree delegateView;
 
     /** the KeYMediator */
@@ -160,6 +155,10 @@ public class TaskTree extends JPanel {
             setFont(myFont);
         } else {
             LOGGER.debug(Config.KEY_FONT_PROOF_LIST_VIEW + " not available, use standard font.");
+        }
+
+        if (delegateView != null) {
+            delegateView.setCellRenderer(new TaskTreeIconCellRenderer());
         }
     }
 
@@ -342,13 +341,11 @@ public class TaskTree extends JPanel {
     } // end of prooftreelistener
 
 
-    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
-            implements java.io.Serializable {
-        private static final long serialVersionUID = 2423935787625012908L;
-        private static final Icon KEY_ICON = IconFactory.keyHole(20, 20);
-        private static final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);
-        private static final Icon KEY_ALMOST_CLOSED_ICON = IconFactory.keyHoleAlmostClosed(20, 20);
-        private static final Icon KEY_CACHED_CLOSED_ICON = IconFactory.keyCachedClosed(20, 20);
+    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer {
+        private final Icon KEY_ICON = IconFactory.keyHole(20, 20);
+        private final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);
+        private final Icon KEY_ALMOST_CLOSED_ICON = IconFactory.keyHoleAlmostClosed(20, 20);
+        private final Icon KEY_CACHED_CLOSED_ICON = IconFactory.keyCachedClosed(20, 20);
 
 
         private TaskTreeIconCellRenderer() {

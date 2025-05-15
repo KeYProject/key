@@ -63,7 +63,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
-        setBackground(Color.white);
+
         // disables selection
         setSelectionColor(getBackground());
         listener = new CurrentGoalViewListener(this, getMediator());

@@ -5,7 +5,6 @@ package de.uka.ilkd.key.settings;
 
 import java.util.List;
 import java.util.Set;
-import javax.swing.*;
 
 /**
  * This class encapsulates information about: 1) relative font size in the prover view 2) the
@@ -13,7 +12,6 @@ import javax.swing.*;
  * number is exceeded no SchemaVariables get instantiated in the displayed tooltip. 3) whether
  * intermediate proofsteps should be hidden in the proof tree view
  *
- * @see de.uka.ilkd.key.gui.settings.StandardUISettings
  * @author unknown
  * @author weigl
  */
@@ -68,10 +66,18 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     private static final String HIDE_CLOSED_SUBTREES = "HideClosedSubtrees";
 
+    /// Property name for property [#lookAndFeel]
+    public static final String PROP_LOOK_AND_FEEL = "LookAndFeel";
+
+    /// Property name for property [#defaultLookAndFeelDecorated]
+    public static final String PROP_DEFAULT_LOOK_AND_FEEL_DECORATED = "defaultLookAndFeelDecorated";
+
     /**
-     * Which look and feel to use.
+     * Boolean flag, if activate the LAF draws the decoration by itself. e.g., FlatLAF
      */
-    private static final String LOOK_AND_FEEL = "LookAndFeel";
+    private final PropertyEntry<Boolean> defaultLookAndFeelDecorated =
+        createBooleanProperty(PROP_DEFAULT_LOOK_AND_FEEL_DECORATED, true);
+
 
     private static final String SHOW_JAVA_WARNING = "ShowJavaWarning";
 
@@ -109,10 +115,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String SEQUENT_VIEW_TOOLTIP = "SequentViewTooltips";
 
-    /** this setting enables/disables tool tips in the source view */
+    /**
+     * this setting enables/disables tool tips in the source view
+     */
     private static final String SOURCE_VIEW_TOOLTIP = "SourceViewTooltips";
 
-    /** this setting enables/disables tool tips in the proof tree */
+    /**
+     * this setting enables/disables tool tips in the proof tree
+     */
     private static final String PROOF_TREE_TOOLTIP = "ProofTreeTooltips";
 
     private static final String HIGHLIGHT_ORIGIN = "HighlightOrigin";
@@ -151,8 +161,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String NOTIFICATION_AFTER_MACRO = "[View]notificationAfterMacro";
 
-    private static final String LOOK_AND_FEEL_DEFAULT =
-        UIManager.getCrossPlatformLookAndFeelClassName();
+    private static final String LOOK_AND_FEEL_DEFAULT = "com.formdev.flatlaf.FlatLightLaf";
 
     public static final String NOTIFICATION_ALWAYS = "Always";
     public static final String NOTIFICATION_UNFOCUSED = "When not focused";
@@ -200,7 +209,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
         createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private final PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
     private final PropertyEntry<String> lookAndFeel =
-        createStringProperty(LOOK_AND_FEEL, LOOK_AND_FEEL_DEFAULT);
+        createStringProperty(PROP_LOOK_AND_FEEL, LOOK_AND_FEEL_DEFAULT);
     private final PropertyEntry<Boolean> showSequentViewTooltips =
         createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
     private final PropertyEntry<Boolean> showSourceViewTooltips =
@@ -230,8 +239,18 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<List<String>> folderBookmarks =
         createStringListProperty(USER_FOLDER_BOOKMARKS, System.getProperty("user.home"));
 
+    //
+    private boolean isDarkMode;
+
     public ViewSettings() {
         super("View");
+        updateIsDarkMode();
+    }
+
+    private void updateIsDarkMode() {
+        isDarkMode = getLookAndFeel().contains("FlatDark")
+                || getLookAndFeel().contains("FlatDarcula")
+                || getLookAndFeel().contains("FlatMacDarkLaf");
     }
 
     /**
@@ -329,6 +348,10 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
 
+    public PropertyEntry<String> lookAndFeel() {
+        return lookAndFeel;
+    }
+
     /**
      * @return class name of the look and feel to use
      */
@@ -343,7 +366,17 @@ public class ViewSettings extends AbstractPropertiesSettings {
      */
     public void setLookAndFeel(String className) {
         lookAndFeel.set(className);
+        updateIsDarkMode();
     }
+
+    public boolean isDefaultLookAndFeelDecorated() {
+        return defaultLookAndFeelDecorated.get();
+    }
+
+    public void setDefaultLookAndFeelDecorated(boolean value) {
+        defaultLookAndFeelDecorated.set(value);
+    }
+
 
     /**
      * When loading a Java file, all other java files in the parent directory are loaded as well.
@@ -594,5 +627,10 @@ public class ViewSettings extends AbstractPropertiesSettings {
         } else {
             throw new IllegalStateException("tried to set wrong value for notification setting");
         }
+    }
+
+    /// Completely based on heuristics.
+    public boolean isDarkMode() {
+        return isDarkMode;
     }
 }

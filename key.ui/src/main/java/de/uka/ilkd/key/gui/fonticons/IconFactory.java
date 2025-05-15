@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.*;
 
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +32,9 @@ public final class IconFactory {
     public static final IconFontProvider PREVIOUS =
         new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
     public static final IconFontProvider START =
-        new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN);
+        new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN, Color.GREEN.brighter().brighter());
     public static final IconFontProvider STOP =
-        new IconFontProvider(FontAwesomeSolid.STOP, Color.RED);
+        new IconFontProvider(FontAwesomeSolid.STOP, Color.RED, Color.GREEN.brighter().brighter());
     // an alternative would be TIMES_CIRCLE
     public static final IconFontProvider CLOSE = new IconFontProvider(FontAwesomeSolid.TIMES);
     public static final IconFontProvider CONFIGURE_MENU =
@@ -528,5 +530,33 @@ class DuneColorScheme {
 
     private static Color hex(String s) {
         return Color.decode(s);
+    }
+}
+
+
+/// An icon that switches between light/dark depending the current [ViewSettings].
+/// @param dark
+/// @param light
+record LightDarkIcon(Icon light, Icon dark) implements Icon {
+    LightDarkIcon {
+        assert (light.getIconHeight() == dark.getIconHeight());
+        assert (light.getIconWidth() == dark.getIconWidth());
+    }
+
+    @Override
+    public void paintIcon(Component c, Graphics g, int x, int y) {
+        var isDarkMode = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isDarkMode();
+        var icon = isDarkMode ? dark : light;
+        icon.paintIcon(c, g, x, y);
+    }
+
+    @Override
+    public int getIconWidth() {
+        return light.getIconWidth();
+    }
+
+    @Override
+    public int getIconHeight() {
+        return light.getIconHeight();
     }
 }
