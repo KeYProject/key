@@ -129,8 +129,7 @@ public class ArrayUtilTest {
     @Test
     public void testRemove() {
         // Test remove on array
-        @Nullable
-        String[] array = { "A", "B", "C", null, "D", null, null, "C", "A" };
+        var array = new @Nullable String[] { "A", "B", "C", null, "D", null, null, "C", "A" };
         array = ArrayUtil.remove(array, "B"); // Remove B
         assertArrayEquals(array, "A", "C", null, "D", null, null, "C", "A");
         array = ArrayUtil.remove(array, "B"); // Remove B again

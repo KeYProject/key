@@ -20,8 +20,8 @@ class WeakValueLinkedHashMapTest {
     @Test
     void putAndGet() {
         WeakValueLinkedHashMap<Object, Object> map = new WeakValueLinkedHashMap<>();
-        final Object[] keys = { new Object(), new Object(), new Object() };
-        final Object[] values = { new Object(), new Object(), new Object() };
+        final Object[] keys = {new Object(), new Object(), new Object()};
+        final Object[] values = {new Object(), new Object(), new Object()};
         map.put(keys[0], values[0]);
         map.put(keys[1], values[1]);
         map.put(keys[2], values[2]);
@@ -33,8 +33,8 @@ class WeakValueLinkedHashMapTest {
     @Test
     void putAndGetWithGC() {
         WeakValueLinkedHashMap<Object, Object> map = new WeakValueLinkedHashMap<>();
-        final Object[] keys = { new Object(), new Object(), new Object() };
-        final @Nullable Object[] values = { new Object(), new Object(), new Object() };
+        final Object[] keys = {new Object(), new Object(), new Object()};
+        final @Nullable Object[] values = {new Object(), new Object(), new Object()};
         map.put(keys[0], values[0]);
         map.put(keys[1], values[1]);
         map.put(keys[2], values[2]);
@@ -46,29 +46,33 @@ class WeakValueLinkedHashMapTest {
         assertEquals(values[0], map.get(keys[0]));
         encourageGC(100);
         assertNull(map.get(keys[1]),
-            "As value is no longer reachable the previous calls to gc should have " +
-                "removed the entry from the map");
+                "As value is no longer reachable the previous calls to gc should have " +
+                        "removed the entry from the map");
         assertEquals(values[2], map.get(keys[2]));
     }
 
     @Test
     void containsKey() {
         WeakValueLinkedHashMap<Object, Object> map = new WeakValueLinkedHashMap<>();
-        final Object[] keys = { new Object(), new Object(), new Object() };
-        final @Nullable Object[] values = { new Object(), new Object(), new Object() };
-        map.put(keys[0], values[0]);
-        map.put(keys[1], values[1]);
-        map.put(keys[2], values[2]);
+        final Object[] keys = {new Object(), new Object(), new Object()};
+        var a = new Object();
+        var b = new Object();
+        var c = new Object();
+
+        map.put(keys[0], a);
+        map.put(keys[1], b);
+        map.put(keys[2], c);
         assertTrue(map.containsKey(keys[0]));
         assertTrue(map.containsKey(keys[1]));
         assertTrue(map.containsKey(keys[2]));
-        values[1] = null;
+
+        b = null;
         encourageGC(100);
         assertTrue(map.containsKey(keys[0]));
         encourageGC(100);
         assertFalse(map.containsKey(keys[1]),
-            "As value is no longer reachable the previous calls to gc should have " +
-                "removed the entry from the map");
+                "As value is no longer reachable the previous calls to gc should have " +
+                        "removed the entry from the map");
         assertTrue(map.containsKey(keys[2]));
     }
 }
