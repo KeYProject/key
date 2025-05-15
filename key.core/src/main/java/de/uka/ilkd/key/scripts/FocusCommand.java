@@ -35,7 +35,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * @author Created by sarah on 1/12/17.
  * @author Mattias Ulbrich, 2023
  */
-public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
+public class FocusCommand extends AbstractCommand {
 
     public FocusCommand() {
         super(Parameters.class);
@@ -47,13 +47,10 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
     }
 
     @Override
-    public void execute(Parameters s) throws ScriptException, InterruptedException {
-        if (s == null) {
-            throw new ScriptException("Missing 'sequent' argument for focus");
-        }
+    public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
+        var s = state().getValueInjector().inject(this, new Parameters(), args);
 
         Sequent toKeep = s.toKeep;
-
         hideAll(toKeep);
     }
 
