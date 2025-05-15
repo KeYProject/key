@@ -233,7 +233,7 @@ public class KeyIO {
      * Little sister of {@link ProblemInitializer}.
      */
     public class Loader {
-        private final URI resource;
+        private final @Nullable URI resource;
         private final @Nullable CharStream content;
         private List<KeyAst.File> ctx = new LinkedList<>();
         private @Nullable Namespace<SchemaVariable> schemaNamespace;
@@ -282,7 +282,11 @@ public class KeyIO {
                 return this;
             }
             long start = System.currentTimeMillis();
-            ctx = parseFiles(resource);
+            if(resource!=null) {
+                ctx = parseFiles(resource);
+            }else{
+                ctx.add(ParsingFacade.parseFile(content));
+            }
             long stop = System.currentTimeMillis();
             LOGGER.info("Parsing took {} ms", stop - start);
             return this;
