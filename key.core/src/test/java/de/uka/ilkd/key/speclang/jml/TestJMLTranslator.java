@@ -129,7 +129,7 @@ public class TestJMLTranslator {
     @Test
     public void testLogicalExpression() {
         LocationVariable selfVar = buildSelfVarAsProgVar();
-        Term result = jmlIO.parseExpression("(b <= s &&  i > 5) ==> this != instance");
+        Term result = jmlIO.parseExpression("(b <= s &&  i > 5) ==> this != `instance`");
         assertNotNull(result);
         assertEquals(Junctor.IMP, result.op());
         assertEquals(Junctor.AND, result.sub(0).op());
