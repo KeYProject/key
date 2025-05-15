@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 public class EliminableQuantifierTF extends BinaryTermFeature {
 
@@ -21,8 +21,8 @@ public class EliminableQuantifierTF extends BinaryTermFeature {
     private EliminableQuantifierTF() {}
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
-        final Operator op = term.op();
+    protected boolean filter(Term term, MutableState mState, LogicServices services) {
+        final var op = term.op();
         assert op == Quantifier.ALL || op == Quantifier.EX;
 
         Term matrix = term;

@@ -7,17 +7,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.prover.proof.rulefilter.RuleFilter;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The default taclet index implementation. It executes method
- * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, Services)} in a single thread
+ * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, Services)}
+ * in a single thread
  * (the thread invoking the method).
  *
  * Do not create this index directly. Use the {@link TacletIndexKit#createTacletIndex()} resp.

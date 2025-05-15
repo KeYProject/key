@@ -70,6 +70,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
+        @Override
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
             e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
                 ExplorationNodeData.class);

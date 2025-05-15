@@ -275,14 +275,15 @@ public class TestLinkedHashMapWrapper {
     @Test
     public void testConstructors() {
         LinkedHashMapWrapper<Term, Integer> wrappedMap =
-            new LinkedHashMapWrapper<>(tb.tt(), 1, TERM_LABELS_PROPERTY);
+            new LinkedHashMapWrapper<Term, Integer>(tb.tt(), 1, TERM_LABELS_PROPERTY);
         assertFalse(wrappedMap.isEmpty(), "Map should not be empty (0)");
         assertEquals(1, wrappedMap.size(), "Map should contain one element");
         assertTrue(wrappedMap.containsKey(tb.tt()), "Map should contain key tt");
 
         // putAll is also tested with these constructor calls
         LinkedHashMapWrapper<Term, Integer> wrappedMap2 =
-            new LinkedHashMapWrapper<>(new Term[] { tb.tt(), tb.ff() }, new Integer[] { 1, 2 },
+            new LinkedHashMapWrapper<Term, Integer>(new Term[] { tb.tt(), tb.ff() },
+                new Integer[] { 1, 2 },
                 TERM_LABELS_PROPERTY);
         assertFalse(wrappedMap2.isEmpty(), "Map should not be empty (1)");
         assertEquals(2, wrappedMap2.size(), "Map should contain two elements");

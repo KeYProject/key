@@ -1,6 +1,6 @@
 /**
  * <p>
- * provides a representation for the term and sequent
+ * provides a representation for the term
  * structure. The structure of a term is defined in {@link
  * de.uka.ilkd.key.logic.Term}. Subclasses of {@link
  * de.uka.ilkd.key.logic.Term} provide representations for special
@@ -21,17 +21,7 @@
  * de.uka.ilkd.key.logic.Term} is constructed.
  * </p>
  * <p>
- * {@link de.uka.ilkd.key.logic.Sequent}s consist of two {@link
- * de.uka.ilkd.key.logic.Semisequent}s which represent a
- * duplicate-free list of a {@link
- * de.uka.ilkd.key.logic.SequentFormula}s. The latter consist of
- * a {@link de.uka.ilkd.key.logic.Constraint} and a {@link
- * de.uka.ilkd.key.logic.Term} of a special sort {@link
- * de.uka.ilkd.key.logic.sort.Sort#FORMULA}.
- * </p>
- * <p>
- * {@link de.uka.ilkd.key.logic.Sequent}s and {@link
- * de.uka.ilkd.key.logic.Term}s are <b>immutable</b>.
+ * {@link de.uka.ilkd.key.logic.Term}s are <b>immutable</b>.
  * <p>
  * <!-- Created: Fri May 12 13:04:53 MET DST 2000 -->
  * <!-- hhmts start -->

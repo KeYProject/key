@@ -559,7 +559,7 @@ public final class IOUtil {
      */
     public static InputStream unifyLineBreaks(InputStream in)
             throws IOException {
-        String text = IOUtil.readFrom(in);
+        String text = readFrom(in);
         text = text.replace("\r\n", "\n");
         text = text.replace("\r", "\n");
         return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));

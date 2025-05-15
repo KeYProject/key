@@ -238,7 +238,7 @@ public final class IssueDialog extends JDialog {
         this.throwable = throwable;
         this.critical = critical;
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.warnings = decorateHTML(warnings);
         this.warnings.sort(Comparator.comparing(o -> o.location));
 

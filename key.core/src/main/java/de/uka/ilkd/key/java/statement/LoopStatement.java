@@ -49,7 +49,7 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement.
      */
-    public LoopStatement() {
+    protected LoopStatement() {
         this.body = null;
         this.updates = null;
         this.inits = null;
@@ -61,7 +61,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @param body a statement.
      */
-    public LoopStatement(Statement body) {
+    protected LoopStatement(Statement body) {
         this.body = body;
         this.updates = null;
         this.inits = null;
@@ -73,7 +73,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @param guard the guard expression.
      */
-    public LoopStatement(Expression guard) {
+    protected LoopStatement(Expression guard) {
         this.body = null;
         this.updates = null;
         this.inits = null;
@@ -85,7 +85,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @param body a statement.
      */
-    public LoopStatement(Expression guard, Statement body, ExtList comments) {
+    protected LoopStatement(Expression guard, Statement body, ExtList comments) {
         super(comments);
         this.body = body;
         this.updates = null;
@@ -94,7 +94,7 @@ public abstract class LoopStatement extends JavaStatement
     }
 
 
-    public LoopStatement(Expression guard, Statement body, ExtList comments, PositionInfo pos) {
+    protected LoopStatement(Expression guard, Statement body, ExtList comments, PositionInfo pos) {
         super(add(comments, pos));
         this.body = body;
         this.updates = null;
@@ -108,14 +108,14 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @param body a statement.
      */
-    public LoopStatement(Expression guard, Statement body) {
+    protected LoopStatement(Expression guard, Statement body) {
         this.body = body;
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
     }
 
-    public LoopStatement(Expression guard, Statement body, PositionInfo pos) {
+    protected LoopStatement(Expression guard, Statement body, PositionInfo pos) {
         super(pos);
         this.body = body;
         this.updates = null;
@@ -132,7 +132,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param updates the updates of the loop
      * @param body the body of the loop
      */
-    public LoopStatement(LoopInitializer[] inits, Expression guard, Expression[] updates,
+    protected LoopStatement(LoopInitializer[] inits, Expression guard, Expression[] updates,
             Statement body) {
         this.body = body;
         if (updates != null) {
@@ -153,7 +153,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param body the body of the loop
      * @param comments the comments attached to this statement.
      */
-    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
+    protected LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
             ExtList comments) {
         super(comments);
         this.body = body;
@@ -163,7 +163,7 @@ public abstract class LoopStatement extends JavaStatement
     }
 
 
-    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
+    protected LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
             ExtList comments, PositionInfo pos) {
         super(add(comments, pos));
         this.body = body;
@@ -182,7 +182,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param body the body of the loop
      * @param pos the position of the loop
      */
-    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
+    protected LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
             PositionInfo pos) {
         super(pos);
         this.body = body;
@@ -200,7 +200,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param updates the updates of the loop
      * @param body the body of the loop
      */
-    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
+    protected LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
         this.body = body;
         this.updates = updates;
         this.inits = inits;

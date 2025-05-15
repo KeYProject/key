@@ -45,7 +45,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      */
     private final Class<T> parameterClazz;
 
-    public AbstractCommand(Class<T> clazz) {
+    protected AbstractCommand(Class<T> clazz) {
         this.parameterClazz = clazz;
     }
 

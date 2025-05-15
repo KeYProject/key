@@ -14,15 +14,16 @@ import java.util.List;
 import java.util.ListIterator;
 
 import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -59,7 +60,7 @@ public class Node implements Iterable<Node> {
      */
     private BranchLocation branchLocation = null;
 
-    private Sequent seq = Sequent.EMPTY_SEQUENT;
+    private Sequent seq = JavaDLSequentKit.getInstance().getEmptySequent();
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 
@@ -77,7 +78,7 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<JFunction> localFunctions = ImmutableSLList.nil();
+    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
 
     private boolean closed = false;
 
@@ -111,7 +112,6 @@ public class Node implements Iterable<Node> {
     private String cachedName = null;
 
     private @Nullable Lookup userData = null;
-
 
     /**
      * If the rule base has been extended e.g. by loading a new taclet as lemma or by applying a
@@ -196,7 +196,8 @@ public class Node implements Iterable<Node> {
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
-            SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
+            SequentChangeInfo oldSeqChangeInfo =
+                this.nodeInfo.getSequentChangeInfo();
             this.nodeInfo = new NodeInfo(this);
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
         } else {
@@ -253,12 +254,12 @@ public class Node implements Iterable<Node> {
      *
      * @return a non-null immutable list of function symbols.
      */
-    public Iterable<JFunction> getLocalFunctions() {
+    public Iterable<Function> getLocalFunctions() {
         return localFunctions;
     }
 
-    public void addLocalFunctions(Collection<? extends JFunction> elements) {
-        for (JFunction op : elements) {
+    public void addLocalFunctions(Collection<Function> elements) {
+        for (Function op : elements) {
             localFunctions = localFunctions.prepend(op);
         }
     }
@@ -759,7 +760,8 @@ public class Node implements Iterable<Node> {
      *
      * @return iterator over children.
      */
-    public Iterator<Node> iterator() {
+    @Override
+    public Iterator<@NonNull Node> iterator() {
         return childrenIterator();
     }
 
@@ -787,7 +789,7 @@ public class Node implements Iterable<Node> {
      *
      * @param obj an object to be registered
      * @param service the key under it should be registered
-     * @param <T>
+     * @param <T> the type of the object to be registered
      */
     public <T> void register(T obj, Class<T> service) {
         getUserData().register(obj, service);
@@ -809,7 +811,7 @@ public class Node implements Iterable<Node> {
     /**
      * Get the assocated lookup of user-defined data.
      *
-     * @return
+     * @return the lookup table for the user data
      */
     public @NonNull Lookup getUserData() {
         if (userData == null) {

@@ -7,11 +7,13 @@ import java.io.File;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +35,7 @@ public class Issue3452Test {
         var po = contract.createProofObl(env.getInitConfig(), contract);
         var proof = env.createProof(po); // just to ensure there is exception
         Services services = proof.getInitConfig().getServices();
-        Namespace<JFunction> functions = services.getNamespaces().functions();
+        Namespace<@NonNull Function> functions = services.getNamespaces().functions();
         assertEquals("[int]", functions.lookup("A::b").argSorts().toString());
         assertEquals("[Heap,int]", functions.lookup("A::c").argSorts().toString());
     }

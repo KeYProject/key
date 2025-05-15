@@ -57,8 +57,8 @@ public class TestTermBuilder {
     @Test
     public void testNumberIsNegativeInt() {
         String[] numbers =
-            new String[] { "-4096", "-1", "" + Integer.MIN_VALUE, "" + Long.MIN_VALUE };
-        int[][] expected = new int[][] { { 4, 0, 9, 6 }, { 1 }, { 2, 1, 4, 7, 4, 8, 3, 6, 4, 8 },
+            { "-4096", "-1", "" + Integer.MIN_VALUE, "" + Long.MIN_VALUE };
+        int[][] expected = { { 4, 0, 9, 6 }, { 1 }, { 2, 1, 4, 7, 4, 8, 3, 6, 4, 8 },
             { 9, 2, 2, 3, 3, 7, 2, 0, 3, 6, 8, 5, 4, 7, 7, 5, 8, 0, 8 } };
         for (int i = 0; i < numbers.length; i++) {
             checkDigits(tb.zTerm(numbers[i]), expected[i],
@@ -69,9 +69,9 @@ public class TestTermBuilder {
     @Test
     public void testNumberIsPositiveInt() {
         String[] numbers =
-            new String[] { "4096", "1", "0", "" + Integer.MAX_VALUE, "" + Long.MAX_VALUE };
+            { "4096", "1", "0", "" + Integer.MAX_VALUE, "" + Long.MAX_VALUE };
         int[][] expected =
-            new int[][] { { 4, 0, 9, 6 }, { 1 }, { 0 }, { 2, 1, 4, 7, 4, 8, 3, 6, 4, 7 },
+            { { 4, 0, 9, 6 }, { 1 }, { 0 }, { 2, 1, 4, 7, 4, 8, 3, 6, 4, 7 },
                 { 9, 2, 2, 3, 3, 7, 2, 0, 3, 6, 8, 5, 4, 7, 7, 5, 8, 0, 7 } };
         for (int i = 0; i < numbers.length; i++) {
             checkDigits(tb.zTerm(numbers[i]), expected[i],
@@ -82,7 +82,7 @@ public class TestTermBuilder {
     @Test
     public void testNumberIsVeryBigPositiveInteger() {
         String number = "16576152376524231864936749621436926134961274698712643261489762897364";
-        int[] expected = new int[] { 1, 6, 5, 7, 6, 1, 5, 2, 3, 7, 6, 5, 2, 4, 2, 3, 1, 8, 6, 4, 9,
+        int[] expected = { 1, 6, 5, 7, 6, 1, 5, 2, 3, 7, 6, 5, 2, 4, 2, 3, 1, 8, 6, 4, 9,
             3, 6, 7, 4, 9, 6, 2, 1, 4, 3, 6, 9, 2, 6, 1, 3, 4, 9, 6, 1, 2, 7, 4, 6, 9, 8, 7, 1, 2,
             6, 4, 3, 2, 6, 1, 4, 8, 9, 7, 6, 2, 8, 9, 7, 3, 6, 4 };
 
@@ -93,7 +93,7 @@ public class TestTermBuilder {
     @Test
     public void testNumberIsVerySmallNegativeInteger() {
         String number = "-16576152376524231864936749621436926134961274698712643261489762897364";
-        int[] expected = new int[] { 1, 6, 5, 7, 6, 1, 5, 2, 3, 7, 6, 5, 2, 4, 2, 3, 1, 8, 6, 4, 9,
+        int[] expected = { 1, 6, 5, 7, 6, 1, 5, 2, 3, 7, 6, 5, 2, 4, 2, 3, 1, 8, 6, 4, 9,
             3, 6, 7, 4, 9, 6, 2, 1, 4, 3, 6, 9, 2, 6, 1, 3, 4, 9, 6, 1, 2, 7, 4, 6, 9, 8, 7, 1, 2,
             6, 4, 3, 2, 6, 1, 4, 8, 9, 7, 6, 2, 8, 9, 7, 3, 6, 4 };
         checkDigits(tb.zTerm(number), expected, services.getTypeConverter().getIntegerLDT(), false);

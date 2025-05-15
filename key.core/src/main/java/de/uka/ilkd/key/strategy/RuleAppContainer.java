@@ -3,15 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Container for RuleApp instances with cost as determined by a given Strategy. Instances of this
@@ -64,7 +67,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return container for the currently applicable RuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    public static RuleAppContainer createAppContainer(RuleApp p_app, PosInOccurrence p_pio,
+    public static @NonNull RuleAppContainer createAppContainer(
+            RuleApp p_app,
+            PosInOccurrence p_pio,
             Goal p_goal) {
 
         if (p_app instanceof NoPosTacletApp) {
@@ -88,7 +93,8 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      *         of <code>TopRuleAppCost</code>.
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(
-            ImmutableList<? extends RuleApp> rules, PosInOccurrence pos, Goal goal) {
+            ImmutableList<? extends RuleApp> rules,
+            PosInOccurrence pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         if (rules.size() == 1) {

@@ -11,6 +11,7 @@ public record RuleJustificationBySpec(Contract spec) implements RuleJustificatio
     /**
      * Contracts for stubs are considered axioms; other contracts not.
      */
+    @Override
     public boolean isAxiomJustification() {
         return spec.getTarget() instanceof IProgramMethod
                 && !((IProgramMethod) spec.getTarget()).isModel()
