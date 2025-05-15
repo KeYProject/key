@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
@@ -85,7 +85,7 @@ public final class SolverTypeImplementation implements SolverType {
     /**
      * The message delimiters used to separate messages in the stdout of processes of this type.
      */
-    private final String[] delimiters;
+    private final Collection<String> delimiters;
 
     /*
      * The current command line parameters, timeout and command to be used instead of the default
@@ -141,15 +141,16 @@ public final class SolverTypeImplementation implements SolverType {
 
     /**
      * The names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used by the
-     * {@link SMTTranslator} that is created with {@link #createTranslator()}.
+     * {@link SMTTranslator} that is created with {@link #createTranslator()}. Careful here:
+     * The order of entries is very important!
      */
-    private final String[] handlerNames;
+    private final List<String> handlerNames;
 
     /**
      * Arbitrary options for the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s used by this solver
      * type's {@link #translator} (only takes effect for {@link ModularSMTLib2Translator}).
      */
-    private final String[] handlerOptions;
+    private final Collection<String> handlerOptions;
 
     /**
      * The class of the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket} to be created
@@ -203,10 +204,11 @@ public final class SolverTypeImplementation implements SolverType {
      * @param preamble the preamble String for the created {@link SMTTranslator}, may be null
      */
     public SolverTypeImplementation(String name, String info, String defaultParams,
-            String defaultCommand, String versionParameter, String minimumSupportedVersion,
-            long defaultTimeout, String[] delimiters, Class<?> translatorClass,
-            String[] handlerNames, String[] handlerOptions, Class<?> solverSocketClass,
-            String preamble) {
+                                    String defaultCommand, String versionParameter, String minimumSupportedVersion,
+                                    long defaultTimeout, Collection<String> delimiters, Class<?> translatorClass,
+                                    Collection<String> handlerNames, Collection<String> handlerOptions,
+                                    Class<?> solverSocketClass,
+                                    String preamble) {
         this.name = name;
         this.info = info;
         this.defaultParams = defaultParams;
@@ -220,8 +222,8 @@ public final class SolverTypeImplementation implements SolverType {
         this.versionParameter = versionParameter;
         this.translatorClass = translatorClass;
         // copy the array so that it cannot accidentally be manipulated from the outside
-        this.handlerNames = Arrays.copyOf(handlerNames, handlerNames.length);
-        this.handlerOptions = Arrays.copyOf(handlerOptions, handlerOptions.length);
+        this.handlerNames = new ArrayList<>(handlerNames);
+        this.handlerOptions = new HashSet<>(handlerOptions);
         this.solverSocketClass = solverSocketClass;
         this.preamble = preamble;
         this.translator = makeTranslator();
@@ -245,7 +247,7 @@ public final class SolverTypeImplementation implements SolverType {
     private SMTTranslator makeTranslator() {
         try {
             return (SMTTranslator) translatorClass
-                    .getDeclaredConstructor(String[].class, String[].class, String.class)
+                    .getDeclaredConstructor(List.class, Collection.class, String.class)
                     .newInstance(handlerNames, handlerOptions, preamble);
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -412,9 +414,9 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     @Override
-    public String[] getDelimiters() {
+    public Collection<String> getDelimiters() {
         // Copy the delimiters array so that it cannot accidentally be manipulated from the outside.
-        return Arrays.copyOf(delimiters, delimiters.length);
+        return new HashSet<>(delimiters);
     }
 
     @Override

@@ -6,6 +6,8 @@ package de.uka.ilkd.key.smt.communication;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -38,7 +40,7 @@ class LegacyPipe implements Pipe {
      * specify several delimiters a single message is chosen as small as possible, i.e., it does not
      * contain any delimiter.
      */
-    private final String[] messageDelimiters;
+    private final Collection<String> messageDelimiters;
 
     private static final Message EXCEPTION_MESSAGE = new Message("Exception", MessageType.ERROR);
 
@@ -55,9 +57,9 @@ class LegacyPipe implements Pipe {
     private Process process;
 
 
-    public LegacyPipe(SolverCommunication session, String[] messageDelimiters) {
+    public LegacyPipe(SolverCommunication session, Collection<String> messageDelimiters) {
         this.session = session;
-        this.messageDelimiters = messageDelimiters;
+        this.messageDelimiters = new HashSet<>(messageDelimiters);
     }
 
     /**

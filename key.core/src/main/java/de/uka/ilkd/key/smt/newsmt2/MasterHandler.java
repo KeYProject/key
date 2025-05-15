@@ -4,17 +4,10 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 
+import de.uka.ilkd.key.api.ScriptResults;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -53,7 +46,7 @@ public class MasterHandler {
     private final List<Writable> axioms = new ArrayList<>();
 
     /** A list of known symbols */
-    private final Set<String> knownSymbols = new HashSet<>();
+    private final Collection<String> knownSymbols = new HashSet<>();
 
     /** A list of untranslatable values */
     private final Map<Term, SExpr> unknownValues = new HashMap<>();
@@ -74,6 +67,12 @@ public class MasterHandler {
     private final Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
 
     /**
+     * Handler Options to be used by all the other SMT handlers.
+     */
+    private final Collection<String> handlerOptions;
+    private HashMap<Sort, Type> coerceType = new HashMap<>();
+
+    /**
      * Create a new handler with the default set of smt handlers.
      *
      * @param services non-null services
@@ -83,11 +82,17 @@ public class MasterHandler {
      * @param handlerOptions arbitrary String options for the handlers to process
      * @throws IOException if the handlers cannot be loaded
      */
-    public MasterHandler(Services services, SMTSettings settings, String[] handlerNames,
-            String[] handlerOptions) throws IOException {
+    public MasterHandler(Services services, SMTSettings settings,
+                         Collection<String> handlerNames, Collection<String> handlerOptions)
+            throws IOException {
         getTranslationState().putAll(settings.getNewSettings().getMap());
-        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames,
-            handlerOptions, this);
+        this.handlerOptions = handlerOptions;
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames, this);
+        coerceType.put(services.getTypeConverter().getIntegerLDT().targetSort(), Type.INT);
+    }
+
+    public boolean isHandlerOptionSet(String optionName) {
+        return handlerOptions.contains(optionName);
     }
 
     /**
@@ -186,7 +191,11 @@ public class MasterHandler {
      */
     public SExpr translate(Term problem, Type type) {
         try {
-            return SExprs.coerce(translate(problem), type);
+            if (coerceType.containsKey(problem.sort())) {
+                return SExprs.coerce(translate(problem), coerceType.get(problem.sort()));
+            } else {
+                return SExprs.coerce(translate(problem), type);
+            }
         } catch (Exception ex) {
             // Fall back to an unknown value despite the exception.
             // The result will still be valid SMT code then.
@@ -310,7 +319,12 @@ public class MasterHandler {
      * @throws SMTTranslationException if the type conversion is impossible
      */
     public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
-        return SExprs.coerce(translate(terms), type);
+        List<SExpr> result = new ArrayList<>();
+        for (Term t : terms) {
+            result.add(translate(t, type));
+        }
+        return result;
+        //return SExprs.coerce(translate(terms), type);
     }
 
     /**

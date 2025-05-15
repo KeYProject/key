@@ -34,8 +34,7 @@ public class QuantifierHandler implements SMTHandler {
     private Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
     }
 
