@@ -15,8 +15,8 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.pp.PosInSequent;
 
-import org.key_project.isabelletranslation.gui.controller.TranslateAllAction;
-import org.key_project.isabelletranslation.gui.controller.TranslationAction;
+import org.key_project.isabelletranslation.gui.controller.IsabelleTranslateAllAction;
+import org.key_project.isabelletranslation.gui.controller.IsabelleTranslationAction;
 
 import org.jspecify.annotations.NonNull;
 
@@ -44,8 +44,8 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
                 return List.of();
             }
             List<Action> list = new ArrayList<>();
-            list.add(new TranslationAction(MainWindow.getInstance()));
-            list.add(new TranslateAllAction(MainWindow.getInstance()));
+            list.add(new IsabelleTranslationAction(MainWindow.getInstance()));
+            list.add(new IsabelleTranslateAllAction(MainWindow.getInstance()));
             return list;
         }
     };
