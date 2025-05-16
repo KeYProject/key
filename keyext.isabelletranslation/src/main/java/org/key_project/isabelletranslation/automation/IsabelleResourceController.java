@@ -275,33 +275,36 @@ public class IsabelleResourceController {
     }
 
     /**
-     * A record bundling a given instance to a theory. This is necessary as a theory object is only usable in conjunction with the instance used to create it.
+     * A record bundling a given instance to a theory. This is necessary as a theory object is only
+     * usable in conjunction with the instance used to create it.
      *
      * @param instance the instance
-     * @param theory   the theory
+     * @param theory the theory
      */
-    private record IsabelleResourceImpl(Isabelle instance, Theory theory) implements IsabelleResource {
+    private record IsabelleResourceImpl(Isabelle instance, Theory theory)
+            implements IsabelleResource {
 
-    @Override
-    public boolean isDestroyed() {
-        return instance.isDestroyed();
-    }
+        @Override
+        public boolean isDestroyed() {
+            return instance.isDestroyed();
+        }
 
-    @Override
-    public void destroy() {
-        instance.destroy();
-    }
+        @Override
+        public void destroy() {
+            instance.destroy();
+        }
 
-    private void interruptIntern() throws IsabelleMLException {
-        instance.executeMLCodeNow("error \"Interrupt\"");
-    }
+        private void interruptIntern() throws IsabelleMLException {
+            instance.executeMLCodeNow("error \"Interrupt\"");
+        }
 
-    @Override
-    public void interrupt() {
-        try {
-            interruptIntern();
-        } catch (IsabelleMLException e) {
-            // Always throws this due to the way Isabelle is interrupted.
+        @Override
+        public void interrupt() {
+            try {
+                interruptIntern();
+            } catch (IsabelleMLException e) {
+                // Always throws this due to the way Isabelle is interrupted.
+            }
         }
     }
-}}
+}
