@@ -337,12 +337,14 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
                             .Normal NONE 1 override p_state;
                                          val (result, (outcome, step)) = results;
                                        in
-                                         (result, (""" + sledgehammer + """
+                                         (result, (""" + sledgehammer
+                    + """
                             .short_string_of_sledgehammer_outcome outcome, [(YXML.parse_body #> XML.content_of) step]))
                                        end;
                                 in
                                   Timeout.apply (Time.fromSeconds\s
-                            """ + getTimeout() + ") go_run (state, thy) end",
+                            """
+                    + getTimeout() + ") go_run (state, thy) end",
                 isabelle, Implicits.toplevelStateConverter(), Implicits.theoryConverter(),
                 new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),
                 new ListConverter<>(de.unruh.isabelle.mlvalue.Implicits.stringConverter()),

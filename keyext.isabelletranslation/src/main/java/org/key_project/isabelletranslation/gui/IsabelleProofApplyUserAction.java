@@ -29,7 +29,7 @@ public class IsabelleProofApplyUserAction extends UserAction {
     private final Node originalSelectedNode;
 
     public IsabelleProofApplyUserAction(KeYMediator mediator, Proof proof,
-                                        Collection<IsabelleSolver> solvers) {
+            Collection<IsabelleSolver> solvers) {
         super(mediator, proof);
         originalProofNodes = proof.openGoals().stream().map(Goal::node).toList();
         originalSelectedNode = mediator.getSelectedNode();
@@ -72,6 +72,7 @@ public class IsabelleProofApplyUserAction extends UserAction {
 
     @Override
     public boolean canUndo() {
-        return goalsClosed.stream().allMatch(g -> proof.find(g.node())) && proof.find(originalSelectedNode);
+        return goalsClosed.stream().allMatch(g -> proof.find(g.node()))
+                && proof.find(originalSelectedNode);
     }
 }

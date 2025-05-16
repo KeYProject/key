@@ -33,15 +33,18 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
                 Choose where the isabelle translation files are stored.
                 """;
 
-    private static final Collection<String> SUPPORTED_VERSIONS_TEXT = List.of("Isabelle2023", "Isabelle2024-RC1", "Isabelle2024", "Isabelle2025");
+    private static final Collection<String> SUPPORTED_VERSIONS_TEXT =
+        List.of("Isabelle2023", "Isabelle2024-RC1", "Isabelle2024", "Isabelle2025");
 
     private static final String infoIsabellePathPanel = String.format(
-            """
-                    Specify the absolute path of the Isabelle folder.
-                    %s.
-                    """, createSupportedVersionText());
+        """
+                Specify the absolute path of the Isabelle folder.
+                %s.
+                """, createSupportedVersionText());
 
-    private enum IsabelleSupportState{SUPPORTED, NOT_SUPPORTED, NO_ISABELLE}
+    private enum IsabelleSupportState {
+        SUPPORTED, NOT_SUPPORTED, NO_ISABELLE
+    }
 
     /**
      * Panel for inputting the path to where translations are stored
@@ -57,11 +60,6 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
      * Input field for timeout in seconds
      */
     private final JSpinner timeoutField;
-
-    /**
-     * Button for the user to check support of the provided Isabelle version
-     */
-    private final JButton checkSupportButton;
 
     /**
      * Supported version info for user
@@ -83,7 +81,7 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         isabellePathPanel = createIsabellePathPanel();
         timeoutField = createTimeoutField();
 
-        checkSupportButton = createCheckSupportButton();
+        createCheckSupportButton();
         this.versionSupported = createSolverSupported();
         this.settings = IsabelleTranslationSettings.getInstance();
 
@@ -113,9 +111,10 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     }
 
     private JTextField createIsabellePathPanel() {
-        JTextField isabellePathPanel = addFileChooserPanel("Isabelle installation folder:", "", infoIsabellePathPanel,
-            false, e -> {
-            });
+        JTextField isabellePathPanel =
+            addFileChooserPanel("Isabelle installation folder:", "", infoIsabellePathPanel,
+                false, e -> {
+                });
         isabellePathPanel.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -172,7 +171,8 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         } catch (IOException e) {
             return IsabelleSupportState.NO_ISABELLE;
         }
-        return SUPPORTED_VERSIONS_TEXT.contains(isabelleVersion) ? IsabelleSupportState.SUPPORTED : IsabelleSupportState.NOT_SUPPORTED;
+        return SUPPORTED_VERSIONS_TEXT.contains(isabelleVersion) ? IsabelleSupportState.SUPPORTED
+                : IsabelleSupportState.NOT_SUPPORTED;
     }
 
     protected JTextField createSolverSupported() {
@@ -190,10 +190,11 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     }
 
     private String getSolverSupportText() {
-        return switch(checkForSupport()) {
-            case NOT_SUPPORTED -> "This version of Isabelle is not supported and is thus unlikely to work.";
-            case SUPPORTED -> "This version of Isabelle is supported.";
-            case NO_ISABELLE -> "Isabelle could not be found in the chosen directory.";
+        return switch (checkForSupport()) {
+        case NOT_SUPPORTED ->
+            "This version of Isabelle is not supported and is thus unlikely to work.";
+        case SUPPORTED -> "This version of Isabelle is supported.";
+        case NO_ISABELLE -> "Isabelle could not be found in the chosen directory.";
         };
     }
 
