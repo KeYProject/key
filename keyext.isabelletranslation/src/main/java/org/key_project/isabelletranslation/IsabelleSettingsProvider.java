@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.InvalidSettingsInputException;
@@ -57,6 +59,11 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     private final JSpinner timeoutField;
 
     /**
+     * Button for the user to check support of the provided Isabelle version
+     */
+    private final JButton checkSupportButton;
+
+    /**
      * Supported version info for user
      */
     private final JTextField versionSupported;
@@ -76,9 +83,12 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         isabellePathPanel = createIsabellePathPanel();
         timeoutField = createTimeoutField();
 
-        createCheckSupportButton();
+        checkSupportButton = createCheckSupportButton();
         this.versionSupported = createSolverSupported();
         this.settings = IsabelleTranslationSettings.getInstance();
+
+
+        updateVersionSupportText();
     }
 
     @Override
@@ -103,9 +113,27 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     }
 
     private JTextField createIsabellePathPanel() {
-        return addFileChooserPanel("Isabelle installation folder:", "", infoIsabellePathPanel,
+        JTextField isabellePathPanel = addFileChooserPanel("Isabelle installation folder:", "", infoIsabellePathPanel,
             false, e -> {
             });
+        isabellePathPanel.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateVersionSupportText();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateVersionSupportText();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateVersionSupportText();
+            }
+        });
+        return isabellePathPanel;
     }
 
     private JSpinner createTimeoutField() {
@@ -126,9 +154,13 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         JButton checkForSupportButton = new JButton("Check for support");
         checkForSupportButton.setEnabled(true);
         checkForSupportButton
-                .addActionListener(arg0 -> versionSupported.setText(getSolverSupportText()));
+                .addActionListener(arg0 -> updateVersionSupportText());
         addRowWithHelp(null, new JLabel(), checkForSupportButton);
         return checkForSupportButton;
+    }
+
+    private void updateVersionSupportText() {
+        versionSupported.setText(getSolverSupportText());
     }
 
     private IsabelleSupportState checkForSupport() {
@@ -173,5 +205,6 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
             translationPathPanel.getText());
         newConfig.set(IsabelleTranslationSettings.isabellePathKey, isabellePathPanel.getText());
         settings.readSettings(newConfig);
+        updateVersionSupportText();
     }
 }
