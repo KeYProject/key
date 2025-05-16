@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Action to translate all open goals.
  */
-public class TranslateAllAction extends MainWindowAction {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TranslateAllAction.class);
+public class IsabelleTranslateAllAction extends MainWindowAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslateAllAction.class);
 
-    public TranslateAllAction(MainWindow mainWindow) {
+    public IsabelleTranslateAllAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Translate all goals to Isabelle");
     }
@@ -29,7 +29,7 @@ public class TranslateAllAction extends MainWindowAction {
         LOGGER.info("Translating...");
 
         KeYMediator mediator = getMediator();
-        TranslationAction.solveGoals(
+        IsabelleTranslationAction.solveGoals(
             Objects.requireNonNull(mediator.getSelectedProof()).openGoals(), mediator, mainWindow);
     }
 }

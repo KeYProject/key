@@ -23,7 +23,7 @@ import org.key_project.isabelletranslation.automation.IsabelleSolver;
 import org.key_project.isabelletranslation.gui.InformationWindow;
 import org.key_project.isabelletranslation.gui.IsabelleProgressDialog;
 import org.key_project.isabelletranslation.gui.IsabelleProgressModel;
-import org.key_project.isabelletranslation.gui.ProofApplyUserAction;
+import org.key_project.isabelletranslation.gui.IsabelleProofApplyUserAction;
 
 /**
  * Updates the {@link IsabelleProgressDialog} for a given {@link IsabelleLauncher}.
@@ -157,7 +157,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         // ensure that the goal closing does not lag the UI
         mediator.stopInterface(true);
         try {
-            new ProofApplyUserAction(mediator, proof, solvers).actionPerformed(null);
+            new IsabelleProofApplyUserAction(mediator, proof, solvers).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
             // switch to new open goal

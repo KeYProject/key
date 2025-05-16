@@ -26,11 +26,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Action to translate the selected goal.
  */
-public class TranslationAction extends MainWindowAction {
+public class IsabelleTranslationAction extends MainWindowAction {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TranslationAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslationAction.class);
 
-    public TranslationAction(MainWindow mainWindow) {
+    public IsabelleTranslationAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Translate to Isabelle");
     }

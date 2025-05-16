@@ -17,16 +17,22 @@ import org.key_project.isabelletranslation.automation.IsabelleProblem;
 import org.key_project.isabelletranslation.automation.IsabelleRuleApp;
 import org.key_project.isabelletranslation.automation.IsabelleSolver;
 
-public class ProofApplyUserAction extends UserAction {
+public class IsabelleProofApplyUserAction extends UserAction {
     private final Collection<IsabelleSolver> solvers;
 
     private final Collection<Goal> goalsClosed = new HashSet<>();
 
     private final int numberOfGoalsClosed;
 
-    public ProofApplyUserAction(KeYMediator mediator, Proof proof,
-            Collection<IsabelleSolver> solvers) {
+    private final Collection<Node> originalProofNodes;
+
+    private final Node originalSelectedNode;
+
+    public IsabelleProofApplyUserAction(KeYMediator mediator, Proof proof,
+                                        Collection<IsabelleSolver> solvers) {
         super(mediator, proof);
+        originalProofNodes = proof.openGoals().stream().map(Goal::node).toList();
+        originalSelectedNode = mediator.getSelectedNode();
         this.solvers = solvers;
         this.numberOfGoalsClosed =
             (int) solvers.stream().filter(solver -> solver.getFinalResult().isSuccessful()).count();
@@ -58,17 +64,14 @@ public class ProofApplyUserAction extends UserAction {
 
     @Override
     public void undo() {
-        for (Goal g : goalsClosed) {
-            Node n = g.node();
-            n.setAppliedRuleApp(null);
-            // re-open the goal
-            Goal firstGoal = proof.getClosedGoal(n);
-            proof.reOpenGoal(firstGoal);
+        for (Node n : originalProofNodes) {
+            n.proof().pruneProof(n);
         }
+        mediator.getSelectionModel().setSelectedNode(originalSelectedNode);
     }
 
     @Override
     public boolean canUndo() {
-        return goalsClosed.stream().allMatch(g -> proof.find(g.node()));
+        return goalsClosed.stream().allMatch(g -> proof.find(g.node())) && proof.find(originalSelectedNode);
     }
 }
