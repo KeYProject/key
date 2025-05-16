@@ -39,6 +39,12 @@ public class ProofSMTApplyUserAction extends UserAction {
      * The number of goals that will be closed by this action.
      */
     private final int numberOfGoalsClosed;
+    /**
+     * The original nodes of the proof. Used to undo this action
+     */
+    private final Collection<Node> originalProofNodes;
+
+    private final Node originalSelectedNode;
 
     public ProofSMTApplyUserAction(KeYMediator mediator, Proof proof,
             Collection<SolverListener.InternSMTProblem> smtProblems) {
@@ -48,6 +54,8 @@ public class ProofSMTApplyUserAction extends UserAction {
                 .filter(p -> p.getProblem().getFinalResult()
                         .isValid() == SMTSolverResult.ThreeValuedTruth.VALID)
                 .count();
+        this.originalProofNodes = proof.openGoals().stream().map(Goal::node).toList();
+        this.originalSelectedNode = mediator.getSelectedNode();
     }
 
     @Override
@@ -81,13 +89,10 @@ public class ProofSMTApplyUserAction extends UserAction {
 
     @Override
     public void undo() {
-        for (Goal g : goalsClosed) {
-            Node n = g.node();
-            n.setAppliedRuleApp(null);
-            // re-open the goal
-            Goal firstGoal = proof.getClosedGoal(n);
-            proof.reOpenGoal(firstGoal);
+        for (Node n : originalProofNodes) {
+            n.proof().pruneProof(n);
         }
+        mediator.getSelectionModel().setSelectedNode(originalSelectedNode);
     }
 
     @Override
