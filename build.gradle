@@ -94,7 +94,7 @@ subprojects {
 
         compileOnly("org.jspecify:jspecify:1.0.0")
         testCompileOnly("org.jspecify:jspecify:1.0.0")
-        def eisop_version = "3.49.1-eisop1"
+        def eisop_version = "3.49.3-eisop1"
         compileOnly "io.github.eisop:checker-qual:$eisop_version"
         compileOnly "io.github.eisop:checker-util:$eisop_version"
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"

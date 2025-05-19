@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.slf4j.Logger;
@@ -68,7 +69,8 @@ public class ProofScriptFromFileAction extends AbstractAction {
             if (res == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fc.getSelectedFile();
                 lastDirectory = selectedFile.getParentFile();
-                ProofScriptWorker psw = new ProofScriptWorker(mediator, selectedFile);
+                var script = ParsingFacade.parseScript(selectedFile.toPath());
+                ProofScriptWorker psw = new ProofScriptWorker(mediator, script);
                 psw.init();
                 psw.execute();
             }

@@ -142,7 +142,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         if (FeatureSettings.isFeatureActivated(FEATURE_SMT_TRANSLATION_OPTIONS)) {
             getChildren().add(new TranslationOptions());
         } else {
-            solverTypes.removeAll(SolverTypes.getLegacySolvers());
+            solverTypes.removeAll(SolverTypes.getExperimentalSolvers());
         }
         /*
          * Only add options for those solvers that are actually theoretically available, according

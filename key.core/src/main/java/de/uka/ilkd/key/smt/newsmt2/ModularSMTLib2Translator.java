@@ -44,7 +44,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Handler option. If provided, the translator will label translations of sequent formulas such
      * that {@link de.uka.ilkd.key.smt.SMTFocusResults} can interpret the unsat core.
      * <p>
-     * This option is currently only enabled for Z3 and CVC5 (needs 1.0.4+).
+     * This option is currently only enabled for Z3 and cvc5 (needs 1.0.4+).
      * </p>
      * Make sure to also send (get-unsat-core) in the respective socket class when adding this
      * option.
