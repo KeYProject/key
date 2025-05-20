@@ -139,8 +139,7 @@ subprojects {
         maxHeapSize = "4g"
 
         // RAC non-null references.
-        jvmArgs("-javaagent:$rootDir/nonnull-0.1.0-SNAPSHOT-all.jar=org.key_project,de.uka")
-        //    jvmArgs("-Dde.matul.nonnull.debug=true")
+        jvmArgs("-javaagent:$rootDir/nonnull-0.1.0-SNAPSHOT-all.jar=VERBOSE,org.key_project,de.uka")
 
 
         forkEvery = 0 //default
