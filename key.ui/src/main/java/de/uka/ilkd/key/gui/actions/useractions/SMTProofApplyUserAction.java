@@ -43,7 +43,7 @@ public class SMTProofApplyUserAction extends UserAction {
     private final Node originalSelectedNode;
 
     public SMTProofApplyUserAction(KeYMediator mediator, Proof proof,
-                                   Collection<SolverListener.InternSMTProblem> smtProblems) {
+            Collection<SolverListener.InternSMTProblem> smtProblems) {
         super(mediator, proof);
         this.smtProblems = smtProblems;
         this.numberOfGoalsClosed = (int) smtProblems.stream()
@@ -81,7 +81,7 @@ public class SMTProofApplyUserAction extends UserAction {
             }
             app = AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, false);
             if (app == null) {
-                //should be unreachable under normal circumstances
+                // should be unreachable under normal circumstances
                 throw new RuntimeException("Could not instantiate SMT Rule Application");
             }
             goal.apply(app);
