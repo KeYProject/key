@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -25,16 +26,11 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Arne Keller
  */
-public class ProofSMTApplyUserAction extends UserAction {
+public class SMTProofApplyUserAction extends UserAction {
     /**
      * Results of running the SMT solvers (one entry for each open goal).
      */
     private final Collection<SolverListener.InternSMTProblem> smtProblems;
-    /**
-     * The nodes closed by applying this action.
-     * Populated in {@link #apply()}.
-     */
-    private final Collection<Goal> goalsClosed = new HashSet<>();
     /**
      * The number of goals that will be closed by this action.
      */
@@ -46,8 +42,8 @@ public class ProofSMTApplyUserAction extends UserAction {
 
     private final Node originalSelectedNode;
 
-    public ProofSMTApplyUserAction(KeYMediator mediator, Proof proof,
-            Collection<SolverListener.InternSMTProblem> smtProblems) {
+    public SMTProofApplyUserAction(KeYMediator mediator, Proof proof,
+                                   Collection<SolverListener.InternSMTProblem> smtProblems) {
         super(mediator, proof);
         this.smtProblems = smtProblems;
         this.numberOfGoalsClosed = (int) smtProblems.stream()
@@ -65,6 +61,7 @@ public class ProofSMTApplyUserAction extends UserAction {
 
     @Override
     protected void apply() {
+        Collection<Goal> goalsClosed = new HashSet<>();
         // only close each solved goal once
         for (SolverListener.InternSMTProblem problem : smtProblems) {
             Goal goal = problem.getProblem().getGoal();
@@ -82,7 +79,11 @@ public class ProofSMTApplyUserAction extends UserAction {
             } else {
                 app = SMTRuleApp.RULE.createApp(problem.getSolver().name());
             }
-            app.tryToInstantiate(goal);
+            app = AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, false);
+            if (app == null) {
+                //should be unreachable under normal circumstances
+                throw new RuntimeException("Could not instantiate SMT Rule Application");
+            }
             goal.apply(app);
         }
     }
@@ -90,14 +91,14 @@ public class ProofSMTApplyUserAction extends UserAction {
     @Override
     public void undo() {
         for (Node n : originalProofNodes) {
-            n.proof().pruneProof(n);
+            proof.pruneProof(n);
         }
         mediator.getSelectionModel().setSelectedNode(originalSelectedNode);
     }
 
     @Override
     public boolean canUndo() {
-        return goalsClosed.stream().allMatch(g -> proof.find(g.node()));
+        return originalProofNodes.stream().allMatch(proof::find);
     }
 
     private String getTitle(SMTProblem p) {
