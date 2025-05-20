@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>General preamble</comment>
+  <entry key="integers.preamble">
+locale jArithmetics =
+  fixes jDiv::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int"
+  assumes jDiv_def [simp]: "b\&lt;noteq&gt;0 \&lt;Longrightarrow&gt; jDiv a b = 
+(if ((a\&lt;le&gt;0 \&lt;and&gt; b&lt;0) \&lt;or&gt; (a\&lt;ge&gt;0 \&lt;and&gt; b&gt;0) \&lt;or&gt; (b dvd a)) then (a div b)
+else ((a div b) + 1))"
+
+fixes euclMod::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int"
+assumes eucl_Mod_def [simp]: "l\&lt;noteq&gt;0 \&lt;Longrightarrow&gt; euclMod k l = (if (k mod l &lt; 0) then ((k mod l) + abs(l))
+else (k mod l))"
+begin
+
+definition int_HALFRANGE::int where [simp, intro]:"int_HALFRANGE=2^31"
+definition int_RANGE::int where [simp, intro]:"int_RANGE=2^32"
+definition int_MIN::int where [simp, intro]:"int_MIN=-(2^31)"
+
+lemma jDiv_spec_requirement:
+  fixes a::int
+  fixes b::int
+  assumes "b\&lt;noteq&gt;0"
+  shows "abs(jDiv a b * b) \&lt;le&gt; abs(a) \&lt;and&gt; abs(a) &lt; abs(jDiv a b * b) + abs(b)"
+proof -
+  have "abs(jDiv a b * b) + abs(b) \&lt;equiv&gt; abs(jDiv a b) * abs(b) + abs(b)"
+    by (simp add: abs_mult)
+  also have "... \&lt;equiv&gt; (abs(jDiv a b) + 1) * abs(b)"
+    by algebra
+  finally have dist_jDiv_largest: "abs(jDiv a b * b) + abs(b) \&lt;equiv&gt; abs((abs(jDiv a b) + 1) * b)"
+    by (simp add: abs_mult)
+  consider (is_Div) "(a\&lt;ge&gt;0 \&lt;and&gt; b&gt;0) \&lt;or&gt; (a\&lt;le&gt;0) \&lt;and&gt; (b&lt;0) \&lt;or&gt; (b dvd a)" | (not_Div) "(a&lt;0\&lt;and&gt;b&gt;0 \&lt;or&gt; a&gt;0\&lt;and&gt;b&lt;0) \&lt;and&gt; \&lt;not&gt;(b dvd a)" using assms by linarith
+  then show ?thesis
+  proof cases
+    case is_Div      
+    then have jDiv_eq_div: "jDiv a b = a div b" using assms by auto
+    consider (b_dvd_a) "b dvd a" | (both_pos) "(a&gt;0 \&lt;and&gt; b&gt;0)" | (both_neg) "(a&lt;0) \&lt;and&gt; (b&lt;0)" using is_Div by (metis dvd_0_right leD linorder_neqE_linordered_idom)
+    then show ?thesis
+    proof cases
+      case (b_dvd_a)
+      then have "a div b * b = a" using assms by simp
+      then show ?thesis by (simp add: assms jDiv_eq_div)
+    next
+      case (both_pos)
+      then have "abs(a div b * b) \&lt;le&gt; abs(a) \&lt;equiv&gt; a div b * b \&lt;le&gt; a"
+        by (simp add:pos_imp_zdiv_nonneg_iff)
+      also 
+      have "... \&lt;equiv&gt; a div b * b \&lt;le&gt; a div b * b + a mod b" using both_pos by simp
+      also
+      have "... \&lt;equiv&gt; 0 \&lt;le&gt; a mod b" using both_pos by linarith
+      finally
+      have req:"abs(jDiv a b * b) \&lt;le&gt; abs(a)"
+        by (simp add: both_pos jDiv_eq_div)
+      have "a mod b &lt; abs(b)" using both_pos by auto
+      then have "a &lt; a div b * b + abs(b)"
+        by (metis add.commute add_less_cancel_right mod_mult_div_eq mult.commute)
+      then have largest:"abs(a) &lt; abs(jDiv a b * b) + abs(b)" using both_pos by auto
+      then show ?thesis using req largest by blast
+    next
+      case (both_neg)
+      then have "abs(a div b * b) \&lt;le&gt; abs (a) \&lt;equiv&gt; -(a div b * b) \&lt;le&gt; -a"
+        by (simp add: div_int_pos_iff mult_nonneg_nonpos)
+      also
+      have "... \&lt;equiv&gt; a div b * b \&lt;ge&gt; a div b * b + a mod b" by simp
+      also
+      have "... \&lt;equiv&gt; 0 \&lt;ge&gt; a mod b" by linarith
+      finally
+      have req:"abs(jDiv a b * b) \&lt;le&gt; abs(a)"
+        by (simp add: both_neg jDiv_eq_div)
+      have "abs(a) &lt; abs(jDiv a b * b) + abs(b) \&lt;equiv&gt; -((a div b * b) + a mod b) &lt; abs(a div b * b) - b" using both_neg by simp
+      also have "... \&lt;equiv&gt; -((a div b * b) + a mod b) &lt; -(a div b * b) - b" using both_neg by (simp add: div_int_pos_iff mult_nonneg_nonpos)
+      also have "... \&lt;equiv&gt; (a div b * b) + a mod b &gt; (a div b * b) + b" by linarith
+      also have "... \&lt;equiv&gt; a mod b &gt; b" by linarith
+      finally have largest:"abs(a) &lt; abs(jDiv a b * b) + abs(b)" using both_neg neg_mod_bound by blast
+      then show ?thesis using req largest by blast
+      qed
+  next
+    case not_Div
+    then have jDiv_eq_divplus: "jDiv a b = (a div b) + 1" using assms by auto
+    then have "abs(jDiv a b * b) \&lt;le&gt; abs(a) \&lt;equiv&gt; abs(a div b * b + b) \&lt;le&gt; abs(a div b * b + a mod b)"
+      by (simp add: distrib_left mult.commute)
+    consider (b_neg) "b&lt;0\&lt;and&gt;a&gt;0" | (b_pos) "b&gt;0\&lt;and&gt;a&lt;0" using assms not_Div by linarith
+    then show ?thesis
+    proof cases
+      case (b_neg)
+      then have quotient_neg:"a div b &lt; 0"
+        by (simp add: neg_imp_zdiv_neg_iff)
+      then have abs_jDiv:"abs((jDiv a b) * b) = (a div b + 1) * b" using b_neg jDiv_eq_divplus
+        by (simp add: mult_nonpos_nonpos)
+      then have "abs(jDiv a b * b) \&lt;le&gt; abs(a) \&lt;equiv&gt; (a div b + 1) * b \&lt;le&gt; a div b * b + a mod b" 
+        by (simp add: abs_of_pos b_neg jDiv_eq_divplus)
+      also have "... \&lt;equiv&gt; a div b * b + b \&lt;le&gt; a div b * b + a mod b" 
+        by (simp add: distrib_left mult.commute)
+      also have "... \&lt;equiv&gt; b \&lt;le&gt; a mod b"
+        by linarith
+      finally have requirement:"abs(jDiv a b * b) \&lt;le&gt; abs(a)" using b_neg neg_mod_bound order_less_imp_le
+        by blast
+
+      have mod_le_zero:"a mod b &lt; 0" using mod_eq_0_iff_dvd not_Div b_neg neg_mod_sign
+        by (metis linorder_not_less verit_la_disequality)
+
+      have "abs(a) &lt; abs(jDiv a b * b) + abs(b) \&lt;equiv&gt; a &lt; ((a div b + 1) * b) + abs(b)" using jDiv_eq_divplus b_neg abs_jDiv
+        by simp
+      also have "... \&lt;equiv&gt; a &lt; a div b * b + b + abs b" 
+        by (simp add: distrib_left mult.commute)
+      also have "... \&lt;equiv&gt; a &lt; a div b * b" using b_neg abs_of_neg
+        by simp
+      also have "... \&lt;equiv&gt; a div b * b + a mod b &lt; a div b * b" using mult_div_mod_eq
+        by simp
+      also have "... \&lt;equiv&gt; a mod b &lt; 0"
+        by linarith
+      finally have largest:"abs(a) &lt; abs(jDiv a b * b) + abs(b)" using mod_le_zero
+        by blast
+
+      show ?thesis using requirement largest by blast
+    next
+      case (b_pos)
+      then have "a div b &lt; 0" 
+        by (simp add: pos_imp_zdiv_neg_iff)
+      then have abs_jDiv:"abs((jDiv a b) * b) = -((a div b + 1) * b)" using b_pos jDiv_eq_divplus
+        by (simp add: mult_le_0_iff)
+      then have "abs(jDiv a b * b) \&lt;le&gt; abs(a) \&lt;equiv&gt; -((a div b + 1) * b) \&lt;le&gt; -(a div b * b + a mod b)" 
+        by (simp add: abs_of_neg b_pos jDiv_eq_divplus)
+      also have "... \&lt;equiv&gt; (a div b + 1) * b \&lt;ge&gt; a div b * b + a mod b"
+        by simp
+      also have "... \&lt;equiv&gt; a div b * b + b \&lt;ge&gt; a div b * b + a mod b" 
+        by (simp add: distrib_left mult.commute abs_of_neg b_pos jDiv_eq_divplus)
+      also have "... \&lt;equiv&gt; b \&lt;ge&gt; a mod b" by linarith
+      finally have requirement:"abs(jDiv a b * b) \&lt;le&gt; abs(a)" using b_pos pos_mod_bound order_less_imp_le
+        by blast
+
+      have mod_greater_zero:"a mod b &gt; 0" using mod_eq_0_iff_dvd not_Div
+        by (metis b_pos mod_int_pos_iff order_antisym_conv verit_comp_simplify1(3))
+
+      have "abs(a) &lt; abs(jDiv a b * b) + abs(b) \&lt;equiv&gt; -a &lt; -((a div b + 1) * b) + abs(b)" using jDiv_eq_divplus b_pos abs_jDiv
+        by simp
+      also have "... \&lt;equiv&gt; -a &lt; -(a div b * b) - b + abs b" 
+        by (simp add: distrib_left mult.commute)
+      also have "... \&lt;equiv&gt; a &gt; a div b * b" using b_pos abs_of_pos
+        by simp
+      also have "... \&lt;equiv&gt; a div b * b + a mod b &gt; a div b * b" using mult_div_mod_eq
+        by simp
+      also have "... \&lt;equiv&gt; a mod b &gt; 0"
+        by linarith
+      finally have largest:"abs(a) &lt; abs(jDiv a b * b) + abs(b)"
+        using mod_greater_zero by blast
+
+      show ?thesis using requirement largest by blast
+    qed
+  qed
+qed
+
+fun jMod::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int" where
+"jMod a b = a - (jDiv a b)*b"
+
+lemma jMod_jDiv_eq:
+  fixes a::int
+  fixes b::int
+  assumes "b\&lt;noteq&gt;0"
+  shows "a = (jDiv a b)*b + jMod a b"
+  by simp
+
+fun moduloInt::"int\&lt;Rightarrow&gt;int"
+  where "moduloInt a = int_MIN + ((int_HALFRANGE + a) mod (int_RANGE))"
+
+fun jAdd::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int"
+  where "jAdd a b = moduloInt (a+b)"
+
+fun jSub:: "int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int" where
+    "jSub a b = moduloInt (a-b)"
+
+fun jMul:: "int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int" where
+    "jMul a b = moduloInt (a*b)"
+
+lemma euclMod_spec:
+  fixes a::int
+  fixes b::int
+  assumes "b\&lt;noteq&gt;0"
+  shows "0\&lt;le&gt;euclMod a b \&lt;and&gt; euclMod a b &lt; abs(b)"
+proof -
+  consider (mod_neg) "a mod b &lt; 0" | (mod_nonneg) "a mod b\&lt;ge&gt;0" by linarith
+  then show ?thesis
+  proof cases
+    case (mod_neg)
+    then have "0\&lt;le&gt;euclMod a b \&lt;and&gt; euclMod a b &lt; abs(b) \&lt;equiv&gt; 0\&lt;le&gt;a mod b + abs(b) \&lt;and&gt; a mod b + abs(b) &lt; abs(b)" using assms
+      by auto
+    also have "... \&lt;equiv&gt; -abs(b)\&lt;le&gt;a mod b \&lt;and&gt; a mod b + abs(b) &lt; abs(b)"
+      by linarith
+    also have "... \&lt;equiv&gt; abs(b) \&lt;ge&gt; abs(a mod b) \&lt;and&gt; a mod b + abs(b) &lt; abs(b)"
+      using mod_neg by linarith
+    also have "... \&lt;equiv&gt; a mod b + abs(b) &lt; abs(b)"
+      by (simp add: abs_mod_less assms dual_order.order_iff_strict)
+    finally show ?thesis
+      using mod_neg by auto
+  next
+    case (mod_nonneg)
+    then have "0\&lt;le&gt;euclMod a b \&lt;and&gt; euclMod a b &lt; abs(b) \&lt;equiv&gt; 0\&lt;le&gt;a mod b \&lt;and&gt; a mod b &lt; abs(b)" using assms
+      by auto
+
+    then show ?thesis
+      by (metis abs_mod_less abs_of_nonneg assms mod_nonneg)
+  qed
+qed
+
+fun euclDiv::"int\&lt;Rightarrow&gt;int\&lt;Rightarrow&gt;int" where
+"(euclDiv k l) = (k - euclMod k l) div l"
+
+lemma euclMod_euclDiv_eq:
+  fixes a::int
+  fixes b::int
+  assumes "b\&lt;noteq&gt;0"
+  shows "a = euclDiv a b * b + euclMod a b"
+proof -
+  consider (mod_le0) "a mod b&lt;0" | (mod_geq0) "a mod b\&lt;ge&gt;0" by linarith
+  then show ?thesis
+proof cases
+  case mod_le0
+  then have "euclMod a b = a mod b + abs(b)" using assms
+    by simp
+  then have "euclMod a b = a - ((a div b) * b) + abs(b)"
+    by (metis minus_div_mult_eq_mod)
+  then have "(euclDiv a b) = (a div b * b) div b - (abs(b)) div b"
+    by simp
+  then have "euclDiv a b = (a div b) - sgn(b)"
+    by (metis div_by_0 linordered_idom_class.abs_sgn nonzero_mult_div_cancel_left nonzero_mult_div_cancel_right sgn_0)
+  then have "euclDiv a b * b = (a div b)*b - abs b"
+    by (metis linordered_idom_class.abs_sgn mult.commute right_diff_distrib')
+  then show ?thesis using assms
+    by auto
+next
+  case mod_geq0
+  then have euclMod_eq_mod:"euclMod a b = a mod b" using assms
+    by simp
+  then have "euclDiv a b = a div b"
+    by (simp add: minus_mod_eq_mult_div)
+  then show ?thesis using euclMod_eq_mod
+    by auto
+  qed
+qed
+end
+  </entry>
+
+  <entry key="integers.locale">jArithmetics</entry>
+</properties>

@@ -1,0 +1,7 @@
+session KeYTranslations = HOL +
+  options [document=false]
+  sessions "HOL-Combinatorics"
+  theories
+    TranslationPreamble
+  document_files
+    "root.tex"
