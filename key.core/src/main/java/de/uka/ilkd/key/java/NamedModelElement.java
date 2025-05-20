@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A model element that carries a name.
  */
@@ -13,6 +15,7 @@ public interface NamedModelElement extends ModelElement {
      *
      * @return the name of the model element.
      */
+    @Nullable
     String getName();
 
 }

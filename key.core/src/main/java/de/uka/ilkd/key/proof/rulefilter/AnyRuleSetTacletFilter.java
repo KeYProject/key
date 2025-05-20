@@ -5,6 +5,8 @@ package de.uka.ilkd.key.proof.rulefilter;
 
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Filter that selects taclets that belong to at least one rule set, i.e. taclets that can be
  * applied automatically.
@@ -17,7 +19,7 @@ public class AnyRuleSetTacletFilter extends TacletFilter {
     /**
      * @return true iff <code>taclet</code> should be included in the result
      */
-    public boolean filter(Taclet taclet) {
+    public boolean filter(@NonNull Taclet taclet) {
         return !taclet.getRuleSets().isEmpty();
     }
 

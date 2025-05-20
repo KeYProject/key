@@ -9,6 +9,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Binary Term Feature return zero if root is a CNF quantifier formula with several clauses. And all
@@ -20,7 +22,7 @@ public class RecAndExistentiallyConnectedClausesFeature extends BinaryTermFeatur
     private RecAndExistentiallyConnectedClausesFeature() {}
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, @NonNull Services services) {
         final ClausesGraph graph = ClausesGraph.create(term, services.getCaches());
         return graph.isFullGraph();
     }

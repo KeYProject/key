@@ -23,10 +23,12 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.nil();
         if (poVars.post.self != null) {
@@ -52,8 +54,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         return buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
     }
 
-    private Term buildProgramTerm(BasicSnippetData d, ProofObligationVars vs, Term postTerm,
-            TermBuilder tb) {
+    private @NonNull Term buildProgramTerm(@NonNull BasicSnippetData d,
+            @NonNull ProofObligationVars vs, @NonNull Term postTerm,
+            @NonNull TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a loop without modality.");
@@ -95,7 +98,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         return tb.apply(update, programTerm);
     }
 
-    private Pair<JavaBlock, JavaBlock> buildJavaBlock(BasicSnippetData d) {
+    private @NonNull Pair<JavaBlock, JavaBlock> buildJavaBlock(@NonNull BasicSnippetData d) {
         ExecutionContext context = (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
 
         // create loop call

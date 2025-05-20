@@ -26,6 +26,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This{@link KeYWatchpoint} represents a KeY watchpoint and is responsible to tell the debugger to
@@ -77,7 +80,8 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+    protected boolean conditionMet(@NonNull RuleApp ruleApp, @NonNull Proof proof,
+            @NonNull Node node) {
         if (suspendOnTrue) {
             return super.conditionMet(ruleApp, proof, node);
         } else {
@@ -130,8 +134,9 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(@Nullable SourceElement activeStatement,
+            @NonNull RuleApp ruleApp, @NonNull Proof proof,
+            @NonNull Node node) {
         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
             return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
         }

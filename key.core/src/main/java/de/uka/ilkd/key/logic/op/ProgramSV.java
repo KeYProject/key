@@ -26,6 +26,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -257,7 +258,8 @@ public final class ProgramSV extends OperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
-    private MatchConditions addProgramInstantiation(ProgramList list, MatchConditions matchCond,
+    private @Nullable MatchConditions addProgramInstantiation(ProgramList list,
+            MatchConditions matchCond,
             Services services) {
         if (matchCond == null) {
             return null;

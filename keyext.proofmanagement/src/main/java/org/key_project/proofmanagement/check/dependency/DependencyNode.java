@@ -13,6 +13,8 @@ import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.proofmanagement.io.Logger;
 
+import org.jspecify.annotations.NonNull;
+
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
 /**
@@ -81,7 +83,7 @@ public class DependencyNode {
         return contract;
     }
 
-    public Map<DependencyNode, DependencyGraph.EdgeType> getDependencies() {
+    public @NonNull Map<DependencyNode, DependencyGraph.EdgeType> getDependencies() {
         return dependencies;
     }
 
@@ -90,7 +92,7 @@ public class DependencyNode {
      *
      * @return all termination sensitive edges starting from this node
      */
-    public Set<DependencyNode> getTermSensitiveDependencies() {
+    public @NonNull Set<DependencyNode> getTermSensitiveDependencies() {
         return dependencies.keySet()
                 .stream()
                 .filter(n -> dependencies.get(n) == TERMINATION_SENSITIVE)
@@ -117,7 +119,7 @@ public class DependencyNode {
 
     // TODO: equals and hashCode needed for HashMaps?
     // @Override
-    // public boolean equals(Object o) {
+    // boolean equals(@org.jspecify.annotations.Nullable Object o) {
     // if (o instanceof DependencyNode) {
     // DependencyNode node = (DependencyNode) o;
     // if (node.contract.equals(contract)) {
@@ -128,7 +130,7 @@ public class DependencyNode {
     // }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder result = new StringBuilder();
         result.append(contract.getName()).append(" -> (");
         boolean first = true;

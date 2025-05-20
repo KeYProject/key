@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.util.collection.ImmutableMap;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * this class contains a Taclet together with its suggested instantiations.
  */
@@ -33,7 +35,7 @@ public class TacletInstantiations {
         return instantiations;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return "rule: " + taclet() + "; instantiation: " + instantiations();
     }
 

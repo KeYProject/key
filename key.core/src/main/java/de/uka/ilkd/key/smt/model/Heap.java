@@ -73,7 +73,8 @@ public class Heap {
     /**
      * Heaps with equal names are equal.
      */
-    public boolean equals(Object that) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object that) {
 
         if (that instanceof Heap thatHeap) {
             return thatHeap.name.equals(name);

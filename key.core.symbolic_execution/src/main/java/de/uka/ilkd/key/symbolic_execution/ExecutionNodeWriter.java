@@ -40,6 +40,9 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Allows to persistent selected properties of {@link IExecutionNode}s as XML file. Such files can
  * be read via an {@link ExecutionNodeReader} instance.
@@ -364,7 +367,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @throws IOException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public void write(IExecutionNode<?> node, String encoding, File file, boolean saveVariables,
+    public void write(IExecutionNode<?> node, String encoding, @NonNull File file,
+            boolean saveVariables,
             boolean saveCallStack, boolean saveReturnValues, boolean saveConstraints)
             throws IOException, ProofInputException {
         try (var out = new FileOutputStream(file)) {
@@ -387,7 +391,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @throws IOException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public void write(IExecutionNode<?> node, String encoding, OutputStream out,
+    public void write(IExecutionNode<?> node, @Nullable String encoding, @Nullable OutputStream out,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
             boolean saveConstraints) throws IOException, ProofInputException {
         if (out != null) {
@@ -411,7 +415,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @return The created XML content.
      * @throws ProofInputException Occurred Exception.
      */
-    public String toXML(IExecutionNode<?> node, String encoding, boolean saveVariables,
+    public @NonNull String toXML(IExecutionNode<?> node, String encoding, boolean saveVariables,
             boolean saveCallStack, boolean saveReturnValues, boolean saveConstraints)
             throws ProofInputException {
         StringBuilder sb = new StringBuilder();
@@ -436,7 +440,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
      */
     protected void appendExecutionNode(int level, IExecutionNode<?> node, boolean saveVariables,
             boolean saveCallStack, boolean saveReturnValues, boolean saveConstraints,
-            StringBuilder sb) throws ProofInputException {
+            @NonNull StringBuilder sb) throws ProofInputException {
         if (node instanceof IExecutionBranchCondition) {
             appendExecutionBranchCondition(level, (IExecutionBranchCondition) node, saveVariables,
                 saveCallStack, saveReturnValues, saveConstraints, sb);
@@ -497,9 +501,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionBranchCondition(int level, IExecutionBranchCondition node,
+    protected void appendExecutionBranchCondition(int level,
+            @NonNull IExecutionBranchCondition node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -533,9 +538,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionStart(int level, IExecutionStart node, boolean saveVariables,
+    protected void appendExecutionStart(int level, @NonNull IExecutionStart node,
+            boolean saveVariables,
             boolean saveCallStack, boolean saveReturnValues, boolean saveConstraints,
-            StringBuilder sb) throws ProofInputException {
+            @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -559,7 +565,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param node The {@link IExecutionStart} which provides the termination entries.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendTerminations(int level, IExecutionStart node, StringBuilder sb) {
+    protected void appendTerminations(int level, @NonNull IExecutionStart node,
+            @NonNull StringBuilder sb) {
         ImmutableList<IExecutionTermination> terminations = node.getTerminations();
         if (terminations != null) {
             for (IExecutionTermination termination : terminations) {
@@ -583,9 +590,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionBranchStatement(int level, IExecutionBranchStatement node,
+    protected void appendExecutionBranchStatement(int level,
+            @NonNull IExecutionBranchStatement node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -616,9 +624,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionLoopCondition(int level, IExecutionLoopCondition node,
+    protected void appendExecutionLoopCondition(int level, @NonNull IExecutionLoopCondition node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -649,9 +657,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionLoopStatement(int level, IExecutionLoopStatement node,
+    protected void appendExecutionLoopStatement(int level, @NonNull IExecutionLoopStatement node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -682,9 +690,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionMethodCall(int level, IExecutionMethodCall node,
+    protected void appendExecutionMethodCall(int level, @NonNull IExecutionMethodCall node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -714,9 +722,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionMethodReturn(int level, IExecutionMethodReturn node,
+    protected void appendExecutionMethodReturn(int level, @NonNull IExecutionMethodReturn node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_SIGNATURE, node.getSignature());
@@ -763,8 +771,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @throws ProofInputException Occurred Exception.
      */
     protected void appendExecutionExceptionalMethodReturn(int level,
-            IExecutionExceptionalMethodReturn node, boolean saveVariables, boolean saveCallStack,
-            boolean saveReturnValues, boolean saveConstraints, StringBuilder sb)
+            @NonNull IExecutionExceptionalMethodReturn node, boolean saveVariables,
+            boolean saveCallStack,
+            boolean saveReturnValues, boolean saveConstraints, @NonNull StringBuilder sb)
             throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -795,7 +804,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @throws ProofInputException Occurred Exception.
      */
     protected void appendExecutionMethodReturnValue(int level,
-            IExecutionMethodReturnValue returnValue, StringBuilder sb) throws ProofInputException {
+            @NonNull IExecutionMethodReturnValue returnValue, @NonNull StringBuilder sb)
+            throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, returnValue.getName());
         attributeValues.put(ATTRIBUTE_RETURN_VALUE_STRING, returnValue.getReturnValueString());
@@ -818,9 +828,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionStatement(int level, IExecutionStatement node,
+    protected void appendExecutionStatement(int level, @NonNull IExecutionStatement node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -849,9 +859,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionJoin(int level, IExecutionJoin node, boolean saveVariables,
+    protected void appendExecutionJoin(int level, @NonNull IExecutionJoin node,
+            boolean saveVariables,
             boolean saveCallStack, boolean saveReturnValues, boolean saveConstraints,
-            StringBuilder sb) throws ProofInputException {
+            @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -881,9 +892,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionOperationContract(int level, IExecutionOperationContract node,
+    protected void appendExecutionOperationContract(int level,
+            @NonNull IExecutionOperationContract node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -921,9 +933,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionLoopInvariant(int level, IExecutionLoopInvariant node,
+    protected void appendExecutionLoopInvariant(int level, @NonNull IExecutionLoopInvariant node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -955,9 +967,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionBlockContract(int level, IExecutionAuxiliaryContract node,
+    protected void appendExecutionBlockContract(int level,
+            @NonNull IExecutionAuxiliaryContract node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -989,9 +1002,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendExecutionTermination(int level, IExecutionTermination node,
+    protected void appendExecutionTermination(int level, @NonNull IExecutionTermination node,
             boolean saveVariables, boolean saveCallStack, boolean saveReturnValues,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, node.getName());
         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -1018,8 +1031,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendConstraints(int level, IExecutionValue value, boolean saveConstraints,
-            StringBuilder sb) throws ProofInputException {
+    protected void appendConstraints(int level, @NonNull IExecutionValue value,
+            boolean saveConstraints,
+            @NonNull StringBuilder sb) throws ProofInputException {
         if (saveConstraints) {
             IExecutionConstraint[] constraints = value.getConstraints();
             for (IExecutionConstraint constraint : constraints) {
@@ -1037,8 +1051,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendConstraints(int level, IExecutionNode<?> node, boolean saveConstraints,
-            StringBuilder sb) throws ProofInputException {
+    protected void appendConstraints(int level, @NonNull IExecutionNode<?> node,
+            boolean saveConstraints,
+            @NonNull StringBuilder sb) throws ProofInputException {
         if (saveConstraints) {
             IExecutionConstraint[] constraints = node.getConstraints();
             for (IExecutionConstraint constraint : constraints) {
@@ -1056,7 +1071,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendConstraint(int level, IExecutionConstraint constraint, StringBuilder sb)
+    protected void appendConstraint(int level, @NonNull IExecutionConstraint constraint,
+            @NonNull StringBuilder sb)
             throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, constraint.getName());
@@ -1073,8 +1089,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendVariables(int level, IExecutionNode<?> node, boolean saveVariables,
-            boolean saveConstraints, StringBuilder sb) throws ProofInputException {
+    protected void appendVariables(int level, @NonNull IExecutionNode<?> node,
+            boolean saveVariables,
+            boolean saveConstraints, @NonNull StringBuilder sb) throws ProofInputException {
         if (saveVariables) {
             IExecutionVariable[] variables = node.getVariables();
             for (IExecutionVariable variable : variables) {
@@ -1093,8 +1110,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendCallStateVariables(int level, IExecutionBaseMethodReturn<?> node,
-            boolean saveVariables, boolean saveConstraints, StringBuilder sb)
+    protected void appendCallStateVariables(int level, @NonNull IExecutionBaseMethodReturn<?> node,
+            boolean saveVariables, boolean saveConstraints, @NonNull StringBuilder sb)
             throws ProofInputException {
         if (saveVariables) {
             IExecutionVariable[] variables = node.getCallStateVariables();
@@ -1115,8 +1132,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendVariable(int level, IExecutionVariable variable, boolean saveConstraints,
-            String tagName, StringBuilder sb) throws ProofInputException {
+    protected void appendVariable(int level, @NonNull IExecutionVariable variable,
+            boolean saveConstraints,
+            String tagName, @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, variable.getName());
         attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndexString());
@@ -1135,8 +1153,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendValues(int level, IExecutionVariable variable, boolean saveConstraints,
-            StringBuilder sb) throws ProofInputException {
+    protected void appendValues(int level, @NonNull IExecutionVariable variable,
+            boolean saveConstraints,
+            @NonNull StringBuilder sb) throws ProofInputException {
         IExecutionValue[] values = variable.getValues();
         for (IExecutionValue value : values) {
             appendValue(level, value, saveConstraints, sb);
@@ -1153,8 +1172,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendValue(int level, IExecutionValue value, boolean saveConstraints,
-            StringBuilder sb) throws ProofInputException {
+    protected void appendValue(int level, @NonNull IExecutionValue value, boolean saveConstraints,
+            @NonNull StringBuilder sb) throws ProofInputException {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, value.getName());
         attributeValues.put(ATTRIBUTE_TYPE_STRING, value.getTypeString());
@@ -1185,9 +1204,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception.
      */
-    protected void appendChildren(int childLevel, IExecutionNode<?> parent, boolean saveVariables,
+    protected void appendChildren(int childLevel, @NonNull IExecutionNode<?> parent,
+            boolean saveVariables,
             boolean saveCallStack, boolean saveReturnValues, boolean saveConstraints,
-            StringBuilder sb) throws ProofInputException {
+            @NonNull StringBuilder sb) throws ProofInputException {
         IExecutionNode<?>[] children = parent.getChildren();
         for (IExecutionNode<?> child : children) {
             appendExecutionNode(childLevel, child, saveVariables, saveCallStack, saveReturnValues,
@@ -1202,7 +1222,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param node the {@link IExecutionNode} whose outgoing links are to be reported
      * @param sb the StringBuilder with the resulting text description
      */
-    protected void appendOutgoingLinks(int level, IExecutionNode<?> node, StringBuilder sb) {
+    protected void appendOutgoingLinks(int level, @NonNull IExecutionNode<?> node,
+            @NonNull StringBuilder sb) {
         if (!node.getOutgoingLinks().isEmpty()) {
             for (IExecutionLink link : node.getOutgoingLinks()) {
                 appendOutgoingLink(level, link, sb);
@@ -1217,7 +1238,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param link the outgoing {@link IExecutionLink} to be reported
      * @param sb the StringBuilder with the resulting text description
      */
-    protected void appendOutgoingLink(int level, IExecutionLink link, StringBuilder sb) {
+    protected void appendOutgoingLink(int level, @NonNull IExecutionLink link,
+            @NonNull StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(link.getTarget()));
         appendEmptyTag(level, TAG_OUTGOING_LINK, attributeValues, sb);
@@ -1231,8 +1253,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param saveCallStack Defines if the call stack should be saved or not.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendCallStack(int level, IExecutionNode<?> node, boolean saveCallStack,
-            StringBuilder sb) {
+    protected void appendCallStack(int level, @NonNull IExecutionNode<?> node,
+            boolean saveCallStack,
+            @NonNull StringBuilder sb) {
         if (saveCallStack) {
             IExecutionNode<?>[] callStack = node.getCallStack();
             if (callStack != null) {
@@ -1252,7 +1275,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param node The {@link IExecutionMethodCall} which provides the call stack.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendMethodReturns(int level, IExecutionMethodCall node, StringBuilder sb) {
+    protected void appendMethodReturns(int level, @NonNull IExecutionMethodCall node,
+            @NonNull StringBuilder sb) {
         ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = node.getMethodReturns();
         if (methodReturns != null) {
             for (IExecutionBaseMethodReturn<?> methodReturn : methodReturns) {
@@ -1271,7 +1295,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      * @throws ProofInputException Occurred Exception
      */
-    protected void appendCompletedBlocks(int level, IExecutionNode<?> node, StringBuilder sb)
+    protected void appendCompletedBlocks(int level, @NonNull IExecutionNode<?> node,
+            @NonNull StringBuilder sb)
             throws ProofInputException {
         ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = node.getCompletedBlocks();
         if (completedBlocks != null) {
@@ -1292,8 +1317,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param node The {@link IExecutionBlockStartNode} which provides the completed blocks.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendBlockCompletions(int level, IExecutionBlockStartNode<?> node,
-            StringBuilder sb) {
+    protected void appendBlockCompletions(int level, @NonNull IExecutionBlockStartNode<?> node,
+            @NonNull StringBuilder sb) {
         ImmutableList<IExecutionNode<?>> blockCompletions = node.getBlockCompletions();
         if (blockCompletions != null) {
             for (IExecutionNode<?> blockCompletion : blockCompletions) {
@@ -1311,7 +1336,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
      * @param node The {@link IExecutionNode} to compute path to.
      * @return The computed path.
      */
-    protected String computePath(IExecutionNode<?> node) {
+    protected @NonNull String computePath(@Nullable IExecutionNode<?> node) {
         StringBuilder sb = new StringBuilder();
         boolean afterFirst = false;
         while (node != null) {

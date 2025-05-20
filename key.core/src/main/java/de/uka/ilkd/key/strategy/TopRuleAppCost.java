@@ -20,7 +20,8 @@ public class TopRuleAppCost implements RuleAppCost {
         return 1;
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof RuleAppCost) {
             return compareTo((RuleAppCost) o) == 0;
         }
@@ -37,7 +38,7 @@ public class TopRuleAppCost implements RuleAppCost {
      * @param cost2 the other costs
      * @return this instance
      */
-    public final RuleAppCost add(@NonNull RuleAppCost cost2) {
+    public final @NonNull RuleAppCost add(@NonNull RuleAppCost cost2) {
         return INSTANCE;
     }
 
@@ -54,7 +55,7 @@ public class TopRuleAppCost implements RuleAppCost {
         return this;
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         return "Costs infinite";
     }
 

@@ -15,6 +15,8 @@ import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides the basic functionality for {@link StopCondition}s which stops the auto mode when the
  * call stack size of the starting set node has a special difference to the call stack size of the
@@ -47,7 +49,7 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      */
     @Override
     public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+            int countApplied, @Nullable Goal goal) {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
@@ -111,7 +113,7 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      */
     @Override
     public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
         // Check if a rule was applied
         if (singleRuleApplicationInfo != null) {
             // Get the node on which a rule was applied.
@@ -146,7 +148,8 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
+    public @Nullable String getStopMessage(int maxApplications, long timeout, Proof proof,
+            long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return null;
     }

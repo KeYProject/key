@@ -15,6 +15,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * {@link Strategy} used to simplify {@link Term}s in side proofs.
  *
@@ -32,7 +34,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
      * @param proof The proof.
      * @param sp The {@link StrategyProperties} to use.
      */
-    private SimplifyTermStrategy(Proof proof, StrategyProperties sp) {
+    private SimplifyTermStrategy(Proof proof, @NonNull StrategyProperties sp) {
         super(proof, sp);
     }
 
@@ -40,7 +42,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 
@@ -85,7 +87,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public Strategy create(Proof proof, StrategyProperties sp) {
+        public @NonNull Strategy create(Proof proof, @NonNull StrategyProperties sp) {
             return new SimplifyTermStrategy(proof, sp);
         }
 
@@ -93,7 +95,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return name;
         }
 

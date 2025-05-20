@@ -22,6 +22,9 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Feature representing a <code>ChoicePoint</code> for instantiating a schema variable of a taclet
@@ -34,11 +37,11 @@ public class SVInstantiationCP implements Feature {
     private final Name svToInstantiate;
     private final ProjectionToTerm value;
 
-    public static Feature create(Name svToInstantiate, ProjectionToTerm value) {
+    public static @NonNull Feature create(Name svToInstantiate, ProjectionToTerm value) {
         return new SVInstantiationCP(svToInstantiate, value);
     }
 
-    public static Feature createTriggeredVarCP(ProjectionToTerm value) {
+    public static @NonNull Feature createTriggeredVarCP(ProjectionToTerm value) {
         return new SVInstantiationCP(null, value);
     }
 
@@ -49,13 +52,13 @@ public class SVInstantiationCP implements Feature {
     }
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+            @NonNull MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(new CP(app, pos, goal, mState), this);
         return NumberRuleAppCost.getZeroCost();
     }
 
-    private SchemaVariable findSVWithName(TacletApp app) {
+    private @Nullable SchemaVariable findSVWithName(@NonNull TacletApp app) {
 
         if (svToInstantiate == null) {
             return app.taclet().getTrigger().triggerVar();
@@ -90,8 +93,8 @@ public class SVInstantiationCP implements Feature {
             this.mState = mState;
         }
 
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
-            if (!(oldApp instanceof final TacletApp tapp)) {
+        public @NonNull Iterator<CPBranch> getBranches(RuleApp oldApp) {
+            if (!(oldApp instanceof final @NonNull TacletApp tapp)) {
                 Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got ",
                     oldApp);
                 throw new IllegalArgumentException(
@@ -107,7 +110,7 @@ public class SVInstantiationCP implements Feature {
             final CPBranch branch = new CPBranch() {
                 public void choose() {}
 
-                public RuleApp getRuleAppForBranch() { return newApp; }
+                public @NonNull RuleApp getRuleAppForBranch() { return newApp; }
             };
 
             return ImmutableSLList.<CPBranch>nil().prepend(branch).iterator();

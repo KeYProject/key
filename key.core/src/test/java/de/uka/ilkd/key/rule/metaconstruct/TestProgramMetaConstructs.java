@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -118,7 +119,8 @@ public class TestProgramMetaConstructs {
             new String[] { "i++;", "i--;", "z = 17;" });
     }
 
-    private void forInitUnfoldTransformerTest(String programBlock, String[] expectedStmts) {
+    private void forInitUnfoldTransformerTest(@NonNull String programBlock,
+            String @NonNull [] expectedStmts) {
         final ProgramElement block = TacletForTests.parsePrg(programBlock);
 
         final JavaASTCollector coll = new JavaASTCollector(block, LoopInit.class);

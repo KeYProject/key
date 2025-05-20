@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Feature that returns zero iff the given rule app is a taclet app that needs explicit
  * instantiation of schema variables (which has not been done yet)
@@ -22,7 +24,8 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
         super(false);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final ImmutableSet<SchemaVariable> neededVars = app.uninstantiatedVars();
         final ImmutableSet<SchemaVariable> ifFindVars = app.taclet().getIfFindVariables();
         for (SchemaVariable neededVar : neededVars) {

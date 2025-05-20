@@ -12,9 +12,11 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 public class SeqSub extends Operator {
 
-    public SeqSub(ExtList children) {
+    public SeqSub(@NonNull ExtList children) {
         super(children);
     }
 
@@ -32,7 +34,7 @@ public class SeqSub extends Operator {
 
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSeqSub(this);
     }
 
@@ -44,7 +46,7 @@ public class SeqSub extends Operator {
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         // bugfix, this used to return the join for the the first two arguments'
         // types.
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);

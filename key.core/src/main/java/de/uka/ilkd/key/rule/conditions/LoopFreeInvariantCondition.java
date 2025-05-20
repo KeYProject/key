@@ -25,6 +25,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Extracts the free loop invariants for the given loop term. Free invariants are only assumed, but
  * not proven (like an axiom).
@@ -44,8 +46,8 @@ public class LoopFreeInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
+    public @NonNull MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull MatchConditions matchCond, @NonNull Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -89,7 +91,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\getFreeInvariant(" + loopStmtSV + ", " + modalitySV + ", " + invSV + ")";
     }
 }

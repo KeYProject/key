@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,61 +34,63 @@ public class StatisticsFile implements Serializable {
     @SuppressWarnings("rawtypes")
     private static final Column[] columns = new Column[] { new Column<String>("Name") {
         @Override
-        String addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
+        @NonNull
+        String addEntry(Statistics statistics, @NonNull File keyFile, boolean proofClosed) {
             String name = keyFile.getAbsolutePath();
             final int slashIndex = name.lastIndexOf("examples/");
             return slashIndex >= 0 ? name.substring(slashIndex) : name;
         }
 
         @Override
-        String[] computeSumAndAverage(List<String> list) {
+        String @NonNull [] computeSumAndAverage(List<String> list) {
             return new String[] { "---SUM---", "---AVG---" };
         }
 
     }, new LongColumn("Total rule apps") {
 
         @Override
-        long getLongValueFromStatistics(Statistics statistics) {
+        long getLongValueFromStatistics(@NonNull Statistics statistics) {
             return statistics.totalRuleApps;
         }
 
     }, new LongColumn("Nodes") {
 
         @Override
-        long getLongValueFromStatistics(Statistics statistics) {
+        long getLongValueFromStatistics(@NonNull Statistics statistics) {
             return statistics.nodes;
         }
 
     }, new LongColumn("Branches") {
 
         @Override
-        long getLongValueFromStatistics(Statistics statistics) {
+        long getLongValueFromStatistics(@NonNull Statistics statistics) {
             return statistics.branches;
         }
 
     }, new LongColumn("Overall time (ms)") {
 
         @Override
-        long getLongValueFromStatistics(Statistics statistics) {
+        long getLongValueFromStatistics(@NonNull Statistics statistics) {
             return statistics.timeInMillis;
         }
 
     }, new LongColumn("Automode time (ms)") {
 
         @Override
-        long getLongValueFromStatistics(Statistics statistics) {
+        long getLongValueFromStatistics(@NonNull Statistics statistics) {
             return statistics.autoModeTimeInMillis;
         }
 
     }, new Column<Integer>("Closed") {
 
         @Override
+        @NonNull
         Integer addEntry(Statistics statistics, File keyFile, boolean closed) {
             return closed ? 1 : 0;
         }
 
         @Override
-        String[] computeSumAndAverage(List<String> list) {
+        String @NonNull [] computeSumAndAverage(@NonNull List<String> list) {
             long sum = 0;
             for (String s : list) {
                 sum += Long.parseLong(s);
@@ -99,12 +102,13 @@ public class StatisticsFile implements Serializable {
     }, new Column<Double>("Time per step (ms)") {
 
         @Override
-        Double addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
+        @NonNull
+        Double addEntry(@NonNull Statistics statistics, File keyFile, boolean proofClosed) {
             return (double) statistics.timePerStepInMillis;
         }
 
         @Override
-        String[] computeSumAndAverage(List<String> list) {
+        String @NonNull [] computeSumAndAverage(@NonNull List<String> list) {
             double sum = 0.0;
             for (String s : list) {
                 sum += Double.parseDouble(s);
@@ -168,7 +172,7 @@ public class StatisticsFile implements Serializable {
      *        table cell.
      * @throws IOException In case statistics file is not accessible for some reason.
      */
-    private void writeLine(List<String> entries) throws IOException {
+    private void writeLine(@NonNull List<String> entries) throws IOException {
         final FileWriter statisticsFileWriter =
             new FileWriter(statisticsFile, StandardCharsets.UTF_8, true);
         final PrintWriter statPrinter = new PrintWriter(statisticsFileWriter);
@@ -192,7 +196,7 @@ public class StatisticsFile implements Serializable {
      *        mentioned explicitly.
      * @throws IOException Thrown in case statistics file is not accessible.
      */
-    public void appendStatistics(Proof proof, File keyFile) throws IOException {
+    public void appendStatistics(@NonNull Proof proof, File keyFile) throws IOException {
         Statistics statistics = proof.getStatistics();
         boolean proofClosed = proof.closed();
         List<String> entries = new LinkedList<>();
@@ -312,12 +316,13 @@ public class StatisticsFile implements Serializable {
         }
 
         @Override
+        @NonNull
         Long addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
             return getLongValueFromStatistics(statistics);
         }
 
         @Override
-        String[] computeSumAndAverage(List<String> list) {
+        String @NonNull [] computeSumAndAverage(@NonNull List<String> list) {
             long sum = 0;
             for (String s : list) {
                 sum += Long.parseLong(s);

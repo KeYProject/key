@@ -12,6 +12,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * <p>
  * Instances of this class defines how a user interfaces has to look like which edits
@@ -46,7 +48,7 @@ public class StrategySettingsDefinition {
             IDefaultStrategyPropertiesFactory factory) {
     }
 
-    private static final ArrayList<StrategySettingEntry> STD_FURTHER_DEFAULTS;
+    private static final @NonNull ArrayList<StrategySettingEntry> STD_FURTHER_DEFAULTS;
 
     /**
      * Defines if a user interface control is shown to edit {@link StrategySettings#getMaxSteps()}.
@@ -66,7 +68,7 @@ public class StrategySettingsDefinition {
     /**
      * Defines the controls to edit {@link StrategyProperties}.
      */
-    private final ImmutableArray<AbstractStrategyPropertyDefinition> properties;
+    private final @NonNull ImmutableArray<AbstractStrategyPropertyDefinition> properties;
 
     /**
      * The default maximal rule applications.
@@ -77,7 +79,7 @@ public class StrategySettingsDefinition {
      * The {@link IDefaultStrategyPropertiesFactory} used to create default
      * {@link StrategyProperties}.
      */
-    private final IDefaultStrategyPropertiesFactory defaultPropertiesFactory;
+    private final @NonNull IDefaultStrategyPropertiesFactory defaultPropertiesFactory;
 
     /**
      * Further default settings, for example suitable for simplification. Consists of triples
@@ -204,7 +206,7 @@ public class StrategySettingsDefinition {
      */
     public StrategySettingsDefinition(boolean showMaxRuleApplications,
             String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
-            IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
+            @NonNull IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
             ArrayList<StrategySettingEntry> furtherDefaults,
             AbstractStrategyPropertyDefinition... properties) {
         assert defaultPropertiesFactory != null;
@@ -253,7 +255,7 @@ public class StrategySettingsDefinition {
      *
      * @return The definition of controls to edit {@link StrategyProperties}.
      */
-    public ImmutableArray<AbstractStrategyPropertyDefinition> getProperties() {
+    public @NonNull ImmutableArray<AbstractStrategyPropertyDefinition> getProperties() {
         return properties;
     }
 
@@ -273,7 +275,7 @@ public class StrategySettingsDefinition {
      * @return The {@link IDefaultStrategyPropertiesFactory} used to create default
      *         {@link StrategyProperties}.
      */
-    public IDefaultStrategyPropertiesFactory getDefaultPropertiesFactory() {
+    public @NonNull IDefaultStrategyPropertiesFactory getDefaultPropertiesFactory() {
         return defaultPropertiesFactory;
     }
 

@@ -19,16 +19,17 @@ import de.uka.ilkd.key.proof.Proof;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
  * @version 1 (24.05.19)
  */
 public class SequentViewDock extends DefaultMultipleCDockable {
-    private final SequentView sequentView;
-    private final Node node;
+    private final @NonNull SequentView sequentView;
+    private final @NonNull Node node;
 
-    public SequentViewDock(MainWindow mainWindow, Node node) {
+    public SequentViewDock(@NonNull MainWindow mainWindow, @NonNull Node node) {
         super(NullMultipleCDockableFactory.NULL);
         this.node = node;
         setCloseable(true);
@@ -47,7 +48,7 @@ public class SequentViewDock extends DefaultMultipleCDockable {
         private static final long serialVersionUID = 8488446344747995700L;
         private final Node node;
 
-        public OpenCurrentNodeAction(MainWindow mainWindow, Node node) {
+        public OpenCurrentNodeAction(@NonNull MainWindow mainWindow, Node node) {
             super(mainWindow);
             this.node = node;
 

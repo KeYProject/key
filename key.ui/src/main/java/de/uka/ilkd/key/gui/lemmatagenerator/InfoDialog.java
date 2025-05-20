@@ -9,6 +9,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 
+import org.jspecify.annotations.NonNull;
+
 public class InfoDialog {
     private JTextPane infoText;
     private JCheckBox showAgainBox;
@@ -49,7 +51,7 @@ public class InfoDialog {
         return infoText;
     }
 
-    private JCheckBox getShowAgainBox() {
+    private @NonNull JCheckBox getShowAgainBox() {
         if (showAgainBox == null) {
             showAgainBox = new JCheckBox("Don't show this dialog again.");
 

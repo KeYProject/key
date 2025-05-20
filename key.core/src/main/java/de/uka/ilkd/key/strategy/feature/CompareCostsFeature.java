@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+
 public abstract class CompareCostsFeature extends BinaryFeature {
 
     protected final Feature a, b;
@@ -16,7 +18,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
         this.b = b;
     }
 
-    public static Feature less(Feature a, Feature b) {
+    public static @NonNull Feature less(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
                     MutableState mState) {
@@ -26,7 +28,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
         };
     }
 
-    public static Feature leq(Feature a, Feature b) {
+    public static @NonNull Feature leq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
                     MutableState mState) {
@@ -36,7 +38,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
         };
     }
 
-    public static Feature eq(Feature a, Feature b) {
+    public static @NonNull Feature eq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
                     MutableState mState) {

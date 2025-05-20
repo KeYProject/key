@@ -15,6 +15,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 
 public final class MetaDisjointCondition extends VariableConditionAdapter {
 
@@ -28,7 +30,8 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
     }
 
 
-    private static boolean clearlyDisjoint(Term t1, Term t2, Services services) {
+    private static boolean clearlyDisjoint(@NonNull Term t1, @NonNull Term t2,
+            @NonNull Services services) {
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         if (t1.op() instanceof JFunction && ((Function) t1.op()).isUnique()
                 && t2.op() instanceof JFunction && ((Function) t2.op()).isUnique()
@@ -67,7 +70,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, @NonNull SVInstantiations svInst,
             Services services) {
         final Term s1Inst = (Term) svInst.getInstantiation(var1);
         final Term s2Inst = (Term) svInst.getInstantiation(var2);
@@ -80,7 +83,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return ("\\metaDisjoint " + var1 + ", " + var2);
     }
 }

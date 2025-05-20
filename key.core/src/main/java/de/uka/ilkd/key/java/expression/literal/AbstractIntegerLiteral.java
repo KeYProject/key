@@ -9,6 +9,8 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class is a superclass for integer literals (Int, Long, Char). It provides a getValue()
  * method to receive the actual value of the literal as well as getValueString() to get a String
@@ -30,7 +32,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
      *
      * @param children the children of this AST element as KeY classes, may contain: Comments
      */
-    protected AbstractIntegerLiteral(ExtList children) {
+    protected AbstractIntegerLiteral(@NonNull ExtList children) {
         super(children);
     }
 
@@ -48,7 +50,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
     public abstract String getValueString();
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -59,7 +61,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return getValueString();
     }
 
@@ -70,7 +72,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return IntegerLDT.NAME;
     }
 
@@ -85,7 +87,7 @@ public abstract class AbstractIntegerLiteral extends Literal {
      *         hexadecimal ("0x"), binary ("0b"), nor octal ("0") prefix. Note that the literal "0"
      *         is decimal too.
      */
-    public static boolean representsDecLiteral(String literalStr) {
+    public static boolean representsDecLiteral(@NonNull String literalStr) {
         if (literalStr.length() == 0) {
             throw new NumberFormatException(literalStr + "does not represent a number.");
         }

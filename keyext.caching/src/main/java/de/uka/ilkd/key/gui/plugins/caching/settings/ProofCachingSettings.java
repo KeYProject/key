@@ -5,6 +5,8 @@ package de.uka.ilkd.key.gui.plugins.caching.settings;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Settings for the proof caching functionality.
  *
@@ -63,7 +65,7 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
         this.enabled.set(enabled);
     }
 
-    public String getDispose() {
+    public @NonNull String getDispose() {
         return dispose.get();
     }
 
@@ -73,7 +75,7 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      *
      * @param operation the operation
      */
-    public void setDispose(String operation) {
+    public void setDispose(@NonNull String operation) {
         dispose.set(operation);
     }
 
@@ -82,7 +84,7 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      *
      * @return either an empty string, {@link #PRUNE_REOPEN} or {@link #PRUNE_COPY}
      */
-    public String getPrune() {
+    public @NonNull String getPrune() {
         return prune.get();
     }
 
@@ -92,7 +94,7 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
      *
      * @param operation the operation
      */
-    public void setPrune(String operation) {
+    public void setPrune(@NonNull String operation) {
         prune.set(operation);
     }
 }

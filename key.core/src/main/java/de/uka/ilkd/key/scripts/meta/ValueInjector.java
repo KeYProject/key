@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (29.03.17)
@@ -58,8 +60,8 @@ public class ValueInjector {
      * @throws NoSpecifiedConverterException unknown type for the current converter map
      * @throws ConversionException an converter could not translate the given value in arguments
      */
-    public static <T> T injection(ProofScriptCommand<T> command, T obj,
-            Map<String, Object> arguments) throws ArgumentRequiredException,
+    public static <T> @NonNull T injection(ProofScriptCommand<T> command, @NonNull T obj,
+            @NonNull Map<String, Object> arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
     }
@@ -70,7 +72,7 @@ public class ValueInjector {
      * @return a static reference to the default converter.
      * @see #createDefault()
      */
-    public static ValueInjector getInstance() {
+    public static @NonNull ValueInjector getInstance() {
         if (instance == null) {
             instance = createDefault();
         }
@@ -83,7 +85,7 @@ public class ValueInjector {
      *
      * @return a fresh instance
      */
-    public static ValueInjector createDefault() {
+    public static @NonNull ValueInjector createDefault() {
         ValueInjector vi = new ValueInjector();
         vi.addConverter(Integer.class, String.class, Integer::parseInt);
         vi.addConverter(Long.class, String.class, Long::parseLong);
@@ -120,7 +122,8 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, Object> arguments)
+    public <T> @NonNull T inject(ProofScriptCommand<T> command, @NonNull T obj,
+            @NonNull Map<String, Object> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
         List<ProofScriptArgument<T>> meta =
@@ -155,7 +158,8 @@ public class ValueInjector {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getStringMap(Object obj, ProofScriptArgument<?> vararg)
+    private @NonNull Map<String, Object> getStringMap(@NonNull Object obj,
+            @NonNull ProofScriptArgument<?> vararg)
             throws InjectionReflectionException {
         try {
             Map<String, Object> map = (Map<String, Object>) vararg.getField().get(obj);
@@ -170,7 +174,8 @@ public class ValueInjector {
         }
     }
 
-    private void injectIntoField(ProofScriptArgument<?> meta, Map<String, Object> args, Object obj)
+    private void injectIntoField(@NonNull ProofScriptArgument<?> meta,
+            @NonNull Map<String, Object> args, Object obj)
             throws InjectionReflectionException, ArgumentRequiredException, ConversionException,
             NoSpecifiedConverterException {
         final var val = args.get(meta.getName());
@@ -199,7 +204,7 @@ public class ValueInjector {
     }
 
     @SuppressWarnings("unchecked")
-    private Object convert(ProofScriptArgument<?> meta, Object val)
+    private Object convert(@NonNull ProofScriptArgument<?> meta, @NonNull Object val)
             throws NoSpecifiedConverterException, ConversionException {
         var converter = (Converter<Object, Object>) getConverter(meta.getType(), val.getClass());
         if (converter == null) {
@@ -218,7 +223,7 @@ public class ValueInjector {
         }
     }
 
-    public <T> T convert(Object val, Class<T> type)
+    public <T> T convert(@NonNull Object val, Class<T> type)
             throws NoSpecifiedConverterException, ConversionException {
         Converter<T, Object> converter = (Converter<T, Object>) getConverter(type, val.getClass());
 
@@ -247,7 +252,7 @@ public class ValueInjector {
         converters.put(new ConverterKey<>(ret, arg), conv);
     }
 
-    public <R, T> void addConverter(Converter<R, T> conv) {
+    public <R, T> void addConverter(@NonNull Converter<R, T> conv) {
         var m = conv.getClass().getMethods()[0];
         converters.put(new ConverterKey<>(m.getReturnType(), m.getParameterTypes()[0]), conv);
     }
@@ -266,7 +271,7 @@ public class ValueInjector {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "%s(%s)".formatted(
             getClass().getName(),
             converters.keySet().stream().map(Record::toString).collect(Collectors.joining(",\n")));

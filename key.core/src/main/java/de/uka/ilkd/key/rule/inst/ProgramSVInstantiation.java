@@ -11,6 +11,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * this class wrapps an {@link ImmutableList} and is used to store instantiations
@@ -51,7 +54,7 @@ public class ProgramSVInstantiation {
      * @param prgElement the JavaProgramElement The SchemaVariable is instantiated with
      * @return ProgramSVInstantiation the new ProgramSVInstantiation containing the given pair
      */
-    public ProgramSVInstantiation add(SchemaVariable sv, JavaProgramElement prgElement) {
+    public @NonNull ProgramSVInstantiation add(SchemaVariable sv, JavaProgramElement prgElement) {
         if (!isInstantiated(sv)) {
             return new ProgramSVInstantiation(list.prepend(new ProgramSVEntry(sv, prgElement)));
         } else {
@@ -67,7 +70,8 @@ public class ProgramSVInstantiation {
      * @param prgElement the JavaProgramElement The SchemaVariable is instantiated with
      * @return ProgramSVInstantiation the new ProgramSVInstantiation containing the given pair
      */
-    public ProgramSVInstantiation replace(SchemaVariable sv, JavaProgramElement prgElement) {
+    public @NonNull ProgramSVInstantiation replace(SchemaVariable sv,
+            JavaProgramElement prgElement) {
         ImmutableList<ProgramSVEntry> result =
             ImmutableSLList.<ProgramSVEntry>nil().prepend(new ProgramSVEntry(sv, prgElement));
         for (final ProgramSVEntry entry : list) {
@@ -98,7 +102,7 @@ public class ProgramSVInstantiation {
      * @return the JavaProgramElement the SchemaVariable will be instantiated with, null if no
      *         instantiation is stored
      */
-    public JavaProgramElement getInstantiation(SchemaVariable sv) {
+    public @Nullable JavaProgramElement getInstantiation(SchemaVariable sv) {
         for (ProgramSVEntry entry : list) {
             if (entry.key() == sv) {
                 return entry.value();
@@ -113,7 +117,7 @@ public class ProgramSVInstantiation {
      *
      * @return the Iterator
      */
-    public Iterator<ProgramSVEntry> iterator() {
+    public @NonNull Iterator<ProgramSVEntry> iterator() {
         return list.iterator();
     }
 
@@ -131,7 +135,8 @@ public class ProgramSVInstantiation {
      *
      * @return true if the given object and this one have the same listpings
      */
-    public boolean equals(Object obj) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         ProgramSVInstantiation cmp;
         if (!(obj instanceof ProgramSVInstantiation)) {
             return false;
@@ -166,7 +171,7 @@ public class ProgramSVInstantiation {
     }
 
     /** toString */
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder result = new StringBuilder("ProgramSVInstantiation:\n");
         return (result.append(list.toString())).toString();
     }

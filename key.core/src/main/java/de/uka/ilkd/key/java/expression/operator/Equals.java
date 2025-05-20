@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Equals.
  */
@@ -20,7 +22,7 @@ public class Equals extends ComparativeOperator {
      * @param children an ExtList with all children of this node the first children in list will be
      *        the one on the left side, the second the one on the right side.
      */
-    public Equals(ExtList children) {
+    public Equals(@NonNull ExtList children) {
         super(children);
     }
 
@@ -30,7 +32,7 @@ public class Equals extends ComparativeOperator {
      * @param lhs the Expression on the left side of the comparison
      * @param rhs the Expression on the right side of the comparison
      */
-    public Equals(Expression lhs, Expression rhs) {
+    public Equals(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -50,7 +52,7 @@ public class Equals extends ComparativeOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnEquals(this);
     }
 }

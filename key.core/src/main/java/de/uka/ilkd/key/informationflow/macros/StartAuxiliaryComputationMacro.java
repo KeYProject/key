@@ -6,10 +6,12 @@ package de.uka.ilkd.key.informationflow.macros;
 import de.uka.ilkd.key.macros.AlternativeMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 
+import org.jspecify.annotations.NonNull;
+
 public class StartAuxiliaryComputationMacro extends AlternativeMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Start auxiliary computation for self-composition proofs";
     }
 
@@ -19,7 +21,7 @@ public class StartAuxiliaryComputationMacro extends AlternativeMacro {
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "In order to increase the efficiency of self-composition "
             + "proofs, this macro starts a side calculation which does "
             + "the symbolic execution only once. The result is "
@@ -28,12 +30,12 @@ public class StartAuxiliaryComputationMacro extends AlternativeMacro {
     }
 
     @Override
-    public String getScriptCommandName() {
+    public @NonNull String getScriptCommandName() {
         return "aux-start";
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
+    protected ProofMacro @NonNull [] createProofMacroArray() {
         return new ProofMacro[] { new StartAuxiliaryMethodComputationMacro(),
             new StartAuxiliaryLoopComputationMacro(), new StartAuxiliaryBlockComputationMacro() };
     }

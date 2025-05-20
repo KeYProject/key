@@ -5,7 +5,7 @@ public class Number {
 	  @ requires true;
 	  @ ensures true;
 	  @*/
-	public boolean equals(Object n) {
+	boolean equals(@org.jspecify.annotations.Nullable Object n) {
 	   if (n instanceof Number) {
 	      if (content == ((Number) n).content) {
 	         return true;

@@ -14,6 +14,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * <p>
@@ -54,6 +56,7 @@ public interface TermLabelPolicy {
      * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
+    @Nullable
     TermLabel keepLabel(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm,

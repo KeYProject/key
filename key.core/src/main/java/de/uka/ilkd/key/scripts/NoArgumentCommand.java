@@ -9,13 +9,15 @@ import java.util.Map;
 
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (28.03.17)
  */
-public abstract class NoArgumentCommand implements ProofScriptCommand<Void> {
+public abstract class NoArgumentCommand implements ProofScriptCommand<@NonNull Void> {
     @Override
-    public List<ProofScriptArgument<Void>> getArguments() {
+    public @NonNull List<ProofScriptArgument<@NonNull Void>> getArguments() {
         return new ArrayList<>();
     }
 

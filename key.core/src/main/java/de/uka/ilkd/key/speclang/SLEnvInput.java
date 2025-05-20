@@ -4,25 +4,19 @@
 package de.uka.ilkd.key.speclang;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaReduxFileCollection;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.statement.SetStatement;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -67,7 +61,6 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
 
-
     // -------------------------------------------------------------------------
     // internal methods
     // -------------------------------------------------------------------------
@@ -109,7 +102,11 @@ public final class SLEnvInput extends AbstractEnvInput {
                     URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
                         filePath);
                     if (url != null) {
-                        rs = RuleSourceFactory.initRuleFile(url);
+                        try {
+                            rs = RuleSourceFactory.initRuleFile(url.toURI());
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
 

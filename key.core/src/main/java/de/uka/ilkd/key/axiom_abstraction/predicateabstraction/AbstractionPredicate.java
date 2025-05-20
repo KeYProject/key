@@ -5,6 +5,7 @@ package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +24,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping
@@ -44,7 +47,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      *
      * This field is needed to save proofs with abstraction predicates.
      */
-    private Term predicateFormWithPlaceholder = null;
+    private Term predicateFormWithPlaceholder;
 
     /**
      * The placeholder variable occurring in {@link #predicateFormWithPlaceholder} which is to be
@@ -53,7 +56,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      *
      * This field is needed to save proofs with abstraction predicates.s
      */
-    private LocationVariable placeholderVariable = null;
+    private LocationVariable placeholderVariable;
 
     /**
      * Creates a new {@link AbstractionPredicate}. Constructor is hidden since elements fo this
@@ -116,8 +119,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
         final Sort fInputSort = placeholder.sort();
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
-            private final Name name = new Name("abstrPred_" + predicate.op().toString());
-            private Function<Term, Term> mapping = null;
+            private final Name name = new Name("abstrPred_" + predicate.op());
+            private @Nullable Function<Term, Term> mapping = null;
 
             @Override
             public Term apply(Term input) {
@@ -220,8 +223,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                 assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
                     + "There should always be pairs of placeholders and predicate terms.";
 
-                final String phStr = m.group(i);
-                final String predStr = m.group(i + 1);
+                final String phStr = Objects.requireNonNull(m.group(i));
+                final String predStr = Objects.requireNonNull(m.group(i + 1));
 
                 // Parse the placeholder
                 Pair<Sort, Name> ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
@@ -247,13 +250,14 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (!(obj instanceof AbstractionPredicate otherPred)) {
             return false;
         }
 
-        return otherPred.placeholderVariable.equals(placeholderVariable)
-                && otherPred.predicateFormWithPlaceholder.equals(predicateFormWithPlaceholder);
+        return Objects.equals(otherPred.placeholderVariable, placeholderVariable)
+                && Objects.equals(otherPred.predicateFormWithPlaceholder,
+                    predicateFormWithPlaceholder);
     }
 
 }

@@ -10,9 +10,12 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<VariableSV> {
 
-    protected MatchVariableSVInstruction(VariableSV op) {
+    protected MatchVariableSVInstruction(@NonNull VariableSV op) {
         super(op);
     }
 
@@ -20,7 +23,8 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, Services services) {
+    public @Nullable MatchConditions match(@NonNull Term subst, @NonNull MatchConditions mc,
+            @NonNull Services services) {
         if (subst.op() instanceof QuantifiableVariable) {
             final Term foundMapping = (Term) mc.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
@@ -33,8 +37,9 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
+            @NonNull MatchConditions mc,
+            @NonNull Services services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();

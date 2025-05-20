@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public class GenerateUnitTests {
      */
     private static String outputFolder;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String @NonNull [] args) throws IOException {
         var collections = new ProofCollection[] { ProofCollections.automaticJavaDL(),
             ProofCollections.automaticInfFlow() };
         if (args.length != 1) {
@@ -103,7 +104,7 @@ public class GenerateUnitTests {
      * @param unit a group of proof collection units
      * @throws IOException if the file is not writable
      */
-    private static void createUnitClass(RunAllProofsTestUnit unit)
+    private static void createUnitClass(@NonNull RunAllProofsTestUnit unit)
             throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs.gen";
         String name = unit.getTestName();

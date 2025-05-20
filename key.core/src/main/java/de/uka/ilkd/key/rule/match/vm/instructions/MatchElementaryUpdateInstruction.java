@@ -13,11 +13,14 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TacletMatchProgram;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpdate> {
 
-    private final MatchOperatorInstruction leftHandSide;
+    private final @NonNull MatchOperatorInstruction leftHandSide;
 
-    protected MatchElementaryUpdateInstruction(ElementaryUpdate op) {
+    protected MatchElementaryUpdateInstruction(@NonNull ElementaryUpdate op) {
         super(op);
         if (op.lhs() instanceof LocationVariable) {
             leftHandSide =
@@ -30,7 +33,8 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
     }
 
     @Override
-    public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
+    public @Nullable MatchConditions match(@NonNull Term instantiationCandidate,
+            MatchConditions matchCond,
             Services services) {
         final Operator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {
@@ -44,7 +48,8 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
+            MatchConditions matchConditions,
             Services services) {
         final MatchConditions result =
             match(termPosition.getCurrentSubterm(), matchConditions, services);

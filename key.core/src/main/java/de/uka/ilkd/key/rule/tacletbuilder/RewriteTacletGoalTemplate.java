@@ -15,6 +15,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
  * ruleGoals that replaces a term by another term. For a sequent {@link AntecSuccTacletGoalTemplate}
@@ -22,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
 public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** term that replaces another one */
-    private final Term replacewith;
+    private final @NonNull Term replacewith;
 
     /**
      * creates new Goaldescription
@@ -32,20 +34,20 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      * @param replacewith the Term that replaces another one
      * @param pvs the set of schema variables
      */
-    public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-            Term replacewith, ImmutableSet<SchemaVariable> pvs) {
+    public RewriteTacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules,
+            @NonNull Term replacewith, ImmutableSet<SchemaVariable> pvs) {
         super(addedSeq, addedRules, pvs);
         TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith term");
         this.replacewith = replacewith;
     }
 
-    public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-            Term replacewith) {
+    public RewriteTacletGoalTemplate(@NonNull Sequent addedSeq, ImmutableList<Taclet> addedRules,
+            @NonNull Term replacewith) {
         this(addedSeq, addedRules, replacewith, DefaultImmutableSet.nil());
     }
 
 
-    public RewriteTacletGoalTemplate(Term replacewith) {
+    public RewriteTacletGoalTemplate(@NonNull Term replacewith) {
         this(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), replacewith);
     }
 
@@ -55,7 +57,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      *
      * @return Term being paramter in the rule goal replacewith(Seq)
      */
-    public Term replaceWith() {
+    public @NonNull Term replaceWith() {
         return replacewith;
     }
 
@@ -65,7 +67,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      * @return all variables that occur bound in this goal template
      */
     @Override
-    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
+    public @NonNull ImmutableSet<QuantifiableVariable> getBoundVariables() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(replaceWith());
         return bvv.getBoundVariables().union(super.getBoundVariables());
@@ -81,7 +83,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }
@@ -100,7 +102,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** toString */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String result = super.toString();
         result += "\\replacewith(" + replaceWith() + ") ";
         return result;

@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * The instantiations of a schemavariable can be restricted on rule scope by attaching conditions on
@@ -31,6 +33,7 @@ public interface VariableCondition {
      * @return modified match results if the condition can be satisfied, or <code>null</code>
      *         otherwise
      */
+    @Nullable
     MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond,
             Services services);

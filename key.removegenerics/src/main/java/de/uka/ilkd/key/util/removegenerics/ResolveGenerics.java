@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.convenience.TreeWalker;
 import recoder.java.CompilationUnit;
@@ -61,7 +62,7 @@ public class ResolveGenerics extends TwoPassTransformation {
      * @see recoder.kit.TwoPassTransformation#analyze()
      */
     @Override
-    public ProblemReport analyze() {
+    public @NonNull ProblemReport analyze() {
         TreeWalker tw = new TreeWalker(compUnitUnderTest);
         transformations = new LinkedList<>();
 

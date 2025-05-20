@@ -9,6 +9,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A feature that computes the depth of the find-position of a taclet (top-level positions have
@@ -22,7 +24,7 @@ public class FindDepthFeature implements Feature {
 
     private FindDepthFeature() {}
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, @Nullable PosInOccurrence pos, Goal goal,
             MutableState mState) {
         // assert pos != null : "Feature is only applicable to rules with find";
 

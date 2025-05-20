@@ -9,13 +9,15 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 public class PrintTermFeature implements TermFeature {
 
     public static final TermFeature INSTANCE = new PrintTermFeature();
 
     private PrintTermFeature() {}
 
-    public RuleAppCost compute(Term term, MutableState mState, Services services) {
+    public @NonNull RuleAppCost compute(Term term, MutableState mState, Services services) {
         return NumberRuleAppCost.getZeroCost();
     }
 }

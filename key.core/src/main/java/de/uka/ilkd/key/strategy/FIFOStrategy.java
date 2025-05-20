@@ -12,6 +12,9 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp.
@@ -30,7 +33,7 @@ public class FIFOStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, @NonNull Goal goal,
             MutableState mState) {
         return NumberRuleAppCost.create(goal.getTime());
     }
@@ -48,23 +51,23 @@ public class FIFOStrategy implements Strategy {
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector) {}
 
-    public Name name() {
+    public @NonNull Name name() {
         return NAME;
     }
 
     public static final Strategy INSTANCE = new FIFOStrategy();
 
     public static class Factory implements StrategyFactory {
-        public Name name() {
+        public @NonNull Name name() {
             return NAME;
         }
 
-        public Strategy create(Proof proof, StrategyProperties properties) {
+        public @NonNull Strategy create(Proof proof, StrategyProperties properties) {
             return INSTANCE;
         }
 
         @Override
-        public StrategySettingsDefinition getSettingsDefinition() {
+        public @Nullable StrategySettingsDefinition getSettingsDefinition() {
             return null;
         }
     }

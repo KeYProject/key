@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Given a monomial and a polynomial, this projection computes the gcd of all numerical
  * coefficients. The constant term of the polynomial is ignored. The result is guaranteed to be
@@ -29,12 +31,13 @@ public class CoeffGcdProjection implements ProjectionToTerm {
         this.polynomialRight = polynomialRight;
     }
 
-    public static ProjectionToTerm create(ProjectionToTerm monomialLeft,
+    public static @NonNull ProjectionToTerm create(ProjectionToTerm monomialLeft,
             ProjectionToTerm polynomialRight) {
         return new CoeffGcdProjection(monomialLeft, polynomialRight);
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Services services = goal.proof().getServices();
 
         final Term monoT = monomialLeft.toTerm(app, pos, goal, mState);

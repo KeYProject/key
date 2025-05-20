@@ -17,6 +17,8 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.util.ParserExceptionTest;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -43,9 +45,9 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
      * If this here is not null, this file name (referring to the resources
      * directory) will be loaded.
      */
-    private static final String FIX_FILE = null; // "SomeSpecificFile.java";
+    private static final @Nullable String FIX_FILE = null; // "SomeSpecificFile.java";
 
-    public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
+    public static @NonNull Stream<Arguments> getFiles() throws URISyntaxException, IOException {
         URL fileURL = JMLParserExceptionTest.class.getResource("exceptional");
         return ParserExceptionTest.getFiles(FIX_FILE, fileURL, ".java");
     }
@@ -53,12 +55,12 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
 
     @ParameterizedTest(name = "case {1}")
     @MethodSource("getFiles")
-    public void testParseAndInterpret(Path file, Path localFilename) throws Exception {
+    public void testParseAndInterpret(@NonNull Path file, Path localFilename) throws Exception {
         parseAndInterpret(file);
     }
 
     @Override
-    protected void tryLoadFile(Path file) throws Exception {
+    protected void tryLoadFile(@NonNull Path file) throws Exception {
         ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
         AbstractProblemLoader pl = new SingleThreadProblemLoader(file.toFile(), null, null,
             null, AbstractProfile.getDefaultProfile(), false,

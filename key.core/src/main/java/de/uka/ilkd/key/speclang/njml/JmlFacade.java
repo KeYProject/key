@@ -73,11 +73,11 @@ public final class JmlFacade {
     /**
      * Parse the given string as an JML expr.
      */
-    public static ParserRuleContext parseExpr(String expr) {
+    public static @NonNull ParserRuleContext parseExpr(@NonNull String expr) {
         return getExpressionContext(createLexer(expr));
     }
 
-    private static ParserRuleContext getExpressionContext(JmlLexer lexer) {
+    private static @NonNull ParserRuleContext getExpressionContext(@NonNull JmlLexer lexer) {
         lexer._mode = JmlLexer.expr;
         JmlParser parser = createParser(lexer);
         JmlParser.ExpressionEOFContext ctx = parser.expressionEOF();

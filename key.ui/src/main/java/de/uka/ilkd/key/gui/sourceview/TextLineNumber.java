@@ -18,6 +18,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class will display line numbers for a related text component. The text component must use
  * the same line height for each line. TextLineNumber supports wrapped lines and will highlight the
@@ -38,7 +40,7 @@ public class TextLineNumber extends JPanel
 
     // Text component this TextTextLineNumber component is in sync with
 
-    private final JTextComponent component;
+    private final @NonNull JTextComponent component;
 
     // Properties that can be changed
 
@@ -62,7 +64,7 @@ public class TextLineNumber extends JPanel
      *
      * @param component the related text component
      */
-    public TextLineNumber(JTextComponent component) {
+    public TextLineNumber(@NonNull JTextComponent component) {
         this(component, 3);
     }
 
@@ -73,7 +75,7 @@ public class TextLineNumber extends JPanel
      * @param minimumDisplayDigits the number of digits used to calculate the minimum width of the
      *        component
      */
-    public TextLineNumber(JTextComponent component, int minimumDisplayDigits) {
+    public TextLineNumber(@NonNull JTextComponent component, int minimumDisplayDigits) {
         this.component = component;
 
         setFont(component.getFont());
@@ -202,7 +204,7 @@ public class TextLineNumber extends JPanel
      * Draw the line numbers
      */
     @Override
-    public void paintComponent(Graphics g) {
+    public void paintComponent(@NonNull Graphics g) {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
@@ -251,7 +253,7 @@ public class TextLineNumber extends JPanel
      * @param rowStartOffset offset.
      * @return the line number to be drawn.
      */
-    protected String getTextLineNumber(int rowStartOffset) {
+    protected @NonNull String getTextLineNumber(int rowStartOffset) {
         Element root = component.getDocument().getDefaultRootElement();
         int index = root.getElementIndex(rowStartOffset);
         Element line = root.getElement(index);
@@ -273,7 +275,7 @@ public class TextLineNumber extends JPanel
     /*
      * Determine the Y offset for the current row
      */
-    private int getOffsetY(int rowStartOffset, FontMetrics fontMetrics)
+    private int getOffsetY(int rowStartOffset, @NonNull FontMetrics fontMetrics)
             throws BadLocationException {
         // Get the bounding rectangle of the row
 
@@ -384,7 +386,7 @@ public class TextLineNumber extends JPanel
     // Implement PropertyChangeListener interface
     //
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(@NonNull PropertyChangeEvent evt) {
         if (evt.getNewValue() instanceof Font) {
             if (updateFont) {
                 Font newFont = (Font) evt.getNewValue();

@@ -12,75 +12,81 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /** Class encoding the instructions of the matching vm */
 public abstract class Instruction<OP extends Operator> implements MatchInstruction {
 
-    public static Instruction<Operator> matchOp(Operator op) {
+    public static @NonNull Instruction<Operator> matchOp(@NonNull Operator op) {
         return new MatchOpIdentityInstruction<>(op);
     }
 
-    public static Instruction<SortDependingFunction> matchSortDependingFunction(
-            SortDependingFunction op) {
+    public static @NonNull Instruction<SortDependingFunction> matchSortDependingFunction(
+            @NonNull SortDependingFunction op) {
         return new MatchSortDependingFunctionInstruction(op);
     }
 
-    public static MatchModalOperatorSVInstruction matchModalOperatorSV(
+    public static @NonNull MatchModalOperatorSVInstruction matchModalOperatorSV(
             ModalOperatorSV sv) {
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static MatchModalityInstruction matchModalOperator(Modality mod) {
+    public static @NonNull MatchModalityInstruction matchModalOperator(@NonNull Modality mod) {
         return new MatchModalityInstruction(mod);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(
-            FormulaSV sv) {
+    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(
+            @NonNull FormulaSV sv) {
         return new MatchFormulaSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(TermSV sv) {
+    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(
+            @NonNull TermSV sv) {
         return new MatchTermSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(
-            VariableSV sv) {
+    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(
+            @NonNull VariableSV sv) {
         return new MatchVariableSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(
-            ProgramSV sv) {
+    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(
+            @NonNull ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(
-            UpdateSV sv) {
+    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(
+            @NonNull UpdateSV sv) {
         return new MatchUpdateSVInstruction(sv);
     }
 
-    public static MatchInstruction matchTermLabelSV(ImmutableArray<TermLabel> labels) {
+    public static @NonNull MatchInstruction matchTermLabelSV(ImmutableArray<TermLabel> labels) {
         return new MatchTermLabelInstruction(labels);
     }
 
-    public static MatchInstruction matchProgram(JavaProgramElement prg) {
+    public static @NonNull MatchInstruction matchProgram(JavaProgramElement prg) {
         return new MatchProgramInstruction(prg);
     }
 
-    public static MatchInstruction matchAndBindVariables(
-            ImmutableArray<QuantifiableVariable> boundVars) {
+    public static @NonNull MatchInstruction matchAndBindVariables(
+            @NonNull ImmutableArray<QuantifiableVariable> boundVars) {
         return new BindVariablesInstruction(boundVars);
     }
 
-    public static MatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
+    public static @NonNull MatchInstruction unbindVariables(
+            ImmutableArray<QuantifiableVariable> boundVars) {
         return new UnbindVariablesInstruction();
     }
 
-    public static MatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
+    public static @NonNull MatchInstruction matchElementaryUpdate(
+            @NonNull ElementaryUpdate elementaryUpdate) {
         return new MatchElementaryUpdateInstruction(elementaryUpdate);
     }
 
-    protected final OP op;
+    protected final @NonNull OP op;
 
-    protected Instruction(OP op) {
+    protected Instruction(@NonNull OP op) {
         this.op = op;
     }
 
@@ -95,6 +101,7 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair {@code (sv, instantiationCandidate)} added
      */
-    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
+    public abstract @Nullable MatchConditions match(Term instantiationCandidate,
+            MatchConditions matchCond,
             Services services);
 }

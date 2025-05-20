@@ -18,6 +18,8 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +37,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
      */
     private static final int MAX_ITEM_NUMBER = 30;
     /** all taclet apps the user can choose from */
-    private final Collection<TacletAppListItem> insertionTaclets;
+    private final @NonNull Collection<TacletAppListItem> insertionTaclets;
     /** the added action listeners */
     private final List<ActionListener> listenerList = new LinkedList<>();
     /** the notation info to pretty print the taclet apps */
@@ -43,7 +45,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     /** the parent frame of the selection dialog to be displayed */
     protected final JFrame parent;
     /** the selected taclet to be applied */
-    private TacletApp selectedTaclet;
+    private @Nullable TacletApp selectedTaclet;
     /** the services */
     protected final Services services;
 
@@ -74,7 +76,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
      * @return the list where the tacletappItems are stored (allows easy exchange for e.g. a sorted
      *         list) default: is filo
      */
-    protected Collection<TacletAppListItem> createInsertionList() {
+    protected @NonNull Collection<TacletAppListItem> createInsertionList() {
         return new LinkedList<>();
     }
 
@@ -84,7 +86,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
      *
      * @param app the TacletApp to be added
      */
-    public void add(TacletApp app) {
+    public void add(@NonNull TacletApp app) {
         insertionTaclets.add(createListItem(app));
 
         if (getItemCount() >= MAX_ITEM_NUMBER) {
@@ -108,10 +110,10 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         listenerList.add(listener);
     }
 
-    protected abstract Sequent checkTaclet(Taclet t);
+    protected abstract @Nullable Sequent checkTaclet(Taclet t);
 
     /** @return the selected taclet to be applied */
-    public TacletApp connectedTo() {
+    public @Nullable TacletApp connectedTo() {
         return selectedTaclet;
     }
 
@@ -245,7 +247,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         listenerList.remove(listener);
     }
 
-    public TacletAppListItem createListItem(TacletApp app) {
+    public @NonNull TacletAppListItem createListItem(@NonNull TacletApp app) {
         return new TacletAppListItem(app, checkTaclet(app.taclet()), notInfo, services);
     }
 
@@ -270,11 +272,11 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
             return app;
         }
 
-        public String shortDescription() {
+        public @NonNull String shortDescription() {
             return longDescription();
         }
 
-        public String longDescription() {
+        public @NonNull String longDescription() {
             final LogicPrinter printer = LogicPrinter.purePrinter(notInfo, services);
             printer.setInstantiation(app.instantiations());
             printer.printSequent(seq);
@@ -282,7 +284,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         }
 
         @Override
-        public String toString() {
+        public @NonNull String toString() {
             return longDescription();
         }
     }

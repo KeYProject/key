@@ -13,6 +13,8 @@ import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
 import org.key_project.util.collection.DirectedGraph;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A directed graph, extended to store equivalence groups of vertices.
  * Equivalence groups are identified using {@link EqualsModProofIrrelevancy}.
@@ -28,7 +30,7 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
         new HashMap<>();
 
     @Override
-    public boolean addVertex(GraphNode v) {
+    public boolean addVertex(@NonNull GraphNode v) {
         if (super.addVertex(v)) {
             if (v instanceof EqualsModProofIrrelevancy) {
                 verticesModProof.computeIfAbsent(
@@ -41,7 +43,7 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
     }
 
     @Override
-    public void removeVertex(GraphNode v) {
+    public void removeVertex(@NonNull GraphNode v) {
         super.removeVertex(v);
         if (v instanceof EqualsModProofIrrelevancy) {
             EqualsModProofIrrelevancyWrapper<?> wrapper =
@@ -68,7 +70,7 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
         }
     }
 
-    public EquivalenceDirectedGraph copy() {
+    public @NonNull EquivalenceDirectedGraph copy() {
         var g = new EquivalenceDirectedGraph();
         for (var vertex : vertexSet()) {
             g.addVertex(vertex);

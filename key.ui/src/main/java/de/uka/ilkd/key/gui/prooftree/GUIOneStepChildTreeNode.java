@@ -10,6 +10,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleApp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A special kind of gui proof tree node to show intermediate steps of the
@@ -21,9 +22,9 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     private final RuleApp app;
     private final int formulaNr;
-    private final GUIAbstractTreeNode parent;
+    private final @NonNull GUIAbstractTreeNode parent;
 
-    public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent,
+    public GUIOneStepChildTreeNode(GUIProofTreeModel tree, @NonNull GUIAbstractTreeNode parent,
             RuleApp app, int formulaNr) {
         super(tree, parent.getNode());
         this.parent = parent;
@@ -32,7 +33,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     }
 
     @Override
-    public TreeNode getChildAt(int childIndex) {
+    public @Nullable TreeNode getChildAt(int childIndex) {
         return null;
     }
 
@@ -52,7 +53,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         // For prettyprinting
         Services services = parent.getNode().proof().getServices();
         String prettySubTerm =

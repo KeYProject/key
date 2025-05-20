@@ -10,6 +10,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.Nullable;
+
 public interface TacletMatcher {
 
     /**
@@ -41,6 +43,7 @@ public interface TacletMatcher {
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
+    @Nullable
     MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services);
 
@@ -88,9 +91,7 @@ public interface TacletMatcher {
      * @param services the Services
      * @return the found schema variable mapping or <code>null</code> if the matching failed
      */
-    MatchConditions matchFind(Term term, MatchConditions matchCond,
-            Services services);
-
+    MatchConditions matchFind(Term term, MatchConditions matchCond, Services services);
 
     /**
      * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link Term}

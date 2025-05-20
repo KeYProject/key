@@ -29,6 +29,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A class axiom corresponding to a JML* represents clause.
  */
@@ -83,7 +85,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == null || o.getClass() != getClass()) {
             return false;
         }
@@ -109,7 +111,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                         .equals(originalSelfVar));
     }
 
-    public Term getAxiom(AbstractSortedOperator heapVar, AbstractSortedOperator selfVar,
+    public Term getAxiom(AbstractSortedOperator heapVar, @Nullable AbstractSortedOperator selfVar,
             Services services) {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();

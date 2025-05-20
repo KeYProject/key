@@ -19,6 +19,9 @@ import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * A variable condition that is satisfied if the two arguments are
@@ -70,8 +73,8 @@ public final class SameObserverCondition implements VariableCondition {
 
     // explanation see class javadoc.
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
+    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         final Term term1 = (Term) svInst.getInstantiation(schema1);
@@ -112,7 +115,7 @@ public final class SameObserverCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "\\sameObserver (" + schema1 + ", " + schema2 + ")";
     }
 }

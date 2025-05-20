@@ -14,13 +14,17 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Resolver manager for JML.
  */
 public final class JMLResolverManager extends SLResolverManager {
 
-    public JMLResolverManager(JavaInfo javaInfo, KeYJavaType specInClass, LocationVariable selfVar,
+    public JMLResolverManager(@NonNull JavaInfo javaInfo, @NonNull KeYJavaType specInClass,
+            LocationVariable selfVar,
             SLExceptionFactory eManager) {
         super(eManager, specInClass, selfVar, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
@@ -31,7 +35,7 @@ public final class JMLResolverManager extends SLResolverManager {
 
 
     @Override
-    public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
+    public @Nullable VisibilityModifier getSpecVisibility(MemberDeclaration md) {
         if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, "spec_public")) {
             return new Public();
         } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, "spec_protected")) {

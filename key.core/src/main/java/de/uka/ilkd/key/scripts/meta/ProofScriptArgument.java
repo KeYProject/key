@@ -8,6 +8,9 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (21.04.17)
@@ -15,7 +18,7 @@ import de.uka.ilkd.key.scripts.ProofScriptCommand;
 public class ProofScriptArgument<T> {
     private ProofScriptCommand<T> command;
     private String name;
-    private Class<?> type;
+    private Class<@NonNull ?> type;
     private boolean required;
     private boolean flag;
     private Field field;
@@ -32,7 +35,7 @@ public class ProofScriptArgument<T> {
         return command;
     }
 
-    public ProofScriptArgument<T> setCommand(ProofScriptCommand<T> command) {
+    public @NonNull ProofScriptArgument<T> setCommand(ProofScriptCommand<T> command) {
         this.command = command;
         return this;
     }
@@ -41,16 +44,16 @@ public class ProofScriptArgument<T> {
         return name;
     }
 
-    public ProofScriptArgument<T> setName(String name) {
+    public @NonNull ProofScriptArgument<T> setName(String name) {
         this.name = name;
         return this;
     }
 
-    public Class<?> getType() {
+    public Class<@NonNull ?> getType() {
         return type;
     }
 
-    public ProofScriptArgument<T> setType(Class<?> type) {
+    public @NonNull ProofScriptArgument<T> setType(Class<@NonNull ?> type) {
         this.type = type;
         return this;
     }
@@ -59,7 +62,7 @@ public class ProofScriptArgument<T> {
         return required;
     }
 
-    public ProofScriptArgument<T> setRequired(boolean required) {
+    public @NonNull ProofScriptArgument<T> setRequired(boolean required) {
         this.required = required;
         return this;
     }
@@ -68,13 +71,13 @@ public class ProofScriptArgument<T> {
         return flag;
     }
 
-    public ProofScriptArgument<T> setFlag(boolean flag) {
+    public @NonNull ProofScriptArgument<T> setFlag(boolean flag) {
         this.flag = flag;
         return this;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
@@ -132,12 +135,12 @@ public class ProofScriptArgument<T> {
      * @param documentation a string
      * @return this
      */
-    public ProofScriptArgument<T> setDocumentation(String documentation) {
+    public @NonNull ProofScriptArgument<T> setDocumentation(String documentation) {
         this.documentation = documentation;
         return this;
     }
 
-    public ProofScriptArgument<T> setVariableArguments(boolean hasVariableArguments) {
+    public @NonNull ProofScriptArgument<T> setVariableArguments(boolean hasVariableArguments) {
         this.variableArguments = hasVariableArguments;
         return this;
     }

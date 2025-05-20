@@ -7,6 +7,8 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * An event thrown by a {@link Proof} and observed via a {@link ProofDisposedListener}.
  *
@@ -23,7 +25,7 @@ public class ProofDisposedEvent extends EventObject {
      *
      * @param source The {@link Proof}.
      */
-    public ProofDisposedEvent(Proof source) {
+    public ProofDisposedEvent(@NonNull Proof source) {
         super(source);
     }
 

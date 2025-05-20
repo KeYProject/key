@@ -22,6 +22,8 @@ import org.key_project.slicing.graph.DependencyGraph.Edge;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Context menu action to show information on a dependency graph node (incoming / outgoing edges).
  * Used only for debugging purposes.
@@ -50,7 +52,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
      * @param tracker dependency tracker
      * @param node node to show info on
      */
-    public ShowNodeInfoAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
+    public ShowNodeInfoAction(@NonNull MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
         setName("Show dependency graph info");
         this.tracker = tracker;
@@ -131,7 +133,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
             });
     }
 
-    private void showDialogForStep(Window parentWindow, Node proofStep) {
+    private void showDialogForStep(Window parentWindow, @NonNull Node proofStep) {
         var graphNodes = new ArrayList<GraphNode>();
         var analysisResults = tracker.getAnalysisResults();
         var idxFactory = new IndexFactory();

@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Binary not.
  *
@@ -27,7 +29,7 @@ public class BinaryNot extends Operator {
      * @param children list withh all children
      */
 
-    public BinaryNot(ExtList children) {
+    public BinaryNot(@NonNull ExtList children) {
         super(children);
     }
 
@@ -80,11 +82,11 @@ public class BinaryNot extends Operator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnBinaryNot(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
         return tc.getPromotedType(tc.getKeYJavaType((Expression) getChildAt(0), ec));
 

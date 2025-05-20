@@ -7,4 +7,7 @@
  * de.uka.ilkd.key.rule.TacletBuilder}). Besides taclets, there are
  * built-in rules implemented directly in Java.
  */
+@NullMarked
 package de.uka.ilkd.key.rule;
+
+import org.jspecify.annotations.NullMarked;

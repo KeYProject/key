@@ -8,6 +8,8 @@ import java.io.Serializable;
 
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Initialising directories for runallproofs is a bit tricky since doing it statically results
  * easily in hard-to-detect bugs for forked mode of runallproofs. Subprocesses have to re-initialise
@@ -24,8 +26,9 @@ import org.key_project.util.helper.FindResources;
  */
 @SuppressWarnings("serial")
 public class RunAllProofsDirectories implements Serializable {
-    public static final File EXAMPLE_DIR = FindResources.getExampleDirectory();
-    public static final File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
+    public static final @Nullable File EXAMPLE_DIR = FindResources.getExampleDirectory();
+    public static final @Nullable File RUNALLPROOFS_DIR =
+        FindResources.getTestResultForRunAllProofs();
 
     public RunAllProofsDirectories() {
         init();

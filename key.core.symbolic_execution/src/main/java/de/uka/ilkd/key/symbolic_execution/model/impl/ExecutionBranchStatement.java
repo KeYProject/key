@@ -14,6 +14,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The default implementation of {@link IExecutionBranchStatement}.
  *
@@ -36,7 +38,7 @@ public class ExecutionBranchStatement extends AbstractExecutionBlockStartNode<Br
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() {
+    protected @NonNull String lazyComputeName() {
         BranchStatement bs = getActiveStatement();
         if (bs instanceof If) {
             PrettyPrinter p = PrettyPrinter.purePrinter();
@@ -55,7 +57,7 @@ public class ExecutionBranchStatement extends AbstractExecutionBlockStartNode<Br
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -63,7 +65,7 @@ public class ExecutionBranchStatement extends AbstractExecutionBlockStartNode<Br
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Branch Statement";
     }
 }

@@ -12,6 +12,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This document knows about syntax highlighting.
@@ -35,7 +37,7 @@ public class SourceHighlightDocument extends DefaultStyledDocument {
     /**
      * The timer that triggers the re-parsing of the text.
      */
-    private Timer refreshTimer = new Timer();
+    private @NonNull Timer refreshTimer = new Timer();
 
     /**
      * The listener that triggers the re-parsing of the text.
@@ -87,7 +89,7 @@ public class SourceHighlightDocument extends DefaultStyledDocument {
      */
     public static final EditorLexer TRIVIAL_LEXER = new EditorLexer() {
         @Override
-        public List<Token> applyTo(String text) {
+        public @NonNull List<Token> applyTo(@NonNull String text) {
             return List.of(new Token(text.length(), new SimpleAttributeSet()));
         }
     };

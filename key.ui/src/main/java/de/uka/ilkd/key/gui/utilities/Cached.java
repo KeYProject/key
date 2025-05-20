@@ -6,6 +6,8 @@ package de.uka.ilkd.key.gui.utilities;
 import java.util.Objects;
 import java.util.function.Function;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Caches a computation using a single value cache
  *
@@ -13,8 +15,8 @@ import java.util.function.Function;
  * @param <T> return type
  */
 public class Cached<A, T> {
-    private A args = null;
-    private T value = null;
+    private @Nullable A args = null;
+    private @Nullable T value = null;
     private final Function<A, T> update;
 
     /**
@@ -32,7 +34,7 @@ public class Cached<A, T> {
      * @param args the arguments
      * @return the value
      */
-    public T get(A args) {
+    public @Nullable T get(A args) {
         if (Objects.equals(args, this.args)) {
             return value;
         }

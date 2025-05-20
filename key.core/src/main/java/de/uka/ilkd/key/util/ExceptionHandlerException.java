@@ -5,14 +5,8 @@ package de.uka.ilkd.key.util;
 
 
 /** This Exception is only thrown by the ExceptionHandler */
-
+@Deprecated()
 public class ExceptionHandlerException extends RuntimeException {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4804191909840321109L;
-
     public ExceptionHandlerException() {
         super("An Exception occurred");
     }
@@ -32,6 +26,6 @@ public class ExceptionHandlerException extends RuntimeException {
 
     @Override
     public String toString() {
-        return super.getMessage();
+        return "" + super.getMessage();
     }
 }

@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
+import org.jspecify.annotations.NonNull;
+
 public class AboutAction extends MainWindowAction {
 
     /**
@@ -18,7 +20,7 @@ public class AboutAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 8240213594748334802L;
 
-    public AboutAction(MainWindow mainWindow) {
+    public AboutAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("About KeY");
         setIcon(IconFactory.help(16));

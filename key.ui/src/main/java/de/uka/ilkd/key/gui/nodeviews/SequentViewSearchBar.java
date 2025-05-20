@@ -54,7 +54,7 @@ public class SequentViewSearchBar extends SearchBar {
         }
     }
 
-    private final List<Pair<Integer, Object>> searchResults;
+    private final @NonNull List<Pair<Integer, Object>> searchResults;
     private int resultIteratorPos;
     private SequentView sequentView;
     private JCheckBox regExpCheckBox;
@@ -65,7 +65,7 @@ public class SequentViewSearchBar extends SearchBar {
         searchResults = new ArrayList<>();
     }
 
-    public void setSequentView(SequentView sequentView) {
+    public void setSequentView(@NonNull SequentView sequentView) {
         if (this.sequentView != sequentView) {
             // search always does a repaint, therefore don't force update in setFilter
             sequentView.setFilter(this.sequentView.getFilter(), false);
@@ -216,7 +216,7 @@ public class SequentViewSearchBar extends SearchBar {
      *
      * @param searchTerm string to search for. If regex is enabled, the string will be escaped
      */
-    public void searchFor(String searchTerm) {
+    public void searchFor(@NonNull String searchTerm) {
         if (regExpCheckBox.isSelected()) {
             // https://stackoverflow.com/questions/60160/how-to-escape-text-for-regular-expression-in-java
             String escaped = searchTerm.replaceAll("[-\\[\\]{}()*+?.,\\\\^$|#s]", "\\\\$0");

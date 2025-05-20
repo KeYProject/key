@@ -27,6 +27,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Provides a basic implementation of backward slicing algorithms.
  *
@@ -37,7 +39,8 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
      * {@inheritDoc}
      */
     @Override
-    public ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation,
+    public @NonNull ImmutableArray<Node> doSlicing(@NonNull Node seedNode,
+            @NonNull Location seedLocation,
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         final Services services = seedNode.proof().getServices();
         Set<Location> relevantLocations = null;
@@ -113,7 +116,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
      * @param services The {@link Services} to use.
      */
     protected void updateRelevantLocations(final ProgramElement read,
-            final Set<Location> relevantLocations, final SequentInfo info,
+            final @NonNull Set<Location> relevantLocations, final @NonNull SequentInfo info,
             final Services services) {
         ReferencePrefix relevantElement = toReferencePrefix(read);
         if (relevantElement != null) {
@@ -139,9 +142,10 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
      *        ({@link ThisReference}).
      * @return The updated locations.
      */
-    protected Set<Location> updateOutdatedLocations(Services services,
-            Set<Location> oldLocationsToUpdate, Map<Location, SortedSet<Location>> newAliases,
-            Map<Location, SortedSet<Location>> oldAliases, Location outdatedPrefix,
+    protected @NonNull Set<Location> updateOutdatedLocations(Services services,
+            @NonNull Set<Location> oldLocationsToUpdate,
+            @NonNull Map<Location, SortedSet<Location>> newAliases,
+            @NonNull Map<Location, SortedSet<Location>> oldAliases, Location outdatedPrefix,
             ReferencePrefix thisReference) {
         // Ensure that at least one possibly outdated location is available.
         if (!oldLocationsToUpdate.isEmpty()) {

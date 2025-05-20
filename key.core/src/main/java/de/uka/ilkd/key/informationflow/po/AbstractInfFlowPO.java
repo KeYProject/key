@@ -12,6 +12,8 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Abstract to customize {@link AbstractPO} and {@link AbstractOperationPO}.
@@ -22,7 +24,7 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
         super(initConfig, name);
     }
 
-    public Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
+    public @NonNull Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
         final Proof proof = super.createProof(proofName, poTerm, proofConfig);
         StrategyInfoUndoMethod undo =
             strategyInfos -> strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
@@ -32,7 +34,8 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
         return proof;
     }
 
-    public InfFlowProof createProofObject(String proofName, String proofHeader, Term poTerm,
+    public @NonNull InfFlowProof createProofObject(String proofName, String proofHeader,
+            Term poTerm,
             InitConfig proofConfig) {
         final InfFlowProof proof = new InfFlowProof(proofName, poTerm, proofHeader, proofConfig);
 

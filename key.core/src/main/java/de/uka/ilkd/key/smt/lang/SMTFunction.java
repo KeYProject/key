@@ -112,7 +112,7 @@ public class SMTFunction {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (obj == null) {
             return false;
         }

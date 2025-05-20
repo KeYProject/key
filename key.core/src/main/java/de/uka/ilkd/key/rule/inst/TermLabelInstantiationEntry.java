@@ -7,20 +7,22 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  *
  *
  */
 public class TermLabelInstantiationEntry extends InstantiationEntry<ImmutableArray<TermLabel>> {
 
-    TermLabelInstantiationEntry(ImmutableArray<TermLabel> labels) {
+    TermLabelInstantiationEntry(@NonNull ImmutableArray<TermLabel> labels) {
         super(labels);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String toString() {
+    public @NonNull String toString() {
         String sb = String.valueOf(getInstantiation()) +
                 '\n';
         return sb;

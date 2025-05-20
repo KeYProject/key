@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Modulo assignment.
  */
@@ -22,7 +24,7 @@ public class ModuloAssignment extends Assignment {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public ModuloAssignment(ExtList children) {
+    public ModuloAssignment(@NonNull ExtList children) {
         super(children);
     }
 
@@ -62,7 +64,7 @@ public class ModuloAssignment extends Assignment {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnModuloAssignment(this);
     }
 }

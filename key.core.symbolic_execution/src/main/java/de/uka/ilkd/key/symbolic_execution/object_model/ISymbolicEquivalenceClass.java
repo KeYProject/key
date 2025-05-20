@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.Term;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * An equivalence class which defines which {@link Term}s represent the same {@link ISymbolicObject}
  * in an {@link ISymbolicLayout}.
@@ -19,6 +21,7 @@ public interface ISymbolicEquivalenceClass extends ISymbolicElement {
      *
      * @return The terms which represents the same {@link ISymbolicObject}.
      */
+    @Nullable
     ImmutableList<Term> getTerms();
 
     /**
@@ -43,6 +46,7 @@ public interface ISymbolicEquivalenceClass extends ISymbolicElement {
      *
      * @return The most representative term.
      */
+    @Nullable
     Term getRepresentative();
 
     /**

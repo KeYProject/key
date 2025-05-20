@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Divide.
@@ -22,11 +24,11 @@ public class Divide extends BinaryOperator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public Divide(ExtList children) {
+    public Divide(@NonNull ExtList children) {
         super(children);
     }
 
-    public Divide(Expression lhs, Expression rhs) {
+    public Divide(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -56,7 +58,7 @@ public class Divide extends BinaryOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnDivide(this);
     }
 

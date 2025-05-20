@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Optional;
 import javax.swing.*;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Utility class to generate HTML tables for UI purposes.
  *
@@ -36,12 +38,12 @@ public final class HtmlFactory {
      * @param indexFactory index factory
      * @return HTML string
      */
-    public static String generateTable(
-            Collection<String> columnNames,
-            boolean[] clickable,
-            Optional<String[]> alignment,
-            Collection<Collection<String>> rows,
-            IndexFactory indexFactory) {
+    public static @NonNull String generateTable(
+            @NonNull Collection<String> columnNames,
+            boolean @NonNull [] clickable,
+            @NonNull Optional<String[]> alignment,
+            @NonNull Collection<Collection<String>> rows,
+            @NonNull IndexFactory indexFactory) {
         if (columnNames.size() != clickable.length) {
             throw new IllegalArgumentException();
         }
@@ -98,7 +100,7 @@ public final class HtmlFactory {
      * @param html HTML document
      * @return Swing component showing that HTML
      */
-    public static JComponent createComponent(String html) {
+    public static @NonNull JComponent createComponent(String html) {
         JEditorPane htmlContent = new JEditorPane("text/html", html);
         htmlContent.setEditable(false);
         htmlContent.setBorder(BorderFactory.createEmptyBorder());
@@ -106,7 +108,7 @@ public final class HtmlFactory {
         return htmlContent;
     }
 
-    private static String escapeText(String text) {
+    private static @NonNull String escapeText(@NonNull String text) {
         return text
                 .replace("&", "&amp;")
                 .replace("<", "&lt;")

@@ -43,6 +43,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An extended {@link JavaProfile} used by the symbolic execution API.
  *
@@ -64,7 +67,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is
      * disabled.
      */
-    private final Boolean truthValueEvaluationEnabled;
+    private final @NonNull Boolean truthValueEvaluationEnabled;
 
     /**
      * <p>
@@ -105,7 +108,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableSet<GoalChooserBuilder> computeSupportedGoalChooserBuilder() {
+    protected @NonNull ImmutableSet<GoalChooserBuilder> computeSupportedGoalChooserBuilder() {
         return super.computeSupportedGoalChooserBuilder()
                 .add(new SymbolicExecutionGoalChooserBuilder());
     }
@@ -125,7 +128,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+    protected @NonNull ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
         result = result
                 .prepend(getSymbolicExecutionTermLabelConfigurations(truthValueEvaluationEnabled));
@@ -139,7 +142,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      *        predicate evaluation is disabled.
      * @return The additional {@link TermLabelFactory} instances used for symbolic execution.
      */
-    public static ImmutableList<TermLabelConfiguration> getSymbolicExecutionTermLabelConfigurations(
+    public static @NonNull ImmutableList<TermLabelConfiguration> getSymbolicExecutionTermLabelConfigurations(
             boolean predicateEvaluationEnabled) {
         ImmutableList<TermLabelPolicy> symExcPolicies =
             ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnOperatorTermLabelPolicy());
@@ -200,7 +203,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableSet<StrategyFactory> getStrategyFactories() {
+    protected @NonNull ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
         set = set.add(SYMBOLIC_EXECUTION_FACTORY);
         return set;
@@ -210,7 +213,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableList<BuiltInRule> initBuiltInRules() {
+    protected @NonNull ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
         builtInRules = builtInRules.prepend(QuerySideProofRule.INSTANCE);
         builtInRules = builtInRules.prepend(ModalitySideProofRule.INSTANCE);
@@ -221,7 +224,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    public String name() {
+    public @NonNull String name() {
         return NAME;
     }
 
@@ -265,7 +268,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      *        {@code false} truth value evaluation is disabled.
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
-    public static synchronized SymbolicExecutionJavaProfile getDefaultInstance(
+    public static synchronized @NonNull SymbolicExecutionJavaProfile getDefaultInstance(
             boolean truthValueEvaluationEnabled) {
         if (!truthValueEvaluationEnabled) {
             if (defaultInstance == null) {
@@ -287,7 +290,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * @return {@code true} truth value evaluation is enabled, {@code false} truth value evaluation
      *         is disabled.
      */
-    public static boolean isTruthValueTracingEnabled(Proof proof) {
+    public static boolean isTruthValueTracingEnabled(@Nullable Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             return isTruthValueEvaluationEnabled(proof.getInitConfig());
         } else {
@@ -302,7 +305,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * @return {@code true} truth value evaluation is enabled, {@code false} truth value evaluation
      *         is disabled.
      */
-    public static boolean isTruthValueEvaluationEnabled(InitConfig initConfig) {
+    public static boolean isTruthValueEvaluationEnabled(@Nullable InitConfig initConfig) {
         if (initConfig != null) {
             return isTruthValueEvaluationEnabled(initConfig.getProfile());
         } else {

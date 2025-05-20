@@ -11,6 +11,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The default implementation of {@link IExecutionJoin}.
  *
@@ -24,7 +26,7 @@ public class ExecutionJoin extends AbstractExecutionNode<SourceElement> implemen
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public ExecutionJoin(ITreeSettings settings, Node proofNode) {
+    public ExecutionJoin(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -32,7 +34,7 @@ public class ExecutionJoin extends AbstractExecutionNode<SourceElement> implemen
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() {
+    protected @NonNull String lazyComputeName() {
         return "Join";
     }
 
@@ -40,7 +42,7 @@ public class ExecutionJoin extends AbstractExecutionNode<SourceElement> implemen
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -48,7 +50,7 @@ public class ExecutionJoin extends AbstractExecutionNode<SourceElement> implemen
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Join";
     }
 

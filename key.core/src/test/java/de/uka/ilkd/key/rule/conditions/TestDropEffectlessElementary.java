@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -95,7 +97,7 @@ public class TestDropEffectlessElementary {
     // assertEquals(expected, result);
     // }
 
-    private Term applyDrop(Term term) {
+    private @Nullable Term applyDrop(@NonNull Term term) {
 
         Term update = term.sub(0);
         Term arg = term.sub(1);

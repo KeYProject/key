@@ -12,6 +12,8 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Abstract superclass for features comparing terms (in particular polynomials or monomials) using
@@ -21,11 +23,12 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     private final TermOrdering termOrdering = new LexPathOrdering();
 
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal currentGoal) {
+    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus,
+            Goal currentGoal) {
         return compare(t1, t2) < 0;
     }
 
-    protected final int compare(Term t1, Term t2) {
+    protected final int compare(@NonNull Term t1, @NonNull Term t2) {
         return termOrdering.compare(t1, t2);
     }
 
@@ -33,7 +36,8 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
      * @return <code>true</code> iff each element of <code>list1</code> is strictly smaller than all
      *         elements of <code>list2</code>
      */
-    protected final boolean lessThan(ImmutableList<Term> list1, ImmutableList<Term> list2,
+    protected final boolean lessThan(@NonNull ImmutableList<Term> list1,
+            @NonNull ImmutableList<Term> list2,
             PosInOccurrence focus, Goal currentGoal) {
         if (list2.isEmpty()) {
             return false;
@@ -51,13 +55,13 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     protected abstract static class Collector {
 
-        private ImmutableList<Term> terms = ImmutableSLList.nil();
+        private @NonNull ImmutableList<Term> terms = ImmutableSLList.nil();
 
         protected void addTerm(Term mon) {
             terms = terms.prepend(mon);
         }
 
-        public ImmutableList<Term> getResult() {
+        public @NonNull ImmutableList<Term> getResult() {
             return terms;
         }
 

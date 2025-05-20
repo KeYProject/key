@@ -38,6 +38,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Defines the basic functionality for slicing algorithms.
  *
@@ -52,7 +55,7 @@ public abstract class AbstractSlicer {
      * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
-    public ImmutableArray<Node> slice(Node seedNode, Term term,
+    public ImmutableArray<Node> slice(@NonNull Node seedNode, @NonNull Term term,
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         return slice(seedNode, toLocation(seedNode.proof().getServices(), term), sec);
     }
@@ -65,7 +68,7 @@ public abstract class AbstractSlicer {
      * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
-    public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation,
+    public ImmutableArray<Node> slice(@NonNull Node seedNode, ReferencePrefix seedLocation,
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         // Solve this reference
         PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
@@ -87,7 +90,7 @@ public abstract class AbstractSlicer {
      * @param sec The optional {@link ISymbolicEquivalenceClass}es to consider.
      * @return The computed slice.
      */
-    public ImmutableArray<Node> slice(Node seedNode, Location seedLocation,
+    public ImmutableArray<Node> slice(@NonNull Node seedNode, Location seedLocation,
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         // Ensure that seed node is valid
         if (seedNode.getAppliedRuleApp() == null) {
@@ -128,12 +131,12 @@ public abstract class AbstractSlicer {
         /**
          * The found aliases.
          */
-        private final Map<Location, SortedSet<Location>> aliases;
+        private final @NonNull Map<Location, SortedSet<Location>> aliases;
 
         /**
          * The local values.
          */
-        private final Map<ProgramVariable, Term> localValues;
+        private final @NonNull Map<ProgramVariable, Term> localValues;
 
         /**
          * The current {@link ExecutionContext}.
@@ -151,8 +154,8 @@ public abstract class AbstractSlicer {
          * @param aliases The found aliases.
          * @param thisReference The this-reference if available.
          */
-        public SequentInfo(Map<Location, SortedSet<Location>> aliases,
-                Map<ProgramVariable, Term> localValues, ExecutionContext executionContext,
+        public SequentInfo(@NonNull Map<Location, SortedSet<Location>> aliases,
+                @NonNull Map<ProgramVariable, Term> localValues, ExecutionContext executionContext,
                 ReferencePrefix thisReference) {
             assert aliases != null;
             assert localValues != null;
@@ -167,7 +170,7 @@ public abstract class AbstractSlicer {
          *
          * @return The found aliases.
          */
-        public Map<Location, SortedSet<Location>> getAliases() {
+        public @NonNull Map<Location, SortedSet<Location>> getAliases() {
             return aliases;
         }
 
@@ -176,7 +179,7 @@ public abstract class AbstractSlicer {
          *
          * @return The local values.
          */
-        public Map<ProgramVariable, Term> getLocalValues() {
+        public @NonNull Map<ProgramVariable, Term> getLocalValues() {
             return localValues;
         }
 
@@ -207,7 +210,8 @@ public abstract class AbstractSlicer {
      * @return The computed {@link SequentInfo} or {@code null} if the {@link Node} is not
      *         supported.
      */
-    protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
+    protected @Nullable SequentInfo analyzeSequent(@NonNull Node node,
+            ImmutableList<ISymbolicEquivalenceClass> sec) {
         PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
         Term topLevel = pio.sequentFormula().formula();
         Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(topLevel);
@@ -243,9 +247,9 @@ public abstract class AbstractSlicer {
      * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeEquivalenceClasses(Services services,
-            ImmutableList<ISymbolicEquivalenceClass> sec,
-            Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+    protected void analyzeEquivalenceClasses(@NonNull Services services,
+            @Nullable ImmutableList<ISymbolicEquivalenceClass> sec,
+            @NonNull Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         if (sec != null) {
             for (ISymbolicEquivalenceClass eq : sec) {
                 ImmutableList<Term> terms = eq.getTerms();
@@ -281,8 +285,8 @@ public abstract class AbstractSlicer {
      * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeSequent(Services services, Sequent sequent,
-            Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+    protected void analyzeSequent(@NonNull Services services, @NonNull Sequent sequent,
+            @NonNull Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         for (SequentFormula sf : sequent.antecedent()) {
             Term term = sf.formula();
             if (Equality.EQUALS == term.op()) {
@@ -309,8 +313,8 @@ public abstract class AbstractSlicer {
      * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeEquality(Services services, Term equality,
-            Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+    protected void analyzeEquality(@NonNull Services services, @NonNull Term equality,
+            @NonNull Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         Term firstSub = equality.sub(0);
         Term secondSub = equality.sub(1);
         if (SymbolicExecutionUtil.hasReferenceSort(services, firstSub)
@@ -335,9 +339,11 @@ public abstract class AbstractSlicer {
      * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeUpdates(ImmutableList<Term> updates, Services services, HeapLDT heapLDT,
-            Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, Term> localValues,
-            ExecutionContext ec, ReferencePrefix thisReference) {
+    protected void analyzeUpdates(@NonNull ImmutableList<Term> updates, @NonNull Services services,
+            @NonNull HeapLDT heapLDT,
+            @NonNull Map<Location, SortedSet<Location>> aliases,
+            @NonNull Map<ProgramVariable, Term> localValues,
+            @NonNull ExecutionContext ec, ReferencePrefix thisReference) {
         for (Term update : updates) {
             analyzeUpdate(update, services, heapLDT, aliases, localValues, ec, thisReference);
         }
@@ -356,9 +362,11 @@ public abstract class AbstractSlicer {
      * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeUpdate(Term term, Services services, HeapLDT heapLDT,
-            Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, Term> localValues,
-            ExecutionContext ec, ReferencePrefix thisReference) {
+    protected void analyzeUpdate(@NonNull Term term, @NonNull Services services,
+            @NonNull HeapLDT heapLDT,
+            @NonNull Map<Location, SortedSet<Location>> aliases,
+            @NonNull Map<ProgramVariable, Term> localValues,
+            @NonNull ExecutionContext ec, ReferencePrefix thisReference) {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE
                 || term.op() == UpdateApplication.UPDATE_APPLICATION) {
             for (int i = 0; i < term.arity(); i++) {
@@ -396,8 +404,9 @@ public abstract class AbstractSlicer {
      * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void analyzeHeapUpdate(Term term, Services services, HeapLDT heapLDT,
-            Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+    protected void analyzeHeapUpdate(@NonNull Term term, @NonNull Services services,
+            @NonNull HeapLDT heapLDT,
+            @NonNull Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         final Function store = heapLDT.getStore();
         final Function create = heapLDT.getCreate();
         if (term.op() == store) {
@@ -437,9 +446,12 @@ public abstract class AbstractSlicer {
      * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void listModifiedLocations(Term term, Services services, HeapLDT heapLDT,
-            List<Location> listToFill, ExecutionContext ec, ReferencePrefix thisReference,
-            Set<Location> relevantLocations, Node node) throws ProofInputException {
+    protected void listModifiedLocations(@NonNull Term term, @NonNull Services services,
+            @NonNull HeapLDT heapLDT,
+            @NonNull List<Location> listToFill, @NonNull ExecutionContext ec,
+            ReferencePrefix thisReference,
+            @NonNull Set<Location> relevantLocations, @NonNull Node node)
+            throws ProofInputException {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE
                 || term.op() == UpdateApplication.UPDATE_APPLICATION) {
             for (int i = 0; i < term.arity(); i++) {
@@ -474,9 +486,11 @@ public abstract class AbstractSlicer {
      * @param thisReference The {@link ReferencePrefix} which is represented by {@code this}
      *        ({@link ThisReference}).
      */
-    protected void listModifiedHeapLocations(Term term, Services services, HeapLDT heapLDT,
-            List<Location> listToFill, ReferencePrefix thisReference,
-            Set<Location> relevantLocations, Node node) throws ProofInputException {
+    protected void listModifiedHeapLocations(@NonNull Term term, @NonNull Services services,
+            @NonNull HeapLDT heapLDT,
+            @NonNull List<Location> listToFill, ReferencePrefix thisReference,
+            @NonNull Set<Location> relevantLocations, @NonNull Node node)
+            throws ProofInputException {
         if (term.op() == heapLDT.getStore()) {
             // Analyze parent heap
             listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference,
@@ -650,7 +664,7 @@ public abstract class AbstractSlicer {
      *        ({@link ThisReference}).
      */
     protected void updateAliases(Services services, Location first, Location second,
-            Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+            @NonNull Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         // Try to get Set for key
         SortedSet<Location> firstValues = aliases.get(first);
         SortedSet<Location> secondValues = aliases.get(second);
@@ -684,13 +698,13 @@ public abstract class AbstractSlicer {
      *
      * @return The new created {@link SortedSet}.
      */
-    protected SortedSet<Location> createSortedSet() {
+    protected @NonNull SortedSet<Location> createSortedSet() {
         return new TreeSet<>(new Comparator<>() {
             /**
              * {@inheritDoc}
              */
             @Override
-            public int compare(Location o1, Location o2) {
+            public int compare(@NonNull Location o1, @NonNull Location o2) {
                 int o1DotCount = o1.getDepth();
                 int o2DotCount = o2.getDepth();
                 if (o1DotCount < o2DotCount) {
@@ -712,8 +726,8 @@ public abstract class AbstractSlicer {
      * @param info The {@link SequentInfo} with the aliases and so on.
      * @return The representative alias.
      */
-    protected Location normalizeAlias(Services services, ReferencePrefix referencePrefix,
-            SequentInfo info) {
+    protected Location normalizeAlias(@NonNull Services services, ReferencePrefix referencePrefix,
+            @NonNull SequentInfo info) {
         Location location = toLocation(services, referencePrefix, info.getExecutionContext(),
             info.getThisReference());
         return normalizeAlias(services, location, info);
@@ -727,7 +741,8 @@ public abstract class AbstractSlicer {
      * @param info The {@link SequentInfo} with the aliases and so on.
      * @return The representative alias.
      */
-    protected Location normalizeAlias(Services services, Location location, SequentInfo info) {
+    protected @NonNull Location normalizeAlias(Services services, @NonNull Location location,
+            @NonNull SequentInfo info) {
         ImmutableList<Access> normalizedAccesses = ImmutableSLList.nil();
         for (Access access : location.getAccesses()) {
             if (access.isArrayIndex()) {
@@ -750,7 +765,8 @@ public abstract class AbstractSlicer {
      * @param info The {@link SequentInfo} with the aliases and so on.
      * @return The normalized array access.
      */
-    protected Access normalizeArrayIndex(Access access, SequentInfo info) {
+    protected @NonNull Access normalizeArrayIndex(@NonNull Access access,
+            @NonNull SequentInfo info) {
         ImmutableArray<Term> oldTerms = access.getDimensionExpressions();
         Term[] newTerms = new Term[oldTerms.size()];
         for (int i = 0; i < newTerms.length; i++) {
@@ -774,7 +790,7 @@ public abstract class AbstractSlicer {
      * @return The representative alias.
      */
     protected Location computeRepresentativeAlias(Location location,
-            Map<Location, SortedSet<Location>> aliases) {
+            @NonNull Map<Location, SortedSet<Location>> aliases) {
         Set<Location> alternatives = aliases.get(location);
         if (alternatives != null) {
             return alternatives.iterator().next(); // Return first alternative
@@ -790,7 +806,7 @@ public abstract class AbstractSlicer {
      * @return The {@link ReferencePrefix} or {@code null} if the {@link SourceElement} can't be
      *         represented as {@link ReferencePrefix}.
      */
-    protected ReferencePrefix toReferencePrefix(SourceElement sourceElement) {
+    protected @Nullable ReferencePrefix toReferencePrefix(SourceElement sourceElement) {
         if (sourceElement instanceof PassiveExpression) {
             if (((PassiveExpression) sourceElement).getChildCount() != 1) {
                 throw new IllegalStateException(
@@ -820,8 +836,8 @@ public abstract class AbstractSlicer {
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
-    protected boolean removeRelevant(Services services, ReferencePrefix sourceElement,
-            Set<Location> relevantLocations, SequentInfo info) {
+    protected boolean removeRelevant(@NonNull Services services, ReferencePrefix sourceElement,
+            @NonNull Set<Location> relevantLocations, @NonNull SequentInfo info) {
         Location normalized = normalizeAlias(services, sourceElement, info);
         return performRemoveRelevant(services, normalized, relevantLocations, info);
     }
@@ -837,8 +853,8 @@ public abstract class AbstractSlicer {
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
-    protected boolean removeRelevant(Services services, Location location,
-            Set<Location> relevantLocations, SequentInfo info) {
+    protected boolean removeRelevant(Services services, @NonNull Location location,
+            @NonNull Set<Location> relevantLocations, @NonNull SequentInfo info) {
         Location normalized = normalizeAlias(services, location, info);
         return performRemoveRelevant(services, normalized, relevantLocations, info);
     }
@@ -854,8 +870,8 @@ public abstract class AbstractSlicer {
      * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing
      *         has changed.
      */
-    protected boolean performRemoveRelevant(Services services, Location normalized,
-            Set<Location> relevantLocations, SequentInfo info) {
+    protected boolean performRemoveRelevant(Services services, @NonNull Location normalized,
+            @NonNull Set<Location> relevantLocations, @NonNull SequentInfo info) {
         boolean relevant = false;
         Iterator<Location> iterator = relevantLocations.iterator();
         while (!relevant && iterator.hasNext()) {
@@ -879,7 +895,8 @@ public abstract class AbstractSlicer {
      *        ({@link ThisReference}).
      * @return The {@link Location} representing the given {@link ReferencePrefix}.
      */
-    protected Location toLocation(Services services, ReferencePrefix prefix, ExecutionContext ec,
+    protected @NonNull Location toLocation(@NonNull Services services, ReferencePrefix prefix,
+            @NonNull ExecutionContext ec,
             ReferencePrefix thisReference) {
         ImmutableList<Access> accesses =
             toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.nil());
@@ -899,8 +916,10 @@ public abstract class AbstractSlicer {
      * @return An {@link ImmutableList} containing all {@link Access}s of the
      *         {@link ReferencePrefix} in the order of access.
      */
-    protected ImmutableList<Access> toLocationRecursive(Services services, ReferencePrefix prefix,
-            ExecutionContext ec, ReferencePrefix thisReference, ImmutableList<Access> children) {
+    protected ImmutableList<Access> toLocationRecursive(@NonNull Services services,
+            ReferencePrefix prefix,
+            @NonNull ExecutionContext ec, ReferencePrefix thisReference,
+            @NonNull ImmutableList<Access> children) {
         if (prefix instanceof ProgramVariable) {
             return children.prepend(new Access((ProgramVariable) prefix));
         } else if (prefix instanceof FieldReference fr) {
@@ -938,8 +957,8 @@ public abstract class AbstractSlicer {
      * @param ec The current {@link ExecutionContext}.
      * @return The created {@link Term}s.
      */
-    public static ImmutableArray<Term> toTerm(Services services,
-            ImmutableArray<Expression> expressions, ExecutionContext ec) {
+    public static @NonNull ImmutableArray<Term> toTerm(@NonNull Services services,
+            @NonNull ImmutableArray<Expression> expressions, @NonNull ExecutionContext ec) {
         Term[] terms = new Term[expressions.size()];
         int i = 0;
         for (Expression expression : expressions) {
@@ -957,7 +976,8 @@ public abstract class AbstractSlicer {
      * @param ec The current {@link ExecutionContext}.
      * @return The created {@link Term}.
      */
-    public static Term toTerm(Services services, Expression expression, ExecutionContext ec) {
+    public static @NonNull Term toTerm(@NonNull Services services, @NonNull Expression expression,
+            @NonNull ExecutionContext ec) {
         return services.getTypeConverter().convertToLogicElement(expression, ec);
     }
 
@@ -969,7 +989,7 @@ public abstract class AbstractSlicer {
      * @return The {@link Location} or {@code null} if the {@link Term} could not be represented as
      *         {@link Location}.
      */
-    public static Location toLocation(Services services, Term term) {
+    public static @Nullable Location toLocation(@NonNull Services services, @NonNull Term term) {
         if (term.op() instanceof ProgramVariable) {
             return new Location(new Access((ProgramVariable) term.op()));
         } else if (SymbolicExecutionUtil.isNullSort(term.sort(), services)) {
@@ -1011,8 +1031,9 @@ public abstract class AbstractSlicer {
      * @param newAlternatives The new alternatives.
      * @return The found alternative or {@code null} if not available.
      */
-    protected Location findNewAlternative(final SortedSet<Location> oldAlternatives,
-            final SortedSet<Location> newAlternatives) {
+    protected @Nullable Location findNewAlternative(
+            final @NonNull SortedSet<Location> oldAlternatives,
+            final @NonNull SortedSet<Location> newAlternatives) {
         return CollectionUtil.search(oldAlternatives,
             element -> !newAlternatives.contains(element));
     }
@@ -1024,8 +1045,9 @@ public abstract class AbstractSlicer {
      * @param toCheck The {@link ImmutableList} to check.
      * @return The common prefix length which is {@code 0} if no elements are common.
      */
-    public static <T> int computeFirstCommonPrefixLength(ImmutableList<ImmutableList<T>> candidates,
-            ImmutableList<T> toCheck) {
+    public static <T> int computeFirstCommonPrefixLength(
+            @NonNull ImmutableList<ImmutableList<T>> candidates,
+            @NonNull ImmutableList<T> toCheck) {
         int commonLength = 0;
         Iterator<ImmutableList<T>> iter = candidates.iterator();
         while (commonLength < 1 && iter.hasNext()) {
@@ -1045,7 +1067,8 @@ public abstract class AbstractSlicer {
      * @return {@code true} the first elements in the {@link ImmutableList} are the prefix,
      *         {@code false} if the first elements are not equal to the prefix.
      */
-    public static <T> boolean startsWith(ImmutableList<T> list, ImmutableList<T> prefix) {
+    public static <T> boolean startsWith(@NonNull ImmutableList<T> list,
+            @NonNull ImmutableList<T> prefix) {
         if (list.size() >= prefix.size()) {
             Iterator<T> listIter = list.iterator();
             Iterator<T> prefixIter = prefix.iterator();

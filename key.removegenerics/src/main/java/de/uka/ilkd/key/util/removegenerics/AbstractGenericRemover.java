@@ -9,13 +9,14 @@ import java.util.*;
 
 import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
+import org.jspecify.annotations.NonNull;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.io.PathList;
 import recoder.java.CompilationUnit;
 
 public abstract class AbstractGenericRemover {
-    private final GenericRemoverMonitor monitor;
+    private final @NonNull GenericRemoverMonitor monitor;
 
     private final CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
 
@@ -24,7 +25,7 @@ public abstract class AbstractGenericRemover {
 
     private final List<String> sourceFiles = new ArrayList<>();
 
-    public AbstractGenericRemover(GenericRemoverMonitor monitor) {
+    public AbstractGenericRemover(@NonNull GenericRemoverMonitor monitor) {
         assert monitor != null;
         this.monitor = monitor;
     }
@@ -34,7 +35,7 @@ public abstract class AbstractGenericRemover {
         searchPaths.add(path);
     }
 
-    public void addSourceFiles(Collection<String> sourceFiles) {
+    public void addSourceFiles(@NonNull Collection<String> sourceFiles) {
         this.sourceFiles.addAll(sourceFiles);
     }
 
@@ -46,7 +47,7 @@ public abstract class AbstractGenericRemover {
         return sc.getProjectSettings().getSearchPathList();
     }
 
-    public List<String> getSourceFiles() {
+    public @NonNull List<String> getSourceFiles() {
         return sourceFiles;
     }
 
@@ -94,7 +95,7 @@ public abstract class AbstractGenericRemover {
     protected abstract void saveModifiedCompilationUnit(CompilationUnit cu, String filename)
             throws IOException;
 
-    private void processDirectory(File dir) throws ParserException {
+    private void processDirectory(@NonNull File dir) throws ParserException {
 
         for (File f : dir.listFiles()) {
             if (f.isDirectory()) {
@@ -106,7 +107,7 @@ public abstract class AbstractGenericRemover {
 
     }
 
-    private void processFile(File file) throws ParserException {
+    private void processFile(@NonNull File file) throws ParserException {
         monitor.taskStarted("Reading from " + file);
         if (!file.exists()) {
             monitor.warningOccurred(file + " does not exist");

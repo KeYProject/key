@@ -15,6 +15,8 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
+
 public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Parameters> {
 
     private static final String PREAMBLE = """
@@ -27,7 +29,7 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
     }
 
     @Override
-    public void execute(Parameters args) throws ScriptException, InterruptedException {
+    public void execute(@NonNull Parameters args) throws ScriptException, InterruptedException {
         ScriptEngineManager factory = new ScriptEngineManager();
         // create JavaScript engine
         ScriptEngine engine = factory.getEngineByName("JavaScript");
@@ -44,16 +46,17 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "javascript";
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option("#2")
         public String script;
@@ -70,11 +73,11 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
             return 0;
         }
 
-        public Sequent getSelectedGoal() throws ScriptException {
+        public @NonNull Sequent getSelectedGoal() throws ScriptException {
             return state.getFirstOpenAutomaticGoal().sequent();
         }
 
-        public void setVar(String var, Term term) throws ScriptException {
+        public void setVar(@NonNull String var, @NonNull Term term) throws ScriptException {
 
             if (!var.matches("@[a-zA-Z0-9_]")) {
                 throw new ScriptException("Is not a variable name: " + var);
@@ -88,7 +91,7 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
             }
         }
 
-        public void setVar(String var, String term) throws ScriptException {
+        public void setVar(@NonNull String var, @NonNull String term) throws ScriptException {
             try {
                 setVar(var, state.toTerm(term, null));
             } catch (ParserException e) {

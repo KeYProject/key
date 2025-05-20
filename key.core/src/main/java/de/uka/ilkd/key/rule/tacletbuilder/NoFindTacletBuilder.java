@@ -9,6 +9,8 @@ import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Due to the immutability of {@link Taclet}s, they are created in the parsers using
@@ -26,7 +28,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      * semisequences. No specification for the interactive or recursive flags imply that the flags
      * are not set.
      */
-    public NoFindTaclet getNoFindTaclet() {
+    public @NonNull NoFindTaclet getNoFindTaclet() {
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         NoFindTaclet t = new NoFindTaclet(this.name,
@@ -71,7 +73,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      * are not set. May throw an TacletBuilderException if a bound SchemaVariable occurs more than
      * once in if and find.
      */
-    public NoFindTaclet getTaclet() {
+    public @NonNull NoFindTaclet getTaclet() {
         checkBoundInIfAndFind();
         return getNoFindTaclet();
     }

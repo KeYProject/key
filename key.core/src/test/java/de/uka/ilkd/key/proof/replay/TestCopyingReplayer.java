@@ -13,6 +13,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author Arne Keller
  */
 class TestCopyingReplayer {
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final @Nullable File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
     void testJavaProof() throws Exception {

@@ -18,6 +18,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Makes sure that the ID of {@link SymbolicExecutionTermLabel}s is increased when a
  * {@link WhileInvariantRule} is applied.
@@ -41,10 +43,10 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
      * {@inheritDoc}
      */
     @Override
-    public void updateLabels(TermLabelState state, Services services,
+    public void updateLabels(TermLabelState state, @NonNull Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
-            Set<TermLabel> labels) {
+            Rule rule, RuleApp ruleApp, @NonNull Object hint, Term tacletTerm, Term newTerm,
+            @NonNull Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint)
                 || (rule instanceof AbstractAuxiliaryContractRule
                         && ((AbstractBlockContractRule.BlockContractHint) hint)

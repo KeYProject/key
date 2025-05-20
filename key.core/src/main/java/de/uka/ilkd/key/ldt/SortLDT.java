@@ -61,8 +61,7 @@ public final class SortLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override
@@ -71,8 +70,7 @@ public final class SortLDT extends LDT {
             return ssubsort;
         }
 
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override
@@ -92,7 +90,6 @@ public final class SortLDT extends LDT {
 
     @Override
     public Type getType(Term t) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 }

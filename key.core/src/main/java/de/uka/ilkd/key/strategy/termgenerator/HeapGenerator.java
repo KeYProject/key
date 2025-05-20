@@ -16,6 +16,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The heap generator returns an iterator over all terms of sort heap that
  * <ol>
@@ -36,7 +38,7 @@ public class HeapGenerator implements TermGenerator {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public @NonNull Iterator<Term> generate(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
             MutableState mState) {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
@@ -46,7 +48,8 @@ public class HeapGenerator implements TermGenerator {
         return heaps.iterator();
     }
 
-    private void collectHeaps(Term term, LinkedHashSet<Term> heaps, Services services) {
+    private void collectHeaps(@NonNull Term term, @NonNull LinkedHashSet<Term> heaps,
+            @NonNull Services services) {
         if (term.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
             heaps.add(term);
         } else {

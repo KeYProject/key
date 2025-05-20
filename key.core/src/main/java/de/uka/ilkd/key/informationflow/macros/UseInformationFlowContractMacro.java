@@ -28,6 +28,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * The macro UseInformationFlowContractMacro applies all applicable information flow contracts.
@@ -40,7 +42,7 @@ import org.key_project.util.collection.ImmutableSet;
 public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Use information flow contracts";
     }
 
@@ -50,7 +52,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Applies all applicable information flow contract rules.";
     }
 
@@ -64,7 +66,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     private static final Set<String> ADMITTED_RULENAME_SET = asSet(ADMITTED_RULENAMES);
 
-    private static ImmutableSet<String> appliedInfFlowRules = DefaultImmutableSet.nil();
+    private static @NonNull ImmutableSet<String> appliedInfFlowRules = DefaultImmutableSet.nil();
 
     /**
      * Gets the set of admitted rule names.
@@ -72,7 +74,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      *
      * @return a constant non- <code>null</code> set
      */
-    protected Set<String> getAdmittedRuleNames() {
+    protected @NonNull Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULENAME_SET;
     }
     /*
@@ -80,13 +82,14 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      */
 
 
-    protected static Set<String> asSet(String[] strings) {
+    protected static @NonNull Set<String> asSet(String[] strings) {
         return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(strings)));
     }
 
 
     @Override
-    protected UseInformationFlowContractMacro.PropExpansionStrategy createStrategy(Proof proof,
+    protected UseInformationFlowContractMacro.@NonNull PropExpansionStrategy createStrategy(
+            Proof proof,
             PosInOccurrence posInOcc) {
         return new UseInformationFlowContractMacro.PropExpansionStrategy(getAdmittedRuleNames());
     }
@@ -108,7 +111,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
     @Override
-    protected void doPostProcessing(Proof proof) {
+    protected void doPostProcessing(@NonNull Proof proof) {
         ImmutableList<Goal> openGoals = proof.openGoals();
         for (Goal openGoal : openGoals) {
 
@@ -151,7 +154,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     }
 
 
-    private String getAppRuleName(Node parent) {
+    private @NonNull String getAppRuleName(@NonNull Node parent) {
         RuleApp parentRuleApp = parent.getAppliedRuleApp();
         String parentRuleName = parentRuleApp.rule().name().toString();
         return parentRuleName;
@@ -176,13 +179,13 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return NAME;
         }
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(@NonNull RuleApp ruleApp, PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             // first try to apply
             // - impLeft on previous information flow contract application
@@ -211,7 +214,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(@NonNull RuleApp app, PosInOccurrence pio,
+                @NonNull Goal goal) {
             // abort if
             // - the parent.parent rule application is an information
             // flow contract rule application,

@@ -7,6 +7,8 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
+
 public class NameRecorder {
 
     private ImmutableList<Name> pre = ImmutableSLList.nil();
@@ -14,11 +16,7 @@ public class NameRecorder {
     private ImmutableList<Name> post = ImmutableSLList.nil();
 
     public void setProposals(ImmutableList<Name> proposals) {
-        if (proposals == null) {
-            pre = ImmutableSLList.nil();
-        } else {
-            pre = proposals;
-        }
+        pre = proposals;
     }
 
     /**
@@ -48,10 +46,10 @@ public class NameRecorder {
      *
      * @return the first proposal
      */
-    public Name getProposal() {
+    public @Nullable Name getProposal() {
         Name proposal = null;
 
-        if (pre != null && !pre.isEmpty()) {
+        if (!pre.isEmpty()) {
             proposal = pre.head();
             pre = pre.tail();
         }

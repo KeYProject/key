@@ -5,6 +5,8 @@ package de.uka.ilkd.key.proof.rulefilter;
 
 import de.uka.ilkd.key.rule.Rule;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Intersection (conjunction) of two rule filters
  */
@@ -23,7 +25,7 @@ public class AndRuleFilter implements RuleFilter {
     }
 
 
-    public String toString() {
+    public @NonNull String toString() {
         return a + " AND " + b;
     }
 

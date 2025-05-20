@@ -9,6 +9,9 @@ import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicElement;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default implementation of {@link ISymbolicElement}.
  *
@@ -45,7 +48,7 @@ public abstract class AbstractElement implements ISymbolicElement {
      * @param services The {@link Services} to use.
      * @return The {@link String} representation of the given {@link Term}.
      */
-    protected String formatTerm(Term term, Services services) {
+    protected @Nullable String formatTerm(@NonNull Term term, Services services) {
         return SymbolicExecutionUtil.formatTerm(term, services, settings.isUseUnicode(),
             settings.isUsePrettyPrinting());
     }

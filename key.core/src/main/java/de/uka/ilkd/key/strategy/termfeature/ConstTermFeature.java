@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A feature that returns a constant value
  */
@@ -20,7 +22,7 @@ public class ConstTermFeature implements TermFeature {
         val = p_val;
     }
 
-    public static TermFeature createConst(RuleAppCost p_val) {
+    public static @NonNull TermFeature createConst(RuleAppCost p_val) {
         return new ConstTermFeature(p_val);
     }
 

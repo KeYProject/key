@@ -22,6 +22,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Generate term "self != null".
@@ -32,7 +34,7 @@ import org.key_project.util.collection.ImmutableSLList;
 abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
             throws UnsupportedOperationException {
 
         IObserverFunction targetMethod =
@@ -48,7 +50,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 
-    protected Sort[] generateContApplArgumentSorts(ImmutableList<Term> termList,
+    protected Sort @NonNull [] generateContApplArgumentSorts(@NonNull ImmutableList<Term> termList,
             IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
@@ -64,9 +66,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private JFunction generateContApplPredicate(String nameString, Sort[] argSorts,
+    private JFunction generateContApplPredicate(@NonNull String nameString, Sort[] argSorts,
             TermBuilder tb,
-            Services services) {
+            @NonNull Services services) {
         final Name name = new Name(nameString);
         Namespace<JFunction> functionNS = services.getNamespaces().functions();
 
@@ -88,8 +90,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    private Term instantiateContApplPredicate(JFunction pred, ImmutableList<Term> termList,
-            TermBuilder tb) {
+    private @NonNull Term instantiateContApplPredicate(@NonNull JFunction pred,
+            @NonNull ImmutableList<Term> termList,
+            @NonNull TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         Term[] predArgs = new Term[predArgSorts.length];
@@ -115,8 +118,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * @param poVars The proof obligation variables.
      * @return
      */
-    private ImmutableList<Term> extractTermListForPredicate(IProgramMethod pm,
-            ProofObligationVars poVars, boolean hasMby) {
+    private @NonNull ImmutableList<Term> extractTermListForPredicate(@NonNull IProgramMethod pm,
+            @NonNull ProofObligationVars poVars, boolean hasMby) {
         ImmutableList<Term> relevantPreVars = ImmutableSLList.nil();
         ImmutableList<Term> relevantPostVars = ImmutableSLList.nil();
 
@@ -150,9 +153,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
         // the result and possible exceptions are relevant only in the post
         // state
-        if (poVars.post.result != null) {
+        if (poVars.post.resultTerm != null) {
             // method is not void
-            relevantPostVars = relevantPostVars.append(poVars.post.result);
+            relevantPostVars = relevantPostVars.append(poVars.post.resultTerm);
         }
         if (poVars.post.exception != null) {
             // TODO: only null for loop invariants?

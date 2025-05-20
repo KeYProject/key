@@ -14,14 +14,17 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This instructions matches the variable below a binder (e.g. a quantifier).
  */
 public class BindVariablesInstruction implements MatchInstruction {
 
-    private final VariableBinderSubinstruction[] boundVarBinders;
+    private final VariableBinderSubinstruction @NonNull [] boundVarBinders;
 
-    public BindVariablesInstruction(ImmutableArray<QuantifiableVariable> boundVars) {
+    public BindVariablesInstruction(@NonNull ImmutableArray<QuantifiableVariable> boundVars) {
         boundVarBinders = new VariableBinderSubinstruction[boundVars.size()];
         int i = 0;
         for (QuantifiableVariable boundVar : boundVars) {
@@ -36,6 +39,7 @@ public class BindVariablesInstruction implements MatchInstruction {
 
 
     private interface VariableBinderSubinstruction {
+        @Nullable
         MatchConditions match(LogicVariable instantiationCandidate,
                 MatchConditions matchCond, Services services);
     }
@@ -47,8 +51,8 @@ public class BindVariablesInstruction implements MatchInstruction {
          * a match between two logic variables is possible if they have been assigned they are same
          * or have been assigned to the same abstract name and the sorts are equal.
          */
-        public MatchConditions match(LogicVariable instantiationCandidate,
-                MatchConditions matchCond, Services services) {
+        public @Nullable MatchConditions match(@NonNull LogicVariable instantiationCandidate,
+                @NonNull MatchConditions matchCond, Services services) {
             final RenameTable rt = matchCond.renameTable();
             if (!rt.containsLocally(templateVar) && !rt.containsLocally(instantiationCandidate)) {
                 matchCond = matchCond.addRenaming(templateVar, instantiationCandidate);
@@ -68,12 +72,12 @@ public class BindVariablesInstruction implements MatchInstruction {
     private static class VariableSVBinder extends MatchSchemaVariableInstruction<VariableSV>
             implements VariableBinderSubinstruction {
 
-        public VariableSVBinder(VariableSV templateVar) {
+        public VariableSVBinder(@NonNull VariableSV templateVar) {
             super(templateVar);
         }
 
-        public MatchConditions match(LogicVariable instantiationCandidate,
-                MatchConditions matchCond, Services services) {
+        public @Nullable MatchConditions match(@NonNull LogicVariable instantiationCandidate,
+                @NonNull MatchConditions matchCond, @NonNull Services services) {
             final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
                 final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
@@ -99,7 +103,8 @@ public class BindVariablesInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
+            MatchConditions matchConditions,
             Services services) {
 
         ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =

@@ -9,11 +9,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Interface for mappings from rule applications to terms. This is used, for instance, for
  * determining the instantiation of a schema variable. We also allow projections to be partial,
  * which is signalled by <code>toTerm</code> returning <code>null</code>
  */
 public interface ProjectionToTerm {
+    @Nullable
     Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState);
 }

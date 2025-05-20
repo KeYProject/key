@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class ExitMainAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 5881706859613947592L;
 
-    public ExitMainAction(MainWindow mainWindow) {
+    public ExitMainAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Exit");
         setIcon(IconFactory.quit(16));

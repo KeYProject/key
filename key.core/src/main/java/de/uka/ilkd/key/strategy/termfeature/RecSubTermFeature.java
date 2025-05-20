@@ -9,6 +9,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Feature for invoking a term feature recursively on all subterms of a term. The result will be the
@@ -24,11 +26,11 @@ public class RecSubTermFeature implements TermFeature {
         this.summand = summand;
     }
 
-    public static TermFeature create(TermFeature cond, TermFeature summand) {
+    public static @NonNull TermFeature create(TermFeature cond, TermFeature summand) {
         return new RecSubTermFeature(cond, summand);
     }
 
-    public RuleAppCost compute(Term term, MutableState mState, Services services) {
+    public RuleAppCost compute(@NonNull Term term, MutableState mState, Services services) {
         RuleAppCost res = summand.compute(term, mState, services);
 
         if (res instanceof TopRuleAppCost

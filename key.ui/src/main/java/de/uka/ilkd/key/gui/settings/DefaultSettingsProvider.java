@@ -8,6 +8,8 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
@@ -65,7 +67,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     }
 
     @Override
-    public boolean contains(String substring) {
+    public boolean contains(@NonNull String substring) {
         return keywords.contains(substring);
     }
 

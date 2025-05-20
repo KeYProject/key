@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Feature that returns the number of branches for a given taclet application Size of "assumes"
  * sequents is currently not considered
@@ -30,7 +32,7 @@ public class CountBranchFeature implements Feature {
      * @param mState
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(@NonNull RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         if (app.rule() instanceof Taclet tac) {
             final long branches = tac.goalTemplates().size();

@@ -11,6 +11,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link IExecutionMethodReturnValue}.
  *
@@ -21,17 +24,17 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
     /**
      * The return value.
      */
-    private final Term returnValue;
+    private final @NonNull Term returnValue;
 
     /**
      * The {@link PosInOccurrence} of the modality of interest.
      */
-    private final PosInOccurrence modalityPIO;
+    private final @NonNull PosInOccurrence modalityPIO;
 
     /**
      * The return value as human readable {@link String}.
      */
-    private String returnValueString;
+    private @Nullable String returnValueString;
 
     /**
      * The optional condition.
@@ -41,7 +44,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
     /**
      * The optional condition as human readable {@link String}.
      */
-    private String conditionString;
+    private @Nullable String conditionString;
 
     /**
      * Constructor.
@@ -52,8 +55,8 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * @param returnValue The return value.
      * @param condition The optional condition or {@code null} if no condition is available.
      */
-    public ExecutionMethodReturnValue(ITreeSettings settings, Node proofNode,
-            PosInOccurrence modalityPIO, Term returnValue, Term condition) {
+    public ExecutionMethodReturnValue(@NonNull ITreeSettings settings, @NonNull Node proofNode,
+            @NonNull PosInOccurrence modalityPIO, @NonNull Term returnValue, Term condition) {
         super(settings, proofNode);
         assert returnValue != null;
         assert modalityPIO != null;
@@ -66,7 +69,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Return Value";
     }
 
@@ -107,7 +110,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      *
      * @return The human readable return value.
      */
-    protected String lazyComputeReturnValueString() throws ProofInputException {
+    protected @Nullable String lazyComputeReturnValueString() throws ProofInputException {
         return !isDisposed() ? formatTerm(returnValue, getServices()) : null;
     }
 
@@ -144,7 +147,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      *
      * @return The human readable return value.
      */
-    protected String lazyComputeConditionString() throws ProofInputException {
+    protected @Nullable String lazyComputeConditionString() throws ProofInputException {
         if (hasCondition()) {
             return !isDisposed() ? formatTerm(condition, getServices()) : null;
         } else {

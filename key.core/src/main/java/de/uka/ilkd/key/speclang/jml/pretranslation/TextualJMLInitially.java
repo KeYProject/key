@@ -7,6 +7,8 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * A JML initially clause declaration in textual form.
@@ -15,17 +17,18 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class TextualJMLInitially extends TextualJMLConstruct {
 
-    private final LabeledParserRuleContext inv;
+    private final @NonNull LabeledParserRuleContext inv;
 
 
-    public TextualJMLInitially(ImmutableList<JMLModifier> modifiers, LabeledParserRuleContext inv) {
+    public TextualJMLInitially(@NonNull ImmutableList<JMLModifier> modifiers,
+            @NonNull LabeledParserRuleContext inv) {
         super(modifiers);
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
     }
 
-    public LabeledParserRuleContext getInv() {
+    public @NonNull LabeledParserRuleContext getInv() {
         return inv;
     }
 
@@ -36,7 +39,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLInitially ci)) {
             return false;
         }

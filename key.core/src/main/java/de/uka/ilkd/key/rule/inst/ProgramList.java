@@ -8,22 +8,25 @@ import de.uka.ilkd.key.java.ProgramElement;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 public class ProgramList implements SyntaxElement {
 
-    private final ImmutableArray<ProgramElement> list;
+    private final @NonNull ImmutableArray<ProgramElement> list;
 
 
-    public ProgramList(ImmutableArray<ProgramElement> list) {
+    public ProgramList(@NonNull ImmutableArray<ProgramElement> list) {
         assert list != null
                 : "Constructor of ProgramList must" + " not be called with null argument";
         this.list = list;
     }
 
-    public ImmutableArray<ProgramElement> getList() {
+    public @NonNull ImmutableArray<ProgramElement> getList() {
         return list;
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof ProgramList)) {
             return false;
         }
@@ -36,7 +39,7 @@ public class ProgramList implements SyntaxElement {
 
 
     @Override
-    public SyntaxElement getChild(int n) {
+    public @NonNull SyntaxElement getChild(int n) {
         return list.get(n);
     }
 

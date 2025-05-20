@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Char literal.
  *
@@ -42,7 +44,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * @param children an ExtList with all children(comments). May contain: Comments
      * @param valueStr a string.
      */
-    public CharLiteral(ExtList children, String valueStr) {
+    public CharLiteral(@NonNull ExtList children, @NonNull String valueStr) {
         super(children);
         this.charVal = parseFromString(valueStr);
     }
@@ -53,7 +55,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
      *
      * @param valueStr a string.
      */
-    public CharLiteral(String valueStr) {
+    public CharLiteral(@NonNull String valueStr) {
         this.charVal = parseFromString(valueStr);
     }
 
@@ -67,23 +69,23 @@ public class CharLiteral extends AbstractIntegerLiteral {
     }
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnCharLiteral(this);
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_CHAR);
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         // the actual char surrounded by single-quotes
         return "'" + charVal + "'";
     }
 
     @Override
-    public String getValueString() {
+    public @NonNull String getValueString() {
         // the char value as a decimal number (without single-quotes)
         return String.valueOf((int) charVal);
     }
@@ -104,7 +106,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4">
      *      https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>
      */
-    protected char parseFromString(final String sourceStr) {
+    protected char parseFromString(final @NonNull String sourceStr) {
         if (sourceStr.charAt(0) != '\'' || sourceStr.charAt(sourceStr.length() - 1) != '\'') {
             throw new NumberFormatException("Invalid char delimiters: " + sourceStr);
         }

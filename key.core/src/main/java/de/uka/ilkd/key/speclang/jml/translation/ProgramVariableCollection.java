@@ -10,6 +10,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A collection of all program variables needed to translate a textual JML specification case.
  *
@@ -34,7 +36,7 @@ public class ProgramVariableCollection {
     /**
      * {@code exception}
      */
-    public LocationVariable excVar;
+    public @Nullable LocationVariable excVar;
 
     /**
      * A map from every variable {@code var} to {@code \old(var)}.

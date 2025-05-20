@@ -7,6 +7,8 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * SMT handler properties are properties for the new modular smt handler.
  *
@@ -255,7 +257,7 @@ public abstract class SMTHandlerProperty<T> {
             this.enumType = enumType;
         }
 
-        public E fromString(String value) {
+        public @NonNull E fromString(String value) {
             for (E enumConstant : enumType.getEnumConstants()) {
                 if (value.equalsIgnoreCase(enumConstant.toString())) {
                     return enumConstant;
@@ -270,7 +272,7 @@ public abstract class SMTHandlerProperty<T> {
         }
 
         @Override
-        public E defaultValue() {
+        public @NonNull E defaultValue() {
             return enumType.getEnumConstants()[0];
         }
 

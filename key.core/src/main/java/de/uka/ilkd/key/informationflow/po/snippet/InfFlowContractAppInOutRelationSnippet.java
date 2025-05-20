@@ -13,6 +13,8 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  *
  * @author christoph
@@ -23,9 +25,9 @@ class InfFlowContractAppInOutRelationSnippet extends InfFlowInputOutputRelationS
     // assume the identity on the newly created objects, as opposed to the
     // proof obligation where we have to show that there is an isomorphism.
     @Override
-    protected Term buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
-            InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
-            ProofObligationVars vs2, Term eqAtLocsTerm) {
+    protected @NonNull Term buildObjectSensitivePostRelation(@NonNull InfFlowSpec infFlowSpec1,
+            @NonNull InfFlowSpec infFlowSpec2, @NonNull BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, @NonNull Term eqAtLocsTerm) {
         // build equalities for newObjects terms
         ImmutableList<Term> newObjEqs = ImmutableSLList.nil();
         Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();

@@ -11,6 +11,9 @@ import de.uka.ilkd.key.strategy.feature.instantiator.BackTrackingManager;
 import de.uka.ilkd.key.strategy.feature.instantiator.ChoicePoint;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Realizes a variable bank for strategy features such that each feature
@@ -54,7 +57,7 @@ public class MutableState {
      * @param v the TermBuffer whose value is asked for
      * @return the current value of the {@link TermBuffer} or {@code null} if there is none
      */
-    public Term read(TermBuffer v) {
+    public @Nullable Term read(TermBuffer v) {
         if (content == null) {
             return null;
         }
@@ -66,7 +69,7 @@ public class MutableState {
      *
      * @return the backtracking manager
      */
-    public BackTrackingManager getBacktrackingManager() {
+    public @NonNull BackTrackingManager getBacktrackingManager() {
         if (btManager == null) {
             btManager = new BackTrackingManager();
         }

@@ -24,7 +24,7 @@ public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardPa
 
     @Override
     public ProgramElement getChildAt(int index) {
-        return null;
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override

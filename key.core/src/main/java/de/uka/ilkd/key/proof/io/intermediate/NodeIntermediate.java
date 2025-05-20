@@ -50,7 +50,10 @@ public abstract class NodeIntermediate {
         Queue<NodeIntermediate> queue = new ArrayDeque<>(getChildren());
         while (!queue.isEmpty()) {
             total++;
-            queue.addAll(queue.poll().getChildren());
+            final var poll = queue.poll();
+            if (poll != null) {
+                queue.addAll(poll.getChildren());
+            }
         }
         subtreeSize = total;
         return total;

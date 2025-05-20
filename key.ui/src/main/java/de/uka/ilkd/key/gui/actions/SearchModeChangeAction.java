@@ -9,6 +9,8 @@ import java.awt.event.KeyEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
+import org.jspecify.annotations.NonNull;
+
 
 /*
  * Menu option for showing the next search result of sequent search Keyboard shortcut: F3. This
@@ -18,10 +20,10 @@ public class SearchModeChangeAction extends MainWindowAction {
 
     private static final long serialVersionUID = -9002019635814787502L;
     private final SequentViewSearchBar searchBar;
-    private final SequentViewSearchBar.SearchMode mode;
+    private final SequentViewSearchBar.@NonNull SearchMode mode;
 
-    public SearchModeChangeAction(MainWindow mainWindow, SequentViewSearchBar searchBar,
-            SequentViewSearchBar.SearchMode mode) {
+    public SearchModeChangeAction(@NonNull MainWindow mainWindow, SequentViewSearchBar searchBar,
+            SequentViewSearchBar.@NonNull SearchMode mode) {
         super(mainWindow);
         setName(mode.toString());
 

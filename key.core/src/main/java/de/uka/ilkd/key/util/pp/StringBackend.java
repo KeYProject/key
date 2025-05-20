@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.pp;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A {@link Backend} which appends all output to a StringBuffer. The {@link #mark(Object o)} method
  * does nothing in this implementation. There is a method {@link #count()} which returns the number
@@ -10,7 +12,7 @@ package de.uka.ilkd.key.util.pp;
  * far.
  */
 public class StringBackend<M> {
-    protected final StringBuilder out;
+    protected final @NonNull StringBuilder out;
 
     /**
      * Create a new StringBackend. This will accumulate output in a fresh, private StringBuffer.
@@ -40,7 +42,7 @@ public class StringBackend<M> {
     }
 
     /** Returns the accumulated output */
-    public String result() {
+    public @NonNull String result() {
         return out.toString();
     }
 }

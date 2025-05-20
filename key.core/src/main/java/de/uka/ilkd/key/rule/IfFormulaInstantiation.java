@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This interface represents objects representing an instantiation of one formula of the if-sequence
@@ -18,6 +20,7 @@ public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
     /**
      * @return the cf this is pointing to
      */
+    @Nullable
     SequentFormula getConstrainedFormula();
 
     String toString(Services services);

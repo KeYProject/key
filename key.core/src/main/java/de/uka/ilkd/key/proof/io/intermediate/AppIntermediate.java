@@ -6,6 +6,8 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents an intermediate rule / taclet application.
  *
@@ -19,12 +21,12 @@ public abstract class AppIntermediate {
     /**
      * @return The new names registered in the course of this app.
      */
-    public abstract ImmutableList<Name> getNewNames();
+    public abstract @Nullable ImmutableList<Name> getNewNames();
 
     /**
      * @return The name of this taclet / built in rule.
      */
-    public abstract String getRuleName();
+    public abstract @Nullable String getRuleName();
 
     /**
      * @return The line number of this application in the loaded proof file.

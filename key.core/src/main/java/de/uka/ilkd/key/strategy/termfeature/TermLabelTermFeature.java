@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A termfeature that can be used to check whether a term has a specific label
  * {@link #create(TermLabel)} or any label {{@link #HAS_ANY_LABEL} at all.
@@ -16,7 +18,7 @@ public class TermLabelTermFeature extends BinaryTermFeature {
 
     public static final TermFeature HAS_ANY_LABEL = new TermLabelTermFeature(null);
 
-    public static TermFeature create(TermLabel label) {
+    public static @NonNull TermFeature create(TermLabel label) {
         return new TermLabelTermFeature(label);
     }
 
@@ -28,7 +30,7 @@ public class TermLabelTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         if (label == null) {
             return term.hasLabels();
         }

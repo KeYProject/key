@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Binary feature that returns zero iff the <tt>\assumes</tt>- and find-formula of a Taclet are
  * matched to different members of the sequent. If a taclet has more than one formula in its
@@ -24,7 +26,8 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
     private DiffFindAndIfFeature() {}
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();

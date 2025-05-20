@@ -9,6 +9,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * A conditional feature, in which the condition itself is a (binary) feature. The general notion is
@@ -62,7 +64,7 @@ public class ShannonFeature implements Feature {
      * @return <code>thenValue</code> if <code>cond</code> returns <code>trueCost</code>, zero
      *         otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
+    public static @NonNull Feature createConditional(Feature cond, RuleAppCost trueCost,
             RuleAppCost thenValue) {
         return createConditional(cond, trueCost, ConstFeature.createConst(thenValue));
     }
@@ -76,7 +78,7 @@ public class ShannonFeature implements Feature {
      * @return <code>thenValue</code> if <code>cond</code> returns <code>trueCost</code>,
      *         <code>elseValue</code> otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
+    public static @NonNull Feature createConditional(Feature cond, RuleAppCost trueCost,
             RuleAppCost thenValue, RuleAppCost elseValue) {
         return createConditional(cond, trueCost, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
@@ -90,7 +92,7 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, zero otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
+    public static @NonNull Feature createConditional(Feature cond, RuleAppCost trueCost,
             Feature thenFeature) {
         return createConditional(cond, trueCost, thenFeature, NumberRuleAppCost.getZeroCost());
     }
@@ -105,7 +107,8 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, <code>elseValue</code> otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost, Feature thenFeature,
+    public static @NonNull Feature createConditional(Feature cond, RuleAppCost trueCost,
+            Feature thenFeature,
             RuleAppCost elseValue) {
         return createConditional(cond, trueCost, thenFeature, ConstFeature.createConst(elseValue));
     }
@@ -120,7 +123,8 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, the value of <code>elseFeature</code> otherwise
      */
-    public static Feature createConditional(Feature cond, RuleAppCost trueCost, Feature thenFeature,
+    public static @NonNull Feature createConditional(Feature cond, RuleAppCost trueCost,
+            Feature thenFeature,
             Feature elseFeature) {
         return new ShannonFeature(cond, trueCost, thenFeature, elseFeature);
     }
@@ -131,7 +135,7 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */
-    public static Feature createConditionalBinary(Feature cond, RuleAppCost thenValue) {
+    public static @NonNull Feature createConditionalBinary(Feature cond, RuleAppCost thenValue) {
         return createConditionalBinary(cond, ConstFeature.createConst(thenValue));
     }
 
@@ -142,7 +146,7 @@ public class ShannonFeature implements Feature {
      * @return <code>thenValue</code> if <code>cond</code> returns zero, <code>elseValue</code>
      *         otherwise
      */
-    public static Feature createConditionalBinary(Feature cond, RuleAppCost thenValue,
+    public static @NonNull Feature createConditionalBinary(Feature cond, RuleAppCost thenValue,
             RuleAppCost elseValue) {
         return createConditionalBinary(cond, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
@@ -155,7 +159,7 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero,
      *         <code>elseValue</code> otherwise
      */
-    public static Feature createConditionalBinary(Feature cond, Feature thenFeature,
+    public static @NonNull Feature createConditionalBinary(Feature cond, Feature thenFeature,
             RuleAppCost elseValue) {
         return createConditionalBinary(cond, thenFeature, ConstFeature.createConst(elseValue));
     }
@@ -167,7 +171,7 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, the value of
      *         <code>elseFeature</code> otherwise
      */
-    public static Feature createConditionalBinary(Feature cond, Feature thenFeature,
+    public static @NonNull Feature createConditionalBinary(Feature cond, Feature thenFeature,
             Feature elseFeature) {
         return createConditional(cond, BinaryFeature.ZERO_COST, thenFeature, elseFeature);
     }
@@ -178,7 +182,7 @@ public class ShannonFeature implements Feature {
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */
-    public static Feature createConditionalBinary(Feature cond, Feature thenFeature) {
+    public static @NonNull Feature createConditionalBinary(Feature cond, Feature thenFeature) {
         return createConditional(cond, BinaryFeature.ZERO_COST, thenFeature,
             NumberRuleAppCost.getZeroCost());
     }

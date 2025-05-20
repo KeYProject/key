@@ -11,6 +11,9 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 public class SequentViewer extends JTextPane {
 
@@ -30,7 +33,7 @@ public class SequentViewer extends JTextPane {
         setText("");
     }
 
-    public void setSequent(Sequent sequent, Services services) {
+    public void setSequent(@NonNull Sequent sequent, @Nullable Services services) {
         if (services != null) {
             LogicPrinter printer = LogicPrinter.purePrinter(new NotationInfo(), services);
             printer.printSequent(sequent);

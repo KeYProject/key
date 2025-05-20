@@ -18,6 +18,8 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros which sequentially
  * apply macros one after the other. This works only for macros which use
@@ -36,7 +38,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      *
      * This array is created on demand using {@link #createProofMacroArray()}.
      */
-    private ProofMacro[] proofMacros = null;
+    private ProofMacro[] proofMacros = new ProofMacro[0];
 
     /**
      * Creates the proof macro array.
@@ -56,7 +58,8 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if (macros.isEmpty()) {
             return false;
@@ -75,8 +78,9 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * @throws InterruptedException if one of the wrapped macros is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+    public ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         final List<Node> initNodes = new ArrayList<>(goals.size());
         for (Goal goal : goals) {

@@ -18,6 +18,8 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
         Position position,
         @Nullable String sourceName) {
 
+    private static final URI URI_UNKNOWN = URI.create("file:unknown");
+
     public static BuildingIssue createError(String message, @Nullable ParserRuleContext token,
             @Nullable Throwable cause) {
         return createError(message, token != null ? token.start : null, cause);
@@ -50,9 +52,10 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
 
     public PositionedString asPositionedString() {
         try {
-            return new PositionedString(message, new Location(new URI(sourceName), position));
+            final var fileUri = sourceName != null ? new URI(sourceName) : URI_UNKNOWN;
+            return new PositionedString(message, new Location(fileUri, position));
         } catch (URISyntaxException e) {
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }

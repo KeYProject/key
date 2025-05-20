@@ -18,6 +18,8 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The menu item for the "delayed-cut" join rule.
  *
@@ -28,8 +30,8 @@ public class JoinMenuItem extends JMenuItem {
 
     private static final long serialVersionUID = -2602116358650063634L;
 
-    public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof,
-            final KeYMediator mediator) {
+    public JoinMenuItem(final @NonNull List<ProspectivePartner> partner, final @NonNull Proof proof,
+            final @NonNull KeYMediator mediator) {
         super();
 
         this.setText(toString());
@@ -51,7 +53,8 @@ public class JoinMenuItem extends JMenuItem {
         });
     }
 
-    private void start(ProspectivePartner partner, Proof proof, final KeYMediator mediator) {
+    private void start(ProspectivePartner partner, @NonNull Proof proof,
+            final @NonNull KeYMediator mediator) {
 
 
         JoinProcessor processor = new JoinProcessor(partner, proof);
@@ -59,12 +62,12 @@ public class JoinMenuItem extends JMenuItem {
         processor.addListener(new Listener() {
 
             @Override
-            public void exceptionWhileJoining(Throwable e) {
+            public void exceptionWhileJoining(@NonNull Throwable e) {
                 mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
             }
 
             @Override
-            public void endOfJoining(final ImmutableList<Goal> goals) {
+            public void endOfJoining(final @NonNull ImmutableList<Goal> goals) {
                 SwingUtilities.invokeLater(() -> {
                     // This method delegates the request only to the UserInterfaceControl which
                     // implements the functionality.
@@ -83,7 +86,7 @@ public class JoinMenuItem extends JMenuItem {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "Delayed Cut Join Rule";
     }
 }

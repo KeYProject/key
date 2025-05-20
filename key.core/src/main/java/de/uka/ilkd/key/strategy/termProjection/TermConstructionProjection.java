@@ -11,6 +11,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
  * operator.
@@ -20,22 +22,25 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
  */
 public class TermConstructionProjection implements ProjectionToTerm {
 
-    private final Operator op;
-    private final ProjectionToTerm[] subTerms;
+    private final @NonNull Operator op;
+    private final ProjectionToTerm @NonNull [] subTerms;
 
 
-    private TermConstructionProjection(Operator op, ProjectionToTerm[] subTerms) {
+    private TermConstructionProjection(@NonNull Operator op,
+            ProjectionToTerm @NonNull [] subTerms) {
         assert !(op instanceof Modality); // XXX
         this.op = op;
         this.subTerms = subTerms;
         assert op.arity() == subTerms.length;
     }
 
-    public static ProjectionToTerm create(Operator op, ProjectionToTerm[] subTerms) {
+    public static @NonNull ProjectionToTerm create(@NonNull Operator op,
+            ProjectionToTerm @NonNull [] subTerms) {
         return new TermConstructionProjection(op, subTerms);
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Term[] subs = new Term[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {
             subs[i] = subTerms[i].toTerm(app, pos, goal, mState);

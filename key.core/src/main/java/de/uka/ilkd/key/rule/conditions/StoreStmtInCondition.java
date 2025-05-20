@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Stores the given {@link Statement}, after substitution of {@link SchemaVariable}s, into the given
  * {@link ProgramSV} for later use in other conditions and transformers. The arguments are a
@@ -38,8 +40,8 @@ public class StoreStmtInCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
+    public @NonNull MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
+            @NonNull MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
@@ -64,7 +66,7 @@ public class StoreStmtInCondition implements VariableCondition {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return String.format( //
             "\\varcond (\\storeStmtIn(%s, %s))", storeInSV, term);
     }

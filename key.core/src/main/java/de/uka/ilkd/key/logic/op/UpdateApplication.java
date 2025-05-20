@@ -12,6 +12,8 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Singleton class defining a binary operator {u}t that applies updates u to terms, formulas, or
@@ -34,7 +36,7 @@ public final class UpdateApplication extends AbstractOperator implements Operato
 
 
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+    public <T extends org.key_project.logic.Term> void validTopLevelException(@NonNull T term)
             throws TermCreationException {
         super.validTopLevelException(term);
         if (term.sub(0).sort() != JavaDLTheory.UPDATE) {

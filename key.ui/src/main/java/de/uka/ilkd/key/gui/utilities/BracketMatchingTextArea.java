@@ -14,6 +14,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -324,7 +325,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         /**
          * The code is copied from @link DefaultHighlighter#DefaultPainter#paint(Graphics)
          */
-        public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
+        public void paint(@NonNull Graphics g, int offs0, int offs1, @NonNull Shape bounds,
+                @NonNull JTextComponent c) {
 
             // dont render if empty
             if (offs0 == offs1) {

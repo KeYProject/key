@@ -12,6 +12,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.jspecify.annotations.NonNull;
+
 public class OneOfCP implements Feature {
 
     private final Feature[] features;
@@ -23,12 +25,12 @@ public class OneOfCP implements Feature {
         this.features = features;
     }
 
-    public static Feature create(Feature[] features) {
+    public static @NonNull Feature create(Feature[] features) {
         return new OneOfCP(features);
     }
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+            @NonNull MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(cp, this);
         return features[theChosenOne].computeCost(app, pos, goal, mState);
@@ -47,7 +49,7 @@ public class OneOfCP implements Feature {
                 return num < features.length;
             }
 
-            public CPBranch next() {
+            public @NonNull CPBranch next() {
                 final int chosen = num++;
                 return new CPBranch() {
                     public void choose() {
@@ -68,7 +70,7 @@ public class OneOfCP implements Feature {
             }
         }
 
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
+        public @NonNull Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator(oldApp);
         }
     }

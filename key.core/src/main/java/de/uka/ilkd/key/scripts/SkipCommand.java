@@ -5,6 +5,8 @@ package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 
+import org.jspecify.annotations.NonNull;
+
 public class SkipCommand extends NoArgumentCommand {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Void args, EngineState stateMap)
@@ -13,12 +15,12 @@ public class SkipCommand extends NoArgumentCommand {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "skip";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return "Does exactly nothing. Really nothing.";
     }
 }

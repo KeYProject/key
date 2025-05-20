@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -25,19 +27,20 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  */
 public class PredictCostProver {
 
-    private final TermBuilder tb;
+    private final @NonNull TermBuilder tb;
 
-    private final Term trueT, falseT;
+    private final @NonNull Term trueT, falseT;
 
     /** assume that all literal in <code>assertLiterals</code> are true */
     private ImmutableSet<Term> assertLiterals;
 
     /** clauses from <code>instance</code> of CNF */
-    private Set<Clause> clauses = new LinkedHashSet<>();
+    private @NonNull Set<Clause> clauses = new LinkedHashSet<>();
 
-    private final Services services;
+    private final @NonNull Services services;
 
-    private PredictCostProver(Term instance, ImmutableSet<Term> assertList, Services services) {
+    private PredictCostProver(@NonNull Term instance, ImmutableSet<Term> assertList,
+            @NonNull Services services) {
         this.assertLiterals = assertList;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -46,8 +49,8 @@ public class PredictCostProver {
         initClauses(instance);
     }
 
-    public static long computerInstanceCost(Substitution sub, Term matrix,
-            ImmutableSet<Term> assertList, Services services) {
+    public static long computerInstanceCost(@NonNull Substitution sub, Term matrix,
+            ImmutableSet<Term> assertList, @NonNull Services services) {
 
         if (!sub.isGround()) {
             // non-ground substitutions not supported yet
@@ -60,7 +63,7 @@ public class PredictCostProver {
     }
 
     // init context
-    private void initClauses(Term instance) {
+    private void initClauses(@NonNull Term instance) {
 
         for (Term t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
             for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR))) {
@@ -69,7 +72,8 @@ public class PredictCostProver {
         }
     }
 
-    private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set) {
+    private @NonNull ImmutableSet<ImmutableSet<Term>> createClause(
+            @NonNull ImmutableSet<Term> set) {
         final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.nil();
         ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
         for (Term t : set) {
@@ -82,8 +86,8 @@ public class PredictCostProver {
         return res;
     }
 
-    private ImmutableSet<ImmutableSet<Term>> createClauseHelper(
-            ImmutableSet<ImmutableSet<Term>> res, Term self, ImmutableSet<Term> ts) {
+    private @NonNull ImmutableSet<ImmutableSet<Term>> createClauseHelper(
+            ImmutableSet<ImmutableSet<Term>> res, Term self, @NonNull ImmutableSet<Term> ts) {
         res = res.add(ts.add(self));
         return res;
     }
@@ -95,7 +99,7 @@ public class PredictCostProver {
      * If the given <code>problem</code>'s operation is equal,or mathmetic operation(=,>=, <=), this
      * method will try to prove it by finding the relation between its two subterms.
      */
-    private Term provedBySelf(Term problem) {
+    private @NonNull Term provedBySelf(@NonNull Term problem) {
         boolean negated = false;
         Term pro = problem;
         Operator op = pro.op();
@@ -121,7 +125,8 @@ public class PredictCostProver {
      * @return trueT if problem is equal axiom, false if problem's negation is equal axiom.
      *         Otherwise retrun problem.
      */
-    private Term directConsequenceOrContradictionOfAxiom(Term problem, Term axiom) {
+    private @NonNull Term directConsequenceOrContradictionOfAxiom(@NonNull Term problem,
+            Term axiom) {
         boolean negated = false;
         Term pro = problem;
         while (pro.op() == Junctor.NOT) {
@@ -146,7 +151,7 @@ public class PredictCostProver {
      * @return if axiom conduct problem then return trueT. If axiom conduct negation of problem
      *         return fastT. Otherwise, return problem
      */
-    private Term provedByAnother(Term problem, Term axiom) {
+    private @NonNull Term provedByAnother(@NonNull Term problem, Term axiom) {
         Term res = directConsequenceOrContradictionOfAxiom(problem, axiom);
         if (TriggerUtils.isTrueOrFalse(res)) {
             return res;
@@ -163,7 +168,8 @@ public class PredictCostProver {
      * @return return <code>trueT</code> if if formu is proved to true, <code> falseT</code> if
      *         false, and <code>atom</code> if it cann't be proved.
      */
-    private Term proveLiteral(Term problem, Iterable<? extends Term> assertLits) {
+    private @NonNull Term proveLiteral(@NonNull Term problem,
+            @NonNull Iterable<? extends Term> assertLits) {
         Term res;
         /*
          * res = provedFromCache(problem, cache); if (res.equals(trueT) || res.equals(falseT)) {
@@ -256,7 +262,7 @@ public class PredictCostProver {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (!(o instanceof Clause other)) {
                 return false;
             }
@@ -272,7 +278,7 @@ public class PredictCostProver {
         }
 
         @Override
-        public Iterator<Term> iterator() {
+        public @NonNull Iterator<Term> iterator() {
             return literals.iterator();
         }
 
@@ -306,7 +312,7 @@ public class PredictCostProver {
          * Refine literals in this clause, but it does not change literlas, only return literals
          * that can't be removed by refining
          */
-        public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
+        public @NonNull ImmutableSet<Term> refine(@NonNull Iterable<? extends Term> assertLits) {
             ImmutableSet<Term> res = DefaultImmutableSet.nil();
             for (final Term lit : this) {
                 final Operator op = proveLiteral(lit, assertLits).op();
@@ -332,7 +338,7 @@ public class PredictCostProver {
          * provedByAnthoer(Lj,!Li) is used to proved (!Li->Lj). Some examples are (!a|a) which is
          * (!!a->a) and (a>=1|a<=0) which is !a>=1->a<=0
          */
-        public boolean selfRefine(ImmutableSet<Term> lits) {
+        public boolean selfRefine(@NonNull ImmutableSet<Term> lits) {
             if (lits.size() <= 1) {
                 return false;
             }

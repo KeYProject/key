@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.proofdiff;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ public class ProofDifferenceTest {
         assertEquals(4, calculate("f(x)", ""));
     }
 
-    public void testPairs(List<String> seq1, List<String> seq2, String exp) {
+    public void testPairs(@NonNull List<String> seq1, @NonNull List<String> seq2, String exp) {
         List<ProofDifference.Matching> pairs =
             ProofDifference.findPairs(new ArrayList<>(seq1), new ArrayList<>(seq2));
         Assertions.assertEquals(exp, pairs.toString());

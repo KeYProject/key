@@ -15,6 +15,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 
 public final class MetaDiv extends AbstractTermTransformer {
@@ -27,7 +29,8 @@ public final class MetaDiv extends AbstractTermTransformer {
     /**
      * checks whether the result is consistent with the axiom div_axiom
      */
-    private boolean checkResult(BigInteger a, BigInteger b, BigInteger result) {
+    private boolean checkResult(@NonNull BigInteger a, @NonNull BigInteger b,
+            @NonNull BigInteger result) {
 
         // (gt(b,0) -> (leq(0,sub(a,mul(result,b))) & lt(sub(a,mul(result,b)),b)) )
         if (b.compareTo(BigInteger.ZERO) > 0) {
@@ -46,7 +49,7 @@ public final class MetaDiv extends AbstractTermTransformer {
 
 
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         Term arg1 = term.sub(0);
         Term arg2 = term.sub(1);
         BigInteger bigIntArg1;

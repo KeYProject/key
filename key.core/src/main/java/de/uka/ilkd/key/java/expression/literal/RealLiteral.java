@@ -13,6 +13,8 @@ import de.uka.ilkd.key.ldt.RealLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * JML \real literal.
  *
@@ -47,12 +49,12 @@ public class RealLiteral extends Literal {
         this.value = String.valueOf(value);
     }
 
-    public RealLiteral(ExtList children, String value) {
+    public RealLiteral(@NonNull ExtList children, String value) {
         super(children);
         this.value = value;
     }
 
-    public RealLiteral(ExtList children) {
+    public RealLiteral(@NonNull ExtList children) {
         super(children);
         value = "0.0";
     }
@@ -68,7 +70,7 @@ public class RealLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -103,12 +105,12 @@ public class RealLiteral extends Literal {
         // v.performActionOnDoubleLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         return RealLDT.NAME;
     }
 

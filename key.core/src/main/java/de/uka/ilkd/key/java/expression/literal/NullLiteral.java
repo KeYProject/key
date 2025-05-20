@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Null literal. Is used as singleton.
  */
@@ -26,7 +28,7 @@ public class NullLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         return o == this;
     }
 
@@ -41,16 +43,16 @@ public class NullLiteral extends Literal {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnNullLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getNullType();
     }
 
     @Override
-    public Name getLDTName() {
+    public @NonNull Name getLDTName() {
         throw new UnsupportedOperationException("No LDT is linked to the null literal.");
     }
 

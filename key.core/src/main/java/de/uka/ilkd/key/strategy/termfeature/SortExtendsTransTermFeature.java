@@ -9,6 +9,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Term feature for testing whether the sort of a term is a subsort of a given sort (or exactly the
@@ -18,7 +20,7 @@ public class SortExtendsTransTermFeature extends BinaryTermFeature {
 
     private final Sort sort;
 
-    public static TermFeature create(Sort sort) {
+    public static @NonNull TermFeature create(Sort sort) {
         return new SortExtendsTransTermFeature(sort);
     }
 
@@ -27,7 +29,7 @@ public class SortExtendsTransTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term term, MutableState mState, Services services) {
         return term.sort().extendsTrans(sort);
     }
 

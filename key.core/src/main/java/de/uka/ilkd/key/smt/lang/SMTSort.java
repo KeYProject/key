@@ -206,7 +206,7 @@ public class SMTSort {
 
     /** Returns true iff ((that is from type sort) and (this.id == that.id)) */
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object that) {
         if (this == that) {
             return true;
         }

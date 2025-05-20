@@ -17,6 +17,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * This {@link StopCondition} stops the auto mode ({@link ApplyStrategy}) if a given number
@@ -101,7 +104,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      */
     @Override
     public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+            int countApplied, @Nullable Goal goal) {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
@@ -205,7 +208,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      */
     @Override
     public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
         // Check if a rule was applied
         if (singleRuleApplicationInfo != null) {
             // Get the node on which a rule was applied.
@@ -240,7 +243,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
+    public @Nullable String getStopMessage(int maxApplications, long timeout, Proof proof,
+            long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return null;
     }
@@ -281,7 +285,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      *
      * @return The number of executed symbolic execution tree nodes per {@link Goal}.
      */
-    public Map<Goal, Integer> getExectuedSetNodesPerGoal() {
+    public @NonNull Map<Goal, Integer> getExectuedSetNodesPerGoal() {
         return executedNumberOfSetNodesPerGoal;
     }
 }

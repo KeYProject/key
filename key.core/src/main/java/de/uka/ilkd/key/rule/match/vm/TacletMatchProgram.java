@@ -27,6 +27,9 @@ import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Instances of this class represent programs for matching a term against a given pattern. The
  * programs are specialised for a certain pattern.
@@ -45,7 +48,7 @@ public class TacletMatchProgram {
      * @param pattern the {@link Term} specifying the pattern
      * @return the specialized matcher for the given pattern
      */
-    public static TacletMatchProgram createProgram(Term pattern) {
+    public static @NonNull TacletMatchProgram createProgram(@NonNull Term pattern) {
         ArrayList<MatchInstruction> program = new ArrayList<>();
         createProgram(pattern, program);
         return new TacletMatchProgram(program.toArray(new MatchInstruction[0]));
@@ -69,7 +72,7 @@ public class TacletMatchProgram {
      * @param op the {@link SchemaVariable} for which to get the instruction
      * @return the instruction for the specified variable
      */
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(
+    public static @NonNull MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(
             SchemaVariable op) {
         MatchSchemaVariableInstruction<? extends SchemaVariable> instruction;
 
@@ -100,7 +103,8 @@ public class TacletMatchProgram {
      * @param program the list of {@link MatchInstruction} to which the instructions for matching
      *        {@code pattern} are added.
      */
-    private static void createProgram(Term pattern, ArrayList<MatchInstruction> program) {
+    private static void createProgram(@NonNull Term pattern,
+            @NonNull ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
         final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
@@ -155,7 +159,8 @@ public class TacletMatchProgram {
      * @param services the {@link Services}
      * @return {@code null} if no match was found or the match result
      */
-    public MatchConditions match(Term p_toMatch, MatchConditions p_matchCond, Services services) {
+    public @Nullable MatchConditions match(Term p_toMatch, MatchConditions p_matchCond,
+            Services services) {
 
         MatchConditions mc = p_matchCond;
 
