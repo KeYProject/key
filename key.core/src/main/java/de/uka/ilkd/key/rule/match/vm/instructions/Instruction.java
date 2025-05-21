@@ -11,51 +11,34 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /** Class encoding the instructions of the matching vm */
-public abstract class Instruction<OP extends org.key_project.logic.op.Operator>
+public abstract class Instruction<@NonNull OP extends org.key_project.logic.op.Operator>
         implements MatchInstruction {
-
-    public static Instruction<Operator> matchOp(Operator op) {
-        return new MatchOpIdentityInstruction<>(op);
-    }
-
-    public static Instruction<SortDependingFunction> matchSortDependingFunction(
-            SortDependingFunction op) {
-        return new MatchSortDependingFunctionInstruction(op);
-    }
 
     public static MatchModalOperatorSVInstruction matchModalOperatorSV(
             ModalOperatorSV sv) {
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static MatchModalityInstruction matchModalOperator(Modality mod) {
-        return new MatchModalityInstruction(mod);
+    public static MatchSchemaVariableInstruction matchTermOrFormulaSV(OperatorSV sv) {
+        return new MatchTermOrFormulaSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(
-            FormulaSV sv) {
-        return new MatchFormulaSVInstruction(sv);
-    }
-
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(TermSV sv) {
-        return new MatchTermSVInstruction(sv);
-    }
-
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(
+    public static MatchSchemaVariableInstruction matchVariableSV(
             VariableSV sv) {
         return new MatchVariableSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(
+    public static MatchSchemaVariableInstruction matchProgramSV(
             ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(
+    public static MatchSchemaVariableInstruction matchUpdateSV(
             UpdateSV sv) {
         return new MatchUpdateSVInstruction(sv);
     }
@@ -77,10 +60,6 @@ public abstract class Instruction<OP extends org.key_project.logic.op.Operator>
         return new UnbindVariablesInstruction();
     }
 
-    public static MatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
-        return new MatchElementaryUpdateInstruction(elementaryUpdate);
-    }
-
     protected final OP op;
 
     protected Instruction(OP op) {
@@ -88,6 +67,7 @@ public abstract class Instruction<OP extends org.key_project.logic.op.Operator>
     }
 
     /**
+     * TODO: REMOVE
      * tries to match the schema variable of this instruction with the specified {@link Term}
      * {@code instantiationCandidate} w.r.t. the given constraints by {@link MatchConditions}
      *

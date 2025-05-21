@@ -11,6 +11,6 @@ import org.key_project.prover.rules.instantiation.MatchConditions;
  * Interface that has to be implemented by instructions for the matching virtual machine
  */
 public interface MatchInstruction {
-    MatchConditions match(PoolSyntaxElementCursor termPosition, MatchConditions matchConditions,
+    MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
             LogicServices services);
 }

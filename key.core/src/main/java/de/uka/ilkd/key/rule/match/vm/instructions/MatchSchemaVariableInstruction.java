@@ -6,24 +6,21 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
-public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
-        extends Instruction<SV> {
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
+public abstract class MatchSchemaVariableInstruction
+        extends Instruction<@NonNull OperatorSV> {
 
-    protected MatchSchemaVariableInstruction(SV op) {
+    protected MatchSchemaVariableInstruction(OperatorSV op) {
         super(op);
     }
 
@@ -75,6 +72,4 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
             LogicServices services) {
         return null;
     }
-
-
 }
