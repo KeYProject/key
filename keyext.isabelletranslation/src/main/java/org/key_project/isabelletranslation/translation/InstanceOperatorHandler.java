@@ -9,13 +9,14 @@ import java.util.Map;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
+import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class handles translation of the instance and exactInstance function.
@@ -31,7 +32,7 @@ public class InstanceOperatorHandler implements IsabelleHandler {
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
             Properties handlerSnippets, String[] handlerOptions) throws IOException {
-        Namespace<JFunction> functionNamespace = services.getNamespaces().functions();
+        Namespace<@NonNull Function> functionNamespace = services.getNamespaces().functions();
         Map<String, String> definedSortDependingFunctions = new HashMap<>();
 
         definedSortDependingFunctions.put("instance", "instanceof");

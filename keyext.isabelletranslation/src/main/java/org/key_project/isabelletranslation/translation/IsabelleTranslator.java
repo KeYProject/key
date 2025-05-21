@@ -8,15 +8,15 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.isabelletranslation.automation.IsabelleProblem;
+import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * Translator for Isabelle.

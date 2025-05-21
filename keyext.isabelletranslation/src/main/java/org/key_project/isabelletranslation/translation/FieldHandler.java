@@ -12,13 +12,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class handles the translation of field values.
@@ -42,7 +44,7 @@ public class FieldHandler implements IsabelleHandler {
         fieldSort = services.getNamespaces().sorts().lookup("Field");
         predefinedFields.add("created");
 
-        Namespace<Sort> sorts = services.getNamespaces().sorts();
+        Namespace<@NonNull Sort> sorts = services.getNamespaces().sorts();
         masterHandler.addPredefinedSort(Objects.requireNonNull(sorts.lookup(new Name("Field"))),
             "Field");
     }
