@@ -7,13 +7,23 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.logic.SyntaxElement;
 
-public class UnbindVariablesInstruction implements MatchInstruction {
+public final class MatchIdentityInstruction
+        implements de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction {
+
+    private final SyntaxElement syntaxElement;
+
+    public MatchIdentityInstruction(SyntaxElement syntaxElement) {
+        this.syntaxElement = syntaxElement;
+    }
 
     @Override
     public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
             LogicServices services) {
-        return matchConditions.shrinkRenameTable();
+        if (syntaxElement == cursor.getCurrentElement()) {
+            return matchConditions;
+        }
+        return null;
     }
-
 }

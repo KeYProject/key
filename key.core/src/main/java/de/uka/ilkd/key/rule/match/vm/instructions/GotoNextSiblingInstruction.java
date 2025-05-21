@@ -8,12 +8,22 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 
-public class UnbindVariablesInstruction implements MatchInstruction {
+public final class GotoNextSiblingInstruction implements MatchInstruction {
+    private final int skipSibling;
+
+    public GotoNextSiblingInstruction() {
+        this(1);
+    }
+
+    public GotoNextSiblingInstruction(int size) {
+        assert size > 0;
+        this.skipSibling = size;
+    }
 
     @Override
     public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
             LogicServices services) {
-        return matchConditions.shrinkRenameTable();
+        cursor.gotoNextSibling(skipSibling);
+        return matchConditions;
     }
-
 }

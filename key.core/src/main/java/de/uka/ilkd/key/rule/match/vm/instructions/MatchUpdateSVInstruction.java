@@ -6,11 +6,11 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
 
-public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<UpdateSV> {
+public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction {
 
     protected MatchUpdateSVInstruction(UpdateSV op) {
         super(op);
@@ -25,11 +25,11 @@ public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<Upd
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
+    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions mc,
             LogicServices services) {
-        MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
+        MatchConditions result = match((Term) cursor.getCurrentElement(), mc, services);
         if (result != null) {
-            termPosition.gotoNextSibling();
+            cursor.gotoNextSibling();
         }
         return result;
     }

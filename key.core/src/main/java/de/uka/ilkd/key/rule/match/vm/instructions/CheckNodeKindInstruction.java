@@ -8,12 +8,19 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 
-public class UnbindVariablesInstruction implements MatchInstruction {
+public final class CheckNodeKindInstruction implements MatchInstruction {
+    private final Class<?> nodeType;
+
+    public CheckNodeKindInstruction(Class<?> nodeType) {
+        this.nodeType = nodeType;
+    }
 
     @Override
     public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
             LogicServices services) {
-        return matchConditions.shrinkRenameTable();
+        if (nodeType.isInstance(cursor.getCurrentElement())) {
+            return matchConditions;
+        }
+        return null;
     }
-
 }

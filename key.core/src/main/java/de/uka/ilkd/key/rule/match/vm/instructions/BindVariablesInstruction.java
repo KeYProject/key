@@ -10,9 +10,9 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -66,7 +66,7 @@ public class BindVariablesInstruction implements MatchInstruction {
     }
 
 
-    private static class VariableSVBinder extends MatchSchemaVariableInstruction<VariableSV>
+    private static class VariableSVBinder extends MatchSchemaVariableInstruction
             implements VariableBinderSubinstruction {
 
         public VariableSVBinder(VariableSV templateVar) {
@@ -88,7 +88,8 @@ public class BindVariablesInstruction implements MatchInstruction {
         }
 
         @Override
-        public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+        public MatchConditions match(PoolSyntaxElementCursor cursor,
+                MatchConditions matchConditions,
                 LogicServices services) {
             throw new UnsupportedOperationException();
         }
@@ -102,10 +103,10 @@ public class BindVariablesInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
             LogicServices services) {
         final ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =
-            termPosition.getCurrentSubterm().boundVars();
+            ((Term) cursor.getCurrentElement()).boundVars();
         matchConditions = matchConditions.extendRenameTable();
         if (variablesToMatchAndBind.size() == boundVarBinders.length) {
             for (int i = 0; i < boundVarBinders.length && matchConditions != null; i++) {

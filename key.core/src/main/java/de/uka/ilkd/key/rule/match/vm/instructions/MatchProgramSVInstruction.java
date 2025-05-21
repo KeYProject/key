@@ -11,15 +11,16 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<ProgramSV>
+public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction
         implements MatchOperatorInstruction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MatchProgramSVInstruction.class);
@@ -116,13 +117,19 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(TermNavigator termPosition,
+    public MatchConditions match(PoolSyntaxElementCursor cursor,
             MatchConditions mc,
             LogicServices services) {
-        MatchConditions result =
-            match(termPosition.getCurrentSubterm(), mc, services);
+        final SyntaxElement se = cursor.getCurrentElement();;
+        MatchConditions result = null;
+
+        if (se instanceof ProgramElement programElement) {
+            result = match(programElement, mc, services);
+        } else if (se instanceof Term term) {
+            result = match(term, mc, services);
+        }
         if (result != null) {
-            termPosition.gotoNextSibling();
+            cursor.gotoNextSibling();
         }
         return result;
     }
