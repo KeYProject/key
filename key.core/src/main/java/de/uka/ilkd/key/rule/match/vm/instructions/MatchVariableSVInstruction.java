@@ -7,11 +7,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
 
-public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<VariableSV> {
+public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction {
 
     protected MatchVariableSVInstruction(VariableSV op) {
         super(op);
@@ -34,11 +34,11 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
+    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions mc,
             LogicServices services) {
-        final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
+        final MatchConditions result = match((Term) cursor.getCurrentElement(), mc, services);
         if (result != null) {
-            termPosition.gotoNextSibling();
+            cursor.gotoNextSibling();
         }
         return result;
     }

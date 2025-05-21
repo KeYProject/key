@@ -8,23 +8,13 @@ import java.util.ArrayList;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
-import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
-import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
+import de.uka.ilkd.key.rule.match.vm.instructions.*;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -70,14 +60,12 @@ public class TacletMatchProgram {
      * @param op the {@link SchemaVariable} for which to get the instruction
      * @return the instruction for the specified variable
      */
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(
+    public static MatchSchemaVariableInstruction getMatchInstructionForSV(
             SchemaVariable op) {
-        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction;
+        MatchSchemaVariableInstruction instruction;
 
-        if (op instanceof FormulaSV formulaSV) {
-            instruction = Instruction.matchFormulaSV(formulaSV);
-        } else if (op instanceof TermSV termSV) {
-            instruction = Instruction.matchTermSV(termSV);
+        if (op instanceof TermSV || op instanceof FormulaSV) {
+            instruction = Instruction.matchTermOrFormulaSV((OperatorSV) op);
         } else if (op instanceof VariableSV variableSV) {
             instruction = Instruction.matchVariableSV(variableSV);
         } else if (op instanceof ProgramSV programSV) {
@@ -114,23 +102,50 @@ public class TacletMatchProgram {
             program.add(Instruction.matchTermLabelSV(pattern.getLabels()));
         }
 
-        if (op instanceof SchemaVariable) {
-            program.add(getMatchInstructionForSV((SchemaVariable) op));
-        } else if (op instanceof SortDependingFunction) {
-            program.add(Instruction.matchSortDependingFunction((SortDependingFunction) op));
-        } else if (op instanceof ElementaryUpdate) {
-            program.add(Instruction.matchElementaryUpdate((ElementaryUpdate) op));
-        } else if (op instanceof Modality mod) {
-            final var kind = mod.kind();
-            if (kind instanceof ModalOperatorSV sv) {
-                program.add(Instruction.matchModalOperatorSV(sv));
-            } else {
-                program.add(Instruction.matchModalOperator(mod));
-            }
-            final JavaProgramElement patternPrg = pattern.javaBlock().program();
-            program.add(Instruction.matchProgram(patternPrg));
+        if (op instanceof SchemaVariable sv) {
+            program.add(getMatchInstructionForSV(sv));
         } else {
-            program.add(Instruction.matchOp(op));
+            program.add(new CheckNodeKindInstruction(Term.class));
+            program.add(new GotoNextInstruction());
+            if (op instanceof final SortDependingFunction sortDependingFunction) {
+                program.add(new CheckNodeKindInstruction(SortDependingFunction.class));
+                program.add(new SimilarSortDependingFunctionInstruction(sortDependingFunction));
+                program.add(new GotoNextInstruction());
+                if (sortDependingFunction.getSortDependingOn() instanceof GenericSort gs) {
+                    program.add(new MatchGenericSortInstruction(gs));
+                } else {
+                    program.add(new MatchIdentityInstruction(sortDependingFunction.getChild(0)));
+                }
+                program.add(new GotoNextSiblingInstruction());
+            } else if (op instanceof ElementaryUpdate elUp) {
+                program.add(new CheckNodeKindInstruction(ElementaryUpdate.class));
+                program.add(new GotoNextInstruction());
+                if (elUp.lhs() instanceof SchemaVariable sv) {
+                    program.add(getMatchInstructionForSV(sv));
+                } else if (elUp.lhs() instanceof LocationVariable locVar) {
+                    program.add(new MatchIdentityInstruction(locVar));
+                    program.add(new GotoNextInstruction());
+                }
+            } else if (op instanceof Modality mod) {
+                program.add(new CheckNodeKindInstruction(Modality.class));
+                program.add(new GotoNextInstruction());
+                if (mod.kind() instanceof ModalOperatorSV modKindSV) {
+                    program.add(Instruction.matchModalOperatorSV(modKindSV));
+                } else {
+                    program.add(new MatchIdentityInstruction(mod.kind()));
+                }
+                program.add(new GotoNextInstruction());
+                final JavaProgramElement patternPrg = pattern.javaBlock().program();
+                program.add(Instruction.matchProgram(patternPrg));
+                program.add(new GotoNextSiblingInstruction());
+            } else {
+                program.add(new MatchIdentityInstruction(op));
+                program.add(new GotoNextInstruction());
+            }
+        }
+
+        if (!boundVars.isEmpty()) {
+            program.add(new GotoNextSiblingInstruction(boundVars.size()));
         }
 
         for (int i = 0; i < pattern.arity(); i++) {
@@ -161,7 +176,7 @@ public class TacletMatchProgram {
 
         MatchConditions mc = p_matchCond;
 
-        final TermNavigator navi = TermNavigator.get(p_toMatch);
+        final PoolSyntaxElementCursor navi = PoolSyntaxElementCursor.get(p_toMatch);
         int instrPtr = 0;
         while (mc != null && instrPtr < instruction.length && navi.hasNext()) {
             mc = instruction[instrPtr].match(navi, mc, services);
