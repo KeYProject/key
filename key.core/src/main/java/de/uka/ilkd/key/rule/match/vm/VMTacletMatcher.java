@@ -376,7 +376,7 @@ public class VMTacletMatcher implements TacletMatcher {
             org.key_project.prover.rules.instantiation.MatchConditions matchCond,
             LogicServices services) {
 
-        final MatchSchemaVariableInstruction<? extends SchemaVariable> instr =
+        final MatchSchemaVariableInstruction instr =
             TacletMatchProgram.getMatchInstructionForSV(sv);
 
         if (syntaxElement instanceof Term term) {

@@ -8,9 +8,9 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -48,9 +48,9 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
             LogicServices services) {
-        final Term term = termPosition.getCurrentSubterm();
+        final Term term = (Term) cursor.getCurrentElement();
         MatchConditions result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels
         // at the moment any termlabbel SV matches on all labels (or no label) (i.e., t<l1,l2> will

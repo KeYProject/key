@@ -4,16 +4,19 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.PoolSyntaxElementCursor;
 
-public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermSV> {
+public class MatchTermOrFormulaSVInstruction extends MatchSchemaVariableInstruction {
 
-    protected MatchTermSVInstruction(TermSV op) {
+    protected MatchTermOrFormulaSVInstruction(OperatorSV op) {
         super(op);
+        assert op instanceof TermSV || op instanceof FormulaSV;
     }
 
     /**
@@ -25,11 +28,11 @@ public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<TermS
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
+    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions mc,
             LogicServices services) {
-        final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
+        final MatchConditions result = match((Term) cursor.getCurrentElement(), mc, services);
         if (result != null) {
-            termPosition.gotoNextSibling();
+            cursor.gotoNextSibling();
         }
         return result;
     }
