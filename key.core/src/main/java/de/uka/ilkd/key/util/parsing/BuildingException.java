@@ -57,9 +57,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
         return getMessage() + " (" + getPosition(offendingSymbol) + ")";
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         if (offendingSymbol != null) {
             URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
             return new Location(uri, Position.fromToken(offendingSymbol));

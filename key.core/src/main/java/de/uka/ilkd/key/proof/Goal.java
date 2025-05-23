@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -524,8 +523,7 @@ public final class Goal {
      * @param n number of goals to create
      * @return the list of new created goals.
      */
-    @NonNull
-    public ImmutableList<Goal> split(int n) {
+    public @NonNull ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node
@@ -579,7 +577,7 @@ public final class Goal {
         for (IProgramVariable pv : node.getLocalProgVars()) {
             newNS.programVariables().add(pv);
         }
-        for (Function op : node.getLocalFunctions()) {
+        for (JFunction op : node.getLocalFunctions()) {
             newNS.functions().add(op);
         }
 
@@ -628,7 +626,7 @@ public final class Goal {
         } else {
             proof.replace(this, goalList);
             if (ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
-                    || ruleApp instanceof SMTRuleApp) {
+                    || ruleApp instanceof AbstractExternalSolverRuleApp) {
                 // the first new goal is the one to be closed
                 proof.closeGoal(goalList.head());
             }
@@ -650,7 +648,7 @@ public final class Goal {
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
-        Collection<Function> newFunctions = localNamespaces.functions().elements();
+        Collection<JFunction> newFunctions = localNamespaces.functions().elements();
 
         localNamespaces.flushToParent();
 

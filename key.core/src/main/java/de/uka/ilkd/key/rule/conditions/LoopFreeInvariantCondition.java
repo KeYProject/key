@@ -16,13 +16,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * Extracts the free loop invariants for the given loop term. Free invariants are only assumed, but
@@ -43,7 +44,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
@@ -67,10 +68,13 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         final Term selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        final Modality modality = (Modality) svInst.getInstantiation(modalitySV);
+        // TODO: Handle exception?!
+        final Modality.JavaModalityKind modalityKind =
+            (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
         Term freeInvInst = tb.tt();
-        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modality, services)) {
+        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
+            services)) {
             final Term currentFreeInvInst = freeInvInst;
 
             final Optional<Term> maybeFreeInvInst = Optional.ofNullable(

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -88,8 +89,7 @@ public class ClashFreeSubst {
         for (int i = 0; i < arity; i++) {
             applyOnSubterm(t, i, newSubterms, newBoundVars);
         }
-        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(),
-            t.getLabels());
+        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.getLabels());
     }
 
     /**
@@ -142,7 +142,7 @@ public class ClashFreeSubst {
                     usedVars = usedVars.add(boundVars.get(i));
                 }
                 // Get a new variable with a fitting name.
-                QuantifiableVariable qv1 = newVarFor(qv, usedVars);
+                LogicVariable qv1 = newVarFor(qv, usedVars);
 
                 // Substitute that for the old one.
                 newBoundVars[varInd] = qv1;
@@ -207,7 +207,7 @@ public class ClashFreeSubst {
      * <P>
      * Assumes that <code>var</code> is a @link{LogicVariable}.
      */
-    protected QuantifiableVariable newVarFor(QuantifiableVariable var,
+    protected LogicVariable newVarFor(QuantifiableVariable var,
             ImmutableSet<QuantifiableVariable> usedVars) {
         LogicVariable lv = (LogicVariable) var;
         String stem = var.name().toString();
@@ -235,7 +235,7 @@ public class ClashFreeSubst {
     /**
      * A Visitor class to collect all (not just the free) variables occurring in a term.
      */
-    public static class VariableCollectVisitor extends DefaultVisitor {
+    public static class VariableCollectVisitor implements DefaultVisitor {
         /** the collected variables */
         private ImmutableSet<QuantifiableVariable> vars;
 
@@ -246,11 +246,11 @@ public class ClashFreeSubst {
 
         @Override
         public void visit(Term t) {
-            if (t.op() instanceof QuantifiableVariable) {
-                vars = vars.add((QuantifiableVariable) t.op());
+            if (t.op() instanceof QuantifiableVariable qv) {
+                vars = vars.add(qv);
             } else {
                 for (int i = 0; i < t.arity(); i++) {
-                    ImmutableArray<QuantifiableVariable> vbh = t.varsBoundHere(i);
+                    var vbh = t.varsBoundHere(i);
                     for (int j = 0; j < vbh.size(); j++) {
                         vars = vars.add(vbh.get(j));
                     }

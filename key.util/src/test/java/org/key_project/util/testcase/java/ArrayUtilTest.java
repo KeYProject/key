@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,24 +21,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ArrayUtilTest {
     @Test
     public void testInsert() {
+        @Nullable
         String[] array = { "A", "B", "C" };
         // Test possible indices
         assertArray(ArrayUtil.insert(array, "X", 0), "X", "A", "B", "C");
         assertArray(ArrayUtil.insert(array, "X", 1), "A", "X", "B", "C");
         assertArray(ArrayUtil.insert(array, "X", 2), "A", "B", "X", "C");
         assertArray(ArrayUtil.insert(array, "X", 3), "A", "B", "C", "X");
-        // Test null array
-        assertArray(ArrayUtil.insert(null, "X", 0), "X");
         // Test null element
         assertArray(ArrayUtil.insert(array, null, 1), "A", null, "B", "C");
-        // Test null array an delement
-        try {
-            ArrayUtil.insert(null, null, 0);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertEquals("Can not create an array if array and element to insert are null.",
-                e.getMessage());
-        }
         // Test invalid indices
         try {
             ArrayUtil.insert(array, "X", -1);
@@ -52,7 +44,7 @@ public class ArrayUtilTest {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void assertArray(T[] current, T... expected) {
+    private <T extends @Nullable Object> void assertArray(T[] current, T... expected) {
         assertNotNull(current);
         assertEquals(current.length, expected.length);
         for (int i = 0; i < current.length; i++) {
@@ -65,14 +57,13 @@ public class ArrayUtilTest {
      */
     @Test
     public void testSearch() {
+        @Nullable
         String[] array = { "A", "B", "C", "D" };
-        assertEquals("A", ArrayUtil.search(array, "A"::equals));
-        assertEquals("B", ArrayUtil.search(array, "B"::equals));
-        assertEquals("C", ArrayUtil.search(array, "C"::equals));
-        assertEquals("D", ArrayUtil.search(array, "D"::equals));
-        assertNull(ArrayUtil.search(array, "E"::equals));
-        assertNull(ArrayUtil.search(array, null));
-        assertNull(ArrayUtil.search(null, "E"::equals));
+        assertEquals("A", ArrayUtil.<@Nullable String>search(array, "A"::equals));
+        assertEquals("B", ArrayUtil.<@Nullable String>search(array, "B"::equals));
+        assertEquals("C", ArrayUtil.<@Nullable String>search(array, "C"::equals));
+        assertEquals("D", ArrayUtil.<@Nullable String>search(array, "D"::equals));
+        assertNull(ArrayUtil.<@Nullable String>search(array, "E"::equals));
     }
 
     /**
@@ -80,7 +71,6 @@ public class ArrayUtilTest {
      */
     @Test
     public void testIsEmpty() {
-        assertTrue(ArrayUtil.isEmpty(null));
         assertTrue(ArrayUtil.isEmpty(new String[] {}));
         assertFalse(ArrayUtil.isEmpty(new String[] { "A" }));
         assertFalse(ArrayUtil.isEmpty(new String[] { null }));
@@ -92,12 +82,10 @@ public class ArrayUtilTest {
      */
     @Test
     public void testToString_int_String() {
-        assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString((int[]) null, ";"));
         assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(new int[] {}, ";"));
         assertEquals("1", ArrayUtil.toString(new int[] { 1 }, ";"));
         assertEquals("1;2", ArrayUtil.toString(new int[] { 1, 2 }, ";"));
         assertEquals("1;2;3", ArrayUtil.toString(new int[] { 1, 2, 3 }, ";"));
-        assertEquals("1null2null3", ArrayUtil.toString(new int[] { 1, 2, 3 }, null));
     }
 
     /**
@@ -105,7 +93,6 @@ public class ArrayUtilTest {
      */
     @Test
     public void testToString_int() {
-        assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString((int[]) null));
         assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(new int[] {}));
         assertEquals("1", ArrayUtil.toString(new int[] { 1 }));
         assertEquals("1, 2", ArrayUtil.toString(new int[] { 1, 2 }));
@@ -117,14 +104,11 @@ public class ArrayUtilTest {
      */
     @Test
     public void testToString_Object_String() {
-        assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString((String[]) null, ";"));
         assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(new String[] {}, ";"));
         assertEquals("A", ArrayUtil.toString(new String[] { "A" }, ";"));
         assertEquals("A;B", ArrayUtil.toString(new String[] { "A", "B" }, ";"));
         assertEquals("A;B;null", ArrayUtil.toString(new String[] { "A", "B", null }, ";"));
         assertEquals("A;B;null;D", ArrayUtil.toString(new String[] { "A", "B", null, "D" }, ";"));
-        assertEquals("AnullBnullnullnullD",
-            ArrayUtil.toString(new String[] { "A", "B", null, "D" }, null));
     }
 
     /**
@@ -132,7 +116,6 @@ public class ArrayUtilTest {
      */
     @Test
     public void testToString_Object() {
-        assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString((String[]) null));
         assertEquals(StringUtil.EMPTY_STRING, ArrayUtil.toString(new String[] {}));
         assertEquals("A", ArrayUtil.toString(new String[] { "A" }));
         assertEquals("A, B", ArrayUtil.toString(new String[] { "A", "B" }));
@@ -146,7 +129,8 @@ public class ArrayUtilTest {
     @Test
     public void testRemove() {
         // Test remove on array
-        String[] array = new String[] { "A", "B", "C", null, "D", null, null, "C", "A" };
+        @Nullable
+        String[] array = new @Nullable String[] { "A", "B", "C", null, "D", null, null, "C", "A" };
         array = ArrayUtil.remove(array, "B"); // Remove B
         assertArrayEquals(array, "A", "C", null, "D", null, null, "C", "A");
         array = ArrayUtil.remove(array, "B"); // Remove B again
@@ -163,9 +147,6 @@ public class ArrayUtilTest {
         assertArrayEquals(array);
         array = ArrayUtil.remove(array, "A"); // Remove A
         assertArrayEquals(array);
-        // Test null array
-        array = ArrayUtil.remove(null, "X");
-        assertNull(array);
     }
 
     /**
@@ -190,32 +171,14 @@ public class ArrayUtilTest {
     public void testAddAll() {
         String[] first = new String[] { "A", "B", "C" };
         String[] second = new String[] { "D", "E" };
-        // Test first parameter null
-        String[] combined = ArrayUtil.addAll(null, second);
-        assertEquals(2, combined.length);
-        assertEquals("D", combined[0]);
-        assertEquals("E", combined[1]);
-        // Test second parameter null
-        combined = ArrayUtil.addAll(first, null);
-        assertEquals(3, combined.length);
-        assertEquals("A", combined[0]);
-        assertEquals("B", combined[1]);
-        assertEquals("C", combined[2]);
-        // Test both parameter valid
-        combined = ArrayUtil.addAll(first, second);
+        @Nullable
+        String[] combined = ArrayUtil.addAll(first, second);
         assertEquals(5, combined.length);
         assertEquals("A", combined[0]);
         assertEquals("B", combined[1]);
         assertEquals("C", combined[2]);
         assertEquals("D", combined[3]);
         assertEquals("E", combined[4]);
-        // Test both parameter null
-        try {
-            ArrayUtil.addAll(null, null);
-            fail("Exception expected if both parameters are null.");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Can not create an array if both paramters are null.", e.getMessage());
-        }
     }
 
     /**
@@ -225,21 +188,8 @@ public class ArrayUtilTest {
     public void testAddAll_newType() {
         String[] first = new String[] { "A", "B", "C" };
         String[] second = new String[] { "D", "E" };
-        // Test first parameter null
-        Object[] combined = ArrayUtil.addAll(null, second, Object.class);
-        assertEquals(Object.class, combined.getClass().getComponentType());
-        assertEquals(2, combined.length);
-        assertEquals("D", combined[0]);
-        assertEquals("E", combined[1]);
-        // Test second parameter null
-        combined = ArrayUtil.addAll(first, null, Object.class);
-        assertEquals(Object.class, combined.getClass().getComponentType());
-        assertEquals(3, combined.length);
-        assertEquals("A", combined[0]);
-        assertEquals("B", combined[1]);
-        assertEquals("C", combined[2]);
-        // Test both parameter valid
-        combined = ArrayUtil.addAll(first, second, Object.class);
+        @Nullable
+        Object[] combined = ArrayUtil.addAll(first, second, Object.class);
         assertEquals(Object.class, combined.getClass().getComponentType());
         assertEquals(5, combined.length);
         assertEquals("A", combined[0]);
@@ -247,10 +197,6 @@ public class ArrayUtilTest {
         assertEquals("C", combined[2]);
         assertEquals("D", combined[3]);
         assertEquals("E", combined[4]);
-        // Test both parameter null
-        combined = ArrayUtil.addAll(null, null, Object.class);
-        assertEquals(Object.class, combined.getClass().getComponentType());
-        assertEquals(0, combined.length);
     }
 
     /**
@@ -258,14 +204,9 @@ public class ArrayUtilTest {
      */
     @Test
     public void testAdd_int() {
-        // Test null array
-        int[] result = ArrayUtil.add(null, 1);
-        assertNotNull(result);
-        assertEquals(1, result.length);
-        assertEquals(1, result[0]);
         // Test empty array
         int[] array = new int[] {};
-        result = ArrayUtil.add(array, 1);
+        int[] result = ArrayUtil.add(array, 1);
         assertNotNull(result);
         assertEquals(1, result.length);
         assertEquals(1, result[0]);
@@ -300,14 +241,11 @@ public class ArrayUtilTest {
      */
     @Test
     public void testAdd_Object() {
-        // Test null array
-        String[] result = ArrayUtil.add(null, "A");
-        assertNotNull(result);
-        assertEquals(1, result.length);
-        assertEquals("A", result[0]);
         // Test empty array
+        @Nullable
         String[] array = new String[] {};
-        result = ArrayUtil.add(array, "A");
+        @Nullable
+        String[] result = ArrayUtil.add(array, "A");
         assertNotNull(result);
         assertEquals(1, result.length);
         assertEquals("A", result[0]);
@@ -344,13 +282,6 @@ public class ArrayUtilTest {
         assertEquals("B", result[1]);
         assertEquals("C", result[2]);
         assertNull(result[3]);
-        // Test null new element on null array
-        try {
-            ArrayUtil.add(null, null);
-            fail("Exception expected if both parameters are null.");
-        } catch (IllegalArgumentException e) {
-            assertEquals("Can not create an array if both paramters are null.", e.getMessage());
-        }
     }
 
     /**
@@ -360,14 +291,13 @@ public class ArrayUtilTest {
     public void testContains() {
         String[] array = { "A", "B", "C" };
         assertFalse(ArrayUtil.contains(array, null));
-        assertFalse(ArrayUtil.contains(null, "A"));
         assertTrue(ArrayUtil.contains(array, "A"));
         assertTrue(ArrayUtil.contains(array, "B"));
         assertTrue(ArrayUtil.contains(array, "C"));
         assertFalse(ArrayUtil.contains(array, "D"));
+        @Nullable
         String[] arrayWithNull = { "A", "B", null, "D" };
         assertTrue(ArrayUtil.contains(arrayWithNull, null));
-        assertFalse(ArrayUtil.contains(null, "A"));
         assertTrue(ArrayUtil.contains(arrayWithNull, "A"));
         assertTrue(ArrayUtil.contains(arrayWithNull, "B"));
         assertFalse(ArrayUtil.contains(arrayWithNull, "C"));
@@ -375,7 +305,6 @@ public class ArrayUtilTest {
         assertFalse(ArrayUtil.contains(arrayWithNull, "E"));
         String[] arrayWithDoubleElements = { "B", "A", "C", "B", "C" };
         assertFalse(ArrayUtil.contains(arrayWithDoubleElements, null));
-        assertFalse(ArrayUtil.contains(null, "A"));
         assertTrue(ArrayUtil.contains(arrayWithDoubleElements, "A"));
         assertTrue(ArrayUtil.contains(arrayWithDoubleElements, "B"));
         assertTrue(ArrayUtil.contains(arrayWithDoubleElements, "C"));
@@ -389,14 +318,13 @@ public class ArrayUtilTest {
     public void testIndexOf() {
         String[] array = { "A", "B", "C" };
         assertEquals(-1, ArrayUtil.indexOf(array, null));
-        assertEquals(-1, ArrayUtil.indexOf(null, "A"));
         assertEquals(0, ArrayUtil.indexOf(array, "A"));
         assertEquals(1, ArrayUtil.indexOf(array, "B"));
         assertEquals(2, ArrayUtil.indexOf(array, "C"));
         assertEquals(-1, ArrayUtil.indexOf(array, "D"));
+        @Nullable
         String[] arrayWithNull = { "A", "B", null, "D" };
         assertEquals(2, ArrayUtil.indexOf(arrayWithNull, null));
-        assertEquals(-1, ArrayUtil.indexOf(null, "A"));
         assertEquals(0, ArrayUtil.indexOf(arrayWithNull, "A"));
         assertEquals(1, ArrayUtil.indexOf(arrayWithNull, "B"));
         assertEquals(-1, ArrayUtil.indexOf(arrayWithNull, "C"));
@@ -404,7 +332,6 @@ public class ArrayUtilTest {
         assertEquals(-1, ArrayUtil.indexOf(arrayWithNull, "E"));
         String[] arrayWithDoubleElements = { "B", "A", "C", "B", "C" };
         assertEquals(-1, ArrayUtil.indexOf(arrayWithDoubleElements, null));
-        assertEquals(-1, ArrayUtil.indexOf(null, "A"));
         assertEquals(1, ArrayUtil.indexOf(arrayWithDoubleElements, "A"));
         assertEquals(0, ArrayUtil.indexOf(arrayWithDoubleElements, "B"));
         assertEquals(2, ArrayUtil.indexOf(arrayWithDoubleElements, "C"));

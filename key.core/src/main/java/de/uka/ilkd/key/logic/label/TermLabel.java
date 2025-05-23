@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
-import de.uka.ilkd.key.logic.*;
+
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -15,6 +18,10 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.TerminalSyntaxElement;
 
 // spotless:off     // this protects the JavaDoc from automatic reformatting
 /**
@@ -29,8 +36,8 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * without parameters class {@link ParameterlessTermLabel} can be used.
  * </p>
  * <p>
- * A term label can have parameters accessible via {@link #getChild(int)} and
- * {@link #getChildCount()}. Such parameters can be any {@link Object}. But keep in mind that it is
+ * A term label can have parameters accessible via {@link #getTLChild(int)} and
+ * {@link #getTLChildCount()}. Such parameters can be any {@link Object}. But keep in mind that it is
  * required to parse {@link String}s into {@link Term}s, e.g. if it is used in a Taclet definition
  * or if a cut rule is applied. For convenience parameters are always printed as {@link String}s
  * and have to be parsed individually into the required {@link Object} instances via a
@@ -145,7 +152,7 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * @see TermLabelManager
  */
 // spotless:on
-public interface TermLabel extends Named {
+public interface TermLabel extends Named, SyntaxElement, /* TODO: Remove */ TerminalSyntaxElement {
 
     /**
      * Retrieves the i-th parameter object of this term label.
@@ -156,16 +163,16 @@ public interface TermLabel extends Named {
      * @param i the number of the parameter to retrieve ( {@code 0 <= i < getChildCount()})
      * @return the selected parameter
      * @throws IndexOutOfBoundsException if the given parameter number <tt>i</tt> is negative or
-     *         greater-or-equal the number of parameters returned by {@link #getChildCount()}
+     *         greater-or-equal the number of parameters returned by {@link #getTLChildCount()}
      */
-    Object getChild(int i);
+    Object getTLChild(int i);
 
     /**
      * Gets the number of parameters of this term label.
      *
      * @return the number of parameters (a non-negative number)
      */
-    int getChildCount();
+    int getTLChildCount();
 
     /**
      * Returns {@code true} iff this label is used in any way during the proof. E.g.,

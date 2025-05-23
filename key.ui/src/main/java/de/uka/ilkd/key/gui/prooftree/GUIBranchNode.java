@@ -124,9 +124,8 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
         childrenCache = null;
     }
 
-    @NonNull
     @Override
-    public String getSearchString() {
+    public @NonNull String getSearchString() {
         return toString();
     }
 

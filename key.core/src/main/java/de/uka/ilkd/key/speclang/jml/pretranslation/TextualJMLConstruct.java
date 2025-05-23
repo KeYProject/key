@@ -9,12 +9,12 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -26,7 +26,7 @@ import org.jspecify.annotations.NonNull;
  */
 public abstract class TextualJMLConstruct {
 
-    protected final ImmutableList<JMLModifier> mods;
+    protected final ImmutableList<JMLModifier> modifiers;
     private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
@@ -35,13 +35,13 @@ public abstract class TextualJMLConstruct {
      */
     protected String name;
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> mods) {
-        assert mods != null;
-        this.mods = mods;
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
+        assert specModifiers != null;
+        this.modifiers = specModifiers;
     }
 
-    public TextualJMLConstruct(ImmutableList<JMLModifier> mods, String name) {
-        this(mods);
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+        this(specModifiers);
         this.name = name;
     }
 
@@ -61,8 +61,8 @@ public abstract class TextualJMLConstruct {
         this.loopContract = loopContract;
     }
 
-    public final ImmutableList<JMLModifier> getMods() {
-        return mods;
+    public final ImmutableList<JMLModifier> getModifiers() {
+        return modifiers;
     }
 
     /**

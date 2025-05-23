@@ -9,7 +9,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -18,10 +17,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
@@ -35,6 +33,8 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -105,7 +105,7 @@ public class TriggeredInstantiations implements TermGenerator {
                 if (tapp.uninstantiatedVars().size() <= 1) {
                     SVInstantiations svInst = tapp.instantiations();
 
-                    final SchemaVariable sv = taclet.getTrigger().triggerVar();
+                    final OperatorSV sv = taclet.getTrigger().triggerVar();
                     final Sort svSort;
                     if (sv.sort() instanceof GenericSort) {
                         svSort = svInst.getGenericSortInstantiations().getRealSort(sv, services);
@@ -116,7 +116,7 @@ public class TriggeredInstantiations implements TermGenerator {
                     final Metavariable mv = new Metavariable(new Name("$MV$" + sv.name()), svSort);
 
                     final Term trigger = instantiateTerm(taclet.getTrigger().getTerm(), services,
-                        svInst.replace(sv, services.getTermBuilder().var(mv), services));
+                        svInst.replace(sv, services.getTermFactory().createTerm(mv), services));
 
                     final Set<Term> instances =
                         computeInstances(services, comprehension, mv, trigger, terms, axioms, tapp);
@@ -158,7 +158,8 @@ public class TriggeredInstantiations implements TermGenerator {
 
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
-            if (sf.formula().op() instanceof Function || sf.formula().op() == Equality.EQUALS) {
+            if (sf.formula().op() instanceof JFunction
+                    || sf.formula().op() == Equality.EQUALS) {
                 axioms.add(
                     inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
             }

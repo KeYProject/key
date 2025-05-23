@@ -49,10 +49,8 @@ public class KeyIO {
 
     private final Services services;
     private final NamespaceSet nss;
-    @Nullable
-    private Namespace<SchemaVariable> schemaNamespace;
-    @Nullable
-    private List<BuildingIssue> warnings;
+    private @Nullable Namespace<SchemaVariable> schemaNamespace;
+    private List<BuildingIssue> warnings = new LinkedList<>();
     private AbbrevMap abbrevMap;
 
 
@@ -90,6 +88,10 @@ public class KeyIO {
      */
     public @NonNull Term parseExpression(@NonNull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
+        return interpretExpression(ctx);
+    }
+
+    private Term interpretExpression(KeyAst.Term ctx) {
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
         if (schemaNamespace != null) {
@@ -118,6 +120,10 @@ public class KeyIO {
         Sequent seq = (Sequent) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return seq;
+    }
+
+    public Sequent parseSequent(String sequent) {
+        return parseSequent(CharStreams.fromString(sequent));
     }
 
     public Services getServices() {
@@ -166,23 +172,29 @@ public class KeyIO {
     public List<Taclet> findTaclets(KeyAst.File ctx) {
         TacletPBuilder visitor = new TacletPBuilder(services, nss);
         ctx.accept(visitor);
+        warnings.addAll(visitor.getBuildingIssues());
         return visitor.getTopLevelTaclets();
     }
 
     /**
      * @param ctx
+     * @return
      */
-    public void evalDeclarations(KeyAst.File ctx) {
+    public List<BuildingIssue> evalDeclarations(KeyAst.File ctx) {
         DeclarationBuilder declBuilder = new DeclarationBuilder(services, nss);
         ctx.accept(declBuilder);
+        warnings.addAll(declBuilder.getBuildingIssues());
+        return declBuilder.getBuildingIssues();
     }
 
     /**
      * @param ctx
      */
-    public void evalFuncAndPred(KeyAst.File ctx) {
+    public List<BuildingIssue> evalFuncAndPred(KeyAst.File ctx) {
         FunctionPredicateBuilder visitor = new FunctionPredicateBuilder(services, nss);
         ctx.accept(visitor);
+        warnings.addAll(visitor.getBuildingIssues());
+        return visitor.getBuildingIssues();
     }
 
 
@@ -198,13 +210,11 @@ public class KeyIO {
         return abbrevMap;
     }
 
-    @Nullable
     public List<BuildingIssue> getWarnings() {
         return warnings;
     }
 
-    @Nullable
-    public List<BuildingIssue> resetWarnings() {
+    public @Nullable List<BuildingIssue> resetWarnings() {
         var w = warnings;
         warnings = new LinkedList<>();
         return w;

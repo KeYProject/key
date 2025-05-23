@@ -9,7 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 public class AbbrevMap {
 
@@ -161,18 +162,18 @@ public class AbbrevMap {
     public record AbbrevWrapper(Term t) {
 
         @Override
-            public boolean equals(Object o) {
-                if (!(o instanceof AbbrevWrapper scw)) {
-                    return false;
-                }
-                if (scw.getTerm() == t) {
-                    return true;
-                }
-                return t.equals(scw.getTerm());
+        public boolean equals(Object o) {
+            if (!(o instanceof AbbrevWrapper scw)) {
+                return false;
             }
-
-            public Term getTerm() {
-                return t;
+            if (scw.getTerm() == t) {
+                return true;
             }
+            return t.equals(scw.getTerm());
         }
+
+        public Term getTerm() {
+            return t;
+        }
+    }
 }

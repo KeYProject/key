@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -10,14 +12,16 @@ import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
@@ -37,8 +41,8 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (5.12.19)
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
-    @NonNull
-    final T ctx;
+
+    final @NonNull T ctx;
 
     protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;
@@ -53,12 +57,22 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         return getClass().getName() + ": " + BuilderHelpers.getPosition(ctx);
     }
 
+    public Location getStartLocation() {
+        return Location.fromToken(ctx.start);
+    }
+
+    public String getText() {
+        var interval = new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1);
+        return ctx.start.getInputStream().getText(interval);
+    }
+
     public static class File extends KeyAst<KeYParser.FileContext> {
         File(KeYParser.FileContext ctx) {
             super(ctx);
         }
 
-        public @Nullable ProofSettings findProofSettings() {
+        @Nullable
+        public ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
 
             if (ctx.preferences() != null && ctx.preferences().s != null) {
@@ -73,12 +87,32 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return settings;
         }
 
-        public @Nullable Triple<String, Integer, Integer> findProofScript() {
-            if (ctx.problem() != null && ctx.problem().proofScript() != null) {
-                KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
-                String text = pctx.ps.getText();
-                return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
-                    pctx.ps.getCharPositionInLine());
+        /**
+         * Returns the a {@link ProofScriptEntry} from the underlying AST if an {@code \proofscript}
+         * entry is present.
+         * The {@code url} is used as the source of input and might be later used for error message,
+         * or including
+         * other files.
+         *
+         * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
+         */
+        public @Nullable ProofScript findProofScript() {
+            if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
+                KeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
+
+                KeYParser.ProofScriptContext ps;
+                if (pctx.STRING_LITERAL() != null) {
+                    var ctx = pctx.STRING_LITERAL().getSymbol();
+                    String text = pctx.STRING_LITERAL().getText();
+
+                    // +1 for the removal of the quote.
+                    text = StringUtil.move(StringUtil.trim(text, '"'), ctx.getLine(),
+                        ctx.getCharPositionInLine() + 1);
+                    return ParsingFacade.parseScript(
+                        CharStreams.fromString(text, ctx.getTokenSource().getSourceName()));
+                } else {
+                    return new KeyAst.ProofScript(pctx.proofScript());
+                }
             }
             return null;
         }
@@ -145,7 +179,28 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             if (!res.isEmpty())
                 return (Configuration) res.get(0);
             else
-                throw new RuntimeException();
+                throw new RuntimeException("Error in configuration. Source: "
+                    + ctx.start.getTokenSource().getSourceName());
+        }
+    }
+
+    public static class SetStatementContext extends KeyAst<JmlParser.Set_statementContext> {
+        public SetStatementContext(JmlParser.@NonNull Set_statementContext ctx) {
+            super(ctx);
+        }
+
+        public Expression getAssignee() {
+            return new Expression(ctx.assignee);
+        }
+
+        public Expression getValue() {
+            return new Expression(ctx.value);
+        }
+    }
+
+    public static class Expression extends KeyAst<JmlParser.ExpressionContext> {
+        public Expression(JmlParser.@NonNull ExpressionContext ctx) {
+            super(ctx);
         }
     }
 
@@ -165,6 +220,29 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Taclet extends KeyAst<KeYParser.TacletContext> {
         public Taclet(KeYParser.TacletContext taclet) {
             super(taclet);
+        }
+    }
+
+    /**
+     * This struct encapsulate the information of a proof script found in key files.
+     *
+     * @author Alexander Weigl
+     * @version 1 (23.04.24)
+     */
+    public static class ProofScript extends KeyAst<KeYParser.ProofScriptContext> {
+        ProofScript(KeYParser.@NonNull ProofScriptContext ctx) {
+            super(ctx);
+        }
+
+        public URI getUrl() {
+            final var sourceName = ctx.start.getTokenSource().getSourceName();
+            try {
+                if (sourceName.startsWith("file:") || sourceName.startsWith("http:")
+                        || sourceName.startsWith("jar:"))
+                    return new URI(sourceName);
+            } catch (URISyntaxException ignored) {
+            }
+            return new java.io.File(sourceName).toURI();
         }
     }
 }

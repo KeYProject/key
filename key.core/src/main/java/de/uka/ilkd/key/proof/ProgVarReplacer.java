@@ -31,7 +31,7 @@ public final class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    private final Map<ProgramVariable, ProgramVariable> map;
+    private final Map<LocationVariable, LocationVariable> map;
 
 
     /**
@@ -43,7 +43,7 @@ public final class ProgVarReplacer {
     /**
      * creates a ProgVarReplacer that replaces program variables as specified by the map parameter
      */
-    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplacer(Map<LocationVariable, LocationVariable> map, Services services) {
         this.map = map;
         this.services = services;
     }
@@ -238,18 +238,22 @@ public final class ProgVarReplacer {
             }
         }
 
+        Operator op = t.op();
+
+        // TODO (DD): Clean up
         final JavaBlock jb = t.javaBlock();
         JavaBlock newJb = jb;
-        if (!jb.isEmpty()) {
+        if (op instanceof Modality mod) {
             Statement s = (Statement) jb.program();
             Statement newS = (Statement) replace(s);
             if (newS != s) {
                 newJb = JavaBlock.createJavaBlock((StatementBlock) newS);
+                op = Modality.getModality(mod.kind(), newJb);
             }
         }
 
         if (changedSubTerm || newJb != jb) {
-            result = services.getTermFactory().createTerm(t.op(), newSubTerms, t.boundVars(), newJb,
+            result = services.getTermFactory().createTerm(op, newSubTerms, t.boundVars(),
                 t.getLabels());
         }
         return result;

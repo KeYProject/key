@@ -221,15 +221,13 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         return buttonPanel;
     }
 
-    @NonNull
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Exploration Steps";
     }
 
-    @NonNull
     @Override
-    public JComponent getComponent() {
+    public @NonNull JComponent getComponent() {
         return this;
     }
 

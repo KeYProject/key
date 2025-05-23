@@ -1,4 +1,5 @@
-description "Computiation of the proof core (the essential rule applications to close a proof)"
+description "Proof slicing (removing of unnecessary nodes) for the KeY system."
+
 
 dependencies {
     implementation project(":key.core")

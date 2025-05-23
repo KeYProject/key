@@ -5,9 +5,8 @@ package org.key_project.slicing;
 
 import java.util.List;
 
-import de.uka.ilkd.key.util.Pair;
-
 import org.key_project.slicing.graph.DependencyGraph;
+import org.key_project.util.collection.Pair;
 
 import org.junit.jupiter.api.Test;
 
@@ -59,14 +58,14 @@ class DependencyGraphTest {
         var incomingClosedGoal =
             graph.incomingGraphEdgesOf(closedGoal).toList();
         assertEquals(1, incomingClosedGoal.size());
-        assertEquals(formB, incomingClosedGoal.get(0).second);
+        assertEquals(formB, incomingClosedGoal.get(0).toNode());
 
         var incomingFormB = graph.incomingGraphEdgesOf(formB).toList();
         assertEquals(2, incomingFormB.size());
-        if (incomingFormB.get(0).second.equals(formA)) {
-            assertEquals(formC, incomingFormB.get(1).second);
+        if (incomingFormB.get(0).toNode().equals(formA)) {
+            assertEquals(formC, incomingFormB.get(1).toNode());
         } else {
-            assertEquals(formA, incomingFormB.get(1).second);
+            assertEquals(formA, incomingFormB.get(1).toNode());
         }
 
         assertTrue(graph.containsNode(formA));

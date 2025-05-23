@@ -6,10 +6,11 @@ package de.uka.ilkd.key.logic.label;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
+
+import org.key_project.logic.Name;
 
 /**
  * A {@link TermLabelState} is used to share information between participants which manage

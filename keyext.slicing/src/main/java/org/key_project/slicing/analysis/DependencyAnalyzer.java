@@ -36,7 +36,6 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.RuleStatistics;
@@ -49,6 +48,7 @@ import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,7 +242,7 @@ public final class DependencyAnalyzer {
         executionTime.stop(TOTAL_WORK);
 
         return new AnalysisResults(
-            proof, steps, rules, usefulSteps, usefulFormulas, uselessBranches,
+            proof, graph, steps, rules, usefulSteps, usefulFormulas, uselessBranches,
             branchStacks, doDependencyAnalysis, doDeduplicateRuleApps, executionTime);
     }
 
@@ -444,7 +444,7 @@ public final class DependencyAnalyzer {
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
             Map<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> foundDupes = new HashMap<>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
-                Node proofNode = t.first;
+                Node proofNode = t.fromNode();
 
                 // this analysis algorithm does not support proofs with State Merging
                 if (proofNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
@@ -465,7 +465,7 @@ public final class DependencyAnalyzer {
                 }
                 // Only try to deduplicate the addition of new formulas.
                 // It is unlikely that two closed goals are derived using the same formula.
-                GraphNode produced = t.second;
+                GraphNode produced = t.toNode();
                 if (!(produced instanceof TrackedFormula)) {
                     return;
                 }
@@ -473,7 +473,7 @@ public final class DependencyAnalyzer {
                         .computeIfAbsent(
                             new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp()),
                             _a -> new LinkedHashSet<>())
-                        .add(t.third.getProofStep());
+                        .add(t.annotation().getProofStep());
             });
 
             // scan dupes, try to find a set of mergable rule applications

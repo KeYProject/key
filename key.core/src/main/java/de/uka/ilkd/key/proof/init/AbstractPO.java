@@ -9,11 +9,11 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -22,13 +22,15 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.util.Pair;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 /**
@@ -151,7 +153,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(ProgramVariable pv, Services services) {
+    protected final void register(LocationVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
@@ -159,18 +161,18 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(ImmutableList<ProgramVariable> pvs, Services services) {
-        for (ProgramVariable pv : pvs) {
+    protected final void register(ImmutableList<LocationVariable> pvs, Services services) {
+        for (LocationVariable pv : pvs) {
             register(pv, services);
         }
     }
 
 
-    protected final void register(Function f, Services services) {
-        Namespace<Function> functionNames = services.getNamespaces().functions();
+    protected final void register(JFunction f, Services services) {
+        Namespace<JFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
-            if (f.sort() == Sort.FORMULA) {
+            assert f.sort() != JavaDLTheory.UPDATE;
+            if (f.sort() == JavaDLTheory.FORMULA) {
                 functionNames.addSafely(f);
             } else {
                 functionNames.addSafely(f);
@@ -524,11 +526,15 @@ public abstract class AbstractPO implements IPersistablePO {
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) {
-        properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
-        properties.setProperty(IPersistablePO.PROPERTY_NAME, name);
+    public Configuration createLoaderConfig() {
+        var c = new Configuration();
+        c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
+        c.set(IPersistablePO.PROPERTY_NAME, name);
+        return c;
     }
 
     /**
@@ -537,8 +543,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param properties The properties to read from.
      * @return The name value.
      */
-    public static String getName(Properties properties) {
-        return properties.getProperty(IPersistablePO.PROPERTY_NAME);
+    public static String getName(Configuration properties) {
+        return properties.getString(IPersistablePO.PROPERTY_NAME);
     }
 
     /**

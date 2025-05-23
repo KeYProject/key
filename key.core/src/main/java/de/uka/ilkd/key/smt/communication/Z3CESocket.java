@@ -47,7 +47,7 @@ public class Z3CESocket extends AbstractSolverSocket {
                 sc.setState(WAIT_FOR_MODEL);
             }
             if (msg.equals("unknown")) {
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
+                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName(), false));
                 sc.setState(WAIT_FOR_DETAILS);
                 pipe.sendMessage("(exit)");
             }

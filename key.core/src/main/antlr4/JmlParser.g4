@@ -87,7 +87,11 @@ accessible_clause
                     (lhs=expression COLON)? rhs=storeRefUnion
                     (MEASURED_BY mby=expression)?
     SEMI_TOPLEVEL;
-assignable_clause: (ASSIGNABLE|MODIFIES|MODIFIABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 //depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
@@ -161,7 +165,7 @@ in_group_clause: IN expression;
 maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
-set_statement: SET expression EQUAL_SINGLE expression SEMI_TOPLEVEL;
+set_statement: SET (assignee=expression) EQUAL_SINGLE (value=expression) SEMI_TOPLEVEL;
 merge_point_statement:
   MERGE_POINT
   (MERGE_PROC (proc=STRING_LITERAL))?
@@ -174,10 +178,15 @@ loop_specification
     | determines_clause
     | loop_separates_clause
     | loop_determines_clause
-    | assignable_clause
+    | loop_assignable_clause
     | variant_function)*;
 
 loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+loop_assignable_clause: (LOOP_ASSIGNABLE | ASSIGNABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
@@ -217,7 +226,7 @@ storeRefUnion: list = storeRefList;
 storeRefList: storeref (COMMA storeref)*;
 storeRefIntersect: storeRefList;
 storeref: (NOTHING | EVERYTHING | NOT_SPECIFIED |  STRICTLY_NOTHING | storeRefExpr);
-createLocset: (LOCSET | SINGLETON) LPAREN exprList RPAREN;
+createLocset: (LOCSET | SINGLETON) LPAREN exprList? RPAREN;
 exprList: expression (COMMA expression)*;
 storeRefExpr: expression;
 predornot: (predicate |NOT_SPECIFIED | SAME);
@@ -347,8 +356,7 @@ jmlprimary
   | VALUES                                                                            #primaryValues
   | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
   | EMPTYSET                                                                          #primaryEmptySet
-  | STOREREF LPAREN storeRefUnion RPAREN                                              #primaryStoreRef
-  | LOCSET LPAREN fieldarrayaccess (COMMA fieldarrayaccess)* RPAREN                   #primaryCreateLocset
+  | (LOCSET|STOREREF) LPAREN storeRefUnion? RPAREN                                    #primaryStoreRef
   | SINGLETON LPAREN expression RPAREN                                                #primaryCreateLocsetSingleton
   | UNION LPAREN storeRefUnion RPAREN                                                 #primaryUnion
   | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
@@ -363,18 +371,10 @@ jmlprimary
   | sequence                                                                         #primaryignore10
   ;
 
-fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;
-fieldarrayaccess_suffix
-    : DOT (ident | inv | inv_free | this_ | super_ | TRANSIENT | INV | INV_FREE)
-    | LBRACKET (expression) RBRACKET
-;
-
-super_: SUPER;
-
 sequence
   : SEQEMPTY                                                              #sequenceEmpty
   | seqdefterm                                                            #sequenceIgnore1
-  | (SEQSINGLETON | SEQ) LPAREN exprList RPAREN                           #sequenceCreate
+  | (SEQSINGLETON | SEQ) LPAREN exprList? RPAREN                          #sequenceCreate
   | SEQSUB LPAREN expression COMMA expression COMMA expression RPAREN     #sequenceSub
   | SEQREVERSE LPAREN expression RPAREN                                   #sequenceReverse
   | SEQREPLACE LPAREN expression COMMA expression COMMA expression RPAREN #sequenceReplace

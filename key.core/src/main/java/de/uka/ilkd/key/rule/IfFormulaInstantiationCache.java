@@ -8,10 +8,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.Pair;
 
 // a simple cache for the results of the method <code>createList</code>
 public final class IfFormulaInstantiationCache {

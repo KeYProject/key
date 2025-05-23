@@ -94,7 +94,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
             } else {
                 newVar = getVariable();
             }
-            newVarTerm = tb.var(newVar);
+            newVarTerm = tb.varOfQuantVar(newVar);
         }
     }
 
@@ -175,7 +175,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         final boolean addSubst = subTermChanges(t.varsBoundHere(targetPos), target);
         newSubterms[targetPos] = addSubst ? substWithNewVar(target) : target;
 
-        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock());
+        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), null);
     }
 
     /**

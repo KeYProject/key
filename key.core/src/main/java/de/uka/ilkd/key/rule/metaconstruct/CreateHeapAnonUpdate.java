@@ -6,11 +6,9 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -21,6 +19,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Creates the anonymizing update for the heap. Expects as arguments the loop formula (for
@@ -38,10 +40,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term loopTerm = term.sub(0);
-        final Optional<LoopSpecification> loopSpec = //
-            MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
-
-        if (!loopSpec.isPresent()) {
+        final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
+        if (loopSpec == null) {
             return null;
         }
 
@@ -49,8 +49,9 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final Term anonSavedHeapTerm = term.sub(2);
         final Term anonPermissionsHeapTerm = term.sub(3);
 
-        return createHeapAnonUpdate(loopSpec.get(),
-            MiscTools.isTransaction((Modality) loopTerm.op()), MiscTools.isPermissions(services),
+        return createHeapAnonUpdate(loopSpec,
+            MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
+            MiscTools.isPermissions(services),
             anonHeapTerm, anonSavedHeapTerm, anonPermissionsHeapTerm, services);
     }
 
@@ -75,16 +76,16 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
         final List<LocationVariable> heapContext = //
-            HeapContext.getModHeaps(services, isTransaction);
+            HeapContext.getModifiableHeaps(services, isTransaction);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        // The call to MiscTools.removeSingletonPVs removes from the assignable clause
+        // The call to MiscTools.removeSingletonPVs removes from the modifiable clause
         // the program variables which of course should not be part of an anonymizing
         // heap expression. The reason why they're there at all is that for Abstract
-        // Execution, it actually makes sense to have program variables in assignable
+        // Execution, it actually makes sense to have program variables in modifiable
         // clauses, since for an abstract statement they cannot be extracted like for
         // concrete statements (such as loop bodies). (DS, 2019-07-05)
         heapContext.forEach(heap -> mods.put(heap,
-            loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
+            loopSpec.getModifiable(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
@@ -113,7 +114,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      *
      * @param heap The heap variable.
      * @param anonHeap The anonymized heap term.
-     * @param mod The modifies clause, only for checking whether it's strictly nothing (then the
+     * @param mod The modifiable clause, only for checking whether it's strictly nothing (then the
      *        elementary update is a skip).
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return An elementary anonymizing heap update.
@@ -124,7 +125,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         final Term anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        return tb.strictlyNothing().equalsModIrrelevantTermLabels(mod) ? tb.skip()
+        return tb.strictlyNothing().equalsModProperty(mod, IRRELEVANT_TERM_LABELS_PROPERTY)
+                ? tb.skip()
                 : tb.anonUpd(heap, mod, anonHeapTerm);
     }
 

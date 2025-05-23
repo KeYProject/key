@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 
 /**
  * Class contains a pair of SchemaVariables.
- * The first part has to match a {@link de.uka.ilkd.key.logic.op.QuantifiableVariable},
+ * The first part has to match a {@link QuantifiableVariable},
  * the second one has to match a Term in order to model a pair of the not-free-in relation of a
  * Taclet.
  */

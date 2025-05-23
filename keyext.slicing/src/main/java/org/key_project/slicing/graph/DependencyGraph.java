@@ -5,17 +5,17 @@ package org.key_project.slicing.graph;
 
 import java.util.*;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,20 +35,27 @@ import org.slf4j.LoggerFactory;
  * @author Arne Keller
  */
 public class DependencyGraph {
-    /**
-     * Logger.
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyGraph.class);
 
     /**
      * Main storage container of graph nodes and edges.
      */
-    private final EquivalenceDirectedGraph graph = new EquivalenceDirectedGraph();
+    private final EquivalenceDirectedGraph graph;
     /**
      * Mapping of rule applications to graph edges.
      * Stores the edges introduced by a proof step.
      */
     private final Map<Node, Collection<AnnotatedEdge>> edgeDataReversed = new IdentityHashMap<>();
+
+    public DependencyGraph() {
+        graph = new EquivalenceDirectedGraph();
+    }
+
+    private DependencyGraph(DependencyGraph copyFrom) {
+        graph = copyFrom.graph.copy();
+        graph.edgeSet().forEach(x -> edgeDataReversed
+                .computeIfAbsent(x.getProofStep(), _node -> new ArrayList<>()).add(x));
+    }
 
     /**
      * Ensure the provided proof is fully represented in this dependency graph.
@@ -69,7 +76,6 @@ public class DependencyGraph {
             tracker.trackNode(node);
         }
     }
-
 
     /**
      * Add a rule application to the dependency graph.
@@ -114,15 +120,28 @@ public class DependencyGraph {
     }
 
     /**
+     * Represents an edge in the dependency graph.
+     *
+     * @param fromNode the outgoing node of the edge
+     * @param toNode the incoming node of the edge
+     * @param annotation annotation associated to the edge
+     */
+    public record Edge(Node fromNode, GraphNode toNode, AnnotatedEdge annotation) {
+    }
+
+    /**
+     * Returns the incoming edges of the given node.
+     *
      * @param node a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
-    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> incomingGraphEdgesOf(GraphNode node) {
+    public Stream<Edge> incomingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.incomingEdgesOf(node).stream()
-                .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeSource(edge), edge));
+                .map(
+                    edge -> new Edge(edge.getProofStep(), graph.getEdgeSource(edge), edge));
     }
 
     /**
@@ -137,15 +156,18 @@ public class DependencyGraph {
     }
 
     /**
+     * Returns the outgoing edges of the given node.
+     *
      * @param node a graph node
      * @return the outgoing (graph edges, graph targets) of that node
      */
-    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> outgoingGraphEdgesOf(GraphNode node) {
+    public Stream<Edge> outgoingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.outgoingEdgesOf(node).stream()
-                .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
+                .map(
+                    edge -> new Edge(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
     }
 
     /**
@@ -218,13 +240,13 @@ public class DependencyGraph {
 
     /**
      * Gets all the edges representing the supplied proof step.
-     * May be used to reconstruct the hyperedge corresponding to the proof step.
+     * The combination of these represents the hyperedge corresponding to the proof step.
      *
      * @param proofStep the proof step
      * @return the edges representing this step
      */
     public Collection<AnnotatedEdge> edgesOf(Node proofStep) {
-        return edgeDataReversed.get(proofStep);
+        return edgeDataReversed.getOrDefault(proofStep, Collections.emptyList());
     }
 
     /**
@@ -273,7 +295,7 @@ public class DependencyGraph {
      * @return the outgoing edges of that node
      */
     public Stream<AnnotatedEdge> edgesUsing(GraphNode node) {
-        return outgoingGraphEdgesOf(node).map(it -> it.third);
+        return outgoingGraphEdgesOf(node).map(it -> it.annotation);
     }
 
     /**
@@ -282,8 +304,8 @@ public class DependencyGraph {
      */
     public Stream<AnnotatedEdge> edgesConsuming(GraphNode node) {
         return outgoingGraphEdgesOf(node)
-                .filter(it -> it.third.replacesInputNode())
-                .map(it -> it.third);
+                .filter(it -> it.annotation.replacesInputNode())
+                .map(it -> it.annotation);
     }
 
     /**
@@ -292,7 +314,7 @@ public class DependencyGraph {
      */
     public Stream<AnnotatedEdge> edgesProducing(GraphNode node) {
         return incomingGraphEdgesOf(node)
-                .map(it -> it.third);
+                .map(it -> it.annotation);
     }
 
     /**
@@ -355,5 +377,86 @@ public class DependencyGraph {
             locationGuess = locationGuess.removeLast();
         }
         return null;
+    }
+
+    /**
+     * Remove all nodes B with degree 2:
+     * A → B → C
+     *
+     * @return modified copy
+     */
+    public DependencyGraph removeChains() {
+        // first, create a copy of the graph
+        var nGraph = new DependencyGraph(this);
+        // get all nodes in the proof
+        var allNodes = proof().root().subtreeIterator();
+        // take the outputs "produced" by the nodes
+        var toCheck = StreamSupport.stream(Spliterators.spliteratorUnknownSize(allNodes, 0), false)
+                .flatMap(this::outputsOf).toList();
+        int removed = 0;
+        // toCheck now contains dependency graph nodes
+        // (TrackedFormulas etc.)
+        for (var node : toCheck) {
+            var incoming = nGraph.incomingGraphEdgesOf(node).toList();
+            var outgoing = nGraph.outgoingGraphEdgesOf(node).toList();
+            if (incoming.size() != 1 || outgoing.size() != 1) {
+                continue;
+            }
+            // we want to remove the incoming edge.
+            // that edge is part of a node startNode,
+            // whose hyperedge should not connect more nodes
+            // (otherwise we cannot remove the edge without
+            // making the graph inconsistent)
+            Node startNode = incoming.get(0).fromNode;
+            if (edgesOf(startNode).size() != 1) {
+                continue;
+            }
+            GraphNode startGraphNode = incoming.get(0).toNode;
+            AnnotatedEdge edge = incoming.get(0).annotation;
+
+            // get real initial node
+            // (in case of repeated shortenings)
+            Node initialNode = startNode;
+            if (edge instanceof AnnotatedShortenedEdge ase) {
+                initialNode = ase.getInitial();
+            }
+
+            // we want to remove the outgoing edge.
+            // that edge is part of a node endNode,
+            // whose hyperedge should not connect more nodes
+            // (otherwise we cannot remove the edge without
+            // making the graph inconsistent)
+            Node endNode = outgoing.get(0).fromNode;
+            GraphNode endGraphNode = outgoing.get(0).toNode;
+            var edge2 = outgoing.get(0).annotation;
+            if (edgesOf(endNode).size() != 1) {
+                continue;
+            }
+
+            // situation:
+            // startGraphNode ---> node ---> endGraphNode
+
+            // chain removal:
+            // remove node and connected edges
+            nGraph.graph.removeVertex(node);
+            // create new edge
+            var edge3 = new AnnotatedShortenedEdge(initialNode, endNode, edge.replacesInputNode());
+            nGraph.graph.addEdge(startGraphNode, endGraphNode, edge3);
+            nGraph.edgeDataReversed.remove(startNode);
+            nGraph.edgeDataReversed.get(endNode).remove(edge2);
+            nGraph.edgeDataReversed.get(endNode).add(edge3);
+            removed++;
+        }
+        LOGGER.debug("removeChains: {} nodes deleted", removed);
+        return nGraph;
+    }
+
+    /**
+     * The proof associated with this graph. May be null if the graph is empty.
+     *
+     * @return the proof
+     */
+    public Proof proof() {
+        return this.edgeDataReversed.keySet().stream().map(Node::proof).findFirst().orElse(null);
     }
 }

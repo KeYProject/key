@@ -10,14 +10,16 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 
 /**
@@ -34,7 +36,7 @@ public class OpReplacer {
     /**
      * The replacement map.
      */
-    private final ReplacementMap<? extends SVSubstitute, ? extends SVSubstitute> map;
+    private final ReplacementMap<? extends SyntaxElement, ? extends SyntaxElement> map;
 
     /**
      * <p>
@@ -51,7 +53,7 @@ public class OpReplacer {
      *        with
      * @param tf a term factory.
      */
-    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf) {
+    public OpReplacer(Map<? extends SyntaxElement, ? extends SyntaxElement> map, TermFactory tf) {
         this(map, tf, null);
     }
 
@@ -63,12 +65,12 @@ public class OpReplacer {
      * @param tf a term factory.
      * @param proof the currently loaded proof
      */
-    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf,
+    public OpReplacer(Map<? extends SyntaxElement, ? extends SyntaxElement> map, TermFactory tf,
             Proof proof) {
         assert map != null;
 
         this.map = map instanceof ReplacementMap
-                ? (ReplacementMap<? extends SVSubstitute, ? extends SVSubstitute>) map
+                ? (ReplacementMap<? extends SyntaxElement, ? extends SyntaxElement>) map
                 : ReplacementMap.create(tf, proof, map);
 
         this.tf = tf;
@@ -232,8 +234,8 @@ public class OpReplacer {
             return newTerm;
         }
 
-        for (SVSubstitute svs : map.keySet()) {
-            if (term.equalsModTermLabels(svs)) {
+        for (SyntaxElement svs : map.keySet()) {
+            if (term.equalsModProperty(svs, TERM_LABELS_PROPERTY)) {
                 return (Term) map.get(svs);
             }
         }
@@ -256,7 +258,7 @@ public class OpReplacer {
         final Term result;
         if (newOp != term.op() || changedSubTerm || newBoundVars != term.boundVars()) {
             result =
-                tf.createTerm(newOp, newSubTerms, newBoundVars, term.javaBlock(), term.getLabels());
+                tf.createTerm(newOp, newSubTerms, newBoundVars, term.getLabels());
         } else {
             result = term;
         }

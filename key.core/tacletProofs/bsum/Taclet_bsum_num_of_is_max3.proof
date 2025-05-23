@@ -42,11 +42,10 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Wed Apr 12 13:16:54 CEST 2023
-name=bsum_num_of_is_max3
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "bsum_num_of_is_max3",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
 (keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))

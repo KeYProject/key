@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
@@ -383,7 +384,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         @SuppressWarnings("unchecked")
         Set<SequentFormula> sfSet =
             (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
-        return !CollectionUtil.isEmpty(sfSet);
+        return sfSet != null && !sfSet.isEmpty();
     }
 
     /**

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class Streams {
-
     private Streams() {
         throw new Error("do not instantiate");
     }
