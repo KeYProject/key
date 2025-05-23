@@ -12,7 +12,6 @@ import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
-import de.uka.ilkd.key.rule.AssumesFormulaInstantiationCache;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
@@ -24,6 +23,8 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.SessionCaches;
+import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.LRUCache;
@@ -69,7 +70,7 @@ import org.key_project.util.collection.Pair;
  *
  * @author Martin Hentschel
  */
-public class ServiceCaches {
+public class ServiceCaches implements SessionCaches {
     /**
      * The maximal number of index entries in {@link #getTermTacletAppIndexCache()}.
      */
@@ -221,7 +222,7 @@ public class ServiceCaches {
         return ifInstantiationCache;
     }
 
-    public final AssumesFormulaInstantiationCache getIfFormulaInstantiationCache() {
+    public final AssumesFormulaInstantiationCache getAssumesFormulaInstantiationCache() {
         return assumesFormulaInstantiationCache;
     }
 

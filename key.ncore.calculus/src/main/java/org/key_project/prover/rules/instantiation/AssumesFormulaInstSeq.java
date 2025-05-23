@@ -5,6 +5,8 @@ package org.key_project.prover.rules.instantiation;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.ProofServices;
+import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -58,15 +60,9 @@ public class AssumesFormulaInstSeq
     /**
      * Create a list with all formulas of a given semi-sequent
      */
-    public static ImmutableArray<AssumesFormulaInstantiation> createList(Sequent p_s,
+    private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(Sequent p_s,
+            Semisequent semi,
             boolean inAntecedent) {
-        Semisequent semi;
-        if (inAntecedent) {
-            semi = p_s.antecedent();
-        } else {
-            semi = p_s.succedent();
-        }
-
         final AssumesFormulaInstSeq[] assumesInstFromSeq =
             new AssumesFormulaInstSeq[semi.size()];
         int i = assumesInstFromSeq.length - 1;
@@ -77,6 +73,26 @@ public class AssumesFormulaInstSeq
         }
 
         return new ImmutableArray<>(assumesInstFromSeq);
+    }
+
+    /**
+     * Retrieves a list with all formulas of a given semi-sequent
+     */
+    public static ImmutableArray<AssumesFormulaInstantiation> createList(Sequent p_s,
+            boolean inAntecedent,
+            ProofServices services) {
+        final AssumesFormulaInstantiationCache cache =
+            services.getCaches().getAssumesFormulaInstantiationCache();
+        final Semisequent semi = inAntecedent ? p_s.antecedent() : p_s.succedent();
+
+        ImmutableArray<AssumesFormulaInstantiation> val = cache.get(inAntecedent, semi);
+
+        if (val == null) {
+            val = createListHelp(p_s, semi, inAntecedent);
+            cache.put(inAntecedent, semi, val);
+        }
+
+        return val;
     }
 
     @Override
