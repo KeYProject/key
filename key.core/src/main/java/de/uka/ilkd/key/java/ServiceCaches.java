@@ -6,26 +6,26 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
-import de.uka.ilkd.key.rule.IfFormulaInstantiationCache;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiationCache;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
@@ -95,20 +95,23 @@ public class ServiceCaches {
     private final LRUCache<Operator, Integer> introductionTimeCache =
         new LRUCache<>(10000);
 
-    private final LRUCache<Term, Monomial> monomialCache = new LRUCache<>(2000);
+    private final LRUCache<org.key_project.logic.Term, Monomial> monomialCache =
+        new LRUCache<>(2000);
 
-    private final LRUCache<Term, Polynomial> polynomialCache = new LRUCache<>(2000);
+    private final LRUCache<org.key_project.logic.Term, Polynomial> polynomialCache =
+        new LRUCache<>(2000);
 
     /**
      * a <code>HashMap</code> from <code>Term</code> to <code>TriggersSet</code> uses to cache all
      * created TriggersSets
      */
-    private final Map<Term, TriggersSet> triggerSetCache = new LRUCache<>(1000);
+    private final Map<org.key_project.logic.Term, TriggersSet> triggerSetCache =
+        new LRUCache<>(1000);
 
     /**
      * Map from <code>Term</code>(allTerm) to <code>ClausesGraph</code>
      */
-    private final Map<Term, ClausesGraph> graphCache = new LRUCache<>(1000);
+    private final Map<org.key_project.logic.Term, ClausesGraph> graphCache = new LRUCache<>(1000);
 
     /**
      * Cache used by the TermFactory to avoid unnecessary creation of terms
@@ -142,8 +145,8 @@ public class ServiceCaches {
     private final IfInstantiationCachePool ifInstantiationCache = new IfInstantiationCachePool();
 
     /** Cache used IfFormulaInstSeq */
-    private final IfFormulaInstantiationCache ifFormulaInstantiationCache =
-        new IfFormulaInstantiationCache();
+    private final AssumesFormulaInstantiationCache assumesFormulaInstantiationCache =
+        new AssumesFormulaInstantiationCache();
 
     /** applied rule apps name cache */
     private final AppliedRuleAppsNameCache appliedRuleAppsNameCache =
@@ -174,19 +177,19 @@ public class ServiceCaches {
         return introductionTimeCache;
     }
 
-    public final LRUCache<Term, Monomial> getMonomialCache() {
+    public final LRUCache<org.key_project.logic.Term, Monomial> getMonomialCache() {
         return monomialCache;
     }
 
-    public final LRUCache<Term, Polynomial> getPolynomialCache() {
+    public final LRUCache<org.key_project.logic.Term, Polynomial> getPolynomialCache() {
         return polynomialCache;
     }
 
-    public final Map<Term, TriggersSet> getTriggerSetCache() {
+    public final Map<org.key_project.logic.Term, TriggersSet> getTriggerSetCache() {
         return triggerSetCache;
     }
 
-    public final Map<Term, ClausesGraph> getGraphCache() {
+    public final Map<org.key_project.logic.Term, ClausesGraph> getGraphCache() {
         return graphCache;
     }
 
@@ -218,8 +221,8 @@ public class ServiceCaches {
         return ifInstantiationCache;
     }
 
-    public final IfFormulaInstantiationCache getIfFormulaInstantiationCache() {
-        return ifFormulaInstantiationCache;
+    public final AssumesFormulaInstantiationCache getIfFormulaInstantiationCache() {
+        return assumesFormulaInstantiationCache;
     }
 
     public AppliedRuleAppsNameCache getAppliedRuleAppsNameCache() {

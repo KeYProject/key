@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.feature.MutableState;
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 
 /**
@@ -25,7 +27,7 @@ public class IsInductionVariable extends BinaryTermFeature {
     private IsInductionVariable() {}
 
     @Override
-    protected boolean filter(Term term, MutableState mState, Services services) {
+    protected boolean filter(Term term, MutableState mState, LogicServices services) {
         // this has been copied from the former InductionVariableCondition
         // TODO: use termlabels instead of names?
         final String name = term.op().toString();

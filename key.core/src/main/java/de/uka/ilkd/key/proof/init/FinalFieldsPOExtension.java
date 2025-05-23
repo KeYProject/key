@@ -15,21 +15,25 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.op.Function;
+
 /**
  * This class is responsible for making the immutable treatment of final fields possible also for
  * constructors.
  * It is an extension of the ProofOblInput interface (originally targeted for the symbolic execution
  * engine)
- *
+ * <p>
  * It has two purposes:
  * 1. It checks if the final fields are not read before they are written (via
  * {@link FinalFieldCodeValidator}).
  * 2. It modifies the postcondition of the constructor to make the final field values available in
  * the postconditions.
- *
+ * </p>
+ * <p>
  * To make 2 possible, an additional premiss is added in the post-state formulating that
  * \forall Fields f; any::final(self, f) = any::select(heap, self, f)
  * essentially activating the final field assignments.
+ * </p>
  *
  * @author Mattias Ulbrich
  */
@@ -61,7 +65,7 @@ public class FinalFieldsPOExtension implements POExtension {
                 : "Expected a ProgramMethod not a schema variable, since we need the actual implementation";
         ProgramMethod constructor = (ProgramMethod) iconstructor;
 
-        List<JFunction> finalFields = findFinalFields(iconstructor, services);
+        List<Function> finalFields = findFinalFields(iconstructor, services);
         if (finalFields.isEmpty()) {
             // If there are no final fields, we do not need to do anything
             return postTerm;
@@ -71,8 +75,8 @@ public class FinalFieldsPOExtension implements POExtension {
 
         TermBuilder tb = services.getTermBuilder();
         Term self = tb.var(selfVar);
-        for (JFunction finalField : finalFields) {
-            Term fieldRef = tb.tf().createTerm(finalField);
+        for (Function finalField : finalFields) {
+            Term fieldRef = tb.tf().createTerm((Operator) finalField);
             Term sel = tb.dot(JavaDLTheory.ANY, self, fieldRef);
             Term fsel = tb.finalDot(JavaDLTheory.ANY, self, fieldRef);
             Term eq = tb.equals(sel, fsel);
@@ -81,7 +85,7 @@ public class FinalFieldsPOExtension implements POExtension {
         return postTerm;
     }
 
-    private List<JFunction> findFinalFields(IProgramMethod iconstructor, Services services) {
+    private List<Function> findFinalFields(IProgramMethod iconstructor, Services services) {
         Type type = iconstructor.getContainerType().getJavaType();
         assert type instanceof ClassType
                 : "Class type was expected here, since a constructor is present";

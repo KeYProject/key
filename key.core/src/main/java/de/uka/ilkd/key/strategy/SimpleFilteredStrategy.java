@@ -3,22 +3,28 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.rulefilter.RuleFilter;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp. A TacletFilter is used to filter out RuleApps.
  */
-public class SimpleFilteredStrategy implements Strategy {
+public class SimpleFilteredStrategy implements Strategy<Goal> {
 
     private static final Name NAME = new Name("Simple ruleset");
 
@@ -34,6 +40,7 @@ public class SimpleFilteredStrategy implements Strategy {
         ruleFilter = p_ruleFilter;
     }
 
+    @Override
     public Name name() {
         return NAME;
     }
@@ -45,7 +52,10 @@ public class SimpleFilteredStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+    @Override
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
+            Goal goal,
             MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
             return TopRuleAppCost.INSTANCE;
@@ -56,8 +66,8 @@ public class SimpleFilteredStrategy implements Strategy {
             return res;
         }
 
-        long cost = goal.getTime();
-        if (app instanceof TacletApp && !((TacletApp) app).ifInstsComplete()) {
+        long cost = ((de.uka.ilkd.key.proof.Goal) goal).getTime();
+        if (app instanceof TacletApp tacletApp && !tacletApp.assumesInstantionsComplete()) {
             cost += IF_NOT_MATCHED_MALUS;
         }
 
@@ -70,12 +80,15 @@ public class SimpleFilteredStrategy implements Strategy {
      *
      * @return true iff the rule should be applied, false otherwise
      */
-    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+    @Override
+    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+            Goal goal) {
         // do not apply a rule twice
         return !(app instanceof TacletApp) || NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,
             goal, new MutableState()) != TopRuleAppCost.INSTANCE;
     }
 
+    @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector) {}
 

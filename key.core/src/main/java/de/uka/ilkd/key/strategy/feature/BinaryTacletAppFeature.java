@@ -3,10 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Abstract superclass for features of TacletApps that have either zero or top cost.
@@ -28,10 +34,11 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
     }
 
     @Override
-    final protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
-        if (app instanceof TacletApp) {
-            return filter((TacletApp) app, pos, goal, mState);
+    final protected <PGoal extends ProofGoal<@NonNull PGoal>> boolean filter(RuleApp app,
+            PosInOccurrence pos,
+            PGoal goal, MutableState mState) {
+        if (app instanceof TacletApp tacletApp) {
+            return filter(tacletApp, pos, (Goal) goal, mState);
         }
         return nonTacletValue;
     }

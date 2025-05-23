@@ -71,11 +71,11 @@ public class TestTermParser extends AbstractTestTermParser {
 
         elem = lookup_sort("elem");
         list = lookup_sort("list");
-        head = lookup_func("head");
-        tail = lookup_func("tail");
-        nil = lookup_func("nil");
-        cons = lookup_func("cons");
-        isempty = lookup_func("isempty");
+        head = (JFunction) lookup_func("head");
+        tail = (JFunction) lookup_func("tail");
+        nil = (JFunction) lookup_func("nil");
+        cons = (JFunction) lookup_func("cons");
+        isempty = (JFunction) lookup_func("isempty");
 
         // The declaration parser cannot parse LogicVariables; these
         // are normally declared in quantifiers, so we introduce them
@@ -258,7 +258,7 @@ public class TestTermParser extends AbstractTestTermParser {
         Term t4 =
             parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;" + " {int s = 2;} }\\>" + " true ->"
                 + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
-        assertTrue(t3.equalsModProperty(t4, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(t3, t4),
             "Terms should be equalModRenaming");
         assertEquals(t3.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             t4.hashCodeModProperty(RENAMING_TERM_PROPERTY),

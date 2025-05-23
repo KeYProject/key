@@ -84,7 +84,7 @@ public final class MainFrame extends JPanel {
         });
 
         // FIXME put this somewhere descent
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
             Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
         setLayout(new BorderLayout());
@@ -96,7 +96,7 @@ public final class MainFrame extends JPanel {
         this.showTacletInfo = showTacletInfo;
 
         if (sequentView instanceof InnerNodeView view) {
-            view.tacletInfo.setVisible(this.showTacletInfo);
+            view.makeTacletInfoVisible(this.showTacletInfo);
         }
     }
 

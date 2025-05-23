@@ -6,10 +6,11 @@ package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
+
+import org.key_project.prover.engine.StopCondition;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Defines the basic functionality of a breakpoint.
@@ -26,21 +27,20 @@ public interface IBreakpoint {
 
     /**
      * This method is called from
-     * {@link StopCondition#isGoalAllowed(int, long, Proof, long, int, Goal)} and can be used to
+     * {@link StopCondition#isGoalAllowed(ProofGoal, int, long, long, int)} and can be used to
      * update the state of the {@link IBreakpoint}.
      *
+     * @param goal The current {@link Goal} on which the next rule will be applied.
      * @param maxApplications The defined maximal number of rules to apply. Can be different to
      *        {@link StrategySettings#getMaxSteps()} in side proofs.
      * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to
      *        {@link StrategySettings#getTimeout()} in side proofs.
-     * @param proof The current {@link Proof}.
      * @param startTime The timestamp when the apply strategy has started, computed via
      *        {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
-     * @param goal The current {@link Goal} on which the next rule will be applied.
      */
-    void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal);
+    void updateState(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied);
 
     /**
      * Determines if the breakpoint represented by this BreakpointStopConition is triggered.
@@ -48,10 +48,9 @@ public interface IBreakpoint {
      *
      * @param activeStatement the activeStatement of the node
      * @param ruleApp the applied {@link RuleApp}
-     * @param proof the current proof
      * @param node the current node
      * @return true if execution should hold
      */
-    boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node);
+    boolean isBreakpointHit(SourceElement activeStatement,
+            RuleApp ruleApp, Node node);
 }

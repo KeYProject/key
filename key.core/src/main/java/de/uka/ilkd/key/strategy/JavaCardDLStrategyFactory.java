@@ -450,6 +450,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             -1, props.toArray(new AbstractStrategyPropertyDefinition[0]));
     }
 
+    @Override
     public Strategy create(Proof proof, StrategyProperties strategyProperties) {
         return new JavaCardDLStrategy(proof, strategyProperties);
     }

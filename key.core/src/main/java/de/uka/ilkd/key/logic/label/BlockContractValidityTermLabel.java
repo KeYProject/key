@@ -23,9 +23,7 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable)
     /**
      * {@inheritDoc}
      */
-    public String toString() {
-        return NAME + "(" + exceptionVariable() + ")";
-    }
+    public String toString() { return NAME + "(" + exceptionVariable() + ")"; }
 
     /**
      * retrieves the original exception variable as found in the local variable declaration
@@ -34,9 +32,7 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable)
      * @return the original exception variable
      */
     @Override
-    public ProgramVariable exceptionVariable() {
-        return exceptionVariable;
-    }
+    public ProgramVariable exceptionVariable() { return exceptionVariable; }
 
     /**
      * {@inheritDoc}
@@ -53,17 +49,13 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable)
      * {@inheritDoc}
      */
     @Override
-    public int getTLChildCount() {
-        return 1;
-    }
+    public int getTLChildCount() { return 1; }
 
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
-        return NAME;
-    }
+    public Name name() { return NAME; }
 
 }

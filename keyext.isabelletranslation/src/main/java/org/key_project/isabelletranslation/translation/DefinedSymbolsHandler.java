@@ -14,11 +14,10 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
@@ -26,6 +25,7 @@ import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class handles the translation of several functions that are already defined in the preamble.
@@ -53,7 +53,7 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
 
-        Namespace<Sort> sorts = services.getNamespaces().sorts();
+        Namespace<@NonNull Sort> sorts = services.getNamespaces().sorts();
         masterHandler.addPredefinedSort(
             Objects.requireNonNull(sorts.lookup(new Name("java.lang.Object"))),
             "java_lang_Object");
@@ -64,7 +64,7 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
         masterHandler.addPredefinedSort(seqLDT.targetSort(), "Seq");
 
 
-        Namespace<JFunction> functionNamespace = services.getNamespaces().functions();
+        Namespace<@NonNull Function> functionNamespace = services.getNamespaces().functions();
         Map<String, String> definedFunctions = getDefinedFunctions();
 
         Map<String, String> definedSortDependingFunctions = new HashMap<>();

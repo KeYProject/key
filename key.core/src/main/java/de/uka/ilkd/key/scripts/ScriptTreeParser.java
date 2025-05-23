@@ -55,7 +55,7 @@ public class ScriptTreeParser {
     public static void main(String[] args) throws IOException, ScriptException {
 
         ScriptNode root =
-            ScriptTreeParser.parse(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+            parse(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
         root.dump(0);
 

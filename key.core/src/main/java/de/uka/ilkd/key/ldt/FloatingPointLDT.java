@@ -17,17 +17,17 @@ public interface FloatingPointLDT {
 
     JFunction getGreaterOrEquals();
 
-    JFunction getEquals();
+    Function getEquals();
 
-    JFunction getJavaUnaryMinus();
+    Function getJavaUnaryMinus();
 
-    JFunction getJavaAdd();
+    Function getJavaAdd();
 
-    JFunction getJavaSub();
+    Function getJavaSub();
 
-    JFunction getJavaMul();
+    Function getJavaMul();
 
-    JFunction getJavaDiv();
+    Function getJavaDiv();
 
     JFunction getJavaMod();
 

@@ -32,6 +32,11 @@ import org.key_project.util.collection.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ServiceConfiguration;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Constructor;
+import recoder.abstraction.DefaultConstructor;
+import recoder.abstraction.ParameterizedType;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.service.NameInfo;
 
 /**
@@ -172,12 +177,12 @@ public class Recoder2KeYTypeConverter {
                 s = new NullSort(objectSort);
             }
             addKeYJavaType(t, s);
-        } else if (t instanceof recoder.abstraction.ParameterizedType pt) {
+        } else if (t instanceof ParameterizedType pt) {
             return getKeYJavaType(pt.getGenericType());
-        } else if (t instanceof recoder.abstraction.ClassType) {
+        } else if (t instanceof ClassType) {
             s = namespaces.sorts().lookup(new Name(t.getFullName()));
             if (s == null) {
-                recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
+                ClassType ct = (ClassType) t;
                 if (ct.isInterface()) {
                     KeYJavaType objectType = getKeYJavaType("java.lang.Object");
                     if (objectType == null) {
@@ -194,12 +199,12 @@ public class Recoder2KeYTypeConverter {
 
             // the unknown classtype has no modelinfo so surround with null check
             if (t.getProgramModelInfo() != null) {
-                List<? extends recoder.abstraction.Constructor> cl =
-                    t.getProgramModelInfo().getConstructors((recoder.abstraction.ClassType) t);
+                List<? extends Constructor> cl =
+                    t.getProgramModelInfo().getConstructors((ClassType) t);
                 if (cl.size() == 1
-                        && (cl.get(0) instanceof recoder.abstraction.DefaultConstructor)) {
+                        && (cl.get(0) instanceof DefaultConstructor)) {
                     getRecoder2KeYConverter().processDefaultConstructor(
-                        (recoder.abstraction.DefaultConstructor) cl.get(0));
+                        (DefaultConstructor) cl.get(0));
                 }
             }
         } else if (t instanceof recoder.abstraction.ArrayType) {
@@ -230,7 +235,7 @@ public class Recoder2KeYTypeConverter {
 
     private void addKeYJavaType(recoder.abstraction.Type t, Sort s) {
         KeYJavaType result = null;
-        if (!(t instanceof recoder.java.declaration.TypeDeclaration)) {
+        if (!(t instanceof TypeDeclaration)) {
             de.uka.ilkd.key.java.abstraction.Type type;
             if (t instanceof recoder.abstraction.PrimitiveType) {
                 type = PrimitiveType.getPrimitiveType(t.getFullName());
@@ -290,11 +295,11 @@ public class Recoder2KeYTypeConverter {
      * @param classType type to examine, not null
      * @return a freshly created set of sorts
      */
-    private ImmutableSet<Sort> directSuperSorts(recoder.abstraction.ClassType classType) {
+    private ImmutableSet<Sort> directSuperSorts(ClassType classType) {
 
-        List<recoder.abstraction.ClassType> supers = classType.getSupertypes();
+        List<ClassType> supers = classType.getSupertypes();
         ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
-        for (recoder.abstraction.ClassType aSuper : supers) {
+        for (ClassType aSuper : supers) {
             ss = ss.add(getKeYJavaType(aSuper).getSort());
         }
 
@@ -316,7 +321,7 @@ public class Recoder2KeYTypeConverter {
      * @param ct the type to be checked, not null
      * @return true iff the name is Object
      */
-    private boolean isObject(recoder.abstraction.ClassType ct) {
+    private boolean isObject(ClassType ct) {
         return "java.lang.Object".equals(ct.getFullName()) || "Object".equals(ct.getName());
     }
 
@@ -327,7 +332,7 @@ public class Recoder2KeYTypeConverter {
      * @param supers the set of (direct?) super-sorts
      * @return a freshly created Sort object
      */
-    private Sort createObjectSort(recoder.abstraction.ClassType ct, ImmutableSet<Sort> supers) {
+    private Sort createObjectSort(ClassType ct, ImmutableSet<Sort> supers) {
         if (ct instanceof recoder.abstraction.ArrayType at) {
             Sort objectSort = javaInfo.objectSort();
             Sort cloneableSort = javaInfo.cloneableSort();

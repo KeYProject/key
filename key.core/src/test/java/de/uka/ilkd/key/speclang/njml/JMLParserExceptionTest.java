@@ -47,7 +47,7 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
 
     public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
         URL fileURL = JMLParserExceptionTest.class.getResource("exceptional");
-        return ParserExceptionTest.getFiles(FIX_FILE, fileURL, ".java");
+        return getFiles(FIX_FILE, fileURL, ".java");
     }
 
 

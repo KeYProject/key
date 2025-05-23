@@ -24,15 +24,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -92,7 +93,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * @param services pointer to services object
      */
-    public VariableNamer(Services services) {
+    protected VariableNamer(Services services) {
         this.services = services;
     }
 
@@ -149,7 +150,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected ProgramElement getProgramFromPIO(PosInOccurrence pio) {
         Term progTerm;
-        if (pio != null && (progTerm = findProgramInTerm(pio.subTerm())) != null) {
+        if (pio != null && (progTerm = findProgramInTerm((Term) pio.subTerm())) != null) {
             return progTerm.javaBlock().program();
         } else {
             return new EmptyStatement();
@@ -324,7 +325,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         } else {
             String name = type.getName();
             name = MiscTools.filterAlphabetic(name);
-            if (name.length() > 0) {
+            if (!name.isEmpty()) {
                 result = name.substring(0, 1).toLowerCase();
             } else {
                 result = "x"; // use default name otherwise
@@ -348,7 +349,8 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the name proposal, or null if no proposal is available
      */
     protected ProgramElementName getNameProposalForSchemaVariable(String basename,
-            SchemaVariable sv, PosInOccurrence posOfFind, PosInProgram posOfDeclaration,
+            SchemaVariable sv, PosInOccurrence posOfFind,
+            PosInProgram posOfDeclaration,
             ImmutableList<String> previousProposals, Services services) {
         ProgramElementName result = null;
 
@@ -427,15 +429,17 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @param previousProposals list of names which should be considered taken, or null
      * @return the name proposal, or null if no proposal is available
      */
+    @Override
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         // determine posOfDeclaration from TacletApp
-        ContextInstantiationEntry cie = app.instantiations().getContextInstantiation();
+        ContextStatementBlockInstantiation cie = app.instantiations().getContextInstantiation();
         PosInProgram posOfDeclaration = (cie == null ? null : cie.prefix());
 
         // determine a suitable base name
         String basename = null;
-        NewVarcond nv = app.taclet().varDeclaredNew(var);
+        NewVarcond nv =
+            (NewVarcond) app.taclet().varDeclaredNew(var);
         if (nv != null) {
             Type type = nv.getType();
             if (type != null) {
@@ -571,7 +575,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         String proposal;
         try {
-            Iterator<TacletGoalTemplate> templs = app.taclet().goalTemplates().iterator();
+            var templs = app.taclet().goalTemplates().iterator();
             RewriteTacletGoalTemplate rwgt;
             String name = "";
             while (templs.hasNext()) {

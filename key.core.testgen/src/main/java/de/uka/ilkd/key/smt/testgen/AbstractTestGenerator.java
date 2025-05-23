@@ -8,11 +8,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
@@ -20,14 +15,11 @@ import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
@@ -42,6 +34,13 @@ import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.key_project.logic.op.Modality;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -281,9 +280,9 @@ public abstract class AbstractTestGenerator {
             boolean removePostCondition) throws ProofInputException {
         final Proof oldProof = node.proof();
         final Sequent oldSequent = node.sequent();
-        Sequent newSequent =
-            Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
-        Iterator<SequentFormula> it = oldSequent.antecedent().iterator();
+        Sequent newSequent = JavaDLSequentKit.getInstance().getEmptySequent();
+        Iterator<SequentFormula> it =
+            oldSequent.antecedent().iterator();
         while (it.hasNext()) {
             final SequentFormula sf = it.next();
             // Allow updates modailities in the antecedent
@@ -324,9 +323,8 @@ public abstract class AbstractTestGenerator {
         return proof;
     }
 
-    private boolean hasModalities(Term t, boolean checkUpdates) {
-        final JavaBlock jb = t.javaBlock();
-        if (jb != null && !jb.isEmpty()) {
+    private boolean hasModalities(org.key_project.logic.Term t, boolean checkUpdates) {
+        if (t.op() instanceof Modality) {
             return true;
         }
         if (t.op() == UpdateApplication.UPDATE_APPLICATION && checkUpdates) {

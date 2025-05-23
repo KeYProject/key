@@ -7,12 +7,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This variable condition checks if an instantiation is a constant formula or term, i.e. its arity
@@ -38,7 +38,7 @@ public class ConstantCondition extends VariableConditionAdapter {
             return true;
         }
         if (var instanceof TermSV) {
-            Term tInst = (Term) instMap.getInstantiation((TermSV) t);
+            Term tInst = instMap.getInstantiation((TermSV) t);
             boolean atomic = (tInst.arity() == 0);
             return negated != atomic;
         }

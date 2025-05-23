@@ -234,7 +234,7 @@ public final class SourceView extends JComponent {
             proof.register(sources, ProofJavaSourceCollection.class);
             proof.root().sequent().forEach(formula -> {
                 OriginTermLabel originLabel =
-                    (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
+                    (OriginTermLabel) ((Term) formula.formula()).getLabel(OriginTermLabel.NAME);
                 if (originLabel != null) {
                     if (originLabel.getOrigin() instanceof OriginTermLabel.FileOrigin) {
                         ((OriginTermLabel.FileOrigin) originLabel.getOrigin())
@@ -961,8 +961,8 @@ public final class SourceView extends JComponent {
             JPanel nowrap = new JPanel(new BorderLayout());
             nowrap.add(textPane);
             setViewportView(nowrap);
-            setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
 
             // increase unit increment (for faster scrolling)
             getVerticalScrollBar().setUnitIncrement(30);

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
@@ -45,6 +44,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -1638,7 +1638,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         Node node = proof.root();
         Sequent sequent = node.sequent();
         assertEquals(1, sequent.succedent().size());
-        Term succedent = sequent.succedent().get(0).formula();
+        Term succedent = (Term) sequent.succedent().get(0).formula();
         assertEquals(2, succedent.arity());
         Term updateApplication = succedent.subs().get(1);
         assertEquals(2, updateApplication.arity());

@@ -12,8 +12,9 @@ import javax.swing.*;
  * maximal number of lines a tooltip with instantiated SchemaVariables is allowed to have. If this
  * number is exceeded no SchemaVariables get instantiated in the displayed tooltip. 3) whether
  * intermediate proofsteps should be hidden in the proof tree view
+ * <br />
+ * (see also StandardUISettings)
  *
- * @see de.uka.ilkd.key.gui.settings.StandardUISettings
  * @author unknown
  * @author weigl
  */
@@ -166,7 +167,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<Boolean> showHeatmap = createBooleanProperty(HEATMAP_SHOW, false);
     private final PropertyEntry<Boolean> heatmapSF = createBooleanProperty(HEATMAP_SF, true);
     /**
-     * Highlight newest formulas/terms (true) or all formulas/terms below specified age (false)
+     * Highlight most recent formulas/terms (true) or all formulas/terms below specified age (false)
      */
     private final PropertyEntry<Boolean> heatmapNewest =
         createBooleanProperty(HEATMAP_NEWEST, true);
@@ -418,8 +419,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
     /**
      * Use Unicode Symbols is only allowed if pretty syntax is used
      *
-     * @return setting of use unicode symbols (if use pretty syntax is on, return the value which is
-     *         set, if use retty is false, return false)
+     * @return setting of "use unicode symbols" (if option "use pretty syntax" is on, return the
+     *         value which is
+     *         set, if "use pretty syntax" is off, return false)
      */
     public boolean isUseUnicode() {
         if (isUsePretty()) {

@@ -21,10 +21,10 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -37,6 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -261,10 +262,11 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                             mbs.getBodySourceAsTypeReference(), mbs.getProgramMethod(services),
                             mbs.getDesignatedContext(), methodReturnNode, getProofNode(),
                             resultVar);
-                    ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(
-                        getProof(), sideProofEnv, input.getSequentToProve(),
-                        StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
-                        StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_NORMAL);
+                    ApplyStrategyInfo<Proof, Goal> info =
+                        SymbolicExecutionSideProofUtil.startSideProof(
+                            getProof(), sideProofEnv, input.getSequentToProve(),
+                            StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
+                            StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_NORMAL);
                     try {
                         if (info.getProof().openGoals().size() == 1) {
                             Goal goal = info.getProof().openGoals().head();

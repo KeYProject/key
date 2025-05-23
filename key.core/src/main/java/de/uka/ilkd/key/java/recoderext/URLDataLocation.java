@@ -30,9 +30,7 @@ public record URLDataLocation(URL url) implements DataLocation {
      *
      * @see DataLocation#getInputStream()
      */
-    public InputStream getInputStream() throws IOException {
-        return url.openStream();
-    }
+    public InputStream getInputStream() throws IOException { return url.openStream(); }
 
     /**
      * @throws UnsupportedOperationException always
@@ -54,9 +52,7 @@ public record URLDataLocation(URL url) implements DataLocation {
         return new InputStreamReader(getInputStream(), StandardCharsets.UTF_8);
     }
 
-    public String getType() {
-        return LOCATION_TYPE_FILE;
-    }
+    public String getType() { return LOCATION_TYPE_FILE; }
 
     /**
      * Getter for url.
@@ -64,36 +60,22 @@ public record URLDataLocation(URL url) implements DataLocation {
      * @return the url of this data location
      */
     @Override
-    public URL url() {
-        return url;
-    }
+    public URL url() { return url; }
 
-    public String toString() {
-        return getType() + ":" + url;
-    }
+    public String toString() { return getType() + ":" + url; }
 
-    public boolean hasReaderSupport() {
-        return true;
-    }
+    public boolean hasReaderSupport() { return true; }
 
-    public boolean hasWriterSupport() {
-        return false;
-    }
+    public boolean hasWriterSupport() { return false; }
 
-    public boolean isWritable() {
-        return false;
-    }
+    public boolean isWritable() { return false; }
 
-    public void inputStreamClosed() {
-    }
+    public void inputStreamClosed() {}
 
-    public void outputStreamClosed() {
-    }
+    public void outputStreamClosed() {}
 
-    public void readerClosed() {
-    }
+    public void readerClosed() {}
 
-    public void writerClosed() {
-    }
+    public void writerClosed() {}
 
 }

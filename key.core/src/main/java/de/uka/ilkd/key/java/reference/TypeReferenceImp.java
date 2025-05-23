@@ -47,7 +47,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      *        the type reference) Comments
      * @param dim the dimension of this type
      */
-    public TypeReferenceImp(ExtList children, int dim) {
+    protected TypeReferenceImp(ExtList children, int dim) {
         super(children);
         prefix = children.get(ReferencePrefix.class);
         name = children.get(ProgramElementName.class);
@@ -55,11 +55,11 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     }
 
 
-    public TypeReferenceImp(ProgramElementName name) {
+    protected TypeReferenceImp(ProgramElementName name) {
         this(name, 0, null);
     }
 
-    public TypeReferenceImp(ProgramElementName name, int dimension, ReferencePrefix prefix) {
+    protected TypeReferenceImp(ProgramElementName name, int dimension, ReferencePrefix prefix) {
         this.name = name;
         this.dimensions = dimension;
         this.prefix = prefix;
