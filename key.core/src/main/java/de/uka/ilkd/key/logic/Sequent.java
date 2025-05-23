@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.logic.Name;
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -23,7 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * {@link Sequent#createSuccSequent} or by inserting formulas directly into
  * {@link Sequent#EMPTY_SEQUENT}.
  */
-public class Sequent implements Iterable<SequentFormula> {
+public class Sequent implements Iterable<SequentFormula>, EqualsModProofIrrelevancy {
 
     public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
 
@@ -281,6 +282,24 @@ public class Sequent implements Iterable<SequentFormula> {
             return false;
         }
         return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Sequent o1)) {
+            return false;
+        }
+
+        return antecedent.equalsModProofIrrelevancy(o1.antecedent)
+                && succedent.equalsModProofIrrelevancy(o1.succedent);
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return 0;
     }
 
     /**
