@@ -27,6 +27,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -41,6 +42,7 @@ public final class HeapLDT extends LDT {
 
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
+    public static final Name FINAL_NAME = new Name("final");
     public static final Name BASE_HEAP_NAME = new Name("heap");
     public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
     public static final Name PERMISSION_HEAP_NAME = new Name("permissions");
@@ -54,6 +56,7 @@ public final class HeapLDT extends LDT {
 
     // select/store
     private final SortDependingFunction select;
+    private final SortDependingFunction finalFunction;
     private final JFunction store;
     private final JFunction create;
     private final JFunction anon;
@@ -96,7 +99,8 @@ public final class HeapLDT extends LDT {
 
         fieldSort = sorts.lookup(new Name("Field"));
         select = addSortDependingFunction(services, SELECT_NAME.toString());
-        store = addFunction(services, "store");
+        finalFunction = addSortDependingFunction(services, FINAL_NAME.toString());
+        store = addFunction(services, STORE_NAME.toString());
         create = addFunction(services, "create");
         anon = addFunction(services, "anon");
         memset = addFunction(services, "memset");
@@ -153,7 +157,8 @@ public final class HeapLDT extends LDT {
      * @param className the class name
      * @param attributeName the attribute name
      */
-    public record SplitFieldName(String className, String attributeName) {}
+    public record SplitFieldName(String className, String attributeName) {
+    }
 
     /**
      * Splits a field name.
@@ -231,6 +236,29 @@ public final class HeapLDT extends LDT {
      */
     public SortDependingFunction getSelect(Sort instanceSort, TermServices services) {
         return select.getInstanceFor(instanceSort, services);
+    }
+
+    /**
+     * Returns the function symbol to access final fields for the given instance sort.
+     *
+     * @param instanceSort the sort of the value to be read
+     * @param services the services to find/create the sort-depending function
+     * @return the function symbol to access final fields for the given instance sort
+     */
+    public @NonNull SortDependingFunction getFinal(@NonNull Sort instanceSort,
+            @NonNull Services services) {
+        return finalFunction.getInstanceFor(instanceSort, services);
+    }
+
+    /**
+     * Check if the given operator is an instance of the "final" function to access final fields.
+     *
+     * @param op the operator to check
+     * @return true if the operator is an instance of the "X::final" srot-depending function
+     */
+    public boolean isFinalOp(Operator op) {
+        return op instanceof SortDependingFunction
+                && ((SortDependingFunction) op).isSimilar(finalFunction);
     }
 
 

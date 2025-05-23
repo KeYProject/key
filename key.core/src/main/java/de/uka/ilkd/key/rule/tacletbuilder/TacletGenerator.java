@@ -166,6 +166,8 @@ public class TacletGenerator {
             new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.nil(), findTerm);
 
         // choices, rule set
+        // Be careful that the choices used here is actually declared (see optionsDeclarations.key),
+        // otherwise the taclet will be unusable!
         var choice = ChoiceExpr.variable("modelFields",
             satisfiabilityGuard ? "showSatisfiability" : "treatAsAxiom");
         final RuleSet ruleSet = new RuleSet(
@@ -417,9 +419,13 @@ public class TacletGenerator {
             for (SchemaVariable paramSV : paramSVs) {
                 tacletBuilder.addVarsNotFreeIn(targetSV, paramSV);
             }
-            axiomSatisfiable =
-                TB.ex(targetSV, TB.and(targetSVReachable, OpReplacer.replace(targetTerm,
-                    TB.var(targetSV), schemaRepresents.term, services.getTermFactory())));
+            final var replaced = OpReplacer.replace(targetTerm,
+                TB.var(targetSV), schemaRepresents.term, services.getTermFactory());
+            if (targetSVReachable == null) { // no heaps are given e.g. no_state method
+                axiomSatisfiable = TB.ex(targetSV, replaced);
+            } else {
+                axiomSatisfiable = TB.ex(targetSV, TB.and(targetSVReachable, replaced));
+            }
         }
         return axiomSatisfiable;
     }
@@ -646,7 +652,7 @@ public class TacletGenerator {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
         Map<Term, Term> replace = new LinkedHashMap<>();
         int i = 0;
-        for (ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (ProgramVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
         }
         final OpReplacer replacer = new OpReplacer(replace, services.getTermFactory());
@@ -1016,5 +1022,6 @@ public class TacletGenerator {
     }
 
 
-    private record TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {}
+    private record TermAndBoundVarPair(Term term, ImmutableSet<VariableSV> boundVars) {
+    }
 }

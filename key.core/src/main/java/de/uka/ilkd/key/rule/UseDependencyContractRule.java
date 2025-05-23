@@ -344,7 +344,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         // heap term of observer must be store-term (or anon, create,
         // memset, ...)
         final Services services = goal.proof().getServices();
-        // final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        // final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         boolean hasRawSteps = false;
         for (int i = 0; i < target.getHeapCount(services) * target.getStateCount(); i++) {
             if (hasRawSteps(focus.sub(i), goal.sequent(), services)) {
@@ -380,7 +380,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term focus = pio.subTerm();
         final IObserverFunction target = (IObserverFunction) focus.op();
-        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         final TermBuilder TB = services.getTermBuilder();
 
         final Term selfTerm;
@@ -397,12 +397,14 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
 
         // configure contract
-        final DependencyContract contract =
+        DependencyContract contract =
             (DependencyContract) ((UseDependencyContractApp) ruleApp).getInstantiation();
+
         assert contract != null;
 
         // get step
-        final PosInOccurrence step = ((UseDependencyContractApp) ruleApp).step();
+        final PosInOccurrence step =
+            ((UseDependencyContractApp) ruleApp).step();
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);

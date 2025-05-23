@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
+import org.key_project.logic.SyntaxElement;
+
 /**
  * A type that implement this interface can be used in all java programs instead of an expression or
  * statement. For example class SchemaVariable implements this interface to be able to stand for
@@ -26,4 +28,9 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 public interface ProgramConstruct extends Expression, Statement, ILoopInit, IForUpdates, IGuard,
         Label, TerminalProgramElement, ExpressionStatement, TypeReference, IProgramVariable,
         IProgramMethod, Branch, IExecutionContext, MethodName {
+    @Override
+    SyntaxElement getChild(int n);
+
+    @Override
+    int getChildCount();
 }

@@ -203,18 +203,19 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         final JavaBlock jb = inst.modality.javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        Modality mod = Modality.getModality(((Modality) inst.modality.op()).kind(), postJavaBlock);
-        Term modTerm =
-            tb.prog(mod.kind(), postJavaBlock, inst.modality.sub(0),
+        Modality modality =
+            Modality.getModality(((Modality) inst.modality.op()).kind(), postJavaBlock);
+        Term modalityTerm =
+            tb.prog(modality.kind(), postJavaBlock, inst.modality.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    tb.tf().createTerm(mod, inst.modality.subs(), null,
+                    tb.tf().createTerm(modality, inst.modality.subs(), null,
                         inst.modality.getLabels())));
         Term lhs = tb.var(inst.assignmentTarget);
 
         Term update = tb.elementary(lhs,
             makeCall(services, inst.observerSymbol, inst.receiver, ImmutableList.of()));
-        Term normalPost = tb.apply(update, modTerm);
+        Term normalPost = tb.apply(update, modalityTerm);
         contGoal.changeFormula(new SequentFormula(tb.apply(inst.update, normalPost, null)),
             ruleApp.posInOccurrence());
 
@@ -262,17 +263,17 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         // ---- create "Assignment" cont branch
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        Modality mod = Modality.getModality(inst.mod.kind(), postJavaBlock);
-        Term modTerm =
-            tb.prog(inst.mod.kind(), postJavaBlock, inst.progPost.sub(0),
+        Modality modality = Modality.getModality(inst.modality.kind(), postJavaBlock);
+        Term modalityTerm =
+            tb.prog(inst.modality.kind(), postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    tb.tf().createTerm(mod, new ImmutableArray<>(inst.progPost.sub(0)), null,
+                    tb.tf().createTerm(modality, new ImmutableArray<>(inst.progPost.sub(0)), null,
                         inst.progPost.getLabels())));
         Term lhs = tb.var((ProgramVariable) inst.actualResult);
         Term update =
             tb.elementary(lhs, makeCall(services, inst.pm, inst.actualSelf, inst.actualParams));
-        Term normalPost = tb.apply(update, modTerm);
+        Term normalPost = tb.apply(update, modalityTerm);
         contGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
             ruleApp.posInOccurrence());
 

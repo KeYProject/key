@@ -440,12 +440,12 @@ public class TermBuilder {
         return tf.createTerm(f, s, boundVars, null);
     }
 
-    // public Term prog(Modality mod, Term t) {
-    // return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock());
+    // public Term prog(Modality modality, Term t) {
+    // return tf.createTerm(modality, new Term[] { t }, null, t.javaBlock());
     // }
     //
-    // public Term prog(Modality mod, Term t, ImmutableArray<TermLabel> labels) {
-    // return tf.createTerm(mod, new Term[] { t }, null, t.javaBlock(), labels);
+    // public Term prog(Modality modality, Term t, ImmutableArray<TermLabel> labels) {
+    // return tf.createTerm(modality, new Term[] { t }, null, t.javaBlock(), labels);
     // }
 
     public Term prog(Modality.JavaModalityKind modKind, JavaBlock jb, Term t) {
@@ -1560,7 +1560,7 @@ public class TermBuilder {
     }
 
     public Term inv(Term o) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -1574,7 +1574,7 @@ public class TermBuilder {
     }
 
     public Term staticInv(KeYJavaType t) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -1591,7 +1591,7 @@ public class TermBuilder {
     }
 
     public Term invFree(Term o) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -1605,7 +1605,7 @@ public class TermBuilder {
     }
 
     public Term staticInvFree(KeYJavaType t) {
-        List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
+        List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -1655,6 +1655,54 @@ public class TermBuilder {
     public Term staticDot(Sort asSort, JFunction f) {
         final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort ? staticDot(asSort, func(f)) : func(f, getBaseHeap());
+    }
+
+    /**
+     * Get a term for accessing a final field.
+     * This can be used for ordinary fields and model fields.
+     * The results are quite different!
+     *
+     * @param sort the sort of the result.
+     * @param o the object to access
+     * @param f the field to access
+     * @return the term representing the access "o.f"
+     * @see #finalDot(Sort, Term, Term) for accessing final Java or ghost fields
+     * @see #dot(Sort, Term, JFunction) for accessing final model fields
+     */
+    public Term finalDot(Sort sort, Term o, JFunction f) {
+        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        return f.sort() == fieldSort ? finalDot(sort, o, func(f))
+                : func(f, getBaseHeap(), o);
+    }
+
+    /**
+     * Get a term for accessing a static final field.
+     * This can be used for ordinary fields.
+     *
+     * @param sort the sort of the result.
+     * @param f the field to access
+     * @return the term representing the static access "C.f"
+     * @see #finalDot(Sort, Term, Term) for accessing final Java or ghost fields
+     * @see #dot(Sort, Term, JFunction) for accessing final model fields
+     */
+    public Term staticFinalDot(Sort sort, JFunction f) {
+        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        return f.sort() == fieldSort ? finalDot(sort, NULL(), func(f))
+                : func(f, getBaseHeap(), NULL());
+    }
+
+    /**
+     * Final fields can be treated differently outside the heap.
+     * This methods creates a heap-independent read access to final field.
+     *
+     * @param asSort the sort of the result.
+     * @param o the object to access
+     * @param f the field to access
+     * @return the term representing the access "o.f"
+     */
+    public Term finalDot(Sort asSort, Term o, Term f) {
+        return func(services.getTypeConverter().getHeapLDT().getFinal(asSort, services),
+            o, f);
     }
 
     public Term arr(Term idx) {
@@ -1920,7 +1968,7 @@ public class TermBuilder {
         return reachableValue(var(pv), pv.getKeYJavaType());
     }
 
-    public Term frame(Term heapTerm, Map<Term, Term> normalToAtPre, Term mod) {
+    public Term frame(Term heapTerm, Map<Term, Term> normalToAtPre, Term modifiable) {
         final Sort objectSort = services.getJavaInfo().objectSort();
         final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
 
@@ -1932,7 +1980,7 @@ public class TermBuilder {
         final Term fieldVarTerm = var(fieldVar);
 
         final OpReplacer or = new OpReplacer(normalToAtPre, tf);
-        final Term modAtPre = or.replace(mod);
+        final Term modifiableAtPre = or.replace(modifiable);
         final Term createdAtPre = or.replace(created(heapTerm, objVarTerm));
 
         ImmutableList<QuantifiableVariable> quantVars = ImmutableSLList.nil();
@@ -1943,7 +1991,7 @@ public class TermBuilder {
         // does not follow Java typing for the permission heap
         boolean permissionHeap =
             heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
-        return all(quantVars, or(elementOf(objVarTerm, fieldVarTerm, modAtPre),
+        return all(quantVars, or(elementOf(objVarTerm, fieldVarTerm, modifiableAtPre),
             and(not(equals(objVarTerm, NULL())), not(createdAtPre)),
             equals(
                 select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort()
@@ -1991,8 +2039,8 @@ public class TermBuilder {
                     or.replace(heapTerm), objVarTerm, fieldVarTerm)));
     }
 
-    public Term anonUpd(LocationVariable heap, Term mod, Term anonHeap) {
-        return elementary(heap, anon(var(heap), mod, anonHeap));
+    public Term anonUpd(LocationVariable heap, Term modifiable, Term anonHeap) {
+        return elementary(heap, anon(var(heap), modifiable, anonHeap));
     }
 
     public Term forallHeaps(Services services, Term t) {

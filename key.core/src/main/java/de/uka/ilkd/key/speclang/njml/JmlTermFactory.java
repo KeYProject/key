@@ -27,7 +27,6 @@ import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -918,16 +917,24 @@ public final class JmlTermFactory {
                         final Term fieldTerm = t.sub(2);
                         t = tb.singleton(objTerm, fieldTerm);
                         singletons = singletons.append(t);
+                    } else if (heapLDT.isFinalOp(t.op())) {
+                        final Term objTerm = t.sub(0);
+                        final Term fieldTerm = t.sub(1);
+                        t = tb.singleton(objTerm, fieldTerm);
+                        singletons = singletons.append(t);
                     } else if (t.op() instanceof ProgramVariable) {
                         // this case may happen with local variables
                         exc.addIgnoreWarning("local variable in assignable clause");
-                        LOGGER.debug("Can't create a locset from local variable " + t + ".\n"
-                            + "In this version of KeY, you do not need to put them in assignable clauses.");
+                        // Actually, KeY only talks about what is modifiable and not assignable in
+                        // general, but for legacy reasons, we use the name 'assignable'.
+                        LOGGER.debug("Cannot create a locset from local variable " + t + ".\n"
+                            + "In this version of KeY, you do not need to put them in "
+                            + "assignable clauses.");
                     } else {
-                        throw exc.createException0("Can't create a locset from " + t + ".");
+                        throw exc.createException0("Cannot create a locset from " + t + ".");
                     }
                 } else {
-                    throw exc.createException0("Can't create a locset of a singleton: " + expr);
+                    throw exc.createException0("Cannot create a locset of a singleton: " + expr);
                 }
             } else {
                 throw exc.createException0("Not a term: " + expr);
@@ -1027,8 +1034,16 @@ public final class JmlTermFactory {
         return new Pair<>((IObserverFunction) lhs.getTerm().op(), t);
     }
 
-    public Triple<IObserverFunction, Term, Term> depends(SLExpression lhs, Term rhs,
-            SLExpression mby) {
+    /**
+     * Translates the dependency clause ({@code accessible rhs := mby \measured_by mby}) into a
+     * dependency contract.
+     *
+     * @param lhs left-hand side of the clause
+     * @param rhs right-hand side of the clause
+     * @param mby measured by term, can be omitted
+     * @return {@link TranslatedDependencyContract}
+     */
+    public TranslatedDependencyContract depends(SLExpression lhs, Term rhs, SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
         if (!lhs.isTerm()) {
@@ -1047,11 +1062,15 @@ public final class JmlTermFactory {
                 + ", given" + lhs.getTerm().sub(0).op());
         }
 
-        return new Triple<>((IObserverFunction) lhs.getTerm().op(), rhs,
+        return new TranslatedDependencyContract((IObserverFunction) lhs.getTerm().op(), rhs,
             mby == null ? null : mby.getTerm());
     }
 
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public Term assignable(@NonNull Term term) {
         return accessible(term);
     }

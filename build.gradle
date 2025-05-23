@@ -21,11 +21,22 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "6.25.0"
+    id "com.diffplug.spotless" version "7.0.3"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.28"
+    id "org.checkerframework" version "0.6.53"
+
+    id("org.sonarqube") version "6.1.0.5360"
 }
+
+sonar {
+  properties {
+    property "sonar.projectKey", "KeYProject_key"
+    property "sonar.organization", "keyproject"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
 
 // Configure this project for use inside IntelliJ:
 idea {
@@ -40,10 +51,10 @@ static def getDate() {
 }
 
 // The $BUILD_NUMBER is an environment variable set by Jenkins.
-def build = System.env.BUILD_NUMBER == null ? "" : "-${System.env.BUILD_NUMBER}"
+def build = System.env.BUILD_NUMBER == null ? "-dev" : "-${System.env.BUILD_NUMBER}"
 
 group = "org.key-project"
-version = "2.13.0$build"
+version = "2.12.4$build"
 
 subprojects {
     apply plugin: "java"
@@ -62,8 +73,8 @@ subprojects {
     version = rootProject.version
 
     java {
-        sourceCompatibility = 17
-        targetCompatibility = 17
+        sourceCompatibility = 21
+        targetCompatibility = 21
     }
 
     repositories {
@@ -74,34 +85,39 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.slf4j:slf4j-api:2.0.13")
-        implementation("org.slf4j:slf4j-api:2.0.12")
-        testImplementation("ch.qos.logback:logback-classic:1.4.8")
+        implementation("org.slf4j:slf4j-api:2.0.17")
+        implementation("org.slf4j:slf4j-api:2.0.17")
+        testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
-        compileOnly("org.jspecify:jspecify:0.3.0")
-        testCompileOnly("org.jspecify:jspecify:0.3.0")
-        def eisop_version = "3.42.0-eisop2"
+        compileOnly("org.jspecify:jspecify:1.0.0")
+        testCompileOnly("org.jspecify:jspecify:1.0.0")
+        def eisop_version = "3.49.3-eisop1"
         compileOnly "io.github.eisop:checker-qual:$eisop_version"
         compileOnly "io.github.eisop:checker-util:$eisop_version"
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
+        checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
 
-        testImplementation("ch.qos.logback:logback-classic:1.5.6")
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.2'
+        testImplementation("ch.qos.logback:logback-classic:1.5.18")
+
+        testImplementation(platform("org.junit:junit-bom:5.12.2"))
+        testImplementation ("org.junit.jupiter:junit-jupiter-api")
+        testImplementation ("org.junit.jupiter:junit-jupiter-api")
+        testImplementation ("org.junit.jupiter:junit-jupiter-params")
+        testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
         testImplementation project(':key.util')
 
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     }
 
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-        // Setting the release to Java 17
-        options.release = 17
+        // Setting the release to Java 21
+        options.release = 21
     }
 
     tasks.withType(Javadoc) {
@@ -109,9 +125,7 @@ subprojects {
         options.addBooleanOption 'Xdoclint:none', true
         //options.verbose()
         options.encoding = 'UTF-8'
-        if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
-        }
+        options.addBooleanOption('html5', true)
     }
 
     tasks.withType(Test) {//Configure all tests
@@ -334,13 +348,20 @@ subprojects {
             targetExclude 'build/**'
 
             // allows us to use spotless:off / spotless:on to keep pre-formatted sections
+            // MU: Only ... because of the eclipse(...) below, it is "@formatter:off" and "@formatter:on"
+            // that must be used instead.
             toggleOffOn()
 
             removeUnusedImports()
-            /* At the moment, we have to ensure that version 4.22 of the eclipse formatter is run, since newer versions
-             * of the formatter crash in SymbolicExecutionTreeBuilder (seems to be a but in the formatter)!
+
+            /* When new options are added in new versions of the Eclipse formatter, the easiest way is to export the new
+             * style file from the Eclipse GUI and then use the CodeStyleMerger tool in
+             * "$rootDir/scripts/tools/checkstyle/CodeStyleMerger.java" to merge the old and the new style files,
+             * i.e. "java CodeStyleMerger.java <oldStyleFile> <newStyleFile> keyCodeStyle.xml". The tool adds all
+             * entries with keys that were not present in the old file and optionally overwrites the old entries. The
+             * file is output with ordered keys, such that the file can easily be diffed using git.
              */
-            eclipse("4.22").configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
+            eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
             //googleJavaFormat().aosp().reflowLongStrings()
 
@@ -351,9 +372,9 @@ subprojects {
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
-            if(project.name == 'recoder') {
+            if (project.name == 'recoder') {
                 licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
-            }else {
+            } else {
                 licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
             }
         }

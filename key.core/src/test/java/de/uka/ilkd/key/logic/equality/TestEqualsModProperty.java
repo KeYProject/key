@@ -5,6 +5,10 @@ package de.uka.ilkd.key.logic.equality;
 
 import java.util.Arrays;
 
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -19,12 +23,13 @@ import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for {@link TermEqualsModProperty}.
+ * Tests for {@link EqualsModProperty}.
  *
  * @author Tobias Reinhold
  */
@@ -63,14 +68,14 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         Term term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
-        assertFalse(term1.equalsModProperty(term2, RENAMING_PROPERTY),
+        assertFalse(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
             "Terms are different to begin with, so they shouldn't be equal");
-        assertFalse(term2.equalsModProperty(term1, RENAMING_PROPERTY),
+        assertFalse(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
             "Terms are different to begin with, so they shouldn't be equal");
         // other tests for equality already in TestTerm.java
 
         // ------------ comparison with something that is not a term
-        assertFalse(term1.equalsModProperty(1, RENAMING_PROPERTY),
+        assertFalse(term1.equalsModProperty(1, RENAMING_TERM_PROPERTY),
             "Should be false as other object is not a term");
 
         // ------------ differing labels
@@ -80,24 +85,34 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         ImmutableArray<TermLabel> labels1 = new ImmutableArray<>(irrelevantLabel);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
+        assertEquals(term1.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            term2.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal as labels do not matter (0)");
+
 
         labels1 = new ImmutableArray<>(relevantLabel1);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
+        assertEquals(term1.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            term2.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal as labels do not matter (1)");
 
         ImmutableArray<TermLabel> labels2 = new ImmutableArray<>(relevantLabel2);
         term2 = tb.label(term2, labels2);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_PROPERTY),
+        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_PROPERTY),
+        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
             "Should be true as labels do not matter");
+        assertEquals(term1.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            term2.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal as labels do not matter (2)");
     }
 
     // equalsModProperty(...) with IRRELEVANT_TERM_LABELS_PROPERTY
@@ -138,6 +153,9 @@ public class TestEqualsModProperty {
             "Should be true as term1 has no relevant term labels and term2 does not have any labels");
         assertTrue(term2.equalsModProperty(term1, IRRELEVANT_TERM_LABELS_PROPERTY),
             "Should be true as term1 has no relevant term labels and term2 does not have any labels");
+        assertEquals(term1.hashCodeModProperty(IRRELEVANT_TERM_LABELS_PROPERTY),
+            term2.hashCodeModProperty(IRRELEVANT_TERM_LABELS_PROPERTY),
+            "Hash codes should be equal as term1 has no relevant term labels and term2 does not have any labels (0)");
 
         // ------------ same relevant labels
         labels1 = new ImmutableArray<>(relevantLabel1, relevantLabel2);
@@ -149,6 +167,9 @@ public class TestEqualsModProperty {
             "Should be true as both terms have the same relevant term labels");
         assertTrue(term2.equalsModProperty(term1, IRRELEVANT_TERM_LABELS_PROPERTY),
             "Should be true as both terms have the same relevant term labels");
+        assertEquals(term1.hashCodeModProperty(IRRELEVANT_TERM_LABELS_PROPERTY),
+            term2.hashCodeModProperty(IRRELEVANT_TERM_LABELS_PROPERTY),
+            "Hash codes should be equal as both terms have the same relevant term labels (1)");
 
         // ------------ not the same relevant labels
         labels1 = new ImmutableArray<>(relevantLabel1, irrelevantLabel);
@@ -192,6 +213,9 @@ public class TestEqualsModProperty {
             "Should be true as underlying terms are equal");
         assertTrue(term2.equalsModProperty(term1, TERM_LABELS_PROPERTY),
             "Should be true as underlying terms are equal");
+        assertEquals(term1.hashCodeModProperty(TERM_LABELS_PROPERTY),
+            term2.hashCodeModProperty(TERM_LABELS_PROPERTY),
+            "Hash codes should be equal as all term labels are ignored (0)");
 
         // ------------ same relevant labels
         labels1 = new ImmutableArray<>(relevantLabel1, relevantLabel2);
@@ -203,6 +227,9 @@ public class TestEqualsModProperty {
             "Should be true as underlying terms are equal");
         assertTrue(term2.equalsModProperty(term1, TERM_LABELS_PROPERTY),
             "Should be true as underlying terms are equal");
+        assertEquals(term1.hashCodeModProperty(TERM_LABELS_PROPERTY),
+            term2.hashCodeModProperty(TERM_LABELS_PROPERTY),
+            "Hash codes should be equal as all term labels are ignored (1)");
 
         // ------------ not the same relevant labels
         labels1 = new ImmutableArray<>(relevantLabel1, irrelevantLabel);
@@ -213,6 +240,9 @@ public class TestEqualsModProperty {
             "Should be true as underlying terms are equal");
         assertTrue(term2.equalsModProperty(term1, TERM_LABELS_PROPERTY),
             "Should be true as underlying terms are equal");
+        assertEquals(term1.hashCodeModProperty(TERM_LABELS_PROPERTY),
+            term2.hashCodeModProperty(TERM_LABELS_PROPERTY),
+            "Hash codes should be equal as all term labels are ignored (2)");
     }
 
     // equalsModProperty(...) with PROOF_IRRELEVANCY_PROPERTY
@@ -253,6 +283,9 @@ public class TestEqualsModProperty {
             "Should be true as term1 has no relevant term labels and term2 does not have any labels");
         assertTrue(term2.equalsModProperty(term1, PROOF_IRRELEVANCY_PROPERTY),
             "Should be true as term1 has no relevant term labels and term2 does not have any labels");
+        assertEquals(term1.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY),
+            term2.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY),
+            "Hash codes should be equal as proof irrelevant properties are ignored (0)");
 
         // ------------ same relevant labels
         labels1 = new ImmutableArray<>(relevantLabel1, relevantLabel2, irrelevantLabel);
@@ -264,6 +297,9 @@ public class TestEqualsModProperty {
             "Should be true as both terms have the same relevant term labels");
         assertTrue(term2.equalsModProperty(term1, PROOF_IRRELEVANCY_PROPERTY),
             "Should be true as both terms have the same relevant term labels");
+        assertEquals(term1.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY),
+            term2.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY),
+            "Hash codes should be equal as proof irrelevant properties are ignored (1)");
 
         labels1 = new ImmutableArray<>(relevantLabel1, relevantLabel2, irrelevantLabel);
         labels2 = new ImmutableArray<>(relevantLabel1, relevantLabel2);
@@ -273,6 +309,9 @@ public class TestEqualsModProperty {
             "Should be true as both terms have the same relevant term labels and irrelevant labels do not matter");
         assertTrue(term2.equalsModProperty(term1, PROOF_IRRELEVANCY_PROPERTY),
             "Should be true as both terms have the same relevant term labels and irrelevant labels do not matter");
+        assertEquals(term1.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY),
+            term2.hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY),
+            "Hash codes should be equal as proof irrelevant properties are ignored (2)");
 
         // ------------ not the same relevant labels
         labels1 = new ImmutableArray<>(relevantLabel1);
@@ -283,5 +322,27 @@ public class TestEqualsModProperty {
             "Should be false as terms do not have the same relevant term labels");
         assertFalse(term2.equalsModProperty(term1, PROOF_IRRELEVANCY_PROPERTY),
             "Should be false as terms do not have the same relevant term labels");
+    }
+
+    @Test
+    public void renamingSourceElements() {
+        ProgramElement match1 = TacletForTests.parsePrg("{ int i; int j; /*Test*/ }");
+        ProgramElement match2 = TacletForTests.parsePrg("{ int i; /*Another test*/ int k; }");
+        assertTrue(
+            match1.equalsModProperty(match2, RENAMING_SOURCE_ELEMENT_PROPERTY,
+                new NameAbstractionTable()),
+            "ProgramElements should be equal modulo renaming (0).");
+        assertEquals(match1.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY),
+            match2.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY),
+            "Hash codes should be equal as ProgramElements are equal modulo renaming (0).");
+
+
+        Comment testComment = new Comment("test");
+        StringLiteral stringLiteral = new StringLiteral("testStringLiteral");
+
+        assertFalse(testComment.equalsModProperty(stringLiteral, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable()));
+        assertFalse(stringLiteral.equalsModProperty(testComment, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable()));
     }
 }

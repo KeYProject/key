@@ -41,7 +41,7 @@ problem
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
   | PROOFOBLIGATION  (proofObligation=cvalue)? SEMI?
   )
-  proofScript?
+  proofScriptEntry?
 ;
 
 
@@ -670,6 +670,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISARRAY
   | ISARRAYLENGTH
   | IS_ABSTRACT_OR_INTERFACE
+  | IS_FINAL
   | ENUM_CONST
   | FINAL
   | STATIC
@@ -688,6 +689,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | NEW
   | NEW_TYPE_OF
   | NEW_DEPENDING_ON
+  | NEW_LOCAL_VARS
   | HAS_ELEMENTARY_SORT
   | SAME
   | ISSUBTYPE
@@ -804,7 +806,7 @@ one_contract
 :
    contractName = simple_ident LBRACE
    (prog_var_decls)?
-   fma=term MODIFIES modifiesClause=term
+   fma=term MODIFIABLE modifiableClause=term
    RBRACE SEMI
 ;
 
@@ -850,10 +852,34 @@ preferences
 	            |  c=cvalue ) // LBRACE, RBRACE included in cvalue#table
 ;
 
-proofScript
+proofScriptEntry
 :
-  PROOFSCRIPT ps = STRING_LITERAL
+  PROOFSCRIPT
+    ( STRING_LITERAL SEMI?
+    | LBRACE proofScript RBRACE
+    )
 ;
+proofScriptEOF: proofScript EOF;
+proofScript: proofScriptCommand+;
+proofScriptCommand: cmd=IDENT proofScriptParameters?
+	( LBRACE sub=proofScript RBRACE SEMI?
+	| SEMI);
+
+proofScriptParameters: proofScriptParameter+;
+proofScriptParameter :  ((pname=proofScriptParameterName (COLON|EQUALS))? expr=proofScriptExpression);
+proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
+proofScriptExpression:
+    boolean_literal
+  | char_literal
+  | integer
+  | floatnum
+  | string_literal
+  | LPAREN (term | seq) RPAREN
+  | simple_ident
+  | abbreviation
+  | literals
+  ;
+
 
 // PROOF
 proof: PROOF EOF;

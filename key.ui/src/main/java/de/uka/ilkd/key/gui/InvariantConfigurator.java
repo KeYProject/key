@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -37,7 +36,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import static java.lang.String.format;
 
 /**
- * This class creates a dialog to input a user-defined invariant, variant and modifies formula for a
+ * This class creates a dialog to input a user-defined invariant, variant and modifiable formula for
+ * a
  * selected loop.
  *
  * @author Dreiner, bruns
@@ -78,8 +78,9 @@ public class InvariantConfigurator {
     }
 
     /**
-     * Creates a Dialog. User can enter Invariant, Variant and Modifies clause. The input is parsed
-     * and a new loop invariant is returned. In case of a ParserException an error-message is shown.
+     * Creates a Dialog. User can enter Invariant, Variant and Modifiable clause. The input is
+     * parsed and a new loop invariant is returned. In case of a ParserException an error-message
+     * is shown.
      *
      * @param loopInv the {@link LoopSpecification} (complete or partial) to be displayed and
      *        edited in the dialog
@@ -100,8 +101,6 @@ public class InvariantConfigurator {
         index = 0;
 
         class InvariantDialog extends JDialog {
-            private final LocationVariable HEAP_LDT =
-                services.getTypeConverter().getHeapLDT().getHeap();
             private final Color COLOR_SUCCESS = Color.GREEN;
             private final Color COLOR_ERROR = Color.RED;
 
@@ -109,7 +108,7 @@ public class InvariantConfigurator {
             private static final String VARIANT_REQUIRED = "Variant required!";
             private static final String INVARIANTTITLE = "Invariant%s: ";
             private static final String VARIANTTITLE = "Variant%s: ";
-            private static final String MODIFIESTITLE = "Modifies%s: ";
+            private static final String MODIFIABLETITLE = "Modifiable%s: ";
             private static final String IF_PRE_TITLE = "InfFlowPreExpressions%s: ";
             private static final String IF_POST_TITLE = "InfFlowPostExpressions%s: ";
             private static final String IF_OO_TITLE = "InfFlowNewObjects%s: ";
@@ -121,8 +120,8 @@ public class InvariantConfigurator {
             private final List<JTabbedPane> heapPanes = new ArrayList<>();
 
             private Term variantTerm = null;
-            private final Map<LocationVariable, Term> modifiesTerm = new LinkedHashMap<>();
-            private final Map<LocationVariable, Term> freeModifiesTerm = new LinkedHashMap<>();
+            private final Map<LocationVariable, Term> modifiableTerm = new LinkedHashMap<>();
+            private final Map<LocationVariable, Term> freeModifiableTerm = new LinkedHashMap<>();
             private final Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
                 new LinkedHashMap<>();
             private final Map<LocationVariable, Term> invariantTerm = new LinkedHashMap<>();
@@ -185,11 +184,6 @@ public class InvariantConfigurator {
                 setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
-                Term self = loopInv.getInternalSelfTerm();
-                if (self != null) {
-                    nss.programVariables()
-                            .add(new LocationVariable(new ProgramElementName("self"), self.sort()));
-                }
                 parser = new KeyIO(services, nss);
                 parser.setAbbrevMap(getAbbrevMap());
 
@@ -262,15 +256,16 @@ public class InvariantConfigurator {
 
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
-                    final Term modifies =
-                        loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
+                    final Term modifiable =
+                        loopInv.getModifiable(heap, loopInv.getInternalSelfTerm(), atPres,
+                            services);
 
-                    if (modifies == null) {
+                    if (modifiable == null) {
                         // FIXME check again and think what is the default for savedHeap
                         loopInvTexts[MOD_IDX].put(heap.toString(), "allLocs");
                     } else {
-                        // pretty syntax cannot be parsed yet for modifies
-                        loopInvTexts[MOD_IDX].put(heap.toString(), printTerm(modifies, false));
+                        // pretty syntax cannot be parsed yet for modifiable
+                        loopInvTexts[MOD_IDX].put(heap.toString(), printTerm(modifiable, false));
                     }
                 }
 
@@ -386,10 +381,10 @@ public class InvariantConfigurator {
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 Map<String, String> mods = invariants.get(i)[MOD_IDX];
                 for (String k : mods.keySet()) {
-                    String title = format(MODIFIESTITLE,
+                    String title = format(MODIFIABLETITLE,
                         k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "[" + k + "]");
                     JTextArea textArea = createInputTextArea(title, mods.get(k));
-                    setModifiesListener(textArea, k, i);
+                    setModifiableListener(textArea, k, i);
                     modPane.add(k, textArea);
                 }
 
@@ -492,7 +487,7 @@ public class InvariantConfigurator {
                 });
             }
 
-            private void setModifiesListener(JTextArea ta, final String key, int i) {
+            private void setModifiableListener(JTextArea ta, final String key, int i) {
                 index = i;
                 ta.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -590,14 +585,18 @@ public class InvariantConfigurator {
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
+
+                    final LocationVariable baseHeap =
+                        services.getTypeConverter().getHeapLDT().getHeap();
                     final String k = heap.name().toString();
                     String title =
-                        format("Invariant%s - Status: ", heap == HEAP_LDT ? "" : "[" + k + "]");
+                        format("Invariant%s - Status: ", heap == baseHeap ? "" : "[" + k + "]");
                     String errorMessage = invMsgs == null ? "OK" : invMsgs.get(k);
                     Color invColor = invColors == null ? COLOR_SUCCESS : invColors.get(k);
                     JTextArea textArea = createErrorTextField(title, errorMessage, invColor);
                     invPane.add(k, textArea);
-                    title = format("Modifies%s - Status: ", heap == HEAP_LDT ? "" : "[" + k + "]");
+                    title =
+                        format("Modifiable%s - Status: ", heap == baseHeap ? "" : "[" + k + "]");
                     String errorMessage2 = modMsgs == null ? "OK" : modMsgs.get(k);
                     Color modColor = modColors == null ? COLOR_SUCCESS : modColors.get(k);
                     textArea = createErrorTextField(title, errorMessage2, modColor);
@@ -816,7 +815,7 @@ public class InvariantConfigurator {
 
                 if (requirementsAreMet) {
                     newInvariant = loopInv.configurate(invariantTerm, freeInvariantTerm,
-                        modifiesTerm, freeModifiesTerm, infFlowSpecs, variantTerm);
+                        modifiableTerm, freeModifiableTerm, infFlowSpecs, variantTerm);
                     return true;
                 } else {
                     return false;
@@ -842,13 +841,13 @@ public class InvariantConfigurator {
                         setError(invErrors, invCols, heap.toString(), e.getMessage());
                     }
                     try {
-                        modifiesTerm.put(heap, parseModifies(heap));
+                        modifiableTerm.put(heap, parseModifiable(heap));
                         setOK(modErrors, modCols, heap.toString());
                     } catch (Exception e) {
                         setError(modErrors, modCols, heap.toString(), e.getMessage());
                     }
                 }
-                LocationVariable baseHeap = HEAP_LDT;
+                LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 // TODO: add post expressions and new objects
                 try {
                     infFlowSpecs.put(baseHeap, parseInfFlowSpec(baseHeap));
@@ -976,7 +975,7 @@ public class InvariantConfigurator {
                 return MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap();
             }
 
-            protected Term parseModifies(LocationVariable heap) {
+            protected Term parseModifiable(LocationVariable heap) {
                 index = inputPane.getSelectedIndex();
                 final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
                 String string = invariants.get(index)[MOD_IDX].get(heap.toString());

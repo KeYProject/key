@@ -397,7 +397,6 @@ public final class ProblemInitializer {
         }
 
         // register non-built-in rules
-        // register non-built-in rules
         Proof[] proofs = pl.getProofs();
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
@@ -600,7 +599,8 @@ public final class ProblemInitializer {
             // done
             proofCreated(pa);
             return pa;
-        } catch (ProofInputException e) {
+        } catch (Exception e) {
+            // This has been generalised from ProofInputException to not miss exceptions
             reportException(po, e);
             throw e;
         } finally {

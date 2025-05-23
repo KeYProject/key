@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -30,7 +31,6 @@ public final class SortDependingFunction extends JFunction {
 
     private final SortDependingFunctionTemplate template;
     private final Sort sortDependingOn;
-
 
     // -------------------------------------------------------------------------
     // constructors
@@ -187,5 +187,19 @@ public final class SortDependingFunction extends JFunction {
 
     private record SortDependingFunctionTemplate(GenericSort sortDependingOn, Name kind, Sort sort,
             ImmutableArray<Sort> argSorts, boolean unique) {
+    }
+
+    @Override
+    public int getChildCount() {
+        return 1;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        if (n == 0) {
+            return QualifierWrapper.get(sortDependingOn);
+        }
+        throw new IndexOutOfBoundsException(
+            "SortDependingFunction " + name() + " has only one child");
     }
 }

@@ -18,13 +18,12 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -55,7 +54,6 @@ import org.key_project.util.java.SwingUtil;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Signal;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow} with the
@@ -79,19 +77,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new BlockContractInternalCompletion(mainWindow));
         completions.add(new BlockContractExternalCompletion(mainWindow));
         completions.add(MergeRuleCompletion.INSTANCE);
-        try {
-            Signal.handle(new Signal("INT"), sig -> {
-                if (getMediator().isInAutoMode()) {
-                    LOGGER.warn("Caught SIGINT, stopping automode...");
-                    getMediator().getUI().getProofControl().stopAutoMode();
-                } else {
-                    LOGGER.warn("Caught SIGINT, exiting...");
-                    new ExitMainAction(mainWindow).exitMainWithoutInteraction();
-                }
-            });
-        } catch (Exception e) {
-            // the above is optional functionality and may not work on every OS
-        }
     }
 
     @Override
@@ -149,7 +134,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportException(Object sender, ProofOblInput input, Exception e) {
-        reportStatus(sender, input.name() + " failed");
+        IssueDialog.showExceptionDialog(mainWindow, e);
     }
 
     @Override
@@ -237,15 +222,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
                 if (problemLoader.hasProofScript()) {
-                    Pair<String, Location> scriptAndLoc;
-                    try {
-                        scriptAndLoc = problemLoader.readProofScript();
-                        ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                            scriptAndLoc.first, scriptAndLoc.second);
+                    KeyAst.ProofScript scriptAndLoc = problemLoader.getProofScript();
+                    if (scriptAndLoc != null) {
+                        ProofScriptWorker psw =
+                            new ProofScriptWorker(mainWindow.getMediator(), scriptAndLoc);
                         psw.init();
                         psw.execute();
-                    } catch (ProofInputException e) {
-                        LOGGER.warn("Failed to load proof", e);
                     }
                 } else if (macroChosen()) {
                     applyMacro();

@@ -32,7 +32,6 @@ import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -45,7 +44,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -652,7 +652,7 @@ public class MergeRuleUtils {
             return JavaBlock.EMPTY_JAVABLOCK;
         }
 
-        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
+        if (term.subs().isEmpty() || !term.javaBlock().isEmpty()) {
             return term.javaBlock();
         } else {
             for (Term sub : term.subs()) {
@@ -821,7 +821,8 @@ public class MergeRuleUtils {
 
         // Quick short cut for the special case where no program variables
         // have to be renamed.
-        if (se1.equalsModRenaming(se2, new NameAbstractionTable())) {
+        if (se1.equalsModProperty(se2, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable())) {
             return true;
         }
 
@@ -836,7 +837,8 @@ public class MergeRuleUtils {
         replVisitor1.start();
         replVisitor2.start();
 
-        return replVisitor1.result().equalsModRenaming(replVisitor2.result(),
+        return replVisitor1.result().equalsModProperty(replVisitor2.result(),
+            RENAMING_SOURCE_ELEMENT_PROPERTY,
             new NameAbstractionTable());
     }
 
@@ -1029,7 +1031,7 @@ public class MergeRuleUtils {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio, services);
 
-        return new SymbolicExecutionState(triple.first, triple.second, node);
+        return new SymbolicExecutionState(triple.symbolicState(), triple.pathCondition(), node);
     }
 
     /**
@@ -1096,11 +1098,12 @@ public class MergeRuleUtils {
             final Node node = sequentInfo.getGoal().node();
             final Services services = sequentInfo.getGoal().proof().getServices();
 
-            Triple<Term, Term, Term> partnerSEState =
+            SymbolicExecutionStateWithProgCnt partnerSEState =
                 sequentToSETriple(node, sequentInfo.getPio(), services);
 
             result = result.prepend(
-                new SymbolicExecutionState(partnerSEState.first, partnerSEState.second, node));
+                new SymbolicExecutionState(partnerSEState.symbolicState(),
+                    partnerSEState.pathCondition(), node));
         }
 
         return result;
@@ -1375,7 +1378,7 @@ public class MergeRuleUtils {
      */
     private static Term joinListToAndTerm(ImmutableList<SequentFormula> formulae,
             Services services) {
-        if (formulae.size() == 0) {
+        if (formulae.isEmpty()) {
             return services.getTermBuilder().tt();
         } else if (formulae.size() == 1) {
             return formulae.head().formula();
@@ -1721,7 +1724,7 @@ public class MergeRuleUtils {
 
         public TermWrapper wrapTerm(Term term) {
             for (Term existingTerm : wrappedTerms) {
-                if (existingTerm.equalsModProperty(term, RENAMING_PROPERTY)) {
+                if (existingTerm.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     return new TermWrapper(term, existingTerm.hashCode());
                 }
             }
@@ -1742,46 +1745,46 @@ public class MergeRuleUtils {
     }
 
     /**
-         * Simple term wrapper for comparing terms modulo renaming.
-         *
-         * @author Dominic Scheurer
-         * @see TermWrapperFactory
-         */
-        record TermWrapper(Term term, int hashcode) {
+     * Simple term wrapper for comparing terms modulo renaming.
+     *
+     * @author Dominic Scheurer
+     * @see TermWrapperFactory
+     */
+    record TermWrapper(Term term, int hashcode) {
 
         @Override
-            public boolean equals(Object obj) {
-                return obj instanceof TermWrapper
-                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_PROPERTY);
-            }
-
-            @Override
-            public int hashCode() {
-                return hashcode;
-            }
-
-            @Override
-            public String toString() {
-                return term.toString();
-            }
-
-            /**
-             * Adds the wrapped content of the Iterable object into the given target collection.
-             *
-             * @param target            The collection to insert the wrapped terms into.
-             * @param wrappedCollection Iterable to transform.
-             * @return The target collection with inserted terms.
-             */
-            public static <T extends Collection<Term>> T toTermList(T target,
-                                                                    Iterable<TermWrapper> wrappedCollection) {
-
-                for (TermWrapper termWrapper : wrappedCollection) {
-                    target.add(termWrapper.term());
-                }
-
-                return target;
-            }
+        public boolean equals(Object obj) {
+            return obj instanceof TermWrapper
+                    && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
         }
+
+        @Override
+        public int hashCode() {
+            return hashcode;
+        }
+
+        @Override
+        public String toString() {
+            return term.toString();
+        }
+
+        /**
+         * Adds the wrapped content of the Iterable object into the given target collection.
+         *
+         * @param target The collection to insert the wrapped terms into.
+         * @param wrappedCollection Iterable to transform.
+         * @return The target collection with inserted terms.
+         */
+        public static <T extends Collection<Term>> T toTermList(T target,
+                Iterable<TermWrapper> wrappedCollection) {
+
+            for (TermWrapper termWrapper : wrappedCollection) {
+                target.add(termWrapper.term());
+            }
+
+            return target;
+        }
+    }
 
     /**
      * Visitor for collecting program locations in a Java block.

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 /**
@@ -14,7 +15,7 @@ import org.key_project.logic.sort.Sort;
  * variables have to be accompanied by a "NewDependingOn" varcond, although with the removal of the
  * meta variable mechanism, this would no longer really be necessary.
  */
-public final class SkolemTermSV extends OperatorSV {
+public final class SkolemTermSV extends OperatorSV implements TerminalSyntaxElement {
 
     /**
      * Creates a new schema variable that is used as placeholder for skolem terms.

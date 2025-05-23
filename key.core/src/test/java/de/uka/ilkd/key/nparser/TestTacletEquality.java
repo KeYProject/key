@@ -42,7 +42,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * <h2>How to update {@code taclet.old.txt} efficiently.</h2>
  * <p>
  * You can generate a new oracle easily by invoking the disabled test-method
- * {@link #createNewOracle()}. This method generates the {@code taclet.new.txt} file. Then, you
+ * {@link #createNewOracle()}. This method generates the {@code taclets.new.txt} file. Then, you
  * should use a diff-tool to compare the changes or directly overwrite {@code taclets.old.txt} with
  * the new representations.
  *
@@ -123,6 +123,11 @@ public class TestTacletEquality {
         } catch (IOException e) {
             Assertions.fail("Exception for opening " + path, e);
         }
+    }
+
+    // @Test
+    public void createOracle() {
+        createNewOracle();
     }
 
     @ParameterizedTest

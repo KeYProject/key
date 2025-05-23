@@ -1089,65 +1089,66 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     }
 
     record ResolvedTypeArgument(WildcardMode wm, Type type,
-                                List<? extends TypeArgument> typeArgs) implements TypeArgument {
+            List<? extends TypeArgument> typeArgs) implements TypeArgument {
         ResolvedTypeArgument {
             if (!(type instanceof ArrayType || type instanceof ClassType)) {
                 throw new IllegalArgumentException();
             }
         }
 
-    public WildcardMode getWildcardMode() {
-        return wm;
+        public WildcardMode getWildcardMode() {
+            return wm;
+        }
+
+        public String getTypeName() {
+            return type.getFullName();
+        }
+
+        public List<? extends TypeArgument> getTypeArguments() {
+            return typeArgs;
+        }
+
     }
 
-    public String getTypeName() {
-        return type.getFullName();
+
+    static class ClassTypeCacheEntry {
+        List<ClassType> supertypes; // used in specialized services only
+
+        Set<ClassType> subtypes;
+
+        List<ClassType> allSupertypes;
+
+        List<ClassType> allMemberTypes;
+
+        List<Field> allFields;
+
+        List<Method> allMethods;
     }
 
-    public List<? extends TypeArgument> getTypeArguments() {
-        return typeArgs;
+
+    static class SuperTypeTopSort extends ClassTypeTopSort {
+
+        protected final List<ClassType> getAdjacent(ClassType c) {
+            return c.getSupertypes();
+        }
     }
 
+
+    static class ReplaceTypeArgResult {
+        final Type baseType;
+        final WildcardMode wildcardMode;
+
+        ReplaceTypeArgResult(Type t, WildcardMode wm) {
+            this.baseType = t;
+            this.wildcardMode = wm;
+        }
+    }
+
+
+    class SubTypeTopSort extends ClassTypeTopSort {
+
+        protected final List<ClassType> getAdjacent(ClassType c) {
+            return getSubtypes(c);
+        }
+    }
 }
-
-
-static class ClassTypeCacheEntry {
-    List<ClassType> supertypes; // used in specialized services only
-
-    Set<ClassType> subtypes;
-
-    List<ClassType> allSupertypes;
-
-    List<ClassType> allMemberTypes;
-
-    List<Field> allFields;
-
-    List<Method> allMethods;
-}
-
-
-static class SuperTypeTopSort extends ClassTypeTopSort {
-
-    protected final List<ClassType> getAdjacent(ClassType c) {
-        return c.getSupertypes();
-    }
-}
-
-
-static class ReplaceTypeArgResult {
-    final Type baseType;
-    final WildcardMode wildcardMode;
-
-    ReplaceTypeArgResult(Type t, WildcardMode wm) {
-        this.baseType = t;
-        this.wildcardMode = wm;
-    }
-}
-
-
-class SubTypeTopSort extends ClassTypeTopSort {
-
-    protected final List<ClassType> getAdjacent(ClassType c) {
-        return getSubtypes(c);
-    }
-}}

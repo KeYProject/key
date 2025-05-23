@@ -4,15 +4,21 @@
 package de.uka.ilkd.key.logic.equality;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.util.EqualityUtils;
 
 import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A property that can be used in
- * {@link TermEqualsModProperty#equalsModProperty(Object, TermProperty)}.
+ * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
  * All term labels are ignored in this equality check.
+ * <p>
+ * The single instance of this property can be accessed through
+ * {@link TermLabelsProperty#TERM_LABELS_PROPERTY}.
+ *
+ * @author Tobias Reinhold
  */
-public class TermLabelsProperty implements TermProperty {
+public class TermLabelsProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
@@ -20,25 +26,24 @@ public class TermLabelsProperty implements TermProperty {
 
     /**
      * This constructor is private as a single instance of this class should be shared. The instance
-     * can be accessed
-     * through {@link TermLabelsProperty#TERM_LABELS_PROPERTY} and is used as a parameter for
-     * {@link TermProperty#equalsModThisProperty(Term, Term)}.
+     * can be accessed through {@link TermLabelsProperty#TERM_LABELS_PROPERTY} and is used as a
+     * parameter for {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])}.
      */
     private TermLabelsProperty() {}
 
     /**
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, ignoring <b>all</b>
-     * term
-     * labels.
+     * term labels.
      *
      * @param term1 a term
      * @param term2 the term compared to {@code term1}
+     * @param v should not be used for this equality check
      * @return {@code true} iff {@code term2} is a term syntactically equal to {@code term1}
-     *         ignoring <b>all</b>
-     *         term labels
+     *         ignoring <b>all</b> term labels
+     * @param <V> is not needed for this equality check
      */
     @Override
-    public Boolean equalsModThisProperty(Term term1, Term term2) {
+    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
         }
@@ -59,9 +64,26 @@ public class TermLabelsProperty implements TermProperty {
         return true;
     }
 
+    /**
+     * Computes the hash code of {@code term} while ignoring <b>all</b> term labels.
+     *
+     * @param term the term to compute the hash code for
+     * @return the hash code
+     */
     @Override
     public int hashCodeModThisProperty(Term term) {
-        throw new UnsupportedOperationException(
-            "Hashing of terms modulo term labels not yet implemented!");
+        /*
+         * Currently, the hash code is computed almost the same way as in TermImpl. This is also the
+         * case for labeled terms, as all term labels are ignored.
+         */
+        int hashcode = 5;
+        hashcode = hashcode * 17 + term.op().hashCode();
+        hashcode = hashcode * 17
+                + EqualityUtils.hashCodeModPropertyOfIterable(TERM_LABELS_PROPERTY, term.subs());
+        hashcode = hashcode * 17 + term.boundVars().hashCode();
+        hashcode = hashcode * 17 + term.javaBlock().hashCode();
+
+        return hashcode;
     }
+
 }
