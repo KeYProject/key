@@ -21,11 +21,6 @@ import org.jspecify.annotations.NonNull;
  */
 class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
     /**
-     * Branch label prefix used for linearized mode.
-     */
-    private static final String MAIN_LABEL = "Normal Execution";
-
-    /**
      * User-facing label for this branch. Always a string.
      */
     private final Object label;
@@ -83,11 +78,8 @@ class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
             if (nextN.size() > 1) {
                 // linearized mode: the main branch will be continued without a new BranchNode
                 if (getProofTreeModel().linearizedModeActive()
-                        && (nextN.get(0).getNodeInfo().getBranchLabel() != null
-                                && nextN.get(0).getNodeInfo().getBranchLabel()
-                                        .startsWith(MAIN_LABEL)
-                                || n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
-                                        .equals(taclet.goalTemplates().last().getTag(), "main"))) {
+                        && (n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
+                                .equals(taclet.goalTemplates().last().getTag(), "main"))) {
                     n = nextN.get(0);
                     nextN.remove(0);
                     for (var node : nextN) {
