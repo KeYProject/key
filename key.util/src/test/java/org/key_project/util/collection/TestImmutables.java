@@ -148,11 +148,11 @@ public class TestImmutables {
 
     @Test
     public void testIntersectEmpty() {
-        ImmutableSet<Object> s0 = DefaultImmutableSet.nil();
-        ImmutableSet<Object> s1 = DefaultImmutableSet.nil().add("1");
-        ImmutableSet<Object> s2 = DefaultImmutableSet.nil().add("2");
+        var s0 = DefaultImmutableSet.nil();
+        var s1 = DefaultImmutableSet.nil().add("1");
+        var s2 = DefaultImmutableSet.nil().add("2");
 
-        ImmutableSet<Object> sIntersect = s1.intersect(s2);
+        var sIntersect = s1.intersect(s2);
         assertEquals(0, sIntersect.size());
         assertEquals(s0, sIntersect);
     }
@@ -160,8 +160,8 @@ public class TestImmutables {
     @Test
     public void testHashCodes() {
 
-        ImmutableSet<Object> s1 = DefaultImmutableSet.nil().add("one").add("two");
-        ImmutableSet<Object> s2 = DefaultImmutableSet.nil().add("two").add("one");
+        var s1 = DefaultImmutableSet.nil().add("one").add("two");
+        var s2 = DefaultImmutableSet.nil().add("two").add("one");
 
         assertEquals(s1, s2);
         int hash1 = s1.hashCode();
