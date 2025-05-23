@@ -42,7 +42,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      */
     protected final List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
 
-    public AbstractPropertiesSettings(String category) {
+    protected AbstractPropertiesSettings(String category) {
         this.category = category;
     }
 

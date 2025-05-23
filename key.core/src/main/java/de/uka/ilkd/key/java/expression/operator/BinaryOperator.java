@@ -19,11 +19,11 @@ import org.key_project.util.ExtList;
  */
 public abstract class BinaryOperator extends Operator {
 
-    public BinaryOperator(ExtList children) {
+    protected BinaryOperator(ExtList children) {
         super(children);
     }
 
-    public BinaryOperator(Expression lhs, Expression rhs) {
+    protected BinaryOperator(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }
 

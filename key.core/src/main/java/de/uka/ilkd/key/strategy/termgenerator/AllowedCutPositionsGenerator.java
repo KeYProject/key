@@ -6,24 +6,26 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /**
  * Enumerate potential subformulas of a formula that could be used for a cut (taclet cut_direct).
  * This term-generator does not descend below quantifiers, only below propositional junctors
  */
-public class AllowedCutPositionsGenerator implements TermGenerator {
+public class AllowedCutPositionsGenerator implements TermGenerator<Goal> {
 
     private AllowedCutPositionsGenerator() {}
 
-    public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator();
+    public final static TermGenerator<Goal> INSTANCE = new AllowedCutPositionsGenerator();
 
+    @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         return new ACPIterator(pos.sequentFormula().formula(), pos.isInAntec());
@@ -41,14 +43,16 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
             termStack.push(negated);
         }
 
+        @Override
         public boolean hasNext() {
             return !termStack.isEmpty();
         }
 
+        @Override
         public Term next() {
             final boolean negated = (Boolean) termStack.pop();
             final Term res = (Term) termStack.pop();
-            final Operator op = res.op();
+            final var op = res.op();
 
             if (op == Junctor.NOT) {
                 push(res.sub(0), !negated);
@@ -63,6 +67,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
             return res;
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException("Remove not supported");
         }

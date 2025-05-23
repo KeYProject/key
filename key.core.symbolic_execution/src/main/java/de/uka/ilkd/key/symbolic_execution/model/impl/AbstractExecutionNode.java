@@ -11,7 +11,6 @@ import java.util.Map;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -109,7 +109,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
+    protected AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -383,10 +383,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @return The {@link PosInOccurrence}s of the modality or its updates.
      */
     protected PosInOccurrence lazyComputeModalityPIO() {
-        PosInOccurrence originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
+        PosInOccurrence originalPio =
+            getProofNode().getAppliedRuleApp().posInOccurrence();
         // Try to go back to the parent which provides the updates
         PosInOccurrence pio = originalPio;
-        Term term = pio.subTerm();
+        var term = pio.subTerm();
         if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
             pio = pio.up();
             term = pio.subTerm();

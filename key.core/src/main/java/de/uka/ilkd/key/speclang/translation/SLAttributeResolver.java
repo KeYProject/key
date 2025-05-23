@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -107,7 +108,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 if (et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
                     if (recTerm != null) {
-                        final JFunction thisFieldSymbol =
+                        final Function thisFieldSymbol =
                             heapLDT.getFieldSymbolForPV(et, services);
                         recTerm =
                             services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
@@ -130,7 +131,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     attribute.getKeYJavaType());
             } else {
                 try {
-                    final JFunction fieldSymbol =
+                    final Function fieldSymbol =
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     Term attributeTerm;
                     if (attribute.isStatic()) {

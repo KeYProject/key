@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.TermSV;
+
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * class containing a pair of SchemaVariables, the first one being a TermSV, the second one a

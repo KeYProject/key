@@ -6,13 +6,16 @@ package org.key_project.isabelletranslation.automation;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -57,11 +60,11 @@ public class IsabelleRuleApp extends AbstractExternalSolverRuleApp {
         for (SequentFormula succ : seq.succedent()) {
             ifInsts.add(new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
         }
-        return app.setIfInsts(ImmutableList.fromList(ifInsts));
+        return app.setAssumesInsts(ImmutableList.fromList(ifInsts));
     }
 
     @Override
-    public IsabelleRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IsabelleRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -100,13 +103,12 @@ public class IsabelleRuleApp extends AbstractExternalSolverRuleApp {
          * with the same sequent as the given one.
          *
          * @param goal the Goal on which to apply <tt>ruleApp</tt>
-         * @param services the Services with the necessary information about the java programs
          * @param ruleApp the rule application to be executed
          * @return a list with an identical goal as the given <tt>goal</tt>
          */
         @Override
         @NonNull
-        public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+        public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
                 goal.proof().getInitConfig().registerRule(RULE, () -> false);
             }

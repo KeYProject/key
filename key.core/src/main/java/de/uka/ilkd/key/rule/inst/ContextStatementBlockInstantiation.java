@@ -71,7 +71,7 @@ public class ContextStatementBlockInstantiation {
      *
      * @return returns the program element this context term instantiation refers to
      */
-    public ProgramElement programElement() {
+    public ProgramElement program() {
         return programElement;
     }
 

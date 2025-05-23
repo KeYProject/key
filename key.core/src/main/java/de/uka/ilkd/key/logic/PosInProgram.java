@@ -6,6 +6,8 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 
+import org.key_project.logic.IntIterator;
+
 /**
  * this class describes the position of a statement in a program.
  */

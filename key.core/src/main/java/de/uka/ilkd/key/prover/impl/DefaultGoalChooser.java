@@ -10,20 +10,23 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.prover.GoalChooser;
 
+import org.key_project.prover.engine.GoalChooser;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
  * Helper class for managing a list of goals on which rules are applied. The class provides methods
  * for removing a goal, and for updating the internal data structures after a rule has been applied.
  */
-public class DefaultGoalChooser implements GoalChooser {
+public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullable Goal> {
 
     /** the proof that is worked with */
-    protected Proof proof;
+    protected @Nullable Proof proof;
 
     /** list of goals on which the strategy should be applied */
     protected ImmutableList<Goal> goalList;
@@ -46,13 +49,10 @@ public class DefaultGoalChooser implements GoalChooser {
     public DefaultGoalChooser() {
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof,
-     * de.uka.ilkd.key.proof.IList<Goal>)
+    /**
+     * {@inheritDoc}
      */
-    public void init(Proof p_proof, ImmutableList<Goal> p_goals) {
+    public void init(@Nullable Proof p_proof, @Nullable ImmutableList<Goal> p_goals) {
         if (p_proof == null && !(p_goals == null || p_goals.isEmpty())) {
             throw new RuntimeException("A not existing proof has goals. This makes no sense.");
         }
@@ -103,6 +103,7 @@ public class DefaultGoalChooser implements GoalChooser {
          * words, that node should no longer have any children now. Any nodes that were not
          * descendants of that node are unaffected.
          */
+        @Override
         public void proofPruned(ProofTreeEvent e) {
             currentSubtreeRoot = e.getNode();
             setupGoals(proof.getSubtreeGoals(proof.root()));
@@ -164,7 +165,7 @@ public class DefaultGoalChooser implements GoalChooser {
      * @see de.uka.ilkd.key.proof.IGoalChooser#updateGoalList(de.uka.ilkd.key.proof.Node,
      * de.uka.ilkd.key.proof.IList<Goal>)
      */
-    public void updateGoalList(Node node, ImmutableList<Goal> newGoals) {
+    public void updateGoalList(@Nullable Object node, @NonNull ImmutableList<Goal> newGoals) {
         if (newGoals.isEmpty() || (newGoals.tail().isEmpty() && newGoals.head().node() == node)) {
             // Goals (may) have been closed, remove them from the goal lists
             removeClosedGoals();
@@ -184,7 +185,7 @@ public class DefaultGoalChooser implements GoalChooser {
         }
     }
 
-    protected void updateGoalListHelp(Node node, ImmutableList<Goal> newGoals) {
+    protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 
@@ -284,13 +285,14 @@ public class DefaultGoalChooser implements GoalChooser {
     /**
      * Search for a minimal subtree of the proof tree which is not closable (constraints of its
      * goals are inconsistent) below p_startNode
-     *
+     * <p>
      * PRECONDITION: * !isSatisfiableSubtree ( p_startNode ) * all goals have satisfiable
      * constraints
+     * </p>
      *
      * @return true iff a non-empty subtree was found
      */
-    protected boolean findMinimalSubtreeBelow(Node p_startNode) {
+    protected boolean findMinimalSubtreeBelow(@NonNull Node p_startNode) {
         Node node = p_startNode;
 
         while (node.childrenCount() == 1) {
@@ -328,10 +330,12 @@ public class DefaultGoalChooser implements GoalChooser {
     /**
      * Search for a minimal subtree of the proof tree which is not closable (constraints of its
      * goals are inconsistent) starting at p_startNode
-     *
+     * <br/>
      * PRECONDITION: all goals have satisfiable constraints
+     *
+     * @param p_startNode the node from where to start the search
      */
-    protected void findMinimalSubtree(Node p_startNode) {
+    protected void findMinimalSubtree(@NonNull Node p_startNode) {
         while (!isSatisfiableSubtree(p_startNode)) {
             p_startNode = p_startNode.parent();
         }
@@ -342,9 +346,8 @@ public class DefaultGoalChooser implements GoalChooser {
     }
 
 
-    protected boolean isSatisfiableSubtree(Node p_root) {
+    protected boolean isSatisfiableSubtree(@NonNull Node p_root) {
         return !p_root.isClosed();
     }
-
 
 }

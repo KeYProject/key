@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
 
@@ -216,7 +216,7 @@ public abstract class TypeResolver {
                 result = ((ProgramVariable) op).getContainerType().getSort();
             } else if (op instanceof IObserverFunction) {
                 result = ((IObserverFunction) op).getContainerType().getSort();
-            } else if (op instanceof Function func && ((Function) op).isUnique()
+            } else if (op instanceof Function func && func.isUnique()
                     && op.name().toString().contains("::")) {
                 // Heap
                 String funcName = func.name().toString();

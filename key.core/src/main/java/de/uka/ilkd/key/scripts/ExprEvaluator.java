@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.scripts;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.*;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
+
+import org.key_project.prover.sequent.Sequent;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import static org.key_project.util.java.StringUtil.trim;
 
 /// Evaluates expression inside of proof script to their appropriate type.
 ///
-/// - [ExpressionContext]: [Term]
+/// - [JmlParser.ExpressionContext]: [Term]
 /// - [SeqContext]: [Sequent]
 /// - [Boolean_literalContext]: [Boolean]
 /// - [IntegerContext]: [Integer]

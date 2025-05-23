@@ -32,6 +32,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -45,7 +46,7 @@ import org.jspecify.annotations.Nullable;
  * {@link AbstractPO} to execute some code within a try catch block.
  * </p>
  * <p>
- * The generated {@link Sequent} has the following form:
+ * The generated {@link org.key_project.prover.sequent.Sequent} has the following form:
  *
  * <pre>
  * {@code
@@ -115,7 +116,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param initConfig The {@link InitConfig} to use.
      * @param name The name to use.
      */
-    public AbstractOperationPO(InitConfig initConfig, String name) {
+    protected AbstractOperationPO(InitConfig initConfig, String name) {
         this(initConfig, name, false, false);
     }
 
@@ -129,7 +130,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
-    public AbstractOperationPO(InitConfig initConfig, String name,
+    protected AbstractOperationPO(InitConfig initConfig, String name,
             boolean addUninterpretedPredicate, boolean addSymbolicExecutionLabel) {
         super(initConfig, name);
         this.addUninterpretedPredicate = addUninterpretedPredicate;
@@ -230,8 +231,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return {@code true} is set, {@code false} is not set.
      */
     public static boolean isAddUninterpretedPredicate(Configuration properties) {
-        String value = properties.getString(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE);
-        return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
+        String value = properties.getString(PROPERTY_ADD_UNINTERPRETED_PREDICATE);
+        return value != null && !value.isEmpty() && Boolean.parseBoolean(value);
     }
 
     /**
@@ -241,8 +242,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return {@code true} is set, {@code false} is not set.
      */
     public static boolean isAddSymbolicExecutionLabel(Configuration properties) {
-        String value = properties.getString(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
-        return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
+        String value = properties.getString(PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
+        return value != null && !value.isEmpty() && Boolean.parseBoolean(value);
     }
 
     private static void collectHeapAtPres(final List<LocationVariable> modifiableHeaps,
@@ -503,11 +504,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public Configuration createLoaderConfig() {
         final Configuration c = super.createLoaderConfig();
         if (isAddUninterpretedPredicate()) {
-            c.set(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE,
+            c.set(PROPERTY_ADD_UNINTERPRETED_PREDICATE,
                 String.valueOf(isAddUninterpretedPredicate()));
         }
         if (isAddSymbolicExecutionLabel()) {
-            c.set(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
+            c.set(PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
                 String.valueOf(isAddSymbolicExecutionLabel()));
         }
         return c;
@@ -760,8 +761,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     /**
-     * Creates a {@link Term} to use in the postcondition of the generated {@link Sequent} which
-     * represents the uninterpreted predicate.
+     * Creates a {@link org.key_project.logic.Term} to use in the postcondition of the generated
+     * {@link org.key_project.prover.sequent.Sequent} which represents the uninterpreted predicate.
      *
      * @param formalParamVars The formal parameters {@link LocationVariable}s.
      * @param exceptionVar The exception variable.
@@ -785,7 +786,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // Create non-rigid predicate with signature:
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<Sort> argumentSorts = tb.getSorts(arguments);
-        JFunction f = new JFunction(new Name(tb.newName(name)), JavaDLTheory.FORMULA,
+        Function f = new JFunction(new Name(tb.newName(name)), JavaDLTheory.FORMULA,
             argumentSorts.toArray(new Sort[argumentSorts.size()]));
         services.getNamespaces().functions().addSafely(f);
         // Create term that uses the new predicate
@@ -937,10 +938,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     /**
-     * Returns the {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} to use as termination
+     * Returns the {@link Modality.JavaModalityKind} to use as termination
      * marker.
      *
-     * @return The {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} to use as termination
+     * @return The {@link Modality.JavaModalityKind} to use as termination
      *         marker.
      */
     protected abstract Modality.JavaModalityKind getTerminationMarker();

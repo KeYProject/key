@@ -26,8 +26,7 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
  * @author Martin Hentschel
  */
 public record TreeSettings(boolean mergeBranchConditions, boolean useUnicode,
-        boolean usePrettyPrinting,
-        boolean variablesAreOnlyComputedFromUpdates,
+        boolean usePrettyPrinting, boolean variablesAreOnlyComputedFromUpdates,
         boolean simplifyConditions) implements ITreeSettings {
     /**
      * Constructor.
@@ -52,25 +51,19 @@ public record TreeSettings(boolean mergeBranchConditions, boolean useUnicode,
      * {@inheritDoc}
      */
     @Override
-    public boolean mergeBranchConditions() {
-        return mergeBranchConditions;
-    }
+    public boolean mergeBranchConditions() { return mergeBranchConditions; }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean useUnicode() {
-        return useUnicode;
-    }
+    public boolean useUnicode() { return useUnicode; }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean usePrettyPrinting() {
-        return usePrettyPrinting;
-    }
+    public boolean usePrettyPrinting() { return usePrettyPrinting; }
 
     /**
      * {@inheritDoc}
@@ -84,7 +77,5 @@ public record TreeSettings(boolean mergeBranchConditions, boolean useUnicode,
      * {@inheritDoc}
      */
     @Override
-    public boolean simplifyConditions() {
-        return simplifyConditions;
-    }
+    public boolean simplifyConditions() { return simplifyConditions; }
 }

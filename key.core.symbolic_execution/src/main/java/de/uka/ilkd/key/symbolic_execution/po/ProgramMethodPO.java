@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -315,7 +315,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         if (value == null) {
             throw new IOException("Property \"method\" is not defined.");
         }
-        int classMethodSeparator = value.indexOf("#");
+        int classMethodSeparator = value.indexOf('#');
         if (classMethodSeparator < 0) {
             throw new IOException(
                 "Property \"method\" does not contain the class method separator \"#\".");
@@ -324,12 +324,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
         String signature = value.substring(classMethodSeparator + 1);
         JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         // Split signature in name and parameter type names
-        int breaketsStart = signature.indexOf("(");
+        int breaketsStart = signature.indexOf('(');
         if (breaketsStart < 0) {
             throw new IOException("Method signature \"" + signature
                 + "\" does not contain required character \"(\".");
         }
-        int breaketsEnd = signature.lastIndexOf(")");
+        int breaketsEnd = signature.lastIndexOf(')');
         if (breaketsEnd < 0) {
             throw new IOException("Method signature \"" + signature
                 + "\" does not contain required character \")\".");

@@ -78,10 +78,10 @@ public final class PathConfig {
      */
     public static void setKeyConfigDir(String keyConfigDir) {
         PathConfig.keyConfigDir = keyConfigDir;
-        PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.json";
-        PathConfig.proofIndependentSettings =
+        recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.json";
+        proofIndependentSettings =
             getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
-        PathConfig.logDirectory = new File(keyConfigDir, "logs");
+        logDirectory = new File(keyConfigDir, "logs");
     }
 
     /**
@@ -97,7 +97,7 @@ public final class PathConfig {
      *
      */
     public static File getLogDirectory() {
-        return PathConfig.logDirectory;
+        return logDirectory;
     }
 
     /**

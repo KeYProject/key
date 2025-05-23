@@ -159,7 +159,7 @@ public final class KeYFileChooser extends JFileChooser {
 
     private void setSaveDialog(boolean b) {
         saveDialog = b;
-        setFileSelectionMode(b ? JFileChooser.FILES_ONLY : JFileChooser.FILES_AND_DIRECTORIES);
+        setFileSelectionMode(b ? FILES_ONLY : FILES_AND_DIRECTORIES);
     }
 
     @Override
@@ -275,7 +275,7 @@ public final class KeYFileChooser extends JFileChooser {
         updateUI();
 
         int result = super.showOpenDialog(component);
-        if (result != JFileChooser.APPROVE_OPTION) {
+        if (result != APPROVE_OPTION) {
             resetPath();
         } else {
             resetFile = null;

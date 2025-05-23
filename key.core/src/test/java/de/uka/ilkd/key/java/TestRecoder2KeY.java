@@ -37,7 +37,7 @@ public class TestRecoder2KeY {
     private static Recoder2KeY c2k;
 
     // some non sense java blocks with lots of statements and expressions
-    private static final String[] jblocks = new String[] {
+    private static final String[] jblocks = {
         """
                 {int j=7; int i;
                  i=1; byte d=0; short f=1; long l=123;\s
@@ -56,7 +56,7 @@ public class TestRecoder2KeY {
     };
 
 
-    private static final String[] jclasses = new String[] { "class A1 { public A1() { }} ",
+    private static final String[] jclasses = { "class A1 { public A1() { }} ",
 
         "package qwe.rty; import qwe.rty.A; import dfg.hjk.*; import java.util.*;"
             + "public abstract class A implements Z{" + "static {d=3; Object v = new Object();}"

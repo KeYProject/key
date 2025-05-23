@@ -37,7 +37,7 @@ public abstract class SMTHandlerProperty<T> {
      */
     private final String description;
 
-    public SMTHandlerProperty(String identifier, String label, String description) {
+    protected SMTHandlerProperty(String identifier, String label, String description) {
         this.identifier = identifier;
         this.label = label;
         this.description = description;

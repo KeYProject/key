@@ -9,12 +9,11 @@ import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.logic.Program;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
+public final class JavaBlock implements Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
     /**
@@ -64,8 +63,8 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     }
 
     public int size() {
-        if ((program() instanceof StatementBlock)) {
-            return ((StatementBlock) program()).getChildCount();
+        if (program() instanceof StatementBlock) {
+            return program().getChildCount();
         }
         return 0;
     }
@@ -105,29 +104,6 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
         PrettyPrinter printer = PrettyPrinter.purePrinter();
         printer.print(prg);
         return printer.result();
-    }
-
-    @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof JavaBlock other)) {
-            return false;
-        }
-        if (this == obj) {
-            return true;
-        }
-        // quite inefficient, but sufficient
-        return toString().equals(other.toString());
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        if (hashCode == -1) {
-            hashCode = toString().hashCode();
-            if (hashCode == -1) {
-                hashCode = 0;
-            }
-        }
-        return hashCode;
     }
 
     @Override

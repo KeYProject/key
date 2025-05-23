@@ -7,10 +7,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleKey;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.Nullable;
 
@@ -40,7 +41,7 @@ public class RuleJustificationInfo {
         return rule2Justification.get(new RuleKey(r));
     }
 
-    public @Nullable RuleJustification getJustification(RuleApp r, TermServices services) {
+    public @Nullable RuleJustification getJustification(RuleApp r, LogicServices services) {
         RuleJustification just = getJustification(r.rule());
         if (just instanceof ComplexRuleJustification) {
             return ((ComplexRuleJustification) just).getSpecificJustification(r, services);

@@ -10,12 +10,13 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 
 /**
  * This SMT translation handler takes care of the builtin Boolean connectives.
@@ -39,10 +40,10 @@ public class BooleanConnectiveHandler implements SMTHandler {
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
-        Operator logicFalse = ldt.getFalseConst();
+        var logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, "false");
 
-        Operator logicTrue = ldt.getTrueConst();
+        var logicTrue = ldt.getTrueConst();
         supportedOperators.put(logicTrue, "true");
 
         masterHandler.addDeclaration(new VerbatimSMT(handlerSnippets.getProperty("bool.decls")));

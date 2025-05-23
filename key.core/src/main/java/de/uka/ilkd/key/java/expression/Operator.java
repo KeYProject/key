@@ -32,7 +32,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     public static final int INFIX = 1;
     public static final int POSTFIX = 2;
 
-    public Operator() {
+    protected Operator() {
         this.children = null;
     }
 
@@ -42,7 +42,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param lhs an expression.
      * @param rhs an expression.
      */
-    public Operator(Expression lhs, Expression rhs) {
+    protected Operator(Expression lhs, Expression rhs) {
         this.children = new ImmutableArray<>(lhs, rhs);
     }
 
@@ -54,7 +54,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      *        hand side, the second as right hand side), Comments
      *
      */
-    public Operator(ExtList children) {
+    protected Operator(ExtList children) {
         super(children);
         this.children = new ImmutableArray<>(children.collect(Expression.class));
     }
@@ -65,7 +65,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param unaryChild an expression.
      */
 
-    public Operator(Expression unaryChild) {
+    protected Operator(Expression unaryChild) {
         this.children = new ImmutableArray<>(unaryChild);
     }
 
@@ -75,7 +75,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param arguments an array of expression.
      */
 
-    public Operator(Expression[] arguments) {
+    protected Operator(Expression[] arguments) {
         this.children = new ImmutableArray<>(arguments);
     }
 

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
@@ -13,6 +12,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Provides a basic implementation of {@link IExecutionVariable}s.
@@ -58,7 +59,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * @param additionalCondition An optional additional condition to consider.
      * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
      */
-    public AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
+    protected AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
             IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,
             Term additionalCondition, PosInOccurrence modalityPIO) {
         super(settings, proofNode);

@@ -9,7 +9,6 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +47,7 @@ public class AbstractTestTermParser {
         return nss.sorts().lookup(new Name(name));
     }
 
-    protected JFunction lookup_func(String name) {
+    protected Function lookup_func(String name) {
         return nss.functions().lookup(new Name(name));
     }
 
@@ -94,7 +94,7 @@ public class AbstractTestTermParser {
 
     /**
      * Remove whitespaces before executing
-     * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
+     * {@link org.junit.jupiter.api.Assertions#assertEquals(Object, Object)}.
      */
     protected static void assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -56,7 +57,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
 
         Term anonUpdate = tb.skip();
         for (var pv : localOuts) {
-            final JFunction anonFunc = anonConstForPV(pv, services);
+            final Function anonFunc = anonConstForPV(pv, services);
             final Term elemUpd = //
                 tb.elementary(pv, tb.func(anonFunc));
             anonUpdate = tb.parallel(anonUpdate, elemUpd);
@@ -65,10 +66,10 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         return anonUpdate;
     }
 
-    private static JFunction anonConstForPV(ProgramVariable pv, Services services) {
+    private static Function anonConstForPV(ProgramVariable pv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-        final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+        final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
         services.getNamespaces().functions().addSafely(anonFunc);
 
         return anonFunc;

@@ -179,7 +179,7 @@ public class ProofIndependentSettings {
      * @return {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
      */
     public static boolean isUsePrettyPrinting() {
-        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        return DEFAULT_INSTANCE.getViewSettings().isUsePretty();
     }
 
     /**
@@ -189,7 +189,7 @@ public class ProofIndependentSettings {
      *        printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
+        DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
         NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
     }
 }

@@ -5,9 +5,8 @@ package de.uka.ilkd.key.proof.io.intermediate;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.PosInTerm;
-
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
@@ -48,6 +47,7 @@ public class TacletAppIntermediate extends AppIntermediate {
         this.newNames = newNames;
     }
 
+    @Override
     public String getRuleName() {
         return tacletName;
     }

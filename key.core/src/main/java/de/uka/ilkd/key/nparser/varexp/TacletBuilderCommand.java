@@ -13,7 +13,8 @@ import org.jspecify.annotations.NonNull;
  * This interface describes a commands that manipulate taclets during construction in the parser.
  * <p>
  * Currently, we use this interface to handle the construction of
- * {@link de.uka.ilkd.key.rule.VariableCondition} ({@code \varcond}), but may be used in future for
+ * {@link org.key_project.prover.rules.VariableCondition} ({@code \varcond}), but may be used in
+ * future for
  * other facilities.
  *
  * @author Alexander Weigl
@@ -43,7 +44,7 @@ public interface TacletBuilderCommand {
      * Applying this command on the given taclet builder.
      * <p>
      * During application, this method should alter, e.g., add a
-     * {@link de.uka.ilkd.key.rule.VariableCondition}, to the taclet builder.
+     * {@link org.key_project.prover.rules.VariableCondition}, to the taclet builder.
      * <p>
      * The given arguments are well-typed for supplied {@link #getArgumentTypes()}.
      */

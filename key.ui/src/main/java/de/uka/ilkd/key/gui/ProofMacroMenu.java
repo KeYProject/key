@@ -11,11 +11,11 @@ import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
@@ -73,7 +73,8 @@ public class ProofMacroMenu extends JMenu {
      * @param mediator the mediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
      */
-    public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
+    public ProofMacroMenu(KeYMediator mediator,
+            PosInOccurrence posInOcc) {
         super("Strategy Macros");
 
         // Macros are grouped according to their category.

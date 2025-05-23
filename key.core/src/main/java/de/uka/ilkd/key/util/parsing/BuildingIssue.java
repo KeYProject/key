@@ -15,8 +15,7 @@ import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.Nullable;
 
 public record BuildingIssue(String message, @Nullable Throwable cause, boolean isWarning,
-        Position position,
-        @Nullable String sourceName) {
+        Position position, @Nullable String sourceName) {
 
     public static BuildingIssue createError(String message, @Nullable ParserRuleContext token,
             @Nullable Throwable cause) {

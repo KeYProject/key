@@ -3,13 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.rulefilter.RuleFilter;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -28,13 +34,15 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
         return new FormulaAddedByRuleFeature(p_filter);
     }
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    public <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final SequentFormula cfma = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
 
-        Node node = goal.node();
+        Node node = ((de.uka.ilkd.key.proof.Goal) goal).node();
 
         while (!node.root()) {
             final Node par = node.parent();

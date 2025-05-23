@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.proofevent;
 
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -16,7 +15,8 @@ public class NodeChangesHolder {
         this(ImmutableSLList.nil());
     }
 
-    NodeChangesHolder(ImmutableList<SequentChangeInfo> p_scis) {
+    NodeChangesHolder(
+            ImmutableList<SequentChangeInfo> p_scis) {
         scis = p_scis;
     }
 
@@ -24,6 +24,7 @@ public class NodeChangesHolder {
         scis = scis.prepend(p_sci);
     }
 
+    @Override
     public Object clone() {
         return new NodeChangesHolder(scis);
     }

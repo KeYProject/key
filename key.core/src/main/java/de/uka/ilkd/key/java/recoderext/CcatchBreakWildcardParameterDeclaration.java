@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 
 /**
@@ -14,7 +15,7 @@ public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardPa
     private static final long serialVersionUID = 1L;
 
     @Override
-    public recoder.java.ProgramElement getChildAt(int arg0) {
+    public ProgramElement getChildAt(int arg0) {
         return null;
     }
 
@@ -24,13 +25,13 @@ public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardPa
     }
 
     @Override
-    public int getChildPositionCode(recoder.java.ProgramElement arg0) {
+    public int getChildPositionCode(ProgramElement arg0) {
         return 0;
     }
 
     @Override
-    public boolean replaceChild(recoder.java.ProgramElement arg0,
-            recoder.java.ProgramElement arg1) {
+    public boolean replaceChild(ProgramElement arg0,
+            ProgramElement arg1) {
         return false;
     }
 

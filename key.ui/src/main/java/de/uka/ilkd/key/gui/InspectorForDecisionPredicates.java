@@ -9,13 +9,14 @@ import java.util.List;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
+
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 public class InspectorForDecisionPredicates implements CheckedUserInputInspector {
 
@@ -40,7 +41,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
     @Override
     public String check(String toBeChecked) {
         if (toBeChecked.isEmpty()) {
-            return CheckedUserInputInspector.NO_USER_INPUT;
+            return NO_USER_INPUT;
         }
         Term term = translate(services, toBeChecked);
 

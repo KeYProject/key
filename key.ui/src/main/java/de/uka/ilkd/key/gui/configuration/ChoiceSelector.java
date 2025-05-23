@@ -398,10 +398,10 @@ public class ChoiceSelector extends JDialog {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ChoiceEntry other) {
-                return choice.equals(other.choice()) && incomplete == other.incomplete()
-                        && unsound == other.unsound()
-                        && Objects.equals(information, other.information());
+            if (obj instanceof ChoiceEntry(String choice1, boolean unsound1, boolean incomplete1, String information1)) {
+                return choice.equals(choice1) && incomplete == incomplete1
+                        && unsound == unsound1
+                        && Objects.equals(information, information1);
             } else {
                 return false;
             }

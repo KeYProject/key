@@ -109,7 +109,7 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
          *
          * @param numApplPreds The number of applicable predicates for the lattice.
          */
-        public AbstractPredicateLatticeIterator(int numApplPreds) {
+        protected AbstractPredicateLatticeIterator(int numApplPreds) {
             // We work with bit sets of length n (where n is the number of
             // predicates). Each bit represents a predicate; when the bit is
             // set to 1, the respective predicate should occur in the

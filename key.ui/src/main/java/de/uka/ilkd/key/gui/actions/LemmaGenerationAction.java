@@ -42,7 +42,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
 
 
-    public LemmaGenerationAction(MainWindow mainWindow) {
+    protected LemmaGenerationAction(MainWindow mainWindow) {
         super(mainWindow);
 
         putValue(NAME, getTitle());

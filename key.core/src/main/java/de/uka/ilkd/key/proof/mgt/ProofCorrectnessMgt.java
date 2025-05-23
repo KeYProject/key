@@ -16,9 +16,9 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -271,6 +271,7 @@ public final class ProofCorrectnessMgt {
     // -------------------------------------------------------------------------
 
     private class DefaultMgtProofListener implements RuleAppListener {
+        @Override
         public void ruleApplied(ProofEvent e) {
             ProofCorrectnessMgt.this.ruleApplied(e.getRuleAppInfo().getRuleApp());
         }

@@ -3,33 +3,41 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.util.TermHelper;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public class ImplicitCastNecessary extends BinaryFeature {
+import org.jspecify.annotations.NonNull;
 
-    private final ProjectionToTerm projection;
+public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extends BinaryFeature {
 
-    private ImplicitCastNecessary(ProjectionToTerm projection) {
+    private final ProjectionToTerm<Goal> projection;
+
+    private ImplicitCastNecessary(ProjectionToTerm<Goal> projection) {
         this.projection = projection;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
+            G goal, MutableState mState) {
         assert pos != null && pos.depth() >= 1;
 
         int subPos = pos.getIndex();
 
         final Sort maxSort = TermHelper.getMaxSort(pos.up().subTerm(), subPos);
-        return projection.toTerm(app, pos, goal, mState).sort().extendsTrans(maxSort);
+        return projection.toTerm(app, pos, (Goal) goal, mState).sort().extendsTrans(maxSort);
     }
 
-    public static Feature create(ProjectionToTerm s1) {
-        return new ImplicitCastNecessary(s1);
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
+            ProjectionToTerm<Goal> s1) {
+        return new ImplicitCastNecessary<>(s1);
     }
 
 }

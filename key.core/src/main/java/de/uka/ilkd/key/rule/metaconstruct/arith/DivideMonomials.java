@@ -30,7 +30,7 @@ public final class DivideMonomials extends AbstractTermTransformer {
         final Monomial m2 = Monomial.create(arg2, services);
 
         final Monomial res = m2.reduce(m1);
-        return res.toTerm(services);
+        return (Term) res.toTerm(services);
     }
 
 }

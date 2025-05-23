@@ -24,7 +24,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
     private int hashCode = -1;
 
-    public JavaProgramElement() {
+    protected JavaProgramElement() {
         comments = NO_COMMENTS;
     }
 
@@ -34,7 +34,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
      *
      * @param list ExtList with comments
      */
-    public JavaProgramElement(ExtList list) {
+    protected JavaProgramElement(ExtList list) {
         super(list);
         comments = extractComments(list);
     }
@@ -45,13 +45,13 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
      *
      * @param pos the PositionInfo where the Java program element occurs in the source
      */
-    public JavaProgramElement(PositionInfo pos) {
+    protected JavaProgramElement(PositionInfo pos) {
         super(pos);
         comments = NO_COMMENTS;
     }
 
 
-    public JavaProgramElement(ExtList children, PositionInfo pos) {
+    protected JavaProgramElement(ExtList children, PositionInfo pos) {
         super(children, pos);
         comments = extractComments(children);
     }

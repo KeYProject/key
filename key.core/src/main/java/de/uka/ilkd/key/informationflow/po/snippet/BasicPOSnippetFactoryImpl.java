@@ -17,6 +17,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.TermCreationException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * @author christoph
  */
 class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
-    private static final org.slf4j.Logger LOGGER =
+    private static final Logger LOGGER =
         LoggerFactory.getLogger(BasicPOSnippetFactoryImpl.class);
 
     /**

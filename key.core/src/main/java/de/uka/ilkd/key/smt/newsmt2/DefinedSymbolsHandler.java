@@ -14,21 +14,20 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
@@ -126,7 +125,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        return op instanceof JFunction && supportedFunctions.contains(op.name().toString());
+        return op instanceof Function && supportedFunctions.contains(op.name().toString());
     }
 
     private void introduceSymbol(MasterHandler trans, String name) throws SMTTranslationException {
@@ -192,7 +191,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
         String name = op.name().toString();
         String prefixedname = PREFIX + name;
 
-        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
+        List<SExpr> children = trans.translate(term.subs(), UNIVERSE);
         SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
         SExpr result = new SExpr(prefixedname, exprType, children);
 

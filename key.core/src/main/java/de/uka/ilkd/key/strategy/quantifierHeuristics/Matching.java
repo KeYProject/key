@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 
+import org.key_project.logic.Term;
 import org.key_project.util.collection.ImmutableSet;
 
 /**

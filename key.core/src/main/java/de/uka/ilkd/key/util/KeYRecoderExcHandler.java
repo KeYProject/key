@@ -8,8 +8,10 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
+import recoder.service.ErrorHandler;
 
-public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
+
+public class KeYRecoderExcHandler implements ErrorHandler {
 
     private final List<Throwable> exceptions = new LinkedList<>();
     private int errorThreshold;

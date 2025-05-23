@@ -31,16 +31,16 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -94,7 +94,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         LOGGER.info("[ DONE  ... rule application ]");
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
-            final Statistics stat = info.getProof().getStatistics();
+            final Statistics stat = ((Proof) info.getProof()).getStatistics();
             LOGGER.debug("Proof steps: {}", stat.nodes);
             LOGGER.debug("Branches: {}", stat.branches);
             LOGGER.debug("Automode Time: {} ms", stat.autoModeTimeInMillis);
@@ -115,7 +115,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          */
         assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
             + " save a proof but no corresponding key problem file is " + "available.";
-        allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
+        allProofsSuccessful &= saveProof(result2, (Proof) info.getProof(), keyProblemFile);
         /*
          * We "delete" the value of keyProblemFile at this point by assigning null to it. That way
          * we prevent KeY from saving another proof (that belongs to another key problem file) for a
@@ -130,7 +130,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     public void taskFinished(TaskFinishedInfo info) {
         super.taskFinished(info);
         progressMax = 0; // reset progress bar marker
-        final Proof proof = info.getProof();
+        final Proof proof = (Proof) info.getProof();
         final Object result = info.getResult();
         if (proof == null) {
             LOGGER.info("Proof loading failed");
@@ -407,7 +407,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         }
         // Says true if all Proofs have succeeded,
         // or false if there is at least one open Proof
-        return proof.openGoals().size() == 0;
+        return proof.openGoals().isEmpty();
     }
 
     @Override

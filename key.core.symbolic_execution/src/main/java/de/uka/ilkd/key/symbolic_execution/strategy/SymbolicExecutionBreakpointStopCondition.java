@@ -13,9 +13,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * An {@link IBreakpointStopCondition} which can be used during symbolic execution.
@@ -45,21 +46,21 @@ public class SymbolicExecutionBreakpointStopCondition extends
      * {@inheritDoc}
      */
     @Override
-    public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
+    public int getMaximalWork(int maxApplications, long timeout) {
         setMaximalNumberOfSetNodesToExecutePerGoal(Integer.MAX_VALUE);
-        return super.getMaximalWork(maxApplications, timeout, proof);
+        return super.getMaximalWork(maxApplications, timeout);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public boolean isGoalAllowed(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
         for (IBreakpoint breakpoint : breakpoints) {
-            breakpoint.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
+            breakpoint.updateState(goal, maxApplications, timeout, startTime, countApplied);
         }
-        return super.isGoalAllowed(maxApplications, timeout, proof, startTime, countApplied, goal);
+        return super.isGoalAllowed(goal, maxApplications, timeout, startTime, countApplied);
     }
 
     /**
@@ -67,7 +68,8 @@ public class SymbolicExecutionBreakpointStopCondition extends
      */
     @Override
     protected void handleNodeLimitNotExceeded(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
+            long startTime, int countApplied, Goal goal, Node node,
+            RuleApp ruleApp,
             Integer executedNumberOfSetNodes) {
         super.handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime, countApplied,
             goal, node, ruleApp, executedNumberOfSetNodes);
@@ -87,14 +89,15 @@ public class SymbolicExecutionBreakpointStopCondition extends
      * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not
      *         hit.
      */
-    protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
+    protected boolean isBreakpointHit(SourceElement activeStatement,
+            RuleApp ruleApp, Proof proof,
             Node node) {
         boolean result = false;
         Iterator<IBreakpoint> iter = breakpoints.iterator();
         while (!result && iter.hasNext()) {
             IBreakpoint next = iter.next();
             result =
-                next.isEnabled() && next.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                next.isEnabled() && next.isBreakpointHit(activeStatement, ruleApp, node);
         }
         return result;
     }

@@ -10,7 +10,19 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.recoderext.CatchSVWrapper;
+import de.uka.ilkd.key.java.recoderext.CcatchSVWrapper;
+import de.uka.ilkd.key.java.recoderext.ExecCtxtSVWrapper;
+import de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper;
+import de.uka.ilkd.key.java.recoderext.LabelSVWrapper;
+import de.uka.ilkd.key.java.recoderext.MethodSignatureSVWrapper;
 import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
+import de.uka.ilkd.key.java.recoderext.RKeYMetaConstruct;
+import de.uka.ilkd.key.java.recoderext.RKeYMetaConstructExpression;
+import de.uka.ilkd.key.java.recoderext.RKeYMetaConstructType;
+import de.uka.ilkd.key.java.recoderext.RMethodBodyStatement;
+import de.uka.ilkd.key.java.recoderext.RMethodCallStatement;
+import de.uka.ilkd.key.java.recoderext.StatementSVWrapper;
 import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
@@ -20,13 +32,16 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import recoder.java.reference.FieldReference;
+import recoder.java.reference.ReferenceSuffix;
+import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.list.generic.ASTList;
 
 /**
@@ -67,7 +82,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * If you add a ProgramTransformer to the system you will most propably have to register it
      * here.
      */
-    public ProgramTransformer convert(de.uka.ilkd.key.java.recoderext.RKeYMetaConstruct mc) {
+    public ProgramTransformer convert(RKeYMetaConstruct mc) {
 
         ExtList list = new ExtList();
         String mcName = mc.getName();
@@ -145,7 +160,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * If you have an expression meta construct you will have to add it here.
      */
     public ProgramTransformer convert(
-            de.uka.ilkd.key.java.recoderext.RKeYMetaConstructExpression mc) {
+            RKeYMetaConstructExpression mc) {
         ExtList list = new ExtList();
         String mcName = mc.getName();
         list.add(callConvert(mc.getChild()));
@@ -165,7 +180,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      *
      * If you have a type meta construct you will have to add it here.
      */
-    public ProgramTransformer convert(de.uka.ilkd.key.java.recoderext.RKeYMetaConstructType mc) {
+    public ProgramTransformer convert(RKeYMetaConstructType mc) {
         ExtList list = new ExtList();
         list.add(callConvert(mc.getChild()));
         if ("#typeof".equals(mc.getName0())) {
@@ -178,7 +193,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * method-call-statements are expanded to method-frames
      */
-    public MethodFrame convert(de.uka.ilkd.key.java.recoderext.RMethodCallStatement l) {
+    public MethodFrame convert(RMethodCallStatement l) {
         ProgramVariableSVWrapper svw = l.getVariableSV();
         return new MethodFrame((IProgramVariable) (svw != null ? svw.getSV() : null),
             (IExecutionContext) callConvert(l.getExecutionContext()),
@@ -188,7 +203,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * translate method body statements.
      */
-    public MethodBodyStatement convert(de.uka.ilkd.key.java.recoderext.RMethodBodyStatement l) {
+    public MethodBodyStatement convert(RMethodBodyStatement l) {
         final IProgramVariable resVar =
             l.getResultVar() == null ? null : (IProgramVariable) l.getResultVar().getSV();
 
@@ -226,16 +241,16 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     // ----- Schema Variables
     // SchemaVariables are unwrapped from their wrapping entity.
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper svw) {
+    public SchemaVariable convert(ExpressionSVWrapper svw) {
 
         return svw.getSV();
     }
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.StatementSVWrapper svw) {
+    public SchemaVariable convert(StatementSVWrapper svw) {
         return svw.getSV();
     }
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.LabelSVWrapper svw) {
+    public SchemaVariable convert(LabelSVWrapper svw) {
         return svw.getSV();
     }
 
@@ -244,27 +259,27 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         return new MergePointStatement((IProgramVariable) callConvert(l.getChildAt(0)));
     }
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.MethodSignatureSVWrapper svw) {
+    public SchemaVariable convert(MethodSignatureSVWrapper svw) {
         return svw.getSV();
     }
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.TypeSVWrapper svw) {
+    public SchemaVariable convert(TypeSVWrapper svw) {
         return svw.getSV();
     }
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.ExecCtxtSVWrapper svw) {
+    public SchemaVariable convert(ExecCtxtSVWrapper svw) {
         return svw.getSV();
     }
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.CatchSVWrapper svw) {
+    public SchemaVariable convert(CatchSVWrapper svw) {
         return svw.getSV();
     }
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.CcatchSVWrapper svw) {
+    public SchemaVariable convert(CcatchSVWrapper svw) {
         return svw.getSV();
     }
 
-    public SchemaVariable convert(de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper svw) {
+    public SchemaVariable convert(ProgramVariableSVWrapper svw) {
 
         return svw.getSV();
     }
@@ -342,18 +357,18 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         while (rp != null) {
             if (prefix == null) {
                 result = new recoder.java.reference.PackageReference(
-                    ((recoder.java.reference.UncollatedReferenceQualifier) rp).getIdentifier());
+                    ((UncollatedReferenceQualifier) rp).getIdentifier());
                 prefix = result;
             } else {
                 recoder.java.reference.PackageReference prefix2 =
                     new recoder.java.reference.PackageReference(
-                        ((recoder.java.reference.UncollatedReferenceQualifier) rp).getIdentifier());
+                        ((UncollatedReferenceQualifier) rp).getIdentifier());
                 prefix.setReferencePrefix(prefix2);
                 prefix = prefix2;
             }
 
-            if (rp instanceof recoder.java.reference.ReferenceSuffix) {
-                rp = ((recoder.java.reference.ReferenceSuffix) rp).getReferencePrefix();
+            if (rp instanceof ReferenceSuffix) {
+                rp = ((ReferenceSuffix) rp).getReferencePrefix();
             } else {
                 rp = null;
             }
@@ -393,7 +408,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     }
 
     @Override
-    public Expression convert(recoder.java.reference.FieldReference fr) {
+    public Expression convert(FieldReference fr) {
         ReferencePrefix prefix = null;
         if (fr.getReferencePrefix() != null) {
             prefix = (ReferencePrefix) callConvert(fr.getReferencePrefix());
@@ -407,7 +422,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public MethodReference convert(recoder.java.reference.MethodReference mr) {
         // convert reference prefix
         final ReferencePrefix prefix;
-        if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier uncoll) {
+        if (mr.getReferencePrefix() instanceof UncollatedReferenceQualifier uncoll) {
             // type references would be allowed
             prefix = convert(new recoder.java.reference.TypeReference(uncoll.getReferencePrefix(),
                 uncoll.getIdentifier()));
@@ -448,26 +463,21 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         IForUpdates ifu;
         IGuard iGuard;
         if (f.getInitializers() != null && f.getInitializers()
-                .get(0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f.getInitializers().get(0); // brrrr!
+                .get(0) instanceof ExpressionSVWrapper esvw) {
+            // brrrr!
             li = (ProgramSV) esvw.getSV();
         } else {
             li = convertLoopInitializers(f);
         }
 
-        if (f.getGuard() instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f.getGuard();
+        if (f.getGuard() instanceof ExpressionSVWrapper esvw) {
             iGuard = (ProgramSV) esvw.getSV();
         } else {
             iGuard = convertGuard(f);
         }
 
         if (f.getUpdates() != null && f.getUpdates()
-                .get(0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f.getUpdates().get(0);
+                .get(0) instanceof ExpressionSVWrapper esvw) {
             ifu = (ProgramSV) esvw.getSV();
         } else {
             ifu = convertUpdates(f);

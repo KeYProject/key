@@ -7,10 +7,10 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.AssertionFailure;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.LRUCache;
 
 import org.jspecify.annotations.NonNull;
@@ -23,7 +23,8 @@ import org.jspecify.annotations.NonNull;
  */
 public class AppliedRuleAppsNameCache {
     /** cache of all applied rules by name of a node */
-    private final LRUCache<Node, HashMap<Name, List<RuleApp>>> cache = new LRUCache<>(32);
+    private final LRUCache<Node, HashMap<Name, List<RuleApp>>> cache =
+        new LRUCache<>(32);
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
@@ -37,7 +38,8 @@ public class AppliedRuleAppsNameCache {
      * @param node the node
      * @return the value
      */
-    private @NonNull HashMap<Name, List<RuleApp>> fillCacheForNode(Node node) {
+    private @NonNull HashMap<Name, List<RuleApp>> fillCacheForNode(
+            Node node) {
         HashMap<Name, List<RuleApp>> nodeCache;
         try {
             writeLock.lock();
@@ -54,7 +56,8 @@ public class AppliedRuleAppsNameCache {
                         nodeCache = parentCache;
                     } else {
                         // Copy the parent cache
-                        for (Map.Entry<Name, List<RuleApp>> entry : parentCache.entrySet()) {
+                        for (Map.Entry<Name, List<RuleApp>> entry : parentCache
+                                .entrySet()) {
                             nodeCache.put(entry.getKey(), new ArrayList<>(entry.getValue()));
                         }
                     }
@@ -62,7 +65,8 @@ public class AppliedRuleAppsNameCache {
                     // Parent did not have a rule applied when we calculated this, add the rule
                     // applied
                     // there
-                    RuleApp parentApp = node.parent().getAppliedRuleApp();
+                    RuleApp parentApp =
+                        node.parent().getAppliedRuleApp();
                     nodeCache.computeIfAbsent(parentApp.rule().name(), k -> new ArrayList<>())
                             .add(parentApp);
 
@@ -107,7 +111,8 @@ public class AppliedRuleAppsNameCache {
      * @param name the name
      * @return rule apps
      */
-    public @NonNull List<RuleApp> get(@NonNull Node node, @NonNull Name name) {
+    public @NonNull List<RuleApp> get(@NonNull Node node,
+            @NonNull Name name) {
         if (node.getAppliedRuleApp() != null || node.childrenCount() != 0) {
             throw new AssertionFailure("Expected an empty leaf node");
         }

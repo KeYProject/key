@@ -6,7 +6,8 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.SuccTaclet;
-import de.uka.ilkd.key.rule.TacletApplPart;
+
+import org.key_project.prover.rules.TacletApplPart;
 
 
 /** class builds SuccTaclet objects. */

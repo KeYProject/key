@@ -60,7 +60,7 @@ public abstract class Modality extends AbstractSortedOperator {
     public abstract static class Kind implements Named, TerminalSyntaxElement {
         private final Name name;
 
-        public Kind(Name name) {
+        protected Kind(Name name) {
             this.name = name;
         }
 

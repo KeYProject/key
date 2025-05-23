@@ -64,7 +64,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
  * constellation has different semantics in KeY than in the JML ref manual. KeY does not recognize
  * {@code requires} as contract initiators.
  */
-class JmlWarnDifferentRequiresSemantics extends AbstractCheck implements JmlCheck {
+class JmlWarnDifferentRequiresSemantics extends AbstractCheck {
     @Override
     public Void visitSpec_body(JmlParser.Spec_bodyContext ctx) {
         checkRequires(ctx.a);

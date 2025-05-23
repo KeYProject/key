@@ -8,18 +8,18 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
@@ -111,7 +111,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             TermLabel targetLabel = target.getLabel(FormulaTermLabel.NAME);
             if (targetLabel instanceof FormulaTermLabel) {
                 if (applicationPosInOccurrence != null) {
-                    Term appliationTerm = applicationPosInOccurrence.subTerm();
+                    Term appliationTerm = (Term) applicationPosInOccurrence.subTerm();
                     TermLabel applicationLabel = appliationTerm.getLabel(FormulaTermLabel.NAME);
                     if (applicationLabel instanceof FormulaTermLabel) {
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also

@@ -35,8 +35,7 @@ public class StaticInitialisation extends ProgramTransformer {
             } else {
                 return null; // no static initialisation necessary
             }
-        } else if (pe instanceof ProgramVariable) {
-            final ProgramVariable pv = (ProgramVariable) pe;
+        } else if (pe instanceof ProgramVariable pv) {
             if (pv.isStatic()) {
                 typeToBeInitialised = pv.getContainerType();
             } else {

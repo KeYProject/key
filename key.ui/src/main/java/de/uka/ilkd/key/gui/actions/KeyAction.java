@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
@@ -96,11 +95,11 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     protected String getTooltip() {
-        return (String) getValue(Action.SHORT_DESCRIPTION);
+        return (String) getValue(SHORT_DESCRIPTION);
     }
 
     protected void setTooltip(String toolTip) {
-        putValue(Action.SHORT_DESCRIPTION, toolTip);
+        putValue(SHORT_DESCRIPTION, toolTip);
     }
 
     protected void setIcon(Icon icon) {

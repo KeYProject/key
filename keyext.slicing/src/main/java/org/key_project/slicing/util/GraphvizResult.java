@@ -39,30 +39,22 @@ public record GraphvizResult(BufferedImage image, String error) {
     /**
      * @return whether this result has an image
      */
-    public boolean hasImage() {
-        return image != null;
-    }
+    public boolean hasImage() { return image != null; }
 
     /**
      * @return the rendered image (null if error is present)
      */
     @Override
-    public BufferedImage image() {
-        return image;
-    }
+    public BufferedImage image() { return image; }
 
     /**
      * @return whether this result indicates an error
      */
-    public boolean hasError() {
-        return error != null;
-    }
+    public boolean hasError() { return error != null; }
 
     /**
      * @return the error message (null if image was rendered)
      */
     @Override
-    public String error() {
-        return error;
-    }
+    public String error() { return error; }
 }
