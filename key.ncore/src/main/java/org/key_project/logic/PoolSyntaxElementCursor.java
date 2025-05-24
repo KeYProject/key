@@ -85,23 +85,24 @@ public class PoolSyntaxElementCursor {
         if (stack.isEmpty()) {
             return;
         }
+        MutablePair el = stack.peek();
         do {
-            MutablePair el = stack.peek();
-            if (el.second < el.first.getChildCount()) {
+            final int firstChildCount = el.first.getChildCount();
+            if (el.second < firstChildCount) {
                 final int oldPos = el.second;
                 final SyntaxElement oldSE = el.first;
-                el.second += 1;
-                if (el.second >= oldSE.getChildCount()) {
+                if (oldPos + 1 >= firstChildCount) {
                     // we visited all children of that element
                     // so it can be removed from the stack
                     stack.pop().release(); // el's components are set to null
                 }
+                el.second += 1;
                 el = MutablePair.get(oldSE.getChild(oldPos), 0);
                 stack.push(el);
             } else {
                 stack.pop().release();
             }
-        } while (!stack.isEmpty() && stack.peek().second != 0);
+        } while (!stack.isEmpty() && (el = stack.peek()).second != 0);
     }
 
     public void gotoNextSibling() {
