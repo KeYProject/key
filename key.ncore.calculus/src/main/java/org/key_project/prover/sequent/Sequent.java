@@ -5,6 +5,7 @@ package org.key_project.prover.sequent;
 
 import java.util.Iterator;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -50,7 +51,7 @@ import org.jspecify.annotations.NonNull;
  * @see SequentChangeInfo
  * @see PosInOccurrence
  */
-public abstract class Sequent implements Iterable<SequentFormula> {
+public abstract class Sequent implements Iterable<SequentFormula>, SyntaxElement {
 
     private final Semisequent antecedent;
     private final Semisequent succedent;
@@ -566,5 +567,16 @@ public abstract class Sequent implements Iterable<SequentFormula> {
      */
     public ImmutableList<SequentFormula> asList() {
         return antecedent().asList().append(succedent().asList());
+    }
+
+    @Override
+    public int getChildCount() {
+        return size();
+    }
+
+    @Override
+    public @NonNull SyntaxElement getChild(int n) {
+        // Could also make SequentFormula a SyntaxElement; no special reason for current decision.
+        return getFormulaByNr(n - 1).formula();
     }
 }

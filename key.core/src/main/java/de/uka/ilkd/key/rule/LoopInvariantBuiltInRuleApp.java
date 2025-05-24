@@ -122,9 +122,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             private Term result;
 
             @Override
-            public void visit(Term visited) {
+            public void visit(org.key_project.logic.Term visited) {
                 // TODO: Remove cast when/if term builder is moved
-                result = replace(visited);
+                result = replace((Term) visited);
             }
 
             public Term getResult() {
@@ -154,8 +154,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             private Term result;
 
             @Override
-            public void visit(Term visited) {
-                result = replace(visited);
+            public void visit(org.key_project.logic.Term visited) {
+                result = replace((Term) visited);
             }
 
             public Term getResult() {

@@ -37,6 +37,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
@@ -135,7 +136,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                     || !tac.assumesSequent().isEmpty() || tac.goalTemplates().size() != 1
                     || !tac.goalTemplates().head().sequent().isEmpty() || !tac.varsNew().isEmpty()
                     || !tac.varsNewDependingOn().isEmpty()
-                    || ((RewriteTaclet) tac).getApplicationRestriction() != RewriteTaclet.NONE
+                    || !tac.applicationRestriction().equals(ApplicationRestriction.NONE)
                     || !proof.getInitConfig().getJustifInfo().getJustification(tac)
                             .isAxiomJustification()) {
                 continue;

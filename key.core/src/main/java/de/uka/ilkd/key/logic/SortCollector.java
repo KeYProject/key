@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 
 /**
