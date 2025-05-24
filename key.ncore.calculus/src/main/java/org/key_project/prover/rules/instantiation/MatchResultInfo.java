@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.instantiation;
 
-
+/**
+ * Container class used to track the current rule matching status
+ */
 public abstract class MatchResultInfo {
     protected final SVInstantiations instantiations;
 
