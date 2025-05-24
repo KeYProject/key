@@ -24,14 +24,14 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * The proof obligation for dependency contracts.
  */
-public final class DependencyContractPO extends AbstractPO implements ContractPO {
+public class DependencyContractPO extends AbstractPO implements ContractPO {
 
-    private Term mbyAtPre;
+    protected Term mbyAtPre;
 
-    private final DependencyContract contract;
+    protected final DependencyContract contract;
 
-    private InitConfig proofConfig;
-    private TermBuilder tb;
+    protected InitConfig proofConfig;
+    protected TermBuilder tb;
 
 
     // -------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Term buildFreePre(List<LocationVariable> heaps, LocationVariable selfVar,
+    protected Term buildFreePre(List<LocationVariable> heaps, LocationVariable selfVar,
             KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, Term wellFormedHeaps,
             Services services) throws ProofInputException {
         // "self != null"
@@ -289,7 +289,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     @Override
     public int hashCode() {
-        return contract.hashCode();
+        // TODO(DD): Proper hashCode
+        return contract.hashCode() + 17 * this.getClass().hashCode();
     }
 
     /**
