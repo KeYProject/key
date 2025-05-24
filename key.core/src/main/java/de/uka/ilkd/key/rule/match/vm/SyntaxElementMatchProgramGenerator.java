@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -93,8 +92,7 @@ public class SyntaxElementMatchProgramGenerator {
                     program.add(getMatchIdentityInstruction(mod.kind()));
                 }
                 program.add(gotoNextInstruction());
-                final JavaProgramElement patternPrg = pattern.javaBlock().program();
-                program.add(matchProgram(patternPrg));
+                program.add(matchProgram(pattern.javaBlock().program()));
                 program.add(gotoNextSiblingInstruction());
             } else {
                 program.add(getMatchIdentityInstruction(op));
