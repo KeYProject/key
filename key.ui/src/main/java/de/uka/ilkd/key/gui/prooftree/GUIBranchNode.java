@@ -77,7 +77,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
                 // linearized mode: the main branch will be continued without a new BranchNode
                 if (getProofTreeModel().linearizedModeActive()
                         && (n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
-                                .equals(taclet.goalTemplates().last().getTag(), "main"))) {
+                                .equals(taclet.goalTemplates().last().tag(), "main"))) {
                     n = nextN.get(0);
                     nextN.remove(0);
                     for (var node : nextN) {
