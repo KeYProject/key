@@ -4,19 +4,24 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.OperatorSV;
-import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 
-public class MatchTermOrFormulaSVInstruction extends MatchSchemaVariableInstruction {
+/**
+ * Matching VM instruction that matches all operator schema variables that
+ * are not a {@link VariableSV} or a {@link ProgramSV}.
+ * For those see {@link MatchVariableSVInstruction} and {@link MatchProgramSVInstruction}.
+ */
+public class MatchNonVariableSVInstruction extends MatchSchemaVariableInstruction {
 
-    protected MatchTermOrFormulaSVInstruction(OperatorSV op) {
+    protected MatchNonVariableSVInstruction(OperatorSV op) {
         super(op);
-        assert op instanceof TermSV || op instanceof FormulaSV;
+        assert !(op instanceof VariableSV || op instanceof ProgramSV);
     }
 
     /**
@@ -30,11 +35,7 @@ public class MatchTermOrFormulaSVInstruction extends MatchSchemaVariableInstruct
     @Override
     public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions mc,
             LogicServices services) {
-        final MatchConditions result = match((Term) cursor.getCurrentElement(), mc, services);
-        if (result != null) {
-            cursor.gotoNextSibling();
-        }
-        return result;
+        return match((Term) cursor.getCurrentElement(), mc, services);
     }
 
 }
