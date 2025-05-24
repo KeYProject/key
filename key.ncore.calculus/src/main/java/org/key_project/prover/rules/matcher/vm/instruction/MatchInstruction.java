@@ -10,7 +10,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Convenience interface for vm instructions that do not manipulate
- * the {@link org.key_project.logic.SyntaxElementCursor},
+ * the {@link PoolSyntaxElementCursor},
  * but perform matching operations on the {@link SyntaxElement}
  * at which the cursor is positioned.
  */
