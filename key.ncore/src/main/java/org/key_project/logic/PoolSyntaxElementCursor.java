@@ -81,7 +81,7 @@ public class PoolSyntaxElementCursor {
         return stack.peek().first;
     }
 
-    private /* @ helper @ */ void gotoNextHelper(final int skips) {
+    private /* @ helper @ */ void gotoNextHelper() {
         if (stack.isEmpty()) {
             return;
         }
@@ -90,7 +90,7 @@ public class PoolSyntaxElementCursor {
             if (el.second < el.first.getChildCount()) {
                 final int oldPos = el.second;
                 final SyntaxElement oldSE = el.first;
-                el.second += skips;
+                el.second += 1;
                 if (el.second >= oldSE.getChildCount()) {
                     // we visited all children of that element
                     // so it can be removed from the stack
@@ -106,12 +106,7 @@ public class PoolSyntaxElementCursor {
 
     public void gotoNextSibling() {
         stack.pop().release();
-        gotoNextHelper(1);
-    }
-
-    public void gotoNextSibling(int nr) {
-        stack.pop().release();
-        gotoNextHelper(nr);
+        gotoNextHelper();
     }
 
     public void release() {
@@ -125,7 +120,7 @@ public class PoolSyntaxElementCursor {
     }
 
     public void gotoNext() {
-        gotoNextHelper(1);
+        gotoNextHelper();
     }
 
     /**

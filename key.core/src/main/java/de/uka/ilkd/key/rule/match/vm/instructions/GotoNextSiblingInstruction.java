@@ -9,21 +9,16 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 
 public final class GotoNextSiblingInstruction implements MatchInstruction {
-    private final int skipSibling;
 
-    public GotoNextSiblingInstruction() {
-        this(1);
-    }
+    public static final GotoNextSiblingInstruction INSTANCE = new GotoNextSiblingInstruction();
 
-    public GotoNextSiblingInstruction(int size) {
-        assert size > 0;
-        this.skipSibling = size;
+    private GotoNextSiblingInstruction() {
     }
 
     @Override
     public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
             LogicServices services) {
-        cursor.gotoNextSibling(skipSibling);
+        cursor.gotoNextSibling();
         return matchConditions;
     }
 }
