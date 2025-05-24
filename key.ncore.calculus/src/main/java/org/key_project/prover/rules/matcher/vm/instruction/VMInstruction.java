@@ -10,7 +10,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 /**
  * Interface that has to be implemented by instructions for the matching virtual machine
  */
-public interface MatchInstruction {
+public interface VMInstruction {
     MatchResultInfo match(PoolSyntaxElementCursor cursor, MatchResultInfo matchResultInfo,
             LogicServices services);
 }
