@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
@@ -122,7 +123,7 @@ public class VMTacletMatcher implements TacletMatcher {
             MatchResultInfo p_matchCond,
             LogicServices p_services) {
         VMProgramInterpreter interpreter = assumesMatchPrograms.get(p_template);
-        final var mc = (de.uka.ilkd.key.rule.MatchConditions) p_matchCond;
+        final var mc = (MatchConditions) p_matchCond;
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableSLList.nil();
         ImmutableList<MatchResultInfo> resMC =
@@ -239,7 +240,7 @@ public class VMTacletMatcher implements TacletMatcher {
     public final MatchResultInfo checkConditions(
             MatchResultInfo cond,
             LogicServices services) {
-        var result = (de.uka.ilkd.key.rule.MatchConditions) cond;
+        var result = (MatchConditions) cond;
         if (result != null) {
 
             final var svIterator = result.getInstantiations().svIterator();
@@ -252,7 +253,7 @@ public class VMTacletMatcher implements TacletMatcher {
                 final SchemaVariable sv = svIterator.next();
                 final Object o = result.getInstantiations().getInstantiation(sv);
                 if (o instanceof SyntaxElement se) {
-                    result = (de.uka.ilkd.key.rule.MatchConditions) checkVariableConditions(sv, se,
+                    result = (MatchConditions) checkVariableConditions(sv, se,
                         result, services);
                 }
             }
@@ -335,7 +336,7 @@ public class VMTacletMatcher implements TacletMatcher {
             // updates can be ignored
             Term update = UpdateApplication.getUpdate(source);
             final var svInstantiations =
-                ((de.uka.ilkd.key.rule.MatchConditions) matchCond).getInstantiations();
+                ((MatchConditions) matchCond).getInstantiations();
             final var resultingConditions =
                 matchCond.setInstantiations(svInstantiations.addUpdate(update, source.getLabels()));
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(source),
@@ -385,7 +386,7 @@ public class VMTacletMatcher implements TacletMatcher {
             matchCond = instr.match(term, matchCond, services);
             matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
         } else if (syntaxElement instanceof ProgramElement pe) {
-            matchCond = instr.match(pe, (de.uka.ilkd.key.rule.MatchConditions) matchCond, services);
+            matchCond = instr.match(pe, (MatchConditions) matchCond, services);
             matchCond = checkConditions(matchCond, services);
         }
         return matchCond;
