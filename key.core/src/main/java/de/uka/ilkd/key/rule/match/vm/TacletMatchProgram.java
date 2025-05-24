@@ -114,7 +114,7 @@ public class TacletMatchProgram {
                 } else {
                     program.add(new MatchIdentityInstruction(sortDependingFunction.getChild(0)));
                 }
-                program.add(GotoNextSiblingInstruction.INSTANCE);
+                program.add(GotoNextInstruction.INSTANCE);
             } else if (op instanceof ElementaryUpdate elUp) {
                 program.add(new CheckNodeKindInstruction(ElementaryUpdate.class));
                 program.add(GotoNextInstruction.INSTANCE);
