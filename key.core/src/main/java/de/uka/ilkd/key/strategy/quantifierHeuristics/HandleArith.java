@@ -152,7 +152,7 @@ public class HandleArith {
             }
             return problem;
         }
-        JFunction addfun = integerLDT.getAdd();
+        Function addfun = integerLDT.getAdd();
         Term arithTerm =
             tb.geq(tb.func(addfun, cd.sub(0), ab.sub(1)), tb.func(addfun, ab.sub(0), cd.sub(1)));
         Term res = provedByArith(arithTerm, services);

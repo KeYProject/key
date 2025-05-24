@@ -38,7 +38,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      *
      * @param settings The {@link IModelSettings} to use.
      */
-    public AbstractSymbolicAssociationValueContainer(IModelSettings settings) {
+    protected AbstractSymbolicAssociationValueContainer(IModelSettings settings) {
         super(settings);
     }
 

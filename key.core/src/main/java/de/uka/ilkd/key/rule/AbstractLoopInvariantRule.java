@@ -24,6 +24,11 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -33,8 +38,8 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
- * {@link #doPreparations(Goal, Services, RuleApp)} directly at the beginning of the
- * {@link #apply(Goal, Services, RuleApp)} method.
+ * {@link #doPreparations(Goal, RuleApp)} directly at the beginning of
+ * the {@link BuiltInRule#apply(Goal, RuleApp)} method.
  *
  * @see LoopScopeInvariantRule
  * @see WhileInvariantRule
@@ -65,13 +70,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * method.
      *
      * @param goal the Goal on which to apply <tt>ruleApp</tt>
-     * @param services the Services with the necessary information about the java programs
      * @param ruleApp the rule application to be executed
      * @return The {@link LoopInvariantInformation} object containing the data for the application
      *         of loop invariant rules.
      */
-    public LoopInvariantInformation doPreparations(Goal goal, Services services, RuleApp ruleApp)
+    public LoopInvariantInformation doPreparations(Goal goal,
+            RuleApp ruleApp)
             throws RuleAbortException {
+        final var services = goal.getOverlayServices();
         // Basic objects needed for rule application
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();
@@ -116,9 +122,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term reachableOut = localOuts.stream().map(tb::reachableValue)
                 .reduce(tb.tt(), tb::and);
 
-        final Term[] uAnon = new Term[] { inst.u, additionalHeapTerms.anonUpdate };
+        final Term[] uAnon = { inst.u, additionalHeapTerms.anonUpdate };
         final Term[] uBeforeLoopDefAnonVariant =
-            new Term[] { inst.u, beforeLoopUpdate, additionalHeapTerms.anonUpdate, variantUpdate };
+            { inst.u, beforeLoopUpdate, additionalHeapTerms.anonUpdate, variantUpdate };
         final Term uAnonInv =
             tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
@@ -138,7 +144,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             return false;
         }
 
-        final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
+        final Term progPost = splitUpdates((Term) pio.subTerm(), goal.proof().getServices()).second;
         JavaBlock javaBlock = progPost.javaBlock();
 
         return !javaBlock.isEmpty() && JavaTools.getActiveStatement(javaBlock) instanceof While;
@@ -198,7 +204,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         }
 
         for (ProgramVariable pv : localOuts) {
-            final String pvBeforeLoopName = tb.newName(pv.name().toString() + "Before_LOOP");
+            final String pvBeforeLoopName = tb.newName(pv.name() + "Before_LOOP");
             final LocationVariable pvBeforeLoop =
                 new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
             progVarNS.addSafely(pvBeforeLoop);
@@ -223,7 +229,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         return localOuts.stream().map(pv -> {
-            final JFunction anonFunc =
+            final Function anonFunc =
                 new JFunction(new Name(tb.newName(pv.name().toString())), pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
 
@@ -365,7 +371,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
             Services services) throws RuleAbortException {
-        final Term focusTerm = app.posInOccurrence().subTerm();
+        final Term focusTerm = (Term) app.posInOccurrence().subTerm();
 
         if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
                 .getSpecificationRepository().getLoopSpec(lastInstantiation.loop)) {
@@ -432,13 +438,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-        final JFunction loopHeapFunc =
+        final Function loopHeapFunc =
             new JFunction(loopHeapName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = tb.func(loopHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_LOOP"));
-        final JFunction anonHeapFunc = new JFunction(anonHeapName, heap.sort());
+        final Function anonHeapFunc = new JFunction(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);

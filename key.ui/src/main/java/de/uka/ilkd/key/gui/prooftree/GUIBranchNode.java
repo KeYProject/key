@@ -19,10 +19,8 @@ import org.jspecify.annotations.NonNull;
  * @author early KeY team
  * @see ProofTreeView
  */
-class GUIBranchNode extends GUIAbstractTreeNode implements TreeNode {
-    /**
-     * User-facing label for this branch. Always a string.
-     */
+class GUIBranchNode extends GUIAbstractTreeNode {
+
     private final Object label;
 
     private ArrayList<TreeNode> childrenCache = null;

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
@@ -26,6 +25,8 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
+import org.key_project.prover.sequent.Sequent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

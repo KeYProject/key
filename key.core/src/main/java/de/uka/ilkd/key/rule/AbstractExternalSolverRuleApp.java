@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -105,7 +106,7 @@ public abstract class AbstractExternalSolverRuleApp extends AbstractBuiltInRuleA
     public abstract AbstractExternalSolverRuleApp setTitle(String title);
 
     @Override
-    public AbstractExternalSolverRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public AbstractExternalSolverRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

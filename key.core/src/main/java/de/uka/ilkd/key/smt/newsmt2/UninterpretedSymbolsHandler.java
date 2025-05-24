@@ -8,13 +8,12 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
@@ -41,7 +40,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        return (op instanceof JFunction && !bindsVars(op)) || op instanceof ProgramVariable;
+        return (op instanceof Function && !bindsVars(op)) || op instanceof ProgramVariable;
     }
 
     /*
@@ -59,7 +58,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
-        String name = PREFIX + op.name().toString();
+        String name = PREFIX + op.name();
         if (!trans.isKnownSymbol(name)) {
             trans.addDeclaration(HandlerUtil.funDeclaration(op, name));
             if (op.sort() != JavaDLTheory.FORMULA && (enableQuantifiers || op.arity() == 0)) {
@@ -68,7 +67,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             trans.addKnownSymbol(name);
         }
 
-        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
+        List<SExpr> children = trans.translate(term.subs(), UNIVERSE);
         SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
         return new SExpr(name, exprType, children);
     }

@@ -46,8 +46,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
-        Operator op = lookup_func(sort + "::select");
-        Term[] params = new Term[] { heap, object, field };
+        Operator op = (Operator) lookup_func(sort + "::select");
+        Term[] params = { heap, object, field };
         return tf.createTerm(op, params);
     }
 

@@ -27,16 +27,16 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.proof.LocationVariableTracker;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
 

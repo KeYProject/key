@@ -34,7 +34,8 @@ public abstract class AbstractEnvInput implements EnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
-    public AbstractEnvInput(String name, String javaPath, List<File> classPath, File bootClassPath,
+    protected AbstractEnvInput(String name, String javaPath, List<File> classPath,
+            File bootClassPath,
             Profile profile, List<File> includes) {
         assert profile != null;
         this.name = name;

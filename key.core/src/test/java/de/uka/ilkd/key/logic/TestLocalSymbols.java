@@ -19,6 +19,9 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Assertions;
@@ -30,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Program variables are now introduced locally.
- *
+ * <br>
  * These tests check that this is done correctly.
  *
  * @author mulbrich
@@ -153,8 +156,10 @@ public class TestLocalSymbols {
         Goal goal = goals.head();
 
         TacletApp app;
-        PosInOccurrence pio = new PosInOccurrence(goal.node().sequent().getFormulabyNr(formulaNo),
-            PosInTerm.getTopLevel(), false);
+        Sequent sequentFormulas = goal.node().sequent();
+        PosInOccurrence pio =
+            new PosInOccurrence(sequentFormulas.getFormulaByNr(formulaNo),
+                PosInTerm.getTopLevel(), false);
 
         app = rule.matchFind(pio, services);
         app = app.setPosInOccurrence(pio, services);

@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The default implementation of {@link IExecutionConstraint}.
@@ -35,7 +36,8 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      *        {@link IExecutionNode}.
      * @param term The {@link Term} representing the constraint.
      */
-    public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO,
+    public ExecutionConstraint(ITreeSettings settings, Node proofNode,
+            PosInOccurrence modalityPIO,
             Term term) {
         super(settings, proofNode);
         assert term != null;

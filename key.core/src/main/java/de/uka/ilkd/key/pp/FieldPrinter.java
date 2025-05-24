@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.op.Function;
@@ -97,7 +96,7 @@ class FieldPrinter {
      * Determine whether a term is a constant function symbol of type field.
      */
     protected static boolean isFieldConstant(Term fieldTerm, HeapLDT heapLDT) {
-        return fieldTerm.op() instanceof JFunction && ((Function) fieldTerm.op()).isUnique()
+        return fieldTerm.op() instanceof Function && ((Function) fieldTerm.op()).isUnique()
                 && fieldTerm.sort() == heapLDT.getFieldSort() && fieldTerm.arity() == 0
                 && fieldTerm.boundVars().isEmpty();
     }

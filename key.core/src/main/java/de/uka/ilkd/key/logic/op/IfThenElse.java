@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
@@ -72,7 +73,7 @@ public final class IfThenElse extends AbstractOperator implements Operator {
         }
     }
 
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+    public <T extends Term> void validTopLevelException(T term)
             throws TermCreationException {
         super.validTopLevelException(term);
 

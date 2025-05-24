@@ -67,7 +67,7 @@ class CheckConfigDialog extends JDialog {
 
         @Override
         protected void done() {
-            CheckConfigDialog.this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            CheckConfigDialog.this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             glassPane.setVisible(false);
             cancelButton.setEnabled(true);
             runButton.setText("Run checkers");
@@ -170,7 +170,7 @@ class CheckConfigDialog extends JDialog {
     public CheckConfigDialog(Frame parent, String title, boolean modal) {
         super(parent, title, modal);
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         setLayout(new BorderLayout());
 
@@ -269,7 +269,7 @@ class CheckConfigDialog extends JDialog {
             glassPane.setVisible(true);
             runButton.setText("Stop");
             cancelButton.setEnabled(false);
-            CheckConfigDialog.this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            CheckConfigDialog.this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             checkWorker = new ProofManagementCheckWorker();
             checkWorker.execute();
         });

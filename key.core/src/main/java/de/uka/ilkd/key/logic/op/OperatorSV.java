@@ -4,15 +4,18 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Abstract base class for schema variables.
  */
-public abstract class OperatorSV extends AbstractSortedOperator implements SchemaVariable {
+public abstract class OperatorSV extends AbstractSortedOperator
+        implements org.key_project.logic.op.sv.OperatorSV, SchemaVariable, ParsableVariable {
 
     private final boolean isStrict;
 
@@ -60,5 +63,25 @@ public abstract class OperatorSV extends AbstractSortedOperator implements Schem
             }
         }
 
+    }
+
+    @Override
+    public boolean isVariable() {
+        return false;
+    }
+
+    @Override
+    public boolean isTerm() {
+        return false;
+    }
+
+    @Override
+    public boolean isFormula() {
+        return false;
+    }
+
+    @Override
+    public boolean isSkolemTerm() {
+        return false;
     }
 }

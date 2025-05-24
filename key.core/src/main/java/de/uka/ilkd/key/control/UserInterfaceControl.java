@@ -17,7 +17,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.prover.ProverTaskListener;
+
+import org.key_project.prover.engine.ProverTaskListener;
 
 /**
  * Provides the user interface independent logic to manage multiple proofs. This includes:

@@ -47,10 +47,10 @@ public class TestSMTMod {
 
     /**
      * This tests if x mod y is non-negative and x mod y < |y| for y != 0
-     * thus satisfying the definition of euclidean modulo
+     * thus satisfying the definition of Euclidean modulo
      * Tests for Z3 and cvc5
      *
-     * @throws ProblemLoaderException Occured Exception during load of problem file
+     * @throws ProblemLoaderException Occurred Exception during load of problem file
      */
     @Test
     public void testModSpec() throws ProblemLoaderException {

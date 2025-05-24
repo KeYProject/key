@@ -31,7 +31,7 @@ public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
      *
      * @param tf a term factory
      */
-    public ReplacementMap(TermFactory tf) {
+    protected ReplacementMap(TermFactory tf) {
         super(tf);
     }
 

@@ -294,41 +294,41 @@ public final class StrategyProperties extends Properties {
         // invariant for the SED. For this, one would
         // however have to change the SED's
         // implementation and to update the tests.
-        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-            loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT
-                    : StrategyProperties.LOOP_EXPAND);
-        sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-            blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT_INTERNAL
-                    : StrategyProperties.BLOCK_EXPAND);
-        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-            methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT
-                    : StrategyProperties.METHOD_EXPAND);
-        sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
-        sp.setProperty(StrategyProperties.MPS_OPTIONS_KEY, StrategyProperties.MPS_MERGE);
-        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
-        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
-            StrategyProperties.AUTO_INDUCTION_OFF);
-        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
-        sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
-        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-            StrategyProperties.SPLITTING_DELAYED);
-        sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-            StrategyProperties.STOPMODE_DEFAULT);
-        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-            StrategyProperties.CLASS_AXIOM_FREE);
-        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-            quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE
-                    : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-        sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
-            aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
-                    : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
+        sp.setProperty(LOOP_OPTIONS_KEY,
+            loopTreatmentInvariant ? LOOP_INVARIANT
+                    : LOOP_EXPAND);
+        sp.setProperty(BLOCK_OPTIONS_KEY,
+            blockTreatmentContract ? BLOCK_CONTRACT_INTERNAL
+                    : BLOCK_EXPAND);
+        sp.setProperty(METHOD_OPTIONS_KEY,
+            methodTreatmentContract ? METHOD_CONTRACT
+                    : METHOD_EXPAND);
+        sp.setProperty(OSS_OPTIONS_KEY, OSS_ON);
+        sp.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
+        sp.setProperty(QUERY_OPTIONS_KEY, QUERY_RESTRICTED);
+        sp.setProperty(NON_LIN_ARITH_OPTIONS_KEY,
+            NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(AUTO_INDUCTION_OPTIONS_KEY,
+            AUTO_INDUCTION_OFF);
+        sp.setProperty(DEP_OPTIONS_KEY, DEP_OFF);
+        sp.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
+        sp.setProperty(SPLITTING_OPTIONS_KEY,
+            SPLITTING_DELAYED);
+        sp.setProperty(STOPMODE_OPTIONS_KEY,
+            STOPMODE_DEFAULT);
+        sp.setProperty(CLASS_AXIOM_OPTIONS_KEY,
+            CLASS_AXIOM_FREE);
+        sp.setProperty(QUANTIFIERS_OPTIONS_KEY,
+            quantifierInstantiationWithSplitting ? QUANTIFIERS_INSTANTIATE
+                    : QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        sp.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
+            aliasChecks ? SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
+                    : SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         sp.setProperty(
-            StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
+            SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
             nonExecutionBranchHidingSideProofs
-                    ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
-                    : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
+                    ? SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
+                    : SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
 
 
@@ -395,6 +395,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    @Override
     public String getProperty(String key) {
         String val = super.getProperty(key);
         if (val != null) {
@@ -436,6 +437,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    @Override
     public synchronized Object clone() {
         final Properties p = (Properties) super.clone();
         final StrategyProperties sp = new StrategyProperties();

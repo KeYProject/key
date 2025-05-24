@@ -15,9 +15,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.ExtList;
 
 public class LineBreakpoint extends AbstractConditionalBreakpoint {
@@ -116,13 +116,12 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
             activeStatement = ((LoopInvariantBuiltInRuleApp) ruleApp).getLoopStatement();
         }
         return isInLine(activeStatement)
-                && super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                && super.isBreakpointHit(activeStatement, ruleApp, node);
     }
 
     private boolean isInLine(SourceElement activeStatement) {

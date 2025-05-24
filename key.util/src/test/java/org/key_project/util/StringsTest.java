@@ -14,7 +14,7 @@ class StringsTest {
 
     @Test
     void containsWholeWord() {
-        String[] sentences = new String[] {
+        String[] sentences = {
             "asfKeY;prover",
             "KeY prover",
             "KeY,prover",
@@ -66,10 +66,10 @@ class StringsTest {
         assertEquals("%1;1;1$",
             Strings.formatAsList(testStrings, "%", ";", "$", String::length));
 
-        testStrings = Arrays.asList("a");
+        testStrings = List.of("a");
         assertEquals("%a$", Strings.formatAsList(testStrings, "%", ";", "$"));
 
-        testStrings = Arrays.asList(new String[] {});
+        testStrings = List.of();
         assertEquals("%$", Strings.formatAsList(testStrings, "%", ";", "$"));
     }
 }

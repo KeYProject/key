@@ -487,7 +487,7 @@ public final class IconFactory {
     public static List<? extends Image> applicationLogos() {
         // https://stackoverflow.com/questions/18224184/sizes-of-frame-icons-used-in-swing
         Image original = keyLogo();
-        int[] sizes = new int[] { 16, 20, 32, 40, 64, 128 };
+        int[] sizes = { 16, 20, 32, 40, 64, 128 };
         ArrayList<Image> images = new ArrayList<>(sizes.length);
         for (int sz : sizes) {
             images.add(original.getScaledInstance(sz, sz, Image.SCALE_SMOOTH));
