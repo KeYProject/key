@@ -28,6 +28,7 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -52,9 +53,9 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 public class VMTacletMatcher implements TacletMatcher {
 
     /** the matcher for the find expression of the taclet */
-    private final TacletMatchProgram findMatchProgram;
+    private final VMProgramInterpreter findMatchProgram;
     /** the matcher for the taclet's assumes formulas */
-    private final HashMap<Term, TacletMatchProgram> assumesMatchPrograms = new HashMap<>();
+    private final HashMap<Term, VMProgramInterpreter> assumesMatchPrograms = new HashMap<>();
 
     /**
      * the variable conditions of the taclet that need to be satisfied by found schema variable
@@ -93,20 +94,21 @@ public class VMTacletMatcher implements TacletMatcher {
             findExp = ((FindTaclet) taclet).find();
             ignoreTopLevelUpdates = taclet.ignoreTopLevelUpdates()
                     && !(findExp.op() instanceof UpdateApplication);
-            findMatchProgram = TacletMatchProgram.createProgram(findExp);
+            findMatchProgram =
+                new VMProgramInterpreter(SyntaxElementMatchProgramGenerator.createProgram(findExp));
 
         } else {
             ignoreTopLevelUpdates = false;
             findExp = null;
-            findMatchProgram = TacletMatchProgram.EMPTY_PROGRAM;
+            findMatchProgram = null;
         }
 
         for (SequentFormula sf : assumesSequent) {
             assumesMatchPrograms.put((Term) sf.formula(),
-                TacletMatchProgram.createProgram((Term) sf.formula()));
+                new VMProgramInterpreter(
+                    SyntaxElementMatchProgramGenerator.createProgram((Term) sf.formula())));
         }
     }
-
 
     /**
      * (non-Javadoc)
@@ -119,7 +121,7 @@ public class VMTacletMatcher implements TacletMatcher {
             org.key_project.logic.Term p_template,
             MatchResultInfo p_matchCond,
             LogicServices p_services) {
-        TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
+        VMProgramInterpreter interpreter = assumesMatchPrograms.get(p_template);
         final var mc = (de.uka.ilkd.key.rule.MatchConditions) p_matchCond;
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableSLList.nil();
@@ -141,7 +143,7 @@ public class VMTacletMatcher implements TacletMatcher {
             }
             if (formula != null) {// update context not present or update context match succeeded
                 final MatchResultInfo newMC =
-                    checkConditions(prg.match(formula, mc, p_services), p_services);
+                    checkConditions(interpreter.match(formula, mc, p_services), p_services);
 
                 if (newMC != null) {
                     resFormulas = resFormulas.prepend(cf);
@@ -351,7 +353,7 @@ public class VMTacletMatcher implements TacletMatcher {
             org.key_project.logic.Term term,
             MatchResultInfo p_matchCond,
             LogicServices services) {
-        if (findMatchProgram == TacletMatchProgram.EMPTY_PROGRAM) {
+        if (findMatchProgram == null) {
             return null;
         }
         Term source = (Term) term;
@@ -362,8 +364,7 @@ public class VMTacletMatcher implements TacletMatcher {
             p_matchCond = resultUpdateMatch.second;
         }
         return checkConditions(
-            findMatchProgram.match(source, (de.uka.ilkd.key.rule.MatchConditions) p_matchCond,
-                services),
+            findMatchProgram.match(source, p_matchCond, services),
             services);
     }
 
