@@ -106,46 +106,48 @@ public class TacletMatchProgram {
             program.add(getMatchInstructionForSV(sv));
         } else {
             program.add(new CheckNodeKindInstruction(Term.class));
-            program.add(new GotoNextInstruction());
+            program.add(GotoNextInstruction.INSTANCE);
             if (op instanceof final SortDependingFunction sortDependingFunction) {
                 program.add(new CheckNodeKindInstruction(SortDependingFunction.class));
                 program.add(new SimilarSortDependingFunctionInstruction(sortDependingFunction));
-                program.add(new GotoNextInstruction());
+                program.add(GotoNextInstruction.INSTANCE);
                 if (sortDependingFunction.getSortDependingOn() instanceof GenericSort gs) {
                     program.add(new MatchGenericSortInstruction(gs));
                 } else {
                     program.add(new MatchIdentityInstruction(sortDependingFunction.getChild(0)));
                 }
-                program.add(new GotoNextSiblingInstruction());
+                program.add(GotoNextSiblingInstruction.INSTANCE);
             } else if (op instanceof ElementaryUpdate elUp) {
                 program.add(new CheckNodeKindInstruction(ElementaryUpdate.class));
-                program.add(new GotoNextInstruction());
+                program.add(GotoNextInstruction.INSTANCE);
                 if (elUp.lhs() instanceof SchemaVariable sv) {
                     program.add(getMatchInstructionForSV(sv));
                 } else if (elUp.lhs() instanceof LocationVariable locVar) {
                     program.add(new MatchIdentityInstruction(locVar));
-                    program.add(new GotoNextInstruction());
+                    program.add(GotoNextInstruction.INSTANCE);
                 }
             } else if (op instanceof Modality mod) {
                 program.add(new CheckNodeKindInstruction(Modality.class));
-                program.add(new GotoNextInstruction());
+                program.add(GotoNextInstruction.INSTANCE);
                 if (mod.kind() instanceof ModalOperatorSV modKindSV) {
                     program.add(Instruction.matchModalOperatorSV(modKindSV));
                 } else {
                     program.add(new MatchIdentityInstruction(mod.kind()));
                 }
-                program.add(new GotoNextInstruction());
+                program.add(GotoNextInstruction.INSTANCE);
                 final JavaProgramElement patternPrg = pattern.javaBlock().program();
                 program.add(Instruction.matchProgram(patternPrg));
-                program.add(new GotoNextSiblingInstruction());
+                program.add(GotoNextSiblingInstruction.INSTANCE);
             } else {
                 program.add(new MatchIdentityInstruction(op));
-                program.add(new GotoNextInstruction());
+                program.add(GotoNextInstruction.INSTANCE);
             }
         }
 
         if (!boundVars.isEmpty()) {
-            program.add(new GotoNextSiblingInstruction(boundVars.size()));
+            for (int i = 0; i < boundVars.size(); i++) {
+                program.add(GotoNextSiblingInstruction.INSTANCE);
+            }
         }
 
         for (int i = 0; i < pattern.arity(); i++) {
@@ -178,7 +180,7 @@ public class TacletMatchProgram {
 
         final PoolSyntaxElementCursor navi = PoolSyntaxElementCursor.get(p_toMatch);
         int instrPtr = 0;
-        while (mc != null && instrPtr < instruction.length && navi.hasNext()) {
+        while (mc != null && instrPtr < instruction.length) {
             mc = instruction[instrPtr].match(navi, mc, services);
             instrPtr++;
         }

@@ -9,16 +9,16 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 
 public final class GotoNextInstruction implements MatchInstruction {
-    public GotoNextInstruction() {
+
+    public static final GotoNextInstruction INSTANCE = new GotoNextInstruction();
+
+    private GotoNextInstruction() {
     }
 
     @Override
     public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
             LogicServices services) {
-        if (cursor.hasNext()) {
-            cursor.gotoNext();
-            return matchConditions;
-        }
-        return null;
+        cursor.gotoNext();
+        return matchConditions;
     }
 }
