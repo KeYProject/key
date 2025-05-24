@@ -36,11 +36,7 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction {
     @Override
     public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions mc,
             LogicServices services) {
-        final MatchConditions result = match((Term) cursor.getCurrentElement(), mc, services);
-        if (result != null) {
-            cursor.gotoNextSibling();
-        }
-        return result;
+        return match((Term) cursor.getCurrentElement(), mc, services);
     }
 
 }
