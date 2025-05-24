@@ -859,8 +859,8 @@ public abstract class TacletApp implements RuleApp {
         return findIfFormulaInstantiationsHelp(
             createSemisequentList(taclet().assumesSequent().succedent()),
             createSemisequentList(taclet().assumesSequent().antecedent()),
-            AssumesFormulaInstSeq.createList(seq, false),
-            AssumesFormulaInstSeq.createList(seq, true),
+            AssumesFormulaInstSeq.createList(seq, false, services),
+            AssumesFormulaInstSeq.createList(seq, true, services),
             ImmutableSLList.nil(), matchConditions(), services);
     }
 
