@@ -16,7 +16,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
@@ -34,8 +34,8 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices services) {
+    public MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices services) {
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();
 
