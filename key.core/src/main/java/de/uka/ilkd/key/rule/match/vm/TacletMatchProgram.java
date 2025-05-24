@@ -63,15 +63,12 @@ public class TacletMatchProgram {
     public static MatchSchemaVariableInstruction getMatchInstructionForSV(
             SchemaVariable op) {
         MatchSchemaVariableInstruction instruction;
-
-        if (op instanceof TermSV || op instanceof FormulaSV) {
-            instruction = Instruction.matchTermOrFormulaSV((OperatorSV) op);
-        } else if (op instanceof VariableSV variableSV) {
+        if (op instanceof VariableSV variableSV) {
             instruction = Instruction.matchVariableSV(variableSV);
         } else if (op instanceof ProgramSV programSV) {
             instruction = Instruction.matchProgramSV(programSV);
-        } else if (op instanceof UpdateSV updateSV) {
-            instruction = Instruction.matchUpdateSV(updateSV);
+        } else if (op instanceof OperatorSV) {
+            instruction = Instruction.matchNonVariableSV((OperatorSV) op);
         } else {
             throw new IllegalArgumentException(
                 "Do not know how to match " + op + " of type " + op.getClass());
@@ -104,6 +101,7 @@ public class TacletMatchProgram {
 
         if (op instanceof SchemaVariable sv) {
             program.add(getMatchInstructionForSV(sv));
+            program.add(GotoNextSiblingInstruction.INSTANCE);
         } else {
             program.add(new CheckNodeKindInstruction(Term.class));
             program.add(GotoNextInstruction.INSTANCE);
@@ -122,6 +120,7 @@ public class TacletMatchProgram {
                 program.add(GotoNextInstruction.INSTANCE);
                 if (elUp.lhs() instanceof SchemaVariable sv) {
                     program.add(getMatchInstructionForSV(sv));
+                    program.add(GotoNextSiblingInstruction.INSTANCE);
                 } else if (elUp.lhs() instanceof LocationVariable locVar) {
                     program.add(new MatchIdentityInstruction(locVar));
                     program.add(GotoNextInstruction.INSTANCE);

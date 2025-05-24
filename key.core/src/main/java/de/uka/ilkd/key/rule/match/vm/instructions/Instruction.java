@@ -24,8 +24,8 @@ public abstract class Instruction<@NonNull OP extends org.key_project.logic.op.O
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction matchTermOrFormulaSV(OperatorSV sv) {
-        return new MatchTermOrFormulaSVInstruction(sv);
+    public static MatchSchemaVariableInstruction matchNonVariableSV(OperatorSV sv) {
+        return new MatchNonVariableSVInstruction(sv);
     }
 
     public static MatchSchemaVariableInstruction matchVariableSV(
@@ -36,11 +36,6 @@ public abstract class Instruction<@NonNull OP extends org.key_project.logic.op.O
     public static MatchSchemaVariableInstruction matchProgramSV(
             ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
-    }
-
-    public static MatchSchemaVariableInstruction matchUpdateSV(
-            UpdateSV sv) {
-        return new MatchUpdateSVInstruction(sv);
     }
 
     public static MatchInstruction matchTermLabelSV(ImmutableArray<TermLabel> labels) {
