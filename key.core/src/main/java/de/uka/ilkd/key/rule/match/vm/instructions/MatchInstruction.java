@@ -6,12 +6,13 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 /**
  * Interface that has to be implemented by instructions for the matching virtual machine
  */
 public interface MatchInstruction
-        extends org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction {
+        extends VMInstruction {
 
     @Override
     default de.uka.ilkd.key.rule.MatchConditions match(PoolSyntaxElementCursor cursor,
