@@ -28,15 +28,14 @@ public class BindVariablesInstruction implements MatchInstruction {
         boundVarBinders = new VariableBinderSubinstruction[boundVars.size()];
         int i = 0;
         for (QuantifiableVariable boundVar : boundVars) {
-            if (boundVar instanceof LogicVariable) {
-                boundVarBinders[i] = new LogicVariableBinder((LogicVariable) boundVar);
+            if (boundVar instanceof LogicVariable lv) {
+                boundVarBinders[i] = new LogicVariableBinder(lv);
             } else {
                 boundVarBinders[i] = new VariableSVBinder((VariableSV) boundVar);
             }
             i++;
         }
     }
-
 
     private interface VariableBinderSubinstruction {
         MatchConditions match(LogicVariable instantiationCandidate,
