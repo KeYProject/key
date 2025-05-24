@@ -66,7 +66,6 @@ public class BindVariablesInstruction implements MatchInstruction {
         }
     }
 
-
     private static class VariableSVBinder extends MatchSchemaVariableInstruction
             implements VariableBinderSubinstruction {
 

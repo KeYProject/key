@@ -18,11 +18,12 @@ import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
-public abstract class MatchSchemaVariableInstruction
-        extends Instruction<@NonNull OperatorSV> {
+public abstract class MatchSchemaVariableInstruction implements MatchInstruction {
 
-    protected MatchSchemaVariableInstruction(OperatorSV op) {
-        super(op);
+    protected final @NonNull OperatorSV op;
+
+    protected MatchSchemaVariableInstruction(@NonNull OperatorSV op) {
+        this.op = op;
     }
 
     /**
