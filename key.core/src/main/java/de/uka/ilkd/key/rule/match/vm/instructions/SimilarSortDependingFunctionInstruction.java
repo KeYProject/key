@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
 public final class SimilarSortDependingFunctionInstruction implements MatchInstruction {
     private final SortDependingFunction sortDependingFunction;

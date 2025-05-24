@@ -1,16 +1,18 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule.match.vm.instructions;
+package org.key_project.prover.rules.matcher.vm.instruction;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
 /**
- * Interface that has to be implemented by instructions for the matching virtual machine
+ * Convenience interface for vm instructions that do not manipulate
+ * the {@link org.key_project.logic.SyntaxElementCursor},
+ * but perform matching operations on the {@link SyntaxElement}
+ * at which the cursor is positioned.
  */
 public interface MatchInstruction extends VMInstruction {
 
