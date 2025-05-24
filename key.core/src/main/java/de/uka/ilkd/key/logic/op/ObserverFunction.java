@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -23,7 +22,7 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class ObserverFunction extends JFunction implements IObserverFunction {
 
-    private final QualifierWrapper<KeYJavaType> container;
+    private final KeYJavaType container;
     private final boolean isStatic;
     private final ImmutableArray<KeYJavaType> paramTypes;
     private final KeYJavaType type;
@@ -43,7 +42,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
         assert type == null || type.getSort() == sort;
         assert container != null;
         this.type = type;
-        this.container = QualifierWrapper.get(container);
+        this.container = container;
         this.isStatic = isStatic;
         this.paramTypes = paramTypes;
         this.heapCount = heapCount;
@@ -53,7 +52,6 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     public static ProgramElementName createName(String baseName, KeYJavaType container) {
         return new ProgramElementName(baseName, container.getSort().toString());
     }
-
 
 
     // -------------------------------------------------------------------------
@@ -85,7 +83,6 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     }
 
 
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
@@ -108,7 +105,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
      */
     @Override
     public final KeYJavaType getContainerType() {
-        return container.getQualifier();
+        return container;
     }
 
 
@@ -168,17 +165,5 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     @Override
     public final ImmutableArray<KeYJavaType> getParamTypes() {
         return paramTypes;
-    }
-
-    @Override
-    public int getChildCount() {
-        return 1;
-    }
-
-    @Override
-    public SyntaxElement getChild(int n) {
-        if (n == 0)
-            return container;
-        throw new IndexOutOfBoundsException("ObserverFunction " + name() + " has only one child");
     }
 }
