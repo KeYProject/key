@@ -28,7 +28,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.*;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
@@ -800,14 +800,14 @@ public abstract class TacletApp implements RuleApp {
      * creates a new Taclet application containing all the instantiations, constraints and new
      * metavariables given by the mc object and forget the old ones
      */
-    public abstract TacletApp setMatchConditions(MatchConditions mc, Services services);
+    public abstract TacletApp setMatchConditions(MatchResultInfo mc, Services services);
 
     /**
      * creates a new Taclet application containing all the instantiations, constraints, new
      * metavariables and if formula instantiations given and forget the old ones
      */
     protected abstract TacletApp setAllInstantiations(
-            MatchConditions mc,
+            MatchResultInfo mc,
             ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services);
 
     /**
@@ -828,7 +828,7 @@ public abstract class TacletApp implements RuleApp {
                 : "If instantiations list has wrong size "
                     + "or the if formulas have already been instantiated";
 
-        MatchConditions mc =
+        MatchResultInfo mc =
             taclet().getMatcher().matchAssumes(p_list, matchConditions, p_services);
 
         return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
@@ -885,7 +885,7 @@ public abstract class TacletApp implements RuleApp {
             ImmutableArray<AssumesFormulaInstantiation> instSucc,
             ImmutableArray<AssumesFormulaInstantiation> instAntec,
             ImmutableList<AssumesFormulaInstantiation> instAlreadyMatched,
-            MatchConditions matchCond,
+            MatchResultInfo matchCond,
             Services services) {
 
         while (ruleSuccTail.isEmpty()) {
@@ -912,7 +912,7 @@ public abstract class TacletApp implements RuleApp {
         // For each matching formula call the method again to match
         // the remaining terms
         ImmutableList<TacletApp> res = ImmutableSLList.nil();
-        Iterator<MatchConditions> itMC = mr.matchConditions().iterator();
+        Iterator<MatchResultInfo> itMC = mr.matchConditions().iterator();
         ruleSuccTail = ruleSuccTail.tail();
         for (final AssumesFormulaInstantiation instantiationCandidate : mr.candidates()) {
             res = res.prepend(findIfFormulaInstantiationsHelp(ruleSuccTail, ruleAntecTail, instSucc,

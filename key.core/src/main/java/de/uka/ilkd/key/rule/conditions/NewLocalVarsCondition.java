@@ -25,7 +25,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.ListInstantiation;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.*;
 
 /**
@@ -68,8 +68,8 @@ public class NewLocalVarsCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices lServices) {
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices lServices) {
         var services = (Services) lServices;
         var svInst = matchCond.getInstantiations();
         if (svInst.getInstantiation(varDeclsSV) != null) {

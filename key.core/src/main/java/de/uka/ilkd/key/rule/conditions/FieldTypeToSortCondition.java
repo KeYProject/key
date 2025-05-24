@@ -18,7 +18,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Variable condition that enforces a given generic sort to be instantiated with the type of a field
@@ -46,8 +46,8 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
-            MatchConditions matchCond, LogicServices services) {
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement svSubst,
+            MatchResultInfo matchCond, LogicServices services) {
 
         if (var != exprOrTypeSV) {
             return matchCond;
