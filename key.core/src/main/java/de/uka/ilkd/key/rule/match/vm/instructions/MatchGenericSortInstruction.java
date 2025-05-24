@@ -5,13 +5,14 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.op.QualifierWrapper;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SortException;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 public class MatchGenericSortInstruction implements MatchInstruction {
 
@@ -27,32 +28,32 @@ public class MatchGenericSortInstruction implements MatchInstruction {
      * {@code null} is returned.
      *
      * @param dependingSortToMatch the depending {@link Sort} of the concrete function to be matched
-     * @param matchConditions the {@link MatchConditions} accumulated so far
+     * @param matchConditions the {@link MatchResultInfo} accumulated so far
      * @return <code>null</code> if failed the resulting match conditions otherwise the resulting
-     *         {@link MatchConditions}
+     *         {@link MatchResultInfo}
      */
-    private MatchConditions matchSorts(Sort dependingSortToMatch, MatchConditions matchConditions,
+    private MatchResultInfo matchSorts(Sort dependingSortToMatch, MatchResultInfo matchConditions,
             LogicServices services) {
         // This restriction has been dropped for free generic sorts to prove taclets correct
         // assert !(s2 instanceof GenericSort)
         // : "Sort s2 is not allowed to be of type generic.";
-        MatchConditions result = null;
+        MatchResultInfo result;
         final GenericSortCondition c =
             GenericSortCondition.createIdentityCondition(genericSortOfOp, dependingSortToMatch);
         try {
-            result = matchConditions.setInstantiations(
-                matchConditions.getInstantiations().add(c, services));
+            final SVInstantiations instantiations =
+                (SVInstantiations) matchConditions.getInstantiations();
+            return matchConditions.setInstantiations(instantiations.add(c, services));
         } catch (SortException e) {
-            result = null;
+            return null;
         }
-        return result;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(SyntaxElement actualElement, MatchConditions mc,
+    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
             LogicServices services) {
         return matchSorts(((QualifierWrapper<Sort>) actualElement).getQualifier(), mc, services);
     }
