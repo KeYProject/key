@@ -8,7 +8,6 @@ import java.util.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -16,7 +15,9 @@ import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
@@ -77,10 +78,6 @@ import org.jspecify.annotations.Nullable;
  * </p>
  */
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
-
-    /** the set of taclet options for this taclet */
-    protected final ChoiceExpr choices;
-
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
      */
@@ -89,10 +86,17 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     /** Integer to cache the hashcode */
     private int hashcode = 0;
 
+    /* TODO: find better solution */
+    private final boolean surviveSymbExec;
+
+
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
      *
      * @param name the name of the Taclet
+     * @param find the Term or Sequent that is the pattern that has to be found in a sequent and the
+     *        places
+     *        where it matches the Taclet can be applied
      * @param applPart contains the application part of an Taclet that is the if-sequence, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
@@ -100,22 +104,25 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
-    protected Taclet(Name name, TacletApplPart applPart,
+    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec,
+        super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
             tacletAnnotations);
-        this.choices = choices;
+        this.surviveSymbExec = surviveSmbExec;
     }
 
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
      *
      * @param name the name of the Taclet
+     * @param find the Term or Sequent that is the pattern that has to be found in a sequent and the
+     *        places
+     *        where it matches the Taclet can be applied
      * @param applPart contains the application part of an Taclet that is the if-sequence, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
@@ -123,13 +130,13 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
-    protected Taclet(Name name, TacletApplPart applPart,
+    protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
+        this(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
     }
 
@@ -179,15 +186,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * @return set of variables that occur bound in taclet entities others than goal templates
      */
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
-
-    public ChoiceExpr getChoices() {
-        return choices;
-    }
-
-    /** returns an iterator over the rule sets. */
-    public Iterator<RuleSet> ruleSets() {
-        return ruleSets.iterator();
-    }
 
     @Override
     public @NonNull TacletExecutor getExecutor() {
@@ -298,9 +296,9 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             }
         }
 
-        for (Operator op : oc.ops()) {
-            if (op instanceof SchemaVariable) {
-                result.add((SchemaVariable) op);
+        for (final var op : oc.ops()) {
+            if (op instanceof SchemaVariable sv) {
+                result.add(sv);
             }
         }
 
@@ -311,6 +309,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         for (SequentFormula cf : s) {
             cf.formula().execPostOrder(oc);
         }
+    }
+
+    public boolean getSurviveSymbExec() {
+        return surviveSymbExec;
     }
 
     /**
@@ -512,7 +514,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         }
     }
 
-    public abstract Taclet setName(String s);
+    public abstract @NonNull Taclet setName(@NonNull String s);
 
     /**
      * Information about the origin of the taclet. Should be a location where the user can find the

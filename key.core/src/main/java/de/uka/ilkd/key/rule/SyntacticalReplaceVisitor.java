@@ -239,7 +239,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * to recursively
      * replace meta variables
      */
-    protected Term toTerm(Term o) {
+    protected <T extends org.key_project.logic.Term> T toTerm(T o) {
         return o;
     }
 
@@ -327,7 +327,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * performs the syntactic replacement of schemavariables with their instantiations
      */
     @Override
-    public void visit(final Term visited) {
+    public void visit(final org.key_project.logic.Term p_visited) {
+        final Term visited = (Term) p_visited;
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
@@ -446,8 +447,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * {@inheritDoc}
      */
     @Override
-    public void subtreeEntered(Term subtreeRoot) {
-        tacletTermStack.push(subtreeRoot);
+    public void subtreeEntered(org.key_project.logic.Term subtreeRoot) {
+        tacletTermStack.push((Term) subtreeRoot);
     }
 
     /**
@@ -459,12 +460,12 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param subtreeRoot root of the subtree which the visitor leaves.
      */
     @Override
-    public void subtreeLeft(Term subtreeRoot) {
+    public void subtreeLeft(org.key_project.logic.Term subtreeRoot) {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);
             final Term labeledTerm = TermLabelManager.label(services, termLabelState,
-                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, subtreeRoot,
+                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, (Term) subtreeRoot,
                 newTerm);
             pushNew(labeledTerm);
         }

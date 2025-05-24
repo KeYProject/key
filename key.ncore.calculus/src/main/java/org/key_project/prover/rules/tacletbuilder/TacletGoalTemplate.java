@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class contains the goal of a taclet. There are new
@@ -84,7 +85,7 @@ public abstract class TacletGoalTemplate {
         return addedProgVars;
     }
 
-    public Object replaceWithExpressionAsObject() {
+    public @Nullable Object replaceWithExpressionAsObject() {
         return null;
     }
 

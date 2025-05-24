@@ -12,26 +12,6 @@ import org.key_project.prover.rules.TacletApplPart;
 public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T> {
 
 
-    /**
-     * encodes restrictions on the state where a rewrite taclet is applicable If the value is equal
-     * to
-     * <ul>
-     * <li>{@link RewriteTaclet#NONE} no state restrictions are posed</li>
-     * <li>{@link RewriteTaclet#SAME_UPDATE_LEVEL} then <code>\assumes</code> must match on a
-     * formula within the same state as <code>\find</code> rsp. <code>\add</code>. For efficiency no
-     * modalities are allowed above the <code>\find</code> position</li>
-     * <li>{@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is only allowed to
-     * match on formulas which are evaluated in the same state as the sequent</li>
-     * </ul>
-     */
-    protected int applicationRestriction;
-
-    public RewriteTacletBuilder<T> setApplicationRestriction(int p_applicationRestriction) {
-        applicationRestriction = p_applicationRestriction;
-        return this;
-    }
-
-
     /* for information flow purposes; TODO: find better solution */
     protected boolean surviveSmbExec;
 
@@ -70,9 +50,10 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         RewriteTaclet t = new RewriteTaclet(name,
-            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+            new TacletApplPart(ifseq, applicationRestriction, varsNew, varsNotFreeIn,
+                varsNewDependingOn,
                 variableConditions),
-            goals, ruleSets, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
+            goals, ruleSets, attrs, (Term) find, prefixBuilder.getPrefixMap(),
             choices, surviveSmbExec, tacletAnnotations);
         t.setOrigin(origin);
         return (T) t;

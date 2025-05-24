@@ -46,7 +46,7 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
      * @param t the Term if the toplevel operator of this term is a substitution of schema
      *        variables, then this pair is added to the map "nameCorrespondences"
      */
-    public void visit(Term t) {
+    public void visit(org.key_project.logic.Term t) {
 
         final var top = t.op();
 
@@ -108,7 +108,7 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
         SchemaVariable findSV = null;
         visit(taclet.assumesSequent());
         if (taclet instanceof FindTaclet) {
-            final Term findTerm = ((FindTaclet) taclet).find();
+            final org.key_project.logic.Term findTerm = ((FindTaclet) taclet).find();
             findTerm.execPostOrder(this);
             if (findTerm.op() instanceof SchemaVariable) {
                 findSV = (SchemaVariable) findTerm.op();
