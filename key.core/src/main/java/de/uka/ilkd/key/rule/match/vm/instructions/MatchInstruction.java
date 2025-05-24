@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Interface that has to be implemented by instructions for the matching virtual machine
@@ -15,9 +15,9 @@ public interface MatchInstruction
 
     @Override
     default de.uka.ilkd.key.rule.MatchConditions match(PoolSyntaxElementCursor cursor,
-            MatchConditions matchConditions,
+            MatchResultInfo matchResultInfo,
             LogicServices services) {
-        return match(cursor, (de.uka.ilkd.key.rule.MatchConditions) matchConditions, services);
+        return match(cursor, (de.uka.ilkd.key.rule.MatchConditions) matchResultInfo, services);
     }
 
 

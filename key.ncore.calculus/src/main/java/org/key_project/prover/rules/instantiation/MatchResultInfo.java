@@ -4,10 +4,10 @@
 package org.key_project.prover.rules.instantiation;
 
 
-public abstract class MatchConditions {
+public abstract class MatchResultInfo {
     protected final SVInstantiations instantiations;
 
-    protected MatchConditions(SVInstantiations p_instantiations) {
+    protected MatchResultInfo(SVInstantiations p_instantiations) {
         assert p_instantiations != null;
         instantiations = p_instantiations;
     }
@@ -16,5 +16,5 @@ public abstract class MatchConditions {
         return instantiations;
     }
 
-    public abstract MatchConditions setInstantiations(SVInstantiations p_instantiations);
+    public abstract MatchResultInfo setInstantiations(SVInstantiations p_instantiations);
 }

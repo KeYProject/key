@@ -11,7 +11,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
@@ -39,7 +39,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param p_goal the {@link Goal} on which the taclet is applied
      * @param p_list the list of {@link AssumesFormulaInstantiation} containing the instantiations
      *        for the assumes formulas
-     * @param p_matchCond the {@link MatchConditions} with the instantiations of the schema
+     * @param p_matchCond the {@link MatchResultInfo} with the instantiations of the schema
      *        variables
      * @param p_numberOfNewGoals the number of new goals the {@link Taclet} creates in any case
      *        because of existing {@link TacletGoalTemplate}s
@@ -49,7 +49,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      */
     protected ImmutableList<SequentChangeInfo> checkAssumesGoals(Goal p_goal,
             ImmutableList<? extends AssumesFormulaInstantiation> p_list,
-            MatchConditions p_matchCond,
+            MatchResultInfo p_matchCond,
             int p_numberOfNewGoals) {
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
@@ -162,16 +162,16 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param rules the rules to be added
      * @param goal the {@link Goal} describing the node where the rules should be added
      * @param services the {@link LogicServices} encapsulating all logic and program information
-     * @param matchCond the {@link MatchConditions} containing in particular the instantiations of
+     * @param matchCond the {@link MatchResultInfo} containing in particular the instantiations of
      *        the schemavariables
      */
     protected abstract void applyAddrule(ImmutableList<? extends Taclet> rules, Goal goal,
             LogicServices services,
-            MatchConditions matchCond);
+            MatchResultInfo matchCond);
 
     protected abstract void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
             SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
-            LogicServices services, MatchConditions matchCond);
+            LogicServices services, MatchResultInfo matchCond);
 
     /**
      * adds SequentFormula to antecedent depending on position information (if none is handed over
@@ -185,14 +185,14 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *        of antecedent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
      *        rewritten
-     * @param matchCond the {@link MatchConditions} containing in particular the instantiations of
+     * @param matchCond the {@link MatchResultInfo} containing in particular the instantiations of
      *        the
      *        SchemaVariables
      * @param services the {@link LogicServices} encapsulating all logic and program information
      */
     protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            PosInOccurrence applicationPosInOccurrence, MatchResultInfo matchCond, Goal goal,
             App tacletApp, LogicServices services, Object... instantiationInfo) {
         addToPos(semi, currentSequent, pos, applicationPosInOccurrence, true,
             matchCond, goal, tacletApp, services, instantiationInfo);
@@ -208,14 +208,14 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *        of antecedent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
      *        rewritten
-     * @param matchCond the {@link MatchConditions} containing in particular the instantiations of
+     * @param matchCond the {@link MatchResultInfo} containing in particular the instantiations of
      *        the schemavariables
      * @param goal the {@link Goal} that knows the node the formulae have to be added
      * @param services the {@link LogicServices} encapsulating all logic information
      */
     protected void addToSucc(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            PosInOccurrence applicationPosInOccurrence, MatchResultInfo matchCond, Goal goal,
             App ruleApp, LogicServices services, Object... instantiationInfo) {
         addToPos(semi, currentSequent, pos, applicationPosInOccurrence, false,
             matchCond, goal, ruleApp, services, instantiationInfo);
@@ -229,11 +229,11 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param currentSequent the {@link SequentChangeInfo} which represent {@link Sequent} the
      *        current (intermediate) result of applying the taclet
      * @param pos the {@link PosInOccurrence} describing the place in the sequent
-     * @param matchCond the {@link MatchConditions} containing in particular
+     * @param matchCond the {@link MatchResultInfo} containing in particular
      * @param services the {@link LogicServices} encapsulating all logic and program information
      */
     protected void replaceAtPos(Semisequent semi,
-            SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
+            SequentChangeInfo currentSequent, PosInOccurrence pos, MatchResultInfo matchCond,
             Goal goal, App ruleApp, LogicServices services, Object... instantiationInfo) {
         if (!semi.isEmpty()) {
             final ImmutableList<SequentFormula> replacements =
@@ -258,7 +258,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *        rewritten
      * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
      *        (only looked at if {@code pos == null})
-     * @param matchCond the {@link MatchConditions} containing in particular
+     * @param matchCond the {@link MatchResultInfo} containing in particular
      * @param services the {@link LogicServices} encapsulating all logic and program information
      * @param instantiationInfo additional instantiation information concerning label:
      */
@@ -266,7 +266,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, boolean antec,
-            MatchConditions matchCond, Goal goal, App tacletApp,
+            MatchResultInfo matchCond, Goal goal, App tacletApp,
             LogicServices services,
             Object... instantiationInfo) {
         final ImmutableList<SequentFormula> replacements =
@@ -292,7 +292,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @return the as far as possible instantiated SequentFormula
      */
     protected SequentFormula instantiateReplacement(
-            SequentFormula schemaFormula, LogicServices services, MatchConditions matchCond,
+            SequentFormula schemaFormula, LogicServices services, MatchResultInfo matchCond,
             PosInOccurrence applicationPosInOccurrence, Goal goal,
             App tacletApp, Object... instantiationInfo) {
         final SVInstantiations svInst = matchCond.getInstantiations();
@@ -315,7 +315,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param term the {@link Term} the syntactical replacement is performed on
      * @param applicationPosInOccurrence the {@link PosInOccurrence} of the find term in the sequent
      *        this taclet is applied to
-     * @param mc the {@link MatchConditions} with all instantiations and the constraint
+     * @param mc the {@link MatchResultInfo} with all instantiations and the constraint
      * @param goal the {@link Goal} on which this taclet is applied
      * @param ruleApp the {@link RuleApp} with application information
      * @param services the {@link LogicServices} with the logic and program model information
@@ -323,7 +323,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      */
     protected abstract Term syntacticalReplace(Term term,
             PosInOccurrence applicationPosInOccurrence,
-            MatchConditions mc, Goal goal, App ruleApp, LogicServices services, Object... args);
+            MatchResultInfo mc, Goal goal, App ruleApp, LogicServices services, Object... args);
 
     /**
      * instantiates the given semisequent with the instantiations found in the match conditions
@@ -331,13 +331,13 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param semi the {@link Semisequent} to be instantiated
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
      *        rewritten
-     * @param matchCond the {@link MatchConditions} including the mapping {@link SchemaVariable}s to
+     * @param matchCond the {@link MatchResultInfo} including the mapping {@link SchemaVariable}s to
      *        concrete logic elements
      * @param services the {@link LogicServices} with the logic and program model information
      * @return the instantiated formulas of the semisequent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
-            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            PosInOccurrence applicationPosInOccurrence, MatchResultInfo matchCond, Goal goal,
             App tacletApp, LogicServices services, Object... instantiationInfo) {
         ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 

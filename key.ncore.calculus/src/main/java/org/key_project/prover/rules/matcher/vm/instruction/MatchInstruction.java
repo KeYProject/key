@@ -5,12 +5,12 @@ package org.key_project.prover.rules.matcher.vm.instruction;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Interface that has to be implemented by instructions for the matching virtual machine
  */
 public interface MatchInstruction {
-    MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
+    MatchResultInfo match(PoolSyntaxElementCursor cursor, MatchResultInfo matchResultInfo,
             LogicServices services);
 }

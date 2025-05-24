@@ -9,7 +9,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 public interface TacletMatcher {
     /**
@@ -28,7 +28,7 @@ public interface TacletMatcher {
      * @param services the Services
      * @return the found schema variable mapping or <code>null</code> if the matching failed
      */
-    MatchConditions matchFind(Term term, MatchConditions matchCond,
+    MatchResultInfo matchFind(Term term, MatchResultInfo matchCond,
             LogicServices services);
 
     /**
@@ -42,8 +42,8 @@ public interface TacletMatcher {
      * @return the match conditions resulting from matching <code>var</code> with
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
-    MatchConditions checkVariableConditions(org.key_project.logic.op.sv.SchemaVariable var,
-            SyntaxElement instantiationCandidate, MatchConditions matchCond,
+    MatchResultInfo checkVariableConditions(org.key_project.logic.op.sv.SchemaVariable var,
+            SyntaxElement instantiationCandidate, MatchResultInfo matchCond,
             LogicServices services);
 
     /**
@@ -52,12 +52,12 @@ public interface TacletMatcher {
      * variable conditions. If the given matchconditions are <code>null</code> then
      * <code>null</code> is returned
      *
-     * @param matchConditions the matches to be checked
+     * @param matchResultInfo the matches to be checked
      * @param services the {@link LogicServices}
      * @return the resulting match conditions or <code>null</code> if given matches do not satisfy
      *         the taclet's variable conditions
      */
-    MatchConditions checkConditions(MatchConditions matchConditions, LogicServices services);
+    MatchResultInfo checkConditions(MatchResultInfo matchResultInfo, LogicServices services);
 
     /**
      * Match the given template (which is probably a formula of the assumes-sequent) against a list
@@ -76,7 +76,7 @@ public interface TacletMatcher {
      *         MatchConditions.
      */
     AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch, Term template,
-            MatchConditions matchCond, LogicServices services);
+            MatchResultInfo matchCond, LogicServices services);
 
     /**
      * Match the whole if sequent using the given list of instantiations of all assumes-sequent
@@ -88,9 +88,9 @@ public interface TacletMatcher {
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
-    MatchConditions matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
-            MatchConditions matchCond, LogicServices services);
+    MatchResultInfo matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
+            MatchResultInfo matchCond, LogicServices services);
 
-    MatchConditions matchSV(SchemaVariable sv, SyntaxElement se, MatchConditions matchConditions,
+    MatchResultInfo matchSV(SchemaVariable sv, SyntaxElement se, MatchResultInfo matchResultInfo,
             LogicServices services);
 }
