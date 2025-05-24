@@ -13,10 +13,11 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * This instructions matches the variable below a binder (e.g. a quantifier).
+ * This instruction matches the variable below a binder (e.g. a quantifier).
  */
 public class BindVariablesInstruction implements MatchInstruction {
 
@@ -80,31 +81,26 @@ public class BindVariablesInstruction implements MatchInstruction {
             final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
                 final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
-                matchCond = addInstantiation(substTerm, matchCond, services);
+                return addInstantiation(substTerm, matchCond, services);
             } else if (((Term) foundMapping).op() != instantiationCandidate) {
-                matchCond = null;
+                return null;
+            } else {
+                return matchCond;
             }
-            return matchCond;
         }
 
         @Override
-        public MatchConditions match(SyntaxElement actualElement,
-                MatchConditions matchConditions,
+        public MatchResultInfo match(SyntaxElement actualElement,
+                MatchResultInfo matchConditions,
                 LogicServices services) {
             throw new UnsupportedOperationException();
         }
-
-        @Override
-        public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-                LogicServices services) {
-            throw new UnsupportedOperationException();
-        }
-
     }
 
     @Override
-    public MatchConditions match(SyntaxElement actualElement, MatchConditions matchConditions,
+    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchResult,
             LogicServices services) {
+        MatchConditions matchConditions = (MatchConditions) matchResult;
         final ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =
             ((Term) actualElement).boundVars();
         matchConditions = matchConditions.extendRenameTable();

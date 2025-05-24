@@ -7,10 +7,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Matching VM instruction that matches all operator schema variables that
@@ -24,18 +24,10 @@ public class MatchNonVariableSVInstruction extends MatchSchemaVariableInstructio
         assert !(op instanceof VariableSV || op instanceof ProgramSV);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, LogicServices services) {
-        return addInstantiation(subst, mc, services);
-    }
-
-    @Override
-    public MatchConditions match(SyntaxElement actualElement, MatchConditions mc,
+    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
             LogicServices services) {
-        return match((Term) actualElement, mc, services);
+        return addInstantiation((Term) actualElement, mc, services);
     }
 
 }
