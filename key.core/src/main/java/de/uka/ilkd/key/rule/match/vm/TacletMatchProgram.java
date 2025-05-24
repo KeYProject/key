@@ -20,6 +20,8 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
+import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.*;
+
 /**
  * Instances of this class represent programs for matching a term against a given pattern. The
  * programs are specialised for a certain pattern.
@@ -56,29 +58,6 @@ public class TacletMatchProgram {
         this.instruction = instruction;
     }
 
-    /**
-     * returns the instruction for the specified variable
-     *
-     * @param op the {@link SchemaVariable} for which to get the instruction
-     * @return the instruction for the specified variable
-     */
-    public static MatchSchemaVariableInstruction getMatchInstructionForSV(
-            SchemaVariable op) {
-        MatchSchemaVariableInstruction instruction;
-        if (op instanceof VariableSV variableSV) {
-            instruction = Instruction.matchVariableSV(variableSV);
-        } else if (op instanceof ProgramSV programSV) {
-            instruction = Instruction.matchProgramSV(programSV);
-        } else if (op instanceof OperatorSV) {
-            instruction = Instruction.matchNonVariableSV((OperatorSV) op);
-        } else {
-            throw new IllegalArgumentException(
-                "Do not know how to match " + op + " of type " + op.getClass());
-        }
-        return instruction;
-    }
-
-
 
     /**
      * creates a matching program for the given pattern. It appends the necessary match instruction
@@ -94,60 +73,60 @@ public class TacletMatchProgram {
         final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
 
         if (!boundVars.isEmpty()) {
-            program.add(Instruction.matchAndBindVariables(boundVars));
+            program.add(matchAndBindVariables(boundVars));
         }
 
         if (pattern.hasLabels()) {
-            program.add(Instruction.matchTermLabelSV(pattern.getLabels()));
+            program.add(matchTermLabelSV(pattern.getLabels()));
         }
 
         if (op instanceof SchemaVariable sv) {
             program.add(getMatchInstructionForSV(sv));
-            program.add(GotoNextSiblingInstruction.INSTANCE);
+            program.add(gotoNextSiblingInstruction());
         } else {
-            program.add(new CheckNodeKindInstruction(Term.class));
-            program.add(GotoNextInstruction.INSTANCE);
+            program.add(getCheckNodeKindInstruction(Term.class));
+            program.add(gotoNextInstruction());
             if (op instanceof final SortDependingFunction sortDependingFunction) {
-                program.add(new CheckNodeKindInstruction(SortDependingFunction.class));
-                program.add(new SimilarSortDependingFunctionInstruction(sortDependingFunction));
-                program.add(GotoNextInstruction.INSTANCE);
+                program.add(getCheckNodeKindInstruction(SortDependingFunction.class));
+                program.add(getSimilarSortDependingFunctionInstruction(sortDependingFunction));
+                program.add(gotoNextInstruction());
                 if (sortDependingFunction.getSortDependingOn() instanceof GenericSort gs) {
-                    program.add(new MatchGenericSortInstruction(gs));
+                    program.add(getMatchGenericSortInstruction(gs));
                 } else {
-                    program.add(new MatchIdentityInstruction(sortDependingFunction.getChild(0)));
+                    program.add(getMatchIdentityInstruction(sortDependingFunction.getChild(0)));
                 }
-                program.add(GotoNextInstruction.INSTANCE);
+                program.add(gotoNextInstruction());
             } else if (op instanceof ElementaryUpdate elUp) {
-                program.add(new CheckNodeKindInstruction(ElementaryUpdate.class));
-                program.add(GotoNextInstruction.INSTANCE);
+                program.add(getCheckNodeKindInstruction(ElementaryUpdate.class));
+                program.add(gotoNextInstruction());
                 if (elUp.lhs() instanceof SchemaVariable sv) {
                     program.add(getMatchInstructionForSV(sv));
-                    program.add(GotoNextSiblingInstruction.INSTANCE);
+                    program.add(gotoNextSiblingInstruction());
                 } else if (elUp.lhs() instanceof LocationVariable locVar) {
-                    program.add(new MatchIdentityInstruction(locVar));
-                    program.add(GotoNextInstruction.INSTANCE);
+                    program.add(getMatchIdentityInstruction(locVar));
+                    program.add(gotoNextInstruction());
                 }
             } else if (op instanceof Modality mod) {
-                program.add(new CheckNodeKindInstruction(Modality.class));
-                program.add(GotoNextInstruction.INSTANCE);
+                program.add(getCheckNodeKindInstruction(Modality.class));
+                program.add(gotoNextInstruction());
                 if (mod.kind() instanceof ModalOperatorSV modKindSV) {
-                    program.add(Instruction.matchModalOperatorSV(modKindSV));
+                    program.add(matchModalOperatorSV(modKindSV));
                 } else {
-                    program.add(new MatchIdentityInstruction(mod.kind()));
+                    program.add(getMatchIdentityInstruction(mod.kind()));
                 }
-                program.add(GotoNextInstruction.INSTANCE);
+                program.add(gotoNextInstruction());
                 final JavaProgramElement patternPrg = pattern.javaBlock().program();
-                program.add(Instruction.matchProgram(patternPrg));
-                program.add(GotoNextSiblingInstruction.INSTANCE);
+                program.add(matchProgram(patternPrg));
+                program.add(gotoNextSiblingInstruction());
             } else {
-                program.add(new MatchIdentityInstruction(op));
-                program.add(GotoNextInstruction.INSTANCE);
+                program.add(getMatchIdentityInstruction(op));
+                program.add(gotoNextInstruction());
             }
         }
 
         if (!boundVars.isEmpty()) {
             for (int i = 0; i < boundVars.size(); i++) {
-                program.add(GotoNextSiblingInstruction.INSTANCE);
+                program.add(gotoNextSiblingInstruction());
             }
         }
 
@@ -156,7 +135,7 @@ public class TacletMatchProgram {
         }
 
         if (!boundVars.isEmpty()) {
-            program.add(Instruction.unbindVariables(boundVars));
+            program.add(unbindVariables(boundVars));
         }
     }
 
