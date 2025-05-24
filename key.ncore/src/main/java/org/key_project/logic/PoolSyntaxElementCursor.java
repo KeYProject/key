@@ -138,7 +138,7 @@ public class PoolSyntaxElementCursor {
         private static final ArrayDeque<MutablePair> PAIR_POOL = new ArrayDeque<>();
         static {
             for (int i = 0; i < PAIR_POOL_SIZE; i++) {
-                PAIR_POOL.push(new MutablePair(null, null));
+                PAIR_POOL.push(new MutablePair(null, 0));
             }
         }
 
@@ -150,7 +150,7 @@ public class PoolSyntaxElementCursor {
          * @return a pooled {@link MutablePair} or a new one if the {@link #PAIR_POOL} is currently
          *         empty
          */
-        static MutablePair get(SyntaxElement first, Integer second) {
+        static MutablePair get(SyntaxElement first, int second) {
             MutablePair pair = null;
             synchronized (PAIR_POOL) {
                 if (!PAIR_POOL.isEmpty()) {
@@ -168,22 +168,21 @@ public class PoolSyntaxElementCursor {
 
         @Nullable
         SyntaxElement first;
-        @Nullable
-        Integer second;
+        int second;
 
-        public MutablePair(@Nullable SyntaxElement first, @Nullable Integer second) {
+        public MutablePair(@Nullable SyntaxElement first, int second) {
             this.first = first;
             this.second = second;
         }
 
-        public final void set(SyntaxElement first, Integer second) {
+        public final void set(SyntaxElement first, int second) {
             this.first = first;
             this.second = second;
         }
 
         public final void release() {
             first = null;
-            second = null;
+            second = 0;
             if (PAIR_POOL.size() < PAIR_POOL_SIZE) {
                 synchronized (PAIR_POOL) {
                     PAIR_POOL.push(this);
