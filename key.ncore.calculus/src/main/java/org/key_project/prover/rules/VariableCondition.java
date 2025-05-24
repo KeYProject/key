@@ -6,7 +6,7 @@ package org.key_project.prover.rules;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * The instantiations of a schema variable can be restricted on rule scope by attaching conditions
@@ -26,6 +26,6 @@ public interface VariableCondition {
      * @return modified match results if the condition can be satisfied, or {@code null}
      *         otherwise
      */
-    MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices services);
+    MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices services);
 }

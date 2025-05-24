@@ -18,7 +18,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
@@ -154,8 +154,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo mc,
             LogicServices p_services) {
         final Services services = (Services) p_services;
         SVInstantiations svInst = mc.getInstantiations();

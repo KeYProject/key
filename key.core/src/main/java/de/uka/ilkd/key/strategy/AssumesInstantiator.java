@@ -19,6 +19,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -231,7 +232,7 @@ public class AssumesInstantiator {
 
         // For each matching formula call the method again to match
         // the remaining terms
-        Iterator<? extends org.key_project.prover.rules.instantiation.MatchConditions> itMC =
+        Iterator<? extends MatchResultInfo> itMC =
             mr.matchConditions().iterator();
         p_ifSeqTail = p_ifSeqTail.tail();
         for (final AssumesFormulaInstantiation ifInstantiation : mr.candidates()) {

@@ -24,7 +24,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 /**
  * Extracts the loop invariants for a loop term (for all applicable heap contexts).
@@ -44,8 +44,8 @@ public class LoopInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices p_services) {
+    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices p_services) {
         final Services services = (Services) p_services;
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();

@@ -26,7 +26,7 @@ import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -110,19 +110,19 @@ public class VMTacletMatcher implements TacletMatcher {
     /**
      * (non-Javadoc)
      *
-     * @see TacletMatcher#matchAssumes(Iterable, org.key_project.logic.Term, MatchConditions,
+     * @see TacletMatcher#matchAssumes(Iterable, org.key_project.logic.Term, MatchResultInfo,
      *      LogicServices)
      */
     @Override
     public final AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> p_toMatch,
             org.key_project.logic.Term p_template,
-            org.key_project.prover.rules.instantiation.MatchConditions p_matchCond,
+            MatchResultInfo p_matchCond,
             LogicServices p_services) {
         TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
         final var mc = (de.uka.ilkd.key.rule.MatchConditions) p_matchCond;
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableSLList.nil();
-        ImmutableList<MatchConditions> resMC =
+        ImmutableList<MatchResultInfo> resMC =
             ImmutableSLList.nil();
 
         final boolean updateContextPresent = !mc.getInstantiations().getUpdateContext().isEmpty();
@@ -139,7 +139,7 @@ public class VMTacletMatcher implements TacletMatcher {
                 formula = matchUpdateContext(context, formula);
             }
             if (formula != null) {// update context not present or update context match succeeded
-                final MatchConditions newMC =
+                final MatchResultInfo newMC =
                     checkConditions(prg.match(formula, mc, p_services), p_services);
 
                 if (newMC != null) {
@@ -183,18 +183,18 @@ public class VMTacletMatcher implements TacletMatcher {
 
 
     /**
-     * @see TacletMatcher#matchAssumes(Iterable, MatchConditions, LogicServices)
+     * @see TacletMatcher#matchAssumes(Iterable, MatchResultInfo, LogicServices)
      */
     @Override
-    public final MatchConditions matchAssumes(
+    public final MatchResultInfo matchAssumes(
             Iterable<AssumesFormulaInstantiation> p_toMatch,
-            MatchConditions p_matchCond,
+            MatchResultInfo p_matchCond,
             LogicServices p_services) {
 
         final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
         final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
 
-        ImmutableList<MatchConditions> newMC;
+        ImmutableList<MatchResultInfo> newMC;
 
         for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ
@@ -233,8 +233,8 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions checkConditions(
-            org.key_project.prover.rules.instantiation.MatchConditions cond,
+    public final MatchResultInfo checkConditions(
+            MatchResultInfo cond,
             LogicServices services) {
         var result = (de.uka.ilkd.key.rule.MatchConditions) cond;
         if (result != null) {
@@ -288,9 +288,9 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions checkVariableConditions(SchemaVariable var,
+    public final MatchResultInfo checkVariableConditions(SchemaVariable var,
             SyntaxElement instantiationCandidate,
-            org.key_project.prover.rules.instantiation.MatchConditions matchCond,
+            MatchResultInfo matchCond,
             LogicServices services) {
         if (matchCond != null) {
             if (instantiationCandidate instanceof Term term) {
@@ -323,9 +323,9 @@ public class VMTacletMatcher implements TacletMatcher {
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates
      *         (Which have been added to the update context in the match conditions)
      */
-    private Pair<Term, MatchConditions> matchAndIgnoreUpdatePrefix(
+    private Pair<Term, MatchResultInfo> matchAndIgnoreUpdatePrefix(
             final Term source,
-            final MatchConditions matchCond) {
+            final MatchResultInfo matchCond) {
         final Operator sourceOp = source.op();
 
         if (sourceOp instanceof UpdateApplication) {
@@ -346,16 +346,16 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions matchFind(
+    public final MatchResultInfo matchFind(
             org.key_project.logic.Term term,
-            MatchConditions p_matchCond,
+            MatchResultInfo p_matchCond,
             LogicServices services) {
         if (findMatchProgram == TacletMatchProgram.EMPTY_PROGRAM) {
             return null;
         }
         Term source = (Term) term;
         if (ignoreTopLevelUpdates) {
-            Pair</* term below updates */Term, MatchConditions> resultUpdateMatch =
+            Pair</* term below updates */Term, MatchResultInfo> resultUpdateMatch =
                 matchAndIgnoreUpdatePrefix(source, p_matchCond);
             source = resultUpdateMatch.first;
             p_matchCond = resultUpdateMatch.second;
@@ -371,9 +371,9 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions matchSV(SchemaVariable sv,
+    public MatchResultInfo matchSV(SchemaVariable sv,
             SyntaxElement syntaxElement,
-            org.key_project.prover.rules.instantiation.MatchConditions matchCond,
+            MatchResultInfo matchCond,
             LogicServices services) {
 
         final MatchSchemaVariableInstruction instr =

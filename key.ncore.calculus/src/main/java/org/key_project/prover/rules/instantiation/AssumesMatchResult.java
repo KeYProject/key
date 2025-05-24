@@ -31,5 +31,5 @@ import org.key_project.util.collection.ImmutableList;
  * @param matchConditions the list of match conditions
  */
 public record AssumesMatchResult(ImmutableList<AssumesFormulaInstantiation> candidates,
-        ImmutableList<MatchConditions> matchConditions) {
+        ImmutableList<MatchResultInfo> matchConditions) {
 }
