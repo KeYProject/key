@@ -13,7 +13,6 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 
@@ -117,14 +116,13 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor,
+    public MatchConditions match(SyntaxElement actualElement,
             MatchConditions mc,
             LogicServices services) {
-        final SyntaxElement se = cursor.getCurrentElement();;
         MatchConditions result = null;
-        if (se instanceof ProgramElement programElement) {
+        if (actualElement instanceof ProgramElement programElement) {
             result = match(programElement, mc, services);
-        } else if (se instanceof Term term) {
+        } else if (actualElement instanceof Term term) {
             result = match(term, mc, services);
         }
         return result;

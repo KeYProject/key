@@ -7,13 +7,14 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
-public class UnbindVariablesInstruction implements MatchInstruction {
-
+public class UnbindVariablesInstruction implements VMInstruction {
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
+    public MatchResultInfo match(PoolSyntaxElementCursor cursor,
+            MatchResultInfo matchConditions,
             LogicServices services) {
-        return matchConditions.shrinkRenameTable();
+        return ((MatchConditions) matchConditions).shrinkRenameTable();
     }
-
 }

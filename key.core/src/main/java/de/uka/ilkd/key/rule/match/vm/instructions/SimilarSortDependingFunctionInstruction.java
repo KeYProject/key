@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.SyntaxElement;
 
 public final class SimilarSortDependingFunctionInstruction implements MatchInstruction {
@@ -18,10 +17,9 @@ public final class SimilarSortDependingFunctionInstruction implements MatchInstr
     }
 
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
+    public MatchConditions match(SyntaxElement actualElement, MatchConditions matchConditions,
             LogicServices services) {
-        final SyntaxElement syntaxElement = cursor.getCurrentElement();
-        if (((SortDependingFunction) syntaxElement).isSimilar(sortDependingFunction)) {
+        if (((SortDependingFunction) actualElement).isSimilar(sortDependingFunction)) {
             return matchConditions;
         }
         return null;
