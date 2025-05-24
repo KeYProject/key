@@ -122,14 +122,10 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction
             LogicServices services) {
         final SyntaxElement se = cursor.getCurrentElement();;
         MatchConditions result = null;
-
         if (se instanceof ProgramElement programElement) {
             result = match(programElement, mc, services);
         } else if (se instanceof Term term) {
             result = match(term, mc, services);
-        }
-        if (result != null) {
-            cursor.gotoNextSibling();
         }
         return result;
     }
