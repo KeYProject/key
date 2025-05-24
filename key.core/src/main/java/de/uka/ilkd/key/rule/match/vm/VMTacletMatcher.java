@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
+import de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
 import org.key_project.logic.LogicServices;
@@ -377,7 +378,7 @@ public class VMTacletMatcher implements TacletMatcher {
             LogicServices services) {
 
         final MatchSchemaVariableInstruction instr =
-            TacletMatchProgram.getMatchInstructionForSV(sv);
+            JavaDLMatchVMInstructionSet.getMatchInstructionForSV(sv);
 
         if (syntaxElement instanceof Term term) {
             matchCond = instr.match(term, matchCond, services);
