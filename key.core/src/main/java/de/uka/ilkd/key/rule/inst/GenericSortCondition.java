@@ -14,6 +14,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 
+import org.jspecify.annotations.NonNull;
 
 /**
  * Abstract superclass for conditions controlling the instantiations of generic sorts
@@ -119,7 +120,8 @@ public abstract class GenericSortCondition {
      * @return a condition that specifies the given generic sort to be instantiated (exactly) with
      *         the given concrete sort
      */
-    public static GenericSortCondition createIdentityCondition(GenericSort p_gs, Sort p_s) {
+    public static @NonNull GenericSortCondition createIdentityCondition(GenericSort p_gs,
+            Sort p_s) {
         return new GSCIdentity(p_gs, p_s);
     }
 
