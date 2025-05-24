@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.logic.SyntaxElement;
 
 public class MatchProgramInstruction implements MatchInstruction {
 
@@ -21,10 +21,10 @@ public class MatchProgramInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
+    public MatchConditions match(SyntaxElement actualElement, MatchConditions matchConditions,
             LogicServices services) {
         final MatchConditions result = pe.match(
-            new SourceData(((JavaBlock) cursor.getCurrentElement()).program(), -1,
+            new SourceData(((JavaBlock) actualElement).program(), -1,
                 (Services) services),
             matchConditions);
         return result;

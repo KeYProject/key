@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.logic.SyntaxElement;
 
 public final class CheckNodeKindInstruction implements MatchInstruction {
     private final Class<?> nodeType;
@@ -16,9 +16,9 @@ public final class CheckNodeKindInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
+    public MatchConditions match(SyntaxElement actualElement, MatchConditions matchConditions,
             LogicServices services) {
-        if (nodeType.isInstance(cursor.getCurrentElement())) {
+        if (nodeType.isInstance(actualElement)) {
             return matchConditions;
         }
         return null;

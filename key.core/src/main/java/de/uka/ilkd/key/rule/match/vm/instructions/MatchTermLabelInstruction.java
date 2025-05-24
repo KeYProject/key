@@ -10,7 +10,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -48,9 +48,9 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
+    public MatchConditions match(SyntaxElement actualElement, MatchConditions matchConditions,
             LogicServices services) {
-        final Term term = (Term) cursor.getCurrentElement();
+        final Term term = (Term) actualElement;
         MatchConditions result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels
         // at the moment any termlabbel SV matches on all labels (or no label) (i.e., t<l1,l2> will
@@ -61,8 +61,8 @@ public class MatchTermLabelInstruction implements MatchInstruction {
             // ignore all labels which are not schema variables
             // if intended to match concrete label, match against schema label
             // and use an appropriate variable condition
-            if (templateLabel instanceof TermLabelSV) {
-                result = match((TermLabelSV) templateLabel, term, result, services);
+            if (templateLabel instanceof TermLabelSV labelSV) {
+                result = match(labelSV, term, result, services);
             }
         }
         return result;

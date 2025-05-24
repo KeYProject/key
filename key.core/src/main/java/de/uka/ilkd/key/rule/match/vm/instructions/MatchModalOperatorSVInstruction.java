@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.logic.SyntaxElement;
 
 public final class MatchModalOperatorSVInstruction implements MatchInstruction {
 
@@ -23,10 +23,9 @@ public final class MatchModalOperatorSVInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor,
-            MatchConditions mc,
-            LogicServices services) {
-        if (cursor.getCurrentElement() instanceof Modality.JavaModalityKind kind
+    public MatchConditions match(SyntaxElement actualElement,
+            MatchConditions mc, LogicServices services) {
+        if (actualElement instanceof Modality.JavaModalityKind kind
                 && modalityKinds.contains(kind)) {
             return mc.setInstantiations(
                 mc.getInstantiations().add(modalitySV, kind, services));

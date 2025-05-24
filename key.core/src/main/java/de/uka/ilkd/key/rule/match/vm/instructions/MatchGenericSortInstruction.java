@@ -10,7 +10,6 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SortException;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
@@ -40,13 +39,11 @@ public class MatchGenericSortInstruction implements MatchInstruction {
         MatchConditions result = null;
         final GenericSortCondition c =
             GenericSortCondition.createIdentityCondition(genericSortOfOp, dependingSortToMatch);
-        if (c != null) {
-            try {
-                result = matchConditions.setInstantiations(
-                    matchConditions.getInstantiations().add(c, services));
-            } catch (SortException e) {
-                result = null;
-            }
+        try {
+            result = matchConditions.setInstantiations(
+                matchConditions.getInstantiations().add(c, services));
+        } catch (SortException e) {
+            result = null;
         }
         return result;
     }
@@ -55,10 +52,9 @@ public class MatchGenericSortInstruction implements MatchInstruction {
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions mc,
+    public MatchConditions match(SyntaxElement actualElement, MatchConditions mc,
             LogicServices services) {
-        final SyntaxElement currentOp = cursor.getCurrentElement();
-        return matchSorts(((QualifierWrapper<Sort>) currentOp).getQualifier(), mc, services);
+        return matchSorts(((QualifierWrapper<Sort>) actualElement).getQualifier(), mc, services);
     }
 
 }

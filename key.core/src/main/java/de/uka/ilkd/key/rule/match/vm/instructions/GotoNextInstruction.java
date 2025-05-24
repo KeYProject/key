@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.rule.MatchConditions;
-
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
-public final class GotoNextInstruction implements MatchInstruction {
+public final class GotoNextInstruction implements VMInstruction {
 
     public static final GotoNextInstruction INSTANCE = new GotoNextInstruction();
 
@@ -16,7 +16,8 @@ public final class GotoNextInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
+    public MatchResultInfo match(PoolSyntaxElementCursor cursor,
+            MatchResultInfo matchConditions,
             LogicServices services) {
         cursor.gotoNext();
         return matchConditions;

@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -88,7 +88,7 @@ public class BindVariablesInstruction implements MatchInstruction {
         }
 
         @Override
-        public MatchConditions match(PoolSyntaxElementCursor cursor,
+        public MatchConditions match(SyntaxElement actualElement,
                 MatchConditions matchConditions,
                 LogicServices services) {
             throw new UnsupportedOperationException();
@@ -103,10 +103,10 @@ public class BindVariablesInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions matchConditions,
+    public MatchConditions match(SyntaxElement actualElement, MatchConditions matchConditions,
             LogicServices services) {
         final ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =
-            ((Term) cursor.getCurrentElement()).boundVars();
+            ((Term) actualElement).boundVars();
         matchConditions = matchConditions.extendRenameTable();
         if (variablesToMatchAndBind.size() == boundVarBinders.length) {
             for (int i = 0; i < boundVarBinders.length && matchConditions != null; i++) {

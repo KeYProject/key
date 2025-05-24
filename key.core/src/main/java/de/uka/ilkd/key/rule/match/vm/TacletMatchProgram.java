@@ -16,6 +16,8 @@ import de.uka.ilkd.key.rule.match.vm.instructions.*;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -37,9 +39,9 @@ public class TacletMatchProgram {
      * @return the specialized matcher for the given pattern
      */
     public static TacletMatchProgram createProgram(Term pattern) {
-        ArrayList<MatchInstruction> program = new ArrayList<>();
+        ArrayList<VMInstruction> program = new ArrayList<>();
         createProgram(pattern, program);
-        return new TacletMatchProgram(program.toArray(new MatchInstruction[0]));
+        return new TacletMatchProgram(program.toArray(new VMInstruction[0]));
     }
 
     /** the skip program (matches anything) */
@@ -47,10 +49,10 @@ public class TacletMatchProgram {
         new TacletMatchProgram(new MatchInstruction[0]);
 
     /** the instructions of the program */
-    private final MatchInstruction[] instruction;
+    private final VMInstruction[] instruction;
 
     /** creates an instance of the matcher consisting of the instruction */
-    private TacletMatchProgram(MatchInstruction[] instruction) {
+    private TacletMatchProgram(VMInstruction[] instruction) {
         this.instruction = instruction;
     }
 
@@ -86,7 +88,7 @@ public class TacletMatchProgram {
      * @param program the list of {@link MatchInstruction} to which the instructions for matching
      *        {@code pattern} are added.
      */
-    private static void createProgram(Term pattern, ArrayList<MatchInstruction> program) {
+    private static void createProgram(Term pattern, ArrayList<VMInstruction> program) {
         final Operator op = pattern.op();
 
         final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
@@ -156,9 +158,7 @@ public class TacletMatchProgram {
         if (!boundVars.isEmpty()) {
             program.add(Instruction.unbindVariables(boundVars));
         }
-
     }
-
 
     /**
      * executes the program and tries to match the provided term; additional restrictions are
@@ -172,10 +172,10 @@ public class TacletMatchProgram {
      * @param services the {@link Services}
      * @return {@code null} if no match was found or the match result
      */
-    public MatchConditions match(Term p_toMatch, MatchConditions p_matchCond,
+    public MatchResultInfo match(Term p_toMatch, MatchConditions p_matchCond,
             LogicServices services) {
 
-        MatchConditions mc = p_matchCond;
+        MatchResultInfo mc = p_matchCond;
 
         final PoolSyntaxElementCursor navi = PoolSyntaxElementCursor.get(p_toMatch);
         int instrPtr = 0;

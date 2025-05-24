@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.PoolSyntaxElementCursor;
+import org.key_project.logic.SyntaxElement;
 
 public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction {
 
@@ -34,9 +34,9 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction {
     }
 
     @Override
-    public MatchConditions match(PoolSyntaxElementCursor cursor, MatchConditions mc,
+    public MatchConditions match(SyntaxElement actualElement, MatchConditions mc,
             LogicServices services) {
-        return match((Term) cursor.getCurrentElement(), mc, services);
+        return match((Term) actualElement, mc, services);
     }
 
 }
