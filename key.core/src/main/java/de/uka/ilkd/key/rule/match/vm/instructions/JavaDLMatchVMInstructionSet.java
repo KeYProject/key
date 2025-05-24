@@ -10,6 +10,10 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.matcher.vm.instruction.GotoNextInstruction;
+import org.key_project.prover.rules.matcher.vm.instruction.GotoNextSiblingInstruction;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchIdentityInstruction;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableArray;
 

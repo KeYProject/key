@@ -11,6 +11,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
 /**

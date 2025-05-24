@@ -11,12 +11,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.instructions.*;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.PoolSyntaxElementCursor;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
+import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
