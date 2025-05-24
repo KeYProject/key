@@ -4,13 +4,9 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.key_project.logic.LogicServices;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
@@ -61,18 +57,4 @@ public abstract class Instruction<@NonNull OP extends org.key_project.logic.op.O
         this.op = op;
     }
 
-    /**
-     * TODO: REMOVE
-     * tries to match the schema variable of this instruction with the specified {@link Term}
-     * {@code instantiationCandidate} w.r.t. the given constraints by {@link MatchConditions}
-     *
-     * @param instantiationCandidate the {@link Term} to be matched
-     * @param matchCond the {@link MatchConditions} with additional constraints (e.g. previous
-     *        matches of this schemavariable)
-     * @param services the {@link Services}
-     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
-     *         the pair {@code (sv, instantiationCandidate)} added
-     */
-    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-            LogicServices services);
 }

@@ -7,10 +7,11 @@ import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 public final class MatchModalOperatorSVInstruction implements MatchInstruction {
 
@@ -23,12 +24,12 @@ public final class MatchModalOperatorSVInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(SyntaxElement actualElement,
-            MatchConditions mc, LogicServices services) {
+    public MatchResultInfo match(SyntaxElement actualElement,
+            MatchResultInfo mc, LogicServices services) {
         if (actualElement instanceof Modality.JavaModalityKind kind
                 && modalityKinds.contains(kind)) {
-            return mc.setInstantiations(
-                mc.getInstantiations().add(modalitySV, kind, services));
+            final SVInstantiations instantiations = (SVInstantiations) mc.getInstantiations();
+            return mc.setInstantiations(instantiations.add(modalitySV, kind, services));
         } else {
             return null;
         }

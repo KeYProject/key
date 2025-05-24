@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 import org.jspecify.annotations.NonNull;
 
@@ -30,13 +31,14 @@ public abstract class MatchSchemaVariableInstruction
      * schemavariable has been already matched to a term <tt>t2</tt> which is not unifiable with the
      * given term.
      */
-    protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
+    protected final MatchConditions addInstantiation(Term term, MatchResultInfo matchResultInfo,
             LogicServices services) {
 
         if (op.isRigid() && !term.isRigid()) {
             return null;
         }
 
+        final MatchConditions matchCond = (MatchConditions) matchResultInfo;
         final SVInstantiations inst = matchCond.getInstantiations();
 
         final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
@@ -58,17 +60,17 @@ public abstract class MatchSchemaVariableInstruction
     /**
      * tries to match the schema variable of this instruction with the specified
      * {@link ProgramElement} {@code instantiationCandidate} w.r.t. the given constraints by
-     * {@link MatchConditions}
+     * {@link MatchResultInfo}
      *
      * @param instantiationCandidate the {@link ProgramElement} to be matched
-     * @param mc the {@link MatchConditions} with additional constraints (e.g. previous matches of
+     * @param mc the {@link MatchResultInfo} with additional constraints (e.g. previous matches of
      *        this instructions {@link org.key_project.logic.op.sv.SchemaVariable})
      * @param services the {@link Services}
-     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
+     * @return {@code null} if no matches have been found or the new {@link MatchResultInfo} with
      *         the pair ({@link org.key_project.logic.op.sv.SchemaVariable}, {@link ProgramElement})
      *         added
      */
-    public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc,
+    public MatchResultInfo match(ProgramElement instantiationCandidate, MatchResultInfo mc,
             LogicServices services) {
         return null;
     }
