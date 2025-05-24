@@ -21,6 +21,6 @@ public interface MatchInstruction extends VMInstruction {
         return match(cursor.getCurrentElement(), matchResultInfo, services);
     }
 
-    MatchConditions match(SyntaxElement actualElement,
-            MatchConditions matchConditions, LogicServices services);
+    MatchResultInfo match(SyntaxElement actualElement,
+            MatchResultInfo matchConditions, LogicServices services);
 }

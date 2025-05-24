@@ -380,8 +380,7 @@ public class VMTacletMatcher implements TacletMatcher {
             TacletMatchProgram.getMatchInstructionForSV(sv);
 
         if (syntaxElement instanceof Term term) {
-            matchCond =
-                instr.match(term, (de.uka.ilkd.key.rule.MatchConditions) matchCond, services);
+            matchCond = instr.match(term, matchCond, services);
             matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
         } else if (syntaxElement instanceof ProgramElement pe) {
             matchCond = instr.match(pe, (de.uka.ilkd.key.rule.MatchConditions) matchCond, services);
