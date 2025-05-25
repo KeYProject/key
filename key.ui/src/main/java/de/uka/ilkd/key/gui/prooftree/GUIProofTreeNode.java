@@ -32,6 +32,23 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
         return children.length;
     }
 
+    @Override
+    public TreeNode getParent() {
+        if (parent != null) {
+            return parent;
+        }
+        // more complicated general case
+        Node n = getNode();
+        if (n == null) {
+            return null;
+        }
+        while (n.parent() != null && findChild(n.parent()) != null) {
+            n = n.parent();
+        }
+        return findBranch(n);
+    }
+
+    @Override
     public boolean isLeaf() {
         return getChildCount() == 0;
     }

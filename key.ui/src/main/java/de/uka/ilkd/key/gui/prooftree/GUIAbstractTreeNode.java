@@ -23,7 +23,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     // and ProofTreeView.delegateView.lastPathComponent
     private final WeakReference<Node> noderef;
 
-    private TreeNode parent;
+    protected TreeNode parent;
 
     protected GUIProofTreeModel getProofTreeModel() {
         return tree;
