@@ -101,7 +101,8 @@ public class SMTProblem {
      * thrown.
      */
     public SMTSolverResult getFinalResult() {
-        SMTSolverResult unknown = SMTSolverResult.NO_IDEA;
+        SMTSolverResult unknown = SMTSolverResult
+                .getUnknownResult(solvers.stream().findFirst().orElseThrow(), this, -1L, null);
         SMTSolverResult valid = null;
         SMTSolverResult invalid = null;
         for (SMTSolver solver : solvers) {

@@ -5,72 +5,75 @@ package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.smt.ModelExtractor;
-import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import org.jspecify.annotations.NonNull;
 
 public class Z3Socket extends AbstractSolverSocket {
 
-    public Z3Socket(String name, ModelExtractor query) {
-        super(name, query);
+    public Z3Socket(SolverType solverType) {
+        super(solverType);
     }
 
     @Override
-    public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
-        SolverCommunication sc = pipe.getSolverCommunication();
-        if (msg.startsWith("(error")) {
-            sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
-            if (msg.contains("WARNING:")) {
-                return;
-            }
-            throw new IOException("Error while executing " + getName() + ": " + msg);
-        }
+    protected boolean isValidResultMessage(@NonNull String msg) {
+        return msg.equals("unsat");
+    }
 
-        // used only to steer the interaction with the solver and thus filtered out currently
-        if (!msg.equals("success")) {
-            sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT);
-        }
+    @Override
+    protected boolean isFalsifiableResultMessage(@NonNull String msg) {
+        return msg.equals("sat");
+    }
 
-        switch (sc.getState()) {
-        case WAIT_FOR_RESULT -> {
-            if (msg.equals("unsat")) {
-                sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                // TODO: proof production is currently completely disabled, since it does not work
-                // with the legacy Z3 translation (proof-production not enabled) and also not
-                // really needed
-                // pipe.sendMessage("(get-proof)");
-                pipe.sendMessage("(get-unsat-core)");
-                pipe.sendMessage("(exit)");
-                sc.setState(WAIT_FOR_DETAILS);
-            }
-            if (msg.equals("sat")) {
-                sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-                pipe.sendMessage("(get-model)");
-                pipe.sendMessage("(exit)");
-                sc.setState(WAIT_FOR_DETAILS);
+    @Override
+    protected boolean isUnknownResultMessage(@NonNull String msg) {
+        return msg.equals("unknown");
+    }
 
-            }
-            if (msg.equals("unknown")) {
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
-                pipe.sendMessage("(exit)\n");
-                sc.setState(WAIT_FOR_DETAILS);
-            }
-        }
-        case WAIT_FOR_DETAILS -> {
-        }
-        // Currently we rely on the solver to terminate after receiving "(exit)". If this does
-        // not work in future, it may be that we have to forcibly close the pipe.
-        // if (msg.equals("success")) {
-        // pipe.sendMessage("(exit)");
-        // pipe.close();
-        // }
-        }
+    @Override
+    protected boolean isFilteredMessage(String msg) {
+        return msg.equals("success");
+    }
+
+    @Override
+    protected boolean isErrorMessage(String msg) {
+        return msg.startsWith("(error") && !msg.contains("WARNING:");
+    }
+
+    @Override
+    protected boolean isWarningMessage(String msg) {
+        return msg.contains("WARNING:");
+    }
+
+    @Override
+    protected void sendValidResultMessages(Pipe pipe) throws IOException {
+        // TODO: proof production is currently completely disabled, since it does not work
+        // with the legacy Z3 translation (proof-production not enabled) and also not
+        // really needed
+        // pipe.sendMessage("(get-proof)");
+        pipe.sendMessage("(get-unsat-core)");
+        pipe.sendMessage("(exit)");
+    }
+
+    @Override
+    protected void sendFalsifiableResultMessages(Pipe pipe) throws IOException {
+        pipe.sendMessage("(get-model)");
+        pipe.sendMessage("(exit)");
+    }
+
+    @Override
+    protected void sendUnknownResultMessages(Pipe pipe) throws IOException {
+        pipe.sendMessage("(exit)\n");
+    }
+
+    @Override
+    protected void sendExitMessages(Pipe pipe) throws IOException {
+        pipe.sendMessage("(exit)\n");
     }
 
     @Override
     public AbstractSolverSocket copy() {
-        return new Z3Socket(getName(), getQuery());
+        return new Z3Socket(solverType);
     }
 
 }

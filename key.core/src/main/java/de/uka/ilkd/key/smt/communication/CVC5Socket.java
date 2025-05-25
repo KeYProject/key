@@ -5,8 +5,7 @@ package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.smt.ModelExtractor;
-import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import org.jspecify.annotations.NonNull;
 
@@ -17,57 +16,64 @@ public class CVC5Socket extends AbstractSolverSocket {
 
     /**
      * Create a new CVC5Socket.
-     *
-     * @param name the socket's name (usually "CVC5", but other solvers might also use it).
-     * @param query the ModelExtractor for model interpretation (currently not used by this socket)
      */
-    public CVC5Socket(String name, ModelExtractor query) {
-        super(name, query);
+    public CVC5Socket(SolverType solverType) {
+        super(solverType);
     }
 
     @Override
-    public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
-        SolverCommunication sc = pipe.getSolverCommunication();
-        if ("".equals(msg.trim())) {
-            return;
-        }
+    protected boolean isValidResultMessage(@NonNull String msg) {
+        return msg.equals("unsat");
+    }
 
-        // used only to steer the interaction with the solver and thus filtered out currently
-        if (!msg.contains("success")) {
-            sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT);
-        }
+    @Override
+    protected boolean isFalsifiableResultMessage(@NonNull String msg) {
+        return msg.equals("sat");
+    }
 
-        if (msg.contains("error") || msg.contains("Error")) {
-            sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
-            throw new IOException("Error while executing " + getName() + ": " + msg);
-        }
+    @Override
+    protected boolean isUnknownResultMessage(@NonNull String msg) {
+        return msg.equals("unknown");
+    }
 
-        // Currently we rely on the solver to terminate after receiving "(exit)". If this does
-        // not work in future, it may be that we have to forcibly close the pipe.
-        if (sc.getState() == WAIT_FOR_RESULT) {
-            if (msg.contains("unsat")) {
-                sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                sc.setState(FINISH);
-                pipe.sendMessage("(get-unsat-core)");
-                pipe.sendMessage("(exit)");
-                // pipe.close();
-            } else if (msg.contains("sat")) {
-                sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-                sc.setState(FINISH);
-                pipe.sendMessage("(exit)");
-                // pipe.close();
-            } else if (msg.contains("unknown")) {
-                sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
-                sc.setState(FINISH);
-                pipe.sendMessage("(exit)");
-                // pipe.close();
-            }
-        }
+    @Override
+    protected boolean isFilteredMessage(String msg) {
+        return msg.contains("success");
+    }
+
+    @Override
+    protected boolean isErrorMessage(String msg) {
+        return msg.contains("error") || msg.contains("Error");
+    }
+
+    @Override
+    protected boolean isWarningMessage(String msg) {
+        return false;
+    }
+
+    @Override
+    protected void sendValidResultMessages(Pipe pipe) throws IOException {
+        pipe.sendMessage("(exit)");
+    }
+
+    @Override
+    protected void sendFalsifiableResultMessages(Pipe pipe) throws IOException {
+        pipe.sendMessage("(exit)");
+    }
+
+    @Override
+    protected void sendUnknownResultMessages(Pipe pipe) throws IOException {
+        pipe.sendMessage("(exit)");
+    }
+
+    @Override
+    protected void sendExitMessages(Pipe pipe) throws IOException {
+        pipe.sendMessage("(exit)");
     }
 
     @Override
     public AbstractSolverSocket copy() {
-        return new CVC5Socket(getName(), getQuery());
+        return new CVC5Socket(solverType);
     }
 
 }

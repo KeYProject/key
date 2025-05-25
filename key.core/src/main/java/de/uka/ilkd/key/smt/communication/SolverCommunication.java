@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.smt.SMTSolverResult;
 
 /**
  * Stores the communication between KeY and an external solver: Contains a list that stores the
@@ -24,9 +23,6 @@ import de.uka.ilkd.key.smt.SMTSolverResult;
 public class SolverCommunication {
     /** All messages (input/output/error) sent between KeY and SMT solver. */
     private final List<Message> messages = Collections.synchronizedList(new LinkedList<>());
-
-    /** The final result of the associated solver (unknown if not yet set). */
-    private SMTSolverResult finalResult = SMTSolverResult.NO_IDEA;
 
     /** The current state of the communication. The states are defined by the solver sockets. */
     private int state = 0;
@@ -99,14 +95,6 @@ public class SolverCommunication {
      */
     void addMessage(String message, MessageType type) {
         messages.add(new Message(message, type));
-    }
-
-    public SMTSolverResult getFinalResult() {
-        return finalResult;
-    }
-
-    void setFinalResult(SMTSolverResult finalResult) {
-        this.finalResult = finalResult;
     }
 
     public int getState() {

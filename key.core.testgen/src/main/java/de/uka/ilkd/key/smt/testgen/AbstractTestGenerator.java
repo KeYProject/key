@@ -35,6 +35,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.communication.AbstractCESolverSocket;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
@@ -392,7 +393,8 @@ public abstract class AbstractTestGenerator {
         final List<SMTSolver> output = new ArrayList<>();
         for (final SMTSolver solver : problemSolvers) {
             try {
-                final SMTSolverResult.ThreeValuedTruth res = solver.getFinalResult().isValid();
+                final SMTSolverResult.ThreeValuedTruth res =
+                    solver.getFinalResult().isValid();
                 if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
                     unknown++;
                     if (solver.getException() != null) {
@@ -400,8 +402,9 @@ public abstract class AbstractTestGenerator {
                     }
                 } else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
                     solvedPaths++;
-                    if (solver.getSocket().getQuery() != null) {
-                        final Model m = solver.getSocket().getQuery().getModel();
+                    if (solver.getSocket() instanceof AbstractCESolverSocket) {
+                        final Model m =
+                            ((AbstractCESolverSocket) solver.getSocket()).getQuery().getModel();
                         if (TestCaseGenerator.modelIsOK(m)) {
                             output.add(solver);
                         } else {

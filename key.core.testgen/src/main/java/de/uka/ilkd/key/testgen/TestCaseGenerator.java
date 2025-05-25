@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.communication.AbstractCESolverSocket;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
@@ -521,8 +522,9 @@ public class TestCaseGenerator {
                          */
                         .proof().name().toString();
                 boolean success = false;
-                if (solver.getSocket().getQuery() != null) {
-                    final Model m = solver.getSocket().getQuery().getModel();
+                if (solver.getSocket() instanceof AbstractCESolverSocket) {
+                    final Model m =
+                        ((AbstractCESolverSocket) solver.getSocket()).getQuery().getModel();
                     if (TestCaseGenerator.modelIsOK(m)) {
                         logger.writeln("Generate: " + originalNodeName);
                         Map<String, Sort> typeInfMap =

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.communication;
 import java.io.IOException;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
+import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import org.jspecify.annotations.NonNull;
@@ -40,32 +41,14 @@ public abstract class AbstractSolverSocket {
     protected static final int FINISH = 4;
 
     /** The name of the solver related to the socket. */
-    private final String name;
+    protected final SolverType solverType;
 
-    /** The ModelExtractor that is to be used for CE generation (only used for CE socket). */
-    private ModelExtractor query;
-
-    /**
-     * Creates a new solver socket with given solver name and ModelExtractor.
-     *
-     * @param name the name of the solver in use
-     * @param query the ModelExtractor used to extract a counterexample
-     */
-    protected AbstractSolverSocket(@NonNull String name, ModelExtractor query) {
-        this.name = name;
-        this.query = query;
-    }
-
-    public ModelExtractor getQuery() {
-        return query;
-    }
-
-    public void setQuery(ModelExtractor query) {
-        this.query = query;
+    protected AbstractSolverSocket(SolverType solverType) {
+        this.solverType = solverType;
     }
 
     protected String getName() {
-        return name;
+        return solverType.getName();
     }
 
     /**
@@ -75,8 +58,107 @@ public abstract class AbstractSolverSocket {
      * @param msg the message as String
      * @throws IOException if an I/O error occurs
      */
-    public abstract void messageIncoming(@NonNull Pipe pipe, @NonNull String msg)
-            throws IOException;
+    public SMTSolverResult.ThreeValuedTruth messageIncoming(@NonNull Pipe pipe, @NonNull String msg)
+            throws IOException {
+        SolverCommunication sc = pipe.getSolverCommunication();
+        if (msg.isBlank() || isFilteredMessage(msg)) {
+            return null;
+        }
+
+        sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT);
+
+        if (isWarningMessage(msg)) {
+            handleWarningMessage(pipe, msg);
+            return null;
+        }
+
+        if (isErrorMessage(msg)) {
+            handleErrorMessage(pipe, msg);
+        }
+
+        if (pipe.getSolverCommunication().getState() == WAIT_FOR_RESULT) {
+            return handleResultMessage(pipe, msg);
+        }
+        return null;
+    }
+
+    protected abstract boolean isValidResultMessage(@NonNull String msg);
+
+    protected abstract boolean isFalsifiableResultMessage(@NonNull String msg);
+
+    protected abstract boolean isUnknownResultMessage(@NonNull String msg);
+
+    protected abstract boolean isFilteredMessage(String msg);
+
+    protected abstract boolean isErrorMessage(String msg);
+
+    protected abstract boolean isWarningMessage(String msg);
+
+
+
+    protected abstract void sendValidResultMessages(Pipe pipe) throws IOException;
+
+    protected abstract void sendFalsifiableResultMessages(Pipe pipe) throws IOException;
+
+    protected abstract void sendUnknownResultMessages(Pipe pipe) throws IOException;
+
+    protected abstract void sendExitMessages(Pipe pipe) throws IOException;
+
+    protected void handleWarningMessage(@NonNull Pipe pipe, @NonNull String msg)
+            throws IOException {
+        pipe.getSolverCommunication().addMessage(msg, SolverCommunication.MessageType.ERROR);
+    }
+
+    protected void handleErrorMessage(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
+        pipe.getSolverCommunication().addMessage(msg, SolverCommunication.MessageType.ERROR);
+        throw new IOException(getName() + " encountered an error: " + msg);
+    }
+
+    protected SMTSolverResult.ThreeValuedTruth handleResultMessage(@NonNull Pipe pipe,
+            @NonNull String msg) throws IOException {
+        if (isValidResultMessage(msg)) {
+            return handleValidResultMessage(pipe, msg);
+        } else if (isFalsifiableResultMessage(msg)) {
+            return handleFalsifiableResultMessage(pipe, msg);
+        } else if (isUnknownResultMessage(msg)) {
+            return handleUnknownResultMessage(pipe, msg);
+        }
+        throw new IllegalStateException(
+            getName() + " encountered an error when parsing message: " + msg);
+    }
+
+    protected SMTSolverResult.ThreeValuedTruth handleValidResultMessage(@NonNull Pipe pipe,
+            @NonNull String msg) throws IOException {
+        if (isValidResultMessage(msg)) {
+            pipe.getSolverCommunication().setState(FINISH);
+            sendValidResultMessages(pipe);
+            return SMTSolverResult.ThreeValuedTruth.VALID;
+        }
+        throw new IllegalStateException(
+            getName() + " encountered an error when parsing message: " + msg);
+    }
+
+    protected SMTSolverResult.ThreeValuedTruth handleFalsifiableResultMessage(@NonNull Pipe pipe,
+            @NonNull String msg) throws IOException {
+        if (isFalsifiableResultMessage(msg)) {
+            pipe.getSolverCommunication().setState(FINISH);
+            sendFalsifiableResultMessages(pipe);
+            return SMTSolverResult.ThreeValuedTruth.FALSIFIABLE;
+        }
+        throw new IllegalStateException(
+            getName() + " encountered an error when parsing message: " + msg);
+    }
+
+    protected SMTSolverResult.ThreeValuedTruth handleUnknownResultMessage(@NonNull Pipe pipe,
+            @NonNull String msg) throws IOException {
+        if (isUnknownResultMessage(msg)) {
+            pipe.getSolverCommunication().setState(FINISH);
+            sendUnknownResultMessages(pipe);
+            return SMTSolverResult.ThreeValuedTruth.UNKNOWN;
+        }
+        throw new IllegalStateException(
+            getName() + " encountered an error when parsing message: " + msg);
+    }
 
     /**
      * Modify an SMT problem String in some way (e.g. prepend some SMT commands). By default, the

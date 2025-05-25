@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.communication.AbstractCESolverSocket;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
@@ -230,15 +231,21 @@ public final class SolverTypeImplementation implements SolverType {
 
     private AbstractSolverSocket makeSocket() {
         try {
-            return (AbstractSolverSocket) solverSocketClass
-                    .getDeclaredConstructor(String.class, ModelExtractor.class)
-                    .newInstance(name, null);
+            if (AbstractCESolverSocket.class.isAssignableFrom(solverSocketClass)) {
+                return (AbstractSolverSocket) solverSocketClass
+                        .getDeclaredConstructor(SolverType.class, ModelExtractor.class)
+                        .newInstance(this, null);
+            } else {
+                return (AbstractSolverSocket) solverSocketClass
+                        .getDeclaredConstructor(SolverType.class)
+                        .newInstance(this);
+            }
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.warn(String.format(
                 "Using default Z3Socket for solver communication due to exception:%s%s",
                 System.lineSeparator(), e.getMessage()));
-            return new Z3Socket(name, null);
+            return new Z3Socket(this);
         }
     }
 
@@ -332,10 +339,13 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     @Override
-    public SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services, SMTSettings smtSettings, long timeout) {
+    public SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services,
+            SMTSettings smtSettings, long timeout) {
         if (timeout > 0)
-            return new SMTSolverImplementation(problem, listener, services, smtSettings, this, timeout);
-        return new SMTSolverImplementation(problem, listener, services, smtSettings, this, defaultTimeout);
+            return new SMTSolverImplementation(problem, listener, services, smtSettings, this,
+                timeout);
+        return new SMTSolverImplementation(problem, listener, services, smtSettings, this,
+            defaultTimeout);
     }
 
     @Override
@@ -496,9 +506,7 @@ public final class SolverTypeImplementation implements SolverType {
 
     @Override
     public @NonNull AbstractSolverSocket getSocket(ModelExtractor query) {
-        AbstractSolverSocket socket = solverSocket.copy();
-        socket.setQuery(query);
-        return socket;
+        return solverSocket.copy();
     }
 
 }

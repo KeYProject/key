@@ -8,11 +8,11 @@ import java.util.Collection;
 /**
  * Encapsulates all exceptions that have occurred while executing the solvers.
  */
-public class SolverException extends RuntimeException {
+public class SolverLauncherException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     private final transient Collection<SMTSolver> solvers;
 
-    public SolverException(Collection<SMTSolver> solvers) {
+    public SolverLauncherException(Collection<SMTSolver> solvers) {
         super();
         this.solvers = solvers;
     }

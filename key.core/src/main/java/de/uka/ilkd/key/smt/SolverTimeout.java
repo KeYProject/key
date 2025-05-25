@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt;
 import java.util.TimerTask;
 
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
+
 import org.jspecify.annotations.NonNull;
 
 /**

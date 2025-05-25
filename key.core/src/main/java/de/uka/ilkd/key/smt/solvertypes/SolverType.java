@@ -42,7 +42,8 @@ public interface SolverType {
      *        {@link SMTObjTranslator})
      * @return a concrete solver process of the type at hand
      */
-    SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services, SMTSettings smtSettings, long timeout);
+    SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services,
+            SMTSettings smtSettings, long timeout);
 
     /**
      * @return the name of the solver.

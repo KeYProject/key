@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.smt.communication.AbstractCESolverSocket;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
@@ -140,6 +141,8 @@ public final class SMTSolverImplementation implements SMTSolver {
      */
     private final long timeout;
 
+    private SMTSolverResult result;
+
     /**
      * Creates a new instance an SMT solver.
      *
@@ -149,7 +152,8 @@ public final class SMTSolverImplementation implements SMTSolver {
      * @param myType the type of the solver to run (e.g., Z3, CVC3, Z3_CE)
      * @param timeout the length of timeout
      */
-    public SMTSolverImplementation(SMTProblem problem, SolverListener listener, Services services, SMTSettings smtSettings,
+    public SMTSolverImplementation(SMTProblem problem, SolverListener listener, Services services,
+            SMTSettings smtSettings,
             SolverType myType, long timeout) {
         this.problem = problem;
         this.listener = listener;
@@ -180,10 +184,12 @@ public final class SMTSolverImplementation implements SMTSolver {
         setReasonOfInterruption(reasonOfInterruption, null);
     }
 
-    private synchronized void setReasonOfInterruption(ReasonOfInterruption reasonOfInterruption, Throwable exc) {
-        if (this.reasonOfInterruption != ReasonOfInterruption.NoInterruption || solverState == SolverState.Stopped) {
-            //don't change the reason of interruption after the first interrupt
-            //also don't interrupt a stopped solver
+    private synchronized void setReasonOfInterruption(ReasonOfInterruption reasonOfInterruption,
+            Throwable exc) {
+        if (this.reasonOfInterruption != ReasonOfInterruption.NoInterruption
+                || solverState == SolverState.Stopped) {
+            // don't change the reason of interruption after the first interrupt
+            // also don't interrupt a stopped solver
             return;
         }
         this.reasonOfInterruption = reasonOfInterruption;
@@ -256,9 +262,29 @@ public final class SMTSolverImplementation implements SMTSolver {
             // processLauncher.getPipe().sendEOF();
 
             String msg = processLauncher.getPipe().readMessage();
-            while (msg != null) {
-                socket.messageIncoming(processLauncher.getPipe(), msg);
+            SMTSolverResult.ThreeValuedTruth result = null;
+            while (msg != null && result == null) {
+                result = socket.messageIncoming(processLauncher.getPipe(), msg);
                 msg = processLauncher.getPipe().readMessage();
+            }
+            switch (result) {
+            case VALID -> {
+                this.result = SMTSolverResult.getValidResult(this, problem,
+                    System.currentTimeMillis() - getStartTime(), solverCommunication);
+            }
+            case FALSIFIABLE -> {
+                this.result = SMTSolverResult.getFalsifiableResult(this, problem,
+                    System.currentTimeMillis() - getStartTime(), solverCommunication);
+            }
+            case UNKNOWN -> {
+                this.result = SMTSolverResult.getUnknownResult(this, problem,
+                    System.currentTimeMillis() - getStartTime(), solverCommunication);
+            }
+            case null -> {
+                this.result = SMTSolverResult.getExceptionResult(this, problem,
+                    System.currentTimeMillis() - getStartTime(), solverCommunication,
+                    new IllegalStateException("Solver " + name() + " did not return any result!"));
+            }
             }
         } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);
@@ -273,7 +299,8 @@ public final class SMTSolverImplementation implements SMTSolver {
     }
 
     private void interruptionOccurred(Throwable e) {
-        //TODO this does not make sense. If there was a reason for the interrupt it is overwritten here. Only listeners can tell what happened, but this class stores another reason
+        // TODO this does not make sense. If there was a reason for the interrupt it is overwritten
+        // here. Only listeners can tell what happened, but this class stores another reason
         ReasonOfInterruption reason = getReasonOfInterruption();
         setReasonOfInterruption(ReasonOfInterruption.Exception, e);
         switch (reason) {
@@ -321,7 +348,11 @@ public final class SMTSolverImplementation implements SMTSolver {
                 new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
             problemString = objTrans.translateProblem(sequent, services, smtSettings).toString();
             ModelExtractor transQuery = objTrans.getQuery();
-            getSocket().setQuery(transQuery);
+            AbstractSolverSocket socket = getSocket();
+            if (!(socket instanceof AbstractCESolverSocket)) {
+                throw new IllegalStateException("Socket used does not support counterexamples.");
+            }
+            ((AbstractCESolverSocket) socket).setQuery(transQuery);
             tacletTranslation = null;
         } else {
             SMTTranslator trans = getType().createTranslator();
@@ -358,7 +389,7 @@ public final class SMTSolverImplementation implements SMTSolver {
 
     @Override
     public SMTSolverResult getFinalResult() {
-        return isRunning() ? null : solverCommunication.getFinalResult();
+        return isRunning() ? null : result;
     }
 
     @Override

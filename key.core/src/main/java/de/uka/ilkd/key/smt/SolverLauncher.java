@@ -184,7 +184,8 @@ public class SolverLauncher {
         for (SMTProblem problem : problems) {
             for (SolverType factory : factories) {
                 if (factory.isInstalled(false)) {
-                    SMTSolver solver = factory.createSolver(problem, null, services, settings, settings.getTimeout(factory));
+                    SMTSolver solver = factory.createSolver(problem, null, services, settings,
+                        settings.getTimeout(factory));
                     problem.addSolver(solver);
                     solvers.add(solver);
                 }
@@ -281,7 +282,8 @@ public class SolverLauncher {
     }
 
     private void notifyListenersOfStop() {
-        Collection<SMTSolver> finishedSolvers = new ArrayList<>(solvers.stream().filter((solver) -> solver.getState() == SMTSolver.SolverState.Stopped).toList());
+        Collection<SMTSolver> finishedSolvers = new ArrayList<>(solvers.stream()
+                .filter((solver) -> solver.getState() == SMTSolver.SolverState.Stopped).toList());
 
         for (SMTSolver solver : solvers) {
             if (!finishedSolvers.contains(solver)) {
@@ -294,7 +296,7 @@ public class SolverLauncher {
         }
 
         if (solvers.size() != finishedSolvers.size() && listeners.isEmpty()) {
-            throw new SolverException(solvers);
+            throw new SolverLauncherException(solvers);
         }
     }
 
