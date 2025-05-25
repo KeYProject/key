@@ -42,6 +42,10 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public TreeNode getParent() {
         if (parent == null && this != tree.getRoot()
                 && !(getNode() != null && ProofTreeViewFilter.hiddenByGlobalFilters(getNode()))) {
+            Node n = getNode();
+            if (n != null && n.proof().root() == n) {
+                return null; // TODO: why can there be another instance of the root node?
+            }
             throw new IllegalStateException("abstract tree node without parent: " + this);
         }
         return parent;
