@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A ChoiceExpr is a boolean expression that determines whether a taclet or a goal should be
@@ -62,7 +63,6 @@ public abstract class ChoiceExpr {
         public String toString() {
             return "true";
         }
-
     }
 
 
@@ -84,7 +84,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }
@@ -120,7 +120,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }
@@ -156,7 +156,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }
@@ -190,7 +190,7 @@ public abstract class ChoiceExpr {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }
