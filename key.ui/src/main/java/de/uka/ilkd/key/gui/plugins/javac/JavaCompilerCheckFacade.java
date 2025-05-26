@@ -126,8 +126,10 @@ public class JavaCompilerCheckFacade {
                     it.getMessage(Locale.ENGLISH),
                     new Location(
                         fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
-                        Position.newOneBased((int) it.getLineNumber(),
-                            (int) it.getColumnNumber())),
+                        it.getPosition() != Diagnostic.NOPOS
+                                ? Position.newOneBased((int) it.getLineNumber(),
+                                    (int) it.getColumnNumber())
+                                : Position.UNDEFINED),
                     it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });
