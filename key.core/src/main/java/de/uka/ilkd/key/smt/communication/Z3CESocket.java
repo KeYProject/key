@@ -58,8 +58,6 @@ public class Z3CESocket extends AbstractCESolverSocket {
 
     @Override
     protected void sendFalsifiableResultMessages(Pipe pipe) throws IOException {
-        pipe.sendMessage("(get-model)");
-        pipe.sendMessage("(exit)");
     }
 
     @Override

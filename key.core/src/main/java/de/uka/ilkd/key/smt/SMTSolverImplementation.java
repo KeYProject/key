@@ -268,23 +268,15 @@ public final class SMTSolverImplementation implements SMTSolver {
                 msg = processLauncher.getPipe().readMessage();
             }
             switch (result) {
-            case VALID -> {
-                this.result = SMTSolverResult.getValidResult(this, problem,
-                    System.currentTimeMillis() - getStartTime(), solverCommunication);
-            }
-            case FALSIFIABLE -> {
-                this.result = SMTSolverResult.getFalsifiableResult(this, problem,
-                    System.currentTimeMillis() - getStartTime(), solverCommunication);
-            }
-            case UNKNOWN -> {
-                this.result = SMTSolverResult.getUnknownResult(this, problem,
-                    System.currentTimeMillis() - getStartTime(), solverCommunication);
-            }
-            case null -> {
-                this.result = SMTSolverResult.getExceptionResult(this, problem,
-                    System.currentTimeMillis() - getStartTime(), solverCommunication,
-                    new IllegalStateException("Solver " + name() + " did not return any result!"));
-            }
+            case VALID -> this.result = SMTSolverResult.getValidResult(this, problem,
+                System.currentTimeMillis() - getStartTime(), solverCommunication);
+            case FALSIFIABLE -> this.result = SMTSolverResult.getFalsifiableResult(this, problem,
+                System.currentTimeMillis() - getStartTime(), solverCommunication);
+            case UNKNOWN -> this.result = SMTSolverResult.getUnknownResult(this, problem,
+                System.currentTimeMillis() - getStartTime(), solverCommunication);
+            case null -> this.result = SMTSolverResult.getExceptionResult(this, problem,
+                System.currentTimeMillis() - getStartTime(), solverCommunication,
+                new IllegalStateException("Solver " + name() + " did not return any result!"));
             }
         } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);

@@ -26,6 +26,27 @@ public abstract class AbstractCESolverSocket extends AbstractSolverSocket {
     }
 
     @Override
+    public SMTSolverResult.ThreeValuedTruth messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
+        SolverCommunication sc = pipe.getSolverCommunication();
+        if (msg.isBlank() || isFilteredMessage(msg)) {
+            return null;
+        }
+
+        sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT);
+
+        if (isWarningMessage(msg)) {
+            handleWarningMessage(pipe, msg);
+            return null;
+        }
+
+        if (isErrorMessage(msg)) {
+            handleErrorMessage(pipe, msg);
+        }
+
+        return handleResultMessage(pipe, msg);
+    }
+
+    @Override
     protected SMTSolverResult.ThreeValuedTruth handleFalsifiableResultMessage(@NonNull Pipe pipe,
             @NonNull String msg) throws IOException {
         if (isFalsifiableResultMessage(msg)) {
@@ -43,6 +64,9 @@ public abstract class AbstractCESolverSocket extends AbstractSolverSocket {
         SolverCommunication sc = pipe.getSolverCommunication();
         switch (sc.getState()) {
         case WAIT_FOR_RESULT -> {
+            if (isFalsifiableResultMessage(msg)) {
+                return handleFalsifiableResultMessage(pipe, msg);
+            }
             return super.handleResultMessage(pipe, msg);
         }
         case WAIT_FOR_DETAILS -> {
@@ -53,6 +77,9 @@ public abstract class AbstractCESolverSocket extends AbstractSolverSocket {
         case WAIT_FOR_QUERY -> {
             if (!isFilteredMessage(msg)) {
                 getQuery().messageIncoming(pipe, msg);
+                if (getQuery().getState() == ModelExtractor.FINISHED) {
+                    return SMTSolverResult.ThreeValuedTruth.FALSIFIABLE;
+                }
             }
             return null;
         }
