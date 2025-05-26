@@ -6,6 +6,7 @@ package org.key_project.logic;
 import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A choice is an option in a category.
@@ -41,7 +42,7 @@ public class Choice implements Named {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
