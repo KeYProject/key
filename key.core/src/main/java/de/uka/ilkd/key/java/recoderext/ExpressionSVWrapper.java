@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.logic.op.OperatorSV;
 
-import recoder.java.Expression;
 import recoder.java.LoopInitializer;
 import recoder.java.SourceVisitor;
 import recoder.java.StatementContainer;
@@ -14,7 +13,7 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 
 public class ExpressionSVWrapper extends Literal
-        implements Expression, LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
+        implements LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
 
     /**
      *

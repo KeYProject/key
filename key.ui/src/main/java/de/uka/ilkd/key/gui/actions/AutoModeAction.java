@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
@@ -42,18 +41,21 @@ public final class AutoModeAction extends MainWindowAction {
 
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 
+        @Override
         public void proofStructureChanged(ProofTreeEvent e) {
             if (e.getSource() == associatedProof) {
                 enable();
             }
         }
 
+        @Override
         public void proofClosed(ProofTreeEvent e) {
             if (e.getSource() == associatedProof) {
                 enable();
             }
         }
 
+        @Override
         public void proofGoalsAdded(ProofTreeEvent e) {
             Proof p = e.getSource();
             ImmutableList<Goal> newGoals = e.getGoals();
@@ -114,9 +116,9 @@ public final class AutoModeAction extends MainWindowAction {
                 if (associatedProof != null) {
                     associatedProof.removeProofTreeListener(ptl);
                 }
-                putValue(Action.NAME, "Stop");
-                putValue(Action.SMALL_ICON, stopLogo);
-                putValue(Action.ACCELERATOR_KEY, STOP_KEY);
+                putValue(NAME, "Stop");
+                putValue(SMALL_ICON, stopLogo);
+                putValue(ACCELERATOR_KEY, STOP_KEY);
                 enable();
             }
 
@@ -128,9 +130,9 @@ public final class AutoModeAction extends MainWindowAction {
                         && !associatedProof.containsProofTreeListener(ptl)) {
                     associatedProof.addProofTreeListener(ptl);
                 }
-                putValue(Action.NAME, getStartCommand());
-                putValue(Action.SMALL_ICON, startLogo);
-                putValue(Action.ACCELERATOR_KEY, START_KEY);
+                putValue(NAME, getStartCommand());
+                putValue(SMALL_ICON, startLogo);
+                putValue(ACCELERATOR_KEY, START_KEY);
                 enable();
             }
 

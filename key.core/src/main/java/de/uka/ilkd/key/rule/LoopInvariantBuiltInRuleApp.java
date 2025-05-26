@@ -17,9 +17,9 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -54,7 +55,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, LoopSpecification inv,
+            ImmutableList<PosInOccurrence> ifInsts,
+            LoopSpecification inv,
             List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
@@ -91,7 +93,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
 
         // try to retrieve a loop index variable
-        de.uka.ilkd.key.java.statement.IGuard guard = loop.getGuard();
+        IGuard guard = loop.getGuard();
         // the guard is expected to be of the form "i < x" and we want to retrieve "i".
         assert guard.getChildCount() == 1 : "child count: " + guard.getChildCount();
         ProgramElement guardStatement = guard.getChildAt(0);
@@ -290,7 +292,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public LoopInvariantBuiltInRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
 

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -24,14 +23,14 @@ import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -141,7 +140,8 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The active statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeActiveStatement(RuleApp ruleApp) {
+    public static SourceElement computeActiveStatement(
+            RuleApp ruleApp) {
         SourceElement firstStatement = computeFirstStatement(ruleApp);
         return computeActiveStatement(firstStatement);
     }
@@ -158,7 +158,8 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The first statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeFirstStatement(RuleApp ruleApp) {
+    public static SourceElement computeFirstStatement(
+            RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
         if (ruleApp instanceof PosTacletApp pta) {
@@ -231,7 +232,7 @@ public class NodeInfo {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp
                 || app instanceof AbstractContractRuleApp
                 || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp
-                        && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
+                        && isSymbolicExecution(((TacletApp) app).taclet());
     }
 
     public static boolean isSymbolicExecution(Taclet t) {
@@ -239,8 +240,7 @@ public class NodeInfo {
         RuleSet rs;
         while (!list.isEmpty()) {
             rs = list.head();
-            Name name = rs.name();
-            if (symbolicExecNames.contains(name)) {
+            if (symbolicExecNames.contains(rs.name())) {
                 return true;
             }
             list = list.tail();
@@ -332,10 +332,6 @@ public class NodeInfo {
                 } else {
                     if (val instanceof Term) {
                         val = TermLabelManager.removeIrrelevantLabels((Term) val,
-                            node.proof().getServices());
-                    } else if (val instanceof TermInstantiation) {
-                        val = TermLabelManager.removeIrrelevantLabels(
-                            ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
                     } else if (val instanceof LocationVariable locVar) {
                         var originTracker = node.proof().lookup(LocationVariableTracker.class);

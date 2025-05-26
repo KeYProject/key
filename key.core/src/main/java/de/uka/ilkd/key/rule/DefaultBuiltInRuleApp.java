@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.rule;
 
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * this class represents an application of a built in rule application
+ * this class represents an application of a built-in rule application
  */
 public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
@@ -35,7 +35,8 @@ public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public DefaultBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public DefaultBuiltInRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
         // return new DefaultBuiltInRuleApp(builtInRule, pio, ifInsts);

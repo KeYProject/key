@@ -12,11 +12,11 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
+
+import org.key_project.prover.engine.SingleRuleApplicationInfo;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * An {@link IBreakpointStopCondition} which can be used during proof.
@@ -49,7 +49,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      * {@inheritDoc}
      */
     @Override
-    public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
+    public int getMaximalWork(int maxApplications, long timeout) {
         breakpointHit = false;
         return 0;
     }
@@ -58,17 +58,17 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      * {@inheritDoc}
      */
     @Override
-    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public boolean isGoalAllowed(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
         for (IBreakpoint breakpoint : breakpoints) {
-            breakpoint.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
+            breakpoint.updateState(goal, maxApplications, timeout, startTime, countApplied);
         }
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-            breakpointHit = isBreakpointHit(activeStatement, ruleApp, proof, node);
+            breakpointHit = isBreakpointHit(activeStatement, ruleApp, node);
         }
         return countApplied == 0 || !breakpointHit;
     }
@@ -77,8 +77,8 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      * {@inheritDoc}
      */
     @Override
-    public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal) {
+    public String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
+            long startTime, int countApplied) {
         return "Breakpoint hit!";
     }
 
@@ -86,7 +86,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      * {@inheritDoc}
      */
     @Override
-    public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
+    public boolean shouldStop(int maxApplications, long timeout, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return false;
     }
@@ -96,19 +96,18 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      *
      * @param activeStatement the activeStatement of the node
      * @param ruleApp the applied {@link RuleApp}
-     * @param proof the current proof
      * @param node the current node
      * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not
      *         hit.
      */
-    protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    protected boolean isBreakpointHit(SourceElement activeStatement,
+            RuleApp ruleApp, Node node) {
         boolean result = false;
         Iterator<IBreakpoint> iter = breakpoints.iterator();
         while (!result && iter.hasNext()) {
             IBreakpoint next = iter.next();
             result =
-                next.isEnabled() && next.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                next.isEnabled() && next.isBreakpointHit(activeStatement, ruleApp, node);
         }
         return result;
     }
@@ -117,7 +116,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
+    public String getStopMessage(int maxApplications, long timeout, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return "Breakpoint hit!";
     }

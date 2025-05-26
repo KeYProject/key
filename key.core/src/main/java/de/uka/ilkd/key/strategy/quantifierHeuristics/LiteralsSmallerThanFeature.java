@@ -7,47 +7,50 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
-    private final ProjectionToTerm left, right;
+    private final ProjectionToTerm<Goal> left, right;
     private final IntegerLDT numbers;
 
     private final QuanEliminationAnalyser quanAnalyser = new QuanEliminationAnalyser();
 
 
-    private LiteralsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+    private LiteralsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         this.left = left;
         this.right = right;
         this.numbers = numbers;
     }
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new LiteralsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
         return compareTerms(leftTerm, rightTerm, pos, goal);
     }
 
-    protected boolean compareTerms(Term leftTerm, Term rightTerm, PosInOccurrence pos, Goal goal) {
+    protected boolean compareTerms(Term leftTerm, Term rightTerm,
+            PosInOccurrence pos, Goal goal) {
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final LiteralCollector m2 = new LiteralCollector();
@@ -73,12 +76,12 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
         // HACK: we move literals that do not contain any variables to the left,
         // so that they can be moved out of the scope of the quantifiers
-        if (t1.freeVars().size() == 0) {
-            if (t2.freeVars().size() > 0) {
+        if (t1.freeVars().isEmpty()) {
+            if (!t2.freeVars().isEmpty()) {
                 return false;
             }
         } else {
-            if (t2.freeVars().size() == 0) {
+            if (t2.freeVars().isEmpty()) {
                 return true;
             }
         }
@@ -169,7 +172,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     private int formulaKind(Term t) {
-        final Operator op = t.op();
+        final var op = t.op();
         if (op == numbers.getLessOrEquals()) {
             return 1;
         }
@@ -208,10 +211,12 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
             }
         }
 
+        @Override
         public boolean hasNext() {
             return nextMonomial != null;
         }
 
+        @Override
         public Term next() {
             final Term res = nextMonomial;
             nextMonomial = null;
@@ -222,6 +227,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         /**
          * throw an unsupported operation exception
          */
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -229,7 +235,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
     private static class LiteralCollector extends Collector {
         protected void collect(Term te) {
-            final Operator op = te.op();
+            final var op = te.op();
             if (op == Junctor.OR) {
                 collect(te.sub(0));
                 collect(te.sub(1));

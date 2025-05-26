@@ -27,13 +27,13 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -315,7 +315,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         LOGGER.debug("Found {} taclets\n", taclets.size());
 
         if (actionOnlyCompleteTaclets.isSelected()) {
-            taclets = taclets.stream().filter(RuleApp::complete).collect(Collectors.toList());
+            taclets = taclets.stream().filter(RuleApp::complete)
+                    .collect(Collectors.toList());
         }
 
         KeyboardTacletModel newModel = new KeyboardTacletModel(taclets);
@@ -403,7 +404,8 @@ class KeyboardTacletModel {
         for (RuleApp t : taclets) {
             String n = t.rule().name().toString();
             seq.add(n);
-            List<RuleApp> appSeq = this.taclets.computeIfAbsent(n, it -> (new ArrayList<>(5)));
+            List<RuleApp> appSeq =
+                this.taclets.computeIfAbsent(n, it -> (new ArrayList<>(5)));
             appSeq.add(t);
         }
 

@@ -26,13 +26,13 @@ public class TestDeclarationProgramVariableCollector {
         LoggerFactory.getLogger(TestDeclarationProgramVariableCollector.class);
 
     // some nonsense java blocks with lots of statements and expressions
-    private static final String[] jblocks = new String[] { "{ int j1 = 0; int j2, j3, j4 = 0;}",
+    private static final String[] jblocks = { "{ int j1 = 0; int j2, j3, j4 = 0;}",
         "{ int j1; { int j2; } { int j3; } for (int j4; j4=0; j4++) {} int j5; }",
         "{ int j0; { { { { {  int j1; } int j2; } int j3;} int j4; } } }" };
 
     // names of variables expected to be collected in jblocks
     private static final String[][] expectedVars =
-        new String[][] { { "j1", "j2", "j3", "j4" }, { "j1", "j5" }, { "j0" } };
+        { { "j1", "j2", "j3", "j4" }, { "j1", "j5" }, { "j0" } };
 
 
     private static JavaBlock[] test_block = new JavaBlock[jblocks.length];

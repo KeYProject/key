@@ -81,7 +81,7 @@ class Context {
     }
 
 
-    private static recoder.java.declaration.ClassDeclaration createClassDecl(
+    private static ClassDeclaration createClassDecl(
             KeYCrossReferenceServiceConfiguration servConf) {
         return servConf.getProgramFactory().createClassDeclaration(null,
             new ImplicitIdentifier(PARSING_CONTEXT_CLASS_NAME), null, null, null);

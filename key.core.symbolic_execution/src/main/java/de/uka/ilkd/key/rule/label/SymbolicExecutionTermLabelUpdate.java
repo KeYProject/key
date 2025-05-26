@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -14,6 +13,9 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -43,7 +45,8 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
     @Override
     public void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm,
+            Term newTerm,
             Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint)
                 || (rule instanceof AbstractAuxiliaryContractRule

@@ -112,7 +112,8 @@ public class PrettyPrinterRoundtripTest {
     }
 
     private void assertEqualModAlpha(Term expected, Term actual) {
-        var value = expected.equalsModProperty(actual, RenamingTermProperty.RENAMING_TERM_PROPERTY);
+        var value =
+            RenamingTermProperty.RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, actual);
         if (!value) {
             System.err.println("Expected: " + expected);
             System.err.println("Actual  : " + actual);

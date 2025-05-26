@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * This is a monad around the parse tree. We use this class to hide the
- * {@link org.antlr.v4.runtime.ParserRuleContext} from the rest of the Key system.
+ * {@link ParserRuleContext} from the rest of the Key system.
  *
  * <p>
  * To obtain an KeYAst use the {@link ParsingFacade#getParseRuleContext(KeyAst)}.

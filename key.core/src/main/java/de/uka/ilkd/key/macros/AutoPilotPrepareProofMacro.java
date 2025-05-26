@@ -5,18 +5,26 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.*;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES =
@@ -63,7 +71,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         return false;
     }
 
-    private static class AutoPilotStrategy implements Strategy {
+    private static class AutoPilotStrategy implements Strategy<Goal> {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
@@ -96,9 +104,11 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+                PosInOccurrence pio, Goal p_goal,
                 MutableState mState) {
 
+            final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
             Rule rule = app.rule();
             if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
                 return TopRuleAppCost.INSTANCE;
@@ -114,9 +124,9 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
             // apply OSS to <inv>() calls.
             if (rule instanceof OneStepSimplifier) {
-                Term target = pio.subTerm();
+                var target = pio.subTerm();
                 if (target.op() instanceof UpdateApplication) {
-                    Operator updatedOp = target.sub(1).op();
+                    var updatedOp = target.sub(1).op();
                     if (updatedOp instanceof ObserverFunction) {
                         return NumberRuleAppCost.getZeroCost();
                     }
@@ -127,7 +137,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+        public void instantiateApp(RuleApp app, PosInOccurrence pio,
+                Goal goal,
                 RuleAppCostCollector collector) {
             delegate.instantiateApp(app, pio, goal, collector);
         }
@@ -140,7 +151,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new AutoPilotStrategy(proof);
     }
 }

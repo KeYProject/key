@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
+import org.key_project.logic.LogicServices;
 
 public class MatchModalOperatorSVInstruction implements MatchInstruction {
 
@@ -18,7 +19,7 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
         this.op = op;
     }
 
-    public MatchConditions match(Term t, MatchConditions mc, Services services) {
+    public MatchConditions match(Term t, MatchConditions mc, LogicServices services) {
         if (t.op() instanceof Modality mod
                 && op.getModalities().contains(mod.kind())) {
             return mc.setInstantiations(
@@ -29,9 +30,9 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
+    public MatchConditions match(TermNavigator termPosition,
+            MatchConditions mc,
+            LogicServices services) {
         return match(termPosition.getCurrentSubterm(), mc, services);
     }
-
 }

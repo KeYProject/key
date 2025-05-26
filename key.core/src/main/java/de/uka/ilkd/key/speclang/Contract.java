@@ -325,11 +325,11 @@ public interface Contract extends SpecificationElement {
             this.self = selfVar;
             this.result = resVar;
             this.exception = excVar;
-            this.atPres = (Map<LocationVariable, LocationVariable>) atPreVars;
+            this.atPres = atPreVars;
             if (paramVars == null) {
                 this.params = ImmutableSLList.nil();
             } else {
-                this.params = (ImmutableList<LocationVariable>) paramVars;
+                this.params = paramVars;
             }
         }
 

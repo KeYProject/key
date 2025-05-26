@@ -10,16 +10,17 @@ import javax.swing.*;
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +138,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         }
     }
 
-    protected void emitProofMacroFinished(Node node, ProofMacro macro, PosInOccurrence posInOcc,
+    protected void emitProofMacroFinished(Node node, ProofMacro macro,
+            PosInOccurrence posInOcc,
             ProofMacroFinishedInfo info) {
         interactionListeners.forEach((l) -> l.runMacro(node, macro, posInOcc, info));
     }

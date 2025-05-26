@@ -4,10 +4,11 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
 
 import org.key_project.util.collection.ImmutableArray;
 
-public interface IForUpdates extends de.uka.ilkd.key.java.NonTerminalProgramElement {
+public interface IForUpdates extends NonTerminalProgramElement {
 
     int size();
 

@@ -13,8 +13,6 @@ import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeYParser.ProofScriptExpressionContext;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -30,6 +28,8 @@ import de.uka.ilkd.key.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
@@ -260,7 +260,8 @@ public class EngineState {
     }
 
 
-    public Term toTerm(String string, @Nullable Sort sort) throws ParserException, ScriptException {
+    public Term toTerm(String string, @Nullable Sort sort)
+            throws ParserException, ScriptException {
         final var io = getKeyIO();
         var term = io.parseExpression(string);
         if (sort == null || term.sort().equals(sort))
