@@ -47,7 +47,7 @@ public class WeakValueLinkedHashMap<K, V> {
      * @return the previous value associated with the key, or {@code null} if there was no mapping
      *         for the key
      */
-    public @Nullable V put(K key, V value) {
+    public @Nullable V put(K key, @Nullable V value) {
         removeEntriesWithGCValues();
         final var weakVal = new KeyWeakValuePair<>(key, value, queue);
         var previous = delegate.put(key, weakVal);
@@ -120,7 +120,7 @@ public class WeakValueLinkedHashMap<K, V> {
          * @param queue the reference queue to which this reference will be appended after garbage
          *        collection
          */
-        public KeyWeakValuePair(K key, V value, ReferenceQueue<V> queue) {
+        public KeyWeakValuePair(K key, @Nullable V value, ReferenceQueue<V> queue) {
             super(value, queue);
             this.key = key;
         }
