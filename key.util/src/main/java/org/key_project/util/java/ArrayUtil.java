@@ -206,7 +206,8 @@ public final class ArrayUtil {
      * @return A copy of the array without the element toRemove.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T @NonNull [] remove(@Nullable T @NonNull [] array, T toRemove) {
+    public static <T extends @Nullable Object> T @NonNull [] remove(@Nullable T @NonNull [] array,
+            T toRemove) {
         List<@Nullable T> result = new LinkedList<>();
         for (T element : array) {
             if (!Objects.equals(element, toRemove)) {
