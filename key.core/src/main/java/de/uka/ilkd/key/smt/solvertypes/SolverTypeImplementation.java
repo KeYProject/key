@@ -332,8 +332,10 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     @Override
-    public SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services) {
-        return new SMTSolverImplementation(problem, listener, services, this);
+    public SMTSolver createSolver(SMTProblem problem, SolverListener listener, Services services, SMTSettings smtSettings, long timeout) {
+        if (timeout > 0)
+            return new SMTSolverImplementation(problem, listener, services, smtSettings, this, timeout);
+        return new SMTSolverImplementation(problem, listener, services, smtSettings, this, defaultTimeout);
     }
 
     @Override

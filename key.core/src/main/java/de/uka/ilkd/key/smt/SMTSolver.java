@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
@@ -21,7 +22,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
  *
  * @author ?
  */
-public interface SMTSolver {
+public interface SMTSolver extends Runnable, Callable<SMTSolverResult> {
 
     /**
      * Possible reasons for why a solver process was interrupted/stopped.
@@ -102,9 +103,6 @@ public interface SMTSolver {
      */
     long getTimeout();
 
-    void setTimeout(long timeout);
-
-
     /**
      * Returns the current state of the solver. Possible values are<br>
      * <code>Waiting</code>: The solver process is waiting for the start signal<br>
@@ -129,16 +127,6 @@ public interface SMTSolver {
      * @return <code>true</code> if the solver process is running, else <code>false</code>.
      */
     boolean isRunning();
-
-    /**
-     * Starts a solver process. This method should be accessed only by an instance of
-     * <code>SolverLauncher</code>. If you want to start a solver please have a look at
-     * <code>SolverLauncher</code>.
-     *
-     * @param timeout
-     * @param settings
-     */
-    void start(SolverTimeout timeout, SMTSettings settings);
 
     /**
      * @return the reason of the interruption: see <code>ReasonOfInterruption</code>.
