@@ -5,6 +5,7 @@ package org.key_project.logic;
 
 import java.util.ArrayDeque;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -78,7 +79,10 @@ public class PoolSyntaxElementCursor {
     }
 
     public SyntaxElement getCurrentElement() {
-        return stack.peek().first;
+        @SuppressWarnings("nullness")
+        @NonNull
+        SyntaxElement element = stack.peek().first;
+        return element;
     }
 
     private /* @ helper @ */ void gotoNextHelper() {
@@ -87,6 +91,7 @@ public class PoolSyntaxElementCursor {
         }
         MutablePair el = stack.peek();
         do {
+            @SuppressWarnings("nullness")
             final int firstChildCount = el.first.getChildCount();
             if (el.second < firstChildCount) {
                 final int oldPos = el.second;
