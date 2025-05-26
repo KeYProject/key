@@ -42,15 +42,7 @@ public class IntegerLiteralExpression extends LiteralExpression {
                 IntegerSuffix integerSuffix2, IntegerSuffix integerSuffix3,
                 IntegerSuffix integerSuffix4, IntegerSuffix integerSuffix5,
                 IntegerSuffix integerSuffix6) {
-            return switch (size) {
-            case "8" -> integerSuffix;
-            case "16" -> integerSuffix2;
-            case "32" -> integerSuffix3;
-            case "64" -> integerSuffix4;
-            case "128" -> integerSuffix5;
-            case "size" -> integerSuffix6;
-            default -> throw new IllegalArgumentException("Unknown size: " + size);
-            };
+            return switch(size){case"8"->integerSuffix;case"16"->integerSuffix2;case"32"->integerSuffix3;case"64"->integerSuffix4;case"128"->integerSuffix5;case"size"->integerSuffix6;default->throw new IllegalArgumentException("Unknown size: "+size);};
         }
     }
 

@@ -5,7 +5,6 @@ package org.key_project.rusty.ast.pat;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.Nullable;
@@ -17,7 +16,7 @@ import org.jspecify.annotations.Nullable;
  * Grammar</a>
  */
 // spotless:off
-public record RangePattern(@Nullable Expr left, Bounds bounds, @Nullable Expr right) implements Pattern {
+public record RangePattern(@Nullable PatExpr left, Bounds bounds, @Nullable PatExpr right) implements Pattern {
     public enum Bounds
             implements RustyProgramElement {
         Inclusive("..="), Exclusive(".."), Obsolete("...");

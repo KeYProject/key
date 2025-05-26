@@ -450,25 +450,8 @@ class KeyboardTacletModel {
     }
 
     public void processChar(char c) {
-        switch (c) {
-        case '\u001B' -> // escape
-            reset();
-        case '\b' -> {
-            if (currentPrefix.length() <= 1) {
-                setCurrentPrefix("");
-            } else {
-                setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
-            }
-        }
-        default -> {
-            if ('0' <= c && c <= '9') {
-                setCurrentPos(c - '0');
-            }
-            if (charValid(c)) {
-                setCurrentPrefix(currentPrefix + c);
-            }
-        }
-        }
+        switch(c){case'\u001B'-> // escape
+        reset();case'\b'->{if(currentPrefix.length()<=1){setCurrentPrefix("");}else{setCurrentPrefix(currentPrefix.substring(0,currentPrefix.length()-1));}}default->{if('0'<=c&&c<='9'){setCurrentPos(c-'0');}if(charValid(c)){setCurrentPrefix(currentPrefix+c);}}}
     }
 
     public int getCurrentPos() {

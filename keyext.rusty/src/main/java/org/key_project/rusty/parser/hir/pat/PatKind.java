@@ -18,7 +18,9 @@ public interface PatKind {
 
     record Path(QPath path) implements PatKind {}
 
-    record Range(@Nullable Expr lhs, @Nullable Expr rhs, boolean inclusive) implements PatKind {}
+    record Range(@Nullable PatExpr lhs, @Nullable PatExpr rhs, boolean inclusive) implements PatKind {}
+
+    record Expr(PatExpr expr) implements PatKind {}
 
     class Adapter extends HirAdapter<PatKind> {
         @Override
@@ -28,6 +30,7 @@ public interface PatKind {
                 case "Binding" -> Binding.class;
                 case "Path" -> Path.class;
                 case "Range" -> Range.class;
+                case "Expr" -> Expr.class;
                 default -> null;
             };
         }

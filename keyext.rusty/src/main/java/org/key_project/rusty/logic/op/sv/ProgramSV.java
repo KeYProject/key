@@ -11,6 +11,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.Type;
+import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.ProgramConstruct;
 import org.key_project.rusty.logic.op.IProgramVariable;
@@ -205,5 +206,10 @@ public final class ProgramSV extends OperatorSV
     @Override
     public Type type(Services services) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Expr toExpr() {
+        return this;
     }
 }

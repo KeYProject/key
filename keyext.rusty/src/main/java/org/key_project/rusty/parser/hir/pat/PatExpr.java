@@ -1,9 +1,9 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.rusty.parser.hir.item;
+package org.key_project.rusty.parser.hir.pat;
 
-import org.key_project.rusty.parser.hir.OwnerId;
+import org.key_project.rusty.parser.hir.HirId;
 import org.key_project.rusty.parser.hir.Span;
 
-public record Item(OwnerId ownerId,ItemKind kind,Span span,Span visSpan){}
+public record PatExpr(HirId hirId,Span span,PatExprKind kind){}

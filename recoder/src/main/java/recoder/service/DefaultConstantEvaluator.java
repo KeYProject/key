@@ -927,46 +927,11 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
     }
 
     static String parseJavaString(String text) {
-        int len = text.length();
-        StringBuilder buf = new StringBuilder(len);
-        for (int i = 1; i < len - 1; i += 1) {
-            char c = text.charAt(i);
-            if (c != '\\') {
-                buf.append(c);
-            } else {
-                i += 1;
-                switch (text.charAt(i)) {
-                case 'b' -> buf.append('\b');
-                case 't' -> buf.append('\t');
-                case 'n' -> buf.append('\n');
-                case 'f' -> buf.append('\f');
-                case 'r' -> buf.append('\r');
-                case '\"' -> buf.append('\"');
-                case '\'' -> buf.append('\'');
-                case '\\' -> buf.append('\\');
-                case 'u' -> {
-                    // skip an arbitrary number of u's
-                    i += 1;
-                    while (text.charAt(i) == 'u') {
-                        i += 1;
-                    }
-                    // the following must be a 4-digit hex value
-                    buf.append((char) Integer.parseInt(text.substring(i, i + 4), 16));
-                    i += 4;
-                }
-                case '0', '1', '2', '3', '4', '5', '6', '7' -> {
-                    int j = i + 1;
-                    while (j < len && text.charAt(j) >= '0' && text.charAt(j) <= '7') {
-                        j += 1;
-                    }
-                    buf.append((char) Integer.parseInt(text.substring(i, j), 8));
-                    i = j;
-                }
-                default -> throw new ModelException("Bad character representation: " + text);
-                }
-            }
-        }
-        return buf.toString();
+        int len=text.length();StringBuilder buf=new StringBuilder(len);for(int i=1;i<len-1;i+=1){char c=text.charAt(i);if(c!='\\'){buf.append(c);}else{i+=1;switch(text.charAt(i)){case'b'->buf.append('\b');case't'->buf.append('\t');case'n'->buf.append('\n');case'f'->buf.append('\f');case'r'->buf.append('\r');case'\"'->buf.append('\"');case'\''->buf.append('\'');case'\\'->buf.append('\\');case'u'->{
+        // skip an arbitrary number of u's
+        i+=1;while(text.charAt(i)=='u'){i+=1;}
+        // the following must be a 4-digit hex value
+        buf.append((char)Integer.parseInt(text.substring(i,i+4),16));i+=4;}case'0','1','2','3','4','5','6','7'->{int j=i+1;while(j<len&&text.charAt(j)>='0'&&text.charAt(j)<='7'){j+=1;}buf.append((char)Integer.parseInt(text.substring(i,j),8));i=j;}default->throw new ModelException("Bad character representation: "+text);}}}return buf.toString();
     }
 
     static void doPrimitiveTypeCast(int newType, ConstantEvaluator.EvaluationResult res) {
@@ -1097,352 +1062,91 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      *         otherwise.
      */
     public boolean isCompileTimeConstant(Expression expr, ConstantEvaluator.EvaluationResult res) {
-        if (expr instanceof Literal) {
-            if (expr instanceof IntLiteral) {
-                String v = ((IntLiteral) expr).getValue();
-                res.setInt(JavaProgramFactory.parseInt(v));
-                return true;
-            } else if (expr instanceof StringLiteral) {
-                res.setString(parseJavaString(((StringLiteral) expr).getValue()));
-                return true;
-            } else if (expr instanceof BooleanLiteral) {
-                res.setBoolean(((BooleanLiteral) expr).getValue());
-                return true;
-            } else if (expr instanceof NullLiteral) {
-                // we may interpret that as a String, here.
-                res.setString(null);
-                return true;
-            } else if (expr instanceof CharLiteral) {
-                res.setChar(parseJavaString(((CharLiteral) expr).getValue()).charAt(0));
-                return true;
-            } else if (expr instanceof LongLiteral) {
-                String v = ((LongLiteral) expr).getValue();
-                res.setLong(JavaProgramFactory.parseLong(v));
-                return true;
-            } else if (expr instanceof FloatLiteral) {
-                String v = ((FloatLiteral) expr).getValue();
-                res.setFloat(Float.valueOf(v));
-                return true;
-            } else if (expr instanceof DoubleLiteral) {
-                String v = ((DoubleLiteral) expr).getValue();
-                res.setDouble(Double.valueOf(v));
-                return true;
-            }
-            throw new ModelException("Unknown literal type");
-        }
-        if (expr instanceof Operator op) {
-            if (expr instanceof Assignment) {
-                // Assignments are not considered compile-time constants (!)
-                return false;
-            }
+        if(expr instanceof Literal){if(expr instanceof IntLiteral){String v=((IntLiteral)expr).getValue();res.setInt(JavaProgramFactory.parseInt(v));return true;}else if(expr instanceof StringLiteral){res.setString(parseJavaString(((StringLiteral)expr).getValue()));return true;}else if(expr instanceof BooleanLiteral){res.setBoolean(((BooleanLiteral)expr).getValue());return true;}else if(expr instanceof NullLiteral){
+        // we may interpret that as a String, here.
+        res.setString(null);return true;}else if(expr instanceof CharLiteral){res.setChar(parseJavaString(((CharLiteral)expr).getValue()).charAt(0));return true;}else if(expr instanceof LongLiteral){String v=((LongLiteral)expr).getValue();res.setLong(JavaProgramFactory.parseLong(v));return true;}else if(expr instanceof FloatLiteral){String v=((FloatLiteral)expr).getValue();res.setFloat(Float.valueOf(v));return true;}else if(expr instanceof DoubleLiteral){String v=((DoubleLiteral)expr).getValue();res.setDouble(Double.valueOf(v));return true;}throw new ModelException("Unknown literal type");}if(expr instanceof Operator op){if(expr instanceof Assignment){
+        // Assignments are not considered compile-time constants (!)
+        return false;}
 
-            if (op instanceof TypeOperator) {
-                if (op instanceof TypeCast) {
-                    if (!isCompileTimeConstant(((TypeCast) expr).getExpressionAt(0), res)) {
-                        return false;
-                    }
-                    int newType = -1;
-                    Type to = getSourceInfo().getType(((TypeCast) expr).getTypeReference());
-                    if (to instanceof PrimitiveType) {
-                        newType = translateType((PrimitiveType) to, getNameInfo());
-                    } else if (to == getNameInfo().getJavaLangString()) {
-                        newType = STRING_TYPE;
-                        // reject casts from anything else than Strings.
-                        // note that we considered nulls as Strings.
-                        return res.getTypeCode() == STRING_TYPE;
-                    } else {
-                        // other non-primitive types are not seen as constants
-                        return false;
-                    }
-                    doPrimitiveTypeCast(newType, res);
-                    return true;
-                }
-                // Instanceof, New, NewArray are not considered constants
-                return false;
-            }
+        if(op instanceof TypeOperator){if(op instanceof TypeCast){if(!isCompileTimeConstant(((TypeCast)expr).getExpressionAt(0),res)){return false;}int newType=-1;Type to=getSourceInfo().getType(((TypeCast)expr).getTypeReference());if(to instanceof PrimitiveType){newType=translateType((PrimitiveType)to,getNameInfo());}else if(to==getNameInfo().getJavaLangString()){newType=STRING_TYPE;
+        // reject casts from anything else than Strings.
+        // note that we considered nulls as Strings.
+        return res.getTypeCode()==STRING_TYPE;}else{
+        // other non-primitive types are not seen as constants
+        return false;}doPrimitiveTypeCast(newType,res);return true;}
+        // Instanceof, New, NewArray are not considered constants
+        return false;}
 
-            if (op instanceof ParenthesizedExpression) {
-                return isCompileTimeConstant(op.getExpressionAt(0), res);
-            }
+        if(op instanceof ParenthesizedExpression){return isCompileTimeConstant(op.getExpressionAt(0),res);}
 
-            // normalize: widen numerical types shorter than int
-            // this is also necessary for unary operations (e.g. unary plus!)
-            // except parentheses
-            promoteNumericTypeToInt(res);
+        // normalize: widen numerical types shorter than int
+        // this is also necessary for unary operations (e.g. unary plus!)
+        // except parentheses
+        promoteNumericTypeToInt(res);
 
-            ConstantEvaluator.EvaluationResult lhs = null;
-            ConstantEvaluator.EvaluationResult rhs = null;
+        ConstantEvaluator.EvaluationResult lhs=null;ConstantEvaluator.EvaluationResult rhs=null;
 
-            // find out, which operator is meant
-            UnaryNumericOperation uno = null;
-            UnaryBooleanOperation ubo = null;
-            BinaryNumericOperation bno = null;
-            BinaryBooleanOperation bbo = null;
+        // find out, which operator is meant
+        UnaryNumericOperation uno=null;UnaryBooleanOperation ubo=null;BinaryNumericOperation bno=null;BinaryBooleanOperation bbo=null;
 
-            switch (op.getArity()) {
-            case 1 -> { // unary operations
+        switch(op.getArity()){case 1->{ // unary operations
 
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
-                if (op instanceof Positive) {
-                    uno = POSITIVE;
-                } else if (op instanceof Negative) {
-                    uno = NEGATIVE;
-                } else if (op instanceof BinaryNot) {
-                    uno = BINARY_NOT;
-                } else if (op instanceof LogicalNot) {
-                    ubo = LOGICAL_NOT;
-                }
-            }
-            case 2 -> { // binary operations
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
-                // widen type
-                lhs = res;
-                promoteNumericTypeToInt(lhs);
-                /*
-                 * The allocation could be optimized away if the contents of the res/lhs object
-                 * would be stored locally and res would be reused for the rhs call. However,
-                 * performance is not critical here.
-                 */
-                rhs = new EvaluationResult();
-                // evaluate right-hand side; finish if not constant
-                if (!isCompileTimeConstant(op.getExpressionAt(1), rhs)) {
-                    return false;
-                }
-                // widen numerical types shorter than int
-                promoteNumericTypeToInt(rhs);
+        if(!isCompileTimeConstant(op.getExpressionAt(0),res)){return false;}if(op instanceof Positive){uno=POSITIVE;}else if(op instanceof Negative){uno=NEGATIVE;}else if(op instanceof BinaryNot){uno=BINARY_NOT;}else if(op instanceof LogicalNot){ubo=LOGICAL_NOT;}}case 2->{ // binary
+                                                                                                                                                                                                                                                                                  // operations
+        if(!isCompileTimeConstant(op.getExpressionAt(0),res)){return false;}
+        // widen type
+        lhs=res;promoteNumericTypeToInt(lhs);
+        /*
+         * The allocation could be optimized away if the contents of the res/lhs object
+         * would be stored locally and res would be reused for the rhs call. However,
+         * performance is not critical here.
+         */
+        rhs=new EvaluationResult();
+        // evaluate right-hand side; finish if not constant
+        if(!isCompileTimeConstant(op.getExpressionAt(1),rhs)){return false;}
+        // widen numerical types shorter than int
+        promoteNumericTypeToInt(rhs);
 
-                // widen the remaining types to match both argument types
-                matchTypes(lhs, rhs);
-                if (op instanceof ComparativeOperator) {
-                    if (op instanceof Equals) {
-                        bbo = EQUALS;
-                    } else if (op instanceof NotEquals) {
-                        bbo = NOT_EQUALS;
-                    } else if (op instanceof GreaterThan) {
-                        bbo = GREATER_THAN;
-                    } else if (op instanceof LessThan) {
-                        bbo = LESS_THAN;
-                    } else if (op instanceof GreaterOrEquals) {
-                        bbo = GREATER_OR_EQUALS;
-                    } else if (op instanceof LessOrEquals) {
-                        bbo = LESS_OR_EQUALS;
-                    } else if (op instanceof LogicalAnd) {
-                        bbo = LOGICAL_AND;
-                    } else if (op instanceof LogicalOr) {
-                        bbo = LOGICAL_OR;
-                    }
-                } else if (op instanceof Plus) {
-                    bno = PLUS;
-                } else if (op instanceof Minus) {
-                    bno = MINUS;
-                } else if (op instanceof Times) {
-                    bno = TIMES;
-                } else if (op instanceof Divide) {
-                    bno = DIVIDE;
-                } else if (op instanceof Modulo) {
-                    bno = MODULO;
-                } else if (op instanceof ShiftLeft) {
-                    bno = SHIFT_LEFT;
-                } else if (op instanceof ShiftRight) {
-                    bno = SHIFT_RIGHT;
-                } else if (op instanceof UnsignedShiftRight) {
-                    bno = UNSIGNED_SHIFT_RIGHT;
-                } else if (op instanceof BinaryAnd) {
-                    bno = BINARY_AND;
-                } else if (op instanceof BinaryOr) {
-                    bno = BINARY_OR;
-                } else if (op instanceof BinaryXOr) {
-                    bno = BINARY_XOR;
-                } else if (op instanceof LogicalAnd) {
-                    bbo = LOGICAL_AND;
-                } else if (op instanceof LogicalOr) {
-                    bbo = LOGICAL_OR;
-                }
-            }
-            case 3 -> {
-                // this must be the conditional (?:)
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
-                if (res.getTypeCode() != BOOLEAN_TYPE) {
-                    throw new ModelException("No boolean expression in ?:");
-                }
-                boolean cond = res.getBoolean();
-                // evaluate both sides; finish if not constant
+        // widen the remaining types to match both argument types
+        matchTypes(lhs,rhs);if(op instanceof ComparativeOperator){if(op instanceof Equals){bbo=EQUALS;}else if(op instanceof NotEquals){bbo=NOT_EQUALS;}else if(op instanceof GreaterThan){bbo=GREATER_THAN;}else if(op instanceof LessThan){bbo=LESS_THAN;}else if(op instanceof GreaterOrEquals){bbo=GREATER_OR_EQUALS;}else if(op instanceof LessOrEquals){bbo=LESS_OR_EQUALS;}else if(op instanceof LogicalAnd){bbo=LOGICAL_AND;}else if(op instanceof LogicalOr){bbo=LOGICAL_OR;}}else if(op instanceof Plus){bno=PLUS;}else if(op instanceof Minus){bno=MINUS;}else if(op instanceof Times){bno=TIMES;}else if(op instanceof Divide){bno=DIVIDE;}else if(op instanceof Modulo){bno=MODULO;}else if(op instanceof ShiftLeft){bno=SHIFT_LEFT;}else if(op instanceof ShiftRight){bno=SHIFT_RIGHT;}else if(op instanceof UnsignedShiftRight){bno=UNSIGNED_SHIFT_RIGHT;}else if(op instanceof BinaryAnd){bno=BINARY_AND;}else if(op instanceof BinaryOr){bno=BINARY_OR;}else if(op instanceof BinaryXOr){bno=BINARY_XOR;}else if(op instanceof LogicalAnd){bbo=LOGICAL_AND;}else if(op instanceof LogicalOr){bbo=LOGICAL_OR;}}case 3->{
+        // this must be the conditional (?:)
+        if(!isCompileTimeConstant(op.getExpressionAt(0),res)){return false;}if(res.getTypeCode()!=BOOLEAN_TYPE){throw new ModelException("No boolean expression in ?:");}boolean cond=res.getBoolean();
+        // evaluate both sides; finish if not constant
 
-                lhs = res; // overwrite old values
-                if (!isCompileTimeConstant(op.getExpressionAt(1), lhs)) {
-                    return false;
-                }
-                rhs = new EvaluationResult();
-                if (!isCompileTimeConstant(op.getExpressionAt(2), rhs)) {
-                    return false;
-                }
-                matchConditionalTypes(lhs, rhs);
-                switch (lhs.getTypeCode()) { // matches type of rhs
-                case BOOLEAN_TYPE -> res.setBoolean(cond ? lhs.getBoolean() : rhs.getBoolean());
-                case BYTE_TYPE -> res.setByte(cond ? lhs.getByte() : rhs.getByte());
-                case SHORT_TYPE -> res.setShort(cond ? lhs.getShort() : rhs.getShort());
-                case CHAR_TYPE -> res.setChar(cond ? lhs.getChar() : rhs.getChar());
-                case INT_TYPE -> res.setInt(cond ? lhs.getInt() : rhs.getInt());
-                case LONG_TYPE -> res.setLong(cond ? lhs.getLong() : rhs.getLong());
-                case FLOAT_TYPE -> res.setFloat(cond ? lhs.getFloat() : rhs.getFloat());
-                case DOUBLE_TYPE -> res.setDouble(cond ? lhs.getDouble() : rhs.getDouble());
-                case STRING_TYPE -> res.setString(cond ? lhs.getString() : rhs.getString());
-                }
-                return true;
-            }
-            }
+        lhs=res; // overwrite old values
+        if(!isCompileTimeConstant(op.getExpressionAt(1),lhs)){return false;}rhs=new EvaluationResult();if(!isCompileTimeConstant(op.getExpressionAt(2),rhs)){return false;}matchConditionalTypes(lhs,rhs);switch(lhs.getTypeCode()){ // matches
+                                                                                                                                                                                                                                     // type
+                                                                                                                                                                                                                                     // of
+                                                                                                                                                                                                                                     // rhs
+        case BOOLEAN_TYPE->res.setBoolean(cond?lhs.getBoolean():rhs.getBoolean());case BYTE_TYPE->res.setByte(cond?lhs.getByte():rhs.getByte());case SHORT_TYPE->res.setShort(cond?lhs.getShort():rhs.getShort());case CHAR_TYPE->res.setChar(cond?lhs.getChar():rhs.getChar());case INT_TYPE->res.setInt(cond?lhs.getInt():rhs.getInt());case LONG_TYPE->res.setLong(cond?lhs.getLong():rhs.getLong());case FLOAT_TYPE->res.setFloat(cond?lhs.getFloat():rhs.getFloat());case DOUBLE_TYPE->res.setDouble(cond?lhs.getDouble():rhs.getDouble());case STRING_TYPE->res.setString(cond?lhs.getString():rhs.getString());}return true;}}
 
-            if (bno != null) {
-                switch (lhs.getTypeCode()) {
-                case BOOLEAN_TYPE -> lhs.setBoolean(bno.eval(lhs.getBoolean(), rhs.getBoolean()));
-                case INT_TYPE -> lhs.setInt(bno.eval(lhs.getInt(), rhs.getInt()));
-                case LONG_TYPE -> lhs.setLong(bno.eval(lhs.getLong(), rhs.getLong()));
-                case FLOAT_TYPE -> lhs.setFloat(bno.eval(lhs.getFloat(), rhs.getFloat()));
-                case DOUBLE_TYPE -> lhs.setDouble(bno.eval(lhs.getDouble(), rhs.getDouble()));
-                case STRING_TYPE -> lhs.setString(bno.eval(lhs.getString(), rhs.getString()));
-                }
-                return true;
-            }
+        if(bno!=null){switch(lhs.getTypeCode()){case BOOLEAN_TYPE->lhs.setBoolean(bno.eval(lhs.getBoolean(),rhs.getBoolean()));case INT_TYPE->lhs.setInt(bno.eval(lhs.getInt(),rhs.getInt()));case LONG_TYPE->lhs.setLong(bno.eval(lhs.getLong(),rhs.getLong()));case FLOAT_TYPE->lhs.setFloat(bno.eval(lhs.getFloat(),rhs.getFloat()));case DOUBLE_TYPE->lhs.setDouble(bno.eval(lhs.getDouble(),rhs.getDouble()));case STRING_TYPE->lhs.setString(bno.eval(lhs.getString(),rhs.getString()));}return true;}
 
-            if (bbo != null) {
-                switch (lhs.getTypeCode()) {
-                case BOOLEAN_TYPE -> lhs.setBoolean(bbo.eval(lhs.getBoolean(), rhs.getBoolean()));
-                case INT_TYPE -> lhs.setBoolean(bbo.eval(lhs.getInt(), rhs.getInt()));
-                case LONG_TYPE -> lhs.setBoolean(bbo.eval(lhs.getLong(), rhs.getLong()));
-                case FLOAT_TYPE -> lhs.setBoolean(bbo.eval(lhs.getFloat(), rhs.getFloat()));
-                case DOUBLE_TYPE -> lhs.setBoolean(bbo.eval(lhs.getDouble(), rhs.getDouble()));
-                case STRING_TYPE -> lhs.setBoolean(bbo.eval(lhs.getString(), rhs.getString()));
-                }
-                return true;
-            }
+        if(bbo!=null){switch(lhs.getTypeCode()){case BOOLEAN_TYPE->lhs.setBoolean(bbo.eval(lhs.getBoolean(),rhs.getBoolean()));case INT_TYPE->lhs.setBoolean(bbo.eval(lhs.getInt(),rhs.getInt()));case LONG_TYPE->lhs.setBoolean(bbo.eval(lhs.getLong(),rhs.getLong()));case FLOAT_TYPE->lhs.setBoolean(bbo.eval(lhs.getFloat(),rhs.getFloat()));case DOUBLE_TYPE->lhs.setBoolean(bbo.eval(lhs.getDouble(),rhs.getDouble()));case STRING_TYPE->lhs.setBoolean(bbo.eval(lhs.getString(),rhs.getString()));}return true;}
 
-            if (uno != null) {
-                switch (res.getTypeCode()) {
-                case BOOLEAN_TYPE -> res.setBoolean(uno.eval(res.getBoolean()));
-                case INT_TYPE -> res.setInt(uno.eval(res.getInt()));
-                case LONG_TYPE -> res.setLong(uno.eval(res.getLong()));
-                case FLOAT_TYPE -> res.setFloat(uno.eval(res.getFloat()));
-                case DOUBLE_TYPE -> res.setDouble(uno.eval(res.getDouble()));
-                case STRING_TYPE -> res.setString(uno.eval(res.getString()));
-                }
-                return true;
-            }
+        if(uno!=null){switch(res.getTypeCode()){case BOOLEAN_TYPE->res.setBoolean(uno.eval(res.getBoolean()));case INT_TYPE->res.setInt(uno.eval(res.getInt()));case LONG_TYPE->res.setLong(uno.eval(res.getLong()));case FLOAT_TYPE->res.setFloat(uno.eval(res.getFloat()));case DOUBLE_TYPE->res.setDouble(uno.eval(res.getDouble()));case STRING_TYPE->res.setString(uno.eval(res.getString()));}return true;}
 
-            if (ubo != null) {
-                switch (res.getTypeCode()) {
-                case BOOLEAN_TYPE -> res.setBoolean(ubo.eval(res.getBoolean()));
-                case INT_TYPE -> res.setBoolean(ubo.eval(res.getInt()));
-                case LONG_TYPE -> res.setBoolean(ubo.eval(res.getLong()));
-                case FLOAT_TYPE -> res.setBoolean(ubo.eval(res.getFloat()));
-                case DOUBLE_TYPE -> res.setBoolean(ubo.eval(res.getDouble()));
-                case STRING_TYPE -> res.setBoolean(ubo.eval(res.getString()));
-                }
-                return true;
-            }
+        if(ubo!=null){switch(res.getTypeCode()){case BOOLEAN_TYPE->res.setBoolean(ubo.eval(res.getBoolean()));case INT_TYPE->res.setBoolean(ubo.eval(res.getInt()));case LONG_TYPE->res.setBoolean(ubo.eval(res.getLong()));case FLOAT_TYPE->res.setBoolean(ubo.eval(res.getFloat()));case DOUBLE_TYPE->res.setBoolean(ubo.eval(res.getDouble()));case STRING_TYPE->res.setBoolean(ubo.eval(res.getString()));}return true;}
 
-            throw new ModelException("Unknown operator " + op.getClass().getName() + "?!");
+        throw new ModelException("Unknown operator "+op.getClass().getName()+"?!");
 
-        }
-        if (expr instanceof UncollatedReferenceQualifier) {
-            ProgramElement pe = getSourceInfo().resolveURQ((UncollatedReferenceQualifier) expr);
-            if (pe instanceof VariableReference) {
-                expr = (VariableReference) pe;
-            } else {
-                return false;
-            }
-        }
-        if (expr instanceof VariableReference) {
-            // check if it has an access path consisting of names only
-            if (expr instanceof FieldReference) {
-                ReferencePrefix pre = ((FieldReference) expr).getReferencePrefix();
-                while (pre != null) {
-                    if (pre instanceof FieldReference || pre instanceof PackageReference
-                            || pre instanceof TypeReference
-                            || pre instanceof UncollatedReferenceQualifier) {
-                        pre = ((ReferenceSuffix) pre).getReferencePrefix();
-                    } else {
-                        // ArrayReference, MethodReference, New, ...
-                        return false; // not considered constant
-                    }
-                }
-            }
-            Variable v = getSourceInfo().getVariable((VariableReference) expr);
-            // unknown vars are not our problem
-            // constants must be final (and static if they are fields)
-            if (v == null || !v.isFinal() || (v instanceof Field && !((Field) v).isStatic())) {
-                return false;
-            }
-            // get type of constant - we are not interested in all types.
-            int vtype = -1;
-            Type vt = v.getType();
-            if (vt instanceof PrimitiveType) {
-                vtype = translateType((PrimitiveType) vt, getNameInfo());
-            } else if (vt == getNameInfo().getJavaLangString()) {
-                vtype = STRING_TYPE;
-            }
-            if (vtype == -1) {
-                return false;
-            }
-            if (visitedVariableReferences.contains(expr)) {
-                return false;
-            }
-            visitedVariableReferences.push(expr);
-            try {
-                ProgramModelInfo qs = v.getProgramModelInfo();
-                if (qs instanceof SourceInfo ais) {
-                    expr = ais.getVariableSpecification(v).getInitializer();
-                    if (expr == null) {
-                        return false;
-                    }
-                    if (!isCompileTimeConstant(expr, res)) {
-                        return false;
-                    }
-                    // cast to type of constant variable
-                    doPrimitiveTypeCast(vtype, res);
-                    return true;
-                } else if (qs instanceof ByteCodeInfo bis) {
-                    String val = bis.getFieldInfo((Field) v).getConstantValue();
-                    if (val == null) {
-                        return false;
-                    }
-                    switch (vtype) {
-                    case BOOLEAN_TYPE -> res.setBoolean(Integer.parseInt(val) != 0);
-                    case BYTE_TYPE -> res.setByte((byte) Integer.parseInt(val));
-                    case SHORT_TYPE -> res.setShort((short) Integer.parseInt(val));
-                    case CHAR_TYPE -> res.setChar((char) Integer.parseInt(val));
-                    case INT_TYPE -> res.setInt(Integer.parseInt(val));
-                    case LONG_TYPE -> res.setLong(Long.parseLong(val));
-                    case FLOAT_TYPE -> {
-                        if (val.equals("NaN")) {
-                            // may occur in byte code?!
-                            res.setFloat(Float.NaN);
-                        } else {
-                            res.setFloat(Float.valueOf(val));
-                        }
-                    }
-                    case DOUBLE_TYPE -> {
-                        if (val.equals("NaN")) {
-                            // may occur in byte code?!
-                            res.setDouble(Double.NaN);
-                        } else {
-                            res.setDouble(Double.valueOf(val));
-                        }
-                    }
-                    case STRING_TYPE -> res.setString(val);
-                    }
-                    return true;
-                }
-            } finally {
-                visitedVariableReferences.pop();
-            }
-            return false;
-        }
+        }if(expr instanceof UncollatedReferenceQualifier){ProgramElement pe=getSourceInfo().resolveURQ((UncollatedReferenceQualifier)expr);if(pe instanceof VariableReference){expr=(VariableReference)pe;}else{return false;}}if(expr instanceof VariableReference){
+        // check if it has an access path consisting of names only
+        if(expr instanceof FieldReference){ReferencePrefix pre=((FieldReference)expr).getReferencePrefix();while(pre!=null){if(pre instanceof FieldReference||pre instanceof PackageReference||pre instanceof TypeReference||pre instanceof UncollatedReferenceQualifier){pre=((ReferenceSuffix)pre).getReferencePrefix();}else{
+        // ArrayReference, MethodReference, New, ...
+        return false; // not considered constant
+        }}}Variable v=getSourceInfo().getVariable((VariableReference)expr);
+        // unknown vars are not our problem
+        // constants must be final (and static if they are fields)
+        if(v==null||!v.isFinal()||(v instanceof Field&&!((Field)v).isStatic())){return false;}
+        // get type of constant - we are not interested in all types.
+        int vtype=-1;Type vt=v.getType();if(vt instanceof PrimitiveType){vtype=translateType((PrimitiveType)vt,getNameInfo());}else if(vt==getNameInfo().getJavaLangString()){vtype=STRING_TYPE;}if(vtype==-1){return false;}if(visitedVariableReferences.contains(expr)){return false;}visitedVariableReferences.push(expr);try{ProgramModelInfo qs=v.getProgramModelInfo();if(qs instanceof SourceInfo ais){expr=ais.getVariableSpecification(v).getInitializer();if(expr==null){return false;}if(!isCompileTimeConstant(expr,res)){return false;}
+        // cast to type of constant variable
+        doPrimitiveTypeCast(vtype,res);return true;}else if(qs instanceof ByteCodeInfo bis){String val=bis.getFieldInfo((Field)v).getConstantValue();if(val==null){return false;}switch(vtype){case BOOLEAN_TYPE->res.setBoolean(Integer.parseInt(val)!=0);case BYTE_TYPE->res.setByte((byte)Integer.parseInt(val));case SHORT_TYPE->res.setShort((short)Integer.parseInt(val));case CHAR_TYPE->res.setChar((char)Integer.parseInt(val));case INT_TYPE->res.setInt(Integer.parseInt(val));case LONG_TYPE->res.setLong(Long.parseLong(val));case FLOAT_TYPE->{if(val.equals("NaN")){
+        // may occur in byte code?!
+        res.setFloat(Float.NaN);}else{res.setFloat(Float.valueOf(val));}}case DOUBLE_TYPE->{if(val.equals("NaN")){
+        // may occur in byte code?!
+        res.setDouble(Double.NaN);}else{res.setDouble(Double.valueOf(val));}}case STRING_TYPE->res.setString(val);}return true;}}finally{visitedVariableReferences.pop();}return false;}
         // all other kinds of expressions are not considered constant
         return false;
     }

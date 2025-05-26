@@ -167,19 +167,7 @@ public final class XMLUtil {
      * @return The encoded text.
      */
     public static String encodeText(String text) {
-        char[] signs = text.toCharArray();
-        StringBuilder sb = new StringBuilder();
-        for (char sign : signs) {
-            switch (sign) {
-            case '"' -> sb.append("&quot;");
-            case '&' -> sb.append("&amp;");
-            case '\'' -> sb.append("&apos;");
-            case '<' -> sb.append("&lt;");
-            case '>' -> sb.append("&gt;");
-            default -> sb.append(sign);
-            }
-        }
-        return sb.toString();
+        char[]signs=text.toCharArray();StringBuilder sb=new StringBuilder();for(char sign:signs){switch(sign){case'"'->sb.append("&quot;");case'&'->sb.append("&amp;");case'\''->sb.append("&apos;");case'<'->sb.append("&lt;");case'>'->sb.append("&gt;");default->sb.append(sign);}}return sb.toString();
     }
 
     /**

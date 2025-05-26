@@ -110,13 +110,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
     private Term translateEquivalence(Term find, Term replace, int polarity,
             TermServices services) {
-        TermBuilder tb = services.getTermBuilder();
-        return switch (polarity) {
-        case 0 -> tb.equals(find, replace);
-        case 1 -> tb.imp(replace, find);
-        case -1 -> tb.imp(find, replace);
-        default -> throw new IllegalArgumentException();
-        };
+        TermBuilder tb=services.getTermBuilder();return switch(polarity){case 0->tb.equals(find,replace);case 1->tb.imp(replace,find);case-1->tb.imp(find,replace);default->throw new IllegalArgumentException();};
     }
 
     private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type,

@@ -61,44 +61,15 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static ResultAndCall getMethodCall(RustyBlock rb,
             Services services) {
-        final Expr actualResult;
-        final Call call;
+        final Expr actualResult;final Call call;
 
-        final RustyProgramElement activeExpr = RustTools.getActiveExpr(rb);
+        final RustyProgramElement activeExpr=RustTools.getActiveExpr(rb);
         // active expr must be function call, method call or assignment with
         // function/method call
-        switch (activeExpr) {
-        case CallExpression ce -> {
-            actualResult = null;
-            call = ce;
-        }
-        case MethodCallExpression me -> {
-            actualResult = null;
-            call = me;
-        }
-        case AssignmentExpression as -> {
-            final Expr lhs = as.lhs();
-            final Expr rhs = as.rhs();
-            if ((rhs instanceof Call c)
-                    && (lhs instanceof ProgramVariable)) {
-                actualResult = lhs;
-                call = c;
-            } else {
-                return null;
-            }
-        }
-        case null, default -> {
-            return null;
-        }
-        }
+        switch(activeExpr){case CallExpression ce->{actualResult=null;call=ce;}case MethodCallExpression me->{actualResult=null;call=me;}case AssignmentExpression as->{final Expr lhs=as.lhs();final Expr rhs=as.rhs();if((rhs instanceof Call c)&&(lhs instanceof ProgramVariable)){actualResult=lhs;call=c;}else{return null;}}case null,default->{return null;}}
 
         // receiver must be simple
-        if (call instanceof MethodCallExpression me
-                && !ProgramSVSort.SIMPLE_EXPRESSION.canStandFor(me.callee(), services)) {
-            return null;
-        } else {
-            return new ResultAndCall(actualResult, call);
-        }
+        if(call instanceof MethodCallExpression me&&!ProgramSVSort.SIMPLE_EXPRESSION.canStandFor(me.callee(),services)){return null;}else{return new ResultAndCall(actualResult,call);}
     }
 
     private static Instantiation instantiate(Term focusTerm, Services services) {

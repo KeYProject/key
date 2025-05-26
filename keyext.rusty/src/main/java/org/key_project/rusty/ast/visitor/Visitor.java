@@ -150,4 +150,6 @@ public interface Visitor {
     void performActionOnLoopScope(LoopScope x);
 
     void performActionOnSortRustType(SortRustType x);
+
+    void performActionOnLitPatExpr(LitPatExpr x);
 }

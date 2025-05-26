@@ -718,4 +718,12 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnSortRustType(SortRustType x) {
         layouter.print(x.getSort(services).name().toString());
     }
+
+    @Override
+    public void performActionOnLitPatExpr(LitPatExpr x) {
+        if (x.isNegated()) {
+            layouter.print("-");
+        }
+        x.getLit().visit(this);
+    }
 }

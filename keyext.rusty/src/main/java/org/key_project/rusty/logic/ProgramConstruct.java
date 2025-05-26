@@ -6,8 +6,10 @@ package org.key_project.rusty.logic;
 import org.key_project.rusty.ast.ElseBranch;
 import org.key_project.rusty.ast.expr.Expr;
 import org.key_project.rusty.ast.expr.ThenBranch;
+import org.key_project.rusty.ast.pat.PatExpr;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.stmt.Statement;
 
-public interface ProgramConstruct extends Expr, Statement, Pattern, ThenBranch, ElseBranch {
+public interface ProgramConstruct
+        extends Expr, PatExpr, Statement, Pattern, ThenBranch, ElseBranch {
 }

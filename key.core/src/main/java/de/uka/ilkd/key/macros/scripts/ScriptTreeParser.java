@@ -13,42 +13,17 @@ public class ScriptTreeParser {
 
     public static ScriptNode parse(Reader reader) throws IOException, ScriptException {
 
-        ScriptNode root = null;
-        ScriptNode last = null;
-        ArrayDeque<ScriptNode> branchStack = new ArrayDeque<>();
+        ScriptNode root=null;ScriptNode last=null;ArrayDeque<ScriptNode>branchStack=new ArrayDeque<>();
 
-        ScriptLineParser lineParser = new ScriptLineParser(reader, null);
+        ScriptLineParser lineParser=new ScriptLineParser(reader,null);
 
-        while (true) {
+        while(true){
 
-            int from = lineParser.getOffset();
-            var command = lineParser.parseCommand();
-            int to = lineParser.getOffset();
+        int from=lineParser.getOffset();var command=lineParser.parseCommand();int to=lineParser.getOffset();
 
-            if (command == null) {
-                return root;
-            }
+        if(command==null){return root;}
 
-            switch (command.args().get(ScriptLineParser.COMMAND_KEY)) {
-            case "branches" -> branchStack.push(last);
-            case "next" -> last = branchStack.peek();
-            case "end" -> {
-                last = null;
-                branchStack.pop();
-            }
-            default -> {
-                ScriptNode node = new ScriptNode(last, command.args(), from, to);
-                if (root == null) {
-                    root = node;
-                } else if (last == null) {
-                    throw new ScriptException("unexpected last");
-                } else {
-                    last.addNode(node);
-                }
-                last = node;
-            }
-            }
-        }
+        switch(command.args().get(ScriptLineParser.COMMAND_KEY)){case"branches"->branchStack.push(last);case"next"->last=branchStack.peek();case"end"->{last=null;branchStack.pop();}default->{ScriptNode node=new ScriptNode(last,command.args(),from,to);if(root==null){root=node;}else if(last==null){throw new ScriptException("unexpected last");}else{last.addNode(node);}last=node;}}}
 
     }
 

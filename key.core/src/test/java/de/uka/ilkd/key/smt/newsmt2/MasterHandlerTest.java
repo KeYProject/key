@@ -192,58 +192,23 @@ public class MasterHandlerTest {
     @ParameterizedTest
     @MethodSource("data")
     public void testZ3(TestData data) throws Exception {
-        Assumptions.assumeTrue(Z3_SOLVER != null);
-        Assumptions.assumeTrue(Z3_SOLVER.isInstalled(false),
-            "Z3 is not installed, this testcase is ignored.");
+        Assumptions.assumeTrue(Z3_SOLVER!=null);Assumptions.assumeTrue(Z3_SOLVER.isInstalled(false),"Z3 is not installed, this testcase is ignored.");
 
-        String expectation = data.props.get("expected");
-        Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");
-        expectation = expectation.toLowerCase().trim();
+        String expectation=data.props.get("expected");Assumptions.assumeTrue(expectation!=null,"No Z3 expectation.");expectation=expectation.toLowerCase().trim();
 
         // TODO Run Z3 on the SMT translation
         // FIXME This is a hack.
-        Process proc = new ProcessBuilder("z3", "-in", "-smt2", "-T:5").start();
-        OutputStream os = proc.getOutputStream();
-        os.write(data.translation.getBytes(StandardCharsets.UTF_8));
-        os.write("\n\n(check-sat)".getBytes(StandardCharsets.UTF_8));
-        os.close();
+        Process proc=new ProcessBuilder("z3","-in","-smt2","-T:5").start();OutputStream os=proc.getOutputStream();os.write(data.translation.getBytes(StandardCharsets.UTF_8));os.write("\n\n(check-sat)".getBytes(StandardCharsets.UTF_8));os.close();
 
-        String[] response = Streams.toString(proc.getInputStream()).split(System.lineSeparator());
+        String[]response=Streams.toString(proc.getInputStream()).split(System.lineSeparator());
 
-        try {
-            String lookFor = null;
-            switch (expectation) {
-            case "valid" -> lookFor = "unsat";
-            case "fail" -> lookFor = "(sat|timeout)";
-            case "irrelevant" -> {
-            }
-            default -> fail("Unexpected expectation: " + expectation);
-            }
+        try{String lookFor=null;switch(expectation){case"valid"->lookFor="unsat";case"fail"->lookFor="(sat|timeout)";case"irrelevant"->{}default->fail("Unexpected expectation: "+expectation);}
 
-            if (lookFor != null) {
-                for (String line : response) {
-                    if (line.startsWith("(error ")) {
-                        fail("An error in Z3: " + line);
-                    }
-                    if (line.matches(lookFor)) {
-                        return;
-                    }
-                }
-            }
+        if(lookFor!=null){for(String line:response){if(line.startsWith("(error ")){fail("An error in Z3: "+line);}if(line.matches(lookFor)){return;}}}
 
-            if (!STRICT_TEST) {
-                assumeFalse("extended".equals(data.props.get("state")),
-                    "This is an extended test (will be run only in strict mode)");
-            }
+        if(!STRICT_TEST){assumeFalse("extended".equals(data.props.get("state")),"This is an extended test (will be run only in strict mode)");}
 
-            if (lookFor != null) {
-                fail("Expectation not found");
-            }
-        } catch (Throwable t) {
-            LOGGER.error("Z3 input {}", data.translation);
-            LOGGER.error("Z3 response: {}", response, t);
-            throw t;
-        }
+        if(lookFor!=null){fail("Expectation not found");}}catch(Throwable t){LOGGER.error("Z3 input {}",data.translation);LOGGER.error("Z3 response: {}",response,t);throw t;}
     }
 
 }

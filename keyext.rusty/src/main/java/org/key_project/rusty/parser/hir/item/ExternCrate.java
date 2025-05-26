@@ -3,4 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir.item;
 
-public record ExternCrate(String symbol)implements ItemKind{}
+import org.key_project.rusty.parser.hir.Ident;
+
+public record ExternCrate(Ident ident,String symbol)implements ItemKind{}

@@ -180,25 +180,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch (columnIndex) {
-            case 0 -> {
-                return actionName.get(rowIndex)
-                        // remove common package prefixes
-                        .replaceAll("([a-z]\\w*\\.)*", "");
-            }
-            case 1 -> {
-                Action a = actions.get(rowIndex);
-                if (a == null) {
-                    return "";
-                }
-                Object val = a.getValue(Action.SHORT_DESCRIPTION);
-                return val != null ? val.toString() : "";
-            }
-            case 2 -> {
-                return shortcut.get(rowIndex);
-            }
-            }
-            return "";
+            switch(columnIndex){case 0->{return actionName.get(rowIndex)
+            // remove common package prefixes
+            .replaceAll("([a-z]\\w*\\.)*","");}case 1->{Action a=actions.get(rowIndex);if(a==null){return"";}Object val=a.getValue(Action.SHORT_DESCRIPTION);return val!=null?val.toString():"";}case 2->{return shortcut.get(rowIndex);}}return"";
         }
 
         @Override

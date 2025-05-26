@@ -14,6 +14,7 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.pat.LitPatExpr;
 import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.RustType;
@@ -158,6 +159,9 @@ public abstract class ProgramSVSort extends SortImpl {
                 return true;
 
             if (pe instanceof TupleExpression te && te.isUnit())
+                return true;
+
+            if (pe instanceof LitPatExpr)
                 return true;
 
             return VARIABLE.canStandFor(pe, services);

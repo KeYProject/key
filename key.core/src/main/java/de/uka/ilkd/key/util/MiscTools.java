@@ -857,61 +857,27 @@ public final class MiscTools {
      *         protocol or illegal format
      */
     public static URL parseURL(final String input) throws MalformedURLException {
-        if (input == null) {
-            throw new NullPointerException("No URL can be created from null!");
-        }
+        if(input==null){throw new NullPointerException("No URL can be created from null!");}
 
-        String scheme = "";
-        String schemeSpecPart = "";
-        Matcher m = URL_PATTERN.matcher(input);
-        if (m.matches() && m.groupCount() == 2) {
-            scheme = m.group(1);
-            schemeSpecPart = m.group(2);
-        }
-        switch (scheme) {
-        case "URL" -> {
-            // schemeSpecPart actually contains a URL again
-            return new URL(schemeSpecPart);
-        }
-        case "ARCHIVE" -> {
-            // format: "ARCHIVE:<filename>?<itemname>"
-            // extract item name and zip file
-            int qmindex = schemeSpecPart.lastIndexOf('?');
-            String zipName = schemeSpecPart.substring(0, qmindex);
-            String itemName = schemeSpecPart.substring(qmindex + 1);
-            try {
-                ZipFile zip = new ZipFile(zipName);
-                // use special method to ensure that path separators are correct
-                return getZipEntryURI(zip, itemName).toURL();
-            } catch (IOException e) {
-                MalformedURLException me =
-                    new MalformedURLException(input + " does not contain a valid URL");
-                me.initCause(e);
-                throw me;
-            }
-        }
-        case "FILE" -> {
-            // format: "FILE:<path>"
-            Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
-            return path.toUri().toURL();
-        }
-        case "" -> {
-            // only file/path without protocol
-            Path p = Paths.get(input).toAbsolutePath().normalize();
-            return p.toUri().toURL();
-        }
-        default -> {
-            // may still be Windows path starting with <drive_letter>:
-            if (scheme.length() == 1) {
-                // TODO: Theoretically, a protocol with only a single letter is allowed.
-                // This (very rare) case currently is not handled correctly.
-                Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
-                return windowsPath.toUri().toURL();
-            }
-            // otherwise call URL constructor
-            // if this also fails, there is an unknown protocol -> MalformedURLException
-            return new URL(input);
-        }
-        }
+        String scheme="";String schemeSpecPart="";Matcher m=URL_PATTERN.matcher(input);if(m.matches()&&m.groupCount()==2){scheme=m.group(1);schemeSpecPart=m.group(2);}switch(scheme){case"URL"->{
+        // schemeSpecPart actually contains a URL again
+        return new URL(schemeSpecPart);}case"ARCHIVE"->{
+        // format: "ARCHIVE:<filename>?<itemname>"
+        // extract item name and zip file
+        int qmindex=schemeSpecPart.lastIndexOf('?');String zipName=schemeSpecPart.substring(0,qmindex);String itemName=schemeSpecPart.substring(qmindex+1);try{ZipFile zip=new ZipFile(zipName);
+        // use special method to ensure that path separators are correct
+        return getZipEntryURI(zip,itemName).toURL();}catch(IOException e){MalformedURLException me=new MalformedURLException(input+" does not contain a valid URL");me.initCause(e);throw me;}}case"FILE"->{
+        // format: "FILE:<path>"
+        Path path=Paths.get(schemeSpecPart).toAbsolutePath().normalize();return path.toUri().toURL();}case""->{
+        // only file/path without protocol
+        Path p=Paths.get(input).toAbsolutePath().normalize();return p.toUri().toURL();}default->{
+        // may still be Windows path starting with <drive_letter>:
+        if(scheme.length()==1){
+        // TODO: Theoretically, a protocol with only a single letter is allowed.
+        // This (very rare) case currently is not handled correctly.
+        Path windowsPath=Paths.get(input).toAbsolutePath().normalize();return windowsPath.toUri().toURL();}
+        // otherwise call URL constructor
+        // if this also fails, there is an unknown protocol -> MalformedURLException
+        return new URL(input);}}
     }
 }

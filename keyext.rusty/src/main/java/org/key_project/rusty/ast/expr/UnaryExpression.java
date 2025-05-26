@@ -70,11 +70,7 @@ public final class UnaryExpression implements Expr {
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        return switch (n) {
-        case 0 -> op;
-        case 1 -> expr;
-        default -> throw new IndexOutOfBoundsException("UnaryExpression has only 2 children");
-        };
+        return switch(n){case 0->op;case 1->expr;default->throw new IndexOutOfBoundsException("UnaryExpression has only 2 children");};
     }
 
     @Override

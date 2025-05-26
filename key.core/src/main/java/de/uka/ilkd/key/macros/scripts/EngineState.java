@@ -147,45 +147,17 @@ public class EngineState {
     }
 
     private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
-        final Deque<Node> choices = new LinkedList<>();
+        final Deque<Node>choices=new LinkedList<>();
 
-        Goal result = null;
-        Node node = rootNode;
+        Goal result=null;Node node=rootNode;
 
-        loop: while (node != null) {
-            if (node.isClosed()) {
-                return null;
-            }
+        loop:while(node!=null){if(node.isClosed()){return null;}
 
-            int childCount = node.childrenCount();
+        int childCount=node.childrenCount();
 
-            switch (childCount) {
-            case 0 -> {
-                result = getGoal(proof.openGoals(), node);
-                if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
-                    // We found our goal
-                    break loop;
-                }
-                node = choices.pollLast();
-            }
-            case 1 -> node = node.child(0);
-            default -> {
-                Node next = null;
-                for (int i = 0; i < childCount; i++) {
-                    Node child = node.child(i);
-                    if (!child.isClosed()) {
-                        if (next == null) {
-                            next = child;
-                        } else {
-                            choices.add(child);
-                        }
-                    }
-                }
-                assert next != null;
-                node = next;
-            }
-            }
-        }
+        switch(childCount){case 0->{result=getGoal(proof.openGoals(),node);if(!checkAutomatic||Objects.requireNonNull(result).isAutomatic()){
+        // We found our goal
+        break loop;}node=choices.pollLast();}case 1->node=node.child(0);default->{Node next=null;for(int i=0;i<childCount;i++){Node child=node.child(i);if(!child.isClosed()){if(next==null){next=child;}else{choices.add(child);}}}assert next!=null;node=next;}}}
 
         return result;
     }

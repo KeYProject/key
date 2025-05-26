@@ -11,6 +11,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Label;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
+import org.key_project.rusty.ast.pat.LitPatExpr;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
@@ -281,6 +282,17 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
             @Override
             RustyProgramElement createNewElement(ExtList changeList) {
                 return new LoopScope(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnLitPatExpr(LitPatExpr x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new LitPatExpr(changeList, x.isNegated());
             }
         };
         def.doAction(x);

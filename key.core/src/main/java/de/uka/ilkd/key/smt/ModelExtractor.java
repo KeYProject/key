@@ -666,28 +666,16 @@ public class ModelExtractor {
 
 
     public void addFunction(SMTFunction f) {
-        if (f.getDomainSorts().isEmpty()) {
-            switch (f.getImageSort().getId()) {
-            case SMTObjTranslator.HEAP_SORT -> heaps.add(f);
-            case SMTObjTranslator.FIELD_SORT -> fields.add(f);
-            case SMTObjTranslator.LOCSET_SORT -> locsets.add(f);
-            case SMTObjTranslator.OBJECT_SORT -> objects.add(f);
-            case SMTObjTranslator.BINT_SORT -> ints.add(f);
-            case SMTObjTranslator.SEQ_SORT -> seqs.add(f);
-            default -> bools.add(f);
-            }
-        } else if (f.getDomainSorts().size() == 2) {
+        if(f.getDomainSorts().isEmpty()){switch(f.getImageSort().getId()){case SMTObjTranslator.HEAP_SORT->heaps.add(f);case SMTObjTranslator.FIELD_SORT->fields.add(f);case SMTObjTranslator.LOCSET_SORT->locsets.add(f);case SMTObjTranslator.OBJECT_SORT->objects.add(f);case SMTObjTranslator.BINT_SORT->ints.add(f);case SMTObjTranslator.SEQ_SORT->seqs.add(f);default->bools.add(f);}}else if(f.getDomainSorts().size()==2){
 
-            SMTSort s1 = f.getDomainSorts().get(0);
-            SMTSort s2 = f.getDomainSorts().get(1);
+        SMTSort s1=f.getDomainSorts().get(0);SMTSort s2=f.getDomainSorts().get(1);
 
-            if (s1.getId().equals(SMTObjTranslator.HEAP_SORT)
-                    && s2.getId().equals(SMTObjTranslator.OBJECT_SORT)) {
+        if(s1.getId().equals(SMTObjTranslator.HEAP_SORT)&&s2.getId().equals(SMTObjTranslator.OBJECT_SORT)){
 
-                objFunctions.put(f.getId(), f.getImageSort());
+        objFunctions.put(f.getId(),f.getImageSort());
 
 
-            }
+        }
 
 
         }

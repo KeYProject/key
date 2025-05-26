@@ -91,10 +91,7 @@ public class FeatureSettings extends AbstractSettings {
      * @return true, if {@code value} feels like a feature activation.
      */
     private boolean isTrue(Object value) {
-        return switch (value.toString().toLowerCase()) {
-        case "true", "yes", "on" -> true;
-        default -> false;
-        };
+        return switch(value.toString().toLowerCase()){case"true","yes","on"->true;default->false;};
     }
 
     @Override

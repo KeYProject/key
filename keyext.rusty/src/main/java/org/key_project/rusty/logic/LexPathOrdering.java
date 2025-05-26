@@ -322,26 +322,13 @@ public class LexPathOrdering implements TermOrdering {
 
 
         protected Integer getWeight(Operator p_op) {
-            final String opStr = p_op.name().toString();
+            final String opStr=p_op.name().toString();
 
-            if (intFunctionNames.contains(opStr) || theoryFunctionNames.contains(opStr)) {
-                return 0;
-            }
+            if(intFunctionNames.contains(opStr)||theoryFunctionNames.contains(opStr)){return 0;}
 
-            if (opStr.equals("neg")) {
-                return 1;
-            }
+            if(opStr.equals("neg")){return 1;}
 
-            if (p_op instanceof RFunction && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
-                return 3;
-            }
-            return switch (opStr) {
-            case "add", "intersect", "seqSingleton" -> 6;
-            case "mul", "union", "seqConcat" -> 7;
-            case "div", "infiniteUnion" -> 8;
-            case "jdiv", "setMinus" -> 9;
-            default -> null;
-            };
+            if(p_op instanceof RFunction&&(opStr.equals("TRUE")||opStr.equals("FALSE"))){return 3;}return switch(opStr){case"add","intersect","seqSingleton"->6;case"mul","union","seqConcat"->7;case"div","infiniteUnion"->8;case"jdiv","setMinus"->9;default->null;};
         }
     }
 

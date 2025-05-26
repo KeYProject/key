@@ -11,6 +11,7 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.abstraction.Type;
+import org.key_project.rusty.ast.pat.LitPatExpr;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.util.ExtList;
@@ -30,8 +31,19 @@ public final class BinaryExpression implements Expr {
 
     public BinaryExpression(ExtList children) {
         op = children.removeFirstOccurrence(Operator.class);
-        left = children.removeFirstOccurrence(Expr.class);
-        right = children.removeFirstOccurrence(Expr.class);
+        if (children.getFirst() instanceof LitPatExpr lpe) {
+            left = lpe.toExpr();
+            children.removeFirst();
+        } else {
+            left = children.removeFirstOccurrence(Expr.class);
+        }
+        if (children.getFirst() instanceof LitPatExpr lpe) {
+            right = lpe.toExpr();
+            children.removeFirst();
+        } else {
+            right = children.removeFirstOccurrence(Expr.class);
+        }
+        assert left != null && right != null;
     }
 
     @Override
@@ -41,12 +53,7 @@ public final class BinaryExpression implements Expr {
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        return switch (n) {
-        case 0 -> left;
-        case 1 -> op;
-        case 2 -> right;
-        default -> throw new IndexOutOfBoundsException("BinaryExpression has only 3 children");
-        };
+        return switch(n){case 0->left;case 1->op;case 2->right;default->throw new IndexOutOfBoundsException("BinaryExpression has only 3 children");};
     }
 
     @Override

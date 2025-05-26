@@ -388,4 +388,9 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     public void performActionOnSortRustType(SortRustType x) {
         doDefaultAction(x);
     }
+
+    @Override
+    public void performActionOnLitPatExpr(LitPatExpr x) {
+        doDefaultAction(x);
+    }
 }
