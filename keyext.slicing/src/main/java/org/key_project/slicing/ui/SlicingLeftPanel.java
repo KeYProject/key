@@ -588,8 +588,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         } else {
             dotExport.setEnabled(true);
             dotExport.setToolTipText(null);
-            showGraphRendering.setEnabled(true);
-            showGraphRendering.setToolTipText(null);
+            if (GraphvizDotExecutor.isDotInstalled()) {
+                showGraphRendering.setEnabled(true);
+                showGraphRendering.setToolTipText(null);
+            }
             boolean algoSelectionSane = doDependencyAnalysis.isSelected()
                     || doDeduplicateRuleApps.isSelected();
             runAnalysis.setEnabled(algoSelectionSane);

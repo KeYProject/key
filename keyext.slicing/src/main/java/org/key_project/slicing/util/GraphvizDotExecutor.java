@@ -74,6 +74,9 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     }
 
     private static boolean checkDotExecutable(String executableName) {
+        if (executableName.isBlank()) {
+            return false;
+        }
         try {
             Process process = new ProcessBuilder(executableName, "-V").start();
             if (process.waitFor() == 0) {
