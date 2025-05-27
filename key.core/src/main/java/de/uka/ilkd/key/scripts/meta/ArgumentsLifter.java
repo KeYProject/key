@@ -20,9 +20,9 @@ public final class ArgumentsLifter {
     private ArgumentsLifter() {
     }
 
-    public static <T> List<ProofScriptArgument<T>> inferScriptArguments(Class<?> clazz,
-            ProofScriptCommand<T> command) {
-        List<ProofScriptArgument<T>> args = new ArrayList<>();
+    public static <T> List<ProofScriptArgument> inferScriptArguments(Class<?> clazz,
+            ProofScriptCommand command) {
+        List<ProofScriptArgument> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isFinal(field.getModifiers())) {
                 throw new UnsupportedOperationException(
@@ -48,8 +48,8 @@ public final class ArgumentsLifter {
         return args;
     }
 
-    private static <T> ProofScriptArgument<T> lift(Varargs vargs, Field field) {
-        ProofScriptArgument<T> arg = new ProofScriptArgument<>();
+    private static <T> ProofScriptArgument lift(Varargs vargs, Field field) {
+        ProofScriptArgument arg = new ProofScriptArgument();
         arg.setName(vargs.prefix());
         arg.setRequired(false);
         arg.setField(field);
@@ -58,8 +58,8 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static <T> ProofScriptArgument<T> lift(Option option, Field field) {
-        ProofScriptArgument<T> arg = new ProofScriptArgument<>();
+    private static <T> ProofScriptArgument lift(Option option, Field field) {
+        ProofScriptArgument arg = new ProofScriptArgument();
         arg.setName(option.value());
         arg.setRequired(option.required());
         arg.setField(field);
@@ -67,7 +67,37 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static <T> ProofScriptArgument<T> lift(Flag flag, Field field) {
+    private static <T> ProofScriptArgument lift(Flag flag, Field field) {
         throw new IllegalStateException("not implemented");
     }
+
+    public static String extractDocumentation(Class<?> parameterClazz) {
+        assert parameterClazz != null;
+
+        Documentation docAn = parameterClazz.getAnnotation(Documentation.class);
+        if (docAn == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(docAn.value());
+
+        for (Field field : parameterClazz.getDeclaredFields()) {
+            Option optionAn = field.getAnnotation(Option.class);
+            if (optionAn != null && !optionAn.help().isBlank()) {
+                sb.append("\n\n");
+                sb.append("* Option %s (%s): %s".formatted(field.getName(),
+                    field.getType().getName(), optionAn.help()));
+            }
+
+            Flag flagAn = field.getAnnotation(Flag.class);
+            if (flagAn != null && !flagAn.help().isBlank()) {
+                sb.append("\n\n");
+                sb.append("* Flag %s: %s".formatted(field.getName(), flagAn.help()));
+            }
+        }
+
+        return sb.toString();
+    }
+
 }
