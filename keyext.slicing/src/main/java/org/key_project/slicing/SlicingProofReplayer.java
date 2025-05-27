@@ -134,7 +134,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * Slice the previously provided proof and save the result in a new temporary file.
      *
      * @return path to temporary proof file
-     * @throws de.uka.ilkd.key.proof.io.IntermediateProofReplayer.BuiltInConstructionException on
+     * @throws IntermediateProofReplayer.BuiltInConstructionException on
      *         error during slice construction
      * @throws IOException on error during proof saving
      */

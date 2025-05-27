@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The default controller for the {@link ReferenceSearchDialog}.
  * When the copy button is clicked,
- * {@link de.uka.ilkd.key.proof.reference.CopyReferenceResolver#copyCachedGoals(Proof, Proof, Consumer, Runnable)}
+ * {@link CopyReferenceResolver#copyCachedGoals(Proof, Proof, Consumer, Runnable)}
  * is started.
  *
  * @author Arne Keller

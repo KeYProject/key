@@ -63,7 +63,7 @@ public class InfoTreeModel extends DefaultTreeModel {
 
             List<String> sortedKeys =
                 new ArrayList<>(functionExplanations.stringPropertyNames());
-            java.util.Collections.sort(sortedKeys);
+            Collections.sort(sortedKeys);
 
             for (String key : sortedKeys) {
                 String[] parts = key.split("/", 2);

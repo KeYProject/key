@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.ParserException;
@@ -39,7 +40,7 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
         try {
             engine.eval(PREAMBLE);
             engine.eval(args.script);
-        } catch (javax.script.ScriptException e) {
+        } catch (ScriptException e) {
             throw new ScriptException(e);
         }
     }

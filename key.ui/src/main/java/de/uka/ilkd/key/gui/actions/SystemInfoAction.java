@@ -4,8 +4,11 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -38,8 +41,8 @@ public class SystemInfoAction extends MainWindowAction {
         if (i > 0) {
             params = params.substring(i + 4);
         }
-        java.lang.management.RuntimeMXBean rmb =
-            java.lang.management.ManagementFactory.getRuntimeMXBean();
+        RuntimeMXBean rmb =
+            ManagementFactory.getRuntimeMXBean();
         final String keyInfoText = "Version: " + KeYConstants.VERSION + "\nKeY parameters: "
             + params + "\nVM parameters: " + formatList(rmb.getInputArguments());
         JTextArea keyInfo = new JTextArea(keyInfoText, 3, TEXT_COLS);
@@ -71,7 +74,7 @@ public class SystemInfoAction extends MainWindowAction {
     @SuppressWarnings("finally")
     private String getProperties() {
         StringBuffer sb = new StringBuffer();
-        java.util.Properties props;
+        Properties props;
         try {
             props = System.getProperties();
             formatMap(sb, props);

@@ -17,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import de.uka.ilkd.key.control.InstantiationFileHandler;
@@ -455,7 +456,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
 
         /** Provide sane single-click editing in table */
-        public javax.swing.table.TableCellEditor getCellEditor(int row, int col) {
+        public TableCellEditor getCellEditor(int row, int col) {
             return iEditor;
         }
 

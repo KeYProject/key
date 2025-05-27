@@ -12,6 +12,7 @@ import de.uka.ilkd.key.parser.Location;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -32,7 +33,7 @@ public class PositionedString {
         this.location = Objects.requireNonNull(location);
     }
 
-    public PositionedString(String text, org.antlr.v4.runtime.Token t) {
+    public PositionedString(String text, Token t) {
         this(text, Location.fromToken(t));
     }
 

@@ -8,7 +8,7 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
 /**
  * A NotificationEvent is triggered if the system wants to notify the user about a certain
  * situation. Each kind of event is assigned a unique id which are declared in
- * {@link de.uka.ilkd.key.gui.notification.NotificationEventID}.
+ * {@link NotificationEventID}.
  *
  * @author bubel
  */

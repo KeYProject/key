@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import javax.swing.Box;
 import javax.swing.JPanel;
 
 /**
@@ -29,7 +30,7 @@ class SequentViewPanel extends JPanel {
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
-        add(javax.swing.Box.createGlue(), gbc);
+        add(Box.createGlue(), gbc);
 
         gbc.insets = new Insets(0, 0, 0, 0);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -49,7 +50,7 @@ class SequentViewPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weighty = 1.0;
-        add(javax.swing.Box.createGlue(), gbc);
+        add(Box.createGlue(), gbc);
 
         setBorder(new SequentHideWarningBorder(sequentView.getTitle(), sequentView));
         // setBorder(new TitledBorder("xxx"));

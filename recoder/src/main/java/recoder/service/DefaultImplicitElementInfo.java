@@ -17,10 +17,10 @@ import recoder.util.Debug;
 
 /**
  * Handles requests for implicitely defined program model elements. In particular these are
- * {@link recoder.abstraction.NullType},
- * {@link recoder.abstraction.Package},{@link recoder.abstraction.ArrayType},
- * {@link recoder.abstraction.DefaultConstructor}, {@link recoder.abstraction.ImplicitEnumValueOf},
- * {@link recoder.abstraction.ImplicitEnumValues}, and {@link recoder.abstraction.IntersectionType}.
+ * {@link NullType},
+ * {@link Package},{@link ArrayType},
+ * {@link DefaultConstructor}, {@link ImplicitEnumValueOf},
+ * {@link ImplicitEnumValues}, and {@link IntersectionType}.
  */
 public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
         implements ImplicitElementInfo {

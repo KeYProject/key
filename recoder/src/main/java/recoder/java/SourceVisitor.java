@@ -14,7 +14,7 @@ import recoder.java.statement.*;
 
 /**
  * A source visitor defines actions to be triggered while visiting source elements. The
- * {@link recoder.java.PrettyPrinter}is an instance of this visitor.
+ * {@link PrettyPrinter}is an instance of this visitor.
  */
 public abstract class SourceVisitor {
 

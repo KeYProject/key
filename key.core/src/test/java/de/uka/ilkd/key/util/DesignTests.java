@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -16,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.rule.Rule;
 
 import org.key_project.util.java.IOUtil;
 
@@ -143,7 +145,7 @@ public class DesignTests {
     public void testGuiSep() {
         LinkedList<Class<?>> badClasses = new LinkedList<>();
         for (Class<?> allClass : allClasses) {
-            if (de.uka.ilkd.key.rule.Rule.class.isAssignableFrom(allClass)
+            if (Rule.class.isAssignableFrom(allClass)
                     || allClass.getPackage().getName().contains("key.rule")
                     || allClass.getPackage().getName().contains("key.logic")
                     || allClass.getPackage().getName().contains("key.proof")
@@ -161,7 +163,7 @@ public class DesignTests {
                 }
 
                 for (Field f : allClass.getDeclaredFields()) {
-                    if (java.awt.Component.class.isAssignableFrom(f.getType())) {
+                    if (Component.class.isAssignableFrom(f.getType())) {
                         // || pkgname.contains("key.gui")) { as long as the mediator and settings
                         // are in the GUI
                         LOGGER.error("Illegal GUI reference at field {} declared in class {}",
@@ -171,13 +173,13 @@ public class DesignTests {
                 }
 
                 for (Method m : allClass.getDeclaredMethods()) {
-                    if (java.awt.Component.class.isAssignableFrom(m.getReturnType())) {
+                    if (Component.class.isAssignableFrom(m.getReturnType())) {
                         LOGGER.error(
                             "Illegal GUI reference as return type of {} declared in class {}",
                             m.getName(), allClass.getName());
                     }
                     for (Class<?> t : m.getParameterTypes()) {
-                        if (java.awt.Component.class.isAssignableFrom(t)) {
+                        if (Component.class.isAssignableFrom(t)) {
                             LOGGER.error(
                                 "Illegal GUI reference as parameter type of {} declared in class {}",
                                 m.getName(), allClass.getName());

@@ -73,7 +73,7 @@ public abstract class Taclet implements Rule {
      * all variables that may appear free in the instantiation of the schemavariable (a bit more
      * complicated for rewrite taclets, see paper of M:Giese)
      */
-    protected final ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
+    protected final ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap;
 
     /** cache; contains set of all bound variables */
     protected ImmutableSet<QuantifiableVariable> boundVariables = null;

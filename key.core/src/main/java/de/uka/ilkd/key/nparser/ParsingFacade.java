@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,8 +231,8 @@ public final class ParsingFacade {
         return p.id_declaration();
     }
 
-    public static @org.jspecify.annotations.Nullable String getValueDocumentation(
-            @org.jspecify.annotations.Nullable TerminalNode docComment) {
+    public static @Nullable String getValueDocumentation(
+            @Nullable TerminalNode docComment) {
         if (docComment == null) {
             return null;
         }

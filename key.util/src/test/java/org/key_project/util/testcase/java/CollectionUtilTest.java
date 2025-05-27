@@ -47,7 +47,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests {@link CollectionUtil#binaryInsert(List, Object, java.util.Comparator)}.
+     * Tests {@link CollectionUtil#binaryInsert(List, Object, Comparator)}.
      */
     @Test
     public void testBinaryInsert() {
@@ -89,7 +89,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests {@link CollectionUtil#indexOf(java.util.Iterator, Object)}
+     * Tests {@link CollectionUtil#indexOf(Iterator, Object)}
      */
     @Test
     public void testIndexOf_Iterator() {
@@ -106,7 +106,7 @@ public class CollectionUtilTest {
 
     /**
      * Tests for
-     * {@link CollectionUtil#searchAndRemoveWithException(Iterable, org.key_project.util.java.IFilterWithException)}.
+     * {@link CollectionUtil#searchAndRemoveWithException(Iterable, IFilterWithException)}.
      */
     @Test
     public void testSearchAndRemoveWithException() throws Throwable {
@@ -379,7 +379,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Test for {@link CollectionUtil#removeComplete(java.util.Collection, Object)}
+     * Test for {@link CollectionUtil#removeComplete(Collection, Object)}
      */
     @Test
     public void testRemoveComplete() {
@@ -469,7 +469,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Test for {@link CollectionUtil#toString(java.util.Collection, String)}
+     * Test for {@link CollectionUtil#toString(Collection, String)}
      */
     @Test
     public void testToString_Collection_String() {
@@ -486,7 +486,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Test for {@link CollectionUtil#toString(java.util.Collection)}
+     * Test for {@link CollectionUtil#toString(Collection)}
      */
     @Test
     public void testToString_Collection() {

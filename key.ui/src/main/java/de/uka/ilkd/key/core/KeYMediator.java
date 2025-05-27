@@ -723,7 +723,7 @@ public class KeYMediator {
      * macro menu in the GUI. Remove this method as soon as another solution can be found.
      */
     @Deprecated
-    public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
+    public void enableWhenProofLoaded(final AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
 

@@ -35,10 +35,10 @@ public class StatementKit {
 
     /**
      * Transformation returning a mutable statement list that contains the given statement, and
-     * creating a new {@link recoder.java.StatementBlock}if necessary. It is necessary to create a
+     * creating a new {@link StatementBlock}if necessary. It is necessary to create a
      * new block, if {@link #getStatementMutableList}returns <CODE>null</CODE>. This is the case if
      * the statement container allows only a single statement and the given statement is not inside
-     * a {@link recoder.java.StatementBlock}. If the statement has no parent, it is wrapped into a
+     * a {@link StatementBlock}. If the statement has no parent, it is wrapped into a
      * new statement list which then is returned.
      *
      * @param s a statement; may not be <CODE>null</CODE>.
@@ -70,10 +70,10 @@ public class StatementKit {
      * a list.
      * <UL>
      * <LI>If the statement container already features a statement mutable list, this list is
-     * returned (e.g. {@link recoder.java.statement.Case}).</LI>
-     * <LI>If the statement container is a {@link recoder.java.StatementBlock}, its list is returned
+     * returned (e.g. {@link Case}).</LI>
+     * <LI>If the statement container is a {@link StatementBlock}, its list is returned
      * (except it is empty).</LI>
-     * <LI>If the statement is the body of a {@link recoder.java.statement.LabeledStatement}, the
+     * <LI>If the statement is the body of a {@link LabeledStatement}, the
      * list for that labeled statement is returned instead.</LI>
      * </UL>
      *
@@ -137,7 +137,7 @@ public class StatementKit {
      * are propagated. The new block is created even if the statement container already is a block.
      * The new block is replacing the old statement with valid parent link. This transformation is
      * safe if the statement is not an instance of
-     * {@link recoder.java.declaration.LocalVariableDeclaration}containing a variable that is
+     * {@link LocalVariableDeclaration}containing a variable that is
      * actually referred.
      *
      * @param s a statement to be wrapped by a new statement block.
@@ -165,7 +165,7 @@ public class StatementKit {
     /**
      * Query deciding if the given single statement can be wrapped inside a block without changing
      * program semantics. This is the case if the statement is not an instance of
-     * {@link recoder.java.declaration.LocalVariableDeclaration}containing a variable that is
+     * {@link LocalVariableDeclaration}containing a variable that is
      * actually referred from outside.
      *
      * @param xr the cross referencer service used.
@@ -422,7 +422,7 @@ public class StatementKit {
          * @return the list of successors of the current statement, or <CODE>
          * null</CODE> if the current statement is <CODE>null</CODE>.
          * @see #getStatement
-         * @see recoder.service.SourceInfo#getSucceedingStatements
+         * @see SourceInfo#getSucceedingStatements
          */
         public List<Statement> getSucceedingStatements() {
             return successors;

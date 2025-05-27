@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+import java.io.ObjectStreamException;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -535,7 +536,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
          * the NIL list is a singleton. Deserialization builds a new NIL object that has to be
          * replaced by the singleton.
          */
-        private Object readResolve() throws java.io.ObjectStreamException {
+        private Object readResolve() throws ObjectStreamException {
             return nil();
         }
 

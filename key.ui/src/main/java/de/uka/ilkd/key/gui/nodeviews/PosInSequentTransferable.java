@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * <li>{@link PosInSequentTransferable#POS_IN_SEQUENT_TRANSFER} flavor which is of mime type
  * {@link DataFlavor#javaJVMLocalObjectMimeType}</li>
  * <li>{@link DataFlavor#stringFlavor} which returns the term described by the
- * {@link de.uka.ilkd.key.pp.PosInSequent} as a parsable string</li>
+ * {@link PosInSequent} as a parsable string</li>
  * </ul>
  */
 public class PosInSequentTransferable implements Transferable {
@@ -63,7 +63,7 @@ public class PosInSequentTransferable implements Transferable {
      * returns the supported flavors of this transferable. These are currently
      * {@link DataFlavor#stringFlavor} and {@link PosInSequentTransferable#POS_IN_SEQUENT_TRANSFER}
      *
-     * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
+     * @see Transferable#getTransferDataFlavors()
      */
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] { POS_IN_SEQUENT_TRANSFER, DataFlavor.stringFlavor };

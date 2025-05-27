@@ -356,7 +356,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     }
 
     /**
-     * Set statement container. Must be a {@link recoder.java.StatementBlock}.
+     * Set statement container. Must be a {@link StatementBlock}.
      *
      * @param p a statement container.
      */

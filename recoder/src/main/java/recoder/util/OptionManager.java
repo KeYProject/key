@@ -7,6 +7,7 @@ package recoder.util;
 import java.io.PrintStream;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -48,7 +49,7 @@ public class OptionManager {
     /**
      * maps strings to their according option objects
      */
-    final java.util.Map str2opt = new HashMap();
+    final Map str2opt = new HashMap();
 
     /**
      * the mandatory options

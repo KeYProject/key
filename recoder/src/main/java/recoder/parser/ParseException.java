@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.parser;
 
+import recoder.ParserException;
+
 /**
  * This exception is thrown when parse errors are encountered. You can explicitly create objects of
  * this exception type by calling the method generateParseException in the generated parser.
@@ -11,7 +13,7 @@ package recoder.parser;
  * You can modify this class to customize your error reporting mechanisms so long as you retain the
  * public fields.
  */
-public class ParseException extends recoder.ParserException {
+public class ParseException extends ParserException {
 
     /**
      * This is the last token that has been consumed successfully. If this object has been created

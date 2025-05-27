@@ -1235,12 +1235,12 @@ public abstract class Transformation {
      * invisible transformations, as only visible transformations report their changes to the change
      * history.
      * <p>
-     * If this object is a {@link recoder.kit.TwoPassTransformation}, a redo should be possible via
-     * a second call to {@link recoder.kit.TwoPassTransformation#transform()}.
+     * If this object is a {@link TwoPassTransformation}, a redo should be possible via
+     * a second call to {@link TwoPassTransformation#transform()}.
      *
      * @throws NoSuchTransformationException if the given transformation is not known, for instance
      *         if it has already been removed.
-     * @see recoder.service.ChangeHistory#rollback(Transformation)
+     * @see ChangeHistory#rollback(Transformation)
      */
     public void rollback() throws NoSuchTransformationException {
         if (isVisible()) {

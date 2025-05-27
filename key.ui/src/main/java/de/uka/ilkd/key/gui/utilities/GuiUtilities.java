@@ -8,6 +8,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
@@ -31,15 +32,15 @@ public final class GuiUtilities {
         if (pane instanceof JScrollPane) {
             ((JScrollPane) pane).getViewport().setBackground(Color.white);
         }
-        pane.setMinimumSize(new java.awt.Dimension(150, 0));
+        pane.setMinimumSize(new Dimension(150, 0));
     }
 
     public static void copyHighlightToClipboard(SequentView view, PosInSequent pos) {
         // Replace nbsp; from html with normal spaces
         String s = view.getHighlightedText(pos).replace('\u00A0', ' ');
         // now CLIPBOARD
-        java.awt.datatransfer.StringSelection ss = new java.awt.datatransfer.StringSelection(s);
-        java.awt.Toolkit toolkit = Toolkit.getDefaultToolkit();
+        StringSelection ss = new StringSelection(s);
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(ss, ss);
     }
 

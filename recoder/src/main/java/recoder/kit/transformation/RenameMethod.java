@@ -61,10 +61,10 @@ public class RenameMethod extends TwoPassTransformation {
     /**
      * Collects all related methods and all references.
      *
-     * @return the problem report: {@link recoder.kit.Identity}(the name has not changed),
-     *         {@link recoder.kit.Equivalence}, or {@link MissingMethodDeclarations}(some of related
+     * @return the problem report: {@link Identity}(the name has not changed),
+     *         {@link Equivalence}, or {@link MissingMethodDeclarations}(some of related
      *         methods are not available as source code), or {@link IllegalName}.
-     * @see recoder.kit.MethodKit#getAllRelatedMethods(CrossReferenceSourceInfo, Method)
+     * @see MethodKit#getAllRelatedMethods(CrossReferenceSourceInfo, Method)
      */
     public ProblemReport analyze() {
         if (newName.equals(methodToRename.getName())) {

@@ -205,7 +205,7 @@ public abstract class Naming {
 
     /**
      * Creates the dotted path name for a reference prefix. Returns an empty string if the prefix is
-     * not a {@link recoder.java.reference.NameReference}. Appends array brackets if the prefix is a
+     * not a {@link NameReference}. Appends array brackets if the prefix is a
      * type reference with a dimension > 0.
      *
      * @param ref a reference prefix.
@@ -250,7 +250,7 @@ public abstract class Naming {
 
     /**
      * Creates the dotted path name for a reference prefix and appends a suffix string. Returns the
-     * suffix if the prefix is not a {@link recoder.java.reference.NameReference}. Ignores the
+     * suffix if the prefix is not a {@link NameReference}. Ignores the
      * suffix if it is <CODE>null</CODE> or empty. Assumes that the prefix is not a type reference
      * with a dimension > 0.
      *

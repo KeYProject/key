@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -418,7 +419,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         } else {
             PosInTerm completePos = termPio.posInTerm();
 
-            org.key_project.logic.IntIterator it = pio.posInTerm().iterator();
+            IntIterator it = pio.posInTerm().iterator();
             while (it.hasNext()) {
                 completePos = completePos.down(it.next());
             }

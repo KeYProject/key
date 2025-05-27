@@ -5,10 +5,13 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.java.abstraction.Package;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.statement.Case;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -26,12 +29,12 @@ public class TestKeYRecoderMapping {
     public void setUp() {
         HashMap<Object, Object> map = new HashMap<>();
         HashMap<Object, Object> revmap = new HashMap<>();
-        rp = new recoder.java.declaration.ClassDeclaration();
+        rp = new ClassDeclaration();
         kp = new EmptyStatement();
-        rm = new recoder.java.statement.Case();
-        km = new de.uka.ilkd.key.java.abstraction.Package("Packet");
-        rp2 = new recoder.java.declaration.ClassDeclaration();
-        rm2 = new recoder.java.statement.Case();
+        rm = new Case();
+        km = new Package("Packet");
+        rp2 = new ClassDeclaration();
+        rm2 = new Case();
         map.put(rp, kp);
         revmap.put(kp, rp);
         map.put(rm, km);

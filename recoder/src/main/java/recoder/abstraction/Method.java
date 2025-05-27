@@ -38,7 +38,7 @@ public interface Method extends Member, ClassTypeContainer {
      *
      * @return <CODE>true</CODE> if this member is abstract, <CODE>false
      * </CODE> otherwise.
-     * @see recoder.abstraction.Constructor
+     * @see Constructor
      */
     boolean isAbstract();
 
@@ -48,7 +48,7 @@ public interface Method extends Member, ClassTypeContainer {
      *
      * @return <CODE>true</CODE> if this method is native, <CODE>false
      * </CODE> otherwise.
-     * @see recoder.abstraction.Constructor
+     * @see Constructor
      */
     boolean isNative();
 
@@ -58,7 +58,7 @@ public interface Method extends Member, ClassTypeContainer {
      *
      * @return <CODE>true</CODE> if this method is synchronized, <CODE>false
      * </CODE> otherwise.
-     * @see recoder.abstraction.Constructor
+     * @see Constructor
      */
     boolean isSynchronized();
 

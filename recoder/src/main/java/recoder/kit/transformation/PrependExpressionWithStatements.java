@@ -105,8 +105,8 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
     /**
      * @throws IllegalStateException if the analysis has not been called.
      * @see #analyze()
-     * @see recoder.kit.transformation.ShiftPreceedingStatementExpressions
-     * @see recoder.kit.transformation.PrepareStatementList
+     * @see ShiftPreceedingStatementExpressions
+     * @see PrepareStatementList
      */
     public void transform() {
         super.transform();

@@ -4,6 +4,8 @@
 package org.key_project.util.collection;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -67,7 +69,7 @@ public class Pair<T1, T2> {
      * @throws IllegalArgumentException if it contains duplicate first entries
      */
     public static <S, T> Map<S, T> toMap(Collection<Pair<S, T>> pairs) {
-        Map<S, T> res = new java.util.LinkedHashMap<>();
+        Map<S, T> res = new LinkedHashMap<>();
         for (Pair<S, T> p : pairs) {
             if (res.containsKey(p.first)) {
                 throw new IllegalArgumentException(
@@ -82,7 +84,7 @@ public class Pair<T1, T2> {
      * Returns the set of first entries from a collection of pairs.
      */
     public static <S, T> Set<S> getFirstSet(Collection<Pair<S, T>> pairs) {
-        Set<S> res = new java.util.HashSet<>();
+        Set<S> res = new HashSet<>();
         for (Pair<S, T> p : pairs) {
             res.add(p.first);
         }
@@ -93,7 +95,7 @@ public class Pair<T1, T2> {
      * Returns the set of second entries from a collection of pairs.
      */
     public static <S, T> Set<T> getSecondSet(Collection<Pair<S, T>> pairs) {
-        Set<T> res = new java.util.HashSet<>();
+        Set<T> res = new HashSet<>();
         for (Pair<S, T> p : pairs) {
             res.add(p.second);
         }

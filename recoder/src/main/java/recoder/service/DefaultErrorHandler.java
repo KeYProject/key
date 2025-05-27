@@ -62,7 +62,7 @@ public class DefaultErrorHandler implements ErrorHandler {
 
     /**
      * Redefine this method to filter exceptions that are not considered as an error. The default
-     * implementation checks for {@link recoder.service.UnresolvedReferenceException}s and returns
+     * implementation checks for {@link UnresolvedReferenceException}s and returns
      * <CODE>
      * true</CODE> if the cause is either part of an incomplete model or contained in template code.
      *

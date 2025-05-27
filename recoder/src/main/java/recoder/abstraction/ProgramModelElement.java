@@ -20,7 +20,7 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
 
     /**
      * Lexical order objects comparing full names. For partial names, use the corresponding order of
-     * {@link recoder.NamedModelElement}.
+     * {@link NamedModelElement}.
      */
     Order LEXICAL_ORDER = new LexicalOrder();
 
@@ -48,7 +48,7 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
 
     /**
      * Lexical order on full names of program model elements. For partial names, use the
-     * corresponding order of {@link recoder.NamedModelElement}. Null elements are considered as
+     * corresponding order of {@link NamedModelElement}. Null elements are considered as
      * empty strings. Program elements are kept unambiguous by attaching source code file name and
      * positions.
      */

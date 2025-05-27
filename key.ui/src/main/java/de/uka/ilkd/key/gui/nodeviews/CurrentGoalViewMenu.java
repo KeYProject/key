@@ -27,6 +27,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -676,7 +677,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             if (b.isEmpty()) {
                 return 0;
             }
-            return new de.uka.ilkd.key.java.visitor.JavaASTWalker(b.program()) {
+            return new JavaASTWalker(b.program()) {
                 private int counter = 0;
 
                 @Override

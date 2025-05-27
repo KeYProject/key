@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -16,7 +17,7 @@ import org.jspecify.annotations.Nullable;
  * List interface to be implemented by non-destructive lists
  */
 public interface ImmutableList<T extends @Nullable Object>
-        extends Iterable<T>, java.io.Serializable {
+        extends Iterable<T>, Serializable {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableList.

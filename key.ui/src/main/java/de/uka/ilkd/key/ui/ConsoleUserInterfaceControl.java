@@ -78,7 +78,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     /**
      * We want to record whether there was a proof that could not be proven. {@link Main} calls
-     * System.exit() after all files have been loaded with {@link #loadProblem(java.io.File)}.
+     * System.exit() after all files have been loaded with {@link #loadProblem(File)}.
      * Program return value depends on whether there has been a proof attempt that was not
      * successful.
      */

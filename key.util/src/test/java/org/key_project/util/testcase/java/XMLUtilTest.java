@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class XMLUtilTest {
     /**
-     * Tests {@link XMLUtil#replaceTags(String, org.key_project.util.java.XMLUtil.ITagReplacer)}.
+     * Tests {@link XMLUtil#replaceTags(String, XMLUtil.ITagReplacer)}.
      */
     @Test
     public void testReplaceTags() {
@@ -40,7 +40,7 @@ public class XMLUtilTest {
      * Executes a test step of {@link #testReplaceTags()}.
      *
      * @param text The text to execute
-     *        {@link XMLUtil#replaceTags(String, org.key_project.util.java.XMLUtil.ITagReplacer)}
+     *        {@link XMLUtil#replaceTags(String, XMLUtil.ITagReplacer)}
      *        on.
      * @param expectedResult The expected result.N
      * @param fixedReplacement The fixed replacement to use.

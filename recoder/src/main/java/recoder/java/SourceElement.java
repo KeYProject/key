@@ -8,7 +8,7 @@ import recoder.ProgramFactory;
 
 /**
  * A source element is a piece of syntax. It does not necessarily have a semantics, at least none
- * that is machinable, for instance a {@link recoder.java.Comment}.
+ * that is machinable, for instance a {@link Comment}.
  *
  * @author AL
  */
@@ -112,7 +112,7 @@ public interface SourceElement {
     /**
      * Creates a deep clone of the current source element. For {@link NonTerminalProgramElement}s,
      * the parent roles are valid, except that the root element is not included anywhere and hence
-     * has no set parents, of course. This method also clones {@link recoder.java.Comment} s, but
+     * has no set parents, of course. This method also clones {@link Comment} s, but
      * does not clone derived information such as scopes.
      */
     SourceElement deepClone();

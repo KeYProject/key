@@ -40,8 +40,8 @@ import org.jspecify.annotations.Nullable;
  * @param <P> the type of the proof object, extending {@link ProofObject}
  * @param <G> the type of the proof goal, extending {@link ProofGoal}
  *
- * @see org.key_project.prover.proof.ProofObject
- * @see org.key_project.prover.proof.ProofGoal
+ * @see ProofObject
+ * @see ProofGoal
  */
 public interface ProofSearchInformation<P extends ProofObject<@NonNull G>, G extends ProofGoal<@NonNull G>> {
 

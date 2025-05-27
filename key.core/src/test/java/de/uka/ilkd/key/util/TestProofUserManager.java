@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestProofUserManager {
     /**
      * Tests {@link ProofUserManager#addUser(Proof, KeYEnvironment, Object)}
-     * {@link ProofUserManager#removeUserAndDispose(de.uka.ilkd.key.proof.Proof, Object)},
+     * {@link ProofUserManager#removeUserAndDispose(Proof, Object)},
      * {@link ProofUserManager#getProofs()}, {@link ProofUserManager#getUsers(Proof)},
      * {@link ProofUserManager#getEnvironment(Proof)} and
      * {@link ProofUserManager#getProofs(KeYEnvironment)}.
@@ -143,7 +143,7 @@ public class TestProofUserManager {
 
     /**
      * Tests {@link ProofUserManager#addUser(Proof, KeYEnvironment, Object)}
-     * {@link ProofUserManager#removeUserAndDispose(de.uka.ilkd.key.proof.Proof, Object)},
+     * {@link ProofUserManager#removeUserAndDispose(Proof, Object)},
      * {@link ProofUserManager#getProofs()} and {@link ProofUserManager#getUsers(Proof)}.
      */
     @Test

@@ -20,9 +20,9 @@ import recoder.list.generic.ASTList;
 /**
  * Syntactic transformation returning a mutable statement list that contains the given statement,
  * and creating a new {@linkrecoder.java.StatementBlock} if necessary. It is necessary to create a
- * new block, if {@link recoder.kit.StatementKit#getStatementMutableList}returns <CODE>null
+ * new block, if {@link StatementKit#getStatementMutableList}returns <CODE>null
  * </CODE>. This is the case if the statement container allows only a single statement and the given
- * statement is not inside a {@link recoder.java.StatementBlock}. If the statement has no parent, it
+ * statement is not inside a {@link StatementBlock}. If the statement has no parent, it
  * is wrapped into a new statement list.
  * <DL>
  * <DT>Added:
@@ -34,7 +34,7 @@ import recoder.list.generic.ASTList;
  * </DL>
  *
  * @author AL
- * @see recoder.kit.StatementKit#getStatementMutableList
+ * @see StatementKit#getStatementMutableList
  */
 public class PrepareStatementList extends TwoPassTransformation {
 
@@ -65,7 +65,7 @@ public class PrepareStatementList extends TwoPassTransformation {
     }
 
     /**
-     * Returns a new {@link recoder.kit.transformation.PrepareStatementList.IllegalParentContext} if
+     * Returns a new {@link PrepareStatementList.IllegalParentContext} if
      * the statement is not embedded in a statement container, otherwise {@link #NO_PROBLEM}if the
      * statement is a local variable declaration (which might potentially change program semantics),
      * otherwise {@link #EQUIVALENCE}.

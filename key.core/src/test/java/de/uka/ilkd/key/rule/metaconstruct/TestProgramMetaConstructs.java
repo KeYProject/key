@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.NoSuchElementException;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -53,7 +55,7 @@ public class TestProgramMetaConstructs {
         ProgramElement block =
             TacletForTests.parsePrg("{int a=5; test1:test2:while (true) " + "{test3: {int j=3;}}}");
         JavaASTCollector coll =
-            new JavaASTCollector(block, de.uka.ilkd.key.java.statement.LabeledStatement.class);
+            new JavaASTCollector(block, LabeledStatement.class);
         coll.start();
         assertEquals(3, coll.getNodes().size());
 
@@ -92,7 +94,7 @@ public class TestProgramMetaConstructs {
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         try {
             wlt.transform(l, new Services(AbstractProfile.getDefaultProfile()), inst);
-        } catch (java.util.NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             fail(" Problem with empty while-blocks. See Bug #183 ");
         }
 

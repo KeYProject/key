@@ -82,8 +82,8 @@ public class TacletIfSelectionDialog extends JPanel {
                      */
                     private static final long serialVersionUID = -6925345438533627265L;
 
-                    public java.awt.Dimension getPreferredSize() {
-                        return new java.awt.Dimension(100, 10);
+                    public Dimension getPreferredSize() {
+                        return new Dimension(100, 10);
                     }
                 };
             p.add(label);
@@ -94,8 +94,8 @@ public class TacletIfSelectionDialog extends JPanel {
                      */
                     private static final long serialVersionUID = -6429999070946158788L;
 
-                    public java.awt.Dimension getPreferredSize() {
-                        return new java.awt.Dimension(800,
+                    public Dimension getPreferredSize() {
+                        return new Dimension(800,
                             (int) super.getPreferredSize().getHeight());
                     }
                 };

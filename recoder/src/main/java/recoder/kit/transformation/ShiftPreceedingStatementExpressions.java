@@ -59,7 +59,7 @@ import recoder.util.Debug;
  * <DD>If the expression was in a field initializer, a new class or object initializer block is
  * added. Otherwise, if the expression is in a statement that cannot be prepended by variable
  * declarations and has preceeding expressions with side-effects, the statement is embedded in a new
- * statement block by {@link recoder.kit.transformation.PrepareStatementList}. Afterwards, or if
+ * statement block by {@link PrepareStatementList}. Afterwards, or if
  * this has not been necessary, a new temporary variable declaration is added as statement in front
  * of the containing statement, and a new variable reference replaces the old expressions.
  * <DT>Removed:
@@ -133,8 +133,8 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
      * variable declarations with new names, replacement references, and prepares the parent for
      * insertion unless it happens to be a field specification.
      *
-     * @return the problem report, may be {@link recoder.kit.Transformation#IDENTITY}, or
-     *         {@link recoder.kit.Transformation#EQUIVALENCE}.
+     * @return the problem report, may be {@link Transformation#IDENTITY}, or
+     *         {@link Transformation#EQUIVALENCE}.
      */
     public ProblemReport analyze() {
         // get all expressions that are executed before x

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.plaf.SplitPaneUI;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -186,7 +187,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
                  */
                 private static final long serialVersionUID = -6688343484818325411L;
 
-                public void setUI(javax.swing.plaf.SplitPaneUI ui) {
+                public void setUI(SplitPaneUI ui) {
                     try {
                         super.setUI(ui);
                     } catch (NullPointerException e) {

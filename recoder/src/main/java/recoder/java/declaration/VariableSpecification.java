@@ -12,7 +12,7 @@ import recoder.service.ProgramModelInfo;
 
 /**
  * Variable specification that defines a variable name. This is a part of a
- * {@link recoder.java.declaration.VariableDeclaration}and does not contain a type reference or own
+ * {@link VariableDeclaration}and does not contain a type reference or own
  * modifiers. Note that calls to modifiers are delegated to the enclosing variable declaration and
  * are therefore discouraged. This was necessary to subtype Declaration as analyses are interested
  * in the exact location of a variable name.

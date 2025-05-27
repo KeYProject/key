@@ -19,7 +19,7 @@ import org.key_project.logic.Term;
  *
  * @author Tobias Reinhold
  */
-public class TermLabelsProperty implements Property<org.key_project.logic.Term> {
+public class TermLabelsProperty implements Property<Term> {
     /**
      * The single instance of this property.
      */
@@ -44,7 +44,7 @@ public class TermLabelsProperty implements Property<org.key_project.logic.Term> 
      * @param <V> is not needed for this equality check
      */
     @Override
-    public <V> boolean equalsModThisProperty(Term term1, org.key_project.logic.Term term2, V... v) {
+    public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
         }

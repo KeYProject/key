@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.actions.QuickSaveAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
@@ -106,7 +107,7 @@ public class RecentFileMenu {
      */
     private void addNewToModelAndView(final String path) {
         // do not add quick save location to recent files
-        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(path)) {
+        if (QuickSaveAction.QUICK_SAVE_PATH.endsWith(path)) {
             return;
         }
 

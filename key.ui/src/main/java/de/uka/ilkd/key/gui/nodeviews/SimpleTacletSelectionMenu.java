@@ -14,11 +14,11 @@ import org.key_project.util.collection.ImmutableList;
 
 /**
  * This simple taclet menu displays the user a list of applicable taclets and lets select her/him
- * one of those. It is similar to {@link de.uka.ilkd.key.gui.nodeviews.CurrentGoalViewMenu} but with
+ * one of those. It is similar to {@link CurrentGoalViewMenu} but with
  * some important differences:
  * <ul>
  * <li>it returns the selected taclet app and does not initiate any further action as the original
- * {@link de.uka.ilkd.key.gui.nodeviews.CurrentGoalViewMenu}</li>
+ * {@link CurrentGoalViewMenu}</li>
  * <li>it does not display any additional menu entries like: Apply strategies here, built-in rules,
  * abbreviation etc.</li>
  * </ul>

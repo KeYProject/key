@@ -466,7 +466,7 @@ public final class NotationInfo {
             }
         }
 
-        if (op instanceof org.key_project.logic.op.sv.SchemaVariable) {
+        if (op instanceof SchemaVariable) {
             result = notationTable.get(SchemaVariable.class);
             if (result != null) {
                 return result;

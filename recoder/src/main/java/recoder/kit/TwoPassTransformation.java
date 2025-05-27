@@ -53,7 +53,7 @@ public abstract class TwoPassTransformation extends Transformation {
      * directly (the model might be augmented by automatic reload, however). This default
      * implementation sets and returns {@link #NO_PROBLEM}.
      *
-     * @return a problem report, an instance of {@link recoder.kit.NoProblem}if all requirements
+     * @return a problem report, an instance of {@link NoProblem}if all requirements
      *         have been met.
      */
     public ProblemReport analyze() {
@@ -85,7 +85,7 @@ public abstract class TwoPassTransformation extends Transformation {
 
     /**
      * Convenience template method that calls {@link #analyze()}and {@link #transform()}if the
-     * result was {@link recoder.kit.NoProblem}and not {@link recoder.kit.Identity}.
+     * result was {@link NoProblem}and not {@link Identity}.
      */
     public ProblemReport execute() {
         ProblemReport report = analyze();

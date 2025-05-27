@@ -113,7 +113,7 @@ public class TaskTree extends JPanel {
         ToolTipManager.sharedInstance().registerComponent(delegateView);
     }
 
-    public synchronized void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
+    public synchronized void addProof(ProofAggregate plist) {
         TaskTreeNode bp = model.addProof(plist);
         Proof[] proofs = plist.getProofs();
         for (Proof proof : proofs) {

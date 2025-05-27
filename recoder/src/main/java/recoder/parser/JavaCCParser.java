@@ -4,11 +4,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.parser;
 
+import java.io.InputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 
 import recoder.abstraction.TypeArgument.WildcardMode;
+import recoder.convenience.Format;
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Final;
@@ -50,7 +55,7 @@ public class JavaCCParser implements JavaCCParserConstants {
      * reuseable position object.
      */
     private static final SourceElement.Position position = new SourceElement.Position(0, 0);
-    static private final java.util.Vector jj_expentries = new java.util.Vector();
+    static private final Vector jj_expentries = new Vector();
     static private final int[] jj_lasttokens = new int[100];
     static public JavaCCParserTokenManager token_source;
     static public Token token, jj_nt;
@@ -96,11 +101,11 @@ public class JavaCCParser implements JavaCCParserConstants {
         jj_la1_3();
     }
 
-    public JavaCCParser(java.io.InputStream stream) {
+    public JavaCCParser(InputStream stream) {
         this(stream, null);
     }
 
-    public JavaCCParser(java.io.InputStream stream, String encoding) {
+    public JavaCCParser(InputStream stream, String encoding) {
         if (jj_initialized_once) {
             System.out.println("ERROR: Second call to constructor of static parser.  You must");
             System.out
@@ -111,7 +116,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         jj_initialized_once = true;
         try {
             jj_input_stream = new JavaCharStream(stream, encoding, 1, 1);
-        } catch (java.io.UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
         token_source = new JavaCCParserTokenManager(jj_input_stream);
@@ -126,7 +131,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         }
     }
 
-    public JavaCCParser(java.io.Reader stream) {
+    public JavaCCParser(Reader stream) {
         if (jj_initialized_once) {
             System.out.println("ERROR: Second call to constructor of static parser.  You must");
             System.out
@@ -4519,7 +4524,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                         if (true) {
                             throw new ParseException(
                                 "Class cast error: ExpressionStatement expected - found "
-                                    + recoder.convenience.Format.toString("%c @%p %s", expr));
+                                    + Format.toString("%c @%p %s", expr));
                         }
                     }
                 }
@@ -11340,14 +11345,14 @@ public class JavaCCParser implements JavaCCParserConstants {
             0x0, 0x0, 0x400, };
     }
 
-    static public void ReInit(java.io.InputStream stream) {
+    static public void ReInit(InputStream stream) {
         ReInit(stream, null);
     }
 
-    static public void ReInit(java.io.InputStream stream, String encoding) {
+    static public void ReInit(InputStream stream, String encoding) {
         try {
             jj_input_stream.ReInit(stream, encoding, 1, 1);
-        } catch (java.io.UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
         JavaCCParserTokenManager.ReInit(jj_input_stream);
@@ -11362,7 +11367,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         }
     }
 
-    static public void ReInit(java.io.Reader stream) {
+    static public void ReInit(Reader stream) {
         jj_input_stream.ReInit(stream, 1, 1);
         JavaCCParserTokenManager.ReInit(jj_input_stream);
         token = new Token();
@@ -11477,7 +11482,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             jj_expentry = new int[jj_endpos];
             System.arraycopy(jj_lasttokens, 0, jj_expentry, 0, jj_endpos);
             boolean exists = false;
-            for (java.util.Enumeration e = jj_expentries.elements(); e.hasMoreElements();) {
+            for (Enumeration e = jj_expentries.elements(); e.hasMoreElements();) {
                 int[] oldentry = (int[]) (e.nextElement());
                 if (oldentry.length == jj_expentry.length) {
                     exists = true;
@@ -11970,7 +11975,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         UncollatedReferenceQualifier name = null;
     }
 
-    static private final class LookaheadSuccess extends java.lang.Error {
+    static private final class LookaheadSuccess extends Error {
     }
 
     static final class JJCalls {

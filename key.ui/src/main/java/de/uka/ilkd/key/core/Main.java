@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -333,7 +334,7 @@ public final class Main {
 
         if (cl.isSet(SHOW_PROPERTIES)) {
             try {
-                java.util.Properties props = System.getProperties();
+                Properties props = System.getProperties();
                 for (var e : props.entrySet()) {
                     LOGGER.info("Property: {} = {}", e.getKey(), e.getValue());
                 }

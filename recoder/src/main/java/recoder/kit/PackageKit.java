@@ -57,7 +57,7 @@ public class PackageKit {
      *
      * @param pkg the package to check for non-source types.
      * @return a list of class types of the given package that are no
-     *         {@link recoder.java.declaration.TypeDeclaration}s.
+     *         {@link TypeDeclaration}s.
      */
     public static List<ClassType> getNonSourcePackageTypes(Package pkg) {
         List<ClassType> result = new ArrayList<>();

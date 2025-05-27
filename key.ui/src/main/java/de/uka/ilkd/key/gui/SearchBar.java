@@ -132,10 +132,10 @@ public abstract class SearchBar extends JPanel {
         add(new JLabel("Search: "));
         add(searchField);
         add(prev);
-        prev.setMargin(new java.awt.Insets(2, 1, 2, 1));
+        prev.setMargin(new Insets(2, 1, 2, 1));
         add(next);
-        next.setMargin(new java.awt.Insets(2, 1, 2, 1));
+        next.setMargin(new Insets(2, 1, 2, 1));
         add(close);
-        close.setMargin(new java.awt.Insets(2, 1, 2, 1));
+        close.setMargin(new Insets(2, 1, 2, 1));
     }
 }

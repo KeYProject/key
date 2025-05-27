@@ -23,7 +23,7 @@ public interface Member extends ProgramModelElement {
 
     /**
      * Checks if this member is static. Returns <CODE>true</CODE> for
-     * {@link recoder.abstraction.Constructor}s.
+     * {@link Constructor}s.
      *
      * @return <CODE>true</CODE> if this member is static, <CODE>false
      * </CODE> otherwise.

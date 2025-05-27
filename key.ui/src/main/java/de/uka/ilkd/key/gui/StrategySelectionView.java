@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
@@ -105,8 +107,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         layoutPane();
         refresh(mediator == null ? null : mediator.getSelectedProof());
         setVisible(true);
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentShown(java.awt.event.ComponentEvent e) {
+        addComponentListener(new ComponentAdapter() {
+            public void componentShown(ComponentEvent e) {
                 components.getMaxRuleAppSlider().refresh();
             }
         });

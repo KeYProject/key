@@ -142,7 +142,7 @@ public class DefaultConstructor implements Constructor {
      * Returns the logical parent class of this member.
      *
      * @return the class type containing this member.
-     * @see recoder.service.ProgramModelInfo#getContainingClassType
+     * @see ProgramModelInfo#getContainingClassType
      */
     public ClassType getContainingClassType() {
         return ownerClass;

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
@@ -16,7 +17,7 @@ import org.jspecify.annotations.Nullable;
  * offer a public static final variable .<called>nil()
  */
 public interface ImmutableSet<T extends @Nullable Object>
-        extends Iterable<T>, java.io.Serializable {
+        extends Iterable<T>, Serializable {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableSet.

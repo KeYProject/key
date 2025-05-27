@@ -58,7 +58,7 @@ public class ResolveGenerics extends TwoPassTransformation {
      * <li>FieldDeclarations
      * </ul>
      *
-     * @see recoder.kit.TwoPassTransformation#analyze()
+     * @see TwoPassTransformation#analyze()
      */
     @Override
     public ProblemReport analyze() {

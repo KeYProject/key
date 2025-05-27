@@ -124,7 +124,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
         return res;
     }
 
-    protected SequentFormula createSequentFormula(org.key_project.logic.Term form) {
+    protected SequentFormula createSequentFormula(Term form) {
         return new SequentFormula(form);
     }
 

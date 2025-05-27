@@ -9,11 +9,11 @@ package recoder.kit;
  * planned transformation is applicable. This does not guarantee that the functional behavior will
  * be retained.
  * <p>
- * Instead of creating a new object, the {@link recoder.kit.Transformation#NO_PROBLEM}constant
+ * Instead of creating a new object, the {@link Transformation#NO_PROBLEM}constant
  * should be used.
  *
  * @author AL
- * @see recoder.kit.Equivalence
+ * @see Equivalence
  */
 public class NoProblem implements ProblemReport {
 

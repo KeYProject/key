@@ -34,6 +34,7 @@ import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
@@ -323,7 +324,7 @@ public abstract class AbstractTestGenerator {
         return proof;
     }
 
-    private boolean hasModalities(org.key_project.logic.Term t, boolean checkUpdates) {
+    private boolean hasModalities(Term t, boolean checkUpdates) {
         if (t.op() instanceof Modality) {
             return true;
         }

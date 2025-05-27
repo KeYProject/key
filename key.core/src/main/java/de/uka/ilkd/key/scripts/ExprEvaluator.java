@@ -27,7 +27,7 @@ import static org.key_project.util.java.StringUtil.trim;
 ///
 /// @author Alexander Weigl
 /// @version 1 (18.01.25)
-/// @see de.uka.ilkd.key.nparser.KeYParser.ProofScriptExpressionContext
+/// @see KeYParser.ProofScriptExpressionContext
 class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExprEvaluator.class);
     private final EngineState state;

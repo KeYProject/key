@@ -10,9 +10,10 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
-public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
+public class SMTTestSettings implements SMTSettings {
 
 
     public long getGlobalBound() {

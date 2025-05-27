@@ -735,7 +735,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     /**
-     * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the current project settings
+     * Returns a new suitable {@link PrettyPrinter}obeying the current project settings
      * for the specified writer,
      *
      * @param out the (initial) writer to print to.

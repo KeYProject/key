@@ -18,11 +18,11 @@ public class Relations {
      * Structural equality and hash code for program elements.
      * <p>
      * To be considered equal, the types of the objects must match, except for certain allowed
-     * combinations with {@link recoder.java.reference.UncollatedReferenceQualifier}s.<BR>
-     * In case of {@link recoder.java.Identifier}or {@link recoder.java.expression.Literal}s, the
+     * combinations with {@link UncollatedReferenceQualifier}s.<BR>
+     * In case of {@link Identifier}or {@link Literal}s, the
      * textual representations are compared, while {@link recoder.java.declaration.Modifier}are
      * compared by type only. <BR>
-     * {@link recoder.java.NonTerminalProgramElement}s are compared child-by-child in the given
+     * {@link NonTerminalProgramElement}s are compared child-by-child in the given
      * order. Note that the corresponding iterator reports all children without separation. In case
      * that two children of the same type play different roles (e.g. return types of methods and
      * thrown exceptions if there was no need for a method name), this behavior must be overriden.
@@ -31,7 +31,7 @@ public class Relations {
      * method can be used to perform a more stringent comparison.
      * <p>
      * The hash code calculated takes into acount the type of the element, its name if it is a
-     * {@link recoder.java.NamedProgramElement}and the number of its children. For reasons of
+     * {@link NamedProgramElement}and the number of its children. For reasons of
      * efficiency, no further recursion is performed.
      */
     public final static HashCode STRUCTURAL_EQUALITY = new HashCode() {

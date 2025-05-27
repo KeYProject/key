@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.EventObject;
 import javax.swing.*;
@@ -40,7 +41,7 @@ public class ExitMainAction extends MainWindowAction {
 
     public final WindowListener windowListener = new WindowAdapter() {
         @Override
-        public void windowClosing(java.awt.event.WindowEvent e) {
+        public void windowClosing(WindowEvent e) {
             exitMain();
         }
     };

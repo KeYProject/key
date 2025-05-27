@@ -377,7 +377,7 @@ class SelectionPanel<T> extends JPanel {
 
             @Override
             public boolean include(
-                    javax.swing.RowFilter.Entry<? extends ItemModel, ? extends Integer> entry) {
+                    RowFilter.Entry<? extends ItemModel, ? extends Integer> entry) {
                 @SuppressWarnings("unchecked")
                 TableItem<T> item =
                     (TableItem<T>) entry.getModel().getValueAt(entry.getIdentifier(), 0);

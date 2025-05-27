@@ -9,6 +9,7 @@ import java.util.List;
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Member;
+import recoder.bytecode.AccessFlags;
 import recoder.java.Declaration;
 import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.MemberDeclaration;
@@ -27,7 +28,7 @@ import recoder.util.Debug;
  * @author Andreas Ludwig
  * @author Rainer Neumann
  */
-public class ModifierKit implements recoder.bytecode.AccessFlags {
+public class ModifierKit implements AccessFlags {
 
     /**
      * The virtual "package" modifier code.

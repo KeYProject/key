@@ -614,7 +614,7 @@ public class TestTermLabelManager {
     }
 
     /**
-     * Tests {@link TermLabelManager#getTermLabelManager(de.uka.ilkd.key.java.Services)}.
+     * Tests {@link TermLabelManager#getTermLabelManager(Services)}.
      */
     @Test
     public void testGetTermLabelManager() {
@@ -773,7 +773,7 @@ public class TestTermLabelManager {
         public void updateLabels(TermLabelState state, Services services,
                 PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Term modalityTerm,
-                org.key_project.prover.rules.Rule rule,
+                Rule rule,
                 RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
                 Set<TermLabel> labels) {
             labels.add(toAdd);

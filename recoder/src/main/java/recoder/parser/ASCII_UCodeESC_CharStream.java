@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.parser;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -21,7 +25,7 @@ public final class ASCII_UCodeESC_CharStream {
     private int[] bufcolumn;
     private int column = 0;
     private int line = 1;
-    private java.io.Reader inputStream;
+    private Reader inputStream;
     private boolean prevCharIsCR = false;
     private boolean prevCharIsLF = false;
     private char[] nextCharBuf;
@@ -30,7 +34,7 @@ public final class ASCII_UCodeESC_CharStream {
     private int nextCharInd = -1;
     private int inBuf = 0;
 
-    public ASCII_UCodeESC_CharStream(java.io.Reader dstream, int startline, int startcolumn,
+    public ASCII_UCodeESC_CharStream(Reader dstream, int startline, int startcolumn,
             int buffersize) {
         inputStream = dstream;
         line = startline;
@@ -43,21 +47,21 @@ public final class ASCII_UCodeESC_CharStream {
         nextCharBuf = new char[4096];
     }
 
-    public ASCII_UCodeESC_CharStream(java.io.Reader dstream, int startline, int startcolumn) {
+    public ASCII_UCodeESC_CharStream(Reader dstream, int startline, int startcolumn) {
         this(dstream, startline, startcolumn, 4096);
     }
 
-    public ASCII_UCodeESC_CharStream(java.io.InputStream dstream, int startline, int startcolumn,
+    public ASCII_UCodeESC_CharStream(InputStream dstream, int startline, int startcolumn,
             int buffersize) {
-        this(new java.io.InputStreamReader(dstream, StandardCharsets.UTF_8), startline, startcolumn,
+        this(new InputStreamReader(dstream, StandardCharsets.UTF_8), startline, startcolumn,
             4096);
     }
 
-    public ASCII_UCodeESC_CharStream(java.io.InputStream dstream, int startline, int startcolumn) {
+    public ASCII_UCodeESC_CharStream(InputStream dstream, int startline, int startcolumn) {
         this(dstream, startline, startcolumn, 4096);
     }
 
-    static int hexval(char c) throws java.io.IOException {
+    static int hexval(char c) throws IOException {
         switch (c) {
         case '0':
             return 0;
@@ -100,7 +104,7 @@ public final class ASCII_UCodeESC_CharStream {
             return 15;
         }
 
-        throw new java.io.IOException(); // Should never come here
+        throw new IOException(); // Should never come here
     }
 
     private void ExpandBuff(boolean wrapAround) {
@@ -143,7 +147,7 @@ public final class ASCII_UCodeESC_CharStream {
         tokenBegin = 0;
     }
 
-    private void FillBuff() throws java.io.IOException {
+    private void FillBuff() throws IOException {
         int i;
         if (maxNextCharInd == 4096) {
             maxNextCharInd = nextCharInd = 0;
@@ -152,11 +156,11 @@ public final class ASCII_UCodeESC_CharStream {
         try {
             if ((i = inputStream.read(nextCharBuf, maxNextCharInd, 4096 - maxNextCharInd)) == -1) {
                 inputStream.close();
-                throw new java.io.IOException();
+                throw new IOException();
             } else {
                 maxNextCharInd += i;
             }
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             if (bufpos != 0) {
                 --bufpos;
                 backup(0);
@@ -168,7 +172,7 @@ public final class ASCII_UCodeESC_CharStream {
         }
     }
 
-    private char ReadByte() throws java.io.IOException {
+    private char ReadByte() throws IOException {
         if (++nextCharInd >= maxNextCharInd) {
             FillBuff();
         }
@@ -176,7 +180,7 @@ public final class ASCII_UCodeESC_CharStream {
         return nextCharBuf[nextCharInd];
     }
 
-    public char BeginToken() throws java.io.IOException {
+    public char BeginToken() throws IOException {
         if (inBuf > 0) {
             --inBuf;
             return buffer[tokenBegin = (bufpos == bufsize - 1) ? (bufpos = 0) : ++bufpos];
@@ -239,7 +243,7 @@ public final class ASCII_UCodeESC_CharStream {
         bufcolumn[bufpos] = column;
     }
 
-    public char readChar() throws java.io.IOException {
+    public char readChar() throws IOException {
         if (inBuf > 0) {
             --inBuf;
             return buffer[(bufpos == bufsize - 1) ? (bufpos = 0) : ++bufpos];
@@ -277,7 +281,7 @@ public final class ASCII_UCodeESC_CharStream {
                         backup(backSlashCnt);
                         return '\\';
                     }
-                } catch (java.io.IOException e) {
+                } catch (IOException e) {
                     if (backSlashCnt > 1) {
                         backup(backSlashCnt);
                     }
@@ -301,7 +305,7 @@ public final class ASCII_UCodeESC_CharStream {
                             | hexval((char) ((char) 0xff & ReadByte())));
 
                 column += 4;
-            } catch (java.io.IOException e) {
+            } catch (IOException e) {
                 throw new Error(
                     "Invalid escape character at line " + line + " column " + column + ".");
             }
@@ -366,7 +370,7 @@ public final class ASCII_UCodeESC_CharStream {
         }
     }
 
-    public void ReInit(java.io.Reader dstream, int startline, int startcolumn, int buffersize) {
+    public void ReInit(Reader dstream, int startline, int startcolumn, int buffersize) {
         inputStream = dstream;
         line = startline;
         column = startcolumn - 1;
@@ -383,17 +387,17 @@ public final class ASCII_UCodeESC_CharStream {
         nextCharInd = bufpos = -1;
     }
 
-    public void ReInit(java.io.Reader dstream, int startline, int startcolumn) {
+    public void ReInit(Reader dstream, int startline, int startcolumn) {
         ReInit(dstream, startline, startcolumn, 4096);
     }
 
-    public void ReInit(java.io.InputStream dstream, int startline, int startcolumn,
+    public void ReInit(InputStream dstream, int startline, int startcolumn,
             int buffersize) {
-        ReInit(new java.io.InputStreamReader(dstream, StandardCharsets.UTF_8), startline,
+        ReInit(new InputStreamReader(dstream, StandardCharsets.UTF_8), startline,
             startcolumn, 4096);
     }
 
-    public void ReInit(java.io.InputStream dstream, int startline, int startcolumn) {
+    public void ReInit(InputStream dstream, int startline, int startcolumn) {
         ReInit(dstream, startline, startcolumn, 4096);
     }
 

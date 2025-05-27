@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
@@ -328,7 +329,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             return goals.get(i);
         }
 
-        class GoalListProofTreeListener implements ProofTreeListener, java.io.Serializable {
+        class GoalListProofTreeListener implements ProofTreeListener, Serializable {
 
             @Serial
             private static final long serialVersionUID = 3090011700136463120L;
@@ -532,7 +533,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         }
     }
 
-    private class GoalListGUIListener implements GUIListener, java.io.Serializable {
+    private class GoalListGUIListener implements GUIListener, Serializable {
 
         @Serial
         private static final long serialVersionUID = -1826501525753975124L;

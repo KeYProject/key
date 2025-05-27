@@ -27,6 +27,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
@@ -71,7 +72,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
         @Override
-        public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
+        public void proofPruned(ProofTreeEvent e) {
             e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
                 ExplorationNodeData.class);
         }

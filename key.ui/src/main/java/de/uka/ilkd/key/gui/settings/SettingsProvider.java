@@ -46,7 +46,7 @@ public interface SettingsProvider {
      * Tree children of your settings dialog.
      * <p>
      * You can use this method, if you need to split your settings into multiple panels. The
-     * children are displayed as children within the {@link javax.swing.JTree}.
+     * children are displayed as children within the {@link JTree}.
      *
      * @return non-null list, default returns the empty list
      */

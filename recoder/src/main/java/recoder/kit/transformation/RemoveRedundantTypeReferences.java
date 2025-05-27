@@ -34,8 +34,8 @@ import recoder.util.ProgressListenerManager;
  * units.
  *
  * @author AL
- * @see recoder.kit.TypeKit#getRedundantSuperInterfaces
- * @see recoder.kit.TypeKit#getRedundantExceptions
+ * @see TypeKit#getRedundantSuperInterfaces
+ * @see TypeKit#getRedundantExceptions
  * @since 0.72
  */
 public class RemoveRedundantTypeReferences extends TwoPassTransformation {

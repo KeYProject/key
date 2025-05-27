@@ -52,7 +52,7 @@ public class RenamePackage extends TwoPassTransformation {
     /**
      * Collects all references to the package. The rename may fail with a
      * {@link MissingTypeDeclarations}reporting the types without accessible declaration, or a
-     * {@link recoder.kit.NameConflict}reporting an already existing package with the given name.
+     * {@link NameConflict}reporting an already existing package with the given name.
      *
      * @return the problem report.
      */

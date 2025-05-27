@@ -10,6 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;
@@ -53,7 +54,7 @@ public class RIFLTransformer {
 
 
     private static final JavaProgramFactory JPF =
-        de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
+        ProofJavaProgramFactory.getInstance();
 
     /**
      * Entry point for the stand-alone RIFL to JML* tool.

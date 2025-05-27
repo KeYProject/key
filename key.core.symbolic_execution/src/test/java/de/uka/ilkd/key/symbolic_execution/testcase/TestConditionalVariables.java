@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the conditional values provided by
- * {@link IExecutionNode#getVariables(de.uka.ilkd.key.logic.Term)}.
+ * {@link IExecutionNode#getVariables(Term)}.
  *
  * @author Martin Hentschel
  */

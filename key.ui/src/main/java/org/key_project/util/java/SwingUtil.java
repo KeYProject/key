@@ -35,7 +35,7 @@ public final class SwingUtil {
     }
 
     /**
-     * Wrapper for {@link java.awt.Desktop#browse(URI)} that also works on Linux.
+     * Wrapper for {@link Desktop#browse(URI)} that also works on Linux.
      *
      * @param uri the URI to be displayed in the user's default browser
      */

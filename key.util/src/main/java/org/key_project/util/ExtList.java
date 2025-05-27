@@ -4,6 +4,7 @@
 package org.key_project.util;
 
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -30,7 +31,7 @@ public final class ExtList extends LinkedList<Object> {
     /** copies list to array (array has type of cl) */
     private static <T> T[] toArray(Class<T> cl, LinkedList<T> list) {
         @SuppressWarnings("unchecked")
-        T[] array = (T[]) java.lang.reflect.Array.newInstance(cl, list.size());
+        T[] array = (T[]) Array.newInstance(cl, list.size());
         System.arraycopy(list.toArray(), 0, array, 0, list.size());
         return array;
     }

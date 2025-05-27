@@ -225,7 +225,7 @@ public interface SourceInfo extends ProgramModelInfo {
     /**
      * Returns the locally defined constructors of the given type declaration. The returned list
      * matches the syntactic order of the declarations. This method always returns a non-empty list,
-     * at least containing a {@link recoder.abstraction.DefaultConstructor}.
+     * at least containing a {@link DefaultConstructor}.
      *
      * @param td a type declaration.
      * @return a list of constructors that are members of the declaration.

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
+import java.io.File;
 import java.util.StringTokenizer;
 
 /**
@@ -72,7 +73,7 @@ public class StringUtils {
      * Normalize a name without suffix
      */
     public static String basename(String s) {
-        int lastIndex = s.lastIndexOf(java.io.File.separator);
+        int lastIndex = s.lastIndexOf(File.separator);
         if (lastIndex == -1) {
             return s;
         }

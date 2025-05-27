@@ -257,7 +257,7 @@ public class ChangeHistory extends AbstractService {
      * @param parent the former parent of the detached subtree; may be <CODE>null
      *               </CODE> only if the root is a compilation unit.
      * @param pos the positional code of the root in its former parent, as obtained by
-     *        {@link recoder.java.NonTerminalProgramElement#getChildPositionCode}; the code may be
+     *        {@link NonTerminalProgramElement#getChildPositionCode}; the code may be
      *        arbitrary if the root is a compilation unit.
      */
     public void detached(ProgramElement root, NonTerminalProgramElement parent, int pos) {
@@ -274,7 +274,7 @@ public class ChangeHistory extends AbstractService {
      *
      * @param root the root of the detached subtree.
      * @param pos the positional code of the root in its former parent, as obtained by
-     *        {@link recoder.java.NonTerminalProgramElement#getChildPositionCode}; the code may be
+     *        {@link NonTerminalProgramElement#getChildPositionCode}; the code may be
      *        arbitrary if the root is a compilation unit.
      */
     public void detached(ProgramElement root, int pos) {

@@ -34,7 +34,7 @@ public class NamedModelElementFilter implements ModelElementFilter {
      * @param type the most general type to accept.
      * @param name the name that is accepted.
      * @throws IllegalArgumentException if the type is not a subtype of
-     *         {@link recoder.NamedModelElement}.
+     *         {@link NamedModelElement}.
      */
     public NamedModelElementFilter(Class type, String name) {
         if (!NamedModelElement.class.isAssignableFrom(type)) {

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic.analysis;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +29,7 @@ import recoder.testsuite.basic.BasicTestsSuite;
 public class ModelRebuildTest extends AnalysisReportTest {
 
     @Test
-    public void runTest() throws java.io.IOException {
+    public void runTest() throws IOException {
         Transformation clearAll = new Transformation(BasicTestsSuite.getConfig()) {
             public ProblemReport execute() {
                 getChangeHistory().begin(this);

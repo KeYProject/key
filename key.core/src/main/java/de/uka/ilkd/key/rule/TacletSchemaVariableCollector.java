@@ -153,7 +153,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
 
     /** @return true iff term contains the given variable */
-    public boolean contains(org.key_project.logic.op.sv.SchemaVariable var) {
+    public boolean contains(SchemaVariable var) {
         return varList.contains(var);
     }
 

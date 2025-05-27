@@ -119,7 +119,7 @@ public interface Order extends Equality {
 
     /**
      * Natural order implementation using the inherited default methods. This implementation
-     * operates on the standard hash codes and implements {@link recoder.util.HashCode}, which will
+     * operates on the standard hash codes and implements {@link HashCode}, which will
      * work for Integer but might be pretty meaningless for other types. No <CODE>null</CODE>
      * objects are allowed, but all others are comparable.
      */
@@ -155,7 +155,7 @@ public interface Order extends Equality {
 
     /**
      * Identity order implementation comparing objects by address. The implementation uses
-     * <CODE>System.identityHashCode</CODE> and implements {@link recoder.util.HashCode}. The order
+     * <CODE>System.identityHashCode</CODE> and implements {@link HashCode}. The order
      * is based upon this encoding which allows retrieval of objects but has no further meaning.
      * Note that <CODE>x&nbsp;!=&nbsp;null</CODE> implies <CODE>less(null,&nbsp;x)
      * </CODE> and of course <CODE>equals(null,&nbsp;null)</CODE>.

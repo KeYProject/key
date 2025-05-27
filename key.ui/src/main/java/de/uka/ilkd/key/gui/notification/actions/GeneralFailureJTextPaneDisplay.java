@@ -10,7 +10,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
- * Displays a string in a {@link javax.swing.JOptionPane} error message window.
+ * Displays a string in a {@link JOptionPane} error message window.
  *
  * @author bubel
  */

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
+import java.io.Serializable;
 import java.util.*;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of TreeModel that can be displayed using the JTree class framework and reflects
- * the state of a {@link de.uka.ilkd.key.proof.Proof} object.
+ * the state of a {@link Proof} object.
  *
  * <p>
  * The tree structure of the proof is transformed, so that nodes following each other on a long
@@ -30,12 +31,12 @@ import org.slf4j.LoggerFactory;
  *
  * <p>
  * There are thus two kinds of node in this TreeModel,
- * {@link de.uka.ilkd.key.gui.prooftree.GUIProofTreeNode}s, representing nodes of the displayed
- * proof, and {@link de.uka.ilkd.key.gui.prooftree.GUIBranchNode}s representing branching points.
+ * {@link GUIProofTreeNode}s, representing nodes of the displayed
+ * proof, and {@link GUIBranchNode}s representing branching points.
  * (There is also one at the root.)
  */
 
-public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
+public class GUIProofTreeModel implements TreeModel, Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GUIProofTreeModel.class);
 
     private static final long serialVersionUID = 4253914848471158358L;

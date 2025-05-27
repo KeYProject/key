@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
+import java.lang.reflect.Array;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -62,7 +63,7 @@ public final class ArrayUtil {
     @SuppressWarnings("unchecked")
     public static <T extends @Nullable Object> T[] addAll(T[] array, T[] toAdd) {
         T[] result =
-            (T[]) java.lang.reflect.Array.newInstance(getComponentType(array),
+            (T[]) Array.newInstance(getComponentType(array),
                 array.length + toAdd.length);
         System.arraycopy(array, 0, result, 0, array.length);
         System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
@@ -94,7 +95,7 @@ public final class ArrayUtil {
     @SuppressWarnings("unchecked")
     public static <T extends @Nullable Object> T[] addAll(T[] array, T[] toAdd,
             Class<?> newArrayType) {
-        T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType,
+        T[] result = (T[]) Array.newInstance(newArrayType,
             array.length + toAdd.length);
         System.arraycopy(array, 0, result, 0, array.length);
         System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
@@ -118,7 +119,7 @@ public final class ArrayUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T extends @Nullable Object> T[] add(T[] array, T toAdd) {
-        T[] result = (T[]) java.lang.reflect.Array
+        T[] result = (T[]) Array
                 .newInstance(getComponentType(array), array.length + 1);
         System.arraycopy(array, 0, result, 0, array.length);
         result[array.length] = toAdd;
@@ -155,7 +156,7 @@ public final class ArrayUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T extends @Nullable Object> T[] insert(T[] array, T toInsert, int index) {
-        T[] result = (T[]) java.lang.reflect.Array
+        T[] result = (T[]) Array
                 .newInstance(getComponentType(array), array.length + 1);
         if (index >= 1) {
             System.arraycopy(array, 0, result, 0, index);
@@ -214,7 +215,7 @@ public final class ArrayUtil {
                 result.add(element);
             }
         }
-        return (T[]) result.toArray((T[]) java.lang.reflect.Array
+        return (T[]) result.toArray((T[]) Array
                 .newInstance(getComponentType(array), result.size()));
     }
 

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Stream;
@@ -14,7 +15,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class ImmutableArray<S extends @Nullable Object>
-        implements java.lang.Iterable<S>, java.io.Serializable {
+        implements Iterable<S>, Serializable {
 
     private static final long serialVersionUID = -9041545065066866250L;
 

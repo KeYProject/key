@@ -7,7 +7,7 @@ package recoder.java;
 import recoder.java.declaration.ParameterDeclaration;
 
 /**
- * Describes program elements that contain {@link recoder.java.declaration.ParameterDeclaration}s.
+ * Describes program elements that contain {@link ParameterDeclaration}s.
  *
  * @author AL
  */

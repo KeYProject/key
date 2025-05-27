@@ -10,7 +10,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
- * Displays a string in a {@link javax.swing.JOptionPane} information message window.
+ * Displays a string in a {@link JOptionPane} information message window.
  *
  * @author bubel
  */

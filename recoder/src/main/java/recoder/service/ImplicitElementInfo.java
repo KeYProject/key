@@ -15,8 +15,8 @@ import recoder.java.declaration.EnumDeclaration;
  * Handles requests for implicitly defined program model elements. In particular these are
  * {@link recoder.abstraction.NullType},
  * {@link recoder.abstraction.Package},{@link recoder.abstraction.ArrayType},
- * {@link recoder.abstraction.DefaultConstructor}, and
- * {@link recoder.abstraction.ImplicitEnumMethod}.
+ * {@link DefaultConstructor}, and
+ * {@link ImplicitEnumMethod}.
  */
 public interface ImplicitElementInfo extends ProgramModelInfo {
 

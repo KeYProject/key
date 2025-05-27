@@ -74,7 +74,7 @@ public class ProofTreeSettingsMenuFactory {
         CButton button = new CButton();
         button.setText("Search");
         button.setIcon(IconFactory.search2(ICON_SIZE));
-        button.setAccelerator(de.uka.ilkd.key.gui.prooftree.ProofTreeView.SEARCH_KEY_STROKE);
+        button.setAccelerator(ProofTreeView.SEARCH_KEY_STROKE);
         button.addActionListener(e -> view.showSearchPanel());
         return button;
     }

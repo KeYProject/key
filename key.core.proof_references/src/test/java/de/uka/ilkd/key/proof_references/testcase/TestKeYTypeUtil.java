@@ -140,7 +140,7 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     }
 
     /**
-     * Tests {@link KeYTypeUtil#getType(de.uka.ilkd.key.java.Services, String)}.
+     * Tests {@link KeYTypeUtil#getType(Services, String)}.
      */
     @Test
     public void testGetType() throws Exception {

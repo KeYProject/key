@@ -5,8 +5,12 @@ package org.key_project.util.collection;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -43,20 +47,20 @@ public class KeYCollections {
     /**
      * Combine two maps by function application. Values of <code>m0</code> which are not keys of
      * <code>m1</code> are dropped. This implementation tries to use the same implementation of
-     * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
+     * {@link Map} (provided in Java SE) as <code>m0</code>.
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
         Map<S, U> res;
         final int size = Math.min(m0.size(), m1.size());
         // try to use more specific implementation
-        if (m0 instanceof java.util.TreeMap) {
-            res = new java.util.TreeMap<>();
-        } else if (m0 instanceof java.util.concurrent.ConcurrentHashMap) {
-            res = new java.util.concurrent.ConcurrentHashMap<>(size);
-        } else if (m0 instanceof java.util.IdentityHashMap) {
-            res = new java.util.IdentityHashMap<>(size);
-        } else if (m0 instanceof java.util.WeakHashMap) {
-            res = new java.util.WeakHashMap<>(size);
+        if (m0 instanceof TreeMap) {
+            res = new TreeMap<>();
+        } else if (m0 instanceof ConcurrentHashMap) {
+            res = new ConcurrentHashMap<>(size);
+        } else if (m0 instanceof IdentityHashMap) {
+            res = new IdentityHashMap<>(size);
+        } else if (m0 instanceof WeakHashMap) {
+            res = new WeakHashMap<>(size);
         } else {
             res = new HashMap<>(size);
         }

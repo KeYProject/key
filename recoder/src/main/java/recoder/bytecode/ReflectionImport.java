@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.bytecode;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +59,9 @@ public class ReflectionImport {
                 | (c.isEnum() ? AccessFlags.ENUM : 0));
         cf.setInterfaceNames(getTypeNames(c.getInterfaces()));
 
-        java.lang.reflect.Field[] dfields = c.getDeclaredFields();
+        Field[] dfields = c.getDeclaredFields();
         List<FieldInfo> fields = new ArrayList<>(dfields.length);
-        for (java.lang.reflect.Field f : dfields) {
+        for (Field f : dfields) {
             int mods = f.getModifiers();
             String cvalue = null;
             if (Modifier.isFinal(mods) && Modifier.isStatic(mods)) {
@@ -79,18 +82,18 @@ public class ReflectionImport {
         }
         cf.setFields(fields);
 
-        java.lang.reflect.Constructor[] dconstructors = c.getDeclaredConstructors();
+        Constructor[] dconstructors = c.getDeclaredConstructors();
         List<ConstructorInfo> constructors = new ArrayList<>(dconstructors.length);
-        for (java.lang.reflect.Constructor co : dconstructors) {
+        for (Constructor co : dconstructors) {
             constructors.add(new ConstructorInfo(co.getModifiers(), getShortName(co.getName()),
                 getTypeNames(co.getParameterTypes()), getTypeNames(co.getExceptionTypes()), cf));
 
         }
         cf.setConstructors(constructors);
 
-        java.lang.reflect.Method[] dmethods = c.getDeclaredMethods();
+        Method[] dmethods = c.getDeclaredMethods();
         List<MethodInfo> methods = new ArrayList<>(dmethods.length);
-        for (java.lang.reflect.Method m : dmethods) {
+        for (Method m : dmethods) {
             if (c.isAnnotation()) {
                 methods.add(new AnnotationPropertyInfo(m.getModifiers(),
                     getTypeName(m.getReturnType()), m.getName(), cf, m.getDefaultValue()));

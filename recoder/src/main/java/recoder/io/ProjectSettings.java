@@ -309,7 +309,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
 
     /**
      * Returns the current error handler. If no error handler is set, a
-     * {@link recoder.service.DefaultErrorHandler}will be constructed.
+     * {@link DefaultErrorHandler}will be constructed.
      *
      * @return the current error handler.
      */

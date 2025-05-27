@@ -8,7 +8,7 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
 /**
  * If the system wants to inform the user it may emit this event. If the flavour of the information
  * is that of an error message, one should use the
- * {@link de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent} instead.
+ * {@link GeneralFailureEvent} instead.
  */
 public class GeneralInformationEvent extends NotificationEvent {
 

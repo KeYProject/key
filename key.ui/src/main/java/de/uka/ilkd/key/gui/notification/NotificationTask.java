@@ -10,7 +10,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
- * A notification task maps a {@link de.uka.ilkd.key.gui.notification.events.NotificationEvent} to a
+ * A notification task maps a {@link NotificationEvent} to a
  * list of actions to be performed when the event is encountered.
  *
  * @author bubel

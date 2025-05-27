@@ -61,6 +61,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
@@ -2754,7 +2755,7 @@ public final class SymbolicExecutionUtil {
     public static <T extends org.key_project.logic.Term> T followPosInOccurrence(
             PosInOccurrence posInOccurrence, T term) {
         boolean matches = true;
-        org.key_project.logic.IntIterator iter = posInOccurrence.posInTerm().iterator();
+        IntIterator iter = posInOccurrence.posInTerm().iterator();
         while (matches && iter.hasNext()) {
             int index = iter.next();
             if (index < term.arity()) {

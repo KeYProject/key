@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
+import java.awt.Cursor;
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -293,13 +294,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void notifyAutoModeBeingStarted() {
-        mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+        mainWindow.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         super.notifyAutoModeBeingStarted();
     }
 
     @Override
     public void notifyAutomodeStopped() {
-        mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        mainWindow.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         super.notifyAutomodeStopped();
     }
 

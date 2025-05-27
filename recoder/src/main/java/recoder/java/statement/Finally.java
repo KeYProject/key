@@ -179,7 +179,7 @@ public class Finally extends Branch {
     }
 
     /**
-     * Set body; must be a {@link recoder.java.StatementBlock}.
+     * Set body; must be a {@link StatementBlock}.
      *
      * @param statement a StatementBlock.
      */

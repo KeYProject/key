@@ -15,7 +15,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 /**
  * Special settings for the SMT solvers tests.
  */
-public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
+public class SMTTestSettings implements SMTSettings {
     /*
      * We set the default timeout to 50s. This should be sufficient for the unsat/sat cases which we
      * have currently. For the unknown/timeout cases, we set a shorter timeout via setTimeout().

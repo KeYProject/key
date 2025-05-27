@@ -20,9 +20,9 @@ import org.jspecify.annotations.Nullable;
  */
 public class Strings {
     /**
-     * @deprecated This class has been merged with {@link org.key_project.util.java.StringUtil}.
+     * @deprecated This class has been merged with {@link StringUtil}.
      *             Call
-     *             {@link org.key_project.util.java.StringUtil#containsWholeWord(String, String)}
+     *             {@link StringUtil#containsWholeWord(String, String)}
      */
     @Deprecated
     public static boolean containsWholeWord(String s, String word) {
@@ -30,8 +30,8 @@ public class Strings {
     }
 
     /**
-     * @deprecated This class has been merged with {@link org.key_project.util.java.StringUtil}.
-     *             Call {@link org.key_project.util.java.StringUtil#isJMLComment(String)}
+     * @deprecated This class has been merged with {@link StringUtil}.
+     *             Call {@link StringUtil#isJMLComment(String)}
      */
     @Deprecated
     public static boolean isJMLComment(String comment) {

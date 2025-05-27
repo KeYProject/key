@@ -21,8 +21,8 @@ import recoder.kit.TwoPassTransformation;
 /**
  * Syntactic transformation that modifies a declaration by adding/removing single modifiers. This
  * transformation replaces an existing visibility modifier if there is one. The modifier codes are
- * taken from the {@link recoder.kit.ModifierKit}, including the
- * {@link recoder.kit.ModifierKit#PACKAGE}pseudo modifier. The transformation obeys the standard
+ * taken from the {@link ModifierKit}, including the
+ * {@link ModifierKit#PACKAGE}pseudo modifier. The transformation obeys the standard
  * JavaDOC modifier order convention: Visibility modifiers go first, then abstract or static and
  * then final. All others are simply appended.
  *
@@ -49,7 +49,7 @@ public class Modify extends TwoPassTransformation {
      * @param isVisible flag indicating if this transformation shall be visible.
      * @param decl the declaration to modify. may not be <CODE>null</CODE> and must denote a valid
      *        identifier name.
-     * @param code the modifier to create, using the codes from {@link recoder.kit.ModifierKit}.
+     * @param code the modifier to create, using the codes from {@link ModifierKit}.
      */
     public Modify(CrossReferenceServiceConfiguration sc, boolean isVisible, Declaration decl,
             int code) {

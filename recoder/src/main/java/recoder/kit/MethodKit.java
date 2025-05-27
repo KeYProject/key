@@ -474,7 +474,7 @@ public class MethodKit {
      *
      * @param md the method declaration to clone the header from.
      * @return a new method declaration sharing the header with the given one.
-     * @see recoder.java.SourceElement#deepClone()
+     * @see SourceElement#deepClone()
      */
     public static MethodDeclaration cloneHeader(MethodDeclaration md) {
         StatementBlock body = md.getBody();

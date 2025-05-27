@@ -19,6 +19,7 @@ import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
+import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.collection.ImmutableList;
@@ -109,7 +110,7 @@ public class SetStatementTest {
     private String parseAndCheck(String statementText) {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         ImmutableList<TextualJMLConstruct> constructs =
-            new de.uka.ilkd.key.speclang.njml.PreParser(true).parseMethodLevel(statementText, null,
+            new PreParser(true).parseMethodLevel(statementText, null,
                 Position.newOneBased(1, 1));
         assertEquals(constructs.size(), 1);
         assertInstanceOf(TextualJMLSetStatement.class, constructs.head());

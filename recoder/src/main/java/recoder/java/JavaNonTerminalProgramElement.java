@@ -43,7 +43,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     }
 
     /**
-     * Defaults to attempt a depth-first traversal using a {@link recoder.convenience.TreeWalker}.
+     * Defaults to attempt a depth-first traversal using a {@link TreeWalker}.
      */
 
     public void makeAllParentRolesValid() {

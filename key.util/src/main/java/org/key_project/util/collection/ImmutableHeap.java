@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 
@@ -14,7 +15,7 @@ import java.util.Iterator;
  * attribute <code>EMPTY_HEAP</code>, which is a singleton representing empty heaps. Heaps may
  * contain multiple references to one object, or multiple objects which are <code>equal</code>.
  */
-public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializable, Iterable<T> {
+public interface ImmutableHeap<T extends Comparable<T>> extends Serializable, Iterable<T> {
 
     /**
      * @return true iff this heap is empty

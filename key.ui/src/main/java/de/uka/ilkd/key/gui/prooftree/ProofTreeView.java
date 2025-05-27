@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Serializable;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -821,7 +822,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     }
 
     // listens to gui events
-    class GUIProofTreeGUIListener implements GUIListener, java.io.Serializable {
+    class GUIProofTreeGUIListener implements GUIListener, Serializable {
 
         private static final long serialVersionUID = 4224100114740308297L;
 
@@ -943,7 +944,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
     }
 
-    class GUITreeSelectionListener implements TreeSelectionListener, java.io.Serializable {
+    class GUITreeSelectionListener implements TreeSelectionListener, Serializable {
         /**
          *
          */

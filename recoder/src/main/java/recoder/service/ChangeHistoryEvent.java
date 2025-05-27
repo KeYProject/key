@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
+import java.util.EventObject;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  * @author AL
  * @since 0.5
  */
-public class ChangeHistoryEvent extends java.util.EventObject {
+public class ChangeHistoryEvent extends EventObject {
 
     /**
      * serialization id

@@ -64,7 +64,7 @@ public class Extension<T> implements Comparable<Extension<T>> {
 
     /**
      * @return true iff this extension was disabled by the annotation
-     *         {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.Info}.
+     *         {@link KeYGuiExtension.Info}.
      */
     public boolean isDisabledByMaintainer() {
         return info != null && info.disabled();

@@ -21,7 +21,7 @@ import recoder.util.ProgressListenerManager;
  * Transformation that removes all superfluous import statements from a compilation unit.
  *
  * @author AL
- * @see recoder.kit.UnitKit#getUnnecessaryImports
+ * @see UnitKit#getUnnecessaryImports
  * @since 0.71
  */
 public class RemoveUnusedImports extends TwoPassTransformation {

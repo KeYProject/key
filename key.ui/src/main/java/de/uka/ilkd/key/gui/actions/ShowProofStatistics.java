@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.Element;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
@@ -413,7 +414,7 @@ public class ShowProofStatistics extends MainWindowAction {
             int pos = viewToModel2D(evt.getPoint());
             if (pos >= 0) {
                 HTMLDocument hdoc = (HTMLDocument) getDocument();
-                javax.swing.text.Element e = hdoc.getCharacterElement(pos);
+                Element e = hdoc.getCharacterElement(pos);
                 AttributeSet a = e.getAttributes();
 
                 return (String) a.getAttribute(HTML.Attribute.TITLE);
