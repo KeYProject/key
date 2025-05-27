@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (29.03.19)
@@ -158,7 +160,10 @@ public class Filenames {
         }
         // @ assert (\forall int i; 0 <= i < k; newa[i] != null);
         // TODO: nullness. This cast cannot be checked, can it? But there is no error message
-        return Arrays.copyOf(newa, k);
+        @SuppressWarnings("nullness")
+        @NonNull
+        String[] strings = Arrays.copyOf(newa, k);
+        return strings;
     }
 
     public static String toValidFileName(String s) {
