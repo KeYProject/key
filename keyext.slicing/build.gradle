@@ -1,4 +1,4 @@
-description "Proof slicing (removing of unnecessary nodes) for the KeY system."
+description = "Proof slicing (removing of unnecessary nodes) for the KeY system."
 
 
 dependencies {
