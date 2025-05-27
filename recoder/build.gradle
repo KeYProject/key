@@ -1,4 +1,4 @@
-description "Fork of the Recoder -- a parser/ast for Java with extensions for KeY-Java dialects."
+description = "Fork of the Recoder -- a parser/ast for Java with extensions for KeY-Java dialects."
 
 def headerFile = "$rootDir/gradle/header-recoder"
 repositories {
