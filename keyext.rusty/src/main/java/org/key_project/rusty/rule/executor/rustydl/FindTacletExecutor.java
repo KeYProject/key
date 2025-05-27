@@ -16,9 +16,9 @@ import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 
-public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
-        extends TacletExecutor<TacletKind> {
-    protected FindTacletExecutor(TacletKind taclet) {
+public abstract class FindTacletExecutor
+        extends TacletExecutor {
+    protected FindTacletExecutor(Taclet taclet) {
         super(taclet);
     }
 

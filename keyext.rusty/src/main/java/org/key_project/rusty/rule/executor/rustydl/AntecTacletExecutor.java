@@ -8,9 +8,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.proof.Goal;
-import org.key_project.rusty.rule.AntecTaclet;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.RuleApp;
+import org.key_project.rusty.rule.Taclet;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 
@@ -18,12 +18,11 @@ import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
  * Executes a Taclet which matches on a formula in the antecedent
  *
  * @author Richard Bubel
- * @param <TacletKind> the kind of taclet this executor is responsible for
  */
-public class AntecTacletExecutor<TacletKind extends AntecTaclet>
-        extends FindTacletExecutor<TacletKind> {
+public class AntecTacletExecutor
+        extends FindTacletExecutor {
 
-    public AntecTacletExecutor(TacletKind taclet) {
+    public AntecTacletExecutor(Taclet taclet) {
         super(taclet);
     }
 

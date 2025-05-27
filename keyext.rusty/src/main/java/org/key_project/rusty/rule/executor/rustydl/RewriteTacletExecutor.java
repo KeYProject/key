@@ -14,16 +14,16 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.MatchConditions;
-import org.key_project.rusty.rule.RewriteTaclet;
 import org.key_project.rusty.rule.RuleApp;
+import org.key_project.rusty.rule.Taclet;
 import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableArray;
 
-public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
-        extends FindTacletExecutor<TacletKind> {
+public class RewriteTacletExecutor
+        extends FindTacletExecutor {
 
-    public RewriteTacletExecutor(TacletKind taclet) {
+    public RewriteTacletExecutor(Taclet taclet) {
         super(taclet);
     }
 

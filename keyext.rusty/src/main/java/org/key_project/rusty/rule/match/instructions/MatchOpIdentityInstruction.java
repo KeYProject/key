@@ -7,7 +7,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
-import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 /**
  * The match instruction reports a success if the top level operator of the term to be matched is

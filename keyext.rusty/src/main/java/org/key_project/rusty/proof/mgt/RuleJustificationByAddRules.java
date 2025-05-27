@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof.mgt;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.rusty.pp.LogicPrinter;
 import org.key_project.rusty.pp.NotationInfo;
 import org.key_project.rusty.proof.Node;
-import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.Taclet;
 
 // spotless:off

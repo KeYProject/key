@@ -13,11 +13,8 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.AssumesFormulaInstSeq;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
-import org.key_project.prover.rules.AssumesMatchResult;
-import org.key_project.prover.rules.MatchConditions;
-import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.prover.rules.instantiation.*;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.sequent.*;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
@@ -33,7 +30,8 @@ import org.key_project.rusty.logic.op.RFunction;
 import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.proof.VariableNameProposer;
-import org.key_project.rusty.rule.inst.*;
+import org.key_project.rusty.rule.inst.GenericSortCondition;
+import org.key_project.rusty.rule.inst.GenericSortException;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
@@ -209,7 +207,7 @@ public abstract class TacletApp implements RuleApp {
     protected static SVInstantiations resolveCollisionVarSV(Taclet taclet, SVInstantiations insts,
             Services services) {
         HashMap<BoundVariable, SchemaVariable> collMap = new LinkedHashMap<>();
-        for (final var pair : ((org.key_project.rusty.rule.inst.SVInstantiations) insts)
+        for (final var pair : insts
                 .getInstantiationMap()) {
             if (pair.key() instanceof VariableSV varSV) {
                 Term value = (Term) pair.value().getInstantiation();
@@ -221,23 +219,6 @@ public abstract class TacletApp implements RuleApp {
             }
         }
         return insts;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    @Override
-    public <F extends Function> void execute(Namespace<@NonNull F> localFunctionNamespace) {
-        if (!complete()) {
-            throw new IllegalStateException(
-                "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
-        }
-
-        if (!isExecutable()) {
-            throw new RuntimeException(
-                "taclet application with unsatisfied 'checkPrefix': " + this);
-        }
-        registerSkolemConstants(localFunctionNamespace);
     }
 
     public boolean isExecutable() {
@@ -329,6 +310,23 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
+     * asserts that the rule application is complete and executable
+     *
+     */
+    @Override
+    public void checkApplicability() {
+        if (!complete()) {
+            throw new IllegalStateException(
+                "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
+        }
+
+        if (!isExecutable()) {
+            throw new RuntimeException(
+                "taclet application with unsatisfied 'checkPrefix': " + this);
+        }
+    }
+
+    /**
      * collects all bound vars that are bound above the subterm described by the given term position
      * information
      *
@@ -387,7 +385,7 @@ public abstract class TacletApp implements RuleApp {
         return calculateNonInstantiatedSV();
     }
 
-    public <F extends Function> void registerSkolemConstants(Namespace<@NonNull F> functions) {
+    public void registerSkolemConstants(Namespace<@NonNull Function> functions) {
         final var insts = instantiations();
         final Iterator<SchemaVariable> svIt = insts.svIterator();
         while (svIt.hasNext()) {
@@ -399,7 +397,7 @@ public abstract class TacletApp implements RuleApp {
                 // case it is used in the \addrules() section of a rule
                 if (functions.lookup(inst.op().name()) == null) {
                     // noinspection unchecked
-                    functions.addSafely((F) inst.op());
+                    functions.addSafely((Function) inst.op());
                 }
             }
         }

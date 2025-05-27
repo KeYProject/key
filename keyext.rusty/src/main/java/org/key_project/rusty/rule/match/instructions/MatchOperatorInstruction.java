@@ -5,7 +5,7 @@ package org.key_project.rusty.rule.match.instructions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
-import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 public interface MatchOperatorInstruction extends MatchInstruction {
 

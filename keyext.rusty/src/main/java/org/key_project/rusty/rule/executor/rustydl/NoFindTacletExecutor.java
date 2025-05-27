@@ -13,7 +13,7 @@ import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 
-public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
+public class NoFindTacletExecutor extends TacletExecutor {
     public NoFindTacletExecutor(NoFindTaclet taclet) {
         super(taclet);
     }

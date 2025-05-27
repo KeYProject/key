@@ -69,7 +69,7 @@ public class AntecTaclet extends FindTaclet {
 
     @Override
     protected void createAndInitializeExecutor() {
-        executor = new AntecTacletExecutor<>(this);
+        executor = new AntecTacletExecutor(this);
     }
 
     @Override

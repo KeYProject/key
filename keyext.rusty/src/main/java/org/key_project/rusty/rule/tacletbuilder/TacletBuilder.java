@@ -13,6 +13,8 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.Choice;

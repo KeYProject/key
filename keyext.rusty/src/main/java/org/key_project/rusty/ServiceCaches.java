@@ -6,6 +6,8 @@ package org.key_project.rusty;
 import java.util.Map;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.SessionCaches;
+import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.rule.metaconstruct.arith.Monomial;
 import org.key_project.util.LRUCache;
@@ -49,12 +51,21 @@ import org.key_project.util.LRUCache;
  *
  * @author Martin Hentschel
  */
-public class ServiceCaches {
+public class ServiceCaches implements SessionCaches {
     private final LRUCache<Term, Monomial> monomialCache = new LRUCache<>(2000);
+
+    /** Cache used IfFormulaInstSeq */
+    private final AssumesFormulaInstantiationCache assumesFormulaInstantiationCache =
+        new AssumesFormulaInstantiationCache();
 
     // private final LRUCache<Term, Polynomial> polynomialCache = new LRUCache<>(2000);
 
     public final LRUCache<Term, Monomial> getMonomialCache() {
         return monomialCache;
+    }
+
+    @Override
+    public AssumesFormulaInstantiationCache getAssumesFormulaInstantiationCache() {
+        return assumesFormulaInstantiationCache;
     }
 }

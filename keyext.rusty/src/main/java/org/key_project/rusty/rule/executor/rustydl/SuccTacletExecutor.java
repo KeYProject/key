@@ -10,14 +10,14 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.RuleApp;
-import org.key_project.rusty.rule.SuccTaclet;
+import org.key_project.rusty.rule.Taclet;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 
-public class SuccTacletExecutor<TacletKind extends SuccTaclet>
-        extends FindTacletExecutor<TacletKind> {
+public class SuccTacletExecutor
+        extends FindTacletExecutor {
 
-    public SuccTacletExecutor(TacletKind taclet) {
+    public SuccTacletExecutor(Taclet taclet) {
         super(taclet);
     }
 

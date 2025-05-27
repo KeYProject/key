@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofServices;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BinaryExpression;
 import org.key_project.rusty.ast.expr.LiteralExpression;
@@ -17,14 +18,11 @@ import org.key_project.rusty.ldt.LDT;
 import org.key_project.rusty.ldt.LDTs;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.proof.Counter;
-import org.key_project.rusty.proof.NameRecorder;
-import org.key_project.rusty.proof.Proof;
-import org.key_project.rusty.proof.RustModel;
+import org.key_project.rusty.proof.*;
 import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.mgt.SpecificationRepository;
 
-public class Services implements LogicServices {
+public class Services implements LogicServices, ProofServices {
     /**
      * proof specific namespaces (functions, predicates, sorts, variables)
      */
@@ -272,5 +270,10 @@ public class Services implements LogicServices {
 
     public void setRustModel(RustModel rustModel) {
         this.rustModel = rustModel;
+    }
+
+    public void saveNameRecorder(Node n) {
+        n.setNameRecorder(nameRecorder);
+        nameRecorder = new NameRecorder();
     }
 }

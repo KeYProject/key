@@ -5,7 +5,7 @@ package org.key_project.rusty.rule.match.instructions;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElementCursor;
-import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 /**
  * Interface that has to be implemented by instructions for the matching virtual machine

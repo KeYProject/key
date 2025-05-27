@@ -6,7 +6,7 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 
-public class NewVarcond implements org.key_project.prover.rules.NewVarcond {
+public class NewVarcond implements org.key_project.prover.rules.conditions.NewVarcond {
     private final org.key_project.logic.op.sv.SchemaVariable sv;
     private final org.key_project.logic.op.sv.SchemaVariable peerSV;
     private final KeYRustyType type;

@@ -12,8 +12,9 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
-import org.key_project.prover.rules.AssumesFormulaInstSeq;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.Services;
@@ -24,7 +25,6 @@ import org.key_project.rusty.pp.PrettyPrinter;
 import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.init.Profile;
-import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.rusty.rule.inst.TermInstantiation;
 import org.key_project.rusty.settings.ProofSettings;
@@ -224,11 +224,11 @@ public class OutputStreamProofSaver {
     public String ifFormulaInsts(Node node, ImmutableList<AssumesFormulaInstantiation> l) {
         StringBuilder s = new StringBuilder();
         for (final AssumesFormulaInstantiation aL : l) {
-            if (aL instanceof AssumesFormulaInstSeq ifis) {
+            if (aL instanceof AssumesFormulaInstSeq assumesIS) {
                 final org.key_project.prover.sequent.SequentFormula f = aL.getSequentFormula();
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
-                                .formulaNumberInSequent(ifis.inAntec(), f))
+                                .formulaNumberInSequent(assumesIS.inAntecedent(), f))
                         .append("\")");
             } /*
                * else if (aL instanceof IfFormulaInstDirect) {

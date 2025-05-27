@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.key_project.rusty.rule.RuleApp;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.util.EnhancedStringBuffer;
 import org.key_project.util.collection.Pair;

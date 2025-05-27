@@ -5,7 +5,7 @@ package org.key_project.rusty.rule;
 
 import org.key_project.rusty.rule.inst.SVInstantiations;
 
-public class MatchConditions extends org.key_project.prover.rules.MatchConditions {
+public class MatchConditions extends org.key_project.prover.rules.instantiation.MatchConditions {
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
         new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS);
 
@@ -22,7 +22,7 @@ public class MatchConditions extends org.key_project.prover.rules.MatchCondition
     }
 
     public MatchConditions setInstantiations(
-            org.key_project.prover.rules.inst.SVInstantiations p_instantiations) {
+            org.key_project.prover.rules.instantiation.SVInstantiations p_instantiations) {
         if (instantiations == p_instantiations) {
             return this;
         } else {

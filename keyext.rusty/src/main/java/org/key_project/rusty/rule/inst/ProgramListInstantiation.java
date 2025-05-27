@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
 
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.util.collection.ImmutableArray;
 

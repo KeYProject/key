@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.NotFreeIn;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.FormulaSV;

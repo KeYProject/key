@@ -5,6 +5,7 @@ package org.key_project.rusty.rule.inst;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
 
 public class TermInstantiation extends InstantiationEntry<Term> {

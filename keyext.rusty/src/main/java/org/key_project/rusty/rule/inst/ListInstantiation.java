@@ -4,6 +4,7 @@
 package org.key_project.rusty.rule.inst;
 
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.util.collection.ImmutableList;
 
 public class ListInstantiation extends InstantiationEntry<ImmutableList<Object>> {

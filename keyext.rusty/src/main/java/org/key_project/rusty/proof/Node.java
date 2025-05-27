@@ -6,12 +6,12 @@ package org.key_project.rusty.proof;
 import java.util.*;
 
 import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.logic.RenamingTable;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.NoPosTacletApp;
-import org.key_project.rusty.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -69,6 +69,8 @@ public class Node implements Iterable<Node> {
      * node.
      */
     private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
+
+    private NameRecorder nameRecorder;
 
     /**
      * creates an empty node that is root and leaf.
@@ -358,5 +360,13 @@ public class Node implements Iterable<Node> {
 
     public void setRenamings(ImmutableList<RenamingTable> list) {
         renamings = list;
+    }
+
+    public NameRecorder getNameRecorder() {
+        return nameRecorder;
+    }
+
+    public void setNameRecorder(NameRecorder nameRecorder) {
+        this.nameRecorder = nameRecorder;
     }
 }

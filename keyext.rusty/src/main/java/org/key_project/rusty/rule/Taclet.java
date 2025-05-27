@@ -161,8 +161,8 @@ public abstract class Taclet extends
         return (TacletPrefix) prefixMap.get(sv);
     }
 
-    public TacletExecutor<?> getExecutor() {
-        return (TacletExecutor<? extends Taclet>) executor;
+    public TacletExecutor getExecutor() {
+        return (TacletExecutor) executor;
     }
 
     @Override

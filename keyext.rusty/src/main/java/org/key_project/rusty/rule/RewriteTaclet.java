@@ -145,7 +145,7 @@ public class RewriteTaclet extends FindTaclet {
 
     @Override
     protected void createAndInitializeExecutor() {
-        this.executor = new RewriteTacletExecutor<>(this);
+        this.executor = new RewriteTacletExecutor(this);
     }
 
     /**
@@ -199,8 +199,8 @@ public class RewriteTaclet extends FindTaclet {
     }
 
     @Override
-    public RewriteTacletExecutor<? extends RewriteTaclet> getExecutor() {
-        return (RewriteTacletExecutor<? extends RewriteTaclet>) executor;
+    public RewriteTacletExecutor getExecutor() {
+        return (RewriteTacletExecutor) executor;
     }
 
     @Override

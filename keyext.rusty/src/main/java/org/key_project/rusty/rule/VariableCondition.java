@@ -34,9 +34,10 @@ public interface VariableCondition extends org.key_project.prover.rules.Variable
             Services services);
 
     @Override
-    default org.key_project.prover.rules.MatchConditions check(
+    default org.key_project.prover.rules.instantiation.MatchConditions check(
             org.key_project.logic.op.sv.SchemaVariable var, SyntaxElement instCandidate,
-            org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
+            org.key_project.prover.rules.instantiation.MatchConditions matchCond,
+            LogicServices services) {
         return check(var, instCandidate, (MatchConditions) matchCond,
             (Services) services);
     }

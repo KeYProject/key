@@ -68,7 +68,12 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     }
 
     @Override
-    public <F extends Function> void execute(Namespace<@NonNull F> fns) {
+    public void checkApplicability() {
+
+    }
+
+    @Override
+    public void registerSkolemConstants(Namespace<@NonNull Function> fns) {
 
     }
 

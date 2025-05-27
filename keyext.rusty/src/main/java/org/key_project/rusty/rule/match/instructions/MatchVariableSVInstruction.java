@@ -7,7 +7,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.rusty.logic.op.sv.VariableSV;
 
 import org.jspecify.annotations.NonNull;

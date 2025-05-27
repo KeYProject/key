@@ -8,14 +8,15 @@ import java.util.Collection;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rule.NoPosTacletApp;
-import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.rusty.rule.inst.SVInstantiations;
@@ -23,6 +24,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 public final class Goal implements ProofGoal<@NonNull Goal> {
@@ -106,32 +108,30 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         return getNode().sequent();
     }
 
-    /**
-     * Perform the provided rule application on this goal.
-     * Returns the new goal(s), if any.
-     * The state of the proof is also updated.
-     *
-     * @param ruleApp the rule app
-     * @return new goal(s)
-     */
-    public ImmutableList<Goal> apply(final RuleApp ruleApp) {
+    @Override
+    public @Nullable ImmutableList<@NonNull Goal> apply(
+            org.key_project.prover.rules.@NonNull RuleApp ruleApp) {
         final Proof proof = proof();
+
+        final Node n = node;
 
         /*
          * wrap the services object into an overlay such that any addition to local symbols is
          * caught.
          */
         final ImmutableList<Goal> goalList;
-        ruleApp.execute(localNamespaces.functions());
+        ruleApp.checkApplicability();
+        ruleApp.registerSkolemConstants(localNamespaces.functions());
         addAppliedRuleApp(ruleApp);
-
         try {
-            goalList = ruleApp.rule().getExecutor().apply(this, ruleApp);
+            goalList = ruleApp.rule().<Goal>getExecutor().apply(this, ruleApp);
         } catch (RuleAbortException rae) {
             removeLastAppliedRuleApp();
             getNode().setAppliedRuleApp(null);
             return null;
         }
+
+        proof.getServices().saveNameRecorder(n);
 
         if (goalList.isEmpty()) {
             proof.closeGoal(this);
@@ -144,8 +144,12 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         }
 
         adaptNamespacesNewGoals(goalList);
-
         return goalList;
+    }
+
+    @Override
+    public RuleApplicationManager<@NonNull Goal> getRuleAppManager() {
+        return null;
     }
 
     /**

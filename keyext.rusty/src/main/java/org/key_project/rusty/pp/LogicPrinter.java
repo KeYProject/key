@@ -11,6 +11,10 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -22,10 +26,7 @@ import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.op.*;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
-import org.key_project.rusty.rule.AntecTaclet;
-import org.key_project.rusty.rule.FindTaclet;
-import org.key_project.rusty.rule.RewriteTaclet;
-import org.key_project.rusty.rule.SuccTaclet;
+import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -245,7 +246,7 @@ public class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) {
-        final ImmutableList<? extends NewVarcond> varsNew = taclet.varsNew();
+        final var varsNew = taclet.varsNew();
         final ImmutableList<? extends NewDependingOn> varsNewDependingOn =
             taclet.varsNewDependingOn();
         final ImmutableList<? extends NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
@@ -266,13 +267,13 @@ public class LogicPrinter {
                 printNewVarDepOnCond(ndo);
             }
 
-            for (final NewVarcond nvc : varsNew) {
+            for (final org.key_project.prover.rules.conditions.NewVarcond nvc : varsNew) {
                 if (first) {
                     first = false;
                 } else {
                     layouter.print(",").brk();
                 }
-                printNewVarcond(nvc);
+                printNewVarcond((NewVarcond) nvc);
             }
 
             for (final NotFreeIn pair : varsNotFreeIn) {
