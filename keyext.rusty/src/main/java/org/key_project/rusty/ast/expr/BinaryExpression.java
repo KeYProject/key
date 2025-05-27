@@ -53,7 +53,12 @@ public final class BinaryExpression implements Expr {
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        return switch(n){case 0->left;case 1->op;case 2->right;default->throw new IndexOutOfBoundsException("BinaryExpression has only 3 children");};
+        return switch (n) {
+        case 0 -> left;
+        case 1 -> op;
+        case 2 -> right;
+        default -> throw new IndexOutOfBoundsException("BinaryExpression has only 3 children");
+        };
     }
 
     @Override

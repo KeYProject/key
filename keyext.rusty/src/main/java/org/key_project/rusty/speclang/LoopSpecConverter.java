@@ -61,24 +61,25 @@ public class LoopSpecConverter {
         return atPres;
     }
 
-    public Term convert(org.key_project.rusty.speclang.spec.Term term, Map<HirId, ProgramVariable> pvs) {
+    public Term convert(org.key_project.rusty.speclang.spec.Term term,
+            Map<HirId, ProgramVariable> pvs) {
         return switch (term.kind()) {
-            case TermKind.Binary(var op, var left, var right) -> {
-                var l = convert(left, pvs);
-                var r = convert(right, pvs);
-                yield convert(op, l, r);
-            }
-            case TermKind.Unary(var op, var child) -> {
-                var c = convert(child, pvs);
-                yield convert(op, c);
-            }
-            case TermKind.Lit(var l) ->switch (l.node()) {
-                case LitKind.Bool(var b) -> b ? tb.tt() : tb.ff();
-                case LitKind.Int(var i, var ignored) -> tb.zTerm(i);
-                default -> throw new IllegalStateException("Unexpected value: " + l.node());
-            };
-            case TermKind.Path(var p) -> convertPath(p, pvs);
-            default -> throw new IllegalStateException("Unexpected value: " + term);
+        case TermKind.Binary(var op, var left, var right) -> {
+            var l = convert(left, pvs);
+            var r = convert(right, pvs);
+            yield convert(op, l, r);
+        }
+        case TermKind.Unary(var op, var child) -> {
+            var c = convert(child, pvs);
+            yield convert(op, c);
+        }
+        case TermKind.Lit(var l) -> switch (l.node()) {
+        case LitKind.Bool(var b) -> b ? tb.tt() : tb.ff();
+        case LitKind.Int(var i, var ignored) -> tb.zTerm(i);
+        default -> throw new IllegalStateException("Unexpected value: " + l.node());
+        };
+        case TermKind.Path(var p) -> convertPath(p, pvs);
+        default -> throw new IllegalStateException("Unexpected value: " + term);
         };
     }
 
@@ -95,7 +96,28 @@ public class LoopSpecConverter {
 
     public Term convert(BinOp op, Term left, Term right) {
         // TODO: make this "proper"
-        var intLDT=services.getLDTs().getIntLDT();var o=switch(op.node()){case BinOpKind.Add->intLDT.getAdd();case BinOpKind.Sub->intLDT.getSub();case BinOpKind.Mul->intLDT.getMul();case BinOpKind.Div->intLDT.getDiv();case BinOpKind.And->Junctor.AND;case BinOpKind.Or->Junctor.OR;case BinOpKind.Lt->intLDT.getLessThan();case BinOpKind.Le->intLDT.getLessOrEquals();case BinOpKind.Gt->intLDT.getGreaterThan();case BinOpKind.Ge->intLDT.getGreaterOrEquals();case BinOpKind.Eq->left.sort()==RustyDLTheory.FORMULA?Equality.EQV:Equality.EQUALS;case BinOpKind.BitXor,BinOpKind.BitAnd,BinOpKind.BitOr,BinOpKind.Shl,BinOpKind.Rem,BinOpKind.Shr->throw new RuntimeException("TODO");case BinOpKind.Ne->Junctor.NOT;};if(o==Junctor.NOT){return tb.not(tb.equals(left,right));}return tf.createTerm(o,left,right);
+        var intLDT = services.getLDTs().getIntLDT();
+        var o = switch (op.node()) {
+        case BinOpKind.Add -> intLDT.getAdd();
+        case BinOpKind.Sub -> intLDT.getSub();
+        case BinOpKind.Mul -> intLDT.getMul();
+        case BinOpKind.Div -> intLDT.getDiv();
+        case BinOpKind.And -> Junctor.AND;
+        case BinOpKind.Or -> Junctor.OR;
+        case BinOpKind.Lt -> intLDT.getLessThan();
+        case BinOpKind.Le -> intLDT.getLessOrEquals();
+        case BinOpKind.Gt -> intLDT.getGreaterThan();
+        case BinOpKind.Ge -> intLDT.getGreaterOrEquals();
+        case BinOpKind.Eq -> left.sort() == RustyDLTheory.FORMULA ? Equality.EQV : Equality.EQUALS;
+        case BinOpKind.BitXor, BinOpKind.BitAnd, BinOpKind.BitOr, BinOpKind.Shl, BinOpKind.Rem,
+                BinOpKind.Shr ->
+            throw new RuntimeException("TODO");
+        case BinOpKind.Ne -> Junctor.NOT;
+        };
+        if (o == Junctor.NOT) {
+            return tb.not(tb.equals(left, right));
+        }
+        return tf.createTerm(o, left, right);
     }
 
     public Term convert(UnOp op, Term child) {

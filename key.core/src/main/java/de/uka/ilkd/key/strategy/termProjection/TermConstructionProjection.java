@@ -13,8 +13,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
  * operator.

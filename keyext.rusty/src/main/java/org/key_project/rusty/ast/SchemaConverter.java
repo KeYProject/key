@@ -951,7 +951,28 @@ public class SchemaConverter {
 
     private PrimitiveRustType convertTypePath(
             org.key_project.rusty.parsing.RustySchemaParser.TypePathContext ctx) {
-        assert ctx.typePathSegment().size()==1;var text=ctx.typePathSegment(0).pathIdentSegment().identifier().getText();var pt=switch(text){case"bool"->PrimitiveType.BOOL;case"u8"->PrimitiveType.U8;case"u16"->PrimitiveType.U16;case"u32"->PrimitiveType.U32;case"u64"->PrimitiveType.U64;case"u128"->PrimitiveType.U128;case"usize"->PrimitiveType.USIZE;case"i8"->PrimitiveType.I8;case"i16"->PrimitiveType.I16;case"i32"->PrimitiveType.I32;case"i64"->PrimitiveType.I64;case"i128"->PrimitiveType.I128;case"isize"->PrimitiveType.ISIZE;case"char"->PrimitiveType.CHAR;case"str"->PrimitiveType.STR;case"!"->PrimitiveType.NEVER;default->throw new IllegalArgumentException("Unknown type '"+text+"'");};return new PrimitiveRustType(pt);
+        assert ctx.typePathSegment().size() == 1;
+        var text = ctx.typePathSegment(0).pathIdentSegment().identifier().getText();
+        var pt = switch (text) {
+        case "bool" -> PrimitiveType.BOOL;
+        case "u8" -> PrimitiveType.U8;
+        case "u16" -> PrimitiveType.U16;
+        case "u32" -> PrimitiveType.U32;
+        case "u64" -> PrimitiveType.U64;
+        case "u128" -> PrimitiveType.U128;
+        case "usize" -> PrimitiveType.USIZE;
+        case "i8" -> PrimitiveType.I8;
+        case "i16" -> PrimitiveType.I16;
+        case "i32" -> PrimitiveType.I32;
+        case "i64" -> PrimitiveType.I64;
+        case "i128" -> PrimitiveType.I128;
+        case "isize" -> PrimitiveType.ISIZE;
+        case "char" -> PrimitiveType.CHAR;
+        case "str" -> PrimitiveType.STR;
+        case "!" -> PrimitiveType.NEVER;
+        default -> throw new IllegalArgumentException("Unknown type '" + text + "'");
+        };
+        return new PrimitiveRustType(pt);
     }
 
     private ImmutableArray<FunctionParam> convertFunctionParams(

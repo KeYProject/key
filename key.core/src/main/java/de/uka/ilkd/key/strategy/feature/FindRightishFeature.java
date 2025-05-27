@@ -18,9 +18,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
-import org.key_project.prover.sequent.PIOPathIterator;
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Walking from the root of a formula down to the focus of a rule application, count how often we
  * choose the left branch (subterm) and how the right branches. This is used to identify the

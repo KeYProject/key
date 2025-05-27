@@ -14,8 +14,6 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Policy for {@link OriginTermLabel}s.
  *

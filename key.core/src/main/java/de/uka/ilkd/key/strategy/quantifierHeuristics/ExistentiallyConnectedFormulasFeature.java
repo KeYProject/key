@@ -12,8 +12,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Binary feature that return zero if two given projection term is CS-Releated.
  */

@@ -7,11 +7,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-<<<<<<<< HEAD:key.core/src/main/java/de/uka/ilkd/key/rule/AssumesFormulaInstantiationCache.java
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
-========
-import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
->>>>>>>> main:key.ncore.calculus/src/main/java/org/key_project/prover/rules/instantiation/caches/AssumesFormulaInstantiationCache.java
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;

@@ -13,8 +13,6 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long the new {@link Term} has the
  * same {@link Operator} as the previous best matching {@link Term} from which it was created.

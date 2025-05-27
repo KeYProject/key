@@ -61,15 +61,43 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static ResultAndCall getMethodCall(RustyBlock rb,
             Services services) {
-        final Expr actualResult;final Call call;
+        final Expr actualResult;
+        final Call call;
 
-        final RustyProgramElement activeExpr=RustTools.getActiveExpr(rb);
+        final RustyProgramElement activeExpr = RustTools.getActiveExpr(rb);
         // active expr must be function call, method call or assignment with
         // function/method call
-        switch(activeExpr){case CallExpression ce->{actualResult=null;call=ce;}case MethodCallExpression me->{actualResult=null;call=me;}case AssignmentExpression as->{final Expr lhs=as.lhs();final Expr rhs=as.rhs();if((rhs instanceof Call c)&&(lhs instanceof ProgramVariable)){actualResult=lhs;call=c;}else{return null;}}case null,default->{return null;}}
+        switch (activeExpr) {
+        case CallExpression ce -> {
+            actualResult = null;
+            call = ce;
+        }
+        case MethodCallExpression me -> {
+            actualResult = null;
+            call = me;
+        }
+        case AssignmentExpression as -> {
+            final Expr lhs = as.lhs();
+            final Expr rhs = as.rhs();
+            if ((rhs instanceof Call c) && (lhs instanceof ProgramVariable)) {
+                actualResult = lhs;
+                call = c;
+            } else {
+                return null;
+            }
+        }
+        case null, default -> {
+            return null;
+        }
+        }
 
         // receiver must be simple
-        if(call instanceof MethodCallExpression me&&!ProgramSVSort.SIMPLE_EXPRESSION.canStandFor(me.callee(),services)){return null;}else{return new ResultAndCall(actualResult,call);}
+        if (call instanceof MethodCallExpression me
+                && !ProgramSVSort.SIMPLE_EXPRESSION.canStandFor(me.callee(), services)) {
+            return null;
+        } else {
+            return new ResultAndCall(actualResult, call);
+        }
     }
 
     private static Instantiation instantiate(Term focusTerm, Services services) {
@@ -430,28 +458,29 @@ public final class UseOperationContractRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     /**
-     * @param u            The enclosing update term.
-     * @param progPost     The program post condition term.
-     * @param modality     The modality.
+     * @param u The enclosing update term.
+     * @param progPost The program post condition term.
+     * @param modality The modality.
      * @param actualResult The actual result expression.
-     * @param actualSelf   The actual self term.
-     * @param call         The call expression
-     * @param fn           The program function.
+     * @param actualSelf The actual self term.
+     * @param call The call expression
+     * @param fn The program function.
      * @param actualParams The actual parameter terms.
      */
-    public record Instantiation(Term u, Term progPost, Modality modality, Expr actualResult, Term actualSelf,
-                                Call call, ProgramFunction fn,
-                                ImmutableList<Term> actualParams) {
+    public record Instantiation(Term u, Term progPost, Modality modality, Expr actualResult,
+            Term actualSelf,
+            Call call, ProgramFunction fn,
+            ImmutableList<Term> actualParams) {
         /**
          * Creates a new instantiation for the contract rule and the given variables.
          *
-         * @param u            the enclosing update term
-         * @param progPost     the post condition of the program method
-         * @param modality     the modality
+         * @param u the enclosing update term
+         * @param progPost the post condition of the program method
+         * @param modality the modality
          * @param actualResult the result expression
-         * @param actualSelf   the self term
-         * @param call         the call expression
-         * @param fn           the program method
+         * @param actualSelf the self term
+         * @param call the call expression
+         * @param fn the program method
          * @param actualParams the actual parameter terms
          */
         public Instantiation {

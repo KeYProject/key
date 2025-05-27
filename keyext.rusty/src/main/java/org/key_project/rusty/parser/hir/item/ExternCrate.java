@@ -5,4 +5,5 @@ package org.key_project.rusty.parser.hir.item;
 
 import org.key_project.rusty.parser.hir.Ident;
 
-public record ExternCrate(Ident ident,String symbol)implements ItemKind{}
+public record ExternCrate(Ident ident, String symbol) implements ItemKind {
+}

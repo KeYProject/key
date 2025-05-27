@@ -483,21 +483,29 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
     }
 
     private void processChar(char strChar) throws BadLocationException {
-        switch(strChar){case('@')->checkAt();case'\n'->checkLinefeed();
+        switch (strChar) {
+        case ('@') -> checkAt();
+        case '\n' -> checkLinefeed();
         // all tabs should have been replaced earlier!
-        case'\t',' '->checkSpaceTab(strChar);case'*'->checkStar();case'/'->checkSlash();case'"'->checkQuote();
+        case '\t', ' ' -> checkSpaceTab(strChar);
+        case '*' -> checkStar();
+        case '/' -> checkSlash();
+        case '"' -> checkQuote();
 
         // keyword delimiters: +-*/(){}[]%!^~.;?:&|<>="'\n(space)
-        case'+','-'->checkPlusMinus(strChar);
+        case '+', '-' -> checkPlusMinus(strChar);
 
         // case '*':
         // case '/':
-        case'(',')','[',']','{','}','%','!','^','~','&','|','.',':',';','?','<','>','=','\''->
-        // case ' ':
-        // case '"':
-        // case '\'':
-        // case '\n':
-        checkDelimiter(strChar);default->checkOther(strChar);}
+        case '(', ')', '[', ']', '{', '}', '%', '!', '^', '~', '&', '|', '.', ':', ';', '?', '<',
+                '>', '=', '\'' ->
+            // case ' ':
+            // case '"':
+            // case '\'':
+            // case '\n':
+            checkDelimiter(strChar);
+        default -> checkOther(strChar);
+        }
     }
 
     private void insertCommentString(String str, int pos) throws BadLocationException {

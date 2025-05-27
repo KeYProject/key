@@ -6,8 +6,9 @@ package org.key_project.rusty.parser.hir.item;
 import org.key_project.rusty.parser.hir.Path;
 import org.key_project.rusty.parser.hir.Res;
 
-public record Use(Path<Res[]>path,UseKind useKind)implements ItemKind{
+public record Use(Path<Res[]> path, UseKind useKind) implements ItemKind {
 
-public enum UseKind {
-    Single, Glob, ListStem
-}}
+    public enum UseKind {
+        Single, Glob, ListStem
+    }
+}

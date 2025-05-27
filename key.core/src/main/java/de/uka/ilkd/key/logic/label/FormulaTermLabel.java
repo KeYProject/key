@@ -135,7 +135,11 @@ public class FormulaTermLabel implements TermLabel {
      */
     @Override
     public Object getTLChild(int i) {
-        return switch(i){case 0->getId();case 1->beforeIds;default->null;};
+        return switch (i) {
+        case 0 -> getId();
+        case 1 -> beforeIds;
+        default -> null;
+        };
     }
 
     /**

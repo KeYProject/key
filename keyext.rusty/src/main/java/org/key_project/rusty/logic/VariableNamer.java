@@ -393,5 +393,6 @@ public abstract class VariableNamer implements InstantiationProposer {
         return null;
     }
 
-    protected record BasenameAndIndex(String basename, int index) {}
+    protected record BasenameAndIndex(String basename, int index) {
+    }
 }

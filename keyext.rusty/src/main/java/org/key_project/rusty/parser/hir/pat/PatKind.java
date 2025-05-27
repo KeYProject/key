@@ -12,26 +12,32 @@ import org.key_project.rusty.parser.hir.expr.Expr;
 import org.jspecify.annotations.Nullable;
 
 public interface PatKind {
-    record Wild() implements PatKind {}
+    record Wild() implements PatKind {
+    }
 
-    record Binding(BindingMode mode, HirId hirId, Ident ident, Pat pat) implements PatKind{}
+    record Binding(BindingMode mode, HirId hirId, Ident ident, Pat pat) implements PatKind {
+    }
 
-    record Path(QPath path) implements PatKind {}
+    record Path(QPath path) implements PatKind {
+    }
 
-    record Range(@Nullable PatExpr lhs, @Nullable PatExpr rhs, boolean inclusive) implements PatKind {}
+    record Range(@Nullable PatExpr lhs, @Nullable PatExpr rhs, boolean inclusive)
+            implements PatKind {
+    }
 
-    record Expr(PatExpr expr) implements PatKind {}
+    record Expr(PatExpr expr) implements PatKind {
+    }
 
     class Adapter extends HirAdapter<PatKind> {
         @Override
         public Class<? extends PatKind> getType(String tag) {
             return switch (tag) {
-                case "Wild" -> Wild.class;
-                case "Binding" -> Binding.class;
-                case "Path" -> Path.class;
-                case "Range" -> Range.class;
-                case "Expr" -> Expr.class;
-                default -> null;
+            case "Wild" -> Wild.class;
+            case "Binding" -> Binding.class;
+            case "Path" -> Path.class;
+            case "Range" -> Range.class;
+            case "Expr" -> Expr.class;
+            default -> null;
             };
         }
     }

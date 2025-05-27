@@ -5,4 +5,5 @@ package org.key_project.rusty.parser.hir.item;
 
 import org.key_project.rusty.parser.hir.hirty.HirTy;
 
-public record Const(HirTy ty,Body body)implements ItemKind{}
+public record Const(HirTy ty, Body body) implements ItemKind {
+}

@@ -7,17 +7,19 @@ import org.key_project.rusty.parser.hir.HirAdapter;
 import org.key_project.rusty.parser.hir.QPath;
 
 public interface HirTyKind {
-    record Path(QPath path) implements HirTyKind {}
+    record Path(QPath path) implements HirTyKind {
+    }
 
-    record Ref(MutHirTy ty) implements HirTyKind {}
+    record Ref(MutHirTy ty) implements HirTyKind {
+    }
 
     class Adapter extends HirAdapter<HirTyKind> {
         @Override
         public Class<? extends HirTyKind> getType(String tag) {
             return switch (tag) {
-                case "Path" -> Path.class;
-                case "Ref" -> Ref.class;
-                default -> null;
+            case "Path" -> Path.class;
+            case "Ref" -> Ref.class;
+            default -> null;
             };
         }
     }

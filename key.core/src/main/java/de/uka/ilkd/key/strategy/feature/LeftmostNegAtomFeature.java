@@ -15,9 +15,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.key_project.prover.sequent.PIOPathIterator;
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Feature that returns zero if there is no atom with negative polarity on a common d-path and on
  * the left of the find-position within the find-formula as a formula of the antecedent. Used

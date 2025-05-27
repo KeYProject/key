@@ -425,7 +425,26 @@ public class ReflectionClassCreator {
      * Sanity check. Checks if number of opening and closing braces is equal.
      */
     private boolean checkBraces(final StringBuilder buf) {
-        int curly=0;int round=0;int edged=0;for(int i=0;i<buf.length();i++){switch(buf.charAt(i)){case'{'->curly++;case'}'->curly--;case'('->round++;case')'->round--;case'['->edged++;case']'->edged--;}}if(curly==0&&round==0&&edged==0){return true;}else{LOGGER.error("Error braces in RFL.java: curly: {} round: {}: egded: {}",curly,round,edged);return false;}
+        int curly = 0;
+        int round = 0;
+        int edged = 0;
+        for (int i = 0; i < buf.length(); i++) {
+            switch (buf.charAt(i)) {
+            case '{' -> curly++;
+            case '}' -> curly--;
+            case '(' -> round++;
+            case ')' -> round--;
+            case '[' -> edged++;
+            case ']' -> edged--;
+            }
+        }
+        if (curly == 0 && round == 0 && edged == 0) {
+            return true;
+        } else {
+            LOGGER.error("Error braces in RFL.java: curly: {} round: {}: egded: {}", curly, round,
+                edged);
+            return false;
+        }
     }
 
 }

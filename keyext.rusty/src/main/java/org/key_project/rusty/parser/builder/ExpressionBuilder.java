@@ -45,7 +45,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class ExpressionBuilder extends DefaultBuilder {
-    public record BoundVar(Name name, Sort sort) {}
+    public record BoundVar(Name name, Sort sort) {
+    }
 
     private boolean rustySchemaModeAllowed;
     private List<BoundVariable> boundVars = new ArrayList<>();
@@ -269,9 +270,27 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitWeak_arith_term(KeYRustyParser.Weak_arith_termContext ctx) {
-        Term termL=Objects.requireNonNull(accept(ctx.a));if(ctx.op.isEmpty()){return termL;}
+        Term termL = Objects.requireNonNull(accept(ctx.a));
+        if (ctx.op.isEmpty()) {
+            return termL;
+        }
 
-        List<Term>terms=mapOf(ctx.b);Term last=termL;for(int i=0;i<terms.size();i++){String opname="";switch(ctx.op.get(i).getType()){case KeYRustyLexer.UTF_INTERSECT->opname="intersect";case KeYRustyLexer.UTF_SETMINUS->opname="setMinus";case KeYRustyLexer.UTF_UNION->opname="union";case KeYRustyLexer.PLUS->opname="add";case KeYRustyLexer.MINUS->opname="sub";default->semanticError(ctx,"Unexpected token: %s",ctx.op.get(i));}Term cur=terms.get(i);last=binaryLDTSpecificTerm(ctx,opname,last,cur);}return last;
+        List<Term> terms = mapOf(ctx.b);
+        Term last = termL;
+        for (int i = 0; i < terms.size(); i++) {
+            String opname = "";
+            switch (ctx.op.get(i).getType()) {
+            case KeYRustyLexer.UTF_INTERSECT -> opname = "intersect";
+            case KeYRustyLexer.UTF_SETMINUS -> opname = "setMinus";
+            case KeYRustyLexer.UTF_UNION -> opname = "union";
+            case KeYRustyLexer.PLUS -> opname = "add";
+            case KeYRustyLexer.MINUS -> opname = "sub";
+            default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
+            }
+            Term cur = terms.get(i);
+            last = binaryLDTSpecificTerm(ctx, opname, last, cur);
+        }
+        return last;
     }
 
     private Term binaryLDTSpecificTerm(ParserRuleContext ctx, String opname, Term last, Term cur) {

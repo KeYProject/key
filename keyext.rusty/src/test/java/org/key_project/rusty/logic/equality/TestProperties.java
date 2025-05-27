@@ -20,7 +20,8 @@ import static org.key_project.rusty.logic.equality.RenamingProgramElementPropert
 @DisplayName("Tests for different equality properties")
 public class TestProperties {
 
-    private record ProgramTuple(RustyProgramElement program1, RustyProgramElement program2) {}
+    private record ProgramTuple(RustyProgramElement program1, RustyProgramElement program2) {
+    }
 
     private ProgramTuple getPrograms(String termString1, String termString2) {
         var t1 = TacletForTests.parseTerm(termString1);

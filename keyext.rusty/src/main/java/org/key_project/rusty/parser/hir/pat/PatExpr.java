@@ -6,4 +6,5 @@ package org.key_project.rusty.parser.hir.pat;
 import org.key_project.rusty.parser.hir.HirId;
 import org.key_project.rusty.parser.hir.Span;
 
-public record PatExpr(HirId hirId,Span span,PatExprKind kind){}
+public record PatExpr(HirId hirId, Span span, PatExprKind kind) {
+}

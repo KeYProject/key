@@ -18,11 +18,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
-import org.key_project.logic.Term;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
-import org.key_project.prover.sequent.SequentFormula;
-
 /**
  * The heap generator returns an iterator over all terms of sort heap that
  * <ol>

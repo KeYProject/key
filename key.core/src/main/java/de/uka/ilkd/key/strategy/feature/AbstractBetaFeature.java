@@ -20,8 +20,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 
 /**
  * This abstract class contains some auxiliary methods for the selection of beta rules that are

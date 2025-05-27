@@ -20,8 +20,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
  * a {@link MergePointStatement}, otherwise, infinitely expensive.

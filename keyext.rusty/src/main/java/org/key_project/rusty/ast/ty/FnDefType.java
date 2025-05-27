@@ -11,8 +11,17 @@ import org.key_project.rusty.ast.fn.Function;
 
 import org.jspecify.annotations.NonNull;
 
-public record FnDefType(Function fn)implements Type{public FnDefType{assert fn!=null;}@Override public Sort getSort(Services services){return null;}
+public record FnDefType(Function fn) implements Type {
+    public FnDefType {
+        assert fn != null;
+    }
 
-@Override public RustType toRustType(Services services){return null;}
+    @Override
+    public Sort getSort(Services services) { return null; }
 
-@Override public @NonNull Name name(){return fn.name();}}
+    @Override
+    public RustType toRustType(Services services) { return null; }
+
+    @Override
+    public @NonNull Name name() { return fn.name(); }
+}

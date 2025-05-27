@@ -7,4 +7,6 @@ import org.key_project.rusty.parser.hir.DefId;
 
 import org.jspecify.annotations.Nullable;
 
-public record SpecCase(DefId did,SpecKind kind,String name,WithParams<Term>[]pre,WithParams<Term>[]post,@Nullable WithParams<Term>variant,WithParams<Term>diverges){}
+public record SpecCase(DefId did, SpecKind kind, String name, WithParams<Term>[] pre,
+        WithParams<Term>[] post, @Nullable WithParams<Term> variant, WithParams<Term> diverges) {
+}

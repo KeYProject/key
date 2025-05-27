@@ -28,44 +28,47 @@ public class BindVariablesInstruction {
     private record LogicVariableBinder(BoundVariable templateVar)
             implements MatchInstruction {
 
-    /**
-     * a match between two logic variables is possible if they have been assigned they are same or
-     * have been assigned to the same abstract name and the sorts are equal.
-     */
-    private MatchConditions match(
-            BoundVariable instantiationCandidate, MatchConditions matchCond,
-            LogicServices services) {
-        if (templateVar != instantiationCandidate) {
-            if (instantiationCandidate.sort() != templateVar.sort()) {
-                matchCond = null;
+        /**
+         * a match between two logic variables is possible if they have been assigned they are same
+         * or
+         * have been assigned to the same abstract name and the sorts are equal.
+         */
+        private MatchConditions match(
+                BoundVariable instantiationCandidate, MatchConditions matchCond,
+                LogicServices services) {
+            if (templateVar != instantiationCandidate) {
+                if (instantiationCandidate.sort() != templateVar.sort()) {
+                    matchCond = null;
+                }
             }
+            return matchCond;
         }
-        return matchCond;
+
+        @Override
+        public MatchConditions match(
+                SyntaxElementCursor cursor,
+                MatchConditions matchConditions, LogicServices services) {
+            var node = cursor.getCurrentNode();
+            if (!(node instanceof BoundVariable bv)) {
+                return null;
+            }
+            var result = match(bv, matchConditions, services);
+            cursor.gotoNextSibling();
+            return result;
+        }
     }
 
-    @Override
-    public MatchConditions match(
-            SyntaxElementCursor cursor,
-            MatchConditions matchConditions, LogicServices services) {
-        var node = cursor.getCurrentNode();
-        if (!(node instanceof BoundVariable bv)) {
-            return null;
-        }
-        var result = match(bv, matchConditions, services);
-        cursor.gotoNextSibling();
-        return result;
-    }
-}
 
-
-private static class VariableSVBinder extends MatchSchemaVariableInstruction<@NonNull VariableSV> {
+    private static class VariableSVBinder
+            extends MatchSchemaVariableInstruction<@NonNull VariableSV> {
 
         public VariableSVBinder(VariableSV templateVar) {
             super(templateVar);
         }
 
         private MatchConditions match(
-                BoundVariable instantiationCandidate, MatchConditions matchCond, Services services) {
+                BoundVariable instantiationCandidate, MatchConditions matchCond,
+                Services services) {
             final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
                 final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
@@ -78,7 +81,8 @@ private static class VariableSVBinder extends MatchSchemaVariableInstruction<@No
 
         @Override
         public MatchConditions match(
-                SyntaxElementCursor cursor, MatchConditions matchConditions, LogicServices services) {
+                SyntaxElementCursor cursor, MatchConditions matchConditions,
+                LogicServices services) {
             var node = cursor.getCurrentNode();
             if (!(node instanceof BoundVariable bv)) {
                 return null;
@@ -93,4 +97,5 @@ private static class VariableSVBinder extends MatchSchemaVariableInstruction<@No
                 Term instantiationCandidate, MatchConditions matchCond, LogicServices services) {
             throw new UnsupportedOperationException();
         }
-    }}
+    }
+}

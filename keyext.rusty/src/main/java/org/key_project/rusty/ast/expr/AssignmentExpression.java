@@ -36,7 +36,12 @@ public final class AssignmentExpression implements Expr {
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        return switch(n){case 0->lhs;case 1->rhs;default->throw new IndexOutOfBoundsException("AssignmentExpression has only two children");};
+        return switch (n) {
+        case 0 -> lhs;
+        case 1 -> rhs;
+        default ->
+            throw new IndexOutOfBoundsException("AssignmentExpression has only two children");
+        };
     }
 
     @Override

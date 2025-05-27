@@ -9,4 +9,5 @@ import org.key_project.rusty.parser.hir.Result;
 
 import org.jspecify.annotations.Nullable;
 
-public record Destination(@Nullable Label label,Result<HirId,LoopIdError>targetId){}
+public record Destination(@Nullable Label label, Result<HirId, LoopIdError> targetId) {
+}

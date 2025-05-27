@@ -11,8 +11,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Feature that returns zero iff one term is smaller than another term in the current term ordering
  */

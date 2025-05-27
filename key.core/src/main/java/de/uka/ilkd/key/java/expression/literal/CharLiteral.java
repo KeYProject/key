@@ -105,14 +105,33 @@ public class CharLiteral extends AbstractIntegerLiteral {
      *      https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>
      */
     protected char parseFromString(final String sourceStr) {
-        if(sourceStr.charAt(0)!='\''||sourceStr.charAt(sourceStr.length()-1)!='\''){throw new NumberFormatException("Invalid char delimiters: "+sourceStr);}
+        if (sourceStr.charAt(0) != '\'' || sourceStr.charAt(sourceStr.length() - 1) != '\'') {
+            throw new NumberFormatException("Invalid char delimiters: " + sourceStr);
+        }
 
-        String valStr=sourceStr.substring(1,sourceStr.length()-1);
+        String valStr = sourceStr.substring(1, sourceStr.length() - 1);
 
         /*
          * There are three possible cases: 1. the char is written directly 2. Java escape like '\n'
          * 3. octal Unicode escape like '\040'
          */
-        if(valStr.charAt(0)=='\\'){return switch(valStr.charAt(1)){case'b'->'\b';case't'->'\t';case'n'->'\n';case'f'->'\f';case'r'->'\r';case'\"'->'\"';case'\''->'\'';case'\\'->'\\';case'0','1','2','3','4','5','6','7'->(char)Integer.parseInt(valStr.substring(1),8);case'u'->(char)Integer.parseInt(valStr.substring(2),16);default->throw new NumberFormatException("Invalid char: "+sourceStr);};}else{return valStr.charAt(0);}
+        if (valStr.charAt(0) == '\\') {
+            return switch (valStr.charAt(1)) {
+            case 'b' -> '\b';
+            case 't' -> '\t';
+            case 'n' -> '\n';
+            case 'f' -> '\f';
+            case 'r' -> '\r';
+            case '\"' -> '\"';
+            case '\'' -> '\'';
+            case '\\' -> '\\';
+            case '0', '1', '2', '3', '4', '5', '6', '7' ->
+                (char) Integer.parseInt(valStr.substring(1), 8);
+            case 'u' -> (char) Integer.parseInt(valStr.substring(2), 16);
+            default -> throw new NumberFormatException("Invalid char: " + sourceStr);
+            };
+        } else {
+            return valStr.charAt(0);
+        }
     }
 }

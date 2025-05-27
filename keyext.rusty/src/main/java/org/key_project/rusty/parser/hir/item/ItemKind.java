@@ -9,7 +9,13 @@ public interface ItemKind {
     class Adapter extends HirAdapter<ItemKind> {
         @Override
         public Class<? extends ItemKind> getType(String tag) {
-            return switch(tag){case"Use"->Use.class;case"ExternCrate"->ExternCrate.class;case"Fn"->Fn.class;case"Const"->Const.class;default->null;};
+            return switch (tag) {
+            case "Use" -> Use.class;
+            case "ExternCrate" -> ExternCrate.class;
+            case "Fn" -> Fn.class;
+            case "Const" -> Const.class;
+            default -> null;
+            };
         }
     }
 }

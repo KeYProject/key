@@ -23,6 +23,31 @@ import org.key_project.rusty.speclang.spec.TermKind;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.GsonBuilder;
 
-public record Crate(Mod topMod,HirTyMapping[]types){public record WrapperOutput(Crate crate,SpecMap specs){}
+public record Crate(Mod topMod, HirTyMapping[] types) {
+    public record WrapperOutput(Crate crate, SpecMap specs) {
+    }
 
-public static WrapperOutput parseJSON(String json){var gson=new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).registerTypeAdapter(ItemKind.class,new ItemKind.Adapter()).registerTypeAdapter(FnRetTy.class,new FnRetTy.Adapter()).registerTypeAdapter(HirTyKind.class,new HirTyKind.Adapter()).registerTypeAdapter(PrimHirTy.class,new PrimHirTy.Adapter()).registerTypeAdapter(QPath.class,new QPath.Adapter()).registerTypeAdapter(Res.class,new Res.Adapter()).registerTypeAdapter(PatKind.class,new PatKind.Adapter()).registerTypeAdapter(LitKind.class,new LitKind.Adapter()).registerTypeAdapter(LitIntTy.class,new LitIntTy.Adapter()).registerTypeAdapter(BlockCheckMode.class,new BlockCheckMode.Adapter()).registerTypeAdapter(LocalSource.class,new LocalSource.Adapter()).registerTypeAdapter(ExprKind.class,new ExprKind.Adapter()).registerTypeAdapter(ByRef.class,new ByRef.Adapter()).registerTypeAdapter(StmtKind.class,new StmtKind.Adapter()).registerTypeAdapter(DefKind.class,new DefKind.Adapter()).registerTypeAdapter(Ty.class,new Ty.Adapter()).registerTypeAdapter(TermKind.class,new TermKind.Adapter()).registerTypeAdapter(PatExprKind.class,new PatExprKind.Adapter()).create();return gson.fromJson(json,WrapperOutput.class);}}
+    public static WrapperOutput parseJSON(String json) {
+        var gson =
+            new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                    .registerTypeAdapter(ItemKind.class, new ItemKind.Adapter())
+                    .registerTypeAdapter(FnRetTy.class, new FnRetTy.Adapter())
+                    .registerTypeAdapter(HirTyKind.class, new HirTyKind.Adapter())
+                    .registerTypeAdapter(PrimHirTy.class, new PrimHirTy.Adapter())
+                    .registerTypeAdapter(QPath.class, new QPath.Adapter())
+                    .registerTypeAdapter(Res.class, new Res.Adapter())
+                    .registerTypeAdapter(PatKind.class, new PatKind.Adapter())
+                    .registerTypeAdapter(LitKind.class, new LitKind.Adapter())
+                    .registerTypeAdapter(LitIntTy.class, new LitIntTy.Adapter())
+                    .registerTypeAdapter(BlockCheckMode.class, new BlockCheckMode.Adapter())
+                    .registerTypeAdapter(LocalSource.class, new LocalSource.Adapter())
+                    .registerTypeAdapter(ExprKind.class, new ExprKind.Adapter())
+                    .registerTypeAdapter(ByRef.class, new ByRef.Adapter())
+                    .registerTypeAdapter(StmtKind.class, new StmtKind.Adapter())
+                    .registerTypeAdapter(DefKind.class, new DefKind.Adapter())
+                    .registerTypeAdapter(Ty.class, new Ty.Adapter())
+                    .registerTypeAdapter(TermKind.class, new TermKind.Adapter())
+                    .registerTypeAdapter(PatExprKind.class, new PatExprKind.Adapter()).create();
+        return gson.fromJson(json, WrapperOutput.class);
+    }
+}

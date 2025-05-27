@@ -7,4 +7,6 @@ import org.key_project.rusty.parser.hir.HirId;
 
 import org.jspecify.annotations.Nullable;
 
-public record LoopSpec(HirId target,WithParams<Term>[]invariants,@Nullable WithParams<Term>variant){}
+public record LoopSpec(HirId target, WithParams<Term>[] invariants,
+        @Nullable WithParams<Term> variant) {
+}

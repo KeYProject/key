@@ -11,8 +11,6 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 
 /**
  * Feature that returns the maximum number of literals occurring within a d-path of the find-formula

@@ -17,8 +17,6 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * This{@link FieldWatchpoint} represents a Java watchpoint and is responsible to tell the debugger
  * to stop execution when the respective variable is accessed or modified.

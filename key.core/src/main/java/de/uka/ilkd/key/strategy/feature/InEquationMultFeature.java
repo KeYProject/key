@@ -13,8 +13,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Feature that decides whether the multiplication of two inequations (using rules of set
  * inEqSimp_nonLin_multiply) is allowed. We only do this if the product of the left sides of the

@@ -8,20 +8,23 @@ import org.key_project.rusty.parser.hir.hirty.IntTy;
 import org.key_project.rusty.parser.hir.hirty.UintTy;
 
 public interface LitIntTy {
-    record Signed(IntTy ty) implements LitIntTy {}
+    record Signed(IntTy ty) implements LitIntTy {
+    }
 
-    record Unsigned(UintTy ty) implements LitIntTy {}
+    record Unsigned(UintTy ty) implements LitIntTy {
+    }
 
-    record Unsuffixed() implements LitIntTy {}
+    record Unsuffixed() implements LitIntTy {
+    }
 
     class Adapter extends HirAdapter<LitIntTy> {
         @Override
         public Class<? extends LitIntTy> getType(String tag) {
             return switch (tag) {
-                case "Signed" -> Signed.class;
-                case "Unsigned" -> Unsigned.class;
-                case "Unsuffixed" -> Unsuffixed.class;
-                default -> null;
+            case "Signed" -> Signed.class;
+            case "Unsigned" -> Unsigned.class;
+            case "Unsuffixed" -> Unsuffixed.class;
+            default -> null;
             };
         }
     }

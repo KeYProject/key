@@ -1093,7 +1093,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private SLExpression processJmlBuiltInFunction(String name,
             ImmutableList<SLExpression> params) {
         // at some point in life, we may want to have a customizable map here.
-        return switch(name){case"\\array2seq"->termFactory.translateToJDLTerm(name.substring(1),params);case"\\seq_upd"->termFactory.translateToJDLTerm("seqUpd",params);case"\\seq_put"->termFactory.translateToJDLTerm("seqUpd",params);default->throw new IllegalStateException("Unexpected value: "+name);};
+        return switch (name) {
+        case "\\array2seq" -> termFactory.translateToJDLTerm(name.substring(1), params);
+        case "\\seq_upd" -> termFactory.translateToJDLTerm("seqUpd", params);
+        case "\\seq_put" -> termFactory.translateToJDLTerm("seqUpd", params);
+        default -> throw new IllegalStateException("Unexpected value: " + name);
+        };
     }
 
     private SLParameters visitParameters(JmlParser.Param_listContext ctx) {
@@ -2513,9 +2518,21 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public LocationVariable[] visitTargetHeap(JmlParser.TargetHeapContext ctx) {
-        if(ctx==null||ctx.SPECIAL_IDENT().isEmpty()){return new LocationVariable[]{getBaseHeap()};}
+        if (ctx == null || ctx.SPECIAL_IDENT().isEmpty()) {
+            return new LocationVariable[] { getBaseHeap() };
+        }
 
-        LocationVariable[]heaps=new LocationVariable[ctx.SPECIAL_IDENT().size()];for(int i=0;i<ctx.SPECIAL_IDENT().size();i++){String heapName=ctx.SPECIAL_IDENT(i).getText();switch(heapName){case"<permission>","<permissions>"->heaps[i]=getPermissionHeap();case"<savedHeap>","<saved>"->heaps[i]=getSavedHeap();case"<heap>"->heaps[i]=getBaseHeap();default->heaps[i]=heapLDT.getHeapForName(new Name(heapName));}}return heaps;
+        LocationVariable[] heaps = new LocationVariable[ctx.SPECIAL_IDENT().size()];
+        for (int i = 0; i < ctx.SPECIAL_IDENT().size(); i++) {
+            String heapName = ctx.SPECIAL_IDENT(i).getText();
+            switch (heapName) {
+            case "<permission>", "<permissions>" -> heaps[i] = getPermissionHeap();
+            case "<savedHeap>", "<saved>" -> heaps[i] = getSavedHeap();
+            case "<heap>" -> heaps[i] = getBaseHeap();
+            default -> heaps[i] = heapLDT.getHeapForName(new Name(heapName));
+            }
+        }
+        return heaps;
     }
     // endregion
 

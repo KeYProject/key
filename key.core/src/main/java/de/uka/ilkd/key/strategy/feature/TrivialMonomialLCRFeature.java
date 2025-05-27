@@ -13,8 +13,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 
 /**
  * Return zero of the least common reducible of two monomials is so trivial that it is not necessary

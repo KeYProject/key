@@ -7,17 +7,20 @@ import org.key_project.rusty.parser.hir.HirAdapter;
 import org.key_project.rusty.parser.hir.QPath;
 
 public interface PatExprKind {
-    record Lit(org.key_project.rusty.parser.hir.expr.Lit lit, boolean negated) implements PatExprKind {}
+    record Lit(org.key_project.rusty.parser.hir.expr.Lit lit, boolean negated)
+            implements PatExprKind {
+    }
 
-    record Path(QPath path) implements PatExprKind {}
+    record Path(QPath path) implements PatExprKind {
+    }
 
     class Adapter extends HirAdapter<PatExprKind> {
         @Override
         public Class<? extends PatExprKind> getType(String tag) {
             return switch (tag) {
-                case "Lit" -> PatExprKind.Lit.class;
-                case "Path" -> PatExprKind.Path.class;
-                default -> null;
+            case "Lit" -> PatExprKind.Lit.class;
+            case "Path" -> PatExprKind.Path.class;
+            default -> null;
             };
         }
     }

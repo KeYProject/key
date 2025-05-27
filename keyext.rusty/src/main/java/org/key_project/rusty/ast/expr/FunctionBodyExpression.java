@@ -12,14 +12,38 @@ import org.key_project.rusty.logic.op.ProgramVariable;
 
 import org.jspecify.annotations.Nullable;
 
-public record FunctionBodyExpression(@Nullable ProgramVariable resultVar,ProgramFunction fn,CallExpression call)implements Expr{@Override public Type type(Services services){return call.type(services);}
+public record FunctionBodyExpression(@Nullable ProgramVariable resultVar, ProgramFunction fn,
+        CallExpression call) implements Expr {
+    @Override
+    public Type type(Services services) { return call.type(services); }
 
-@Override public void visit(Visitor v){v.performActionOnFunctionBodyExpression(this);}
+    @Override
+    public void visit(Visitor v) { v.performActionOnFunctionBodyExpression(this); }
 
-@Override public SyntaxElement getChild(int n){if(resultVar!=null){if(resultVar!=null)return resultVar;--n;};if(n==0)return call;throw new IndexOutOfBoundsException("Index: "+n);}
+    @Override
+    public SyntaxElement getChild(int n) {
+        if (resultVar != null) {
+            if (resultVar != null)
+                return resultVar;
+            --n;
+        } ;
+        if (n == 0)
+            return call;
+        throw new IndexOutOfBoundsException("Index: " + n);
+    }
 
-@Override public int getChildCount(){return 2;}
+    @Override
+    public int getChildCount() { return 2; }
 
-@Override public String toString(){var sb=new StringBuilder();if(resultVar!=null){sb.append(resultVar);sb.append(" = ");}return sb.append(call).append("@").toString();}
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        if (resultVar != null) {
+            sb.append(resultVar);
+            sb.append(" = ");
+        }
+        return sb.append(call).append("@").toString();
+    }
 
-public BlockExpression getBody(){return fn.getBody();}}
+    public BlockExpression getBody() { return fn.getBody(); }
+}

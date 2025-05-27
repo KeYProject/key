@@ -5,4 +5,6 @@ package org.key_project.rusty.proof;
 
 import java.io.Serializable;
 
-public record TestResult(String message,boolean success)implements Serializable{private static final long serialVersionUID=7635762713077999920L;}
+public record TestResult(String message, boolean success) implements Serializable {
+    private static final long serialVersionUID = 7635762713077999920L;
+}

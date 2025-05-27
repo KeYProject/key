@@ -16,9 +16,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
-import org.key_project.prover.sequent.PIOPathIterator;
-import org.key_project.prover.sequent.PosInOccurrence;
-
 
 /**
  * Returns zero iff the position of a rule application is not in the scope of a modal operator (a

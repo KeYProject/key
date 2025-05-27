@@ -9,9 +9,9 @@ public record Path<R>(Span span, R res, PathSegment[] segments) {
     @Override
     public String toString() {
         return "Path{" +
-                "span=" + span +
-                ", res=" + res +
-                ", segments=" + Arrays.toString(segments) +
-                '}';
+            "span=" + span +
+            ", res=" + res +
+            ", segments=" + Arrays.toString(segments) +
+            '}';
     }
 }

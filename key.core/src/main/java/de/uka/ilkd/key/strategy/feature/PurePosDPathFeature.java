@@ -11,8 +11,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 
 /**
  * Binary feature that returns zero iff the find-formula of a rule contains a d-path consisting only

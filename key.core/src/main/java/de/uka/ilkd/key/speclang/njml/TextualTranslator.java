@@ -37,9 +37,38 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
      * @return the modifier
      */
     public static JMLModifier modifierFromToken(Token token) {
-        if(token==null){return null;}
+        if (token == null) {
+            return null;
+        }
 
-        return switch(token.getType()){case JmlLexer.ABSTRACT->JMLModifier.ABSTRACT;case JmlLexer.FINAL->JMLModifier.FINAL;case JmlLexer.GHOST->JMLModifier.GHOST;case JmlLexer.HELPER->JMLModifier.HELPER;case JmlLexer.INSTANCE->JMLModifier.INSTANCE;case JmlLexer.MODEL->JMLModifier.MODEL;case JmlLexer.NON_NULL->JMLModifier.NON_NULL;case JmlLexer.NULLABLE->JMLModifier.NULLABLE;case JmlLexer.NULLABLE_BY_DEFAULT->JMLModifier.NULLABLE_BY_DEFAULT;case JmlLexer.PRIVATE->JMLModifier.PRIVATE;case JmlLexer.PROTECTED->JMLModifier.PROTECTED;case JmlLexer.PUBLIC->JMLModifier.PUBLIC;case JmlLexer.PURE->JMLModifier.PURE;case JmlLexer.STRICTLY_PURE->JMLModifier.STRICTLY_PURE;case JmlLexer.SPEC_PROTECTED->JMLModifier.SPEC_PROTECTED;case JmlLexer.SPEC_PUBLIC->JMLModifier.SPEC_PUBLIC;case JmlLexer.STATIC->JMLModifier.STATIC;case JmlLexer.TWO_STATE->JMLModifier.TWO_STATE;case JmlLexer.NO_STATE->JMLModifier.NO_STATE;case JmlLexer.SPEC_JAVA_MATH->JMLModifier.SPEC_JAVA_MATH;case JmlLexer.SPEC_SAFE_MATH->JMLModifier.SPEC_SAFE_MATH;case JmlLexer.SPEC_BIGINT_MATH->JMLModifier.SPEC_BIGINT_MATH;case JmlLexer.CODE_JAVA_MATH->JMLModifier.CODE_JAVA_MATH;case JmlLexer.CODE_SAFE_MATH->JMLModifier.CODE_SAFE_MATH;case JmlLexer.CODE_BIGINT_MATH->JMLModifier.CODE_BIGINT_MATH;default->throw new IllegalStateException("Illegal token is given");};
+        return switch (token.getType()) {
+        case JmlLexer.ABSTRACT -> JMLModifier.ABSTRACT;
+        case JmlLexer.FINAL -> JMLModifier.FINAL;
+        case JmlLexer.GHOST -> JMLModifier.GHOST;
+        case JmlLexer.HELPER -> JMLModifier.HELPER;
+        case JmlLexer.INSTANCE -> JMLModifier.INSTANCE;
+        case JmlLexer.MODEL -> JMLModifier.MODEL;
+        case JmlLexer.NON_NULL -> JMLModifier.NON_NULL;
+        case JmlLexer.NULLABLE -> JMLModifier.NULLABLE;
+        case JmlLexer.NULLABLE_BY_DEFAULT -> JMLModifier.NULLABLE_BY_DEFAULT;
+        case JmlLexer.PRIVATE -> JMLModifier.PRIVATE;
+        case JmlLexer.PROTECTED -> JMLModifier.PROTECTED;
+        case JmlLexer.PUBLIC -> JMLModifier.PUBLIC;
+        case JmlLexer.PURE -> JMLModifier.PURE;
+        case JmlLexer.STRICTLY_PURE -> JMLModifier.STRICTLY_PURE;
+        case JmlLexer.SPEC_PROTECTED -> JMLModifier.SPEC_PROTECTED;
+        case JmlLexer.SPEC_PUBLIC -> JMLModifier.SPEC_PUBLIC;
+        case JmlLexer.STATIC -> JMLModifier.STATIC;
+        case JmlLexer.TWO_STATE -> JMLModifier.TWO_STATE;
+        case JmlLexer.NO_STATE -> JMLModifier.NO_STATE;
+        case JmlLexer.SPEC_JAVA_MATH -> JMLModifier.SPEC_JAVA_MATH;
+        case JmlLexer.SPEC_SAFE_MATH -> JMLModifier.SPEC_SAFE_MATH;
+        case JmlLexer.SPEC_BIGINT_MATH -> JMLModifier.SPEC_BIGINT_MATH;
+        case JmlLexer.CODE_JAVA_MATH -> JMLModifier.CODE_JAVA_MATH;
+        case JmlLexer.CODE_SAFE_MATH -> JMLModifier.CODE_SAFE_MATH;
+        case JmlLexer.CODE_BIGINT_MATH -> JMLModifier.CODE_BIGINT_MATH;
+        default -> throw new IllegalStateException("Illegal token is given");
+        };
     }
 
     public TextualTranslator(boolean attachOriginLabel) {
@@ -77,8 +106,19 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     private Behavior getBehavior(Token behavior) {
-        if(behavior==null){return Behavior.NONE; // lightweight specification
-        }return switch(behavior.getType()){case JmlLexer.BEHAVIOR->Behavior.BEHAVIOR;case JmlLexer.NORMAL_BEHAVIOR->Behavior.NORMAL_BEHAVIOR;case JmlLexer.BREAK_BEHAVIOR->Behavior.BREAK_BEHAVIOR;case JmlLexer.EXCEPTIONAL_BEHAVIOUR->Behavior.EXCEPTIONAL_BEHAVIOR;case JmlLexer.MODEL_BEHAVIOUR->Behavior.MODEL_BEHAVIOR;case JmlLexer.RETURN_BEHAVIOR->Behavior.RETURN_BEHAVIOR;case JmlLexer.CONTINUE_BEHAVIOR->Behavior.CONTINUE_BEHAVIOR;default->throw new IllegalStateException("No behavior is given");};
+        if (behavior == null) {
+            return Behavior.NONE; // lightweight specification
+        }
+        return switch (behavior.getType()) {
+        case JmlLexer.BEHAVIOR -> Behavior.BEHAVIOR;
+        case JmlLexer.NORMAL_BEHAVIOR -> Behavior.NORMAL_BEHAVIOR;
+        case JmlLexer.BREAK_BEHAVIOR -> Behavior.BREAK_BEHAVIOR;
+        case JmlLexer.EXCEPTIONAL_BEHAVIOUR -> Behavior.EXCEPTIONAL_BEHAVIOR;
+        case JmlLexer.MODEL_BEHAVIOUR -> Behavior.MODEL_BEHAVIOR;
+        case JmlLexer.RETURN_BEHAVIOR -> Behavior.RETURN_BEHAVIOR;
+        case JmlLexer.CONTINUE_BEHAVIOR -> Behavior.CONTINUE_BEHAVIOR;
+        default -> throw new IllegalStateException("No behavior is given");
+        };
     }
 
     @Override

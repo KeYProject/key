@@ -16,8 +16,6 @@ import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.prover.sequent.Sequent;
 
-import org.key_project.prover.sequent.Sequent;
-
 public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Parameters> {
 
     private static final String PREAMBLE = """

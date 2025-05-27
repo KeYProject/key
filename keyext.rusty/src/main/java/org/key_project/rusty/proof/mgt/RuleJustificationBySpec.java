@@ -5,6 +5,9 @@ package org.key_project.rusty.proof.mgt;
 
 import org.key_project.rusty.speclang.Contract;
 
-public record RuleJustificationBySpec(Contract spec)implements RuleJustification{public boolean isAxiomJustification(){
-// TODO
-return false;}}
+public record RuleJustificationBySpec(Contract spec) implements RuleJustification {
+    public boolean isAxiomJustification() {
+        // TODO
+        return false;
+    }
+}

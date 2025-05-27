@@ -11,12 +11,19 @@ import org.key_project.rusty.ast.visitor.Visitor;
 /**
  * Used for {@link KeYRustyType}s where there is no Rust type.
  */
-public record SortRustType(KeYRustyType krt)implements RustType{@Override public Type type(){return krt;}
+public record SortRustType(KeYRustyType krt) implements RustType {
+    @Override
+    public Type type() { return krt; }
 
-@Override public void visit(Visitor v){v.performActionOnSortRustType(this);}
+    @Override
+    public void visit(Visitor v) { v.performActionOnSortRustType(this); }
 
-@Override public SyntaxElement getChild(int n){throw new IndexOutOfBoundsException();}
+    @Override
+    public SyntaxElement getChild(int n) { throw new IndexOutOfBoundsException(); }
 
-@Override public int getChildCount(){return 0;}
+    @Override
+    public int getChildCount() { return 0; }
 
-@Override public String toString(){return krt.getSort().toString();}}
+    @Override
+    public String toString() { return krt.getSort().toString(); }
+}

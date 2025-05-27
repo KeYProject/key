@@ -8,7 +8,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 
-public record EmptyPanic()implements Expr {
+public record EmptyPanic() implements Expr {
     @Override
     public Type type(Services services) {
         return null;

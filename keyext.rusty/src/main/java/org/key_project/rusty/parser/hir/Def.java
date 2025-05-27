@@ -3,4 +3,5 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir;
 
-public record Def(DefKind kind,DefId id){}
+public record Def(DefKind kind, DefId id) {
+}

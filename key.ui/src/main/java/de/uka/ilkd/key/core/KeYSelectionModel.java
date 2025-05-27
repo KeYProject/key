@@ -12,8 +12,6 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 
-import org.key_project.prover.sequent.Sequent;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

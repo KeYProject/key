@@ -17,16 +17,20 @@ public interface FnRetTy {
     record Return(HirTy ty) implements FnRetTy {
     }
 
-    record DefaultReturn(Span span) implements FnRetTy {}
+    record DefaultReturn(Span span) implements FnRetTy {
+    }
 
     class Adapter implements JsonDeserializer<FnRetTy> {
         @Override
-        public FnRetTy deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        public FnRetTy deserialize(JsonElement jsonElement, Type type,
+                JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             var obj = jsonElement.getAsJsonObject();
             if (obj.has("Return")) {
-                return new Return(jsonDeserializationContext.deserialize(obj.get("Return"), HirTy.class));
+                return new Return(
+                    jsonDeserializationContext.deserialize(obj.get("Return"), HirTy.class));
             }
-            return new DefaultReturn(jsonDeserializationContext.deserialize(obj.get("DefaultReturn"), Span.class));
+            return new DefaultReturn(
+                jsonDeserializationContext.deserialize(obj.get("DefaultReturn"), Span.class));
         }
     }
 }

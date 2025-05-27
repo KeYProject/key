@@ -5,6 +5,6 @@ package org.key_project.rusty.parser.hir.expr;
 
 import org.key_project.rusty.parser.hir.Span;
 
-public record AssignOperator(AssignOpKind node,Span span){
+public record AssignOperator(AssignOpKind node, Span span) {
 
 }

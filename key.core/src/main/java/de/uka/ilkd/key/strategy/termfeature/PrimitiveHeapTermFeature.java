@@ -13,8 +13,6 @@ import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 
-import org.key_project.logic.Term;
-
 
 public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
 

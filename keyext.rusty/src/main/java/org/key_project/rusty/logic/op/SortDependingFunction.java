@@ -177,5 +177,6 @@ public final class SortDependingFunction extends Function {
     }
 
     private record SortDependingFunctionTemplate(GenericSort sortDependingOn, Name kind, Sort sort,
-            ImmutableArray<Sort> argSorts, boolean unique) {}
+            ImmutableArray<Sort> argSorts, boolean unique) {
+    }
 }

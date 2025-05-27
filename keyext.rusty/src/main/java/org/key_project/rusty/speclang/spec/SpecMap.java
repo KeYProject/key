@@ -6,4 +6,5 @@ package org.key_project.rusty.speclang.spec;
 import org.key_project.rusty.parser.hir.DefId;
 import org.key_project.rusty.parser.hir.HirId;
 
-public record SpecMap(Entry<DefId,FnSpec>[]fnSpecs,Entry<HirId,LoopSpec>[]loopSpecs){}
+public record SpecMap(Entry<DefId, FnSpec>[] fnSpecs, Entry<HirId, LoopSpec>[] loopSpecs) {
+}

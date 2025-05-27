@@ -6,4 +6,6 @@ package org.key_project.rusty.speclang;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 
-public record ProgramVariableCollection(ProgramVariable self,ImmutableList<ProgramVariable>params,ProgramVariable result){}
+public record ProgramVariableCollection(ProgramVariable self, ImmutableList<ProgramVariable> params,
+        ProgramVariable result) {
+}

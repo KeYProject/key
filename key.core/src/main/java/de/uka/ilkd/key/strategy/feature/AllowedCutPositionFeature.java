@@ -16,9 +16,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
-import org.key_project.prover.sequent.PIOPathIterator;
-import org.key_project.prover.sequent.PosInOccurrence;
-
 
 /**
  * Feature that returns zero iff the application focus of a rule is a potential cut position (taclet

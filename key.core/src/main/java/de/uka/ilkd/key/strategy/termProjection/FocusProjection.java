@@ -11,8 +11,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.key_project.prover.sequent.PosInOccurrence;
-
 /**
  * Projection of a rule application to its focus (the term or formula that the rule operates on,
  * that for taclets is described using <code>\find</code>, and that can be modified by the rule).
