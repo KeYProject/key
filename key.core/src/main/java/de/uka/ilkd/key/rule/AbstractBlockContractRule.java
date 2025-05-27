@@ -41,6 +41,8 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -173,16 +175,16 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
-    protected static Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
+    protected static Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final BlockContract contract,
             final TermServices services) {
-        Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
+        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiableClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final JFunction anonymisationFunction =
+                final Function anonymisationFunction =
                     new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
@@ -404,7 +406,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
             final BlockContract contract,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final Services services, final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,

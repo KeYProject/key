@@ -121,6 +121,7 @@ public class FormulaTagManager {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object clone() {
         return new FormulaTagManager((HashMap<FormulaTag, FormulaInfo>) tagToFormulaInfo.clone(),

@@ -6,9 +6,11 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -28,6 +30,7 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         return new ExistentiallyConnectedFormulasFeature(for0, for1);
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

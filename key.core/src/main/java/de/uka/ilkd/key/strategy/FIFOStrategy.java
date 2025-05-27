@@ -5,18 +5,23 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp.
  */
-public class FIFOStrategy implements Strategy {
+public class FIFOStrategy implements Strategy<Goal> {
 
     private static final Name NAME = new Name("FIFO");
 
@@ -30,10 +35,12 @@ public class FIFOStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+    @Override
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
-        return NumberRuleAppCost.create(goal.getTime());
+        return NumberRuleAppCost.create(((de.uka.ilkd.key.proof.Goal) goal).getTime());
     }
 
     /**
@@ -42,14 +49,17 @@ public class FIFOStrategy implements Strategy {
      *
      * @return true iff the rule should be applied, false otherwise
      */
+    @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return true;
     }
 
+    @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector) {}
 
+    @Override
     public Name name() {
         return NAME;
     }
@@ -57,10 +67,12 @@ public class FIFOStrategy implements Strategy {
     public static final Strategy INSTANCE = new FIFOStrategy();
 
     public static class Factory implements StrategyFactory {
+        @Override
         public Name name() {
             return NAME;
         }
 
+        @Override
         public Strategy create(Proof proof, StrategyProperties properties) {
             return INSTANCE;
         }

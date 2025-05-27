@@ -23,7 +23,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -32,10 +32,6 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -47,6 +43,10 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
@@ -134,7 +134,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void reportException(Object sender, ProofOblInput input, Exception e) {
-        reportStatus(sender, input.name() + " failed");
+        IssueDialog.showExceptionDialog(mainWindow, e);
     }
 
     @Override
@@ -164,9 +164,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
             }
-            ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+            ApplyStrategyInfo<Proof, Goal> result =
+                (ApplyStrategyInfo<Proof, Goal>) info.getResult();
 
-            Proof proof = info.getProof();
+            final Proof proof = (Proof) info.getProof();
             if (proof != null && !proof.isDisposed() && !proof.closed()
                     && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
@@ -174,7 +175,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     g = proof.openGoals().head();
                 }
                 mainWindow.getMediator().goalChosen(g);
-                if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+                if (inStopAtFirstUncloseableGoalMode(proof)) {
                     // iff Stop on non-closeable Goal is selected a little
                     // popup is generated and proof is stopped
                     AutoDismissDialog dialog = new AutoDismissDialog(
@@ -190,12 +191,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 mainWindow.hideStatusProgress();
                 assert info instanceof ProofMacroFinishedInfo;
-                Proof proof = info.getProof();
+                final Proof proof = (Proof) info.getProof();
                 if (proof != null && !proof.closed()
                         && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
-                    if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+                    if (inStopAtFirstUncloseableGoalMode(proof)) {
                         // iff Stop on non-closeable Goal is selected a little
                         // popup is generated and proof is stopped
                         AutoDismissDialog dialog = new AutoDismissDialog(
@@ -221,12 +222,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                ProofScriptEntry scriptAndLoc = problemLoader.getProofScript();
-                if (scriptAndLoc != null) {
-                    ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                        scriptAndLoc.script(), scriptAndLoc.location());
-                    psw.init();
-                    psw.execute();
+                if (problemLoader.hasProofScript()) {
+                    KeyAst.ProofScript scriptAndLoc = problemLoader.getProofScript();
+                    if (scriptAndLoc != null) {
+                        ProofScriptWorker psw =
+                            new ProofScriptWorker(mainWindow.getMediator(), scriptAndLoc);
+                        psw.init();
+                        psw.execute();
+                    }
                 } else if (macroChosen()) {
                     applyMacro();
                 }
@@ -363,7 +366,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     /**
      * Save proof in file. If autoSave is on, this will potentially overwrite already existing proof
-     * files with the same name. Otherwise the save dialog pops up. For loaded proofs both are
+     * files with the same name. Otherwise, the save dialog pops up. For loaded proofs both are
      * turned off by default, i.e. only manual saving is possible, and the save dialog never pops up
      * automatically (except for hitting the "Save ..." or "Save current proof" button).
      *
@@ -513,8 +516,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         "Proof could only be loaded partially.\n" + "In summary "
                             + result.getErrorList().size()
                             + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().get(0).getMessage(),
-                        result.getErrorList().get(0));
+                            + "The first one:\n" + result.getErrorList().getFirst().getMessage(),
+                        result.getErrorList().getFirst());
                 }
             }
         }

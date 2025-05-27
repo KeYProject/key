@@ -16,11 +16,11 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -56,12 +56,13 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
             PosInOccurrence posInOcc) {
-        if (goals == null || goals.isEmpty() || goals.head().node() == null
+        if (goals == null || posInOcc == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
         }
         Term subTerm = (Term) posInOcc.subTerm();
-        if (posInOcc == null || subTerm == null) {
+
+        if (subTerm == null) {
             return false;
         }
 

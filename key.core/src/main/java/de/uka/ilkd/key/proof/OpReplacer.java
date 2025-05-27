@@ -8,11 +8,11 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -258,7 +258,8 @@ public class OpReplacer {
         final Term result;
         if (newOp != term.op() || changedSubTerm || newBoundVars != term.boundVars()) {
             result =
-                tf.createTerm(newOp, newSubTerms, newBoundVars, term.getLabels());
+                tf.createTerm((de.uka.ilkd.key.logic.op.Operator) newOp, newSubTerms, newBoundVars,
+                    term.getLabels());
         } else {
             result = term;
         }

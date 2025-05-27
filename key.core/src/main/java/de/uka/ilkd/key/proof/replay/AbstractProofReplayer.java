@@ -26,9 +26,10 @@ import de.uka.ilkd.key.speclang.OperationContract;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.AssumesFormulaInstDirect;
-import org.key_project.prover.rules.AssumesFormulaInstSeq;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -123,7 +124,7 @@ public abstract class AbstractProofReplayer {
         // Load ifInsts, if applicable
         builtinIfInsts = ImmutableSLList.nil();
         for (PosInOccurrence oldFormulaPio : RuleAppUtil
-                .ifInstsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)) {
+                .assumesInstantiationsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)) {
             PosInOccurrence newFormula =
                 findInNewSequent(oldFormulaPio, currGoal.sequent());
             if (newFormula == null) {
@@ -177,7 +178,7 @@ public abstract class AbstractProofReplayer {
             }
 
             if (builtinIfInsts != null) {
-                ourApp = ourApp.setIfInsts(builtinIfInsts);
+                ourApp = ourApp.setAssumesInsts(builtinIfInsts);
             }
             return ourApp;
         }
@@ -212,25 +213,24 @@ public abstract class AbstractProofReplayer {
      * @return new taclet app equivalent to {@code originalStep}
      */
     private TacletApp constructTacletApp(Node originalStep, Goal currGoal) {
-
-        final String tacletName = originalStep.getAppliedRuleApp().rule().name().toString();
         TacletApp originalTacletApp = null;
-        if (originalStep.getAppliedRuleApp() instanceof TacletApp) {
-            originalTacletApp = (TacletApp) originalStep.getAppliedRuleApp();
+        if (originalStep.getAppliedRuleApp() instanceof TacletApp tacletApp) {
+            originalTacletApp = tacletApp;
         }
+        assert originalTacletApp != null
+                : "Tried to construct TacletApp for a rule that is not a taclet";
+
+        final String tacletName = originalTacletApp.rule().name().toString();
 
         TacletApp ourApp = null;
-        PosInOccurrence pos = null;
+        PosInOccurrence pos;
 
-        Taclet t = proof.getInitConfig()
-                .lookupActiveTaclet(new Name(tacletName));
+        Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
             // find the correct taclet
-            for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
-                    .getPartialInstantiatedApps()) {
-                if ((Object) originalTacletApp instanceof TacletApp cmp
-                        && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
-                            cmp)) {
+            for (var partialApp : currGoal.indexOfTaclets().getPartialInstantiatedApps()) {
+                if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
+                    originalTacletApp)) {
                     ourApp = partialApp;
                     break;
                 }
@@ -245,10 +245,10 @@ public abstract class AbstractProofReplayer {
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
-        Services services = proof.getServices();
 
-        PosInOccurrence oldPos =
-            originalStep.getAppliedRuleApp().posInOccurrence();
+        final Services services = proof.getServices();
+        final PosInOccurrence oldPos = originalTacletApp.posInOccurrence();
+
         if (oldPos != null) { // otherwise we have no pos
             pos = findInNewSequent(oldPos, currGoal.sequent());
             if (pos == null) {
@@ -260,21 +260,18 @@ public abstract class AbstractProofReplayer {
             ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 
-        RuleApp app = originalStep.getAppliedRuleApp();
-        assert app instanceof TacletApp;
-        TacletApp tacletApp = (TacletApp) app;
-        SVInstantiations instantantions = tacletApp.instantiations();
+        SVInstantiations instantantions = originalTacletApp.instantiations();
         ourApp = IntermediateProofReplayer.constructInsts(ourApp, currGoal,
             getInterestingInstantiations(instantantions), services);
 
         ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
         List<Pair<PosInOccurrence, Boolean>> oldFormulas = RuleAppUtil
-                .ifInstsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)
+                .assumesInstantiationsOfRuleApp(originalTacletApp, originalStep)
                 .stream()
                 .map(x -> new Pair<>(x, true))
                 .collect(Collectors.toList());
         // add direct instantiations
-        if (tacletApp instanceof PosTacletApp posTacletApp) {
+        if (originalTacletApp instanceof PosTacletApp posTacletApp) {
             if (posTacletApp.assumesFormulaInstantiations() != null) {
                 for (AssumesFormulaInstantiation x : posTacletApp.assumesFormulaInstantiations()) {
                     if (x instanceof AssumesFormulaInstDirect) {

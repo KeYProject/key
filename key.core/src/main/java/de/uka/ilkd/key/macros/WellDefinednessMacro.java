@@ -9,18 +9,21 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This macro resolves the well-definedness transformer, i.e. it applies exactly all applicable
@@ -90,7 +93,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
      * This strategy accepts all rule apps for which the rule name is a Well-Definedness rule and
      * rejects everything else.
      */
-    private static class WellDefinednessStrategy implements Strategy {
+    private static class WellDefinednessStrategy implements Strategy<Goal> {
 
         private static final Name NAME = new Name(WellDefinednessStrategy.class.getSimpleName());
 
@@ -103,7 +106,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();

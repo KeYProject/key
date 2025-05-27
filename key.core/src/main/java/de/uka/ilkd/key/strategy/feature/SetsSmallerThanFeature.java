@@ -6,20 +6,22 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.util.collection.ImmutableList;
 
 
 public class SetsSmallerThanFeature extends SmallerThanFeature {
 
-    private final ProjectionToTerm left, right;
+    private final ProjectionToTerm<Goal> left, right;
     private final LocSetLDT locSetLDT;
 
 
-    private SetsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+    private SetsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             LocSetLDT locSetLDT) {
         this.left = left;
         this.right = right;
@@ -27,7 +29,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     }
 
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             LocSetLDT locSetLDT) {
         return new SetsSmallerThanFeature(left, right, locSetLDT);
     }

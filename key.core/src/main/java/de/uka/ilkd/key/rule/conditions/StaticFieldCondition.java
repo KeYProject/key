@@ -21,7 +21,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
  *
  * The negated condition is true if the instantiation refers to an instance (non-static) field.
  *
- * Inspired by {@link de.uka.ilkd.key.rule.conditions.FieldTypeToSortCondition}.
+ * Inspired by {@link FieldTypeToSortCondition}.
  *
  * @author Michael Kirsten
  */

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -199,7 +200,7 @@ public class StateVars {
         if (t == null) {
             return null;
         }
-        if (!(t.op() instanceof JFunction)) {
+        if (!(t.op() instanceof Function)) {
             // Sometimes the heap term operator is a location variable (for
             // instance if it is the base heap). Create a location variable
             // in this case.
@@ -218,7 +219,7 @@ public class StateVars {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        final JFunction newFunc = new JFunction(new Name(name), t.sort());
+        final Function newFunc = new JFunction(new Name(name), t.sort());
         register(newFunc, services);
         return tb.func(newFunc);
     }
@@ -334,7 +335,7 @@ public class StateVars {
             return tb.getBaseHeap();
         } else {
             Name heapName = new Name("heap" + postfix);
-            JFunction heap = new JFunction(heapName, heapLDT.getHeap().sort());
+            Function heap = new JFunction(heapName, heapLDT.getHeap().sort());
             Term heapFunc = tb.func(heap);
             register(heap, services);
             return tb.label(heapFunc, labels);
@@ -354,7 +355,7 @@ public class StateVars {
         final TermBuilder tb = services.getTermBuilder();
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         String newName = tb.newName("mbyAtPre" + postfix);
-        final JFunction mbyAtPreFunc = new JFunction(new Name(newName), intSort);
+        final Function mbyAtPreFunc = new JFunction(new Name(newName), intSort);
         register(mbyAtPreFunc, services);
         return tb.func(mbyAtPreFunc);
     }
@@ -375,15 +376,11 @@ public class StateVars {
     }
 
 
-    static void register(JFunction f, Services services) {
-        Namespace<JFunction> functionNames = services.getNamespaces().functions();
+    static void register(Function f, Services services) {
+        Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
-            if (f.sort() == JavaDLTheory.FORMULA) {
-                functionNames.addSafely(f);
-            } else {
-                functionNames.addSafely(f);
-            }
+            functionNames.addSafely(f);
         }
     }
 

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.util.Debug;
 
@@ -19,8 +20,8 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 
 /**
@@ -64,7 +65,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
         Debug.assertTrue(svSubst instanceof Expression || svSubst instanceof TypeReference
                 || svSubst instanceof Term);
 
-        final var inst = (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
+        final var inst = (SVInstantiations) matchCond.getInstantiations();
         Sort type;
         if (svSubst instanceof Term) {
             type = ((Term) svSubst).sort();

@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -18,8 +17,10 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -28,6 +29,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -49,7 +51,7 @@ import org.jspecify.annotations.Nullable;
  * The find part of a taclet is used to attached the rule to a term in the sequent of the current
  * goal. Therefore the term of the sequent has to match the schema as found in the taclet's find
  * part. The taclet is then attached to this term, more precise not the taclet itself, but an
- * application object of this taclet (see {@link de.uka.ilkd.key.rule.TacletApp TacletApp}. When
+ * application object of this taclet (see {@link TacletApp TacletApp}. When
  * this attached taclet application object is applied, the new goals are constructed as described by
  * the goal descriptions. For example <br>
  * </br>
@@ -71,20 +73,10 @@ import org.jspecify.annotations.Nullable;
  * looking where it can be applied, these tasks have to be done in advance. For example by one of
  * the following classes {@link de.uka.ilkd.key.proof.RuleAppIndex RuleAppIndex} or
  * {@link de.uka.ilkd.key.proof.TacletAppIndex TacletAppIndex} or
- * {@link de.uka.ilkd.key.rule.TacletApp TacletApp}
+ * {@link TacletApp TacletApp}
  * </p>
  */
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
-
-
-    public RuleJustification getRuleJustification() {
-        if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
-            return LemmaJustification.INSTANCE;
-        } else {
-            return AxiomJustification.INSTANCE;
-        }
-    }
-
 
     /** the set of taclet options for this taclet */
     protected final ChoiceExpr choices;
@@ -92,18 +84,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
      */
-    private ImmutableMap<SchemaVariable, SchemaVariable> svNameCorrespondences = null;
+    private ImmutableMap<@NonNull SchemaVariable, SchemaVariable> svNameCorrespondences = null;
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
-
-
-    // The two rule engines for matching and execution (application) of taclets
-    // In the long run, we should think about keeping those somewhere else, e.g., in the services
-    // such that we gain more flexibility like combined matchers that do not just match one taclet
-    // but
-    // all at once for a given term.
-
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -117,10 +101,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec,
@@ -140,10 +124,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
@@ -155,18 +139,27 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
     protected abstract void createAndInitializeExecutor();
 
+    public RuleJustification getRuleJustification() {
+        if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
+            return LemmaJustification.INSTANCE;
+        } else {
+            return AxiomJustification.INSTANCE;
+        }
+    }
+
+
     /**
      * computes and returns all variables that occur bound in the taclet including the taclets
      * defined in <tt>addrules</tt> sections. The result is cached and therefore only computed once.
      *
      * @return all variables occuring bound in the taclet
      */
-    public ImmutableSet<org.key_project.logic.op.QuantifiableVariable> getBoundVariables() {
+    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
         if (boundVariables == null) {
-            ImmutableSet<org.key_project.logic.op.QuantifiableVariable> result =
+            ImmutableSet<QuantifiableVariable> result =
                 DefaultImmutableSet.nil();
 
-            for (final org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate tgt : goalTemplates()) {
+            for (final TacletGoalTemplate tgt : goalTemplates()) {
                 result = result.union(tgt.getBoundVariables());
             }
 
@@ -185,7 +178,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *
      * @return set of variables that occur bound in taclet entities others than goal templates
      */
-    protected abstract ImmutableSet<org.key_project.logic.op.QuantifiableVariable> getBoundVariablesHelper();
+    protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
     public ChoiceExpr getChoices() {
         return choices;
@@ -197,7 +190,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     }
 
     @Override
-    public TacletExecutor<Goal, TacletApp, Taclet> getExecutor() {
+    public @NonNull TacletExecutor getExecutor() {
         return executor;
     }
 
@@ -285,59 +278,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         return svNameCorrespondences.get(p);
     }
 
-    StringBuffer toStringAttribs(StringBuffer sb) {
-        // if (noninteractive()) sb = sb.append(" \\noninteractive");
-        sb.append("\nChoices: ").append(choices);
-        return sb;
-    }
-
-    /**
-     * returns a representation of the Taclet as String
-     *
-     * @return string representation
-     */
-    @Override
-    public String toString() {
-        if (tacletAsString == null) {
-            // FIXME this essentially reimplements PrettyPrinter::printTaclet
-            StringBuffer sb = new StringBuffer();
-            sb = sb.append(name()).append(" {\n");
-            sb = toStringAssumes(sb);
-            sb = toStringVarCond(sb);
-            sb = toStringGoalTemplates(sb);
-            sb = toStringRuleSets(sb);
-            sb = toStringAttribs(sb);
-            sb = toStringTriggers(sb);
-            tacletAsString = sb.append("}").toString();
-        }
-        return tacletAsString;
-    }
-
-    /**
-     * @return true iff <code>this</code> taclet may be applied for the given mode
-     *         (interactive/non-interactive, activated rule sets)
-     */
-    public boolean admissible(boolean interactive, ImmutableList<RuleSet> p_ruleSets) {
-        if (interactive) {
-            return admissibleInteractive(p_ruleSets);
-        } else {
-            return admissibleAutomatic(p_ruleSets);
-        }
-    }
-
-    protected boolean admissibleInteractive(ImmutableList<RuleSet> notAdmissibleRuleSets) {
-        return true;
-    }
-
-    protected boolean admissibleAutomatic(ImmutableList<RuleSet> admissibleRuleSets) {
-        for (final RuleSet tacletRuleSet : getRuleSets()) {
-            if (admissibleRuleSets.contains(tacletRuleSet)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Set<SchemaVariable> collectSchemaVars() {
 
         Set<SchemaVariable> result = new LinkedHashSet<>();
@@ -351,10 +291,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         // add, replacewith
         for (var tgt : this.goalTemplates()) {
             collectSchemaVarsHelper(tgt.sequent(), oc);
-            if (tgt instanceof AntecSuccTacletGoalTemplate) {
-                collectSchemaVarsHelper(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), oc);
-            } else if (tgt instanceof RewriteTacletGoalTemplate) {
-                ((RewriteTacletGoalTemplate) tgt).replaceWith().execPostOrder(oc);
+            if (tgt instanceof AntecSuccTacletGoalTemplate antecSuccTemplate) {
+                collectSchemaVarsHelper(antecSuccTemplate.replaceWith(), oc);
+            } else if (tgt instanceof RewriteTacletGoalTemplate rwTemplate) {
+                rwTemplate.replaceWith().execPostOrder(oc);
             }
         }
 
@@ -366,8 +306,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
         return result;
     }
-
-
 
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
         for (SequentFormula cf : s) {
@@ -576,7 +514,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
     public abstract Taclet setName(String s);
 
-
     /**
      * Information about the origin of the taclet. Should be a location where the user can find the
      * declaration of the taclet.
@@ -592,5 +529,33 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
     public void setOrigin(@Nullable String origin) {
         this.origin = origin;
+    }
+
+    StringBuffer toStringAttribs(StringBuffer sb) {
+        // if (noninteractive()) sb = sb.append(" \\noninteractive");
+        sb.append("\nChoices: ").append(choices);
+        return sb;
+    }
+
+    /**
+     * returns a representation of the Taclet as String
+     *
+     * @return string representation
+     */
+    @Override
+    public String toString() {
+        if (tacletAsString == null) {
+            // FIXME this essentially reimplements PrettyPrinter::printTaclet
+            StringBuffer sb = new StringBuffer();
+            sb.append(name()).append(" {\n");
+            sb = toStringAssumes(sb);
+            sb = toStringVarCond(sb);
+            sb = toStringGoalTemplates(sb);
+            sb = toStringRuleSets(sb);
+            sb = toStringAttribs(sb);
+            sb = toStringTriggers(sb);
+            tacletAsString = sb.append("}").toString();
+        }
+        return tacletAsString;
     }
 }

@@ -39,6 +39,7 @@ class UniTrigger implements Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
 
+    @Override
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
             Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
@@ -68,6 +69,7 @@ class UniTrigger implements Trigger {
     }
 
 
+    @Override
     public Term getTriggerTerm() {
         return trigger;
     }
@@ -133,8 +135,8 @@ class UniTrigger implements Trigger {
      * Code copied from logic.EqualityConstraint
      */
     private static boolean containsLoop(
-            ImmutableMap<org.key_project.logic.op.QuantifiableVariable, Term> varMap,
-            org.key_project.logic.op.QuantifiableVariable var) {
+            ImmutableMap<QuantifiableVariable, Term> varMap,
+            QuantifiableVariable var) {
         ImmutableList<QuantifiableVariable> body = ImmutableSLList.nil();
         ImmutableList<Term> fringe = ImmutableSLList.nil();
         Term checkForCycle = varMap.get(var);

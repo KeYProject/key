@@ -8,7 +8,8 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
 

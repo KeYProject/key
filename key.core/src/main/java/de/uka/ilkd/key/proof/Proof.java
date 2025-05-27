@@ -657,6 +657,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * returns true if the root node is marked as closed and all goals have been removed
      */
+    @Override
     public boolean closed() {
         return root.isClosed() && openGoals.isEmpty();
     }
@@ -970,7 +971,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getOpenGoal(Node node) {
+    public Goal getOpenGoal(@NonNull Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;
@@ -1223,7 +1224,7 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     protected void fireProofDisposing(ProofDisposedEvent e) {
         ProofDisposedListener[] listener = getProofDisposedListeners();
-        for (ProofDisposedListener l : listener) {
+        for (final ProofDisposedListener l : listener) {
             l.proofDisposing(e);
         }
     }

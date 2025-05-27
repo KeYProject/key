@@ -371,9 +371,9 @@ subprojects {
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
-            if(project.name == 'recoder') {
+            if (project.name == 'recoder') {
                 licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
-            }else {
+            } else {
                 licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
             }
         }

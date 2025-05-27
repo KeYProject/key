@@ -30,6 +30,7 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -583,7 +584,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term paramsOK = generateParamsOK(params);
 
         // initial value of measured_by clause
-        final JFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
+        final Function mbyAtPreFunc = generateMbyAtPreFunc(services);
         final Term mbyAtPreDef;
         if (type().equals(Type.OPERATION_CONTRACT)) {
             MethodWellDefinedness mwd = (MethodWellDefinedness) this;
@@ -638,7 +639,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term paramsOK = generateParamsOK(params);
 
         // initial value of measured_by clause
-        final JFunction mbyAtPreFunc = generateMbyAtPreFunc(services);
+        final Function mbyAtPreFunc = generateMbyAtPreFunc(services);
 
         final Term wellFormed = TB.wellFormed(TB.var(heap));
 
@@ -729,7 +730,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return tb.getTaclet();
     }
 
-    abstract JFunction generateMbyAtPreFunc(Services services);
+    abstract Function generateMbyAtPreFunc(Services services);
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars.self, newVars.result, newVars.exception, newVars.atPres,
@@ -1337,40 +1338,41 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private final static class TermListAndFunc {
         private final ImmutableList<Term> terms;
-        private final JFunction func;
+        private final Function func;
 
 
-        private TermListAndFunc(ImmutableList<Term> ts, JFunction f) {
+        private TermListAndFunc(ImmutableList<Term> ts, Function f) {
             this.terms = ts;
             this.func = f;
         }
     }
 
     /**
-         * A static data structure for storing and passing two terms, denoting the implicit and the
-         * explicit part of a pre- or post-condition.
-         *
-         * @author Michael Kirsten
-         */
-        public record Condition(Term implicit, Term explicit) {
+     * A static data structure for storing and passing two terms, denoting the implicit and the
+     * explicit part of a pre- or post-condition.
+     *
+     * @author Michael Kirsten
+     */
+    public record Condition(Term implicit, Term explicit) {
 
         /**
-             * Applies a unary operator to every term in this object.
-             *
-             * @param op the operator to apply.
-             * @return this object with the operator applied.
-             */
-            Condition map(UnaryOperator<Term> op) {
-                return new Condition(op.apply(implicit), op.apply(explicit));
-            }
+         * Applies a unary operator to every term in this object.
+         *
+         * @param op the operator to apply.
+         * @return this object with the operator applied.
+         */
+        Condition map(UnaryOperator<Term> op) {
+            return new Condition(op.apply(implicit), op.apply(explicit));
         }
+    }
 
     /**
      * A static data structure for passing a term with a function.
      *
      * @author Michael Kirsten
      */
-    public record TermAndFunc(Term term, JFunction func) {}
+    public record TermAndFunc(Term term, Function func) {
+    }
 
     /**
      * A data structure for storing and passing all specifications of a specification element

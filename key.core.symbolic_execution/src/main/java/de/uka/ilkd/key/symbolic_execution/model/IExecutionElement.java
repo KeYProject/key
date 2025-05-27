@@ -9,7 +9,9 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 

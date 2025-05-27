@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.*;
+import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -150,7 +151,7 @@ public class BuiltInRuleAppIndex {
     private void scanAddedFormulas(Goal goal, boolean antec,
             SequentChangeInfo sci,
             NewRuleListener listener) {
-        ImmutableList<org.key_project.prover.sequent.SequentFormula> cfmas =
+        ImmutableList<SequentFormula> cfmas =
             sci.addedFormulas(antec);
         while (!cfmas.isEmpty()) {
             final SequentFormula cfma = cfmas.head();

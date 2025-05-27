@@ -20,12 +20,15 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.TacletPrefix;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A RewriteTaclet represents a taclet, whose find can be matched against any term in the sequent no
@@ -105,10 +108,10 @@ public class RewriteTaclet extends FindTaclet {
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             int p_applicationRestriction, ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
@@ -116,10 +119,10 @@ public class RewriteTaclet extends FindTaclet {
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             int p_applicationRestriction, ChoiceExpr choices,
             boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -131,7 +134,7 @@ public class RewriteTaclet extends FindTaclet {
 
     @Override
     protected void createAndInitializeExecutor() {
-        this.executor = new RewriteTacletExecutor<>(this);
+        this.executor = new RewriteTacletExecutor(this);
     }
 
     /**

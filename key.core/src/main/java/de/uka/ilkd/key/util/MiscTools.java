@@ -35,12 +35,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
@@ -107,11 +107,11 @@ public final class MiscTools {
     }
 
     /**
-     * Checks whether the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
+     * Checks whether the given {@link Modality.JavaModalityKind} is a
      * transaction modality.
      *
      * @param modalityKind The modality to check.
-     * @return true iff the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
+     * @return true iff the given {@link Modality.JavaModalityKind} is a
      *         transaction modality.
      */
     public static boolean isTransaction(final Modality.JavaModalityKind modalityKind) {
@@ -274,7 +274,7 @@ public final class MiscTools {
     /**
      * Combine two maps by function application. Values of <code>m0</code> which are not keys of
      * <code>m1</code> are dropped. This implementation tries to use the same implementation of
-     * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
+     * {@link Map} (provided in Java SE) as <code>m0</code>.
      *
      * @param m0 a map.
      * @param m1 another map.
@@ -731,31 +731,31 @@ public final class MiscTools {
 
         try {
             return switch (loc.getType()) {
-                case "URL" -> // URLDataLocation
-                        Optional.of(((URLDataLocation) loc).url().toURI());
-                case "ARCHIVE" -> { // ArchiveDataLocation
-                    // format: "ARCHIVE:<filename>?<itemname>"
-                    ArchiveDataLocation adl = (ArchiveDataLocation) loc;
+            case "URL" -> // URLDataLocation
+                Optional.of(((URLDataLocation) loc).url().toURI());
+            case "ARCHIVE" -> { // ArchiveDataLocation
+                // format: "ARCHIVE:<filename>?<itemname>"
+                ArchiveDataLocation adl = (ArchiveDataLocation) loc;
 
-                    // extract item name and zip file
-                    int qmindex = adl.toString().lastIndexOf('?');
-                    String itemName = adl.toString().substring(qmindex + 1);
-                    ZipFile zip = adl.getFile();
+                // extract item name and zip file
+                int qmindex = adl.toString().lastIndexOf('?');
+                String itemName = adl.toString().substring(qmindex + 1);
+                ZipFile zip = adl.getFile();
 
-                    // use special method to ensure that path separators are correct
-                    yield Optional.of(getZipEntryURI(zip, itemName));
-                }
-                case "FILE" -> // DataFileLocation
-                    // format: "FILE:<path>"
-                        Optional.of(((DataFileLocation) loc).getFile().toURI());
-                default -> // SpecDataLocation
-                    // format "<type>://<location>"
-                    // wrap into URN to ensure URI encoding is correct (no spaces!)
-                        Optional.empty();
+                // use special method to ensure that path separators are correct
+                yield Optional.of(getZipEntryURI(zip, itemName));
+            }
+            case "FILE" -> // DataFileLocation
+                // format: "FILE:<path>"
+                Optional.of(((DataFileLocation) loc).getFile().toURI());
+            default -> // SpecDataLocation
+                // format "<type>://<location>"
+                // wrap into URN to ensure URI encoding is correct (no spaces!)
+                Optional.empty();
             };
         } catch (URISyntaxException | IOException e) {
             throw new IllegalArgumentException(
-                    "The given DataLocation can not be converted into a valid URI: " + loc, e);
+                "The given DataLocation can not be converted into a valid URI: " + loc, e);
         }
     }
 
@@ -766,7 +766,7 @@ public final class MiscTools {
      * <b>Note:</b> There is an unresolved bug in Java for JarURLs when the jar path contains a
      * directory ending with "!" ("!" should be encoded as "%21", but is not). In this case, the
      * program will crash if trying to open a resource from the url. This will not be fixed until
-     * {@link java.net.URI} supports RFC 3986 (currently, as of 02-2020, it seems like there are no
+     * {@link URI} supports RFC 3986 (currently, as of 02-2020, it seems like there are no
      * plans for this).<br>
      * <b>Workaround:</b> Don't use directory names ending with "!".
      *

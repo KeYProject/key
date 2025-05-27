@@ -37,7 +37,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
@@ -67,6 +66,8 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableArray;
@@ -196,8 +197,9 @@ public final class SymbolicExecutionUtil {
                     .addFormula(new SequentFormula(term), false, true)
                     .sequent();
         // Return created Sequent and the used predicate to identify the value interested in.
-        ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(parentProof,
-            sideProofEnv, sequentToProve);
+        ApplyStrategyInfo<Proof, Goal> info =
+            SymbolicExecutionSideProofUtil.startSideProof(parentProof,
+                sideProofEnv, sequentToProve);
         try {
             // The simplified formula is the conjunction of all open goals
             ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
@@ -877,7 +879,8 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Utility method of {@link #internalCollectAllElementaryUpdateTerms(Services, List, Term)}
+     * Utility method of
+     * {@link #internalCollectAllElementaryUpdateTerms(Services, List, org.key_project.logic.Term)}
      * which collects static field manipulations on the given heap update.
      *
      * @param services The {@link Services} to use.
@@ -931,7 +934,7 @@ public final class SymbolicExecutionUtil {
     public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
             org.key_project.logic.Term locationTerm) {
         ProgramVariable result = null;
-        if (locationTerm.op() instanceof JFunction function) {
+        if (locationTerm.op() instanceof Function function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
@@ -998,7 +1001,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as method call, {@code false} represent node as something
      *         else.
      */
-    public static boolean isMethodCallNode(Node node, RuleApp ruleApp, SourceElement statement) {
+    public static boolean isMethodCallNode(Node node, RuleApp ruleApp,
+            SourceElement statement) {
         return isMethodCallNode(node, ruleApp, statement, false);
     }
 
@@ -1013,7 +1017,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as method call, {@code false} represent node as something
      *         else.
      */
-    public static boolean isMethodCallNode(Node node, RuleApp ruleApp, SourceElement statement,
+    public static boolean isMethodCallNode(Node node, RuleApp ruleApp,
+            SourceElement statement,
             boolean allowImpliciteMethods) {
         if (ruleApp != null) { // Do not handle open goal nodes without applied rule
             if (statement instanceof MethodBodyStatement) {
@@ -1066,7 +1071,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as branch statement, {@code false} represent node as
      *         something else.
      */
-    public static boolean isBranchStatement(Node node, RuleApp ruleApp, SourceElement statement,
+    public static boolean isBranchStatement(Node node, RuleApp ruleApp,
+            SourceElement statement,
             PositionInfo posInfo) {
         return isStatementNode(node, ruleApp, statement, posInfo)
                 && (statement instanceof BranchStatement);
@@ -1082,7 +1088,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as loop statement, {@code false} represent node as
      *         something else.
      */
-    public static boolean isLoopStatement(Node node, RuleApp ruleApp, SourceElement statement,
+    public static boolean isLoopStatement(Node node, RuleApp ruleApp,
+            SourceElement statement,
             PositionInfo posInfo) {
         return isStatementNode(node, ruleApp, statement, posInfo)
                 && (statement instanceof LoopStatement);
@@ -1098,7 +1105,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as statement, {@code false} represent node as something
      *         else.
      */
-    public static boolean isStatementNode(Node node, RuleApp ruleApp, SourceElement statement,
+    public static boolean isStatementNode(Node node, RuleApp ruleApp,
+            SourceElement statement,
             PositionInfo posInfo) {
         // filter out: open goal node which has no applied rule, statements where source code is
         // missing, empty statements, empty blocks
@@ -1115,7 +1123,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as termination, {@code false} represent node as something
      *         else.
      */
-    public static boolean isTerminationNode(Node node, RuleApp ruleApp) {
+    public static boolean isTerminationNode(Node node,
+            RuleApp ruleApp) {
         return "emptyModality".equals(MiscTools.getRuleDisplayName(ruleApp));
     }
 
@@ -1127,7 +1136,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as operation contract, {@code false} represent node as
      *         something else.
      */
-    public static boolean isOperationContract(Node node, RuleApp ruleApp) {
+    public static boolean isOperationContract(Node node,
+            RuleApp ruleApp) {
         if (ruleApp instanceof AbstractContractRuleApp) {
             Contract contract = ((AbstractContractRuleApp) ruleApp).getInstantiation();
             if (contract instanceof OperationContract) {
@@ -1149,7 +1159,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as block contract, {@code false} represent node as
      *         something else.
      */
-    public static boolean isBlockSpecificationElement(Node node, RuleApp ruleApp) {
+    public static boolean isBlockSpecificationElement(Node node,
+            RuleApp ruleApp) {
         return ruleApp instanceof AbstractAuxiliaryContractBuiltInRuleApp;
     }
 
@@ -1173,7 +1184,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as method return, {@code false} represent node as
      *         something else.
      */
-    public static boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
+    public static boolean isMethodReturnNode(Node node,
+            RuleApp ruleApp) {
         String displayName = MiscTools.getRuleDisplayName(ruleApp);
         String ruleName = MiscTools.getRuleName(ruleApp);
         return "methodCallEmpty".equals(displayName) || "methodCallEmptyReturn".equals(ruleName)
@@ -1188,7 +1200,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as exceptional method return, {@code false} represent
      *         node as something else.
      */
-    public static boolean isExceptionalMethodReturnNode(Node node, RuleApp ruleApp) {
+    public static boolean isExceptionalMethodReturnNode(Node node,
+            RuleApp ruleApp) {
         String ruleName = MiscTools.getRuleName(ruleApp);
         return "methodCallParamThrow".equals(ruleName) || "methodCallThrow".equals(ruleName);
     }
@@ -1201,7 +1214,8 @@ public final class SymbolicExecutionUtil {
      * @param statement The actual statement ({@link SourceElement}).
      * @return {@code true} has loop condition, {@code false} has no loop condition.
      */
-    public static boolean hasLoopCondition(Node node, RuleApp ruleApp, SourceElement statement) {
+    public static boolean hasLoopCondition(Node node, RuleApp ruleApp,
+            SourceElement statement) {
         // Do not handle open goal nodes without applied rule.
         // For each loops have no loop condition.
         return ruleApp != null && statement instanceof LoopStatement
@@ -1240,7 +1254,8 @@ public final class SymbolicExecutionUtil {
      *         contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is
      *         {@code null}.
      */
-    public static boolean hasLoopBodyTerminationLabel(RuleApp ruleApp) {
+    public static boolean hasLoopBodyTerminationLabel(
+            RuleApp ruleApp) {
         if (ruleApp != null && ruleApp.posInOccurrence() != null) {
             Term term = (Term) ruleApp.posInOccurrence().subTerm();
             return term.containsLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
@@ -1269,7 +1284,8 @@ public final class SymbolicExecutionUtil {
      * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no
      *         {@link SymbolicExecutionTermLabel} is provided.
      */
-    public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(RuleApp ruleApp) {
+    public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(
+            RuleApp ruleApp) {
         if (ruleApp != null && ruleApp.posInOccurrence() != null) {
             return getSymbolicExecutionLabel((Term) ruleApp.posInOccurrence().subTerm());
         } else {
@@ -1484,7 +1500,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Utility class used to find the maximal modality Term used by
-     * {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(Term)}.
+     * {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(org.key_project.logic.Term)}.
      *
      * @author Martin Hentschel
      */
@@ -1582,7 +1598,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a
      *         symbolic execution tree.
      */
-    public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
+    public static boolean isSymbolicExecutionTreeNode(Node node,
+            RuleApp ruleApp) {
         if (node != null && !isRuleAppToIgnore(ruleApp) && hasSymbolicExecutionLabel(ruleApp)) {
             SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
             PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
@@ -1634,7 +1651,8 @@ public final class SymbolicExecutionUtil {
      * @param ruleApp The {@link RuleApp} may used or not used in the rule.
      * @return {@code true} is in implicit method, {@code false} is not in implicit method.
      */
-    public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
+    public static boolean isInImplicitMethod(Node node,
+            RuleApp ruleApp) {
         Term term = (Term) ruleApp.posInOccurrence().subTerm();
         term = TermBuilder.goBelowUpdates(term);
         JavaBlock block = term.javaBlock();
@@ -1725,7 +1743,8 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches for the given {@link Node} the parent node which also represents a symbolic
-     * execution tree node (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
+     * execution tree node (checked via
+     * {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
      *
      * @param node The {@link Node} to start search in.
      * @param pio The {@link PosInOccurrence} of the modality.
@@ -1764,7 +1783,8 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Searches for the given {@link Node} the parent node which also represents a symbolic
-     * execution tree node (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
+     * execution tree node (checked via
+     * {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
      *
      * @param node The {@link Node} to start search in.
      * @return The parent {@link Node} of the given {@link Node} which is also a set node or
@@ -2673,7 +2693,7 @@ public final class SymbolicExecutionUtil {
      */
     private static ImmutableList<Term> listNewSemisequentTerms(Semisequent parent,
             Semisequent child) {
-        Set<org.key_project.prover.sequent.SequentFormula> parentSFs = new HashSet<>();
+        Set<SequentFormula> parentSFs = new HashSet<>();
         for (final SequentFormula sf : parent) {
             parentSFs.add(sf);
         }
@@ -2904,10 +2924,11 @@ public final class SymbolicExecutionUtil {
         Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalAntecedent,
             nullExpected ? isNull : isNotNull, false);
         // Execute proof in the current thread
-        ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(),
-            sideProofEnv, sequentToProve, StrategyProperties.METHOD_CONTRACT,
-            StrategyProperties.LOOP_INVARIANT, StrategyProperties.QUERY_ON,
-            StrategyProperties.SPLITTING_NORMAL);
+        ApplyStrategyInfo<Proof, Goal> info =
+            SymbolicExecutionSideProofUtil.startSideProof(node.proof(),
+                sideProofEnv, sequentToProve, StrategyProperties.METHOD_CONTRACT,
+                StrategyProperties.LOOP_INVARIANT, StrategyProperties.QUERY_ON,
+                StrategyProperties.SPLITTING_NORMAL);
         try {
             return !info.getProof().openEnabledGoals().isEmpty();
         } finally {
@@ -3786,7 +3807,8 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} represent node as loop body termination, {@code false} represent node as
      *         something else.
      */
-    public static boolean isLoopBodyTermination(final Node node, RuleApp ruleApp) {
+    public static boolean isLoopBodyTermination(final Node node,
+            RuleApp ruleApp) {
         boolean result = false;
         if (ruleApp instanceof OneStepSimplifierRuleApp simplifierApp) {
             // Check applied rules in protocol
@@ -3863,7 +3885,7 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} is number, {@code false} is something else.
      */
     public static boolean isNumber(Operator op) {
-        if (op instanceof JFunction) {
+        if (op instanceof Function) {
             String[] numbers =
                 { "#", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Z", "neglit" };
             Arrays.sort(numbers);
@@ -3961,7 +3983,8 @@ public final class SymbolicExecutionUtil {
      * @param ruleApp The {@link RuleApp}.
      * @return The computed call stack size and the second statement if available.
      */
-    public static Pair<Integer, SourceElement> computeSecondStatement(RuleApp ruleApp) {
+    public static Pair<Integer, SourceElement> computeSecondStatement(
+            RuleApp ruleApp) {
         if (ruleApp != null) {
             // Find inner most block
             SourceElement firstStatement = NodeInfo.computeFirstStatement(ruleApp);
@@ -4059,7 +4082,7 @@ public final class SymbolicExecutionUtil {
         final Services services = variable.getServices();
         if (isStaticVariable(variable.getProgramVariable())) {
             // Static field access
-            JFunction function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+            Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                 (LocationVariable) variable.getProgramVariable(), services);
             return services.getTermBuilder().staticDot(variable.getProgramVariable().sort(),
                 function);
@@ -4073,12 +4096,12 @@ public final class SymbolicExecutionUtil {
                 if (variable.getProgramVariable() != null) {
                     if (services.getJavaInfo().getArrayLength() == variable.getProgramVariable()) {
                         // Special handling for length attribute of arrays
-                        JFunction function =
+                        Function function =
                             services.getTypeConverter().getHeapLDT().getLength();
                         return services.getTermBuilder().func(function, parentTerm);
                     } else {
                         // Field access on the parent variable
-                        JFunction function =
+                        Function function =
                             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                                 (LocationVariable) variable.getProgramVariable(), services);
                         return services.getTermBuilder().dot(variable.getProgramVariable().sort(),
@@ -4302,7 +4325,8 @@ public final class SymbolicExecutionUtil {
      * @param appliedRuleApp The {@link RuleApp} to check.
      * @return {@code true} validitiy branch, {@code false} otherwise.
      */
-    public static boolean isBlockContractValidityBranch(RuleApp appliedRuleApp) {
+    public static boolean isBlockContractValidityBranch(
+            RuleApp appliedRuleApp) {
         return appliedRuleApp != null
                 && isBlockContractValidityBranch(appliedRuleApp.posInOccurrence());
     }

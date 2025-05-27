@@ -320,6 +320,7 @@ public class TaskTree extends JPanel {
         /**
          * invoked if all goals of the proof are closed
          */
+        @Override
         public void proofClosed(ProofTreeEvent e) {
             delegateView.repaint();
         }
@@ -327,6 +328,7 @@ public class TaskTree extends JPanel {
         /**
          * invoked if a proof has been pruned, potentially reopening branches
          */
+        @Override
         public void proofPruned(ProofTreeEvent e) {
             delegateView.repaint();
         }
@@ -336,6 +338,7 @@ public class TaskTree extends JPanel {
          * proof
          * tree.
          */
+        @Override
         public void proofStructureChanged(ProofTreeEvent e) {
             delegateView.repaint();
         }

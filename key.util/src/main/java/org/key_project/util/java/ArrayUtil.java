@@ -206,14 +206,15 @@ public final class ArrayUtil {
      * @return A copy of the array without the element toRemove.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T[] remove(@NonNull T[] array, T toRemove) {
-        List<T> result = new LinkedList<>();
+    public static <T extends @Nullable Object> T @NonNull [] remove(@Nullable T @NonNull [] array,
+            T toRemove) {
+        List<@Nullable T> result = new LinkedList<>();
         for (T element : array) {
             if (!Objects.equals(element, toRemove)) {
                 result.add(element);
             }
         }
-        return result.toArray((T[]) java.lang.reflect.Array
+        return (T[]) result.toArray((T[]) java.lang.reflect.Array
                 .newInstance(getComponentType(array), result.size()));
     }
 

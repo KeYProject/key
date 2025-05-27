@@ -18,12 +18,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
@@ -39,6 +35,10 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
 import org.key_project.logic.op.Modality;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -281,7 +281,7 @@ public abstract class AbstractTestGenerator {
         final Proof oldProof = node.proof();
         final Sequent oldSequent = node.sequent();
         Sequent newSequent = JavaDLSequentKit.getInstance().getEmptySequent();
-        Iterator<org.key_project.prover.sequent.SequentFormula> it =
+        Iterator<SequentFormula> it =
             oldSequent.antecedent().iterator();
         while (it.hasNext()) {
             final SequentFormula sf = it.next();

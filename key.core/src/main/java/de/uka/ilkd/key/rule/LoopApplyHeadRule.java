@@ -19,6 +19,7 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;

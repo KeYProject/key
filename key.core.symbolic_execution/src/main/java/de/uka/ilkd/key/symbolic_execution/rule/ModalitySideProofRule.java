@@ -17,12 +17,12 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -181,7 +181,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                     .sequent();
             // Compute results and their conditions
             List<ResultsAndCondition> conditionsAndResultsMap =
-                computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
+                computeResultsAndConditions(goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
             ImmutableList<Goal> goals = goal.split(1);

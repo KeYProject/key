@@ -501,6 +501,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             return getIfSelectionPanel() != null;
         }
 
+        @Override
         public void modelChanged(ModelEvent me) {
             if (me.getSource() instanceof TacletInstantiationModel) {
                 setModel(((TacletInstantiationModel) me.getSource()).tableModel());

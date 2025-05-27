@@ -6,6 +6,8 @@ package org.key_project.logic;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
+import org.jspecify.annotations.Nullable;
+
 public class PosInTerm {
     private static final PosInTerm TOP_LEVEL = new PosInTerm();
 
@@ -118,7 +120,7 @@ public class PosInTerm {
      *
      * @return the position of the parent
      */
-    public PosInTerm up() {
+    public @Nullable PosInTerm up() {
         if (size == 0) {
             return null;
         }
@@ -232,7 +234,7 @@ public class PosInTerm {
         return hash;
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

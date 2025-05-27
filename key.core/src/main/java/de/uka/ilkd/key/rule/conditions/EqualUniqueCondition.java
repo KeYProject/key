@@ -8,13 +8,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 
 public final class EqualUniqueCondition implements VariableCondition {
@@ -51,7 +52,7 @@ public final class EqualUniqueCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions mc,
             LogicServices services) {
-        var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
+        var svInst = (SVInstantiations) mc.getInstantiations();
         Term tInst = svInst.getInstantiation(t);
         Term t2Inst = svInst.getInstantiation(t2);
         Term resInst = (Term) svInst.getInstantiation(res);

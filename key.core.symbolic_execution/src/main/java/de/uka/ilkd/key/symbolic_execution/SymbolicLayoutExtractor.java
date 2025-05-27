@@ -14,7 +14,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -271,7 +271,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
                 Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
-                ApplyStrategyInfo info = null;
+                ApplyStrategyInfo<Proof, Goal> info = null;
                 try {
                     // Instantiate proof in which equivalent classes of symbolic objects are
                     // computed.
@@ -423,8 +423,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
 
                 TacletApp t2 = c.addInstantiation(cutF, term, false, getServices());
 
-                final ImmutableList<Goal> branches = g.apply(t2);
-                starter.start(branches);
+                starter.start(g.apply(t2));
             }
         }
     }

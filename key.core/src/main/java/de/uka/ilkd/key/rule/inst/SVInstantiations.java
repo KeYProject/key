@@ -20,6 +20,9 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -35,7 +38,8 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * and is used to store instantiations of schemavariables. The class is immutable,
  * this means changing its content results in creating a new object.
  */
-public class SVInstantiations implements org.key_project.prover.rules.inst.SVInstantiations {
+public class SVInstantiations
+        implements org.key_project.prover.rules.instantiation.SVInstantiations {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
 
@@ -125,22 +129,17 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, Term subst, LogicServices services) {
-        return add(sv, new TermInstantiation(sv, subst), services);
+        return add(sv, new InstantiationEntry<>(subst), services);
     }
 
 
     public SVInstantiations addInteresting(SchemaVariable sv, Term subst, LogicServices services) {
-        return addInteresting(sv, new TermInstantiation(sv, subst), services);
+        return addInteresting(sv, new InstantiationEntry<>(subst), services);
     }
 
-
-    public SVInstantiations add(SchemaVariable sv, ProgramList pes, LogicServices services) {
-        return add(sv, new ProgramListInstantiation(pes.getList()), services);
-    }
-
-    public SVInstantiations add(SchemaVariable sv, ImmutableArray<TermLabel> labels,
+    public <T> SVInstantiations add(SchemaVariable sv, ImmutableArray<T> pes, Class<T> type,
             LogicServices services) {
-        return add(sv, new TermLabelInstantiationEntry(labels), services);
+        return add(sv, new ListInstantiation(pes, type), services);
     }
 
     /**
@@ -148,16 +147,8 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      */
     public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind,
             LogicServices services) throws SortException {
-        return add(sv, new InstantiationEntry<>(kind) {
-        }, services);
+        return add(sv, new InstantiationEntry<>(kind), services);
     }
-
-    public SVInstantiations addList(SchemaVariable sv, Object[] list, LogicServices services) {
-        return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
-            services);
-    }
-
-
 
     /**
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
@@ -168,22 +159,14 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, ProgramElement pe, LogicServices services) {
-        return add(sv, new ProgramInstantiation(pe), services);
+        return add(sv, new InstantiationEntry<>(pe), services);
     }
 
 
     public SVInstantiations addInteresting(SchemaVariable sv, ProgramElement pe,
             LogicServices services) {
-        return addInteresting(sv, new ProgramInstantiation(pe), services);
+        return addInteresting(sv, new InstantiationEntry<>(pe), services);
     }
-
-    public SVInstantiations addInterestingList(SchemaVariable sv, Object[] list,
-            LogicServices services) {
-        return addInteresting(sv,
-            new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)), services);
-    }
-
-
 
     /**
      * adds the given pair to the instantiations for the context.If the context has been
@@ -198,7 +181,9 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     public SVInstantiations add(PosInProgram prefix, PosInProgram postfix,
             ExecutionContext activeStatementContext, ProgramElement pe, LogicServices services) {
         return add(CONTEXTSV,
-            new ContextInstantiationEntry(prefix, postfix, activeStatementContext, pe), services);
+            new InstantiationEntry<>(new ContextStatementBlockInstantiation(prefix, postfix,
+                activeStatementContext, pe)),
+            services);
     }
 
 
@@ -274,7 +259,6 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
                 .checkSorts(sv, entry, false, services);
     }
 
-
     public SVInstantiations addInteresting(SchemaVariable sv, Name name, LogicServices services) {
         SchemaVariable existingSV = lookupVar(sv.name());
         Name oldValue = (Name) getInstantiation(existingSV);
@@ -285,10 +269,9 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
                 "Trying to add a second name proposal for " + sv + ": " + oldValue + "->" + name);
         } else {
             // otherwise (nothing here yet) add it
-            return addInteresting(sv, new NameInstantiationEntry(name), services);
+            return addInteresting(sv, new InstantiationEntry<>(name), services);
         }
     }
-
 
     /**
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
@@ -330,7 +313,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @param term the Term the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, Term term, Services services) {
-        return replace(sv, new TermInstantiation(sv, term), services);
+        return replace(sv, new InstantiationEntry<>(term), services);
     }
 
     /**
@@ -341,7 +324,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, ProgramElement pe, Services services) {
-        return replace(sv, new ProgramInstantiation(pe), services);
+        return replace(sv, new InstantiationEntry<>(pe), services);
     }
 
     /**
@@ -353,7 +336,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      */
     public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes,
             Services services) {
-        return replace(sv, new ProgramListInstantiation(pes), services);
+        return replace(sv, new ListInstantiation(pes, ProgramElement.class), services);
     }
 
     /**
@@ -370,7 +353,9 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     public SVInstantiations replace(PosInProgram prefix, PosInProgram postfix,
             ExecutionContext activeStatementContext, ProgramElement pe, Services services) {
         return replace(CONTEXTSV,
-            new ContextInstantiationEntry(prefix, postfix, activeStatementContext, pe), services);
+            new InstantiationEntry<>(new ContextStatementBlockInstantiation(prefix, postfix,
+                activeStatementContext, pe)),
+            services);
     }
 
 
@@ -477,7 +462,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
 
         @Override
         public int hashCode() {
-            return update.hashCode() + 13*updateApplicationlabels.hashCode();
+            return update.hashCode() + 13 * updateApplicationlabels.hashCode();
         }
     }
 
@@ -503,9 +488,9 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     /**
      * returns the instantiation entry for the context "schema variable" or null if non such exists
      */
-    public ContextInstantiationEntry getContextInstantiation() {
+    public ContextStatementBlockInstantiation getContextInstantiation() {
         final InstantiationEntry<?> entry = getInstantiationEntry(CONTEXTSV);
-        return (ContextInstantiationEntry) entry;
+        return entry == null ? null : (ContextStatementBlockInstantiation) entry.getInstantiation();
     }
 
     /**
@@ -613,7 +598,8 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
         return result;
     }
 
-    public SVInstantiations union(org.key_project.prover.rules.inst.SVInstantiations p_other,
+    public SVInstantiations union(
+            org.key_project.prover.rules.instantiation.SVInstantiations p_other,
             LogicServices services) {
         final var other = (SVInstantiations) p_other;
         ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
@@ -660,7 +646,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     }
 
     public ExecutionContext getExecutionContext() {
-        final ContextInstantiationEntry cte = getContextInstantiation();
+        final ContextStatementBlockInstantiation cte = getContextInstantiation();
         if (cte != null) {
             return cte.activeStatementContext();
         } else {
@@ -686,6 +672,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     @Override
     public Object lookupValue(Name name) {
         final var e = lookupEntryForSV(name);
+        // e.value() cannot be null here as null instantiations are not allowed
         return e == null ? null : e.value().getInstantiation();
     }
 }

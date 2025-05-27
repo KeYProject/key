@@ -10,8 +10,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -29,9 +27,7 @@ class TestUnsatCore {
 
     @Test
     void testUnsatCore() throws ProblemLoaderException {
-        if (!z3Installed()) {
-            return;
-        }
+        SmtTestUtils.assumeZ3Installed();
 
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory, "smt/unsatCore.proof"));
@@ -42,7 +38,7 @@ class TestUnsatCore {
         Node n = p.findAny(node -> node.getAppliedRuleApp() instanceof SMTRuleApp);
         SMTRuleApp app = ((SMTRuleApp) n.getAppliedRuleApp());
         Assertions.assertEquals("Z3", app.getSuccessfulSolverName());
-        ImmutableList<PosInOccurrence> ifs = app.ifInsts();
+        ImmutableList<PosInOccurrence> ifs = app.assumesInsts();
         Assertions.assertTrue(
             ifs.contains(PosInOccurrence.findInSequent(n.sequent(), 1,
                 PosInTerm.getTopLevel())));
@@ -57,10 +53,4 @@ class TestUnsatCore {
         Assertions.assertEquals(4, ifs.size());
     }
 
-    private static boolean z3Installed() {
-        return SolverTypes.getSolverTypes().stream()
-                .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
-                        && it.getName().equals("Z3"))
-                .findFirst().map(x -> x.isInstalled(true)).orElse(false);
-    }
 }

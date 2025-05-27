@@ -46,7 +46,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
-        Operator op = lookup_func(sort + "::select");
+        Operator op = (Operator) lookup_func(sort + "::select");
         Term[] params = { heap, object, field };
         return tf.createTerm(op, params);
     }
@@ -214,8 +214,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     // @Ignore(value="weigl: This test is not comprehensible anymore.")
     public void testUnknownConstant() throws Exception {
-        parseDecls("\\functions { \\unique Field unkonwn.Clazz::$unknownField; }");
-        String string = "int::select(heap,a,unkonwn.Clazz::$unknownField)";
+        parseDecls("\\functions { \\unique Field unknown.Clazz::$unknownField; }");
+        String string = "int::select(heap,a,unknown.Clazz::$unknownField)";
         comparePrettyPrintAgainstToString(string, string);
     }
 

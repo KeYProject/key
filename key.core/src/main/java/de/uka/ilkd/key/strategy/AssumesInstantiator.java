@@ -16,9 +16,9 @@ import de.uka.ilkd.key.strategy.IfInstantiationCachePool.AssumesInstantiationCac
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.rules.AssumesFormulaInstSeq;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
-import org.key_project.prover.rules.AssumesMatchResult;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.AssumesMatchResult;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -62,7 +62,7 @@ public class AssumesInstantiator {
      * Find all possible instantiations of the assumes-sequent formulas within the sequent
      * {@code goal.sequent()}
      */
-    public void findIfFormulaInstantiations() {
+    public void findAssumesFormulaInstantiations() {
         final Sequent p_seq = goal.sequent();
 
         Debug.assertTrue(tacletAppContainer.getTacletApp().assumesFormulaInstantiations() == null,
@@ -141,7 +141,7 @@ public class AssumesInstantiator {
      *         (container) have been matched
      */
     private boolean isNewFormula(AssumesFormulaInstSeq p_ifInstantiation) {
-        final boolean antec = p_ifInstantiation.inAntec();
+        final boolean antec = p_ifInstantiation.inAntecedent();
 
         final ImmutableArray<AssumesFormulaInstantiation> cache =
             getNewSequentFormulasFromCache(antec);
@@ -159,7 +159,7 @@ public class AssumesInstantiator {
      *         (container) have been matched (this method does not use the cache)
      */
     private boolean isNewFormulaDirect(AssumesFormulaInstSeq p_ifInstantiation) {
-        final boolean antec = p_ifInstantiation.inAntec();
+        final boolean antec = p_ifInstantiation.inAntecedent();
 
         final SequentFormula cfma =
             p_ifInstantiation.getSequentFormula();
@@ -203,7 +203,7 @@ public class AssumesInstantiator {
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> p_ifSeqTail,
+            ImmutableList<SequentFormula> p_ifSeqTail,
             ImmutableList<SequentFormula> p_ifSeqTail2nd,
             ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched,
             MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
@@ -231,7 +231,7 @@ public class AssumesInstantiator {
 
         // For each matching formula call the method again to match
         // the remaining terms
-        Iterator<? extends org.key_project.prover.rules.MatchConditions> itMC =
+        Iterator<? extends org.key_project.prover.rules.instantiation.MatchConditions> itMC =
             mr.matchConditions().iterator();
         p_ifSeqTail = p_ifSeqTail.tail();
         for (final AssumesFormulaInstantiation ifInstantiation : mr.candidates()) {

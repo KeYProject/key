@@ -16,12 +16,13 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -228,7 +229,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                         .sequent();
             // Compute results and their conditions
             List<ResultsAndCondition> conditionsAndResultsMap =
-                computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
+                computeResultsAndConditions(goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
             ImmutableList<Goal> goals = goal.split(1);
@@ -250,7 +251,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                     resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
                 }
             } else {
-                JFunction resultFunction = createResultConstant(services, varTerm.sort());
+                Function resultFunction = createResultConstant(services, varTerm.sort());
                 Term resultFunctionTerm = tb.func(resultFunction);
                 resultGoal.addFormula(
                     replace(pio,

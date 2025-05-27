@@ -46,6 +46,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * Returns an instantiation proposal for the schema variable var. Currently supports names for
      * skolemterm SVs, variable SVs, and labels.
      */
+    @Override
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {
@@ -199,7 +200,7 @@ public class VariableNameProposer implements InstantiationProposer {
             Node undoAnchor, ImmutableList<String> previousProposals) {
 
         ProgramElement contextProgram =
-            app.matchConditions().getInstantiations().getContextInstantiation().contextProgram();
+            app.matchConditions().getInstantiations().getContextInstantiation().program();
 
         if (contextProgram == null) {
             contextProgram = new StatementBlock();

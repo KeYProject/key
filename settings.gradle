@@ -1,6 +1,7 @@
 include "key.util"
 include "key.ui"
 include "key.ncore"
+include 'key.ncore.calculus'
 include "key.core"
 include "key.core.rifl"
 include "key.core.symbolic_execution"
@@ -15,10 +16,9 @@ include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
 include 'keyext.caching'
+include 'keyext.isabelletranslation'
 include 'keyext.rusty'
 
 // ENABLE NULLNESS here or on the CLI
 // This flag is activated to enable the checker framework.
 // System.setProperty("ENABLE_NULLNESS", "true")
-include 'key.ncore.calculus'
-

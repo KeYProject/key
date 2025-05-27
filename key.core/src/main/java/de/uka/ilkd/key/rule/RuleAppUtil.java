@@ -12,8 +12,9 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.rules.AssumesFormulaInstSeq;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -33,9 +34,9 @@ public final class RuleAppUtil {
      * @param node proof node which contains that rule application
      * @return sequent formulas used
      */
-    public static Set<PosInOccurrence> ifInstsOfRuleApp(
+    public static Set<PosInOccurrence> assumesInstantiationsOfRuleApp(
             RuleApp ruleApp, Node node) {
-        // replayer requires that ifInsts are provided in order (!)
+        // replayer requires that assumesFormulaInstantiations are provided in order (!)
         Set<PosInOccurrence> inputs = new LinkedHashSet<>();
         // taclets with \find or similar
         if (ruleApp instanceof PosTacletApp posTacletApp) {
@@ -44,7 +45,7 @@ public final class RuleAppUtil {
                 for (AssumesFormulaInstantiation x : posTacletApp.assumesFormulaInstantiations()) {
 
                     if (x instanceof AssumesFormulaInstSeq assumes) {
-                        boolean antec = assumes.inAntec();
+                        boolean antec = assumes.inAntecedent();
                         inputs.add(new PosInOccurrence(assumes.getSequentFormula(),
                             PosInTerm.getTopLevel(), antec));
                     }
@@ -54,7 +55,7 @@ public final class RuleAppUtil {
         // built-ins need special treatment:
         // record if instantiations
         if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) {
-            builtIn.ifInsts().forEach(inputs::add);
+            builtIn.assumesInsts().forEach(inputs::add);
         }
 
         // State Merging: add all formulas as inputs

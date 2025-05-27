@@ -14,11 +14,11 @@ import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -73,19 +73,19 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
             Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         if (goal != null) {
-            if (rule instanceof UseOperationContractRule
-                    && (goal.node().getNodeInfo().getBranchLabel().startsWith("Pre") || goal.node()
-                            .getNodeInfo().getBranchLabel().startsWith("Null reference"))) {
-                return RefactoringScope.SEQUENT;
-            } else if (rule instanceof WhileInvariantRule && goal.node().getNodeInfo()
-                    .getBranchLabel().startsWith("Invariant Initially Valid")) {
-                return RefactoringScope.SEQUENT;
-            } else if (rule instanceof AbstractAuxiliaryContractRule
-                    && goal.node().getNodeInfo().getBranchLabel().startsWith("Precondition")) {
-                return RefactoringScope.SEQUENT;
-            } else {
-                return RefactoringScope.NONE;
-            }
+            final String branchLabel = goal.node().getNodeInfo().getBranchLabel();
+            return switch (rule) {
+            case UseOperationContractRule ignored when (branchLabel.startsWith("Pre") ||
+                    branchLabel.startsWith("Null reference")) ->
+                RefactoringScope.SEQUENT;
+            case WhileInvariantRule ignored when branchLabel
+                    .startsWith("Invariant Initially Valid") ->
+                RefactoringScope.SEQUENT;
+            case AbstractAuxiliaryContractRule ignored when branchLabel
+                    .startsWith("Precondition") ->
+                RefactoringScope.SEQUENT;
+            case null, default -> RefactoringScope.NONE;
+            };
         } else {
             return RefactoringScope.NONE;
         }

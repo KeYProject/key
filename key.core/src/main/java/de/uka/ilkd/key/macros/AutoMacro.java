@@ -13,14 +13,15 @@ import java.util.stream.StreamSupport;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -121,20 +122,14 @@ public class AutoMacro extends StrategyProofMacro {
     @Override
     public void setParameter(String paramName, String paramValue)
             throws IllegalArgumentException {
-        if (paramName.equals(BREAKPOINT_PARAM_NAME)) {
-            breakpoint = Optional.ofNullable(paramValue);
-        } else if (paramName.equals(ALLOW_SPLITS_PARAM_NAME)) {
-            allowSplits = checkBoolean(ALLOW_SPLITS_PARAM_NAME, paramValue);
-        } else if (paramName.equals(SYMBEX_ONLY_PARAM_NAME)) {
-            symbexOnly = checkBoolean(SYMBEX_ONLY_PARAM_NAME, paramValue);
-        } else if (paramName.equals(ONLY_HUMAN_PARAM_NAME)) {
-            onlyHumanReadable = checkBoolean(ONLY_HUMAN_PARAM_NAME, paramValue);
-        } else if (paramName.equals(WHITELIST_PARAM_NAME)) {
-            whitelist = StreamSupport
+        switch(paramName){case BREAKPOINT_PARAM_NAME->breakpoint = Optional.ofNullable(paramValue);
+            case ALLOW_SPLITS_PARAM_NAME->allowSplits = checkBoolean(ALLOW_SPLITS_PARAM_NAME, paramValue);
+            case SYMBEX_ONLY_PARAM_NAME->symbexOnly = checkBoolean(SYMBEX_ONLY_PARAM_NAME, paramValue);
+            case ONLY_HUMAN_PARAM_NAME->onlyHumanReadable = checkBoolean(ONLY_HUMAN_PARAM_NAME, paramValue);
+            case WHITELIST_PARAM_NAME->whitelist = StreamSupport
                     .stream(Arrays.spliterator(paramValue.split(",")), true)
                     .collect(Collectors.toList());
-        } else {
-            super.setParameter(paramName, paramValue);
+            default->super.setParameter(paramName, paramValue);
         }
     }
 
@@ -229,7 +224,7 @@ public class AutoMacro extends StrategyProofMacro {
             }
 
             if (isJavaPIO(pio)) {
-                var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();final SourceElement activeStmt = //
+                var term = (Term) pio.subTerm();final SourceElement activeStmt = //
                         JavaTools.getActiveStatement(term.javaBlock());
                 final String currStmtString = activeStmt.toString();
 
@@ -245,7 +240,7 @@ public class AutoMacro extends StrategyProofMacro {
         }
 
         private boolean isJavaPIO(PosInOccurrence pio) {
-            if(pio==null) return false;var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+            if(pio==null) return false;var term = (Term) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
         }
 
         @Override

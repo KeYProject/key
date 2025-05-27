@@ -5,14 +5,17 @@ package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Apply a single proof step.
@@ -54,13 +57,13 @@ public class OneStepProofMacro extends StrategyProofMacro {
      *
      */
 
-    private static class OneStepStrategy implements Strategy {
+    private static class OneStepStrategy implements Strategy<Goal> {
 
         private static final Name NAME = new Name(OneStepStrategy.class.getSimpleName());
         private int counter;
-        public final Strategy delegate;
+        public final Strategy<Goal> delegate;
 
-        public OneStepStrategy(Strategy delegate) {
+        public OneStepStrategy(Strategy<Goal> delegate) {
             this.delegate = delegate;
             this.counter = 0;
         }
@@ -86,7 +89,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             return delegate.computeCost(app, pio, goal, mState);

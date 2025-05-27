@@ -11,13 +11,14 @@ import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Buit-in rule interface. As applications of this rule kind may not be successful in each case one
+ * Built-in rule interface. As applications of this rule kind may not be successful in each case one
  * has to ensure that the goal split is done only iff the application was successful.
  */
-public interface BuiltInRule extends Rule, RuleExecutor<Goal> {
+public interface BuiltInRule extends Rule, RuleExecutor<@NonNull Goal> {
 
     /**
      * returns true iff a rule is applicable at the given position. This does not necessarily mean
@@ -31,15 +32,10 @@ public interface BuiltInRule extends Rule, RuleExecutor<Goal> {
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
 
     @Override
-    default ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
-        return apply(goal,
-            (de.uka.ilkd.key.rule.RuleApp) ruleApp);
-    }
-
-    ImmutableList<Goal> apply(Goal goal, de.uka.ilkd.key.rule.RuleApp ruleApp);
+    ImmutableList<@NonNull Goal> apply(@NonNull Goal goal, @NonNull RuleApp ruleApp);
 
     @Override
-    default RuleExecutor getExecutor() {
+    default @NonNull RuleExecutor<@NonNull Goal> getExecutor() {
         return this;
     }
 

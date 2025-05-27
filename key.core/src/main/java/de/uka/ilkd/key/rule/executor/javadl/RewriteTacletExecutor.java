@@ -9,9 +9,7 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -19,27 +17,27 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 
-public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
-        extends FindTacletExecutor<TacletKind> {
+public class RewriteTacletExecutor extends FindTacletExecutor {
 
-    public RewriteTacletExecutor(TacletKind taclet) {
+    public RewriteTacletExecutor(RewriteTaclet taclet) {
         super(taclet);
     }
-
 
     /**
      * does the work for applyReplacewith (wraps recursion)
      */
     private Term replace(Term term, Term with, TermLabelState termLabelState,
             TacletLabelHint labelHint, PosInOccurrence posOfFind,
-            org.key_project.logic.IntIterator it,
-            MatchConditions mc, Sort maxSort, Goal goal, Services services, RuleApp ruleApp) {
+            IntIterator it,
+            MatchConditions mc,
+            Sort maxSort, Goal goal, Services services, TacletApp ruleApp) {
         if (it.hasNext()) {
             final int indexOfNextSubTerm = it.next();
 
@@ -69,7 +67,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             TermLabelState termLabelState,
             RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind,
             Services services,
-            MatchConditions matchCond, RuleApp ruleApp) {
+            MatchConditions matchCond,
+            TacletApp ruleApp) {
         final Term term = (Term) posOfFind.sequentFormula().formula();
         final IntIterator it = posOfFind.posInTerm().iterator();
         final Term rwTemplate = gt.replaceWith();
@@ -91,7 +90,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             Services services, TacletApp app) {
         assert taclet.goalTemplates().size() == 1;
         assert taclet.goalTemplates().head().sequent().isEmpty();
-        assert taclet.getApplicationRestriction() != RewriteTaclet.IN_SEQUENT_STATE;
+        assert ((RewriteTaclet) taclet)
+                .getApplicationRestriction() != RewriteTaclet.IN_SEQUENT_STATE;
         assert app.complete();
         final RewriteTacletGoalTemplate gt =
             (RewriteTacletGoalTemplate) taclet.goalTemplates().head();
@@ -107,7 +107,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond,
-            Goal goal, RuleApp ruleApp, Services services) {
+            Goal goal, TacletApp ruleApp, Services services) {
         if (gt instanceof RewriteTacletGoalTemplate) {
             final SequentFormula cf =
                 applyReplacewithHelper(goal, termLabelState,
@@ -146,7 +146,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
-            MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+            MatchConditions matchCond, Goal goal, TacletApp ruleApp, Services services) {
         if (posOfFind.isInAntec()) {
             addToAntec(add.antecedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal,
                 ruleApp, services, termLabelState,

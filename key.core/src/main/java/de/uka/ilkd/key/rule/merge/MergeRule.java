@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeProcedure.ValuesMergeResult;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
@@ -35,6 +34,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -477,7 +477,7 @@ public class MergeRule implements BuiltInRule {
             return new ValuesMergeResult(newConstraints, heap1, newNames, sideConditionsToProve);
         }
 
-        if (!(heap1.op() instanceof JFunction) || !(heap2.op() instanceof JFunction)) {
+        if (!(heap1.op() instanceof Function) || !(heap2.op() instanceof Function)) {
             // Covers the case of two different symbolic heaps
             return new ValuesMergeResult(newConstraints,
                 MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2,
@@ -534,7 +534,7 @@ public class MergeRule implements BuiltInRule {
 
                 }
 
-                return new ValuesMergeResult(newConstraints, tb.func((JFunction) heap1.op(),
+                return new ValuesMergeResult(newConstraints, tb.func((Function) heap1.op(),
                     mergedSubHeap.mergeVal(), heap1.sub(1), field1, mergedVal), newNames,
                     sideConditionsToProve);
 
@@ -562,7 +562,7 @@ public class MergeRule implements BuiltInRule {
                 sideConditionsToProve.addAll(mergedSubHeap.sideConditions());
 
                 return new ValuesMergeResult(newConstraints,
-                    tb.func((JFunction) heap1.op(), mergedSubHeap.mergeVal(), pointer1),
+                    tb.func((Function) heap1.op(), mergedSubHeap.mergeVal(), pointer1),
                     newNames,
                     sideConditionsToProve);
             }

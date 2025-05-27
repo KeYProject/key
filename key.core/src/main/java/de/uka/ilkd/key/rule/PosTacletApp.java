@@ -12,9 +12,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
-import org.key_project.prover.rules.MatchConditions;
-import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * the sequent the taclet is attached. The position information has been determined by matching the
  * find-part of the corresponding taclet against the term described by the position information. If
  * such a match has not been performed or a taclet is a no find taclet, a no position taclet object
- * ({@link de.uka.ilkd.key.rule.NoPosTacletApp}) is used to keep track of the (partial)
+ * ({@link NoPosTacletApp}) is used to keep track of the (partial)
  * instantiation information.
  */
 public class PosTacletApp extends TacletApp {
@@ -39,13 +39,13 @@ public class PosTacletApp extends TacletApp {
     /**
      * creates a PosTacletApp for the given taclet with some known instantiations and a position
      * information and CHECKS variable conditions as well as it resolves collisions The
-     * ifInstantiations parameter is not matched against the if sequence, but only stored. For
-     * matching use the method "setIfFormulaInstantiations".
+     * ifInstantiations parameter is not matched against the assumes-sequence, but only stored. For
+     * matching use the method "setAssumesFormulaInstantiations".
      *
      * @param taclet the FindTaclet
      * @param instantiations the SVInstantiations
      * @param pos the PosInOccurrence storing the position where to apply the Taclet
-     * @return new PosTacletApp or null if conditions (assertions) have been hurted
+     * @return new PosTacletApp or null if conditions (assertions) have been hurt
      */
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
             SVInstantiations instantiations, PosInOccurrence pos, Services services) {
@@ -71,18 +71,6 @@ public class PosTacletApp extends TacletApp {
     public static PosTacletApp createPosTacletApp(FindTaclet taclet, MatchConditions matchCond,
             PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, matchCond.getInstantiations(), null, pos, services);
-    }
-
-
-    /**
-     * creates a PosTacletApp for the given taclet and a position information
-     *
-     * @param taclet the FindTaclet
-     * @param pos the PosInOccurrence storing the position where to apply the Taclet
-     */
-    private PosTacletApp(FindTaclet taclet, PosInOccurrence pos) {
-        super(taclet);
-        this.pos = pos;
     }
 
     /**
@@ -199,25 +187,6 @@ public class PosTacletApp extends TacletApp {
         }
     }
 
-
-
-    @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Object[] list, boolean interesting,
-            Services services) {
-        if (interesting) {
-            return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().addInterestingList(sv, list, services),
-                assumesFormulaInstantiations(),
-                posInOccurrence(), services);
-        } else {
-            return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().addList(sv, list, services), assumesFormulaInstantiations(),
-                posInOccurrence(), services);
-        }
-    }
-
-
-
     /**
      * creates a new Taclet application containing all the instantiations given by the
      * SVInstantiations and the ones of this TacletApp
@@ -262,7 +231,7 @@ public class PosTacletApp extends TacletApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     @Override
-    protected TacletApp setAllInstantiations(org.key_project.prover.rules.MatchConditions mc,
+    protected TacletApp setAllInstantiations(MatchConditions mc,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
         return createPosTacletApp((FindTaclet) taclet(),
@@ -272,13 +241,14 @@ public class PosTacletApp extends TacletApp {
 
 
     /**
-     * returns true iff all necessary informations are collected, so that the Taclet can be applied.
+     * returns true iff all necessary information is collected, so that the Taclet can be applied.
      *
-     * @return true iff all necessary informations are collected, so that the Taclet can be applied.
+     * @return true iff all necessary information is collected, so that the Taclet can be applied.
      */
     @Override
     public boolean complete() {
-        return posInOccurrence() != null && uninstantiatedVars().isEmpty() && ifInstsComplete();
+        return posInOccurrence() != null && uninstantiatedVars().isEmpty()
+                && assumesInstantionsComplete();
     }
 
     /**

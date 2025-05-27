@@ -7,12 +7,13 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 
-import org.key_project.prover.rules.AssumesFormulaInstSeq;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * This feature checks that an equation is not applied to itself. This means that the focus of the
@@ -25,13 +26,13 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     private CheckApplyEqFeature() {}
 
+    @Override
     protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        Debug.assertTrue(pos != null,
-            "Need to know the position of " + "the application of the taclet");
+        assert pos != null : "Need to know the position of " + "the application of the taclet";
 
         AssumesFormulaInstantiation ifInst = p_app.assumesFormulaInstantiations().head();
 
-        Debug.assertTrue(ifInst != null, "Need to know the equation the taclet" + " is used with");
+        assert ifInst != null : "Need to know the equation the taclet is used with";
 
         return isNotSelfApplication(pos, ifInst)
         // && equationIsDirected ( ifInst, p_app.constraint() )
@@ -39,10 +40,10 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     }
 
     private boolean isNotSelfApplication(PosInOccurrence pos,
-            AssumesFormulaInstantiation ifInst) {
-        if (!(ifInst instanceof AssumesFormulaInstSeq)
-                || ifInst.getSequentFormula() != pos.sequentFormula()
-                || ((AssumesFormulaInstSeq) ifInst).inAntec() != pos.isInAntec()) {
+            AssumesFormulaInstantiation assumesInstantiation) {
+        if (!(assumesInstantiation instanceof AssumesFormulaInstSeq assumesFormulaInstSeq)
+                || assumesInstantiation.getSequentFormula() != pos.sequentFormula()
+                || assumesFormulaInstSeq.inAntecedent() != pos.isInAntec()) {
             return true;
         }
 

@@ -17,13 +17,13 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
@@ -78,40 +78,41 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+    protected boolean conditionMet(RuleApp ruleApp,
+            Node node) {
         if (suspendOnTrue) {
-            return super.conditionMet(ruleApp, proof, node);
+            return super.conditionMet(ruleApp, node);
         } else {
             ApplyStrategyInfo info = null;
             try {
-                Term negatedCondition =
-                    getProof().getServices().getTermBuilder().not(getCondition());
+                final TermBuilder tb = getProof().getServices().getTermBuilder();
+                Term negatedCondition = tb.not(getCondition());
                 // initialize values
                 PosInOccurrence pio = ruleApp.posInOccurrence();
                 var t = pio.subTerm();
                 Term term = TermBuilder.goBelowUpdates(t);
                 IExecutionContext ec =
-                    JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+                    JavaTools.getInnermostExecutionContext(term.javaBlock(),
+                        getProof().getServices());
                 // put values into map which have to be replaced
                 if (ec != null) {
                     getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
                 }
                 // replace renamings etc.
-                OpReplacer replacer = new OpReplacer(getVariableNamingMap(),
-                    getProof().getServices().getTermFactory());
+                OpReplacer replacer = new OpReplacer(getVariableNamingMap(), tb.tf());
                 Term termForSideProof = replacer.replace(negatedCondition);
                 // start side proof
-                Term toProof = getProof().getServices().getTermBuilder()
-                        .equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+                Term toProof = tb.equals(tb.tt(), termForSideProof);
                 // New OneStepSimplifier is required because it has an internal state and the
                 // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false);
                 Sequent sequent =
                     SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
-                info = SymbolicExecutionSideProofUtil.startSideProof(proof, sideProofEnv, sequent,
-                    StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
-                    StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
+                info =
+                    SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
+                        StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
+                        StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
                 return !info.getProof().closed();
             } catch (ProofInputException e) {
                 return false;
@@ -131,10 +132,9 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
-            return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+            return super.isBreakpointHit(activeStatement, ruleApp, node);
         }
         return false;
     }

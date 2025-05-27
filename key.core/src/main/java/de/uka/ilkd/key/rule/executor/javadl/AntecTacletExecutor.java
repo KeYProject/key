@@ -7,13 +7,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -24,16 +24,12 @@ import org.key_project.prover.sequent.SequentFormula;
  * Executes a Taclet which matches on a formula in the antecedent
  *
  * @author Richard Bubel
- * @param <TacletKind> the kind of taclet this executor is responsible for
  */
-public class AntecTacletExecutor<TacletKind extends AntecTaclet>
-        extends FindTacletExecutor<TacletKind> {
+public class AntecTacletExecutor extends FindTacletExecutor {
 
-
-    public AntecTacletExecutor(TacletKind taclet) {
+    public AntecTacletExecutor(AntecTaclet taclet) {
         super(taclet);
     }
-
 
     /**
      * {@inheritDoc}
@@ -42,9 +38,9 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond,
-            Goal goal, RuleApp ruleApp, Services services) {
-        if (gt instanceof AntecSuccTacletGoalTemplate) {
-            final Sequent replWith = ((AntecSuccTacletGoalTemplate) gt).replaceWith();
+            Goal goal, TacletApp ruleApp, Services services) {
+        if (gt instanceof AntecSuccTacletGoalTemplate template) {
+            final Sequent replWith = template.replaceWith();
             replaceAtPos(replWith.antecedent(), currentSequent, posOfFind, matchCond, goal, ruleApp,
                 services, termLabelState,
                 new TacletLabelHint(TacletOperation.REPLACE_AT_ANTECEDENT, replWith));
@@ -74,7 +70,8 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
      *        match took place
      * @param matchCond the {@link MatchConditions} with all required instantiations
      * @param goal the Goal where the taclet is applied to
-     * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
+     * @param ruleApp the {@link RuleApp} (a TacletApp) describing the current ongoing taclet
+     *        application
      * @param services the {@link Services} encapsulating all Java model information
      */
     @Override
@@ -82,7 +79,7 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
             SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd,
             PosInOccurrence posOfFind,
-            MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
+            MatchConditions matchCond, Goal goal, TacletApp ruleApp, Services services) {
         addToAntec(add.antecedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal,
             ruleApp, services, termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));

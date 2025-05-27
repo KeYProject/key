@@ -24,6 +24,7 @@ public class NodeChangesHolder {
         scis = scis.prepend(p_sci);
     }
 
+    @Override
     public Object clone() {
         return new NodeChangesHolder(scis);
     }

@@ -25,8 +25,6 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -38,7 +36,10 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.engine.ProofSearchInformation;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
@@ -402,9 +403,9 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return A new Skolem constant of the given sort with the given prefix in its name.
      */
-    public static JFunction getNewSkolemConstantForPrefix(String prefix, Sort sort,
+    public static Function getNewSkolemConstantForPrefix(String prefix, Sort sort,
             Services services) {
-        JFunction result = null;
+        Function result = null;
         String newName = "";
 
         do {
@@ -1164,21 +1165,22 @@ public class MergeRuleUtils {
             // Loop over all problematic operators and rename them in the
             // partner state.
             for (Operator partnerStateOp : problematicOps) {
-                final Operator mergeStateOp = thisGoalSymbols.parallelStream()
-                        .filter(s -> s.name().equals(partnerStateOp.name()))
-                        .toList().get(0);
+                final Operator mergeStateOp =
+                    thisGoalSymbols.parallelStream()
+                            .filter(s -> s.name().equals(partnerStateOp.name()))
+                            .toList().get(0);
 
                 Operator newOp1;
                 Operator newOp2;
-                if (partnerStateOp instanceof JFunction partnerFun) {
+                if (partnerStateOp instanceof Function partnerFun) {
                     newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), (JFunction) mergeStateOp);
-                    thisGoalNamespaces.functions().add((JFunction) newOp1);
+                        thisGoal.getLocalNamespaces())), (Function) mergeStateOp);
+                    thisGoalNamespaces.functions().add((Function) newOp1);
                     thisGoalNamespaces.flushToParent();
 
                     newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
                         thisGoal.getLocalNamespaces())), partnerFun);
-                    thisGoalNamespaces.functions().add((JFunction) newOp2);
+                    thisGoalNamespaces.functions().add((Function) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else if (partnerStateOp instanceof LocationVariable partnerLV) {
                     newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
@@ -1353,7 +1355,7 @@ public class MergeRuleUtils {
      * @param old the function to be renamed
      * @return equivalent operator with the new name
      */
-    private static JFunction rename(Name newName, JFunction old) {
+    private static Function rename(Name newName, Function old) {
         return new JFunction(newName, old.sort(), old.argSorts(), old.whereToBind(),
             old.isUnique(), old.isSkolemConstant());
     }
@@ -1479,7 +1481,8 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds.
      * @return The proof result.
      */
-    private static ApplyStrategyInfo tryToProve(Term toProve, Services services, boolean doSplit,
+    private static ProofSearchInformation tryToProve(Term toProve, Services services,
+            boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(// Sequent to prove
             JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
@@ -1497,7 +1500,8 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds. Set to -1 for no timeout.
      * @return The proof result.
      */
-    private static ApplyStrategyInfo tryToProve(Sequent toProve, Services services, boolean doSplit,
+    private static ProofSearchInformation tryToProve(Sequent toProve, Services services,
+            boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         final ProofEnvironment sideProofEnv =
             SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
@@ -1548,7 +1552,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(Term toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ApplyStrategyInfo proofResult =
+            final ProofSearchInformation proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1570,7 +1574,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(Sequent toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ApplyStrategyInfo proofResult =
+            final ProofSearchInformation<Proof, Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1597,7 +1601,7 @@ public class MergeRuleUtils {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo info =
+        final ProofSearchInformation<Proof, Goal> info =
             tryToProve(term, services, true, "Term simplification", timeout);
 
         // The simplified formula is the conjunction of all open goals
@@ -1875,7 +1879,7 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
+        public Set<Map.Entry<LocationVariable, LocationVariable>> entrySet() {
             return null;
         }
     }

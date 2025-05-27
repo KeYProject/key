@@ -17,21 +17,27 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
+
+import org.jspecify.annotations.NonNull;
 
 
 public class InfFlowContractAppFeature implements Feature {
@@ -48,9 +54,7 @@ public class InfFlowContractAppFeature implements Feature {
      * <code>equals</code> or <code>eqEquals</code> (checking for same or equal formulas), which has
      * to be decided by the subclasses
      */
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            PosInOccurrence newPio,
-            PosInOccurrence oldPio) {
+    protected final boolean comparePio(PosInOccurrence newPio, PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
     }
 
@@ -59,8 +63,7 @@ public class InfFlowContractAppFeature implements Feature {
      * Check whether a semisequent contains a formula. Again, one can either search for the same or
      * an equal formula
      */
-    protected boolean semiSequentContains(Semisequent semisequent,
-            SequentFormula cfma) {
+    protected boolean semiSequentContains(Semisequent semisequent, SequentFormula cfma) {
         return semisequent.containsEqual(cfma);
     }
 
@@ -70,8 +73,8 @@ public class InfFlowContractAppFeature implements Feature {
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp,
-            PosInOccurrence newPio) {
+    protected boolean sameApplication(RuleApp ruleCmp,
+            TacletApp newApp, PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -85,7 +88,7 @@ public class InfFlowContractAppFeature implements Feature {
                 return false;
             }
             final PosInOccurrence oldPio = cmp.posInOccurrence();
-            if (!comparePio(newApp, cmp, newPio, oldPio)) {
+            if (!comparePio(newPio, oldPio)) {
                 return false;
             }
         }
@@ -128,10 +131,10 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private boolean subset(
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts0,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts1) {
+            ImmutableMap<@NonNull SchemaVariable, InstantiationEntry<?>> insts0,
+            ImmutableMap<@NonNull SchemaVariable, InstantiationEntry<?>> insts1) {
 
-        for (final ImmutableMapEntry<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
+        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
             if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
                 continue;
             }
@@ -155,9 +158,9 @@ public class InfFlowContractAppFeature implements Feature {
      * the sequent
      */
     protected boolean duplicateFindTaclet(TacletApp app,
-            PosInOccurrence pos, Goal goal) {
+            PosInOccurrence pos, ProofGoal<?> goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
-        assert app.assumesFormulaInstantiations().size() >= 1
+        assert !app.assumesFormulaInstantiations().isEmpty()
                 : "Featureis only applicable to rules with at least one assumes.";
 
         final SequentFormula focusFor = pos.sequentFormula();
@@ -167,13 +170,13 @@ public class InfFlowContractAppFeature implements Feature {
 
         // assumtion has to occour before the find-term in the sequent in order
         // to avoid duplicated applications
-        int focusPos = goal.node().sequent().formulaNumberInSequent(antec, focusFor);
-        int assumesPos = goal.node().sequent().formulaNumberInSequent(antec, assumesFor);
+        int focusPos = goal.sequent().formulaNumberInSequent(antec, focusFor);
+        int assumesPos = goal.sequent().formulaNumberInSequent(antec, assumesFor);
         if (focusPos <= assumesPos) {
             return true;
         }
 
-        Node node = goal.node();
+        Node node = ((Goal) goal).node();
 
         int i = 0;
         while (!node.root()) {
@@ -207,18 +210,18 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
 
-        if (!app.ifInstsComplete()) {
+        if (!app.assumesInstantionsComplete()) {
             return NumberRuleAppCost.getZeroCost();
         }
 
-        if (!isInfFlowProof(goal.proof()) || app.assumesFormulaInstantiations() == null
-                || app.assumesFormulaInstantiations().size() < 1
+        if (!isInfFlowProof((Proof) goal.proof()) || app.assumesFormulaInstantiations() == null
+                || app.assumesFormulaInstantiations().isEmpty()
                 || duplicateFindTaclet(app, pos, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
@@ -229,8 +232,7 @@ public class InfFlowContractAppFeature implements Feature {
         final SequentFormula assumesFor =
             app.assumesFormulaInstantiations().iterator().next().getSequentFormula();
 
-        ArrayList<org.key_project.prover.sequent.SequentFormula> relatesTerms =
-            getRelatesTerms(goal);
+        ArrayList<SequentFormula> relatesTerms = getRelatesTerms(goal);
         final int numOfContractAppls = relatesTerms.size() / 2;
         int assumesApplNumber = 0;
         for (int i = 0; i < numOfContractAppls; i++) {
@@ -255,9 +257,9 @@ public class InfFlowContractAppFeature implements Feature {
     }
 
 
-    private ArrayList<org.key_project.prover.sequent.SequentFormula> getRelatesTerms(Goal goal) {
-        ArrayList<org.key_project.prover.sequent.SequentFormula> list = new ArrayList<>();
-        Semisequent antecedent = goal.node().sequent().antecedent();
+    private ArrayList<SequentFormula> getRelatesTerms(ProofGoal<?> goal) {
+        ArrayList<SequentFormula> list = new ArrayList<>();
+        Semisequent antecedent = goal.sequent().antecedent();
         for (SequentFormula f : antecedent) {
             if (f.formula().op().toString().startsWith("RELATED_BY_")) {
                 list.add(f);

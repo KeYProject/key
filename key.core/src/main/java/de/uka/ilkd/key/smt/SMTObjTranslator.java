@@ -11,14 +11,15 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
 import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
@@ -601,28 +602,102 @@ public class SMTObjTranslator implements SMTTranslator {
      */
     private void generateWellFormedAssertions() throws IllegalFormulaException {
         // Assertion 1:
-        SMTTermVariable h=new SMTTermVariable("h",sorts.get(HEAP_SORT));SMTTermVariable o=new SMTTermVariable("o",sorts.get(OBJECT_SORT));SMTTermVariable f=new SMTTermVariable("f",sorts.get(FIELD_SORT));SMTTermVariable o1=new SMTTermVariable("o1",sorts.get(OBJECT_SORT));SMTTermVariable f1=new SMTTermVariable("f1",sorts.get(FIELD_SORT));SMTTermVariable bi=new SMTTermVariable(varName('i'),sorts.get(BINT_SORT));List<SMTTerm>vars=new LinkedList<>();vars.add(h);vars.add(o);vars.add(f);
+        SMTTermVariable h = new SMTTermVariable("h", sorts.get(HEAP_SORT));
+        SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
+        SMTTermVariable f = new SMTTermVariable("f", sorts.get(FIELD_SORT));
+        SMTTermVariable o1 = new SMTTermVariable("o1", sorts.get(OBJECT_SORT));
+        SMTTermVariable f1 = new SMTTermVariable("f1", sorts.get(FIELD_SORT));
+        SMTTermVariable bi = new SMTTermVariable(varName('i'), sorts.get(BINT_SORT));
+        List<SMTTerm> vars = new LinkedList<>();
+        vars.add(h);
+        vars.add(o);
+        vars.add(f);
         // wellformed(h)
         // select(h,o,f)
-        SMTTerm select=SMTTerm.call(selectFunction,vars);
+        SMTTerm select = SMTTerm.call(selectFunction, vars);
 
         // any2obj(select(h,o,f))
-        SMTTerm selectObj=castTermIfNecessary(select,sorts.get(OBJECT_SORT));
+        SMTTerm selectObj = castTermIfNecessary(select, sorts.get(OBJECT_SORT));
 
         // any2obj(select(h,o,f)) == null
-        SMTTerm right=selectObj.equal(nullConstant);
+        SMTTerm right = selectObj.equal(nullConstant);
         // created
-        SMTTerm created=SMTTerm.call(functions.get(CREATED_FIELD_NAME));List<SMTTerm>args=new LinkedList<>();args.add(h);args.add(selectObj);args.add(created);
+        SMTTerm created = SMTTerm.call(functions.get(CREATED_FIELD_NAME));
+        List<SMTTerm> args = new LinkedList<>();
+        args.add(h);
+        args.add(selectObj);
+        args.add(created);
         // select(h,any2obj(select(h,o,f)),created)
-        SMTTerm selectCreated=SMTTerm.call(selectFunction,args);SMTTerm selectCreatedBool=castTermIfNecessary(selectCreated,SMTSort.BOOL);right=right.or(selectCreatedBool);SMTTerm assertion1=right;List<SMTTermVariable>assertion1Vars=new LinkedList<>();assertion1Vars.add(o);assertion1Vars.add(f);assertion1=SMTTerm.forall(assertion1Vars,assertion1,null);
+        SMTTerm selectCreated = SMTTerm.call(selectFunction, args);
+        SMTTerm selectCreatedBool = castTermIfNecessary(selectCreated, SMTSort.BOOL);
+        right = right.or(selectCreatedBool);
+        SMTTerm assertion1 = right;
+        List<SMTTermVariable> assertion1Vars = new LinkedList<>();
+        assertion1Vars.add(o);
+        assertion1Vars.add(f);
+        assertion1 = SMTTerm.forall(assertion1Vars, assertion1, null);
         // Assertion 2 - locset
-        SMTFunction isLocSetFun=getIsFunction(sorts.get(LOCSET_SORT));SMTTerm selectLocSet=castTermIfNecessary(select,sorts.get(LOCSET_SORT));SMTTerm right2=o1.equal(nullConstant);SMTTerm selectCreated2=SMTTerm.call(selectFunction,h,o1,created);SMTTerm selectCreatedBool2=castTermIfNecessary(selectCreated2,SMTSort.BOOL);right2=right2.or(selectCreatedBool2);List<SMTTermVariable>forallVariables=new LinkedList<>();forallVariables.add(o);forallVariables.add(f);forallVariables.add(o1);forallVariables.add(f1);SMTTerm assertion2=SMTTerm.call(elementOfFunction,o1,f1,selectLocSet).implies(right2);assertion2=SMTTerm.forall(forallVariables,assertion2,null);
+        SMTFunction isLocSetFun = getIsFunction(sorts.get(LOCSET_SORT));
+        SMTTerm selectLocSet = castTermIfNecessary(select, sorts.get(LOCSET_SORT));
+        SMTTerm right2 = o1.equal(nullConstant);
+        SMTTerm selectCreated2 = SMTTerm.call(selectFunction, h, o1, created);
+        SMTTerm selectCreatedBool2 = castTermIfNecessary(selectCreated2, SMTSort.BOOL);
+        right2 = right2.or(selectCreatedBool2);
+        List<SMTTermVariable> forallVariables = new LinkedList<>();
+        forallVariables.add(o);
+        forallVariables.add(f);
+        forallVariables.add(o1);
+        forallVariables.add(f1);
+        SMTTerm assertion2 = SMTTerm.call(elementOfFunction, o1, f1, selectLocSet).implies(right2);
+        assertion2 = SMTTerm.forall(forallVariables, assertion2, null);
         // Assertion(s) 3 - normal field types
-        SMTTerm assertion3=SMTTerm.TRUE;for(String field:fieldSorts.keySet()){assertion3=assertion3.and(addAssertionForField(field));}assertion3=SMTTerm.forall(o,assertion3,null);
+        SMTTerm assertion3 = SMTTerm.TRUE;
+        for (String field : fieldSorts.keySet()) {
+            assertion3 = assertion3.and(addAssertionForField(field));
+        }
+        assertion3 = SMTTerm.forall(o, assertion3, null);
         // Assertion(s) 4 - array field types
-        SMTTerm assertion4=new SMTTerm.True();for(Sort s:thierarchy.getArraySortList()){String name=s.name().toString();addTypePredicate(s);String single=name.substring(0,name.length()-2);SMTFunction tp=getTypePredicate(name);if(tp==null){continue;}SMTTerm tpo=SMTTerm.call(tp,o);SMTTerm oNotNull=o.equal(nullConstant).not();SMTTerm premise=tpo.and(oNotNull);SMTTerm arr=SMTTerm.call(functions.get(ARR_FUNCTION_NAME),bi);SMTTerm selectArr=SMTTerm.call(selectFunction,h,o,arr);SMTTerm typeReq;switch(single){case"int","char","byte"->typeReq=SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)),selectArr);case"java.lang.Object"->typeReq=SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)),selectArr);case"boolean"->typeReq=SMTTerm.call(getIsFunction(SMTSort.BOOL),selectArr);default->{typeReq=SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)),selectArr);Sort singleSort=services.getJavaInfo().getKeYJavaType(single).getSort();addTypePredicate(singleSort);SMTFunction tps=getTypePredicate(singleSort.name().toString());SMTTerm selectObjArr=castTermIfNecessary(selectArr,sorts.get(OBJECT_SORT));typeReq=typeReq.and(SMTTerm.call(tps,selectObjArr));}}assertion4=assertion4.and(premise.implies(typeReq));}List<SMTTermVariable>a4vars=new LinkedList<>();a4vars.add(o);a4vars.add(bi);assertion4=SMTTerm.forall(a4vars,assertion4,null);
+        SMTTerm assertion4 = new SMTTerm.True();
+        for (Sort s : thierarchy.getArraySortList()) {
+            String name = s.name().toString();
+            addTypePredicate(s);
+            String single = name.substring(0, name.length() - 2);
+            SMTFunction tp = getTypePredicate(name);
+            if (tp == null) {
+                continue;
+            }
+            SMTTerm tpo = SMTTerm.call(tp, o);
+            SMTTerm oNotNull = o.equal(nullConstant).not();
+            SMTTerm premise = tpo.and(oNotNull);
+            SMTTerm arr = SMTTerm.call(functions.get(ARR_FUNCTION_NAME), bi);
+            SMTTerm selectArr = SMTTerm.call(selectFunction, h, o, arr);
+            SMTTerm typeReq;
+            switch (single) {
+            case "int", "char", "byte" -> typeReq =
+                SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
+            case "java.lang.Object" -> typeReq =
+                SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+            case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
+            default -> {
+                typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+                Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
+                addTypePredicate(singleSort);
+                SMTFunction tps = getTypePredicate(singleSort.name().toString());
+                SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
+                typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
+            }
+            }
+            assertion4 = assertion4.and(premise.implies(typeReq));
+        }
+        List<SMTTermVariable> a4vars = new LinkedList<>();
+        a4vars.add(o);
+        a4vars.add(bi);
+        assertion4 = SMTTerm.forall(a4vars, assertion4, null);
         // Combined Assertion
-        SMTTerm finalAssertion=assertion1.and(assertion2).and(assertion3).and(assertion4);wellformedFunction=new SMTFunctionDef(wellformedFunction,h,finalAssertion);functions.put(WELL_FORMED_NAME,wellformedFunction);functionDefinitionOrder.add(WELL_FORMED_NAME);
+        SMTTerm finalAssertion = assertion1.and(assertion2).and(assertion3).and(assertion4);
+        wellformedFunction = new SMTFunctionDef(wellformedFunction, h, finalAssertion);
+        functions.put(WELL_FORMED_NAME, wellformedFunction);
+        functionDefinitionOrder.add(WELL_FORMED_NAME);
     }
 
     /**
@@ -825,15 +900,10 @@ public class SMTObjTranslator implements SMTTranslator {
      * @param term the term where we look for the sorts
      */
     private void findSorts(Set<Sort> sorts, Term term) {
-        Sort s = term.sort();
-
-
-        addSingleSort(sorts, s);
+        addSingleSort(sorts, term.sort());
         if (term.op() instanceof SortDependingFunction sdf) {
-            Sort d = sdf.getSortDependingOn();
-            addSingleSort(sorts, d);
+            addSingleSort(sorts, sdf.getSortDependingOn());
         }
-
         for (Term sub : term.subs()) {
             findSorts(sorts, sub);
         }
@@ -984,8 +1054,8 @@ public class SMTObjTranslator implements SMTTranslator {
                 falseCase = castTermIfNecessary(falseCase, sorts.get(ANY_SORT));
             }
             return SMTTerm.ite(condition, trueCase, falseCase);
-        } else if (op == Quantifier.ALL) {
-            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
+        } else if (op == Quantifier.ALL || op == Quantifier.EX) {
+            var vars = term.varsBoundHere(0);
             Debug.assertTrue(vars.size() == 1);
             SMTTermVariable var = translateVariable(vars.get(0));
             List<SMTTermVariable> variables = new LinkedList<>();
@@ -999,25 +1069,8 @@ public class SMTObjTranslator implements SMTTranslator {
                 SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
                 sub = call.implies(sub);
             }
-            SMTTerm result = SMTTerm.forall(variables, sub, null);
-            quantifiedVariables.remove(quantifiedVariables.size() - 1);
-            return result;
-        } else if (op == Quantifier.EX) {
-            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
-            Debug.assertTrue(vars.size() == 1);
-            SMTTermVariable var = translateVariable(vars.get(0));
-            List<SMTTermVariable> variables = new LinkedList<>();
-            quantifiedVariables.add(var);
-            variables.add(var);
-            Sort sort = vars.get(0).sort();
-            String sortName = sort.name().toString();
-            String id = getTypePredicateName(sortName);
-            SMTTerm sub = translateTerm(term.sub(0));
-            if (typePredicates.containsKey(id) && !sort.equals(objectSort)) {
-                SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
-                sub = call.and(sub);
-            }
-            SMTTerm result = SMTTerm.exists(variables, sub, null);
+            SMTTerm result = op == Quantifier.ALL ? SMTTerm.forall(variables, sub, null)
+                    : SMTTerm.exists(variables, sub, null);
             quantifiedVariables.remove(quantifiedVariables.size() - 1);
             return result;
         } else if (op == Junctor.TRUE) {
@@ -1052,7 +1105,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
             }
 
-        } else if (op instanceof JFunction fun) {
+        } else if (op instanceof Function fun) {
             if (isTrueConstant(fun, services)) {
                 return SMTTerm.TRUE;
             } else if (isFalseConstant(fun, services)) {
@@ -1073,7 +1126,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a quantified variable.
      */
-    private SMTTermVariable translateVariable(QuantifiableVariable q)
+    private SMTTermVariable translateVariable(org.key_project.logic.op.QuantifiableVariable q)
             throws IllegalFormulaException {
         SMTSort s = translateSort(q.sort());
         return new SMTTermVariable(q.name().toString(), s);
@@ -1352,7 +1405,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a function call of function f with argument subs.
      */
-    private SMTTerm translateCall(Function fun, ImmutableArray<Term> subs)
+    private SMTTerm translateCall(Function fun, ImmutableArray<? extends Term> subs)
             throws IllegalFormulaException {
         String name = fun.name().toString();
         // handle sort constants
@@ -1652,7 +1705,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Creates an SMTTermCall using the given function and arguments.
      */
-    private SMTTerm call(SMTFunction function, ImmutableArray<Term> subs)
+    private SMTTerm call(SMTFunction function, ImmutableArray<? extends Term> subs)
             throws IllegalFormulaException {
         List<SMTTerm> subTerms = new LinkedList<>();
         int i = 0;

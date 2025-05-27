@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -30,8 +31,7 @@ public final class SortDependingFunction extends JFunction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SortDependingFunction.class);
 
     private final SortDependingFunctionTemplate template;
-    private final Qualifier<Sort> sortDependingOn;
-
+    private final Sort sortDependingOn;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -42,7 +42,7 @@ public final class SortDependingFunction extends JFunction {
             instantiateResultSort(template, sortDependingOn),
             instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
         this.template = template;
-        this.sortDependingOn = Qualifier.create(sortDependingOn);
+        this.sortDependingOn = sortDependingOn;
     }
 
 
@@ -118,7 +118,7 @@ public final class SortDependingFunction extends JFunction {
         }
 
         final NamespaceSet namespaces = services.getNamespaces();
-        Namespace<JFunction> functions = namespaces.functions();
+        Namespace<Function> functions = namespaces.functions();
 
         SortDependingFunction result;
         synchronized (namespaces) {
@@ -169,7 +169,7 @@ public final class SortDependingFunction extends JFunction {
 
 
     public Sort getSortDependingOn() {
-        return sortDependingOn.getQualifier();
+        return sortDependingOn;
     }
 
 
@@ -198,7 +198,7 @@ public final class SortDependingFunction extends JFunction {
     @Override
     public SyntaxElement getChild(int n) {
         if (n == 0) {
-            return sortDependingOn;
+            return QualifierWrapper.get(sortDependingOn);
         }
         throw new IndexOutOfBoundsException(
             "SortDependingFunction " + name() + " has only one child");

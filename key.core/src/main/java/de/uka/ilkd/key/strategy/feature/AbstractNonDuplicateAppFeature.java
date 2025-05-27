@@ -10,13 +10,13 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -40,8 +40,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp,
-            PosInOccurrence newPio) {
+    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp, PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;

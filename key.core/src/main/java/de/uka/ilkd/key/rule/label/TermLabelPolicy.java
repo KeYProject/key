@@ -10,7 +10,10 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
+
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;

@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortException;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
@@ -26,9 +25,10 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.*;
-import org.key_project.prover.rules.MatchConditions;
-import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.*;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
@@ -52,7 +52,7 @@ public abstract class TacletApp implements RuleApp {
     public static final AtomicLong PERF_PRE = new AtomicLong();
 
     /** the taclet for which the application information is collected */
-    private final /* @NonNull */ Taclet taclet;
+    private final /* @NonNull */ org.key_project.prover.rules.Taclet taclet;
 
     /**
      * contains the instantiations of the schema variables of the Taclet
@@ -83,11 +83,11 @@ public abstract class TacletApp implements RuleApp {
     /**
      * constructs a TacletApp for the given taclet, with an empty instantiation map
      */
-    TacletApp(Taclet taclet) {
+    TacletApp(org.key_project.prover.rules.Taclet taclet) {
         this(taclet, de.uka.ilkd.key.rule.inst.SVInstantiations.EMPTY_SVINSTANTIATIONS, null);
     }
 
-    TacletApp(Taclet taclet, SVInstantiations instantiations,
+    TacletApp(org.key_project.prover.rules.Taclet taclet, SVInstantiations instantiations,
             ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         this.taclet = taclet;
         this.instantiations = (de.uka.ilkd.key.rule.inst.SVInstantiations) instantiations;
@@ -154,7 +154,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the Taclet the application information is collected for
      */
     public Taclet taclet() {
-        return taclet;
+        return (Taclet) taclet;
     }
 
     /**
@@ -164,7 +164,7 @@ public abstract class TacletApp implements RuleApp {
      */
     @Override
     public Taclet rule() {
-        return taclet;
+        return (Taclet) taclet;
     }
 
     /**
@@ -194,13 +194,13 @@ public abstract class TacletApp implements RuleApp {
      * @param insts the original SVInstantiations
      * @return the resolved SVInstantiations
      */
-    protected static SVInstantiations resolveCollisionVarSV(Taclet taclet, SVInstantiations insts,
+    protected static SVInstantiations resolveCollisionVarSV(
+            org.key_project.prover.rules.Taclet taclet, SVInstantiations insts,
             Services services) {
 
         HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<>();
 
-        for (var pair : ((de.uka.ilkd.key.rule.inst.SVInstantiations) insts)
-                .getInstantiationMap()) {
+        for (var pair : insts.getInstantiationMap()) {
             if (pair.key() instanceof VariableSV varSV) {
                 Term value = (Term) pair.value().getInstantiation();
                 if (!collMap.containsKey(value.op())) {
@@ -220,7 +220,7 @@ public abstract class TacletApp implements RuleApp {
      * @param term the term to be searched in
      * @return the term below the given quantifier in the given term
      */
-    private static Term getTermBelowQuantifier(org.key_project.logic.op.sv.SchemaVariable varSV,
+    private static Term getTermBelowQuantifier(SchemaVariable varSV,
             Term term) {
         for (int i = 0; i < term.arity(); i++) {
             for (int j = 0; j < term.varsBoundHere(i).size(); j++) {
@@ -243,8 +243,8 @@ public abstract class TacletApp implements RuleApp {
      * @param varSV the searched bound SchemaVariable
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
-    private static Term getTermBelowQuantifier(Taclet taclet,
-            org.key_project.logic.op.sv.SchemaVariable varSV) {
+    private static Term getTermBelowQuantifier(org.key_project.prover.rules.Taclet taclet,
+            SchemaVariable varSV) {
         for (SequentFormula sequentFormula : taclet.assumesSequent()) {
             Term result = getTermBelowQuantifier(varSV, (Term) sequentFormula.formula());
             if (result != null) {
@@ -252,8 +252,8 @@ public abstract class TacletApp implements RuleApp {
             }
         }
 
-        if (taclet instanceof FindTaclet) {
-            return getTermBelowQuantifier(varSV, ((FindTaclet) taclet).find());
+        if (taclet instanceof FindTaclet findTaclet) {
+            return getTermBelowQuantifier(varSV, findTaclet.find());
         } else {
             return null;
         }
@@ -284,8 +284,9 @@ public abstract class TacletApp implements RuleApp {
      * returns a new SVInstantiations that modifies the given SVInstantiations insts at the bound
      * SchemaVariable varSV to a new LogicVariable.
      */
-    protected static SVInstantiations replaceInstantiation(Taclet taclet, SVInstantiations insts,
-            org.key_project.logic.op.sv.SchemaVariable varSV,
+    protected static SVInstantiations replaceInstantiation(
+            org.key_project.prover.rules.Taclet taclet, SVInstantiations insts,
+            SchemaVariable varSV,
             Services services) {
         Term term = getTermBelowQuantifier(taclet, varSV);
         LogicVariable newVariable = new LogicVariable(
@@ -301,15 +302,12 @@ public abstract class TacletApp implements RuleApp {
      * SchemaVariable u to the Term (that is a LogicVariable) y.
      */
     private static de.uka.ilkd.key.rule.inst.SVInstantiations replaceInstantiation(
-            SVInstantiations insts, Term t,
-            org.key_project.logic.op.sv.SchemaVariable u, Term y,
-            Services services) {
+            SVInstantiations insts, Term t, SchemaVariable u, Term y, Services services) {
 
         var result = (de.uka.ilkd.key.rule.inst.SVInstantiations) insts;
         LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u)).op();
-        if (t.op() instanceof SchemaVariable) {
+        if (t.op() instanceof SchemaVariable sv) {
             if (!(t.op() instanceof VariableSV)) {
-                SchemaVariable sv = (SchemaVariable) t.op();
                 ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
                 result =
                     result.replace(sv, cfSubst.apply((Term) insts.getInstantiation(sv)), services);
@@ -322,19 +320,16 @@ public abstract class TacletApp implements RuleApp {
             }
 
         }
-
         result = result.replace(u, y, services);
         return result;
     }
 
     /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
+     * asserts that the rule application is complete and executable
      *
-     * @return list of new created goals
      */
     @Override
-    public <F extends Function> void execute(Namespace<@NonNull F> fns) {
+    public void checkApplicability() {
         if (!complete()) {
             throw new IllegalStateException(
                 "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
@@ -344,7 +339,6 @@ public abstract class TacletApp implements RuleApp {
             throw new RuntimeException(
                 "taclet application with unsatisfied 'checkPrefix': " + this);
         }
-        registerSkolemConstants(fns);
     }
 
     /*
@@ -353,15 +347,15 @@ public abstract class TacletApp implements RuleApp {
      */
     public boolean isExecutable() {
         // bugfix #1336, see bugtracker
-        if (taclet instanceof RewriteTaclet) {
+        if (taclet instanceof RewriteTaclet rwTaclet) {
             ImmutableList<UpdateLabelPair> oldUpdCtx =
                 matchConditions().getInstantiations().getUpdateContext();
-            var newConditions = ((RewriteTaclet) taclet).checkPrefix(posInOccurrence(),
+            var newConditions = rwTaclet.checkPrefix(posInOccurrence(),
                 de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS);
             if (newConditions == null) {
                 return false;
             }
-            ImmutableList<UpdateLabelPair> newUpdCtx =
+            final ImmutableList<UpdateLabelPair> newUpdCtx =
                 newConditions.getInstantiations().getUpdateContext();
             return oldUpdCtx.equals(newUpdCtx);
         }
@@ -486,7 +480,6 @@ public abstract class TacletApp implements RuleApp {
             if (appMC == null) {
                 return null;
             }
-
             return app;
         }
 
@@ -693,13 +686,13 @@ public abstract class TacletApp implements RuleApp {
 
     public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv, Sort sort,
             boolean interesting, Services services) {
-        final JFunction c =
+        final Function c =
             new JFunction(new Name(instantiation), sort, true, new Sort[0]);
         return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
     }
 
 
-    private <F extends Function> void registerSkolemConstants(Namespace<@NonNull F> fns) {
+    public void registerSkolemConstants(Namespace<@NonNull Function> fns) {
         final var insts = instantiations();
         for (final var pair : insts.getInstantiationMap()) {
             final var sv = pair.key();
@@ -709,7 +702,7 @@ public abstract class TacletApp implements RuleApp {
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
                 if (fns.lookup(inst.op().name()) == null) {
-                    fns.addSafely((F) inst.op());
+                    fns.addSafely((Function) inst.op());
                 }
             }
         }
@@ -724,9 +717,6 @@ public abstract class TacletApp implements RuleApp {
      */
     public abstract TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services);
-
-    public abstract TacletApp addInstantiation(SchemaVariable sv, Object[] list,
-            boolean interesting, Services services);
 
     /**
      * adds a new instantiation to this TacletApp. This method does not check (beside some very
@@ -818,7 +808,7 @@ public abstract class TacletApp implements RuleApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     protected abstract TacletApp setAllInstantiations(
-            org.key_project.prover.rules.MatchConditions mc,
+            MatchConditions mc,
             ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services);
 
     /**
@@ -891,12 +881,12 @@ public abstract class TacletApp implements RuleApp {
      * @return a list of tacletapps with the found if formula instantiations
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> ruleSuccTail,
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> ruleAntecTail,
+            ImmutableList<SequentFormula> ruleSuccTail,
+            ImmutableList<SequentFormula> ruleAntecTail,
             ImmutableArray<AssumesFormulaInstantiation> instSucc,
             ImmutableArray<AssumesFormulaInstantiation> instAntec,
             ImmutableList<AssumesFormulaInstantiation> instAlreadyMatched,
-            org.key_project.prover.rules.MatchConditions matchCond,
+            MatchConditions matchCond,
             Services services) {
 
         while (ruleSuccTail.isEmpty()) {
@@ -923,8 +913,7 @@ public abstract class TacletApp implements RuleApp {
         // For each matching formula call the method again to match
         // the remaining terms
         ImmutableList<TacletApp> res = ImmutableSLList.nil();
-        Iterator<org.key_project.prover.rules.MatchConditions> itMC =
-            mr.matchConditions().iterator();
+        Iterator<MatchConditions> itMC = mr.matchConditions().iterator();
         ruleSuccTail = ruleSuccTail.tail();
         for (final AssumesFormulaInstantiation instantiationCandidate : mr.candidates()) {
             res = res.prepend(findIfFormulaInstantiationsHelp(ruleSuccTail, ruleAntecTail, instSucc,
@@ -935,9 +924,9 @@ public abstract class TacletApp implements RuleApp {
         return res;
     }
 
-    private ImmutableList<org.key_project.prover.sequent.SequentFormula> createSemisequentList(
+    private ImmutableList<SequentFormula> createSemisequentList(
             Semisequent p_ss) {
-        ImmutableList<org.key_project.prover.sequent.SequentFormula> res = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> res = ImmutableSLList.nil();
 
         for (SequentFormula p_s : p_ss) {
             res = res.prepend(p_s);
@@ -972,7 +961,7 @@ public abstract class TacletApp implements RuleApp {
     /**
      * @return true iff the if-instantiation list is not null or no if sequent is needed
      */
-    public boolean ifInstsComplete() {
+    public boolean assumesInstantionsComplete() {
         return ifInstantiations != null || taclet().assumesSequent().isEmpty();
     }
 
@@ -1039,9 +1028,9 @@ public abstract class TacletApp implements RuleApp {
      * @param var_ns the old variable namespace
      * @return the new created variable namespace
      */
-    public Namespace<QuantifiableVariable> extendVarNamespaceForSV(
-            Namespace<QuantifiableVariable> var_ns, SchemaVariable sv) {
-        Namespace<QuantifiableVariable> ns = new Namespace<>(var_ns);
+    public Namespace<@NonNull QuantifiableVariable> extendVarNamespaceForSV(
+            Namespace<@NonNull QuantifiableVariable> var_ns, SchemaVariable sv) {
+        Namespace<@NonNull QuantifiableVariable> ns = new Namespace<>(var_ns);
         TacletPrefix tacletPrefix = (TacletPrefix) taclet().getPrefix(sv);
         for (final var schemaVariable : tacletPrefix.prefix()) {
             if (instantiations().getInstantiation(schemaVariable) instanceof Term term &&
@@ -1069,16 +1058,17 @@ public abstract class TacletApp implements RuleApp {
      * @param func_ns the original function namespace, not <code>null</code>
      * @return the new function namespace that bases on the original one
      */
-    public Namespace<JFunction> extendedFunctionNameSpace(Namespace<JFunction> func_ns) {
-        Namespace<JFunction> ns = new Namespace<>(func_ns);
+    public Namespace<@NonNull Function> extendedFunctionNameSpace(
+            Namespace<@NonNull Function> func_ns) {
+        Namespace<@NonNull Function> ns = new Namespace<>(func_ns);
         for (var pair : instantiations.getInstantiationMap()) {
             if (pair.key() instanceof SkolemTermSV skolemSV) {
                 Term inst = instantiations.getInstantiation(skolemSV);
                 Operator op = inst.op();
-                assert op instanceof JFunction
+                assert op instanceof Function
                         : "At this point the skolem instantiation is expected to "
                             + "be a function symbol, not " + inst;
-                ns.addSafely((JFunction) op);
+                ns.addSafely((Function) op);
             }
         }
         return ns;
@@ -1092,7 +1082,7 @@ public abstract class TacletApp implements RuleApp {
      *
      * @return null iff there is no conflict and one of the conflict-causing bound SchemaVariables
      */
-    public org.key_project.logic.op.sv.SchemaVariable varSVNameConflict() {
+    public SchemaVariable varSVNameConflict() {
         for (final SchemaVariable sv : uninstantiatedVars()) {
             if (sv instanceof TermSV || sv instanceof FormulaSV) {
                 TacletPrefix prefix = (TacletPrefix) taclet().getPrefix(sv);
@@ -1135,18 +1125,10 @@ public abstract class TacletApp implements RuleApp {
      *
      * @return true iff the list of if instantiations has the correct size or is null
      */
-    protected static boolean ifInstsCorrectSize(Taclet p_taclet,
+    protected static boolean ifInstsCorrectSize(org.key_project.prover.rules.Taclet p_taclet,
             ImmutableList<AssumesFormulaInstantiation> p_list) {
         return p_list == null || p_list.size() == (p_taclet.assumesSequent().antecedent().size()
                 + p_taclet.assumesSequent().succedent().size());
-    }
-
-    /**
-     * @return true iff the Taclet may be applied for the given mode (interactive/non-interactive,
-     *         activated rule sets)
-     */
-    public boolean admissible(boolean interactive, ImmutableList<RuleSet> ruleSets) {
-        return taclet().admissible(interactive, ruleSets);
     }
 
     public ProgramElement getProgramElement(String instantiation, ProgramSV sv,
@@ -1166,8 +1148,8 @@ public abstract class TacletApp implements RuleApp {
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
                     } else {
                         Expression peerInstExpr;
-                        if (peerInst instanceof Term) {
-                            peerInstExpr = tc.convertToProgramElement((Term) peerInst);
+                        if (peerInst instanceof Term peerTerm) {
+                            peerInstExpr = tc.convertToProgramElement(peerTerm);
                         } else {
                             peerInstExpr = (Expression) peerInst;
                         }
@@ -1195,7 +1177,7 @@ public abstract class TacletApp implements RuleApp {
      * @param pos the PosInOccurrence where the Taclet is applied
      * @return true iff all variable conditions x not free in y are hold
      */
-    public static boolean checkVarCondNotFreeIn(Taclet taclet,
+    public static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
             PosInOccurrence pos) {
         final var it = ((de.uka.ilkd.key.rule.inst.SVInstantiations) instantiations).svIterator();

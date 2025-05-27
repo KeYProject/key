@@ -4,19 +4,20 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
-import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.prover.proof.rulefilter.AndRuleFilter;
+import org.key_project.prover.proof.rulefilter.RuleFilter;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.*;
 
 /**
@@ -131,7 +132,7 @@ public class TermTacletAppIndex {
             PosInOccurrence pos,
             Services services, TacletIndex tacletIndex, NewRuleListener listener, RuleFilter filter,
             ITermTacletAppIndexCache indexCache) {
-        final Term localTerm = (Term) pos.subTerm();
+        final Term localTerm = pos.subTerm();
         final TermTacletAppIndex[] result = new TermTacletAppIndex[localTerm.arity()];
 
         for (int i = 0; i < result.length; i++) {
@@ -176,7 +177,7 @@ public class TermTacletAppIndex {
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener, RuleFilter filter,
             ITermTacletAppIndexCache indexCache) {
-        final Term localTerm = (Term) pos.subTerm();
+        final Term localTerm = pos.subTerm();
 
         final TermTacletAppIndex cached = indexCache.getIndexForTerm(localTerm);
         if (cached != null) {
@@ -274,7 +275,7 @@ public class TermTacletAppIndex {
             return updateCompleteRebuild(pos, services, tacletIndex, listener, indexCache);
         }
 
-        final Term newTerm = (Term) pathToModification.getSubTerm();
+        final Term newTerm = pathToModification.getSubTerm();
 
         final TermTacletAppIndex cached = indexCache.getIndexForTerm(newTerm);
         if (cached != null) {
@@ -297,7 +298,7 @@ public class TermTacletAppIndex {
             PosInOccurrence pos, Services services,
             TacletIndex tacletIndex, NewRuleListener listener,
             ITermTacletAppIndexCache indexCache) {
-        final Term newTerm = (Term) pos.subTerm();
+        final Term newTerm = pos.subTerm();
         final Operator newOp = newTerm.op();
 
         if (newOp instanceof Modality mod
@@ -333,7 +334,7 @@ public class TermTacletAppIndex {
             ITermTacletAppIndexCache indexCache) {
         ImmutableArray<TermTacletAppIndex> newSubIndices = subtermIndices;
 
-        final Term newTerm = (Term) pathToModification.getSubTerm();
+        final Term newTerm = pathToModification.getSubTerm();
         final int child = pathToModification.getChild();
 
         if (newTerm.op() instanceof UpdateApplication) {
@@ -470,7 +471,8 @@ public class TermTacletAppIndex {
         return descend(pos).collectTacletApps(pos, filter, services);
     }
 
-    private ImmutableList<TacletApp> convert(ImmutableList<? extends RuleApp> rules,
+    private ImmutableList<TacletApp> convert(
+            ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos, RuleFilter filter,
             ImmutableList<TacletApp> convertedApps,
             Services services) {
@@ -538,7 +540,8 @@ public class TermTacletAppIndex {
      * sub-indices of <code>this</code>).
      *
      * @param pos The position of this index
-     * @param collectedApps the {@link ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>>}
+     * @param collectedApps the {@link ImmutableMap} from positions {@link PosInOccurrence} to
+     *        lists of taclet applications {@link TacletApp}
      *        to which to add the found taclet applications; it must not contain {@code pos} or any
      *        position below pos as key
      * @return the resulting list of taclet applications from this and all subterm taclet indices

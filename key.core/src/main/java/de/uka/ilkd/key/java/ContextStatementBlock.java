@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -139,7 +140,7 @@ public class ContextStatementBlock extends StatementBlock {
         throw new UnsupportedOperationException(getClass() + ": We are not quite a StatementBlock");
     }
 
-    public de.uka.ilkd.key.java.declaration.TypeDeclaration getTypeDeclarationAt(int index) {
+    public TypeDeclaration getTypeDeclarationAt(int index) {
         throw new UnsupportedOperationException(getClass() + ": We are not quite a StatementBlock");
     }
 

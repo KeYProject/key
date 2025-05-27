@@ -34,6 +34,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
@@ -149,7 +150,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal,
+            RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate((Term) ruleApp.posInOccurrence().subTerm(), services);

@@ -162,8 +162,8 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
         }
 
         @Override
-        public boolean equals(Object o) {
-            return o == this;
+        public boolean equals(Object other) {
+            return other == this;
         }
 
         @Override

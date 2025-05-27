@@ -28,14 +28,14 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.slicing.DependencyNodeData;
@@ -443,7 +443,8 @@ public final class DependencyAnalyzer {
             }
             // groups proof steps that act upon this graph node by their rule app
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
-            Map<EqualsAndHashCodeDelegator<RuleApp>, Set<Node>> foundDupes = new HashMap<>();
+            Map<EqualsAndHashCodeDelegator<RuleApp>, Set<Node>> foundDupes =
+                new HashMap<>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
                 Node proofNode = t.fromNode();
 

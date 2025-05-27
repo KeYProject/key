@@ -27,7 +27,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -35,9 +34,11 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.rules.AssumesFormulaInstDirect;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
@@ -402,7 +403,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private RuleApp makeReplaceKnownTacletApp(Term formula, boolean inAntecedent,
+    private RuleApp makeReplaceKnownTacletApp(Term formula,
+            boolean inAntecedent,
             PosInOccurrence pio) {
         FindTaclet taclet;
         if (pio.isInAntec()) {
@@ -470,7 +472,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @param protocol
      */
     private Instantiation computeInstantiation(PosInOccurrence ossPIO,
-            Sequent seq, Protocol protocol, Goal goal, RuleApp ruleApp) {
+            Sequent seq, Protocol protocol, Goal goal,
+            RuleApp ruleApp) {
         // collect context formulas (potential if-insts for replace-known)
         final Map<TermReplacementKey, PosInOccurrence> context =
             new LinkedHashMap<>();
@@ -595,8 +598,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
-    public synchronized @NonNull ImmutableList<Goal> apply(Goal goal,
-            RuleApp ruleApp) {
+    public synchronized @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp
                 : "The rule app must be suitable for OSS";
@@ -612,7 +614,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (((OneStepSimplifierRuleApp) ruleApp).shouldRestrictAssumeInsts()
                 && !disableOSSRestriction) {
             ImmutableList<PosInOccurrence> ifInsts =
-                ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
+                ((OneStepSimplifierRuleApp) ruleApp).assumesInsts();
             ImmutableList<SequentFormula> anteFormulas =
                 ImmutableSLList.nil();
             ImmutableList<SequentFormula> succFormulas =
@@ -645,7 +647,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         resultGoal.changeFormula(inst.getCf(), pos);
         goal.setBranchLabel(
             inst.getNumAppliedRules() + (inst.getNumAppliedRules() > 1 ? " rules" : " rule"));
-        ((IBuiltInRuleApp) ruleApp).setIfInsts(inst.getIfInsts());
+        ((IBuiltInRuleApp) ruleApp).setAssumesInsts(inst.getIfInsts());
 
 
         return result;

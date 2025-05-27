@@ -31,6 +31,9 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -80,6 +83,7 @@ public class LogicPrinter {
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     private final SelectPrinter selectPrinter;
+    private final FinalPrinter finalPrinter;
     private final StorePrinter storePrinter;
 
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
@@ -104,7 +108,8 @@ public class LogicPrinter {
             notationInfo.refresh(services);
         }
         storePrinter = new StorePrinter(this.services);
-        selectPrinter = new SelectPrinter(this.services);
+        finalPrinter = new FinalPrinter(this.services);
+        selectPrinter = new SelectPrinter(notationInfo, this.services);
         this.layouter = layouter;
     }
 
@@ -350,11 +355,11 @@ public class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) {
-        final ImmutableList<? extends org.key_project.prover.rules.NewVarcond> varsNew =
+        final ImmutableList<? extends NewVarcond> varsNew =
             taclet.varsNew();
-        final ImmutableList<? extends org.key_project.prover.rules.NewDependingOn> varsNewDependingOn =
+        final ImmutableList<? extends NewDependingOn> varsNewDependingOn =
             taclet.varsNewDependingOn();
-        final ImmutableList<? extends org.key_project.prover.rules.NotFreeIn> varsNotFreeIn =
+        final ImmutableList<? extends NotFreeIn> varsNotFreeIn =
             taclet.varsNotFreeIn();
         final ImmutableList<? extends VariableCondition> variableConditions =
             taclet.getVariableConditions();
@@ -364,7 +369,7 @@ public class LogicPrinter {
             layouter.nl().beginC().print("\\varcond(").brk(0);
             boolean first = true;
 
-            for (org.key_project.prover.rules.NewDependingOn ndo : varsNewDependingOn) {
+            for (NewDependingOn ndo : varsNewDependingOn) {
                 if (first) {
                     first = false;
                 } else {
@@ -403,7 +408,7 @@ public class LogicPrinter {
         }
     }
 
-    private void printNewVarDepOnCond(org.key_project.prover.rules.NewDependingOn on) {
+    private void printNewVarDepOnCond(NewDependingOn on) {
         layouter.beginC(0);
         layouter.print("\\new(");
         printSchemaVariable(on.first());
@@ -414,7 +419,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printNewVarcond(org.key_project.prover.rules.NewVarcond p_sv) {
+    protected void printNewVarcond(NewVarcond p_sv) {
         de.uka.ilkd.key.rule.NewVarcond sv = (de.uka.ilkd.key.rule.NewVarcond) p_sv;
         layouter.beginC();
         layouter.print("\\new(");
@@ -434,7 +439,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printNotFreeIn(org.key_project.prover.rules.NotFreeIn sv) {
+    protected void printNotFreeIn(NotFreeIn sv) {
         layouter.beginI(0).print("\\notFreeIn(").brk(0);
         printSchemaVariable(sv.first());
         layouter.print(",").brk();
@@ -473,7 +478,7 @@ public class LogicPrinter {
         Trigger trigger = taclet.getTrigger();
         printSchemaVariable(trigger.triggerVar());
         layouter.print("} ");
-        printTerm((Term) trigger.getTerm());
+        printTerm((Term) trigger.trigger());
         if (trigger.hasAvoidConditions()) {
             layouter.brk(1, 2);
             layouter.print(" \\avoid ");
@@ -1083,6 +1088,13 @@ public class LogicPrinter {
     }
 
     /*
+     * Print a term of the form: T::final(object, field).
+     */
+    public void printFinal(Term t) {
+        finalPrinter.printFinal(this, t);
+    }
+
+    /*
      * Print a term of the form: store(heap, object, field, value).
      */
     public void printStore(Term t, boolean closingBrace) {
@@ -1366,9 +1378,7 @@ public class LogicPrinter {
      * the format is like
      *
      * <pre>
-     * {@code
-     * p & q
-     * }
+     * {@code p & q}
      * </pre>
      * <p>
      * The subterms are printed using {@link #printTermContinuingBlock(Term)}.
@@ -1820,11 +1830,30 @@ public class LogicPrinter {
      * @return the text with special characters replaced
      */
     public static String escapeHTML(String text, boolean escapeWhitespace) {
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        for(int i=0,sz=text.length();i<sz;i++){char c=text.charAt(i);switch(c){case'<'->sb.append("&lt;");case'>'->sb.append("&gt;");case'&'->sb.append("&amp;");case'\"'->sb.append("&quot;");case'\''->sb.append("&#039;");case'('->sb.append("&#040;");case')'->sb.append("&#041;");case'#'->sb.append("&#035;");case'+'->sb.append("&#043;");case'-'->sb.append("&#045;");case'%'->sb.append("&#037;");case';'->sb.append("&#059;");case'\n'->sb.append(escapeWhitespace?"<br>":c);case' '->sb.append(escapeWhitespace?"&nbsp;":c);default->sb.append(c);}
+        for (int i = 0, sz = text.length(); i < sz; i++) {
+            char c = text.charAt(i);
+            switch (c) {
+            case '<' -> sb.append("&lt;");
+            case '>' -> sb.append("&gt;");
+            case '&' -> sb.append("&amp;");
+            case '\"' -> sb.append("&quot;");
+            case '\'' -> sb.append("&#039;");
+            case '(' -> sb.append("&#040;");
+            case ')' -> sb.append("&#041;");
+            case '#' -> sb.append("&#035;");
+            case '+' -> sb.append("&#043;");
+            case '-' -> sb.append("&#045;");
+            case '%' -> sb.append("&#037;");
+            case ';' -> sb.append("&#059;");
+            case '\n' -> sb.append(escapeWhitespace ? "<br>" : c);
+            case ' ' -> sb.append(escapeWhitespace ? "&nbsp;" : c);
+            default -> sb.append(c);
+            }
 
-        }return sb.toString();
+        }
+        return sb.toString();
     }
 
     /**

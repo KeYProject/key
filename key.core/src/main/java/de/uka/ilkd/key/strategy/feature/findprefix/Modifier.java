@@ -19,5 +19,5 @@ interface Modifier {
      * @param pos the position to be modified
      * @return the (new) position
      */
-    PosInOccurrence modifyPosistion(PosInOccurrence pos);
+    PosInOccurrence modifyPosition(PosInOccurrence pos);
 }

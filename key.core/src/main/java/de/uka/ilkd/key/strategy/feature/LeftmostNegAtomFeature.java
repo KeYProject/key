@@ -8,7 +8,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.strategy.RuleAppCost;
+
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;

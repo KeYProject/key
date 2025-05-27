@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -116,9 +117,8 @@ abstract class ReplaceAndRegisterMethod {
         }
 
         OpReplacer or = new OpReplacer(map, tb.tf());
-        Term result = or.replace(term);
 
-        return result;
+        return or.replace(term);
     }
 
 
@@ -137,8 +137,8 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final void register(JFunction f, Services services) {
-        Namespace<JFunction> functionNames = services.getNamespaces().functions();
+    final void register(Function f, Services services) {
+        Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
             functionNames.addSafely(f);

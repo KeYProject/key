@@ -15,15 +15,15 @@ import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 import org.key_project.logic.Name;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -47,6 +47,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Term modalityTerm,
@@ -74,8 +75,8 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
             }
         }
         if (ruleApp instanceof TacletApp ta) {
-            if (ta.ifInstsComplete() && ta.assumesFormulaInstantiations() != null) {
-                Map<org.key_project.prover.sequent.SequentFormula, FormulaTermLabel> ifLabels =
+            if (ta.assumesInstantionsComplete() && ta.assumesFormulaInstantiations() != null) {
+                Map<SequentFormula, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<>();
                 for (AssumesFormulaInstantiation ifInst : ta.assumesFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(

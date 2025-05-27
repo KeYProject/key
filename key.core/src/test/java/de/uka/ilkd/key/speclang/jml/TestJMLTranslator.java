@@ -451,7 +451,7 @@ public class TestJMLTranslator {
 
         assertNotNull(result);
         final LogicVariable qv = new LogicVariable(new Name("a"), selfVar.sort());
-        final JFunction fieldSymbol =
+        final Function fieldSymbol =
             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
         Term expected = TB.all(qv,
             TB.imp(

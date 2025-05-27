@@ -7,10 +7,14 @@ import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -20,21 +24,23 @@ import org.key_project.prover.sequent.PosInOccurrence;
  * coefficients. The constant term of the polynomial is ignored. The result is guaranteed to be
  * non-negative.
  */
-public class CoeffGcdProjection implements ProjectionToTerm {
+public class CoeffGcdProjection implements ProjectionToTerm<Goal> {
 
-    private final ProjectionToTerm monomialLeft;
-    private final ProjectionToTerm polynomialRight;
+    private final ProjectionToTerm<Goal> monomialLeft;
+    private final ProjectionToTerm<Goal> polynomialRight;
 
-    private CoeffGcdProjection(ProjectionToTerm monomialLeft, ProjectionToTerm polynomialRight) {
+    private CoeffGcdProjection(ProjectionToTerm<Goal> monomialLeft,
+            ProjectionToTerm<Goal> polynomialRight) {
         this.monomialLeft = monomialLeft;
         this.polynomialRight = polynomialRight;
     }
 
-    public static ProjectionToTerm create(ProjectionToTerm monomialLeft,
-            ProjectionToTerm polynomialRight) {
+    public static ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> monomialLeft,
+            ProjectionToTerm<Goal> polynomialRight) {
         return new CoeffGcdProjection(monomialLeft, polynomialRight);
     }
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
 

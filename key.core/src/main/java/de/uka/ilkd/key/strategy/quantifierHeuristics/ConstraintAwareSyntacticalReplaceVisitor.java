@@ -6,11 +6,11 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 
@@ -33,6 +33,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
         this.metavariableInst = metavariableInst;
     }
 
+    @Override
     protected Term toTerm(Term t) {
         if (!EqualityConstraint.metaVars(t, services).isEmpty() && !metavariableInst.isBottom()) {
             // use the visitor recursively for replacing metavariables that

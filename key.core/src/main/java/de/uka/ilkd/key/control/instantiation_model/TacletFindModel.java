@@ -30,13 +30,16 @@ import de.uka.ilkd.key.rule.inst.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 
 public class TacletFindModel extends AbstractTableModel {
 
@@ -45,7 +48,7 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 5285420522875326156L;
     /** the instantiations entries */
-    private final ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> entries;
+    private final ArrayList<Pair<SchemaVariable, String>> entries;
     /** the related rule application */
     private final TacletApp originalApp;
     /** the integer defines the row until which no editing is possible */
@@ -99,9 +102,9 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * creates a Vector with the row entries of the table
      */
-    private ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> createEntryArray(
+    private ArrayList<Pair<SchemaVariable, String>> createEntryArray(
             TacletApp tacletApp) {
-        ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> rowVec =
+        ArrayList<Pair<SchemaVariable, String>> rowVec =
             new ArrayList<>();
         int count = 0;
 
@@ -122,7 +125,7 @@ public class TacletFindModel extends AbstractTableModel {
                 String proposal = instantiationProposers.getProposal(tacletApp, var, services,
                     goal.node(), proposals);
 
-                Pair<org.key_project.logic.op.sv.SchemaVariable, String> pair =
+                Pair<SchemaVariable, String> pair =
                     new Pair<>(var, proposal);
 
                 if (proposal != null) {
@@ -175,8 +178,8 @@ public class TacletFindModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS,
-            Namespace<JFunction> functNS) throws ParserException {
+    private Term parseTerm(String s, Namespace<@NonNull QuantifiableVariable> varNS,
+            Namespace<@NonNull Function> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -208,7 +211,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         final int icol = 1;
 
-        if ((getValueAt(irow, icol) == null || ((String) getValueAt(irow, icol)).length() == 0)
+        if ((getValueAt(irow, icol) == null || ((String) getValueAt(irow, icol)).isEmpty())
                 && !originalApp.complete()) {
             throw new MissingInstantiationException(String.valueOf(getValueAt(irow, 0)),
                 createPosition(irow),
@@ -220,7 +223,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @return true iff this row is not empty (i.e. a string of data is available)
      */
     private boolean isInputAvailable(int irow) {
-        return getValueAt(irow, 1) != null && ((String) getValueAt(irow, 1)).length() != 0;
+        return getValueAt(irow, 1) != null && !((String) getValueAt(irow, 1)).isEmpty();
     }
 
     /**
@@ -231,8 +234,8 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
-    private Term parseRow(int irow, Namespace<QuantifiableVariable> varNS,
-            Namespace<JFunction> functNS)
+    private Term parseRow(int irow, Namespace<@NonNull QuantifiableVariable> varNS,
+            Namespace<@NonNull Function> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);
@@ -256,7 +259,7 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * parses the indicated row and returns a identifier declaration corresponding to the entry in
+     * parses the indicated row and returns an identifier declaration corresponding to the entry in
      * the row
      *
      * @param irow the row to be parsed
@@ -303,7 +306,7 @@ public class TacletFindModel extends AbstractTableModel {
         String instantiation = (String) getValueAt(irow, 1);
         ProgramSV sv = (ProgramSV) getValueAt(irow, 0);
 
-        ContextInstantiationEntry contextInstantiation =
+        final ContextStatementBlockInstantiation contextInstantiation =
             originalApp.instantiations().getContextInstantiation();
 
         final PosInProgram prefix;
@@ -407,10 +410,10 @@ public class TacletFindModel extends AbstractTableModel {
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else {
                     if (isInputAvailable(irow)) {
-                        final Namespace<QuantifiableVariable> extVarNS =
+                        final Namespace<@NonNull QuantifiableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
 
-                        Namespace<JFunction> functNS =
+                        Namespace<@NonNull Function> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
 
                         final Term instance = parseRow(irow, extVarNS, functNS);

@@ -10,8 +10,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.GoalListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
@@ -80,6 +80,7 @@ public class NodeChangeJournal implements GoalListener {
     /**
      * informs the listener about a change that occured to the sequent of goal
      */
+    @Override
     public void sequentChanged(Goal source, SequentChangeInfo sci) {
         NodeChangesHolder nc = getChangeObj(source.node());
 
@@ -95,6 +96,7 @@ public class NodeChangeJournal implements GoalListener {
      * <code>newGoals</code>). The nodes of <code>newGoals</code> are children of the node
      * <code>parent</code>
      */
+    @Override
     public void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals) {
         NodeChangesHolder nc = removeChangeObj(parent);
 

@@ -13,9 +13,9 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
-import org.key_project.prover.rules.MatchConditions;
-import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -54,7 +54,7 @@ public class NoPosTacletApp extends TacletApp {
     /**
      * creates a NoPosTacletApp for the given taclet with some known instantiations and CHECKS
      * variable conditions as well as it resolves collisions The ifInstantiations parameter is not
-     * matched against the if sequence, but only stored. For matching use the method
+     * matched against the assumes-sequence, but only stored. For matching use the method
      * "setIfFormulaInstantiations".
      *
      * @param taclet the Taclet
@@ -65,7 +65,7 @@ public class NoPosTacletApp extends TacletApp {
         return createNoPosTacletApp(taclet, instantiations, null, services);
     }
 
-    public static NoPosTacletApp createNoPosTacletApp(Taclet taclet,
+    public static NoPosTacletApp createNoPosTacletApp(org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
@@ -90,7 +90,8 @@ public class NoPosTacletApp extends TacletApp {
      * to decide about introduction of metavariables. Immutable instantiations are important for the
      * "addrules" part of taclets.
      */
-    public static NoPosTacletApp createFixedNoPosTacletApp(Taclet taclet,
+    public static NoPosTacletApp createFixedNoPosTacletApp(
+            org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations, Services services) {
         NoPosTacletApp res = createNoPosTacletApp(taclet, instantiations, null, services);
         // Make the given SVs fixed
@@ -106,7 +107,7 @@ public class NoPosTacletApp extends TacletApp {
      *
      * @param taclet the Taclet
      */
-    protected NoPosTacletApp(Taclet taclet) {
+    protected NoPosTacletApp(org.key_project.prover.rules.Taclet taclet) {
         super(taclet);
     }
 
@@ -116,7 +117,8 @@ public class NoPosTacletApp extends TacletApp {
      * @param taclet the Taclet
      * @param instantiations the SVInstantiations
      */
-    private NoPosTacletApp(Taclet taclet, SVInstantiations instantiations,
+    private NoPosTacletApp(org.key_project.prover.rules.Taclet taclet,
+            SVInstantiations instantiations,
             ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         super(taclet, instantiations, ifInstantiations);
     }
@@ -132,9 +134,9 @@ public class NoPosTacletApp extends TacletApp {
      * @param instantiations the SVInstantiations so that the find(if) matches
      * @return true iff all variable conditions x not free in y are hold
      */
-    protected static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations) {
-        for (var pair : ((de.uka.ilkd.key.rule.inst.SVInstantiations) instantiations)
-                .getInstantiationMap()) {
+    protected static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
+            SVInstantiations instantiations) {
+        for (var pair : instantiations.getInstantiationMap()) {
             final var sv = pair.key();
 
             if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
@@ -179,29 +181,11 @@ public class NoPosTacletApp extends TacletApp {
         }
     }
 
-
-
-    @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Object[] list, boolean interesting,
-            Services services) {
-        if (interesting) {
-            return createNoPosTacletApp(taclet(),
-                instantiations().addInterestingList(sv, list, services),
-                assumesFormulaInstantiations(),
-                services);
-        } else {
-            return createNoPosTacletApp(taclet(), instantiations().addList(sv, list, services),
-                assumesFormulaInstantiations(), services);
-        }
-    }
-
-
-
     /**
      * adds a new instantiation to this TacletApp
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SV is instantiated with
+     * @param pe the ProgramElement with which the SV is instantiated
      * @return the new TacletApp
      */
     @Override
@@ -261,7 +245,7 @@ public class NoPosTacletApp extends TacletApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     @Override
-    protected TacletApp setAllInstantiations(org.key_project.prover.rules.MatchConditions mc,
+    protected TacletApp setAllInstantiations(MatchConditions mc,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations, Services services) {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(), assumesInstantiations,
             services);
@@ -269,14 +253,14 @@ public class NoPosTacletApp extends TacletApp {
 
 
     /**
-     * returns true iff all necessary informations are collected, so that the Taclet can be applied.
+     * returns true iff all necessary information is collected, so that the Taclet can be applied.
      *
-     * @return true iff all necessary informations are collected, so that the Taclet can be applied.
+     * @return true iff all necessary information is collected, so that the Taclet can be applied.
      */
     @Override
     public boolean complete() {
         return (uninstantiatedVars().isEmpty() && taclet() instanceof NoFindTaclet
-                && ifInstsComplete());
+                && assumesInstantionsComplete());
 
     }
 
@@ -302,17 +286,15 @@ public class NoPosTacletApp extends TacletApp {
      *
      * <pre>
      *  {@code
-     * ifFormulaInstantiations() == null &&
-     *         (pos == null || termConstraint.isSatisfiable())
+     * ifFormulaInstantiations () == null &&
+     *   ( pos == null || termConstraint.isSatisfiable () )
      * }
      * </pre>
      *
      * @return TacletApp with the resulting instantiations or null
      */
-    public NoPosTacletApp matchFind(PosInOccurrence pos,
-            Services services) {
-        NoPosTacletApp result = matchFind(pos, services, null);
-        return result;
+    public NoPosTacletApp matchFind(PosInOccurrence pos, Services services) {
+        return matchFind(pos, services, null);
     }
 
 

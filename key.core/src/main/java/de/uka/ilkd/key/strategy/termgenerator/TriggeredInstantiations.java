@@ -13,16 +13,13 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
@@ -30,17 +27,21 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-public class TriggeredInstantiations implements TermGenerator {
+public class TriggeredInstantiations implements TermGenerator<Goal> {
 
-    public static TermGenerator create(boolean skipConditions) {
+    public static TermGenerator<Goal> create(boolean skipConditions) {
         return new TriggeredInstantiations(skipConditions);
     }
 
@@ -114,7 +115,7 @@ public class TriggeredInstantiations implements TermGenerator {
                     final Metavariable mv = new Metavariable(new Name("$MV$" + sv.name()), svSort);
 
                     final Term trigger =
-                        instantiateTerm((Term) taclet.getTrigger().getTerm(), services,
+                        instantiateTerm((Term) taclet.getTrigger().trigger(), services,
                             svInst.replace(sv, services.getTermFactory().createTerm(mv), services));
 
                     final Set<org.key_project.logic.Term> instances =
@@ -158,7 +159,7 @@ public class TriggeredInstantiations implements TermGenerator {
         for (SequentFormula sf : antecedent) {
             Term formula = (Term) sf.formula();
             collectTerms(formula, terms, integerLDT);
-            if (formula.op() instanceof JFunction
+            if (formula.op() instanceof Function
                     || formula.op() == Equality.EQUALS) {
                 axioms.add(
                     inAntecedent ? formula : services.getTermBuilder().not(formula));
@@ -172,6 +173,8 @@ public class TriggeredInstantiations implements TermGenerator {
         long cost = PredictCostProver.computerInstanceCost(
             new Substitution(DefaultImmutableMap.nilMap()), cond,
             axioms, services);
+
+
         return cost == -1;
     }
 

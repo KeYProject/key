@@ -390,7 +390,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         final GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
         if (gs.isUseJML()) {
-            return createSpecs(new JMLSpecExtractor(initConfig.getServices()));
+            return createSpecs(new JMLSpecExtractor(initConfig));
         } else {
             return null;
         }

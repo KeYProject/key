@@ -13,11 +13,14 @@ import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -280,7 +283,7 @@ public class DelayedCutProcessor implements Runnable {
         if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
             for (var entry : insts.getInstantiationMap()) {
-                final org.key_project.logic.op.sv.SchemaVariable sv = entry.key();
+                final SchemaVariable sv = entry.key();
                 if (sv instanceof SkolemTermSV) {
                     final Term inst = (Term) insts.getInstantiation(sv);
                     services.getNamespaces().functions().remove(inst.op().name());
@@ -357,8 +360,8 @@ public class DelayedCutProcessor implements Runnable {
 
         }
 
-        if (app instanceof TacletApp) {
-            NoPosTacletApp noPosApp = NoPosTacletApp.createNoPosTacletApp((Taclet) app.rule());
+        if (app instanceof TacletApp tacletApp) {
+            NoPosTacletApp noPosApp = NoPosTacletApp.createNoPosTacletApp(tacletApp.taclet());
             if (noPosApp.matchFind(newPos, services) == null) {
 
                 throw new RuntimeException("Cannot apply taclet-app");

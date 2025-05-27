@@ -22,8 +22,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
@@ -324,7 +325,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         } else {
             String name = type.getName();
             name = MiscTools.filterAlphabetic(name);
-            if (name.length() > 0) {
+            if (!name.isEmpty()) {
                 result = name.substring(0, 1).toLowerCase();
             } else {
                 result = "x"; // use default name otherwise
@@ -432,19 +433,19 @@ public abstract class VariableNamer implements InstantiationProposer {
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         // determine posOfDeclaration from TacletApp
-        ContextInstantiationEntry cie = app.instantiations().getContextInstantiation();
+        ContextStatementBlockInstantiation cie = app.instantiations().getContextInstantiation();
         PosInProgram posOfDeclaration = (cie == null ? null : cie.prefix());
 
         // determine a suitable base name
         String basename = null;
-        de.uka.ilkd.key.rule.NewVarcond nv =
-            (de.uka.ilkd.key.rule.NewVarcond) app.taclet().varDeclaredNew(var);
+        NewVarcond nv =
+            (NewVarcond) app.taclet().varDeclaredNew(var);
         if (nv != null) {
             Type type = nv.getType();
             if (type != null) {
                 basename = getBaseNameProposal(type);
             } else {
-                org.key_project.logic.op.sv.SchemaVariable psv = nv.getPeerSchemaVariable();
+                SchemaVariable psv = nv.getPeerSchemaVariable();
                 Object inst = app.instantiations().getInstantiation(psv);
                 if (inst instanceof Expression) {
                     final ExecutionContext ec = app.instantiations().getExecutionContext();

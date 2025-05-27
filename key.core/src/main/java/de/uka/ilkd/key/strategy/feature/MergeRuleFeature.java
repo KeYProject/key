@@ -7,12 +7,18 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -30,7 +36,8 @@ public class MergeRuleFeature implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Term t = (Term) pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {

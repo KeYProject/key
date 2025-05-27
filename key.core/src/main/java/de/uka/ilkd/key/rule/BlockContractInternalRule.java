@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -27,7 +26,9 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -113,7 +114,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      * @return the postconditions.
      */
     private static Term[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
@@ -138,7 +139,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      */
     private static Term[] createUpdates(final Term contextUpdate,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final BlockContract.Variables variables,
             final Map<LocationVariable, Term> modifiableClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
@@ -165,7 +166,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     private static ImmutableList<Goal> splitIntoGoals(final Goal goal, final BlockContract contract,
             final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final Term contextUpdate,
             final Term remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
             final GoalsConfigurator configurator, final Services services) {
@@ -235,7 +236,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, JFunction> anonymisationHeaps =
+        final Map<LocationVariable, Function> anonymisationHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
@@ -325,7 +326,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
     private void setUpValidityGoal(final ImmutableList<Goal> result, final boolean isInfFlow,
             final BlockContract contract, final BlockContractInternalBuiltInRuleApp application,
             final Instantiation instantiation, final List<LocationVariable> heaps,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final ImmutableSet<LocationVariable> localOutVariables,
             final BlockContract.Variables variables, final Term[] preconditions,

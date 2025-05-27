@@ -27,6 +27,7 @@ public class InstantiationProposerCollection implements InstantiationProposer {
     }
 
 
+    @Override
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         for (InstantiationProposer proposer : proposers) {

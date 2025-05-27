@@ -8,6 +8,10 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -18,6 +22,10 @@ import org.jspecify.annotations.NonNull;
 
 import static org.key_project.util.Strings.formatAsList;
 
+/**
+ * A taclet (formerly known as schematic theory specific rule) is a rule representation used
+ * within the KeY verification system.
+ */
 public abstract class Taclet implements Rule {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
@@ -26,7 +34,7 @@ public abstract class Taclet implements Rule {
     protected final Name name;
 
     /** name displayed by the pretty printer */
-    private final String displayName;
+    protected final String displayName;
 
     /**
      * the <tt>assumes</tt> sequent of the taclet
@@ -65,7 +73,7 @@ public abstract class Taclet implements Rule {
      * all variables that may appear free in the instantiation of the schemavariable (a bit more
      * complicated for rewrite taclets, see paper of M:Giese)
      */
-    protected final ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
+    protected final ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
 
     /** cache; contains set of all bound variables */
     protected ImmutableSet<QuantifiableVariable> boundVariables = null;
@@ -76,7 +84,7 @@ public abstract class Taclet implements Rule {
 
     protected String tacletAsString;
 
-    /** Set of schemavariables of the {@code assumes} part */
+    /** Set of schema variables of the {@code assumes} part */
     protected ImmutableSet<SchemaVariable> assumesVariables = null;
 
     /**
@@ -84,10 +92,18 @@ public abstract class Taclet implements Rule {
      */
     protected final ImmutableList<RuleSet> ruleSets;
 
+    /**
+     * trigger of the taclet
+     */
     protected final Trigger trigger;
 
     /* TODO: find better solution */
     private final boolean surviveSymbExec;
+
+    // The two rule engines for matching and execution (application) of taclets
+    // In the long run, we should think about keeping those somewhere else, e.g., in the services
+    // such that we gain more flexibility like combined matchers that do not just match one taclet
+    // but all at once for a given term.
 
     /**
      * The taclet matcher
@@ -97,7 +113,7 @@ public abstract class Taclet implements Rule {
     /**
      * The taclet executor
      */
-    protected TacletExecutor/* <?, App, ? extends Taclet<?, App>> */ executor;
+    protected TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -183,7 +199,7 @@ public abstract class Taclet implements Rule {
      * computes and returns all variables that occur bound in the taclet including the taclets
      * defined in <tt>addrules</tt> sections. The result is cached and therefore only computed once.
      *
-     * @return all variables occuring bound in the taclet
+     * @return all variables occurring bound in the taclet
      */
     public abstract ImmutableSet<QuantifiableVariable> getBoundVariables();
 
@@ -238,7 +254,7 @@ public abstract class Taclet implements Rule {
      * returns the display name of the taclet, or, if not specified -- the canonical name
      */
     @Override
-    public String displayName() {
+    public @NonNull String displayName() {
         return displayName;
     }
 
@@ -283,8 +299,8 @@ public abstract class Taclet implements Rule {
      * method cacheMatchInfo
      */
     public boolean hasReplaceWith() {
-        for (final TacletGoalTemplate goalDescr : goalTemplates) {
-            if (goalDescr.replaceWithExpressionAsObject() != null) {
+        for (final TacletGoalTemplate goalTemplate : goalTemplates) {
+            if (goalTemplate.replaceWithExpressionAsObject() != null) {
                 return true;
             }
         }
@@ -390,7 +406,7 @@ public abstract class Taclet implements Rule {
             sb.append("\n\\trigger{");
             sb.append(trigger.triggerVar());
             sb.append("} ");
-            sb.append(trigger.getTerm());
+            sb.append(trigger.trigger());
             if (trigger.hasAvoidConditions()) {
                 sb.append(" \\avoid ");
                 sb.append(formatAsList(trigger.avoidConditions(), "", ", ", ""));
@@ -427,8 +443,8 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
-    public TacletExecutor<?, ?, ?> getExecutor() {
-        return executor;
+    public @NonNull <G extends ProofGoal<@NonNull G>> TacletExecutor<@NonNull G, ?> getExecutor() {
+        return (TacletExecutor<@NonNull G, ?>) executor;
     }
 
     public abstract Taclet setName(String s);

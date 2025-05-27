@@ -14,7 +14,7 @@ import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

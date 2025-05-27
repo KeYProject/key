@@ -11,12 +11,18 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
@@ -79,7 +85,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * This strategy accepts all rule apps for which the rule name is in the admitted set and
      * rejects everything else.
      */
-    private static class PropExpansionStrategy implements Strategy {
+    private static class PropExpansionStrategy implements Strategy<Goal> {
 
         private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
@@ -100,7 +106,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();

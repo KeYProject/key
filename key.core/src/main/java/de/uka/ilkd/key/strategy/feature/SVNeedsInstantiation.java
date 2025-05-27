@@ -9,6 +9,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 public class SVNeedsInstantiation extends InstantiatedSVFeature {
 

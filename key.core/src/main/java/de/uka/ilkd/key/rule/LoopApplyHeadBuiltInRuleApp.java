@@ -80,7 +80,7 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(
+    public IBuiltInRuleApp setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;

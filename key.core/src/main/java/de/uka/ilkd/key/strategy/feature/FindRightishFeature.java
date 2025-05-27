@@ -6,10 +6,17 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
+
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -31,7 +38,9 @@ public class FindRightishFeature implements Feature {
         add = numbers.getAdd();
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    @Override
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

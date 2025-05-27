@@ -39,6 +39,7 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -583,7 +584,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
             SLExpression other = expr.get(i);
             if (other.isType() && !result.isType()) {
-                JFunction ssortFunc = sortLDT.getSsort(other.getType().getSort(), services);
+                Function ssortFunc = sortLDT.getSsort(other.getType().getSort(), services);
                 other = new SLExpression(tb.func(ssortFunc));
             }
 
@@ -645,14 +646,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         if (left.isType() && left.getTerm() != null && right.isType()) {
             Sort os = right.getType().getSort();
-            JFunction ioFunc = services.getJavaDLTheory().getInstanceofSymbol(os, services);
+            Function ioFunc = services.getJavaDLTheory().getInstanceofSymbol(os, services);
             left = new SLExpression(tb.equals(tb.func(ioFunc, left.getTerm()), tb.TRUE()));
         } else {
             Term leftSort;
             if (left.isTerm()) {
                 leftSort = left.getTerm();
             } else {
-                JFunction ssortFunc = sortLDT.getSsort(left.getType().getSort(), services);
+                Function ssortFunc = sortLDT.getSsort(left.getType().getSort(), services);
                 leftSort = tb.func(ssortFunc);
             }
 
@@ -660,7 +661,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (right.isTerm()) {
                 rightSort = right.getTerm();
             } else {
-                JFunction ssortFunc = sortLDT.getSsort(right.getType().getSort(), services);
+                Function ssortFunc = sortLDT.getSsort(right.getType().getSort(), services);
                 rightSort = tb.func(ssortFunc);
             }
 
@@ -673,7 +674,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitRelational_lockset(JmlParser.Relational_locksetContext ctx) {
-        JFunction f = null;
+        Function f = null;
         SLExpression left = accept(ctx.shiftexpr());
         SLExpression right = accept(ctx.postfixexpr());
 
@@ -1153,7 +1154,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Token l = ctx.STRING_LITERAL().getSymbol();
         Term charListTerm =
             services.getTypeConverter().convertToLogicElement(new StringLiteral(l.getText()));
-        JFunction strPool =
+        Function strPool =
             services.getNamespaces().functions().lookup(CharListLDT.STRINGPOOL_NAME);
         if (strPool == null) {
             raiseError("String literals used in specification, but string pool function not found",
@@ -1321,7 +1322,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         String opName = ctx.getStart().getText();
         assert opName.startsWith("\\fp_");
-        JFunction op = ldt.getFunctionFor(opName.substring(4), services);
+        Function op = ldt.getFunctionFor(opName.substring(4), services);
         if (op == null) {
             raiseError(ctx, "The operation %s has no function in %s.", opName, ldt.name());
         }
@@ -1497,7 +1498,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitPrimaryStringEq(JmlParser.PrimaryStringEqContext ctx) {
         SLExpression e1 = accept(ctx.expression(0));
         SLExpression e2 = accept(ctx.expression(1));
-        JFunction strContent =
+        Function strContent =
             services.getNamespaces().functions().lookup(CharListLDT.STRINGCONTENT_NAME);
         if (strContent == null) {
             raiseError("strings used in spec, but string content function not found", ctx);
@@ -1674,13 +1675,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         final Term t2 = e2.getTerm();
         final Term t1 = e1.getTerm();
         return switch (ctx.op.getType()) {
-            case JmlLexer.SEQCONCAT -> termFactory.seqConcat(t1, t2);
-            case JmlLexer.SEQGET -> termFactory.seqGet(t1, t2);
-            case JmlLexer.INDEXOF -> termFactory.createIndexOf(t1, t2);
-            default -> {
-                raiseError(ctx, "Unknown operator: %s", ctx.op);
-                yield null;
-            }
+        case JmlLexer.SEQCONCAT -> termFactory.seqConcat(t1, t2);
+        case JmlLexer.SEQGET -> termFactory.seqGet(t1, t2);
+        case JmlLexer.INDEXOF -> termFactory.createIndexOf(t1, t2);
+        default -> {
+            raiseError(ctx, "Unknown operator: %s", ctx.op);
+            yield null;
+        }
         };
     }
 
@@ -1706,7 +1707,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             guard = a.getTerm();
         }
         SLExpression expr =
-                ctx.expression().size() == 2 ? accept(ctx.expression(1)) : accept(ctx.expression(0));
+            ctx.expression().size() == 2 ? accept(ctx.expression(1)) : accept(ctx.expression(0));
 
         resolverManager.popLocalVariablesNamespace();
         assert guard != null;
@@ -1714,28 +1715,32 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert expr != null;
         final Term body = expr.getTerm();
         return switch (ctx.quantifier().start.getType()) {
-            case JmlLexer.FORALL -> termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
-                    expr.getType());
-            case JmlLexer.EXISTS -> termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
-                    expr.getType());
-            case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
-                    declVars.second);
-            case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
-                    declVars.second);
-            case JmlLexer.NUM_OF -> {
-                KeYJavaType kjtInt =
-                        services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-                yield termFactory.quantifiedNumOf(guard, body, declVars.first, nullable,
-                        declVars.second, kjtInt);
-            }
-            case JmlLexer.SUM -> termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
-                    expr.getType());
-            case JmlLexer.PRODUCT -> termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
-                    body, expr.getType());
-            default -> {
-                raiseError(ctx, "Unexpected syntax case.");
-                yield null;
-            }
+        case JmlLexer.FORALL ->
+            termFactory.forall(guard, body, declVars.first, declVars.second, nullable,
+                expr.getType());
+        case JmlLexer.EXISTS ->
+            termFactory.exists(guard, body, declVars.first, declVars.second, nullable,
+                expr.getType());
+        case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
+            declVars.second);
+        case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
+            declVars.second);
+        case JmlLexer.NUM_OF -> {
+            KeYJavaType kjtInt =
+                services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            yield termFactory.quantifiedNumOf(guard, body, declVars.first, nullable,
+                declVars.second, kjtInt);
+        }
+        case JmlLexer.SUM ->
+            termFactory.quantifiedSum(declVars.first, nullable, declVars.second, guard, body,
+                expr.getType());
+        case JmlLexer.PRODUCT ->
+            termFactory.quantifiedProduct(declVars.first, nullable, declVars.second, guard,
+                body, expr.getType());
+        default -> {
+            raiseError(ctx, "Unexpected syntax case.");
+            yield null;
+        }
         };
     }
 

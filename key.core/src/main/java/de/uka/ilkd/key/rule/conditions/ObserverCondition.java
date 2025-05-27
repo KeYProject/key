@@ -11,9 +11,9 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.SVInstantiations;
 
 
 public final class ObserverCondition implements VariableCondition {

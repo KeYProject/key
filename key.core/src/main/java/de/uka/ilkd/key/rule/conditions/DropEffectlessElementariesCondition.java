@@ -14,12 +14,13 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {
@@ -91,8 +92,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions mc,
             LogicServices services) {
-        de.uka.ilkd.key.rule.inst.SVInstantiations svInst =
-            (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
+        SVInstantiations svInst =
+            (SVInstantiations) mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);
         Term xInst = (Term) svInst.getInstantiation(x);
         Term resultInst = (Term) svInst.getInstantiation(result);

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -113,7 +112,7 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
             findTerm.execPostOrder(this);
             if (findTerm.op() instanceof SchemaVariable) {
                 findSV = (SchemaVariable) findTerm.op();
-            } else if (findTerm.op() instanceof JFunction
+            } else if (findTerm.op() instanceof Function
                     && heapLDT.containsFunction((Function) findTerm.op())) {
                 findSV = (SchemaVariable) findTerm.sub(2).op();
             }

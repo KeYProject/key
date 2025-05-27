@@ -60,7 +60,7 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
     }
 
     @Override
-    public LoopContractExternalBuiltInRuleApp setIfInsts(
+    public LoopContractExternalBuiltInRuleApp setAssumesInsts(
             final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;

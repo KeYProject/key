@@ -7,11 +7,8 @@ import java.io.File;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -19,10 +16,12 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Assertions;
@@ -34,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Program variables are now introduced locally.
- *
+ * <br>
  * These tests check that this is done correctly.
  *
  * @author mulbrich
@@ -126,13 +125,17 @@ public class TestLocalSymbols {
     // there was a bug.
     @Test
     public void testDoubleInstantiation() throws Exception {
+        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX, "doubleSkolem.key");
+        Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
 
-        KeYEnvironment<?> env = loadProof("doubleSkolem.key");
+        KeYEnvironment<?> env = KeYEnvironment.load(
+            JavaProfile.getDefaultInstance(), proofFile, null, null,
+            null, true);
+
         Proof proof = env.getLoadedProof();
-        String script = env.getProofScript().script();
+        var script = env.getProofScript();
 
-        ProofScriptEngine pse =
-            new ProofScriptEngine(script, new Location(null, Position.newOneBased(1, 1)));
+        ProofScriptEngine pse = new ProofScriptEngine(script);
         pse.execute(null, proof);
 
         ImmutableList<Goal> openGoals = proof.openGoals();
@@ -153,8 +156,9 @@ public class TestLocalSymbols {
         Goal goal = goals.head();
 
         TacletApp app;
+        Sequent sequentFormulas = goal.node().sequent();
         PosInOccurrence pio =
-            new PosInOccurrence(goal.node().sequent().getFormulabyNr(formulaNo),
+            new PosInOccurrence(sequentFormulas.getFormulaByNr(formulaNo),
                 PosInTerm.getTopLevel(), false);
 
         app = rule.matchFind(pio, services);

@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
@@ -31,12 +33,10 @@ public final class ProgVarReplacer {
      */
     private final Map<LocationVariable, LocationVariable> map;
 
-
     /**
      * The services object
      */
     private final Services services;
-
 
     /**
      * creates a ProgVarReplacer that replaces program variables as specified by the map parameter
@@ -68,7 +68,7 @@ public final class ProgVarReplacer {
      * replaces in the partially instantiated apps of a taclet index
      */
     public void replace(TacletIndex tacletIndex) {
-        ImmutableList<NoPosTacletApp> noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
+        final var noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
         ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
         appsToBeRemoved = DefaultImmutableSet.nil();
         appsToBeAdded = DefaultImmutableSet.nil();
@@ -103,26 +103,31 @@ public final class ProgVarReplacer {
             InstantiationEntry<?> ie = e.value();
             Object inst = ie.getInstantiation();
 
-            if (ie instanceof ContextInstantiationEntry) {
-                ProgramElement pe = (ProgramElement) inst;
-                ProgramElement newPe = replace(pe);
+            if (inst instanceof Term t) {
+                final Term newT = replace(t);
+                if (newT != t) {
+                    result = result.replace(sv, newT, services);
+                }
+            } else if (inst instanceof ContextStatementBlockInstantiation cie) {
+                final ProgramElement pe = cie.program();
+                final ProgramElement newPe = replace(pe);
                 if (newPe != pe) {
-                    ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
                     result = result.replace(cie.prefix(), cie.suffix(),
                         cie.activeStatementContext(), newPe, services);
                 }
-            } else if (ie instanceof OperatorInstantiation) {
+            } else if (inst instanceof Operator) {
                 /* nothing to be done (currently) */
-            } else if (ie instanceof ProgramInstantiation) {
-                ProgramElement pe = (ProgramElement) inst;
-                ProgramElement newPe = replace(pe);
+            } else if (inst instanceof ProgramElement pe) {
+                final ProgramElement newPe = replace(pe);
                 if (newPe != pe) {
                     result = result.replace(sv, newPe, services);
                 }
-            } else if (ie instanceof ProgramListInstantiation) {
-                @SuppressWarnings("unchecked")
-                ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
-                int size = a.size();
+            } else if (ie instanceof ListInstantiation list) {
+                if (list.getType() != ProgramElement.class) {
+                    throw new RuntimeException("Unexpected list instantiation: " + ie);
+                }
+                final ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
+                final int size = a.size();
                 ProgramElement[] array = new ProgramElement[size];
 
                 boolean changedSomething = false;
@@ -137,12 +142,6 @@ public final class ProgVarReplacer {
                 if (changedSomething) {
                     result = result.replace(sv, new ImmutableArray<>(array), services);
                 }
-            } else if (ie instanceof TermInstantiation) {
-                Term t = (Term) inst;
-                Term newT = replace(t);
-                if (newT != t) {
-                    result = result.replace(sv, newT, services);
-                }
             } else {
                 assert false : "unexpected subtype of InstantiationEntry<?>";
             }
@@ -150,7 +149,6 @@ public final class ProgVarReplacer {
 
         return result;
     }
-
 
     /**
      * replaces in a sequent
@@ -194,7 +192,6 @@ public final class ProgVarReplacer {
         return result;
     }
 
-
     private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         ProgramVariable o = map.get(pv);
@@ -203,7 +200,6 @@ public final class ProgVarReplacer {
         }
         return t;
     }
-
 
     private Term standardReplace(Term t) {
         Term result = t;
@@ -244,7 +240,6 @@ public final class ProgVarReplacer {
         }
         return result;
     }
-
 
     /**
      * replaces in a term

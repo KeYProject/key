@@ -24,7 +24,6 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
@@ -39,6 +38,8 @@ import de.uka.ilkd.key.util.SideProofUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
@@ -115,8 +116,9 @@ public final class SymbolicExecutionSideProofUtil {
             String description, String methodTreatment, String loopTreatment, String queryTreatment,
             String splittingOption, boolean addNamesToServices) throws ProofInputException {
         // Execute side proof
-        ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve,
-            methodTreatment, loopTreatment, queryTreatment, splittingOption);
+        ApplyStrategyInfo<Proof, Goal> info =
+            startSideProof(proof, sideProofEnvironment, sequentToProve,
+                methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract results and conditions from side proof
             List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<>();
@@ -180,8 +182,9 @@ public final class SymbolicExecutionSideProofUtil {
             String queryTreatment, String splittingOption, boolean addNamesToServices)
             throws ProofInputException {
         // Execute side proof
-        ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve,
-            methodTreatment, loopTreatment, queryTreatment, splittingOption);
+        ApplyStrategyInfo<Proof, Goal> info =
+            startSideProof(proof, sideProofEnvironment, sequentToProve,
+                methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract relevant things
             Set<Operator> relevantThingsInSequentToProve =
@@ -307,12 +310,12 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check its {@link Name}s.
      */
     public static void addNewNamesToNamespace(Services services, Term term) {
-        final Namespace<JFunction> functions = services.getNamespaces().functions();
+        final Namespace<Function> functions = services.getNamespaces().functions();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
         term.execPreOrder((DefaultVisitor) visited -> {
-            if (visited.op() instanceof JFunction) {
-                functions.add((JFunction) visited.op());
+            if (visited.op() instanceof Function) {
+                functions.add((Function) visited.op());
             } else if (visited.op() instanceof IProgramVariable) {
                 progVars.add((IProgramVariable) visited.op());
             }
@@ -345,7 +348,7 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     /**
-     * Utility method used by {@link #containsModalityOrQuery(Term)}.
+     * Utility method used by {@link #containsModalityOrQuery(org.key_project.logic.Term)}
      *
      * @author Martin Hentschel
      */
@@ -390,9 +393,12 @@ public final class SymbolicExecutionSideProofUtil {
             Sequent sequentToProve) {
         final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
-            sf.formula().execPreOrder((DefaultVisitor) visited -> {
-                if (isRelevantThing(services, visited)) {
-                    result.add(visited.op());
+            sf.formula().execPreOrder(new DefaultVisitor() {
+                @Override
+                public void visit(Term visited) {
+                    if (isRelevantThing(services, visited)) {
+                        result.add(visited.op());
+                    }
                 }
             });
         }
@@ -414,7 +420,7 @@ public final class SymbolicExecutionSideProofUtil {
     private static boolean isRelevantThing(Services services, Term term) {
         if (term.op() instanceof IProgramVariable) {
             return true;
-        } else if (term.op() instanceof JFunction) {
+        } else if (term.op() instanceof Function) {
             HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             if (SymbolicExecutionUtil.isHeap(term.op(), heapLDT)) {
                 return true;
@@ -494,7 +500,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     /**
      * Utility class used by
-     * {@link #containsIrrelevantThings(Services, org.key_project.prover.sequent.SequentFormula, Set)}.
+     * {@link #containsIrrelevantThings(Services, SequentFormula, Set)}.
      *
      * @author Martin Hentschel
      */
@@ -610,7 +616,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @param splittingOption The splitting option to use.
      * @return The site proof result.
      */
-    public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter,
+    public static ApplyStrategyInfo<Proof, Goal> startSideProof(Proof proof, ProofStarter starter,
             String methodTreatment, String loopTreatment, String queryTreatment,
             String splittingOption) {
         assert starter != null;
@@ -628,7 +634,7 @@ public final class SymbolicExecutionSideProofUtil {
             StrategyProperties.QUANTIFIERS_NON_SPLITTING);
         starter.setStrategyProperties(sp);
         // Execute proof in the current thread
-        return starter.start();
+        return (ApplyStrategyInfo<Proof, Goal>) starter.start();
     }
 
     /**
@@ -666,7 +672,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The operator term of the formula with the given {@link Operator}.
      * @throws ProofInputException Occurred Exception.
      */
-    public static Term extractOperatorTerm(ApplyStrategyInfo info, Operator operator)
+    public static Term extractOperatorTerm(ApplyStrategyInfo<Proof, Goal> info, Operator operator)
             throws ProofInputException {
         // Make sure that valid parameters are given
         assert info != null;
@@ -839,7 +845,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @param description The description.
      * @param info The {@link ApplyStrategyInfo} to store or dispose its {@link Proof}.
      */
-    public static void disposeOrStore(String description, ApplyStrategyInfo info) {
+    public static void disposeOrStore(String description, ApplyStrategyInfo<Proof, Goal> info) {
         if (info != null) {
             if (SideProofStore.DEFAULT_INSTANCE.isEnabled()) {
                 SideProofStore.DEFAULT_INSTANCE.addProof(description, info.getProof());

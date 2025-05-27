@@ -5,9 +5,16 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -23,9 +30,10 @@ public class AllowedCutPositionFeature extends BinaryFeature {
 
     private AllowedCutPositionFeature() {}
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
-
+    @Override
+    public <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
+        assert pos != null : "Feature is only applicable to rules with find";
         return onlyBelowRightJunctors(pos);
     }
 

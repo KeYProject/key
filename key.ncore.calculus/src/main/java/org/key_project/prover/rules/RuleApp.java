@@ -9,7 +9,10 @@ import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
 
-
+/**
+ * Instances of this type accumulate the information for a specific rule application
+ * like application position, instantiations and more.
+ */
 public interface RuleApp {
     /**
      * returns the rule of this rule application
@@ -17,12 +20,24 @@ public interface RuleApp {
     Rule rule();
 
     /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
+     * last minute check whether rule is applicable and throws an exception if not
+     * <p>
+     * This is a debugging method, if an exception gets thrown there is nothing that can be done
+     * by the user
+     * </p>
      *
-     * @TODO: better name
+     * @throws RuntimeException if rule is scheduled for application but not yet ready
      */
-    <F extends Function> void execute(Namespace<@NonNull F> fns);
+    void checkApplicability();
+
+    /**
+     * registers new Skolem functions to the provided namespace
+     * This method should be moved to the rule application logic, but remains for
+     * the moment here (checkApplicability() did also the registration before)
+     *
+     * @param fns the {@link Namespace} where to register the Skolem functions
+     */
+    void registerSkolemConstants(Namespace<@NonNull Function> fns);
 
     /**
      * returns true if all variables are instantiated
@@ -38,5 +53,10 @@ public interface RuleApp {
         return rule().displayName();
     }
 
+    /**
+     * the position where to apply the rule to which this application belongs
+     *
+     * @return the {@link PosInOccurrence} with the position information
+     */
     PosInOccurrence posInOccurrence();
 }

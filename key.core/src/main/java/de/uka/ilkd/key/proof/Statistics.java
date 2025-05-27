@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.EnhancedStringBuffer;
 import org.key_project.util.collection.Pair;
 
@@ -318,7 +319,7 @@ public class Statistics {
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
-                if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
+                if (ruleApp instanceof OneStepSimplifierRuleApp) {
                     oss++;
                     ossCaptured += tmpOssCaptured(ruleApp);
                 } else if (ruleApp instanceof SMTRuleApp) {
@@ -398,7 +399,7 @@ public class Statistics {
         private int tmpOssCaptured(final RuleApp ruleApp) {
             int tmpOssCaptured = 0;
             final Protocol protocol =
-                ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                ((OneStepSimplifierRuleApp) ruleApp).getProtocol();
             if (protocol != null) {
                 tmpOssCaptured = protocol.size() - 1;
             }
@@ -411,7 +412,8 @@ public class Statistics {
          * @param ruleApp The {@link RuleApp} to check.
          * @return 1 or 0.
          */
-        private int tmpLoopScopeInvTacletRuleApps(final RuleApp ruleApp) {
+        private int tmpLoopScopeInvTacletRuleApps(
+                final RuleApp ruleApp) {
             return tacletHasRuleSet(ruleApp, "loop_scope_inv_taclet");
         }
 
@@ -421,7 +423,8 @@ public class Statistics {
          * @param ruleApp The {@link RuleApp} to check.
          * @return 1 or 0.
          */
-        private int tacletHasRuleSet(final RuleApp ruleApp, final String ruleSet) {
+        private int tacletHasRuleSet(final RuleApp ruleApp,
+                final String ruleSet) {
             return ((TacletApp) ruleApp).taclet().getRuleSets().stream()
                     .map(rs -> rs.name().toString()).anyMatch(n -> n.equals(ruleSet)) ? 1 : 0;
         }

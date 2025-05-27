@@ -7,13 +7,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 /**
  * Extracts the variant for a loop term.
@@ -53,7 +54,7 @@ public class LoopVariantCondition implements VariableCondition {
         }
 
         return matchCond.setInstantiations(//
-            ((de.uka.ilkd.key.rule.inst.SVInstantiations) svInst).add(variantSV, variant,
+            ((SVInstantiations) svInst).add(variantSV, variant,
                 services));
     }
 

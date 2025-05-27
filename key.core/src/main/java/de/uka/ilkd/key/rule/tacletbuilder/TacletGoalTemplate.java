@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -76,8 +77,8 @@ public class TacletGoalTemplate
      *
      * @return all variables that occur bound in this goal template
      */
-    public ImmutableSet<org.key_project.logic.op.QuantifiableVariable> getBoundVariables() {
-        ImmutableSet<org.key_project.logic.op.QuantifiableVariable> result =
+    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
+        ImmutableSet<QuantifiableVariable> result =
             DefaultImmutableSet.nil();
 
         for (Taclet taclet : rules()) {

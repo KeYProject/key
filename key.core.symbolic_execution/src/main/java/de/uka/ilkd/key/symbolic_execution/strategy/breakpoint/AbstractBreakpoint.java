@@ -37,8 +37,8 @@ public abstract class AbstractBreakpoint implements IBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public void updateState(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
     }
 
     /**

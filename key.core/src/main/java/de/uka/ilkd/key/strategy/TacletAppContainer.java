@@ -13,10 +13,13 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.AssumesFormulaInstSeq;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -48,9 +51,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return age;
     }
 
-    private ImmutableList<NoPosTacletApp> incMatchIfFormulas(Goal p_goal) {
+    private ImmutableList<NoPosTacletApp> incMatchAssumesFormulas(Goal p_goal) {
         final AssumesInstantiator instantiator = new AssumesInstantiator(this, p_goal);
-        instantiator.findIfFormulaInstantiations();
+        instantiator.findAssumesFormulaInstantiations();
         return instantiator.getResults();
     }
 
@@ -80,7 +83,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     @Override
     public final ImmutableList<RuleAppContainer> createFurtherApps(Goal p_goal) {
         if (!isStillApplicable(p_goal)
-                || (getTacletApp().ifInstsComplete() && !ifFormulasStillValid(p_goal))) {
+                || (getTacletApp().assumesInstantionsComplete()
+                        && !assumesFormulasStillValid(p_goal))) {
             return ImmutableSLList.nil();
         }
 
@@ -92,10 +96,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         ImmutableList<RuleAppContainer> res =
             ImmutableSLList.<RuleAppContainer>nil().prepend(newCont);
 
-        if (getTacletApp().ifInstsComplete()) {
+        if (getTacletApp().assumesInstantionsComplete()) {
             res = addInstances(getTacletApp(), res, p_goal);
         } else {
-            for (NoPosTacletApp tacletApp : incMatchIfFormulas(p_goal)) {
+            for (NoPosTacletApp tacletApp : incMatchAssumesFormulas(p_goal)) {
                 final NoPosTacletApp app = tacletApp;
                 res = addContainer(app, res, p_goal);
                 res = addInstances(app, res, p_goal);
@@ -231,14 +235,14 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     /**
-     * @return true iff instantiation of the if-formulas of the stored taclet app exist and are
+     * @return true iff instantiation of the assumes-formulas of the stored taclet app exist and are
      *         valid are still valid, i.e. the referenced formulas still exist
      */
-    protected boolean ifFormulasStillValid(Goal p_goal) {
+    protected boolean assumesFormulasStillValid(Goal p_goal) {
         if (getTacletApp().taclet().assumesSequent().isEmpty()) {
             return true;
         }
-        if (!getTacletApp().ifInstsComplete()) {
+        if (!getTacletApp().assumesInstantionsComplete()) {
             return false;
         }
 
@@ -247,14 +251,16 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final Sequent seq = p_goal.sequent();
 
         while (it.hasNext()) {
-            final AssumesFormulaInstantiation ifInst2 = it.next();
-            if (!(ifInst2 instanceof final AssumesFormulaInstSeq ifInst))
+            final AssumesFormulaInstantiation assumesInstantiations2 = it.next();
+            if (!(assumesInstantiations2 instanceof final AssumesFormulaInstSeq assumesInst))
             // faster than assertTrue
             {
-                Debug.fail("Don't know what to do with the " + "assumes-instantiation ", ifInst2);
-                throw new IllegalStateException("Unexpected assume-instantiation" + ifInst2);
-            } else if (!(ifInst.inAntec() ? seq.antecedent() : seq.succedent())
-                    .contains(ifInst.getSequentFormula())) {
+                Debug.fail("Don't know what to do with the " + "assumes-instantiation ",
+                    assumesInstantiations2);
+                throw new IllegalStateException(
+                    "Unexpected assume-instantiation" + assumesInstantiations2);
+            } else if (!(assumesInst.inAntecedent() ? seq.antecedent() : seq.succedent())
+                    .contains(assumesInst.getSequentFormula())) {
                 return false;
             }
         }
@@ -264,7 +270,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     /**
      * @return true iff the stored rule app is applicable for the given sequent, i.e. if the
-     *         find-position does still exist (if-formulas are not considered)
+     *         find-position does still exist (assumes-formulas are not considered)
      */
     protected abstract boolean isStillApplicable(Goal p_goal);
 
@@ -277,7 +283,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     @Override
     public TacletApp completeRuleApp(Goal p_goal) {
-        if (!(isStillApplicable(p_goal) && ifFormulasStillValid(p_goal))) {
+        if (!(isStillApplicable(p_goal) && assumesFormulasStillValid(p_goal))) {
             return null;
         }
 

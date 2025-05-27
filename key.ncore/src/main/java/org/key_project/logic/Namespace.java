@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
  * objects have to implement the interface {@link Named}. It is possible to have nested namespaces
  * in order to represent different visibility scopes.
  */
-public class Namespace<E extends Named> implements java.io.Serializable {
-
-    private static final long serialVersionUID = 7510655524858729144L;
+public class Namespace<E extends Named> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Namespace.class);
 
     /**
@@ -41,14 +39,14 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * Construct an empty Namespace without a parent namespace.
      */
     public Namespace() {
-        this.parent = null;
+        this(null);
     }
 
     /**
      * Construct a Namespace that uses <code>parent</code> as a fallback for finding symbols not
      * defined in this one.
      */
-    public Namespace(Namespace<E> parent) {
+    public Namespace(@Nullable Namespace<E> parent) {
         this.parent = parent;
     }
 
@@ -56,15 +54,15 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * Adds the object <code>sym</code> to this Namespace. If an object with the same name is
      * already there, it is quietly replaced by <code>sym</code>. Use addSafely() instead if
      * possible.
-     *
+     * <br>
      * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet. (This is
      * no longer self-explanatory. mu 2016)
-     *
+     * <br>
      * If the local table is empty, then the new symbol is added as "singleton map". This has been
      * adapted from an earlier implementation, done for memory efficiency reasons: Many namespaces
      * only contain a single element; no need to allocate a hash map. The hash map is only created
      * when the 2nd element is added.
-     *
+     * <br>
      * This is not threadsafe.
      */
     public void add(E sym) {
@@ -123,7 +121,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     /**
      * Remove a name from the namespace.
-     *
+     * <br>
      * Removal is not delegated to the parent namespace.
      *
      * @param name non-null name whose symbol is to be removed.
@@ -202,7 +200,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if (parent == null) {
             return new ArrayList<>(elements());
         } else {
-            Collection<E> result = parent().allElements();
+            Collection<E> result = parent.allElements();
             result.addAll(elements());
             return result;
         }
@@ -256,7 +254,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public Namespace<E> simplify() {
-        if (parent != null && isSealed() && isEmpty()) {
+        if (isSealed() && isEmpty() && parent != null) {
             return parent;
         } else {
             return this;
@@ -278,6 +276,8 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if (parent == null) {
             return;
         }
+
+        var parent = this.parent;
 
         for (E element : elements()) {
             parent.add(element);

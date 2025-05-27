@@ -22,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -47,9 +48,9 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created constant.
      */
-    protected JFunction createResultConstant(Services services, Sort sort) {
+    protected Function createResultConstant(Services services, Sort sort) {
         String functionName = services.getTermBuilder().newName("QueryResult");
-        JFunction function = new JFunction(new Name(functionName), sort);
+        Function function = new JFunction(new Name(functionName), sort);
         services.getNamespaces().functions().addSafely(function);
         return function;
     }
@@ -83,8 +84,8 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    protected List<ResultsAndCondition> computeResultsAndConditions(Services services,
-            Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
+    protected List<ResultsAndCondition> computeResultsAndConditions(Goal goal,
+            ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             JFunction newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(goal.getOverlayServices(),
             goal.proof(),

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
+
 /**
  *
  * @author jomi
@@ -11,9 +12,6 @@ package org.key_project.prover.rules;
  *
  */
 public class RuleAbortException extends RuntimeException {
-
-    private static final long serialVersionUID = -645034125571021135L;
-
     public RuleAbortException() {
         super("A rule application has been aborted");
     }

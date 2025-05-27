@@ -60,7 +60,7 @@ public class BlockContractExternalBuiltInRuleApp extends AbstractBlockContractBu
     }
 
     @Override
-    public BlockContractExternalBuiltInRuleApp setIfInsts(
+    public BlockContractExternalBuiltInRuleApp setAssumesInsts(
             final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -127,7 +128,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {
@@ -156,17 +157,18 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     /**
      * This encapsulates all information from the rule application that is needed to apply the rule.
      *
-     * @param update    The context update.
-     * @param formula   The update target.
-     * @param modality  The contract's modality.
-     * @param self      The self variable.
+     * @param update The context update.
+     * @param formula The update target.
+     * @param modality The contract's modality.
+     * @param self The self variable.
      * @param statement The statement the contract belongs to.
-     * @param context   The execution context in which the block occurs.
+     * @param context The execution context in which the block occurs.
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
-        public record Instantiation(@NonNull Term update, @NonNull Term formula, @NonNull Modality modality, Term self,
-                                    @NonNull JavaStatement statement,
-                                    ExecutionContext context) {
+    public record Instantiation(@NonNull Term update, @NonNull Term formula,
+            @NonNull Modality modality, Term self,
+            @NonNull JavaStatement statement,
+            ExecutionContext context) {
         public Instantiation {
             assert update != null;
             assert update.sort() == JavaDLTheory.UPDATE;
@@ -176,13 +178,13 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             assert statement != null;
         }
 
-            /**
-             * @return {@code true} iff the modality is transactional.
-             */
-            public boolean isTransactional() {
-                return modality.transaction();
-            }
+        /**
+         * @return {@code true} iff the modality is transactional.
+         */
+        public boolean isTransactional() {
+            return modality.transaction();
         }
+    }
 
     /**
      * A builder for {@link Instantiation}s.

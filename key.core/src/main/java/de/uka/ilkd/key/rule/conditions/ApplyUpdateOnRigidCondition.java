@@ -9,13 +9,14 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -217,7 +218,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         }
         Term properResultInst = applyUpdateOnRigid(uInst, phiInst, (TermServices) services);
         if (resultInst == null) {
-            svInst = ((de.uka.ilkd.key.rule.inst.SVInstantiations) svInst).add(result,
+            svInst = ((SVInstantiations) svInst).add(result,
                 properResultInst, services);
             return mc.setInstantiations(svInst);
         } else if (RENAMING_TERM_PROPERTY.equalsModThisProperty(resultInst, properResultInst)) {

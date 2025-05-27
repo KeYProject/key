@@ -9,21 +9,23 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 public class TestGenMacro extends StrategyProofMacro {
     @Override
-    protected Strategy createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new TestGenStrategy(proof.getActiveStrategy());
     }
 
@@ -81,7 +83,8 @@ class TestGenStrategy extends FilterStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         if (isUnwindRule(app.rule())) {

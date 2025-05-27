@@ -17,8 +17,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.prover.ProverTaskListener;
 
+import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 

@@ -6,10 +6,12 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
-import org.key_project.prover.rules.AssumesFormulaInstSeq;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -24,6 +26,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
     private DiffFindAndIfFeature() {}
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
@@ -34,12 +37,14 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         assert list != null;
 
         for (final AssumesFormulaInstantiation aList : list) {
-            final AssumesFormulaInstSeq iffi = (AssumesFormulaInstSeq) aList;
-            assert iffi != null;
-            final SequentFormula ifFormula = iffi.getSequentFormula();
+            final AssumesFormulaInstSeq instantiationOfAssumesFormula =
+                (AssumesFormulaInstSeq) aList;
+            assert instantiationOfAssumesFormula != null;
+            final SequentFormula assumesFormula = instantiationOfAssumesFormula.getSequentFormula();
 
             final boolean result =
-                findIsInAntec != iffi.inAntec() || !findFormula.equals(ifFormula);
+                findIsInAntec != instantiationOfAssumesFormula.inAntecedent() ||
+                        !findFormula.equals(assumesFormula);
             if (!result) {
                 return false;
             }

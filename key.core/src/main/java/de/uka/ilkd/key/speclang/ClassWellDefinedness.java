@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -59,7 +60,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    JFunction generateMbyAtPreFunc(Services services) {
+    Function generateMbyAtPreFunc(Services services) {
         return null;
     }
 

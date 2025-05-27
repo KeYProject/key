@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -192,7 +193,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    JFunction generateMbyAtPreFunc(Services services) {
+    Function generateMbyAtPreFunc(Services services) {
         return hasMby()
                 ? new JFunction(new Name(TB.newName("mbyAtPre")),
                     services.getTypeConverter().getIntegerLDT().targetSort())
@@ -209,7 +210,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the measured by at pre equation for the precondition
      */
     Term generateMbyAtPreDef(LocationVariable self, ImmutableList<LocationVariable> params,
-            JFunction mbyAtPreFunc, Services services) {
+            Function mbyAtPreFunc, Services services) {
         final Term mbyAtPreDef;
         if (hasMby()) {
             final Term mbyAtPre = TB.func(mbyAtPreFunc);

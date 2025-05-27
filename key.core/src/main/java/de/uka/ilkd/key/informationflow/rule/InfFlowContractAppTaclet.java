@@ -9,11 +9,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.TacletPrefix;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -61,10 +64,10 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
 
     public InfFlowContractAppTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             int p_applicationRestriction, ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
@@ -73,10 +76,10 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
 
     public InfFlowContractAppTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             int p_applicationRestriction, ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -75,7 +76,8 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp setStep(PosInOccurrence p_step) {
         assert this.step == null;
-        return new UseDependencyContractApp(rule(), posInOccurrence(), ifInsts(), instantiation,
+        return new UseDependencyContractApp(rule(), posInOccurrence(), assumesInsts(),
+            instantiation,
             p_step);
     }
 
@@ -117,7 +119,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
                 "Dependency contract rule is not applicable to term " + focus);
         }
 
-        final org.key_project.logic.Term selfTerm;
+        final Term selfTerm;
         final KeYJavaType kjt;
 
         if (target.isStatic()) {
@@ -157,7 +159,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
 
     @Override
-    public UseDependencyContractApp setIfInsts(
+    public UseDependencyContractApp setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;

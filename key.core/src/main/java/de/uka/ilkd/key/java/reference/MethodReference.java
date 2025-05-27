@@ -179,8 +179,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference) prefix;
+        if (prefix instanceof TypeReference prefixRef && index == 0) {
+            return prefixRef;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -212,9 +212,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression) {
+        if (prefix instanceof Expression prefixExpr) {
             if (index == 0) {
-                return (Expression) prefix;
+                return prefixExpr;
             }
             index -= 1;
         }
@@ -239,10 +239,10 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-        if (name instanceof ProgramElementName) {
-            return (ProgramElementName) name;
-        } else if (name instanceof SchemaVariable) {
-            return (((ProgramSV) name).getProgramElementName());
+        if (name instanceof ProgramElementName peName) {
+            return peName;
+        } else if (name instanceof ProgramSV sv) {
+            return sv.getProgramElementName();
         } else {
             return null;
         }

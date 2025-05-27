@@ -35,7 +35,7 @@ public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public DefaultBuiltInRuleApp setIfInsts(
+    public DefaultBuiltInRuleApp setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;

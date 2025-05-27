@@ -45,9 +45,15 @@ import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
 import recoder.io.PropertyNames;
 import recoder.java.CompilationUnit;
+import recoder.java.Identifier;
 import recoder.java.ProgramElement;
+import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.ClassInitializer;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.MemberDeclaration;
 import recoder.java.declaration.MethodDeclaration;
+import recoder.java.reference.PackageReference;
+import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
@@ -463,7 +469,7 @@ public class Recoder2KeY implements JavaReader {
                 cUnitStrings[current], ioe);
             reportError("IOError reading java program " + cUnitStrings[current] + ". "
                 + "May be file not found or missing permissions.", ioe);
-        } catch (recoder.ParserException pe) {
+        } catch (ParserException pe) {
             LOGGER.debug("recoder2key: Recoder Parser Error when" + "reading a comiplation unit {}",
                 cUnitStrings[current], pe);
             if (pe.getCause() != null) {
@@ -581,7 +587,7 @@ public class Recoder2KeY implements JavaReader {
     private List<recoder.java.CompilationUnit> parseLibs(FileRepo fileRepo)
             throws IOException, ParserException {
 
-        recoder.ProgramFactory pf = servConf.getProgramFactory();
+        ProgramFactory pf = servConf.getProgramFactory();
         List<recoder.java.CompilationUnit> rcuList = new LinkedList<>();
         List<FileCollection> sources = new ArrayList<>();
 
@@ -867,14 +873,14 @@ public class Recoder2KeY implements JavaReader {
      * @param block the recoder.java.StatementBlock to wrap
      * @return the enclosing recoder.java.MethodDeclaration
      */
-    protected recoder.java.declaration.MethodDeclaration embedBlock(
+    protected MethodDeclaration embedBlock(
             recoder.java.StatementBlock block) {
 
         /*
          * MethodDeclaration(modifiers,return type,Identifier, parameters, throws, StatementBlock)
          */
-        recoder.java.declaration.MethodDeclaration mdecl =
-            new recoder.java.declaration.MethodDeclaration(null, null,
+        MethodDeclaration mdecl =
+            new MethodDeclaration(null, null,
                 new ImplicitIdentifier("<virtual_method_for_parsing>"), null, null, block);
         mdecl.makeParentRoleValid();
         return mdecl;
@@ -888,13 +894,13 @@ public class Recoder2KeY implements JavaReader {
      *        embedded
      * @return the enclosing recoder.java.declaration.ClassDeclaration
      */
-    protected recoder.java.declaration.ClassDeclaration embedMethod(
-            recoder.java.declaration.MethodDeclaration mdecl, Context context) {
+    protected ClassDeclaration embedMethod(
+            MethodDeclaration mdecl, Context context) {
 
-        recoder.java.declaration.ClassDeclaration classContext = context.getClassContext();
+        ClassDeclaration classContext = context.getClassContext();
 
         // add method to member declaration list
-        ASTList<recoder.java.declaration.MemberDeclaration> memberList = classContext.getMembers();
+        ASTList<MemberDeclaration> memberList = classContext.getMembers();
 
         if (memberList == null) {
             memberList = new ASTArrayList<>(1);
@@ -923,7 +929,7 @@ public class Recoder2KeY implements JavaReader {
      * @return the new recoder.java.CompilationUnit
      */
     public Context createEmptyContext() {
-        recoder.java.declaration.ClassDeclaration classContext = interactClassDecl();
+        ClassDeclaration classContext = interactClassDecl();
         return new Context(servConf, classContext);
     }
 
@@ -948,8 +954,8 @@ public class Recoder2KeY implements JavaReader {
      * @return a newly created context.
      */
     protected Context createContext(ImmutableList<ProgramVariable> vars,
-            recoder.service.CrossReferenceSourceInfo csi) {
-        recoder.java.declaration.ClassDeclaration classContext = interactClassDecl();
+            CrossReferenceSourceInfo csi) {
+        ClassDeclaration classContext = interactClassDecl();
         addProgramVariablesToClassContext(classContext, vars, csi);
         return new Context(servConf, classContext);
     }
@@ -961,14 +967,14 @@ public class Recoder2KeY implements JavaReader {
      * @param vars vars to add
      */
     private void addProgramVariablesToClassContext(
-            recoder.java.declaration.ClassDeclaration classContext,
-            ImmutableList<ProgramVariable> vars, recoder.service.CrossReferenceSourceInfo csi) {
+            ClassDeclaration classContext,
+            ImmutableList<ProgramVariable> vars, CrossReferenceSourceInfo csi) {
 
         HashMap<String, recoder.java.declaration.VariableSpecification> names2var =
             new LinkedHashMap<>();
         Iterator<ProgramVariable> it = vars.iterator();
-        java.util.HashSet<String> names = new java.util.HashSet<>();
-        ASTList<recoder.java.declaration.MemberDeclaration> list = classContext.getMembers();
+        HashSet<String> names = new HashSet<>();
+        ASTList<MemberDeclaration> list = classContext.getMembers();
 
         // perhaps install a new list for the members of the class context
         if (list == null) {
@@ -1006,8 +1012,8 @@ public class Recoder2KeY implements JavaReader {
             typeName = javaType.getFullName();
 
 
-            recoder.java.declaration.FieldDeclaration recVar =
-                new recoder.java.declaration.FieldDeclaration(null, name2typeReference(typeName),
+            FieldDeclaration recVar =
+                new FieldDeclaration(null, name2typeReference(typeName),
                     new ExtendedIdentifier(keyVarSpec.getName()), null);
 
             list.add(recVar);
@@ -1044,8 +1050,8 @@ public class Recoder2KeY implements JavaReader {
      * @param typeName non-null type name as string
      * @return a freshly created type reference to the given type.
      */
-    private recoder.java.reference.TypeReference name2typeReference(String typeName) {
-        recoder.java.reference.PackageReference pr = null;
+    private TypeReference name2typeReference(String typeName) {
+        PackageReference pr = null;
         String baseType = TypeNameTranslator.getBaseType(typeName);
         int idx = baseType.indexOf('.');
         int lastIndex = 0;
@@ -1053,19 +1059,19 @@ public class Recoder2KeY implements JavaReader {
         while (idx != -1 && baseType.charAt(lastIndex) >= 'a'
                 && baseType.charAt(lastIndex) <= 'z') {
             String s = baseType.substring(lastIndex, idx);
-            pr = new recoder.java.reference.PackageReference(pr, new recoder.java.Identifier(s));
+            pr = new PackageReference(pr, new Identifier(s));
             lastIndex = idx + 1;
             idx = baseType.indexOf('.', lastIndex);
         }
         baseType = anonType + baseType;
-        recoder.java.Identifier typeId;
+        Identifier typeId;
         if (baseType.charAt(0) == '<') {
             typeId = new ImplicitIdentifier(baseType.substring(lastIndex));
         } else {
             typeId = new ObjectTypeIdentifier(baseType.substring(lastIndex));
         }
-        recoder.java.reference.TypeReference result =
-            new recoder.java.reference.TypeReference(pr, typeId);
+        TypeReference result =
+            new TypeReference(pr, typeId);
         result.setDimensions(TypeNameTranslator.getDimensions(typeName));
         return result;
     }
@@ -1173,9 +1179,9 @@ public class Recoder2KeY implements JavaReader {
      *
      * @return a newly created recoder ClassDeclaration with a unique name
      */
-    private recoder.java.declaration.ClassDeclaration interactClassDecl() {
-        recoder.java.declaration.ClassDeclaration classContext =
-            new recoder.java.declaration.ClassDeclaration(null,
+    private ClassDeclaration interactClassDecl() {
+        ClassDeclaration classContext =
+            new ClassDeclaration(null,
                 new ImplicitIdentifier("<virtual_class_for_parsing" + interactCounter + ">"), null,
                 null, null);
         interactCounter++;

@@ -38,6 +38,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 import org.key_project.logic.Namespace;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -304,13 +306,13 @@ public final class ProblemInitializer {
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
-        Namespace<JFunction> newFuncNS = new Namespace<>();
+        Namespace<Function> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {
             if (!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
             }
         }
-        for (JFunction n : initConfig.funcNS().allElements()) {
+        for (Function n : initConfig.funcNS().allElements()) {
             if (!(n instanceof SortDependingFunction
                     && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
                 newFuncNS.addSafely(n);
@@ -338,13 +340,13 @@ public final class ProblemInitializer {
         }
     }
 
-    private void populateNamespaces(org.key_project.logic.Term term, NamespaceSet namespaces,
+    private void populateNamespaces(Term term, NamespaceSet namespaces,
             Goal rootGoal) {
         for (int i = 0; i < term.arity(); i++) {
             populateNamespaces(term.sub(i), namespaces, rootGoal);
         }
 
-        if (term.op() instanceof JFunction fn) {
+        if (term.op() instanceof Function fn) {
             namespaces.functions().add(fn);
         } else if (term.op() instanceof ProgramVariable pv) {
             if (namespaces.programVariables().lookup(pv.name()) == null) {
@@ -534,8 +536,7 @@ public final class ProblemInitializer {
 
         // register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<JFunction> functions =
-            initConfig.getServices().getNamespaces().functions();
+        final Namespace<Function> functions = initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {
@@ -597,7 +598,8 @@ public final class ProblemInitializer {
             // done
             proofCreated(pa);
             return pa;
-        } catch (ProofInputException e) {
+        } catch (Exception e) {
+            // This has been generalised from ProofInputException to not miss exceptions
             reportException(po, e);
             throw e;
         } finally {

@@ -3,24 +3,34 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
-import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.prover.proof.ProofGoal;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * The interface to be implemented by all types of rules of the system.
+ * It provides access to the rule application logic.
+ */
 public interface Rule extends Named {
+
     /**
-     * the name of the rule
+     * Returns the rule executor for this rule.
+     * The rule executor encapsulates the logic for rule applications.
+     *
+     * @return the rule executor for this rule
+     * @param <G> kind of goal on which the executor operates
      */
     @NonNull
-    Name name();
+    <G extends ProofGoal<G>> RuleExecutor<G> getExecutor();
 
     /**
      * returns the display name of the rule
+     * by default the name is the same as the rules unique name
      */
+    @NonNull
     default String displayName() {
         return name().toString();
     }
 
-    RuleExecutor getExecutor();
 }

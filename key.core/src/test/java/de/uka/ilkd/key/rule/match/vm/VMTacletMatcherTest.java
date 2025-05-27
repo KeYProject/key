@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
-import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

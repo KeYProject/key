@@ -12,14 +12,14 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.label.*;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -509,7 +509,8 @@ public class TermLabelManager {
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
+            RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm,
+            Term newTerm) {
         Term applicationTerm =
             applicationPosInOccurrence != null ? (Term) applicationPosInOccurrence.subTerm() : null;
         return instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule,
@@ -546,7 +547,8 @@ public class TermLabelManager {
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services, Term applicationTerm,
             PosInOccurrence applicationPosInOccurrence,
-            Rule rule, RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
+            Rule rule, RuleApp ruleApp, Goal goal, Object hint,
+            Term tacletTerm, Term newTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             return manager.instantiateLabels(state, services, applicationPosInOccurrence,
@@ -644,7 +646,8 @@ public class TermLabelManager {
     public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule,
-            RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
+            RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm,
+            Term newTerm) {
         // Compute current rule specific updates
         ImmutableList<TermLabelUpdate> currentRuleSpecificUpdates =
             rule != null ? ruleSpecificUpdates.get(rule.name()) : null;
@@ -959,7 +962,8 @@ public class TermLabelManager {
     protected void performUpdater(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm,
+            Term newTerm,
             ImmutableList<TermLabelUpdate> updater,
             Set<TermLabel> newLabels) {
         for (TermLabelUpdate update : updater) {
@@ -1460,24 +1464,26 @@ public class TermLabelManager {
      * Utility class used by
      * {@link TermLabelManager#computeRefactorings(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Object, Term)}
      *
-     * @param sequentRefactorings                      The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
-     * @param belowUpdatesRefactorings                 The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
-     * @param childAndGrandchildRefactorings           The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
+     * @param sequentRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#SEQUENT}.
+     * @param belowUpdatesRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
+     * @param childAndGrandchildRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
      * @param childAndGrandchildRefactoringsAndParents The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
-     * @param directChildRefactorings                  The {@link TermLabelRefactoring} for
-     *                                                 {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
+     *        {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
+     * @param directChildRefactorings The {@link TermLabelRefactoring} for
+     *        {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
      * @author Martin Hentschel
      */
     protected record RefactoringsContainer(Set<TermLabelRefactoring> sequentRefactorings,
-                                           Set<TermLabelRefactoring> belowUpdatesRefactorings,
-                                           Set<TermLabelRefactoring> childAndGrandchildRefactorings,
-                                           Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
-                                           Set<TermLabelRefactoring> directChildRefactorings) {
+            Set<TermLabelRefactoring> belowUpdatesRefactorings,
+            Set<TermLabelRefactoring> childAndGrandchildRefactorings,
+            Set<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
+            Set<TermLabelRefactoring> directChildRefactorings) {
         public RefactoringsContainer() {
             this(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(),
-                    new LinkedHashSet<>(), new LinkedHashSet<>());
+                new LinkedHashSet<>(), new LinkedHashSet<>());
         }
 
         /**
@@ -1489,7 +1495,7 @@ public class TermLabelManager {
          */
         public Set<TermLabelRefactoring> getAllApplicationChildAndGrandchildRefactorings() {
             final LinkedHashSet<TermLabelRefactoring> result =
-                    new LinkedHashSet<>(childAndGrandchildRefactorings);
+                new LinkedHashSet<>(childAndGrandchildRefactorings);
             result.addAll(childAndGrandchildRefactoringsAndParents);
             return result;
         }
