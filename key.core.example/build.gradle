@@ -2,9 +2,11 @@ plugins {
     id 'application'
 }
 
-description "Example project to use KeY's APIs"
+description = "Example project to use KeY's APIs"
 
-mainClassName ="org.key_project.Main"
+application {
+    mainClass = "org.key_project.Main"
+}
 
 dependencies {
     implementation project(":key.core")

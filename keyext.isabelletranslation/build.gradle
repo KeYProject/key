@@ -1,4 +1,4 @@
-description "Translation of Sequents to Isabelle"
+description = "Translation of Sequents to Isabelle"
 
 dependencies {
     implementation project(':key.core')
