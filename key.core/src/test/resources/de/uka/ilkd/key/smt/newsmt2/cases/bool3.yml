@@ -1,0 +1,10 @@
+contains:
+  - |-
+    (assert (= (ite (< 2 1) (b2u true) (b2u false))
+               (ite (> 2 1) (b2u true) (b2u false))))
+expected: VALID
+keySrc: |-
+  \predicates { p; }
+  \functions { boolean b; }
+
+  \problem { \if(2<1)\then(TRUE)\else(FALSE) != \if(2>1)\then(TRUE)\else(FALSE) }
