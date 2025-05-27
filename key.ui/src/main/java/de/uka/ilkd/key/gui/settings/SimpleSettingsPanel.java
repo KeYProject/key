@@ -43,6 +43,7 @@ public class SimpleSettingsPanel extends JPanel {
     private static final ColorSettings.ColorProperty COLOR_ERROR =
         ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
             "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
+    public static final String SAVED_BACKGROUND_COLOR = "saved_background_color";
 
     protected final Box pNorth = new Box(BoxLayout.Y_AXIS);
     protected final JPanel pCenter = new JPanel();
@@ -53,7 +54,7 @@ public class SimpleSettingsPanel extends JPanel {
         setLayout(new BorderLayout());
 
         pNorth.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        pNorth.setBackground(Color.WHITE);
+        //pNorth.setBackground(Color.WHITE);
         pNorth.setOpaque(true);
 
         lblHead.setFont(lblHead.getFont().deriveFont(16f).deriveFont(Font.BOLD));
@@ -76,14 +77,14 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     protected void demarkComponentAsErrornous(JComponent component) {
-        Object col = component.getClientProperty("saved_background_color");
+        Object col = component.getClientProperty(SAVED_BACKGROUND_COLOR);
         if (col instanceof Color) {
             component.setBackground((Color) col);
         }
     }
 
     protected void markComponentAsErrornous(JComponent component, String error) {
-        component.putClientProperty("saved_background_color", component.getBackground());
+        component.putClientProperty(SAVED_BACKGROUND_COLOR, component.getBackground());
         component.setBackground(COLOR_ERROR.get());
         component.setToolTipText(error);
     }
@@ -170,7 +171,7 @@ public class SimpleSettingsPanel extends JPanel {
                 return editor.getTextField().getBackground();
             }
         };
-        spinner.setBackground(Color.WHITE); // without this, the background would be gray ...
+        // spinner.setBackground(Color.WHITE); // without this, the background would be gray ...
         spinner.addChangeListener(new ValidatorSpinnerAdapter<>(spinner, validator));
         return spinner;
     }
