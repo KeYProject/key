@@ -49,10 +49,10 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public void updateLabels(TermLabelState state, Services services,
-                             PosInOccurrence applicationPosInOccurrence,
-                             JTerm applicationTerm, JTerm modalityTerm,
-                             Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
-                             Set<TermLabel> labels) {
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, JTerm modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
+            Set<TermLabel> labels) {
         if (hint instanceof TacletLabelHint tacletHint) {
             if ((TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation())
                     || TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()))

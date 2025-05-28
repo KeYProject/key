@@ -43,7 +43,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
     protected abstract Term divide(Monomial numerator, BigInteger denominator, Services services);
 
     private JTerm quotient(BigInteger monoCoeff, Term rightPoly,
-                           Services services) {
+            Services services) {
         final Function add = services.getTypeConverter().getIntegerLDT().getAdd();
         if (rightPoly.op() == add) {
             final var left = quotient(monoCoeff, rightPoly.sub(0), services);

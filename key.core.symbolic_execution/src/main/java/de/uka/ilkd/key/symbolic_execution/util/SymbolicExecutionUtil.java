@@ -289,7 +289,8 @@ public final class SymbolicExecutionUtil {
      *
      * @param term The {@link JTerm} to improve.
      * @param services The {@link Services} to use.
-     * @return The improved {@link JTerm} or the {@link JTerm} itself if no improvements are possible.
+     * @return The improved {@link JTerm} or the {@link JTerm} itself if no improvements are
+     *         possible.
      */
     public static JTerm improveReadability(JTerm term, Services services) {
         if (term != null && services != null) {
@@ -305,10 +306,11 @@ public final class SymbolicExecutionUtil {
      * @param term The {@link JTerm} to improve.
      * @param services The {@link Services} to use.
      * @param integerLDT The {@link IntegerLDT} to use.
-     * @return The improved {@link JTerm} or the {@link JTerm} itself if no improvements are possible.
+     * @return The improved {@link JTerm} or the {@link JTerm} itself if no improvements are
+     *         possible.
      */
     private static JTerm improveReadabilityRecursive(JTerm term, Services services,
-                                                     IntegerLDT integerLDT) {
+            IntegerLDT integerLDT) {
         // Improve children
         boolean subChanged = false;
         List<JTerm> newSubs = new LinkedList<>();
@@ -934,7 +936,7 @@ public final class SymbolicExecutionUtil {
      * @return The {@link JTerm}s {@link ProgramVariable} or {@code null} if not available.
      */
     public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
-                                                     Term locationTerm) {
+            Term locationTerm) {
         ProgramVariable result = null;
         if (locationTerm.op() instanceof Function function) {
             // Make sure that the function is not an array
@@ -1366,7 +1368,8 @@ public final class SymbolicExecutionUtil {
      *
      * @param semisequent The {@link Semisequent} to search in.
      * @param inAntec {@code true} antecedent, {@code false} succedent.
-     * @return The modality {@link JTerm} with the maximal ID if available or {@code null} otherwise.
+     * @return The modality {@link JTerm} with the maximal ID if available or {@code null}
+     *         otherwise.
      */
     public static PosInOccurrence findModalityWithMaxSymbolicExecutionLabelId(
             Semisequent semisequent, boolean inAntec) {
@@ -1822,7 +1825,7 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception.
      */
     public static JTerm computeBranchCondition(Node node, boolean simplify,
-                                               boolean improveReadability) throws ProofInputException {
+            boolean improveReadability) throws ProofInputException {
         // Get applied taclet on parent proof node
         Node parent = node.parent();
         if (parent.getAppliedRuleApp() instanceof TacletApp) {
@@ -1882,7 +1885,7 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception.
      */
     private static JTerm computeContractRuleAppBranchCondition(Node parent, Node node,
-                                                               boolean simplify, boolean improveReadability) throws ProofInputException {
+            boolean simplify, boolean improveReadability) throws ProofInputException {
         final Services services = node.proof().getServices();
         // Make sure that a computation is possible
         if (!(parent.getAppliedRuleApp() instanceof ContractRuleApp)) {
@@ -2027,8 +2030,8 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception.
      */
     private static void collectSpecifcationCasesPreconditions(JTerm normalExcDefinition,
-                                                              JTerm exceptionalExcDefinition, JTerm term, List<JTerm> normalConditions,
-                                                              List<JTerm> exceptinalConditions) throws ProofInputException {
+            JTerm exceptionalExcDefinition, JTerm term, List<JTerm> normalConditions,
+            List<JTerm> exceptinalConditions) throws ProofInputException {
         if (term.op() == Junctor.AND) {
             JTerm lastChild = term.sub(term.arity() - 1);
             if (lastChild.equalsModProperty(normalExcDefinition, IRRELEVANT_TERM_LABELS_PROPERTY)
@@ -2219,8 +2222,8 @@ public final class SymbolicExecutionUtil {
          * @param exceptionEquality The equality which contains the equality.
          */
         public ContractPostOrExcPostExceptionVariableResult(JTerm workingTerm,
-                                                            Pair<ImmutableList<JTerm>, JTerm> updatesAndTerm, JTerm exceptionDefinition,
-                                                            JTerm exceptionEquality) {
+                Pair<ImmutableList<JTerm>, JTerm> updatesAndTerm, JTerm exceptionDefinition,
+                JTerm exceptionEquality) {
             this.workingTerm = workingTerm;
             this.updatesAndTerm = updatesAndTerm;
             this.exceptionDefinition = exceptionDefinition;
@@ -2287,7 +2290,7 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception.
      */
     private static JTerm computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent, Node node,
-                                                                           boolean simplify, boolean improveReadability) throws ProofInputException {
+            boolean simplify, boolean improveReadability) throws ProofInputException {
         // Make sure that a computation is possible
         if (!(parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)) {
             throw new ProofInputException(
@@ -2397,7 +2400,7 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception.
      */
     private static JTerm computeBlockContractBuiltInRuleAppBranchCondition(Node parent, Node node,
-                                                                           boolean simplify, boolean improveReadability) throws ProofInputException {
+            boolean simplify, boolean improveReadability) throws ProofInputException {
         // Make sure that a computation is possible
         if (!(parent.getAppliedRuleApp() instanceof AbstractBlockContractBuiltInRuleApp)) {
             throw new ProofInputException("Only AbstractBlockContractBuiltInRuleApp is allowed in "
@@ -2451,8 +2454,8 @@ public final class SymbolicExecutionUtil {
      *         or {@code null} if not available.
      */
     public static JTerm posInOccurrenceInOtherNode(Node original,
-                                                   PosInOccurrence pio,
-                                                   Node toApplyOn) {
+            PosInOccurrence pio,
+            Node toApplyOn) {
         PosInOccurrence appliedPIO =
             posInOccurrenceToOtherSequent(original, pio, toApplyOn);
         if (appliedPIO != null) {
@@ -2474,8 +2477,8 @@ public final class SymbolicExecutionUtil {
      *         {@link PosInOccurrence} or {@code null} if not available.
      */
     public static JTerm posInOccurrenceInOtherNode(Sequent original,
-                                                   PosInOccurrence pio,
-                                                   Sequent toApplyOn) {
+            PosInOccurrence pio,
+            Sequent toApplyOn) {
         PosInOccurrence appliedPIO =
             posInOccurrenceToOtherSequent(original, pio, toApplyOn);
         if (appliedPIO != null) {
@@ -2555,7 +2558,7 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception.
      */
     private static JTerm computeTacletAppBranchCondition(Node parent, Node node, boolean simplify,
-                                                         boolean improveReadability) throws ProofInputException {
+            boolean improveReadability) throws ProofInputException {
         if (!(parent.getAppliedRuleApp() instanceof TacletApp app)) {
             throw new ProofInputException(
                 "Only TacletApp is allowed in branch computation but rule \""
@@ -2695,7 +2698,7 @@ public final class SymbolicExecutionUtil {
      * @return An {@link ImmutableList} with all new {@link JTerm}s.
      */
     private static ImmutableList<JTerm> listNewSemisequentTerms(Semisequent parent,
-                                                                Semisequent child) {
+            Semisequent child) {
         Set<SequentFormula> parentSFs = new HashSet<>();
         for (final SequentFormula sf : parent) {
             parentSFs.add(sf);
@@ -2719,15 +2722,16 @@ public final class SymbolicExecutionUtil {
      * @return The found {@link JTerm} or {@code null} if not available.
      */
     private static JTerm findReplacement(Semisequent semisequent,
-                                         final PosInOccurrence posInOccurrence,
-                                         final JTerm replaceTerm) {
+            final PosInOccurrence posInOccurrence,
+            final JTerm replaceTerm) {
         SequentFormula sf = CollectionUtil.search(semisequent,
             element -> checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm));
         return sf != null ? (JTerm) sf.formula() : null;
     }
 
     /**
-     * Checks if the given replace {@link JTerm} is equal module labels to the {@link JTerm} to check.
+     * Checks if the given replace {@link JTerm} is equal module labels to the {@link JTerm} to
+     * check.
      *
      * @param toCheck The {@link JTerm} to check.
      * @param posInOccurrence The {@link PosInOccurrence} of the {@link Rule} application.
@@ -2779,8 +2783,8 @@ public final class SymbolicExecutionUtil {
      * @return The instantiated {@link JTerm} or {@code null} if no {@link JTerm} was given.
      */
     public static JTerm instantiateTerm(Node node, org.key_project.logic.Term term,
-                                        TacletApp tacletApp,
-                                        Services services) {
+            TacletApp tacletApp,
+            Services services) {
         if (term != null) {
             SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(new TermLabelState(),
                 null, tacletApp.posInOccurrence(), services, tacletApp.taclet(), tacletApp, true);
@@ -2804,8 +2808,8 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception.
      */
     private static JTerm evaluateInSideProof(Services services, Proof proof,
-                                             ProofEnvironment sideProofEnvironment, Sequent sequentToProve, TermLabel label,
-                                             String description, String splittingOption) throws ProofInputException {
+            ProofEnvironment sideProofEnvironment, Sequent sequentToProve, TermLabel label,
+            String description, String splittingOption) throws ProofInputException {
         List<Pair<JTerm, Node>> resultValuesAndConditions =
             SymbolicExecutionSideProofUtil.computeResults(services, proof, sideProofEnvironment,
                 sequentToProve, label, description, StrategyProperties.METHOD_NONE, // Stop at
@@ -2912,7 +2916,7 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception
      */
     private static boolean checkNull(Node node, JTerm additionalAntecedent, JTerm newSuccedent,
-                                     boolean nullExpected) throws ProofInputException {
+            boolean nullExpected) throws ProofInputException {
         // Make sure that correct parameters are given
         assert node != null;
         assert newSuccedent != null;
@@ -2963,8 +2967,9 @@ public final class SymbolicExecutionUtil {
      * @param newSuccedent The new succedent.
      * @return The created {@link Sequent}.
      */
-    public static Sequent createSequentToProveWithNewSuccedent(Node node, JTerm additionalAntecedent,
-                                                               JTerm newSuccedent, boolean addResultLabel) {
+    public static Sequent createSequentToProveWithNewSuccedent(Node node,
+            JTerm additionalAntecedent,
+            JTerm newSuccedent, boolean addResultLabel) {
         return createSequentToProveWithNewSuccedent(node,
             node.getAppliedRuleApp() != null ? node.getAppliedRuleApp().posInOccurrence() : null,
             additionalAntecedent, newSuccedent, addResultLabel);
@@ -2980,8 +2985,8 @@ public final class SymbolicExecutionUtil {
      * @return The created {@link Sequent}.
      */
     public static Sequent createSequentToProveWithNewSuccedent(Node node,
-                                                               PosInOccurrence pio,
-                                                               JTerm additionalAntecedent, JTerm newSuccedent, boolean addResultLabel) {
+            PosInOccurrence pio,
+            JTerm additionalAntecedent, JTerm newSuccedent, boolean addResultLabel) {
         if (pio != null) {
             // Get the updates from the return node which includes the value interested in.
             ImmutableList<JTerm> originalUpdates;
@@ -3051,8 +3056,9 @@ public final class SymbolicExecutionUtil {
      * @param updates The updates to use.
      * @return The created {@link Sequent}.
      */
-    public static Sequent createSequentToProveWithNewSuccedent(Node node, JTerm additionalAntecedent,
-                                                               JTerm newSuccedent, ImmutableList<JTerm> updates, boolean addResultLabel) {
+    public static Sequent createSequentToProveWithNewSuccedent(Node node,
+            JTerm additionalAntecedent,
+            JTerm newSuccedent, ImmutableList<JTerm> updates, boolean addResultLabel) {
         return createSequentToProveWithNewSuccedent(node,
             node.getAppliedRuleApp().posInOccurrence(), additionalAntecedent, newSuccedent, updates,
             addResultLabel);
@@ -3069,9 +3075,9 @@ public final class SymbolicExecutionUtil {
      * @return The created {@link Sequent}.
      */
     public static Sequent createSequentToProveWithNewSuccedent(Node node,
-                                                               PosInOccurrence pio,
-                                                               JTerm additionalAntecedent, JTerm newSuccedent, ImmutableList<JTerm> updates,
-                                                               boolean addResultLabel) {
+            PosInOccurrence pio,
+            JTerm additionalAntecedent, JTerm newSuccedent, ImmutableList<JTerm> updates,
+            boolean addResultLabel) {
         final TermBuilder tb = node.proof().getServices().getTermBuilder();
         // Combine method frame, formula with value predicate and the updates which provides the
         // values
@@ -3194,7 +3200,8 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Removes the given {@link TermLabel} from the given {@link JTerm} and from all of its children.
+     * Removes the given {@link TermLabel} from the given {@link JTerm} and from all of its
+     * children.
      *
      * @param tf The {@link TermFactory} to use.
      * @param term The {@link JTerm} to remove label from.
@@ -3221,7 +3228,8 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Collects all contained skolem {@link JTerm}s which fulfill {@link #isSkolemConstant(JTerm)} as
+     * Collects all contained skolem {@link JTerm}s which fulfill {@link #isSkolemConstant(JTerm)}
+     * as
      * well as the skolem constants used in the find once recursive.
      *
      * @param sequent The {@link Sequent} which provides the skolem equalities.
@@ -3482,7 +3490,7 @@ public final class SymbolicExecutionUtil {
      * @return The equality parts of the given skolem equality.
      */
     private static List<JTerm> findSkolemReplacements(Sequent sequent, JTerm skolemConstant,
-                                                      JTerm skolemEquality) {
+            JTerm skolemEquality) {
         List<JTerm> result = new LinkedList<>();
         for (SequentFormula sf : sequent) {
             JTerm term = (JTerm) sf.formula();
@@ -3554,7 +3562,8 @@ public final class SymbolicExecutionUtil {
      * @return The computed path condition.
      * @throws ProofInputException Occurred Exception.
      */
-    public static JTerm computePathCondition(Node node, boolean simplify, boolean improveReadability)
+    public static JTerm computePathCondition(Node node, boolean simplify,
+            boolean improveReadability)
             throws ProofInputException {
         return computePathCondition(null, node, simplify, improveReadability);
     }
@@ -3572,7 +3581,7 @@ public final class SymbolicExecutionUtil {
      * @throws ProofInputException Occurred Exception.
      */
     public static JTerm computePathCondition(Node parentNode, Node childNode, boolean simplify,
-                                             boolean improveReadability) throws ProofInputException {
+            boolean improveReadability) throws ProofInputException {
         if (childNode != null) {
             final Services services = childNode.proof().getServices();
             JTerm pathCondition = services.getTermBuilder().tt();
@@ -3935,7 +3944,7 @@ public final class SymbolicExecutionUtil {
      * @return The {@link String} representation of the given {@link JTerm}.
      */
     public static String formatTerm(JTerm term, Services services, boolean useUnicode,
-                                    boolean usePrettyPrinting) {
+            boolean usePrettyPrinting) {
         if ((useUnicode || usePrettyPrinting) && services != null) {
             NotationInfo ni = new NotationInfo();
             LogicPrinter logicPrinter = LogicPrinter.purePrinter(ni, services);

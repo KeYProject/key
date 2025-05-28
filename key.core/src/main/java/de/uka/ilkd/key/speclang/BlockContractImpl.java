@@ -16,8 +16,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -62,18 +62,18 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
     public BlockContractImpl(final String baseName, final StatementBlock block,
-                             final List<Label> labels, final IProgramMethod method,
-                             final JModality.JavaModalityKind modalityKind,
-                             final Map<LocationVariable, JTerm> preconditions,
-                             final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
-                             final Map<LocationVariable, JTerm> postconditions,
-                             final Map<LocationVariable, JTerm> freePostconditions,
-                             final Map<LocationVariable, JTerm> modifiableClauses,
-                             final Map<LocationVariable, JTerm> freeModifiableClauses,
-                             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-                             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasModifiable,
-                             final Map<LocationVariable, Boolean> hasFreeModifiable,
-                             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
+            final List<Label> labels, final IProgramMethod method,
+            final JModality.JavaModalityKind modalityKind,
+            final Map<LocationVariable, JTerm> preconditions,
+            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> postconditions,
+            final Map<LocationVariable, JTerm> freePostconditions,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses,
+            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
+            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasModifiable,
+            final Map<LocationVariable, Boolean> hasFreeModifiable,
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         super(baseName, block, labels, method, modalityKind,
             preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
             modifiableClauses, freeModifiableClauses, infFlowSpecs, variables,
@@ -253,16 +253,16 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
          * @param services services.
          */
         public Creator(String baseName, StatementBlock block, List<Label> labels,
-                       IProgramMethod method, Behavior behavior, Variables variables,
-                       Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
-                       JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
-                       Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
-                       Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
-                       JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
-                       Map<LocationVariable, JTerm> modifiablesFree,
-                       Map<LocationVariable, Boolean> hasModifiable,
-                       Map<LocationVariable, Boolean> hasFreeModifiable,
-                       Services services) {
+                IProgramMethod method, Behavior behavior, Variables variables,
+                Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
+                JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
+                Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
+                Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
+                JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
+                Map<LocationVariable, JTerm> modifiablesFree,
+                Map<LocationVariable, Boolean> hasModifiable,
+                Map<LocationVariable, Boolean> hasFreeModifiable,
+                Services services) {
             super(baseName, block, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
                 infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
@@ -271,16 +271,16 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
 
         @Override
         protected BlockContract build(String baseName, StatementBlock block, List<Label> labels,
-                                      IProgramMethod method, JModality.JavaModalityKind modalityKind,
-                                      Map<LocationVariable, JTerm> preconditions,
-                                      Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
-                                      Map<LocationVariable, JTerm> postconditions,
-                                      Map<LocationVariable, JTerm> freePostconditions,
-                                      Map<LocationVariable, JTerm> modifiableClauses,
-                                      Map<LocationVariable, JTerm> freeModifiableClauses,
-                                      ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                                      boolean transactionApplicable, Map<LocationVariable, Boolean> hasModifiable,
-                                      Map<LocationVariable, Boolean> hasFreeModifiable) {
+                IProgramMethod method, JModality.JavaModalityKind modalityKind,
+                Map<LocationVariable, JTerm> preconditions,
+                Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
+                Map<LocationVariable, JTerm> postconditions,
+                Map<LocationVariable, JTerm> freePostconditions,
+                Map<LocationVariable, JTerm> modifiableClauses,
+                Map<LocationVariable, JTerm> freeModifiableClauses,
+                ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasModifiable,
+                Map<LocationVariable, Boolean> hasFreeModifiable) {
             return new BlockContractImpl(baseName, block, labels, method, modalityKind,
                 preconditions, freePreconditions, measuredBy,
                 postconditions, freePostconditions, modifiableClauses, freeModifiableClauses,

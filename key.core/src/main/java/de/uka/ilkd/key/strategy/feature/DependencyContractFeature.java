@@ -28,7 +28,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 public final class DependencyContractFeature extends BinaryFeature {
 
     private void removePreviouslyUsedSteps(JTerm focus, Goal goal,
-                                           List<PosInOccurrence> steps) {
+            List<PosInOccurrence> steps) {
         for (RuleApp app : goal.appliedRuleApps()) {
             JTerm term = (JTerm) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule

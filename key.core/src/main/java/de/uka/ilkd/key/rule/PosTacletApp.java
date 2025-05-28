@@ -96,7 +96,7 @@ public class PosTacletApp extends TacletApp {
      *         of the TacletApp.
      */
     private static ImmutableSet<JQuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
-                                                                             PosInOccurrence pos) {
+            PosInOccurrence pos) {
 
         if (!(taclet instanceof RewriteTaclet)) {
             return DefaultImmutableSet.nil();
@@ -154,7 +154,7 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
-                                      Services services) {
+            Services services) {
 
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),

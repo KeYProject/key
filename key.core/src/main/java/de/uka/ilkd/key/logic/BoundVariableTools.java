@@ -6,8 +6,8 @@ package de.uka.ilkd.key.logic;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -33,8 +33,8 @@ public class BoundVariableTools {
      * @param services the Services
      */
     public JTerm renameVariables(JTerm originalTerm,
-                                 ImmutableArray<JQuantifiableVariable> oldBoundVars,
-                                 ImmutableArray<JQuantifiableVariable> newBoundVars, TermServices services) {
+            ImmutableArray<JQuantifiableVariable> oldBoundVars,
+            ImmutableArray<JQuantifiableVariable> newBoundVars, TermServices services) {
         JTerm res = originalTerm;
         for (int i = 0; i != oldBoundVars.size(); ++i) {
             if (oldBoundVars.get(i) != newBoundVars.get(i)) {
@@ -49,8 +49,8 @@ public class BoundVariableTools {
     }
 
     public JTerm[] renameVariables(JTerm[] originalTerms,
-                                   ImmutableArray<JQuantifiableVariable> oldBoundVars,
-                                   ImmutableArray<JQuantifiableVariable> newBoundVars, TermServices services) {
+            ImmutableArray<JQuantifiableVariable> oldBoundVars,
+            ImmutableArray<JQuantifiableVariable> newBoundVars, TermServices services) {
         final JTerm[] res = new JTerm[originalTerms.length];
         for (int i = 0; i != res.length; ++i) {
             res[i] = renameVariables(originalTerms[i], oldBoundVars, newBoundVars, services);
@@ -71,7 +71,7 @@ public class BoundVariableTools {
      * @return <code>true</code> iff it was necessary to create at least one new variable
      */
     public boolean resolveCollisions(ImmutableArray<JQuantifiableVariable> oldVars,
-                                     JQuantifiableVariable[] newVars, ImmutableSet<JQuantifiableVariable> criticalVars) {
+            JQuantifiableVariable[] newVars, ImmutableSet<JQuantifiableVariable> criticalVars) {
         boolean changedVar = false;
 
         for (int i = 0; i != newVars.length; ++i) {
@@ -115,9 +115,9 @@ public class BoundVariableTools {
      *         in the term <code>originalTerm</code>
      */
     public boolean resolveCollisions(JTerm originalTerm,
-                                     ImmutableSet<JQuantifiableVariable> criticalVars,
-                                     ImmutableArray<JQuantifiableVariable>[] newBoundVars, JTerm[] newSubs,
-                                     TermServices services) {
+            ImmutableSet<JQuantifiableVariable> criticalVars,
+            ImmutableArray<JQuantifiableVariable>[] newBoundVars, JTerm[] newSubs,
+            TermServices services) {
         boolean changed = false;
 
         for (int i = 0; i != originalTerm.arity(); ++i) {
@@ -153,7 +153,8 @@ public class BoundVariableTools {
      * @param services TODO
      */
     public ImmutableArray<JQuantifiableVariable> unifyBoundVariables(
-            ImmutableArray<JQuantifiableVariable>[] boundVarsPerSub, JTerm[] subs, int subtermsBegin,
+            ImmutableArray<JQuantifiableVariable>[] boundVarsPerSub, JTerm[] subs,
+            int subtermsBegin,
             int subtermsEnd, TermServices services) {
         // at least one subterms belongs to the entry (value)
         ImmutableArray<JQuantifiableVariable> unifiedVariable = boundVarsPerSub[subtermsBegin];
@@ -203,7 +204,7 @@ public class BoundVariableTools {
      *         terms)
      */
     public boolean equalsModRenaming(ImmutableArray<JQuantifiableVariable> vars0, JTerm term0,
-                                     ImmutableArray<JQuantifiableVariable> vars1, JTerm term1, TermServices services) {
+            ImmutableArray<JQuantifiableVariable> vars1, JTerm term1, TermServices services) {
         if (!consistentVariableArrays(vars0, vars1)) {
             return false;
         }

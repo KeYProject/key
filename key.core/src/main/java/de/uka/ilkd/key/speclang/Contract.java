@@ -71,8 +71,8 @@ public interface Contract extends SpecificationElement {
      * @return precondition
      */
     JTerm getPre(LocationVariable heap, LocationVariable selfVar,
-                 ImmutableList<LocationVariable> paramVars,
-                 Map<LocationVariable, LocationVariable> atPreVars, Services services);
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the precondition of the contract.
@@ -85,8 +85,8 @@ public interface Contract extends SpecificationElement {
      * @return precondition
      */
     JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
-                 ImmutableList<LocationVariable> paramVars,
-                 Map<LocationVariable, LocationVariable> atPreVars, Services services);
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the precondition of the contract.
@@ -100,7 +100,8 @@ public interface Contract extends SpecificationElement {
      * @return the precondition
      */
     JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                 ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services);
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     /**
      * Returns the precondition of the contract.
@@ -114,8 +115,8 @@ public interface Contract extends SpecificationElement {
      * @return the precondition
      */
     JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
-                 JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
-                 Services services);
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     /**
      * Returns the dependency set of the contract.
@@ -129,8 +130,8 @@ public interface Contract extends SpecificationElement {
      * @return the dependency set
      */
     JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
-                 ImmutableList<LocationVariable> paramVars,
-                 Map<LocationVariable, LocationVariable> atPreVars, Services services);
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the dependency set of the contract.
@@ -145,7 +146,8 @@ public interface Contract extends SpecificationElement {
      * @return the dependency set
      */
     JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
-                 ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services);
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     JTerm getRequires(LocationVariable heap);
 
@@ -156,7 +158,7 @@ public interface Contract extends SpecificationElement {
     JTerm getGlobalDefs();
 
     JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                        ImmutableList<JTerm> paramTerms, Services services);
+            ImmutableList<JTerm> paramTerms, Services services);
 
     JTerm getMby();
 
@@ -169,7 +171,7 @@ public interface Contract extends SpecificationElement {
      * @return the measured-by term
      */
     JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                 Services services);
+            Services services);
 
     /**
      * Returns the measured_by clause of the contract.
@@ -182,7 +184,8 @@ public interface Contract extends SpecificationElement {
      * @return the measured-by term
      */
     JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
-                 ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services);
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     /**
      * Returns the contract in pretty HTML format.

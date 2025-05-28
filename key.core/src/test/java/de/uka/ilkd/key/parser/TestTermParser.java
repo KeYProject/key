@@ -128,8 +128,9 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @Test
     public void test5() throws Exception {
-        JTerm t = tf.createTerm(Equality.EQUALS, tf.createTerm(head, tf.createTerm(cons, t_x, t_xs)),
-            tf.createTerm(head, tf.createTerm(cons, t_x, t_nil)));
+        JTerm t =
+            tf.createTerm(Equality.EQUALS, tf.createTerm(head, tf.createTerm(cons, t_x, t_xs)),
+                tf.createTerm(head, tf.createTerm(cons, t_x, t_nil)));
 
         assertEquals(t, parseFormula("head(cons(x,xs))=head(cons(x,nil))"),
             "parse head(cons(x,xs))=head(cons(x,nil))");

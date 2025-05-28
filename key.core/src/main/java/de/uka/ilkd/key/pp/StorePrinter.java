@@ -94,8 +94,8 @@ class StorePrinter extends FieldPrinter {
      * This is called in case parameter fieldTerm represents an array element.
      */
     private void printStoreOnArrayElement(LogicPrinter lp, final JTerm heapTerm,
-                                          final JTerm objectTerm,
-                                          final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
+            final JTerm objectTerm,
+            final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
         initPrettyPrint(lp, heapTerm);
 
         PosTableLayouter layouter = lp.layouter();
@@ -121,8 +121,8 @@ class StorePrinter extends FieldPrinter {
      * This is called in case parameter fieldTerm represents a non-static field.
      */
     private void printStoreOnJavaFieldConstant(LogicPrinter lp, final JTerm heapTerm,
-                                               final JTerm objectTerm,
-                                               final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
+            final JTerm objectTerm,
+            final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
         initPrettyPrint(lp, heapTerm);
 
         lp.layouter.markStartSub();
@@ -141,8 +141,8 @@ class StorePrinter extends FieldPrinter {
     }
 
     private void printStoreOnGenericFieldConstant(LogicPrinter lp, final JTerm heapTerm,
-                                                  final JTerm objectTerm,
-                                                  final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
+            final JTerm objectTerm,
+            final JTerm fieldTerm, final JTerm valueTerm, boolean closingBrace) {
         initPrettyPrint(lp, heapTerm);
 
         lp.layouter.markStartSub();
@@ -162,8 +162,9 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents a static field.
      */
-    private void printStoreOnStaticField(LogicPrinter lp, final JTerm heapTerm, final JTerm fieldTerm,
-                                         final JTerm valueTerm, boolean closingBrace) {
+    private void printStoreOnStaticField(LogicPrinter lp, final JTerm heapTerm,
+            final JTerm fieldTerm,
+            final JTerm valueTerm, boolean closingBrace) {
         initPrettyPrint(lp, heapTerm);
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());

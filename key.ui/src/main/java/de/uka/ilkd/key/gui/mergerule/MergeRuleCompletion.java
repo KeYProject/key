@@ -45,7 +45,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
         ImmutableList<MergePartner> chosenCandidates = null;
         final MergeProcedure chosenRule;
         JTerm chosenDistForm = null; // null is admissible standard ==> auto
-                                    // generation
+                                     // generation
 
         if (forced) {
             chosenCandidates = candidates;

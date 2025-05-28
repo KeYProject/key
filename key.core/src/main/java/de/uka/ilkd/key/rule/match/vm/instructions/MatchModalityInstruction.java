@@ -28,7 +28,7 @@ public class MatchModalityInstruction extends Instruction<JModality>
      */
     @Override
     public final MatchConditions match(JTerm t, MatchConditions matchConditions,
-                                       LogicServices services) {
+            LogicServices services) {
         return match(t.op(), matchConditions, services);
     }
 
@@ -37,7 +37,7 @@ public class MatchModalityInstruction extends Instruction<JModality>
      */
     @Override
     public MatchConditions match(JOperator instantiationCandidate, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         if (instantiationCandidate instanceof JModality mod1 && mod1.kind() == op.kind()) {
             return matchConditions;
         } else {

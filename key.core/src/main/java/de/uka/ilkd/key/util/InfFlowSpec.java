@@ -26,7 +26,7 @@ public class InfFlowSpec {
 
 
     public InfFlowSpec(final ImmutableList<JTerm> preExpressions,
-                       final ImmutableList<JTerm> postExpressions, final ImmutableList<JTerm> newObjects) {
+            final ImmutableList<JTerm> postExpressions, final ImmutableList<JTerm> newObjects) {
         this.preExpressions = preExpressions;
         this.postExpressions = postExpressions;
         this.newObjects = newObjects;

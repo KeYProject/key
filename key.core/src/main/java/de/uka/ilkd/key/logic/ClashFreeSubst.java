@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -98,7 +98,7 @@ public class ClashFreeSubst {
      * <code>newBoundVars</code> (at index <code>subtermIndex</code>)
      */
     protected void applyOnSubterm(JTerm completeTerm, int subtermIndex, JTerm[] newSubterms,
-                                  ImmutableArray<JQuantifiableVariable>[] newBoundVars) {
+            ImmutableArray<JQuantifiableVariable>[] newBoundVars) {
         if (subTermChanges(completeTerm.varsBoundHere(subtermIndex),
             completeTerm.sub(subtermIndex))) {
             final JQuantifiableVariable[] nbv =
@@ -124,7 +124,7 @@ public class ClashFreeSubst {
      * <code>varInd</code> upwards..
      */
     private void applyOnSubterm(int varInd, ImmutableArray<JQuantifiableVariable> boundVars,
-                                JQuantifiableVariable[] newBoundVars, int subInd, JTerm subTerm, JTerm[] newSubterms) {
+            JQuantifiableVariable[] newBoundVars, int subInd, JTerm subTerm, JTerm[] newSubterms) {
         if (varInd >= boundVars.size()) {
             newSubterms[subInd] = apply1(subTerm);
         } else {
@@ -163,7 +163,7 @@ public class ClashFreeSubst {
      * subterm. It is however assumed that no more clash can occurr.
      */
     private void applyOnSubterm1(int varInd, ImmutableArray<JQuantifiableVariable> boundVars,
-                                 JQuantifiableVariable[] newBoundVars, int subInd, JTerm subTerm, JTerm[] newSubterms) {
+            JQuantifiableVariable[] newBoundVars, int subInd, JTerm subTerm, JTerm[] newSubterms) {
         if (varInd >= boundVars.size()) {
             newSubterms[subInd] = apply(subTerm);
         } else {
@@ -188,7 +188,8 @@ public class ClashFreeSubst {
      * @returns true if <code>subTerm</code> bound by <code>boundVars</code> would change under
      *          application of this substitution
      */
-    protected boolean subTermChanges(ImmutableArray<JQuantifiableVariable> boundVars, JTerm subTerm) {
+    protected boolean subTermChanges(ImmutableArray<JQuantifiableVariable> boundVars,
+            JTerm subTerm) {
         if (!subTerm.freeVars().contains(v)) {
             return false;
         } else {
@@ -208,7 +209,7 @@ public class ClashFreeSubst {
      * Assumes that <code>var</code> is a @link{LogicVariable}.
      */
     protected LogicVariable newVarFor(JQuantifiableVariable var,
-                                      ImmutableSet<JQuantifiableVariable> usedVars) {
+            ImmutableSet<JQuantifiableVariable> usedVars) {
         LogicVariable lv = (LogicVariable) var;
         String stem = var.name().toString();
         int i = 1;

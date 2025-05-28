@@ -75,7 +75,7 @@ public class HandleArith {
 
 
     private static void putInTermCache(final LRUCache<JTerm, JTerm> provedByArithCache,
-                                       final JTerm key, final JTerm value) {
+            final JTerm key, final JTerm value) {
         synchronized (provedByArithCache) {
             provedByArithCache.put(key, value);
         }
@@ -187,7 +187,7 @@ public class HandleArith {
      * @return falseT if <code>term</code>'s operator is not >= or <=
      */
     private static JTerm formatArithTerm(final JTerm problem, TermBuilder tb, IntegerLDT ig,
-                                         ServiceCaches caches) {
+            ServiceCaches caches) {
         final LRUCache<JTerm, JTerm> formattedTermCache = caches.getFormattedTermCache();
         JTerm pro;
         synchronized (formattedTermCache) {

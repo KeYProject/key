@@ -196,7 +196,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     public OriginTermLabelVisualizer(PosInOccurrence pos, Node node, Services services) {
         super(node,
             "Origin for node " + node.serialNr() + ": " + (pos == null ? "whole sequent"
-                    : LogicPrinter.quickPrintTerm((JTerm) pos.subTerm(), services).replaceAll("\\s+",
+                    : LogicPrinter.quickPrintTerm((JTerm) pos.subTerm(), services).replaceAll(
+                        "\\s+",
                         " ")),
             "Node " + node.serialNr());
 

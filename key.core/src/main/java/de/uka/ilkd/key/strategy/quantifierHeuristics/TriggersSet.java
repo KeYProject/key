@@ -116,7 +116,7 @@ public class TriggersSet {
      * @return a <code>Trigger</code> with <code>trigger</code> as its term
      */
     private Trigger createUniTrigger(JTerm trigger, ImmutableSet<QuantifiableVariable> qvs,
-                                     boolean isUnify, boolean isElement) {
+            boolean isUnify, boolean isElement) {
         Trigger t = termToTrigger.get(trigger);
         if (t == null) {
             t = new UniTrigger(trigger, qvs, isUnify, isElement, this);
@@ -243,9 +243,10 @@ public class TriggersSet {
             return res;
         }
 
-        private Set<JTerm> combineSubterms(JTerm oriTerm, Set<JTerm>[] possibleSubs, JTerm[] chosenSubs,
-                                           ImmutableArray<JQuantifiableVariable> boundVars, int i,
-                                           TermServices services) {
+        private Set<JTerm> combineSubterms(JTerm oriTerm, Set<JTerm>[] possibleSubs,
+                JTerm[] chosenSubs,
+                ImmutableArray<JQuantifiableVariable> boundVars, int i,
+                TermServices services) {
             final HashSet<JTerm> set = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {
                 final JTerm res = services.getTermFactory().createTerm(oriTerm.op(), chosenSubs,

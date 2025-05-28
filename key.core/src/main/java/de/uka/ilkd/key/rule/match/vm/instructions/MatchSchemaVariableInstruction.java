@@ -34,7 +34,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * given term.
      */
     protected final MatchConditions addInstantiation(JTerm term, MatchConditions matchCond,
-                                                     LogicServices services) {
+            LogicServices services) {
 
         if (op.isRigid() && !term.isRigid()) {
             return null;

@@ -8,8 +8,8 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -58,7 +58,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
     private final Goal goal;
 
     public TacletAssumesModel(JTerm ifFma, ImmutableList<AssumesFormulaInstantiation> candidates,
-                              TacletApp app, Goal goal, Services services, NamespaceSet nss, AbbrevMap scm) {
+            TacletApp app, Goal goal, Services services, NamespaceSet nss, AbbrevMap scm) {
         super(createIfInsts(candidates));
 
         this.ifFma = ifFma;

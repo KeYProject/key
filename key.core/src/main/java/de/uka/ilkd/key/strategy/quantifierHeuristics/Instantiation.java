@@ -149,7 +149,7 @@ class Instantiation {
      * @return all literals in antesequent, and all negation of literal in succedent
      */
     private ImmutableSet<JTerm> initAssertLiterals(Sequent seq,
-                                                   TermServices services) {
+            TermServices services) {
         ImmutableList<JTerm> assertLits = ImmutableSLList.nil();
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();

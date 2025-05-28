@@ -1425,7 +1425,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private final StringBuilder translateTermIte(JTerm iteTerm,
-                                                 List<JQuantifiableVariable> quantifiedVars, Services services)
+            List<JQuantifiableVariable> quantifiedVars, Services services)
             throws IllegalFormulaException {
 
         // make typecasts, if this is neccesary. Subterms might contain
@@ -1487,7 +1487,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *        we get there.
      */
     protected StringBuilder translateTerm(JTerm term, List<JQuantifiableVariable> quantifiedVars,
-                                          Services services) throws IllegalFormulaException {
+            Services services) throws IllegalFormulaException {
 
 
         JOperator op = term.op();
@@ -1799,8 +1799,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsBindingUninterpretedPredicate(JTerm term, Function fun,
-                                                                   List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
-                                                                   Services services) throws IllegalFormulaException {
+            List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
         for (int i = 0; i < term.arity(); i++) {
@@ -1911,8 +1911,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     private StringBuilder translateAsBindingUninterpretedFunction(JTerm term, Function fun,
-                                                                  List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
-                                                                  Services services) throws IllegalFormulaException {
+            List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
         for (int i = 0; i < term.arity(); i++) {
@@ -2011,8 +2011,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsUninterpretedFunction(JFunction fun,
-                                                           List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
-                                                           Services services) throws IllegalFormulaException {
+            List<JQuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            Services services) throws IllegalFormulaException {
         // an uninterpreted function. just
         // translate it as such
         // it has to be made a difference between binding functions and those not binding
@@ -2108,7 +2108,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return a unique predicate representing a modality.
      */
     private StringBuilder getModalityPredicate(JTerm t, List<JQuantifiableVariable> quantifiedVars,
-                                               Services services) throws IllegalFormulaException {
+            Services services) throws IllegalFormulaException {
         // check, if the modality was already translated.
         for (JTerm toMatch : modalityPredicates.keySet()) {
             if (RENAMING_TERM_PROPERTY.equalsModThisProperty(toMatch, t)) {
@@ -2179,7 +2179,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     protected final StringBuilder translateUnknown(JTerm term,
-                                                   List<JQuantifiableVariable> quantifiedVars, Services services)
+            List<JQuantifiableVariable> quantifiedVars, Services services)
             throws IllegalFormulaException {
 
         // translate the term as uninterpreted function/predicate
@@ -2258,7 +2258,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return
      */
     protected final StringBuilder translateBsumFunction(JTerm bsumterm,
-                                                        ArrayList<StringBuilder> sub) {
+            ArrayList<StringBuilder> sub) {
         StringBuilder name = null;
         for (JTerm t : usedBsumTerms.keySet()) {
             if (RENAMING_TERM_PROPERTY.equalsModThisProperty(t, bsumterm)) {
@@ -2296,7 +2296,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @return
      */
     protected final StringBuilder translateBprodFunction(JTerm bprodterm,
-                                                         ArrayList<StringBuilder> sub) {
+            ArrayList<StringBuilder> sub) {
         StringBuilder name = null;
         for (JTerm t : usedBprodTerms.keySet()) {
             if (RENAMING_TERM_PROPERTY.equalsModThisProperty(t, bprodterm)) {

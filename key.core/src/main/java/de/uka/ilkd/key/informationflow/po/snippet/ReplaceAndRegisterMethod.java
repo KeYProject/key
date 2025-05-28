@@ -33,7 +33,7 @@ import org.key_project.util.collection.ImmutableSLList;
 abstract class ReplaceAndRegisterMethod {
 
     final JTerm replace(JTerm term, ProofObligationVars origVars, ProofObligationVars poVars,
-                        TermBuilder tb) {
+            TermBuilder tb) {
         JTerm intermediateResult = replace(term, origVars.pre, poVars.pre, tb);
         return replace(intermediateResult, origVars.post, poVars.post, tb);
     }
@@ -146,7 +146,7 @@ abstract class ReplaceAndRegisterMethod {
     }
 
     static JTerm replaceQuantifiableVariables(JTerm term, Set<JQuantifiableVariable> qvs,
-                                              Services services) {
+            Services services) {
         Map<JQuantifiableVariable, JQuantifiableVariable> replaceMap = new LinkedHashMap<>();
         for (JQuantifiableVariable qv : qvs) {
             replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));

@@ -1582,7 +1582,8 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected void initNewMethodCallStack(Node currentNode,
             PosInOccurrence childPIO) {
-        JTerm newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
+        JTerm newModality =
+            childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);

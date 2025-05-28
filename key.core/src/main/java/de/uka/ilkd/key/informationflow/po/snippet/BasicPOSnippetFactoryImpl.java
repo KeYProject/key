@@ -60,7 +60,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     }
 
     BasicPOSnippetFactoryImpl(LoopSpecification invariant, ProofObligationVars poVars,
-                              ExecutionContext context, JTerm guardTerm, Services services) {
+            ExecutionContext context, JTerm guardTerm, Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars = poVars;
         registerFactoryMethods();

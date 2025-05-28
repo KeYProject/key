@@ -35,10 +35,10 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
      * does the work for applyReplacewith (wraps recursion)
      */
     private JTerm replace(JTerm term, JTerm with, TermLabelState termLabelState,
-                          TacletLabelHint labelHint, PosInOccurrence posOfFind,
-                          IntIterator it,
-                          MatchConditions mc,
-                          Sort maxSort, Goal goal, Services services, TacletApp ruleApp) {
+            TacletLabelHint labelHint, PosInOccurrence posOfFind,
+            IntIterator it,
+            MatchConditions mc,
+            Sort maxSort, Goal goal, Services services, TacletApp ruleApp) {
         if (it.hasNext()) {
             final int indexOfNextSubTerm = it.next();
 

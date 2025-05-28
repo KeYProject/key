@@ -600,7 +600,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                                                   boolean isArrayIndex, JTerm arrayIndex, JTerm condition) {
+                boolean isArrayIndex, JTerm arrayIndex, JTerm condition) {
             return null;
         }
 
@@ -609,7 +609,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                                       JTerm arrayIndex, JTerm condition) {
+                JTerm arrayIndex, JTerm condition) {
             return null;
         }
     }
@@ -689,7 +689,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                                                   boolean isArrayIndex, JTerm arrayIndex, JTerm condition) {
+                boolean isArrayIndex, JTerm arrayIndex, JTerm condition) {
             return null;
         }
 
@@ -698,7 +698,7 @@ public class SymbolicLayoutReader {
          */
         @Override
         public ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                                       JTerm arrayIndex, JTerm condition) {
+                JTerm arrayIndex, JTerm condition) {
             return null;
         }
     }

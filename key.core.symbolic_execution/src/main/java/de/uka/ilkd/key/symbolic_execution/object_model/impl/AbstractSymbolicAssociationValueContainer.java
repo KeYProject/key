@@ -64,7 +64,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      */
     @Override
     public ISymbolicAssociation getAssociation(final IProgramVariable programVariable,
-                                               final boolean isArrayIndex, final JTerm arrayIndex, final JTerm condition) {
+            final boolean isArrayIndex, final JTerm arrayIndex, final JTerm condition) {
         return CollectionUtil.search(associations,
             element -> element.getProgramVariable() == programVariable
                     && element.isArrayIndex() == isArrayIndex
@@ -94,7 +94,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      */
     @Override
     public ISymbolicValue getValue(final IProgramVariable programVariable,
-                                   final boolean isArrayIndex, final JTerm arrayIndex, final JTerm condition) {
+            final boolean isArrayIndex, final JTerm arrayIndex, final JTerm condition) {
         return CollectionUtil.search(values,
             element -> element.getProgramVariable() == programVariable
                     && element.isArrayIndex() == isArrayIndex

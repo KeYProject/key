@@ -16,15 +16,15 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -286,7 +286,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     private JTerm makeCall(Services services, IObserverFunction op, JTerm receiver,
-                           ImmutableList<JTerm> methodArgs) {
+            ImmutableList<JTerm> methodArgs) {
 
         JTerm[] args = new JTerm[op.arity()];
         int idx = 0;
@@ -403,7 +403,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     private static Union<Instantiation, ModelFieldInstantiation> instantiate(JTerm focusTerm,
-                                                                             Services services) {
+            Services services) {
         // result cached?
         if (focusTerm == lastFocusTerm) {
             return lastInstantiation;

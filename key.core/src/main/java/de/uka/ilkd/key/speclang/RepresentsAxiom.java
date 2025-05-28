@@ -48,16 +48,16 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final ImmutableList<LocationVariable> originalParamVars;
 
     public RepresentsAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-                           VisibilityModifier visibility, JTerm pre, JTerm rep, LocationVariable selfVar,
-                           ImmutableList<LocationVariable> paramVars,
-                           Map<LocationVariable, LocationVariable> atPreVars) {
+            VisibilityModifier visibility, JTerm pre, JTerm rep, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars) {
         this(name, null, target, kjt, visibility, pre, rep, selfVar, paramVars, atPreVars);
     }
 
     public RepresentsAxiom(String name, String displayName, IObserverFunction target,
-                           KeYJavaType kjt, VisibilityModifier visibility, JTerm pre, JTerm rep,
-                           LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                           Map<LocationVariable, LocationVariable> atPreVars) {
+            KeYJavaType kjt, VisibilityModifier visibility, JTerm pre, JTerm rep,
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars) {
         assert name != null;
         assert kjt != null;
         assert target != null;
@@ -110,7 +110,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     public JTerm getAxiom(JAbstractSortedOperator heapVar, JAbstractSortedOperator selfVar,
-                          Services services) {
+            Services services) {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
         final Map<ProgramVariable, JAbstractSortedOperator> map =

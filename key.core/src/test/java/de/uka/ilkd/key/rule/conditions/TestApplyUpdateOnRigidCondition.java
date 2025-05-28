@@ -263,7 +263,7 @@ public class TestApplyUpdateOnRigidCondition {
      *         formula or term is returned
      */
     private JTerm instantiateAndCheck(JTerm term, UpdateSV u, SchemaVariable tOrPhi,
-                                      SchemaVariable result) {
+            SchemaVariable result) {
         JTerm update = term.sub(0);
         JTerm arg = term.sub(1);
 

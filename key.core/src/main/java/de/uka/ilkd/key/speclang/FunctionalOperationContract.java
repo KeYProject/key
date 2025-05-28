@@ -12,8 +12,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -49,14 +49,14 @@ public interface FunctionalOperationContract extends OperationContract {
      * @return the post condition.
      */
     JTerm getPost(LocationVariable heap, LocationVariable selfVar,
-                  ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                  LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                  Services services);
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services);
 
     JTerm getPost(List<LocationVariable> heapContext, LocationVariable selfVar,
-                  ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                  LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                  Services services);
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services);
 
     /**
      * Returns the postcondition of the contract.
@@ -72,41 +72,42 @@ public interface FunctionalOperationContract extends OperationContract {
      * @return the postcondition.
      */
     JTerm getPost(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                  ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                  Map<LocationVariable, JTerm> atPres, Services services);
+            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services);
 
     JTerm getPost(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
-                  JTerm selfTerm, ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                  Map<LocationVariable, JTerm> atPres, Services services);
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services);
 
     JTerm getFreePost(LocationVariable heap, LocationVariable selfVar,
-                      ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                      LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                      Services services);
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services);
 
     JTerm getFreePost(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                      ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                      Map<LocationVariable, JTerm> atPres, Services services);
+            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services);
 
     JTerm getFreePost(List<LocationVariable> heapContext,
-                      Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm, ImmutableList<JTerm> paramTerms,
-                      JTerm resultTerm, JTerm excTerm, Map<LocationVariable, JTerm> atPres, Services services);
+            Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm, ImmutableList<JTerm> paramTerms,
+            JTerm resultTerm, JTerm excTerm, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     JTerm getFreePost(List<LocationVariable> heapContext, LocationVariable selfVar,
-                      ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                      LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                      Services services);
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services);
 
     /**
      * Returns the model method definition for model method contracts
      */
     JTerm getRepresentsAxiom(LocationVariable heap, LocationVariable selfVar,
-                             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                             Map<LocationVariable, LocationVariable> atPreVars, Services services);
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     JTerm getRepresentsAxiom(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                             ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                             Map<LocationVariable, JTerm> atPres, Services services);
+            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services);
 
     String getBaseName();
 

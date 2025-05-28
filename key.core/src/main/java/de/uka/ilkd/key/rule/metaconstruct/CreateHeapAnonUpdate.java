@@ -13,8 +13,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -70,8 +70,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * @return The anonymizing update.
      */
     private static JTerm createHeapAnonUpdate(LoopSpecification loopSpec, boolean isTransaction,
-                                              boolean isPermissions, JTerm anonHeapTerm, JTerm anonSavedHeapTerm,
-                                              JTerm anonPermissionsHeapTerm, Services services) {
+            boolean isPermissions, JTerm anonHeapTerm, JTerm anonSavedHeapTerm,
+            JTerm anonPermissionsHeapTerm, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Map<LocationVariable, JTerm> atPres = loopSpec.getInternalAtPres();
@@ -119,8 +119,9 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return An elementary anonymizing heap update.
      */
-    private static JTerm createElementaryAnonUpdate(LocationVariable heap, JTerm anonHeap, JTerm mod,
-                                                    Services services) {
+    private static JTerm createElementaryAnonUpdate(LocationVariable heap, JTerm anonHeap,
+            JTerm mod,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final JTerm anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);

@@ -8,7 +8,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * An equivalence class which defines which {@link JTerm}s represent the same {@link ISymbolicObject}
+ * An equivalence class which defines which {@link JTerm}s represent the same
+ * {@link ISymbolicObject}
  * in an {@link ISymbolicLayout}.
  *
  * @author Martin Hentschel
@@ -25,7 +26,8 @@ public interface ISymbolicEquivalenceClass extends ISymbolicElement {
      * Checks if a {@link JTerm} is contained.
      *
      * @param term The {@link JTerm} to check.
-     * @return {@code true} {@link JTerm} is contained, {@code false} {@link JTerm} is not contained.
+     * @return {@code true} {@link JTerm} is contained, {@code false} {@link JTerm} is not
+     *         contained.
      */
     boolean containsTerm(JTerm term);
 

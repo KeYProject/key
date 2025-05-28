@@ -37,7 +37,7 @@ public class TestTermBuilder {
      * Test number conversion
      */
     private void checkDigits(JTerm number, int[] expected, IntegerLDT intLDT,
-                             boolean isNonNegative) {
+            boolean isNonNegative) {
         assertSame(intLDT.getNumberSymbol(), number.op());
         number = number.sub(0);
 

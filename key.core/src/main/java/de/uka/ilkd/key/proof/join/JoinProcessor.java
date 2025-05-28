@@ -259,7 +259,7 @@ public class JoinProcessor implements Runnable {
     }
 
     private Collection<JTerm> createConstrainedTerms(Collection<JTerm> terms, JTerm predicate,
-                                                     boolean gamma) {
+            boolean gamma) {
         Collection<JTerm> result = new LinkedList<>();
         for (JTerm term : terms) {
             if (gamma) {
@@ -283,7 +283,7 @@ public class JoinProcessor implements Runnable {
     }
 
     private Collection<JTerm> computeDifference(Semisequent s, Collection<JTerm> excludeSet,
-                                                JTerm exclude) {
+            JTerm exclude) {
         LinkedList<JTerm> result = new LinkedList<>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {

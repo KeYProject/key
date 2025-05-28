@@ -667,7 +667,7 @@ public final class MiscTools {
     }
 
     public static ImmutableList<JTerm> filterOutDuplicates(ImmutableList<JTerm> localIns,
-                                                           ImmutableList<JTerm> localOuts) {
+            ImmutableList<JTerm> localOuts) {
         ImmutableList<JTerm> result = ImmutableSLList.nil();
         for (JTerm localIn : localIns) {
             if (!localOuts.contains(localIn)) {

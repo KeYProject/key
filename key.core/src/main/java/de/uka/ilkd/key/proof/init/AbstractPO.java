@@ -201,7 +201,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return The term representing the general assumption.
      */
     protected JTerm generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
-                                        ProgramVariable selfVar, Services services) {
+            ProgramVariable selfVar, Services services) {
         if (selfVar == null || pm.isConstructor()) {
             return tb.tt();
         }
@@ -230,7 +230,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return The term representing the general assumption.
      */
     protected JTerm generateSelfExactType(IProgramMethod pm, ProgramVariable selfVar,
-                                          KeYJavaType selfKJT) {
+            KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
     }

@@ -173,7 +173,7 @@ public class CloseAfterMerge implements BuiltInRule {
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
     private JTerm getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
-                                               Goal isWeakeningGoal) {
+            Goal isWeakeningGoal) {
         final Services services = isWeakeningGoal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -246,7 +246,7 @@ public class CloseAfterMerge implements BuiltInRule {
      *         before.
      */
     private JTerm allClosure(final JTerm term, final HashSet<Function> constsToReplace,
-                             Services services) {
+            Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         JTerm termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
@@ -288,8 +288,8 @@ public class CloseAfterMerge implements BuiltInRule {
      * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
     public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio, Node thePartnerNode,
-                                                       Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
-                                                       SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
+            Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
+            SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pio, thePartnerNode,
             correspondingMergeNode, mergeNodeState, partnerState, pc, newNames);
     }

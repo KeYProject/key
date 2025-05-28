@@ -36,10 +36,10 @@ import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
@@ -193,7 +193,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     private static JTerm getActualSelf(MethodOrConstructorReference mr, IProgramMethod pm,
-                                       ExecutionContext ec, Services services) {
+            ExecutionContext ec, Services services) {
         final TypeConverter tc = services.getTypeConverter();
         final ReferencePrefix rp = mr.getReferencePrefix();
         if (pm.isStatic() || pm.isConstructor()) {
@@ -211,7 +211,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     private static ImmutableList<JTerm> getActualParams(MethodOrConstructorReference mr,
-                                                        ExecutionContext ec, Services services) {
+            ExecutionContext ec, Services services) {
         ImmutableList<JTerm> result = ImmutableSLList.nil();
         for (Expression expr : mr.getArguments()) {
             JTerm actualParam = services.getTypeConverter().convertToLogicElement(expr, ec);
@@ -270,7 +270,7 @@ public final class UseOperationContractRule implements BuiltInRule {
      * @return (assumption, anon update, anon heap)
      */
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, IProgramMethod pm,
-                                                   JTerm modifiable, Services services) {
+            JTerm modifiable, Services services) {
         assert pm != null;
         assert modifiable != null;
         final TermBuilder tb = services.getTermBuilder();
@@ -301,8 +301,9 @@ public final class UseOperationContractRule implements BuiltInRule {
      * for location sets containing only locations that belong to created objects.
      */
     private static JTerm getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
-                                     KeYJavaType kjt, JTerm resultTerm, JTerm selfTerm, Map<LocationVariable, JTerm> heapAtPres,
-                                     JTerm freeSpecPost, Services services) {
+            KeYJavaType kjt, JTerm resultTerm, JTerm selfTerm,
+            Map<LocationVariable, JTerm> heapAtPres,
+            JTerm freeSpecPost, Services services) {
         final TermBuilder TB = services.getTermBuilder();
         final JTerm result;
         if (pm.isConstructor()) {
@@ -393,10 +394,10 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     private static void applyInfFlow(Goal goal, final FunctionalOperationContract contract,
-                                     final Instantiation inst, final JTerm self, final ImmutableList<JTerm> params,
-                                     final JTerm result, final JTerm exception, final JTerm mby, final JTerm atPreUpdates,
-                                     final JTerm finalPreTerm, final ImmutableList<AnonUpdateData> anonUpdateDatas,
-                                     Services services) {
+            final Instantiation inst, final JTerm self, final ImmutableList<JTerm> params,
+            final JTerm result, final JTerm exception, final JTerm mby, final JTerm atPreUpdates,
+            final JTerm finalPreTerm, final ImmutableList<AnonUpdateData> anonUpdateDatas,
+            Services services) {
         if (!InfFlowCheckInfo.isInfFlow(goal)) {
             return;
         }
@@ -896,8 +897,8 @@ public final class UseOperationContractRule implements BuiltInRule {
          * @param transaction TODO
          */
         public Instantiation(JTerm u, JTerm progPost, JModality modality, Expression actualResult,
-                             JTerm actualSelf, KeYJavaType staticType, MethodOrConstructorReference mr,
-                             IProgramMethod pm, ImmutableList<JTerm> actualParams, boolean transaction) {
+                JTerm actualSelf, KeYJavaType staticType, MethodOrConstructorReference mr,
+                IProgramMethod pm, ImmutableList<JTerm> actualParams, boolean transaction) {
             assert u != null;
             assert u.sort() == JavaDLTheory.UPDATE;
             assert progPost != null;
@@ -953,7 +954,7 @@ public final class UseOperationContractRule implements BuiltInRule {
      * @return the resulting self term
      */
     public static JTerm computeSelf(JTerm baseHeapTerm, Map<LocationVariable, JTerm> atPres,
-                                    LocationVariable baseHeap, Instantiation inst, JTerm resultTerm, TermFactory tf) {
+            LocationVariable baseHeap, Instantiation inst, JTerm resultTerm, TermFactory tf) {
         return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap),
             inst.pm.isConstructor() ? resultTerm : inst.actualSelf, tf);
     }
@@ -969,8 +970,8 @@ public final class UseOperationContractRule implements BuiltInRule {
      * @return a list of the resulting parameter terms
      */
     public static ImmutableList<JTerm> computeParams(JTerm baseHeapTerm,
-                                                     Map<LocationVariable, JTerm> atPres, LocationVariable baseHeap, Instantiation inst,
-                                                     TermFactory tf) {
+            Map<LocationVariable, JTerm> atPres, LocationVariable baseHeap, Instantiation inst,
+            TermFactory tf) {
         return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams, tf);
     }
 
@@ -1010,7 +1011,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         public final JTerm anonHeap;
 
         public AnonUpdateData(JTerm assumption, JTerm anonUpdate, JTerm methodHeap,
-                              JTerm methodHeapAtPre, JTerm anonHeap) {
+                JTerm methodHeapAtPre, JTerm anonHeap) {
             this.assumption = assumption;
             this.anonUpdate = anonUpdate;
             this.methodHeap = methodHeap;

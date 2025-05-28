@@ -104,7 +104,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @return The created {@link SequentFormula} in which the {@link JTerm} is replaced.
      */
     protected static SequentFormula replace(PosInOccurrence pio,
-                                            JTerm newTerm, Services services) {
+            JTerm newTerm, Services services) {
         // Iterate along the PosInOccurrence and collect the parents and indices
         Deque<Pair<Integer, JTerm>> indexAndParents = new LinkedList<>();
         JTerm root = (JTerm) pio.sequentFormula().formula();

@@ -274,7 +274,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
     abstract JTerm buildContractApplications(ProofObligationVars contAppData,
-                                             ProofObligationVars contAppData2, Services services);
+            ProofObligationVars contAppData2, Services services);
 
     /**
      * A normal RewriteTacletBuilder except that an InfFlowContractAppTaclet is returned instead of

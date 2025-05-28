@@ -131,7 +131,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right,
-                                 Services services, ExecutionContext ec) {
+            Services services, ExecutionContext ec) {
         if (left != null && left.sort().extendsTrans(targetSort()) && right != null
                 && right.sort().extendsTrans(targetSort())) {
             return getFunctionFor(op, services, ec) != null;

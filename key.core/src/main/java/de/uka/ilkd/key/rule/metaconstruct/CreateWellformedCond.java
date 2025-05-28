@@ -54,11 +54,12 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
      * @return The wellformedness condition.
      */
     private JTerm createWellformedCond(boolean isTransaction, boolean isPermissions,
-                                       JTerm anonHeapTerm, JTerm anonSavedHeapTerm, JTerm anonPermissionsHeapTerm,
-                                       Services services) {
+            JTerm anonHeapTerm, JTerm anonSavedHeapTerm, JTerm anonPermissionsHeapTerm,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        JTerm result = tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);
+        JTerm result =
+            tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         if (isTransaction) {
             result = tb.and(result, tb.wellFormed(anonSavedHeapTerm));

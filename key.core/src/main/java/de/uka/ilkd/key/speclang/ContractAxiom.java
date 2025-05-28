@@ -42,18 +42,18 @@ public final class ContractAxiom extends ClassAxiom {
     private final Map<LocationVariable, LocationVariable> atPreVars;
 
     public ContractAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-                         VisibilityModifier visibility, JTerm pre, JTerm freePre, JTerm post, JTerm freePost,
-                         JTerm mby, Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
-                         LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
+            VisibilityModifier visibility, JTerm pre, JTerm freePre, JTerm post, JTerm freePost,
+            JTerm mby, Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
+            LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
         this(name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
             selfVar, resultVar, paramVars);
     }
 
     public ContractAxiom(String name, String displayName, IObserverFunction target, KeYJavaType kjt,
-                         VisibilityModifier visibility, JTerm originalPre, JTerm originalFreePre,
-                         JTerm originalPost, JTerm originalFreePost, JTerm originalMby,
-                         Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
-                         LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
+            VisibilityModifier visibility, JTerm originalPre, JTerm originalFreePre,
+            JTerm originalPost, JTerm originalFreePost, JTerm originalMby,
+            Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
+            LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
 
         assert name != null;
         assert kjt != null;

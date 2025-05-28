@@ -115,9 +115,9 @@ public final class SymbolicExecutionSideProofUtil {
      * @throws ProofInputException Occurred Exception.
      */
     public static List<Pair<JTerm, Node>> computeResults(Services services, Proof proof,
-                                                         ProofEnvironment sideProofEnvironment, Sequent sequentToProve, TermLabel label,
-                                                         String description, String methodTreatment, String loopTreatment, String queryTreatment,
-                                                         String splittingOption, boolean addNamesToServices) throws ProofInputException {
+            ProofEnvironment sideProofEnvironment, Sequent sequentToProve, TermLabel label,
+            String description, String methodTreatment, String loopTreatment, String queryTreatment,
+            String splittingOption, boolean addNamesToServices) throws ProofInputException {
         // Execute side proof
         ApplyStrategyInfo<Proof, Goal> info =
             startSideProof(proof, sideProofEnvironment, sequentToProve,
@@ -235,7 +235,8 @@ public final class SymbolicExecutionSideProofUtil {
                             result = formula.sub(0);
                         }
                     } else {
-                        JTerm constructedResult = constructResultIfContained(services, sf, operator);
+                        JTerm constructedResult =
+                            constructResultIfContained(services, sf, operator);
                         if (constructedResult != null) {
                             if (result != null) {
                                 throw new IllegalStateException(
@@ -267,13 +268,13 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     private static JTerm constructResultIfContained(Services services,
-                                                    SequentFormula sf,
-                                                    Operator operator) {
+            SequentFormula sf,
+            Operator operator) {
         return constructResultIfContained(services, (JTerm) sf.formula(), operator);
     }
 
     private static JTerm constructResultIfContained(Services services, JTerm term,
-                                                    Operator operator) {
+            Operator operator) {
         if (JOperator.opEquals(term.op(), operator)) {
             return term.sub(0);
         } else {

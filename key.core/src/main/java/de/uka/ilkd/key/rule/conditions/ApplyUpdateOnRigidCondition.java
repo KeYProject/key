@@ -6,8 +6,8 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.*;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -163,7 +163,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @return a non-colliding {@link Name} for <code>var</code>
      */
     private static Name createNonCollidingNameFor(JQuantifiableVariable var, JTerm u, JTerm phi,
-                                                  TermServices services) {
+            TermServices services) {
         ClashFreeSubst.VariableCollectVisitor vcv = new ClashFreeSubst.VariableCollectVisitor();
         ImmutableSet<JQuantifiableVariable> usedVars = u.freeVars();
         phi.execPostOrder(vcv);

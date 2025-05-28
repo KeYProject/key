@@ -144,7 +144,7 @@ public abstract class AbstractUpdateExtractor {
      * @return The objects to ignore.
      */
     protected Set<JTerm> computeInitialObjectsToIgnore(boolean ignoreExceptionVariable,
-                                                       boolean ignoreOldStateVariables) {
+            boolean ignoreOldStateVariables) {
         Set<JTerm> result = new LinkedHashSet<>();
         if (ignoreExceptionVariable) {
             // Add exception variable to the ignore list because it is not part of the source code.
@@ -211,8 +211,8 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected void collectLocationsFromUpdates(Sequent sequent,
-                                               Set<ExtractLocationParameter> locationsToFill, Set<JTerm> updateCreatedObjectsToFill,
-                                               Set<JTerm> updateValueObjectsToFill, Set<JTerm> objectsToIgnore)
+            Set<ExtractLocationParameter> locationsToFill, Set<JTerm> updateCreatedObjectsToFill,
+            Set<JTerm> updateValueObjectsToFill, Set<JTerm> objectsToIgnore)
             throws ProofInputException {
         // Go up in parent hierarchy and collect updates on all update applications
         PosInOccurrence pio = modalityPio;
@@ -234,7 +234,8 @@ public abstract class AbstractUpdateExtractor {
     /**
      * <p>
      * Computes for each location (value/association of an object) used in the the given
-     * {@link JTerm} the {@link JTerm}s which allows to compute the object itself and the value of the
+     * {@link JTerm} the {@link JTerm}s which allows to compute the object itself and the value of
+     * the
      * value/association. The result is a {@link Set} of {@link ExtractLocationParameter} which
      * contains the computed {@link JTerm}s.
      * </p>
@@ -253,8 +254,8 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected void collectLocationsFromTerm(JTerm updateTerm,
-                                            Set<ExtractLocationParameter> locationsToFill, Set<JTerm> updateCreatedObjectsToFill,
-                                            Set<JTerm> updateValueObjectsToFill, Set<JTerm> objectsToIgnore)
+            Set<ExtractLocationParameter> locationsToFill, Set<JTerm> updateCreatedObjectsToFill,
+            Set<JTerm> updateValueObjectsToFill, Set<JTerm> objectsToIgnore)
             throws ProofInputException {
         if (updateTerm.op() instanceof UpdateJunctor) {
             for (JTerm sub : updateTerm.subs()) {
@@ -293,7 +294,8 @@ public abstract class AbstractUpdateExtractor {
     /**
      * <p>
      * Computes for each location (value/association of an object) used in the the given heap update
-     * {@link JTerm} the {@link JTerm}s which allows to compute the object itself and the value of the
+     * {@link JTerm} the {@link JTerm}s which allows to compute the object itself and the value of
+     * the
      * value/association. The result is a {@link Set} of {@link ExtractLocationParameter} which
      * contains the computed {@link JTerm}s.
      * </p>
@@ -311,8 +313,8 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected void collectLocationsFromHeapUpdate(JTerm term,
-                                                  Set<ExtractLocationParameter> locationsToFill, Set<JTerm> updateCreatedObjectsToFill,
-                                                  Set<JTerm> updateValueObjectsToFill) throws ProofInputException {
+            Set<ExtractLocationParameter> locationsToFill, Set<JTerm> updateCreatedObjectsToFill,
+            Set<JTerm> updateValueObjectsToFill) throws ProofInputException {
         final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
         if (term.op() == heapLDT.getStore()) {
             // Add select object term to result
@@ -459,14 +461,15 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected Set<ExtractLocationParameter> extractLocationsFromTerm(JTerm term,
-                                                                     Set<JTerm> objectsToIgnore) throws ProofInputException {
+            Set<JTerm> objectsToIgnore) throws ProofInputException {
         Set<ExtractLocationParameter> result = new LinkedHashSet<>();
         collectLocationsFromTerm(result, term, objectsToIgnore);
         return result;
     }
 
     /**
-     * Utility method of {@link #extractLocationsFromTerm(JTerm, Set)} which recursively extracts the
+     * Utility method of {@link #extractLocationsFromTerm(JTerm, Set)} which recursively extracts
+     * the
      * locations.
      *
      * @param toFill The result {@link Set} to fill.
@@ -515,7 +518,7 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected void collectLocationsFromHeapTerms(JTerm selectTerm, JTerm variableTerm,
-                                                 HeapLDT heapLDT, Set<ExtractLocationParameter> toFill, Set<JTerm> objectsToIgnore)
+            HeapLDT heapLDT, Set<ExtractLocationParameter> toFill, Set<JTerm> objectsToIgnore)
             throws ProofInputException {
         if (!objectsToIgnore.contains(selectTerm)
                 && !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
@@ -550,7 +553,8 @@ public abstract class AbstractUpdateExtractor {
     }
 
     /**
-     * Creates a predicate and a {@link JTerm} which can be used to compute the values defined by the
+     * Creates a predicate and a {@link JTerm} which can be used to compute the values defined by
+     * the
      * given {@link ExtractLocationParameter}s.
      *
      * @param valueSelectParameter The {@link ExtractLocationParameter}s to compute in the created
@@ -780,7 +784,8 @@ public abstract class AbstractUpdateExtractor {
          * @param parentTerm The parent object represented as {@link JTerm}.
          * @throws ProofInputException Occurred Exception.
          */
-        public ExtractLocationParameter(JTerm arrayStartIndex, JTerm arrayEndIndex, JTerm parentTerm)
+        public ExtractLocationParameter(JTerm arrayStartIndex, JTerm arrayEndIndex,
+                JTerm parentTerm)
                 throws ProofInputException {
             assert arrayStartIndex != null;
             assert arrayEndIndex != null;
@@ -1098,8 +1103,8 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected Set<ExecutionVariableValuePair> computeVariableValuePairs(JTerm layoutCondition,
-                                                                        JTerm layoutTerm, Set<ExtractLocationParameter> locations, boolean currentLayout,
-                                                                        boolean simplifyConditions) throws ProofInputException {
+            JTerm layoutTerm, Set<ExtractLocationParameter> locations, boolean currentLayout,
+            boolean simplifyConditions) throws ProofInputException {
         // Get original updates
         ImmutableList<JTerm> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
         // Combine memory layout with original updates
@@ -1310,7 +1315,7 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception
      */
     protected Map<Goal, JTerm> computeValueConditions(Set<Goal> valueGoals,
-                                                      Map<Node, JTerm> branchConditionCache, boolean simplifyConditions)
+            Map<Node, JTerm> branchConditionCache, boolean simplifyConditions)
             throws ProofInputException {
         Comparator<NodeGoal> comparator = (o1, o2) -> {
             return o2.getSerialNr() - o1.getSerialNr(); // Descending order
@@ -1345,8 +1350,9 @@ public abstract class AbstractUpdateExtractor {
                     if (childGoals.size() != childGoal.getParent().childrenCount()) {
                         // Add branch condition to conditions of all child goals
                         for (NodeGoal nodeGoal : childGoals) {
-                            JTerm branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(),
-                                branchConditionCache, simplifyConditions);
+                            JTerm branchCondition =
+                                computeBranchCondition(nodeGoal.getCurrentNode(),
+                                    branchConditionCache, simplifyConditions);
                             for (Goal goal : nodeGoal.getStartingGoals()) {
                                 Set<JTerm> conditions = goalConditions.get(goal);
                                 conditions.add(branchCondition);
@@ -1530,7 +1536,7 @@ public abstract class AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected JTerm computeBranchCondition(Node node, Map<Node, JTerm> branchConditionCache,
-                                           boolean simplifyConditions) throws ProofInputException {
+            boolean simplifyConditions) throws ProofInputException {
         JTerm result = branchConditionCache.get(node);
         if (result == null) {
             result = SymbolicExecutionUtil.computeBranchCondition(node, simplifyConditions, true);
@@ -1610,8 +1616,9 @@ public abstract class AbstractUpdateExtractor {
          * @param condition An optional condition under which the value is valid.
          * @param stateMember Defines if this location should explicitly be shown on the state.
          */
-        public ExecutionVariableValuePair(ProgramVariable programVariable, JTerm parent, JTerm value,
-                                          JTerm condition, boolean stateMember, Node goalNode) {
+        public ExecutionVariableValuePair(ProgramVariable programVariable, JTerm parent,
+                JTerm value,
+                JTerm condition, boolean stateMember, Node goalNode) {
             assert programVariable != null;
             assert value != null;
             this.programVariable = programVariable;
@@ -1634,8 +1641,9 @@ public abstract class AbstractUpdateExtractor {
          * @param condition An optional condition under which the value is valid.
          * @param stateMember Defines if this location should explicitly be shown on the state.
          */
-        public ExecutionVariableValuePair(JTerm arrayIndex, JTerm parent, JTerm value, JTerm condition,
-                                          boolean stateMember, Node goalNode) {
+        public ExecutionVariableValuePair(JTerm arrayIndex, JTerm parent, JTerm value,
+                JTerm condition,
+                boolean stateMember, Node goalNode) {
             assert parent != null;
             assert value != null;
             this.programVariable = null;
@@ -1661,8 +1669,8 @@ public abstract class AbstractUpdateExtractor {
          * @param stateMember Defines if this location should explicitly be shown on the state.
          */
         public ExecutionVariableValuePair(JTerm arrayStartIndex, JTerm arrayEndIndex,
-                                          JTerm arrayRangeConstant, JTerm parent, JTerm value, JTerm condition,
-                                          boolean stateMember, Node goalNode) {
+                JTerm arrayRangeConstant, JTerm parent, JTerm value, JTerm condition,
+                boolean stateMember, Node goalNode) {
             assert parent != null;
             assert value != null;
             this.programVariable = null;

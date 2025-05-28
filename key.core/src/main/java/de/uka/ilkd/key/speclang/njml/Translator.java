@@ -292,7 +292,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     private ImmutableList<JTerm> append(ImmutableList<JTerm> target,
-                                        List<JmlParser.InfflowspeclistContext> ctx) {
+            List<JmlParser.InfflowspeclistContext> ctx) {
         for (ParserRuleContext c : ctx) {
             ImmutableList<JTerm> t = accept(c);
             target = target.append(t);

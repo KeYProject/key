@@ -64,7 +64,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicValue(Services services, JTerm arrayIndex, JTerm value, JTerm condition,
-                         IModelSettings settings) {
+            IModelSettings settings) {
         super(settings);
         assert services != null;
         assert arrayIndex != null;
@@ -89,7 +89,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicValue(Services services, JTerm arrayIndex, JTerm arrayStartIndex,
-                         JTerm arrayEndIndex, JTerm value, JTerm condition, IModelSettings settings) {
+            JTerm arrayEndIndex, JTerm value, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert arrayIndex != null;
@@ -112,7 +112,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicValue(Services services, IProgramVariable programVariable, JTerm value,
-                         JTerm condition, IModelSettings settings) {
+            JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert programVariable != null;

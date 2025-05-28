@@ -506,7 +506,8 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             REPLACE_TO_SUCCEDENT,
 
             /**
-             * Replace clause of a {@link Taclet} provides a {@link JTerm} which is currently used to
+             * Replace clause of a {@link Taclet} provides a {@link JTerm} which is currently used
+             * to
              * modify the {@link PosInOccurrence}. Available information are
              * {@link TacletLabelHint#getTerm()}.
              */

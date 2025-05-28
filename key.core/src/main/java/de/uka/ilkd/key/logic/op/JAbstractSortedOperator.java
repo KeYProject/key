@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
@@ -22,23 +22,23 @@ public abstract class JAbstractSortedOperator extends AbstractSortedOperator
         implements JOperator, Sorted {
 
     protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-                                      ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+            ImmutableArray<Boolean> whereToBind, Modifier modifier) {
         super(name, argSorts, sort, whereToBind, modifier);
     }
 
     protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-                                      ImmutableArray<Boolean> whereToBind, boolean isRigid) {
+            ImmutableArray<Boolean> whereToBind, boolean isRigid) {
         this(name, argSorts, sort, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
     protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
-                                      boolean isRigid) {
+            boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort,
             new ImmutableArray<>(whereToBind), isRigid);
     }
 
     protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-                                      boolean isRigid) {
+            boolean isRigid) {
         this(name, argSorts, sort, null, isRigid);
     }
 

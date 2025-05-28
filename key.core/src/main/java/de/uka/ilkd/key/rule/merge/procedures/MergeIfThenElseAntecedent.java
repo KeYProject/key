@@ -55,8 +55,8 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
 
     @Override
     public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
-                                                 JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
-                                                 JTerm distinguishingFormula, Services services) {
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -95,8 +95,8 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
      *         terms.
      */
     private static ImmutableSet<JTerm> getIfThenElseConstraints(JTerm constrained, JTerm ifTerm,
-                                                                JTerm elseTerm, SymbolicExecutionState state1, SymbolicExecutionState state2,
-                                                                JTerm distinguishingFormula, Services services) {
+            JTerm elseTerm, SymbolicExecutionState state1, SymbolicExecutionState state2,
+            JTerm distinguishingFormula, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<JTerm> result = DefaultImmutableSet.nil();

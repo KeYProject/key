@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.Reader;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -43,9 +43,9 @@ public final class DefaultTermParser {
      *         correctly or the term has an invalid sort.
      */
     public JTerm parse(Reader in, Sort sort, Services services,
-                       Namespace<JQuantifiableVariable> var_ns,
-                       Namespace<Function> func_ns,
-                       Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
+            Namespace<JQuantifiableVariable> var_ns,
+            Namespace<Function> func_ns,
+            Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
         return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,
             new Namespace<>(), new Namespace<>(), progVar_ns), scm);

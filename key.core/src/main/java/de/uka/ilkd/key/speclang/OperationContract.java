@@ -48,7 +48,7 @@ public interface OperationContract extends Contract {
      * @return the modifiable clause.
      */
     JTerm getModifiable(LocationVariable heapVar, LocationVariable selfVar,
-                        ImmutableList<LocationVariable> paramVars, Services services);
+            ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
      * Returns the modifiable clause of the contract.
@@ -61,7 +61,7 @@ public interface OperationContract extends Contract {
      * @return the modifiable clause.
      */
     JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, JTerm selfTerm,
-                        ImmutableList<JTerm> paramTerms, Services services);
+            ImmutableList<JTerm> paramTerms, Services services);
 
     /**
      * Returns the free modifiable clause of the contract.
@@ -73,8 +73,8 @@ public interface OperationContract extends Contract {
      * @return the free modifiable clause.
      */
     JTerm getFreeModifiable(LocationVariable heapVar, LocationVariable selfVar,
-                            ImmutableList<LocationVariable> paramVars,
-                            Services services);
+            ImmutableList<LocationVariable> paramVars,
+            Services services);
 
     /**
      * Returns the free modifiable clause of the contract.
@@ -87,18 +87,19 @@ public interface OperationContract extends Contract {
      * @return the free modifiable clause.
      */
     JTerm getFreeModifiable(LocationVariable heapVar, JTerm heapTerm,
-                            JTerm selfTerm,
-                            ImmutableList<JTerm> paramTerms,
-                            Services services);
+            JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms,
+            Services services);
 
     JTerm getFreePre(LocationVariable heap, LocationVariable selfVar,
-                     ImmutableList<LocationVariable> paramVars,
-                     Map<LocationVariable, LocationVariable> atPreVars, Services services);
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     JTerm getFreePre(List<LocationVariable> heapContext, LocationVariable selfVar,
-                     ImmutableList<LocationVariable> paramVars,
-                     Map<LocationVariable, LocationVariable> atPreVars, Services services);
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     JTerm getFreePre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                     ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services);
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 }

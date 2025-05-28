@@ -72,8 +72,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception
      */
     public ExecutionVariableExtractor(Node node,
-                                      PosInOccurrence modalityPio,
-                                      IExecutionNode<?> executionNode, JTerm condition, boolean simplifyConditions)
+            PosInOccurrence modalityPio,
+            IExecutionNode<?> executionNode, JTerm condition, boolean simplifyConditions)
             throws ProofInputException {
         super(node, modalityPio);
         this.executionNode = executionNode;
@@ -493,10 +493,10 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
          */
         public ExtractedExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-                                          PosInOccurrence modalityPIO,
-                                          IProgramVariable programVariable, JTerm arrayIndex,
-                                          JTerm arrayStartIndex, JTerm arrayEndIndex, JTerm additionalCondition,
-                                          ExtractedExecutionValue parentValue) {
+                PosInOccurrence modalityPIO,
+                IProgramVariable programVariable, JTerm arrayIndex,
+                JTerm arrayStartIndex, JTerm arrayEndIndex, JTerm additionalCondition,
+                ExtractedExecutionValue parentValue) {
             super(parentNode.getSettings(), proofNode, programVariable, parentValue, arrayIndex,
                 additionalCondition, modalityPIO);
             this.arrayStartIndex = arrayStartIndex;
@@ -615,7 +615,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param value The value.
          */
         public ExtractedExecutionValue(IExecutionNode<?> parentNode, Node proofNode,
-                                       IExecutionVariable variable, JTerm condition, JTerm value) {
+                IExecutionVariable variable, JTerm condition, JTerm value) {
             super(parentNode.getSettings(), proofNode, variable, condition, value);
             this.parentNode = parentNode;
         }

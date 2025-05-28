@@ -36,7 +36,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     private static JTerm dropEffectlessElementariesHelper(JTerm update,
-                                                          Set<LocationVariable> relevantVars, TermServices services) {
+            Set<LocationVariable> relevantVars, TermServices services) {
         if (update.op() instanceof ElementaryUpdate eu) {
             LocationVariable lhs = (LocationVariable) eu.lhs();
             if (relevantVars.contains(lhs)) {
@@ -76,7 +76,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     private static JTerm dropEffectlessElementaries(JTerm update, JTerm target,
-                                                    LogicServices p_services) {
+            LogicServices p_services) {
         final Services services = (Services) p_services;
         TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);

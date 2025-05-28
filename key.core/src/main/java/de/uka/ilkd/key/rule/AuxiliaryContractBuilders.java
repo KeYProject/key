@@ -627,8 +627,8 @@ public final class AuxiliaryContractBuilders {
          *         modified variable that occurs in the specified program element.
          */
         public JTerm buildAnonOutUpdate(final ProgramElement el,
-                                        final Map<LocationVariable, Function> anonymisationHeaps,
-                                        final Map<LocationVariable, JTerm> modifiableClauses) {
+                final Map<LocationVariable, Function> anonymisationHeaps,
+                final Map<LocationVariable, JTerm> modifiableClauses) {
             return buildAnonOutUpdate(el, anonymisationHeaps, modifiableClauses, ANON_OUT_PREFIX);
         }
 
@@ -642,8 +642,8 @@ public final class AuxiliaryContractBuilders {
          *         modified variable that occurs in the specified program element.
          */
         public JTerm buildAnonOutUpdate(final ProgramElement el,
-                                        final Map<LocationVariable, Function> anonymisationHeaps,
-                                        final Map<LocationVariable, JTerm> modifiableClauses, final String prefix) {
+                final Map<LocationVariable, Function> anonymisationHeaps,
+                final Map<LocationVariable, JTerm> modifiableClauses, final String prefix) {
             return buildAnonOutUpdate(
                 MiscTools.getLocalOuts(el, services).stream()
                         .filter(LocationVariable.class::isInstance)
@@ -661,8 +661,8 @@ public final class AuxiliaryContractBuilders {
          *         variable in the specified set.
          */
         public JTerm buildAnonOutUpdate(final Set<LocationVariable> vars,
-                                        final Map<LocationVariable, Function> anonymisationHeaps,
-                                        final Map<LocationVariable, JTerm> modifiableClauses, final String prefix) {
+                final Map<LocationVariable, Function> anonymisationHeaps,
+                final Map<LocationVariable, JTerm> modifiableClauses, final String prefix) {
             JTerm result = buildLocalVariablesAnonUpdate(vars, prefix);
             for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
@@ -712,7 +712,7 @@ public final class AuxiliaryContractBuilders {
          * @return an anonymization update for the specified variables.
          */
         private JTerm buildLocalVariablesAnonUpdate(Collection<LocationVariable> vars,
-                                                    String prefix) {
+                String prefix) {
             JTerm result = skip();
 
             for (LocationVariable variable : vars) {
@@ -764,8 +764,8 @@ public final class AuxiliaryContractBuilders {
          * @param services services.
          */
         public ConditionsAndClausesBuilder(final AuxiliaryContract contract,
-                                           final List<LocationVariable> heaps, final BlockContract.Variables variables,
-                                           final JTerm self, final Services services) {
+                final List<LocationVariable> heaps, final BlockContract.Variables variables,
+                final JTerm self, final Services services) {
             super(services.getTermFactory(), services);
             this.contract = contract;
             this.heaps = heaps;
@@ -1060,7 +1060,7 @@ public final class AuxiliaryContractBuilders {
          * @return the assumptions for the {@code self} variable.
          */
         public JTerm buildSelfConditions(List<LocationVariable> heaps, IProgramMethod pm,
-                                         KeYJavaType selfKJT, JTerm self, Services services) {
+                KeYJavaType selfKJT, JTerm self, Services services) {
             if (self != null && !pm.isConstructor()) {
                 JTerm notNull = not(equals(self, NULL()));
 
@@ -1247,12 +1247,12 @@ public final class AuxiliaryContractBuilders {
          * @return the sequent for the validity branch in a loop contract rule.
          */
         private static JTerm buildLoopValiditySequent(final Goal goal, final LoopContract contract,
-                                                      JavaBlock unfold, JavaBlock body, JavaBlock tail, final JModality modality,
-                                                      boolean bodyBreakFound, final JTerm context, final JTerm remember,
-                                                      final JTerm rememberNext, final JTerm decreasesCheck, JTerm anonOut, JTerm anonOut2,
-                                                      JTerm post, JTerm postNext, JTerm postAfterTail, JTerm pre, JTerm brokeLoop,
-                                                      JTerm notBrokeLoop, JTerm exceptionEqNull, JTerm exceptionNeqNull, JTerm cond,
-                                                      JTerm notCond, JTerm abrupt, JTerm notAbrupt, final TermBuilder tb) {
+                JavaBlock unfold, JavaBlock body, JavaBlock tail, final JModality modality,
+                boolean bodyBreakFound, final JTerm context, final JTerm remember,
+                final JTerm rememberNext, final JTerm decreasesCheck, JTerm anonOut, JTerm anonOut2,
+                JTerm post, JTerm postNext, JTerm postAfterTail, JTerm pre, JTerm brokeLoop,
+                JTerm notBrokeLoop, JTerm exceptionEqNull, JTerm exceptionNeqNull, JTerm cond,
+                JTerm notCond, JTerm abrupt, JTerm notAbrupt, final TermBuilder tb) {
             JTerm update;
             if (goal == null) {
                 // We are building a proof obligation for a loop contract.
@@ -1294,10 +1294,11 @@ public final class AuxiliaryContractBuilders {
             return term;
         }
 
-        private static JTerm buildSimplifiedPostBody(boolean bodyBreakFound, final JTerm rememberNext,
-                                                     final JTerm decreasesCheck, JTerm anonOut, JTerm post, JTerm postNext, JTerm pre,
-                                                     JTerm brokeLoop, JTerm notBrokeLoop, JTerm abrupt, JTerm notAbrupt,
-                                                     final TermBuilder tb) {
+        private static JTerm buildSimplifiedPostBody(boolean bodyBreakFound,
+                final JTerm rememberNext,
+                final JTerm decreasesCheck, JTerm anonOut, JTerm post, JTerm postNext, JTerm pre,
+                JTerm brokeLoop, JTerm notBrokeLoop, JTerm abrupt, JTerm notAbrupt,
+                final TermBuilder tb) {
             final JTerm postBody;
             if (bodyBreakFound) {
                 postBody = tb.and(tb.imp(tb.or(brokeLoop, abrupt), post),
@@ -1312,10 +1313,10 @@ public final class AuxiliaryContractBuilders {
         }
 
         private static JTerm buildFullPostBody(boolean bodyBreakFound, JavaBlock tail,
-                                               final JModality modality, final JTerm rememberNext, final JTerm decreasesCheck,
-                                               JTerm anonOut, JTerm post, JTerm postNext, JTerm postAfterTail, JTerm pre,
-                                               JTerm brokeLoop, JTerm notBrokeLoop, JTerm abrupt, JTerm notAbrupt,
-                                               final TermBuilder tb) {
+                final JModality modality, final JTerm rememberNext, final JTerm decreasesCheck,
+                JTerm anonOut, JTerm post, JTerm postNext, JTerm postAfterTail, JTerm pre,
+                JTerm brokeLoop, JTerm notBrokeLoop, JTerm abrupt, JTerm notAbrupt,
+                final TermBuilder tb) {
             final JTerm postBody;
             if (bodyBreakFound) {
                 postBody = tb.and(tb.imp(brokeLoop, postAfterTail), tb.imp(abrupt, post), tb.imp(
@@ -1335,7 +1336,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         private static JTerm createAbruptTerms(final AuxiliaryContract.Terms terms,
-                                               JTerm exceptionNeqNull, final TermBuilder tb) {
+                JTerm exceptionNeqNull, final TermBuilder tb) {
             Set<JTerm> abruptTerms = new LinkedHashSet<>();
             abruptTerms.add(exceptionNeqNull);
             if (terms.returnFlag != null) {
@@ -1362,8 +1363,8 @@ public final class AuxiliaryContractBuilders {
          * @return the well-definedness formula.
          */
         public JTerm setUpWdGoal(final Goal goal, final BlockContract contract, final JTerm update,
-                                 final JTerm anonUpdate, final LocationVariable heap, final Function anonHeap,
-                                 final ImmutableSet<LocationVariable> localIns) {
+                final JTerm anonUpdate, final LocationVariable heap, final Function anonHeap,
+                final ImmutableSet<LocationVariable> localIns) {
             // FIXME: Handling of \old-references needs to be investigated,
             // however only completeness is lost, soundness is guaranteed
             final BlockWellDefinedness bwd =
@@ -1394,8 +1395,8 @@ public final class AuxiliaryContractBuilders {
          * @return the term for the validity goal.
          */
         public JTerm setUpValidityGoal(final Goal goal, final JTerm[] updates,
-                                       final JTerm[] assumptions, final JTerm[] postconditions,
-                                       final ProgramVariable exceptionParameter, final AuxiliaryContract.Terms terms) {
+                final JTerm[] assumptions, final JTerm[] postconditions,
+                final ProgramVariable exceptionParameter, final AuxiliaryContract.Terms terms) {
             final TermBuilder tb = services.getTermBuilder();
             JavaBlock newJavaBlock = getJavaBlock(exceptionParameter);
             JTerm newPost = tb.and(postconditions);
@@ -1459,14 +1460,14 @@ public final class AuxiliaryContractBuilders {
          * @return the term for the validity goal in a loop contract rule app.
          */
         public JTerm setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
-                                           final JTerm context, final JTerm remember, final JTerm rememberNext,
-                                           final Map<LocationVariable, Function> anonOutHeaps,
-                                           final Map<LocationVariable, JTerm> modifiableClauses,
-                                           final Map<LocationVariable, JTerm> freeModifiableClauses,
-                                           final JTerm[] assumptions,
-                                           final JTerm decreasesCheck, final JTerm[] postconditions,
-                                           final JTerm[] postconditionsNext, final LocationVariable exceptionParameter,
-                                           final AuxiliaryContract.Terms terms, final AuxiliaryContract.Variables nextVars) {
+                final JTerm context, final JTerm remember, final JTerm rememberNext,
+                final Map<LocationVariable, Function> anonOutHeaps,
+                final Map<LocationVariable, JTerm> modifiableClauses,
+                final Map<LocationVariable, JTerm> freeModifiableClauses,
+                final JTerm[] assumptions,
+                final JTerm decreasesCheck, final JTerm[] postconditions,
+                final JTerm[] postconditionsNext, final LocationVariable exceptionParameter,
+                final AuxiliaryContract.Terms terms, final AuxiliaryContract.Variables nextVars) {
             final TermBuilder tb = services.getTermBuilder();
             final JModality modality = instantiation.modality();
 
@@ -1521,7 +1522,8 @@ public final class AuxiliaryContractBuilders {
             JTerm abrupt = createAbruptTerms(terms, exceptionNeqNull, tb);
             JTerm notAbrupt = tb.not(abrupt);
 
-            final JTerm term = buildLoopValiditySequent(goal, contract, javaBlocks[0], javaBlocks[1],
+            final JTerm term = buildLoopValiditySequent(goal, contract, javaBlocks[0],
+                javaBlocks[1],
                 javaBlocks[2], modality, bodyBreakFound, context, remember, rememberNext,
                 decreasesCheck, anonOut, anonOut2, posts[0], posts[1], postAfterTail, pre,
                 brokeLoop, notBrokeLoop, exceptionEqNull, exceptionNeqNull, cond, notCond, abrupt,
@@ -1715,8 +1717,8 @@ public final class AuxiliaryContractBuilders {
         }
 
         private JTerm[] createPosts(final Goal goal, final JTerm[] postconditions,
-                                    final JTerm[] postconditionsNext, final AuxiliaryContract.Terms terms,
-                                    final TermBuilder tb) {
+                final JTerm[] postconditionsNext, final AuxiliaryContract.Terms terms,
+                final TermBuilder tb) {
             JTerm post = tb.and(postconditions);
             post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, post,
                 ImmutableSLList.<LocationVariable>nil()

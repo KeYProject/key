@@ -43,8 +43,8 @@ public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbst
 
     @Override
     public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
-                                                 JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
-                                                 JTerm distinguishingFormula, Services services) {
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
         throw new UnsupportedOperationException(
             "You need to create an instance of MergeWithPredicateAbstraction.");
     }

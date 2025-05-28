@@ -175,21 +175,21 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
 
     private static JTerm replace(JTerm term, IFProofObligationVars origVars,
-                                 IFProofObligationVars schemaVars, Services services) {
+            IFProofObligationVars schemaVars, Services services) {
         JTerm intermediateResult = replace(term, origVars.c1, schemaVars.c1, services);
         return replace(intermediateResult, origVars.c2, schemaVars.c2, services);
     }
 
 
     private static JTerm replace(JTerm term, ProofObligationVars origVars,
-                                 ProofObligationVars schemaVars, Services services) {
+            ProofObligationVars schemaVars, Services services) {
         JTerm intermediateResult = replace(term, origVars.pre, schemaVars.pre, services);
         return replace(intermediateResult, origVars.post, schemaVars.post, services);
     }
 
 
     private static JTerm replace(JTerm term, StateVars origVars, StateVars schemaVars,
-                                 Services services) {
+            Services services) {
         LinkedHashMap<JTerm, JTerm> map = new LinkedHashMap<>();
 
         Pair<StateVars, StateVars> vars = filter(origVars, schemaVars);

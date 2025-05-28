@@ -9,14 +9,15 @@ import java.util.function.Predicate;
 import de.uka.ilkd.key.java.Services;
 
 /**
- * A generic {@link JTerm} replace visitor based on a filter predicate and a replacement function for
+ * A generic {@link JTerm} replace visitor based on a filter predicate and a replacement function
+ * for
  * the filtered subterms.
  *
  * @author Dominic Steinhoefel
  */
 public class GenericTermReplacer {
     public static JTerm replace(final JTerm t, final Predicate<JTerm> filter,
-                                final Function<JTerm, JTerm> replacer, Services services) {
+            final Function<JTerm, JTerm> replacer, Services services) {
         JTerm newTopLevelTerm = t;
         if (filter.test(t)) {
             newTopLevelTerm = replacer.apply(t);

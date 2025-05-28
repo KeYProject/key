@@ -386,8 +386,9 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
     private ImmutableArray<TermLabel> instantiateLabels(JTerm tacletTerm, JOperator newTermOp,
-                                                        ImmutableArray<JTerm> newTermSubs, ImmutableArray<JQuantifiableVariable> newTermBoundVars,
-                                                        ImmutableArray<TermLabel> newTermOriginalLabels) {
+            ImmutableArray<JTerm> newTermSubs,
+            ImmutableArray<JQuantifiableVariable> newTermBoundVars,
+            ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
             tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));

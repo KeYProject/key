@@ -7,8 +7,8 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -66,7 +66,7 @@ public class ProofObligationVars {
 
 
     public ProofObligationVars(StateVars pre, StateVars post, JTerm exceptionParameter,
-                               ImmutableList<JTerm> formalParams, Services services) {
+            ImmutableList<JTerm> formalParams, Services services) {
         this.pre = pre;
         this.post = post;
         this.exceptionParameter = exceptionParameter;
@@ -76,7 +76,7 @@ public class ProofObligationVars {
     }
 
     public ProofObligationVars(StateVars pre, StateVars post, JTerm exceptionParameter,
-                               ImmutableList<JTerm> formalParams, TermBuilder tb) {
+            ImmutableList<JTerm> formalParams, TermBuilder tb) {
         this.pre = pre;
         this.post = post;
         this.exceptionParameter = exceptionParameter;

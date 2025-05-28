@@ -17,8 +17,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -405,8 +405,8 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     private RuleApp makeReplaceKnownTacletApp(JTerm formula,
-                                              boolean inAntecedent,
-                                              PosInOccurrence pio) {
+            boolean inAntecedent,
+            PosInOccurrence pio) {
         FindTaclet taclet;
         if (pio.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig()

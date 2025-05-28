@@ -92,10 +92,10 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @return the preconditions.
      */
     private static JTerm[] createPreconditions(final Instantiation instantiation,
-                                               final BlockContract contract, final List<LocationVariable> heaps,
-                                               final ImmutableSet<LocationVariable> localInVariables,
-                                               final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-                                               final Services services) {
+            final BlockContract contract, final List<LocationVariable> heaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
+            final Services services) {
         final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
         final JTerm wellFormedHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
@@ -115,8 +115,8 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @return the postconditions.
      */
     private static JTerm[] createAssumptions(final ImmutableSet<LocationVariable> localOutVariables,
-                                             final Map<LocationVariable, Function> anonymisationHeaps,
-                                             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
+            final Map<LocationVariable, Function> anonymisationHeaps,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final JTerm postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final JTerm wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
@@ -138,11 +138,11 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      * @return the updates.
      */
     private static JTerm[] createUpdates(final JTerm contextUpdate,
-                                         final List<LocationVariable> heaps,
-                                         final Map<LocationVariable, Function> anonymisationHeaps,
-                                         final BlockContract.Variables variables,
-                                         final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-                                         final Services services) {
+            final List<LocationVariable> heaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
+            final BlockContract.Variables variables,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
+            final Services services) {
         final Map<LocationVariable, JTerm> modifiableClauses =
             conditionsAndClausesBuilder.buildModifiableClauses();
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);

@@ -50,8 +50,8 @@ class LabeledTermImpl extends TermImpl {
      * @param origin a String with origin information
      */
     public LabeledTermImpl(JOperator op, ImmutableArray<JTerm> subs,
-                           ImmutableArray<JQuantifiableVariable> boundVars,
-                           ImmutableArray<TermLabel> labels, String origin) {
+            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<TermLabel> labels, String origin) {
         super(op, subs, boundVars, origin);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
@@ -67,8 +67,8 @@ class LabeledTermImpl extends TermImpl {
      * @param labels the terms labels (must not be null or empty)
      */
     public LabeledTermImpl(JOperator op, ImmutableArray<JTerm> subs,
-                           ImmutableArray<JQuantifiableVariable> boundVars,
-                           ImmutableArray<TermLabel> labels) {
+            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<TermLabel> labels) {
         super(op, subs, boundVars, "");
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";

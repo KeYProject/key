@@ -640,8 +640,9 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
-    public JTerm getProgramMethodTerm(JTerm prefix, String methodName, JTerm[] args, String className,
-                                      boolean traverseHierarchy) {
+    public JTerm getProgramMethodTerm(JTerm prefix, String methodName, JTerm[] args,
+            String className,
+            boolean traverseHierarchy) {
 
         /*
          * This is just a safety measure. To avoid null pointers, try to call
@@ -685,7 +686,7 @@ public final class JavaInfo {
     }
 
     public JTerm getTermFromProgramMethod(IProgramMethod pm, String methodName, String className,
-                                          JTerm[] args, JTerm prefix) throws IllegalArgumentException {
+            JTerm[] args, JTerm prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException(
                 "Program method " + methodName + " in " + className + " not found.");

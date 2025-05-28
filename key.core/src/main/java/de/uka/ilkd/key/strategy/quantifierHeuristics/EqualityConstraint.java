@@ -16,8 +16,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.JOperator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
@@ -251,8 +251,8 @@ public class EqualityConstraint implements Constraint {
      * @param cmpBoundVars variables bound above the current position
      */
     private static boolean compareBoundVariables(JQuantifiableVariable ownVar,
-                                                 JQuantifiableVariable cmpVar, ImmutableList<JQuantifiableVariable> ownBoundVars,
-                                                 ImmutableList<JQuantifiableVariable> cmpBoundVars) {
+            JQuantifiableVariable cmpVar, ImmutableList<JQuantifiableVariable> ownBoundVars,
+            ImmutableList<JQuantifiableVariable> cmpBoundVars) {
 
         final int ownNum = indexOf(ownVar, ownBoundVars);
         final int cmpNum = indexOf(cmpVar, cmpBoundVars);
@@ -274,7 +274,8 @@ public class EqualityConstraint implements Constraint {
      * @return the index of the first occurrence of <code>var</code> in <code>list</code>, or
      *         <code>-1</code> if the variable is not an element of the list
      */
-    private static int indexOf(JQuantifiableVariable var, ImmutableList<JQuantifiableVariable> list) {
+    private static int indexOf(JQuantifiableVariable var,
+            ImmutableList<JQuantifiableVariable> list) {
         int res = 0;
         while (!list.isEmpty()) {
             if (list.head() == var) {
@@ -307,9 +308,10 @@ public class EqualityConstraint implements Constraint {
      *         <code>!modifyThis</code> a new object is created, and <code>this</code> is never
      *         modified. <code>Constraint.TOP</code> is always returned for ununifiable terms
      */
-    private Constraint unifyHelp(JTerm t0, JTerm t1, ImmutableList<JQuantifiableVariable> ownBoundVars,
-                                 ImmutableList<JQuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
-                                 boolean modifyThis, Services services) {
+    private Constraint unifyHelp(JTerm t0, JTerm t1,
+            ImmutableList<JQuantifiableVariable> ownBoundVars,
+            ImmutableList<JQuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
+            boolean modifyThis, Services services) {
 
         if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
             return this;
@@ -444,9 +446,9 @@ public class EqualityConstraint implements Constraint {
     }
 
     private Constraint descendRecursively(JTerm t0, JTerm t1,
-                                          ImmutableList<JQuantifiableVariable> ownBoundVars,
-                                          ImmutableList<JQuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
-                                          boolean modifyThis, Services services) {
+            ImmutableList<JQuantifiableVariable> ownBoundVars,
+            ImmutableList<JQuantifiableVariable> cmpBoundVars, NameAbstractionTable nat,
+            boolean modifyThis, Services services) {
         Constraint newConstraint = this;
 
         for (int i = 0; i < t0.arity(); i++) {
@@ -487,7 +489,7 @@ public class EqualityConstraint implements Constraint {
     }
 
     private Constraint handleTwoMetavariables(JTerm t0, JTerm t1, boolean modifyThis,
-                                              Services services) {
+            Services services) {
         final Metavariable mv0 = (Metavariable) t0.op();
         final Metavariable mv1 = (Metavariable) t1.op();
         final Sort mv0S = mv0.sort();
@@ -511,8 +513,8 @@ public class EqualityConstraint implements Constraint {
     }
 
     private Constraint handleQuantifiableVariable(JTerm t0, JTerm t1,
-                                                  ImmutableList<JQuantifiableVariable> ownBoundVars,
-                                                  ImmutableList<JQuantifiableVariable> cmpBoundVars) {
+            ImmutableList<JQuantifiableVariable> ownBoundVars,
+            ImmutableList<JQuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof JQuantifiableVariable)
                 && compareBoundVariables((JQuantifiableVariable) t0.op(),
                     (JQuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
@@ -552,7 +554,7 @@ public class EqualityConstraint implements Constraint {
      * @return the resulting Constraint ( == this iff this subsumes the new constraint )
      */
     private Constraint normalize(Metavariable mv, JTerm t, boolean modifyThis,
-                                 Services services) {
+            Services services) {
         // MV cycles are impossible if the orders of MV pairs are
         // correct
 

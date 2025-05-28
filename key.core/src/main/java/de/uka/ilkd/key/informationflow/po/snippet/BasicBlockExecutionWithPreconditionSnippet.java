@@ -22,7 +22,8 @@ class BasicBlockExecutionWithPreconditionSnippet extends ReplaceAndRegisterMetho
 
         // precondition
         final JTerm freePre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
-        final JTerm contractPre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+        final JTerm contractPre =
+            symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
         final JTerm pre = d.tb.and(freePre, contractPre);
 
         // symbolic execution

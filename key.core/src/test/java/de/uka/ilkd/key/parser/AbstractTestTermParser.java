@@ -160,7 +160,7 @@ public class AbstractTestTermParser {
      *        tested for correct parsing.
      */
     protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax,
-                                                                        JTerm expectedParseResult, String... optionalStringRepresentations) throws Exception {
+            JTerm expectedParseResult, String... optionalStringRepresentations) throws Exception {
 
         verifyParsing(expectedParseResult, prettySyntax);
         verifyPrettyPrinting(prettySyntax, expectedParseResult);

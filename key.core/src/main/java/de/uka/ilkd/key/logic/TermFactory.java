@@ -56,8 +56,8 @@ public final class TermFactory {
      * entire system.
      */
     public JTerm createTerm(@NonNull JOperator op, ImmutableArray<JTerm> subs,
-                            ImmutableArray<JQuantifiableVariable> boundVars,
-                            ImmutableArray<TermLabel> labels) {
+            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -70,7 +70,7 @@ public final class TermFactory {
     }
 
     public JTerm createTerm(JOperator op, ImmutableArray<JTerm> subs,
-                            ImmutableArray<JQuantifiableVariable> boundVars) {
+            ImmutableArray<JQuantifiableVariable> boundVars) {
 
         return createTerm(op, subs, boundVars, null);
     }
@@ -79,8 +79,9 @@ public final class TermFactory {
         return createTerm(op, createSubtermArray(subs), null, null);
     }
 
-    public JTerm createTerm(JOperator op, JTerm[] subs, ImmutableArray<JQuantifiableVariable> boundVars,
-                            ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(JOperator op, JTerm[] subs,
+            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 
@@ -96,7 +97,8 @@ public final class TermFactory {
         return createTerm(op, new ImmutableArray<>(sub), null, labels);
     }
 
-    public JTerm createTerm(JOperator op, JTerm sub1, JTerm sub2, ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(JOperator op, JTerm sub1, JTerm sub2,
+            ImmutableArray<TermLabel> labels) {
         return createTerm(op, new JTerm[] { sub1, sub2 }, labels);
     }
 
@@ -114,8 +116,8 @@ public final class TermFactory {
     }
 
     private JTerm doCreateTerm(JOperator op, ImmutableArray<JTerm> subs,
-                               ImmutableArray<JQuantifiableVariable> boundVars,
-                               ImmutableArray<TermLabel> labels, String origin) {
+            ImmutableArray<JQuantifiableVariable> boundVars,
+            ImmutableArray<TermLabel> labels, String origin) {
 
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()
