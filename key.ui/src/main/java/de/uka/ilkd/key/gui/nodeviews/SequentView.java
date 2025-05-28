@@ -42,8 +42,6 @@ import org.slf4j.LoggerFactory;
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JEditorPane {
-    private static final long serialVersionUID = 6867808795064180589L;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
     public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
@@ -68,8 +66,8 @@ public abstract class SequentView extends JEditorPane {
         "[currentGoal]mouseSelectionColor", "Color of the mouse selection in the sequent view.",
         new Color(230, 230, 230, 255));
 
-    protected static final Color INACTIVE_BACKGROUND_COLOR =
-        new Color(UIManager.getColor("Panel.background").getRGB());
+    protected static Color INACTIVE_BACKGROUND_COLOR =
+            new Color(UIManager.getColor("Panel.background").getRGB());
 
     private static final HighlightPainter MOUSE_SELECTION_PAINTER =
         new DefaultHighlightPainter(MOUSE_SELECTION_COLOR.get());
@@ -689,6 +687,7 @@ public abstract class SequentView extends JEditorPane {
     public void updateUI() {
         super.updateUI();
         setFont();
+        INACTIVE_BACKGROUND_COLOR = UIManager.getColor("Panel.background");
     }
 
     public static int computeLineWidthFor(JComponent c) {
