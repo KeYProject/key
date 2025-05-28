@@ -3802,7 +3802,7 @@ public final class SymbolicExecutionUtil {
      * Checks if the given node should be represented as loop body termination.
      *
      * @param node The current {@link Node} in the proof tree of KeY.
-     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+     * @param ruleApp The {@link RuleApp} may or may not be used in the rule.
      * @return {@code true} represent node as loop body termination, {@code false} represent node as
      *         something else.
      */

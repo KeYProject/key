@@ -44,6 +44,9 @@ public abstract class Taclet implements Rule {
     /** contains the find term */
     protected final @Nullable SyntaxElement find;
 
+    /**
+     * The restriction(s) for applying this update. {@link ApplicationRestriction}.
+     */
     protected final ApplicationRestriction applicationRestriction;
 
     /**
@@ -162,6 +165,9 @@ public abstract class Taclet implements Rule {
         check();
     }
 
+    /// Throws an exception if the taclet is improperly constructed. This is the case if
+    /// - There is no find part, but the application restriction does not match "in sequent state."
+    /// - The find part is a sequent but contains no or more than one formula.
     private void check() {
         if (find == null
                 && !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE)) {
@@ -173,6 +179,7 @@ public abstract class Taclet implements Rule {
         }
     }
 
+    /// @return Whether the taclet has a trigger.
     public boolean hasTrigger() {
         return trigger != null;
     }
@@ -194,41 +201,35 @@ public abstract class Taclet implements Rule {
         createAndInitializeExecutor();
     }
 
+    /// A helper method for creating the appropriate taclet matcher.
     protected abstract void createAndInitializeMatcher();
 
+    /// A helper method for creating the appropriate taclet executor.
     protected abstract void createAndInitializeExecutor();
 
-    /**
-     * computes and returns all variables that occur bound in the taclet including the taclets
-     * defined in <tt>addrules</tt> sections. The result is cached and therefore only computed once.
-     *
-     * @return all variables occurring bound in the taclet
-     */
+    /// computes and returns all variables that occur bound in the taclet including the taclets
+    /// defined in `addrules` sections. The result is cached and therefore only computed once.
+    ///
+    /// @return all variables occurring bound in the taclet
     public abstract ImmutableSet<QuantifiableVariable> getBoundVariables();
 
-    /**
-     * collects bound variables in taclet entities others than goal templates
-     *
-     * @return set of variables that occur bound in taclet entities others than goal templates
-     */
+    /// collects bound variables in taclet entities others than goal templates
+    ///
+    /// @return set of variables that occur bound in taclet entities others than goal templates
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
-    /**
-     * returns true iff the taclet contains a "close goal"-statement
-     *
-     * @return true iff the taclet contains a "close goal"-statement
-     */
+    /// returns true iff the taclet contains a "close goal"-statement
+    ///
+    /// @return true iff the taclet contains a "close goal"-statement
     public boolean closeGoal() {
         return goalTemplates.isEmpty();
     }
 
-    /**
-     * looks if a variable is declared as new and returns its sort to match with or the schema
-     * variable it shares the match-sort with. Returns null if the SV is not declared to as new.
-     *
-     * @param var the SchemaVariable to look for
-     * @return the sort of the SV to match or the SV it shares the same match-sort with
-     */
+    /// looks if a variable is declared as new and returns its sort to match with or the schema
+    /// variable it shares the match-sort with. Returns null if the SV is not declared to as new.
+    ///
+    /// @param var the SchemaVariable to look for
+    /// @return the sort of the SV to match or the SV it shares the same match-sort with
     public @Nullable NewVarcond varDeclaredNew(SchemaVariable var) {
         for (final NewVarcond nv : varsNew) {
             if (nv.getSchemaVariable() == var) {
@@ -238,53 +239,39 @@ public abstract class Taclet implements Rule {
         return null;
     }
 
-    /**
-     * @return the generic variable conditions of this taclet
-     */
+    /// @return the generic variable conditions of this taclet
     public ImmutableList<? extends VariableCondition> getVariableConditions() {
         return variableConditions;
     }
 
-    /**
-     * returns the name of the Taclet
-     */
+    /// @return the name of the Taclet
     @Override
     public @NonNull Name name() {
         return name;
     }
 
-    /**
-     * returns the display name of the taclet, or, if not specified -- the canonical name
-     */
+    /// @return the display name of the taclet, or, if not specified -- the canonical name
     @Override
     public @NonNull String displayName() {
         return displayName;
     }
 
-    /**
-     * returns the if-sequence of the application part of the Taclet.
-     */
+    /// @return the assumes-sequence of the application part of the Taclet.
     public Sequent assumesSequent() {
         return assumesSequent;
     }
 
-    /**
-     * returns the application restrictions of the Taclet.
-     */
+    /// @return the application restrictions of the Taclet.
     public ApplicationRestriction applicationRestriction() {
         return applicationRestriction;
     }
 
-    /**
-     * returns an iterator over the variables that are new in the Taclet.
-     */
+    /// @return an iterator over the variables that are new in the Taclet.
     public ImmutableList<? extends NewVarcond> varsNew() {
         return varsNew;
     }
 
-    /**
-     * returns an iterator over the variable pairs that indicate that are new in the Taclet.
-     */
+    /// @return an iterator over the variable pairs that indicate that are new in the Taclet.
     public ImmutableList<? extends NotFreeIn> varsNotFreeIn() {
         return varsNotFreeIn;
     }
@@ -293,9 +280,7 @@ public abstract class Taclet implements Rule {
         return varsNewDependingOn;
     }
 
-    /**
-     * returns an iterator over the goal descriptions.
-     */
+    /// @return an iterator over the goal descriptions.
     public ImmutableList<TacletGoalTemplate> goalTemplates() {
         return goalTemplates;
     }
@@ -304,10 +289,8 @@ public abstract class Taclet implements Rule {
         return prefixMap;
     }
 
-    /**
-     * returns true if one of the goal templates is a replacewith. Already computed and cached by
-     * method cacheMatchInfo
-     */
+    /// @return true if one of the goal templates is a replacewith. Already computed and cached by
+    /// method cacheMatchInfo
     public boolean hasReplaceWith() {
         for (final TacletGoalTemplate goalTemplate : goalTemplates) {
             if (goalTemplate.replaceWithExpressionAsObject() != null) {
@@ -317,15 +300,13 @@ public abstract class Taclet implements Rule {
         return false;
     }
 
-    /**
-     * returns the computed prefix for the given schemavariable. The prefix of a schemavariable is
-     * used to determine if an instantiation is correct, in more detail: it mainly contains all
-     * variables that can appear free in an instantiation of the schemvariable sv (rewrite taclets
-     * have some special handling, see paper of M. Giese and comment of method isContextInPrefix).
-     *
-     * @param sv the Schemavariable
-     * @return prefix of schema variable sv
-     */
+    /// Returns the computed prefix for the given schemavariable. The prefix of a schemavariable is
+    /// used to determine if an instantiation is correct, in more detail: it mainly contains all
+    /// variables that can appear free in an instantiation of the schemvariable sv (rewrite taclets
+    /// have some special handling, see paper of M. Giese and comment of method isContextInPrefix).
+    ///
+    /// @param sv the Schemavariable
+    /// @return prefix of schema variable sv
     public @Nullable TacletPrefix getPrefix(SchemaVariable sv) {
         return prefixMap.get(sv);
     }
@@ -334,35 +315,29 @@ public abstract class Taclet implements Rule {
         return choices;
     }
 
-    /** returns an iterator over the rule sets. */
+    /// @return an iterator over the rule sets.
     public Iterator<RuleSet> ruleSets() {
         return ruleSets.iterator();
     }
 
-    /**
-     * returns the set of schemavariables of the taclet's assumes-part
-     *
-     * @return Set of schemavariables of the {@code if} part
-     */
+    /// Returns the set of schemavariables of the taclet's assumes-part
+    ///
+    /// @return Set of schemavariables of the `if` part
     protected abstract ImmutableSet<? extends SchemaVariable> getAssumesVariables();
 
-    /**
-     * this method is used to determine if top level updates are allowed to be ignored. This is the
-     * case if we have an AntecTaclet or SuccTaclet but not for a RewriteTaclet
-     *
-     * @return true if top level updates shall be ignored
-     */
+    /// This method is used to determine if top level updates are allowed to be ignored. This is the
+    /// case if we have an AntecTaclet or SuccTaclet but not for a RewriteTaclet
+    ///
+    /// @return true if top level updates shall be ignored
     public boolean ignoreTopLevelUpdates() {
         return find instanceof Sequent &&
                 !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE);
     }
 
-    /**
-     * returns true iff a context flag is set in one of the entries in the prefix map. Is cached
-     * after having been called once. __OPTIMIZE__ is caching really necessary here?
-     *
-     * @return true iff a context flag is set in one of the entries in the prefix map.
-     */
+    /// Returns true iff a context flag is set in one of the entries in the prefix map. Is cached
+    /// after having been called once. __OPTIMIZE__ is caching really necessary here?
+    ///
+    /// @return true iff a context flag is set in one of the entries in the prefix map.
     public boolean isContextInPrefix() {
         if (contextInfoComputed) {
             return contextIsInPrefix;
@@ -379,11 +354,10 @@ public abstract class Taclet implements Rule {
         return false;
     }
 
-    /**
-     * @return set of schemavariables of the {@code \assumes} and the (optional) {@code \find} part
-     */
+    /// @return set of schemavariables of the `\assumes` and the (optional) `\find` part
     public abstract ImmutableSet<SchemaVariable> getAssumesAndFindVariables();
 
+    /// Helper for {@link Taclet#toString()}, specifically the `assumes` part.
     protected StringBuffer toStringAssumes(StringBuffer sb) {
         if (!assumesSequent.isEmpty()) {
             sb.append("\\assumes (").append(assumesSequent).append(") ");
@@ -392,6 +366,7 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
+    /// Helper for {@link Taclet#toString()}, specifically the variable conditions.
     protected StringBuffer toStringVarCond(StringBuffer sb) {
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
             sb.append("\\varcond(");
@@ -422,6 +397,7 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
+    /// Helper for {@link Taclet#toString()}, specifically the goal templates.
     protected StringBuffer toStringGoalTemplates(StringBuffer sb) {
         if (goalTemplates.isEmpty()) {
             sb.append("\\closegoal");
@@ -431,6 +407,7 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
+    /// Helper for {@link Taclet#toString()}, specifically the triggers.
     protected StringBuffer toStringTriggers(StringBuffer sb) {
         if (trigger != null) {
             sb.append("\n\\trigger{");
@@ -445,17 +422,24 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
+    /// Helper for {@link Taclet#toString()}, specifically the attributes.
     StringBuffer toStringAttribs(StringBuffer sb) {
         // if (noninteractive()) sb = sb.append(" \\noninteractive");
         sb.append("\nChoices: ").append(choices);
         return sb;
     }
 
-    /**
-     * returns a representation of the Taclet as String
-     *
-     * @return string representation
-     */
+    /// Helper for {@link Taclet#toString()}, specifically the rule sets.
+    protected StringBuffer toStringRuleSets(StringBuffer sb) {
+        if (!ruleSets.isEmpty()) {
+            sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")"));
+        }
+        return sb;
+    }
+
+    /// Returns a representation of the Taclet as String
+    ///
+    /// @return string representation
     @Override
     public String toString() {
         if (tacletAsString == null) {
@@ -473,13 +457,6 @@ public abstract class Taclet implements Rule {
         return tacletAsString;
     }
 
-    protected StringBuffer toStringRuleSets(StringBuffer sb) {
-        if (!ruleSets.isEmpty()) {
-            sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")"));
-        }
-        return sb;
-    }
-
     public @NonNull <G extends ProofGoal<@NonNull G>> TacletExecutor<@NonNull G, ?> getExecutor() {
         // noinspection unchecked
         return (TacletExecutor<@NonNull G, ?>) executor;
@@ -491,6 +468,7 @@ public abstract class Taclet implements Rule {
         return ruleSets;
     }
 
+    /// Restricts where a taclet may be applied. Any combination of these restrictions in possible.
     public record ApplicationRestriction(int value) {
         public ApplicationRestriction {
             if ((value & ANTECEDENT_POLARITY) == ANTECEDENT_POLARITY
@@ -500,59 +478,58 @@ public abstract class Taclet implements Rule {
             }
         }
 
-        /** does not pose state restrictions on valid matchings */
+        /// does not pose state restrictions on valid matchings
         public static final ApplicationRestriction NONE = new ApplicationRestriction(0);
-        /**
-         * all taclet constituents must appear in the same state (and not below a modality (for
-         * efficiency reasons))
-         */
+
+        /// all taclet constituents must appear in the same state (and not below a modality (for
+        /// efficiency reasons))
         public static final int SAME_UPDATE_LEVEL = 1;
-        /**
-         * all taclet constituents must be in the same state as the sequent
-         */
+
+        /// all taclet constituents must be in the same state as the sequent
         public static final int IN_SEQUENT_STATE = 2;
-        /**
-         * If the surrounding formula has been decomposed completely, the find-term will NOT appear
-         * on
-         * the succedent. The formula {@code wellformed(h)} in {@code wellformed(h) ==>} or in
-         * {@code ==> wellformed(h) ->
-         * (inv(h) = inv(h2))} or in {@code ==> \if(b) \then(!wellformed(h)) \else(!wellformed(h2))}
-         * has
-         * antecedent polarity. The formula {@code wellformed(h)} in
-         * {@code wellformed(h) <-> wellformed(h2) ==>}
-         * has NO antecedent polarity.
-         * <br>
-         * If this flag is set, the rule matches <b>only</b> on positions with antecedent polarity.
-         */
+
+        /// If the surrounding formula has been decomposed completely, the find-term will NOT appear
+        /// on
+        /// the succedent. The formula `wellformed(h)` in `wellformed(h) ==>` or in
+        /// `==> wellformed(h) ->(inv(h) = inv(h2))` or in `==> \if(b) \then(!wellformed(h))
+        /// \else(!wellformed(h2))`
+        /// has
+        /// antecedent polarity. The formula `wellformed(h)` in
+        /// `wellformed(h) <-> wellformed(h2) ==>`
+        /// has NO antecedent polarity.
+        ///
+        /// If this flag is set, the rule matches **only** on positions with antecedent polarity.
         public static final int ANTECEDENT_POLARITY = 4;
-        /**
-         * If the surrounding formula has been decomposed completely, the find-term will NOT appear
-         * on
-         * the antecedent. The formula {@code wellformed(h)} in {@code ==> wellformed(h)} or in
-         * {@code wellformed(h) ->
-         * (inv(h) = inv(h2)) ==>} or in
-         * {@code \if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>}
-         * has
-         * succedent polarity. The formula {@code wellformed(h)} in
-         * {@code wellformed(h) <-> wellformed(h2) ==>} has
-         * NO succedent polarity.
-         * <br>
-         * If this flag is set, the rule matches <b>only</b> on positions with succedent polarity.
-         */
+
+        /// If the surrounding formula has been decomposed completely, the find-term will NOT appear
+        /// on
+        /// the antecedent. The formula `wellformed(h)` in `==> wellformed(h)` or in
+        /// `wellformed(h) ->(inv(h) = inv(h2)) ==>` or in
+        /// `\if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>`
+        /// has
+        /// succedent polarity. The formula `wellformed(h)` in
+        /// `wellformed(h) <-> wellformed(h2) ==>` has
+        /// NO succedent polarity.
+        ///
+        /// If this flag is set, the rule matches **only** on positions with succedent polarity.
         public static final int SUCCEDENT_POLARITY = 8;
 
+        /// @return `true` iff `this` and `o` have at least one common flag.
         public boolean matches(ApplicationRestriction o) {
             return (value() & o.value()) != 0;
         }
 
+        /// @return `true` iff `this` and `value` have at least one common bit set to `1`.
         public boolean matches(int value) {
             return (value() & value) != 0;
         }
 
+        /// @return a new restriction where all flags set by `this` or `restriction` are set.
         public ApplicationRestriction combine(ApplicationRestriction restriction) {
             return new ApplicationRestriction(this.value | restriction.value());
         }
 
+        /// @return a new restriction where all flags set by `this` or `value` are set.
         public ApplicationRestriction combine(int value) {
             return new ApplicationRestriction(this.value | value);
         }

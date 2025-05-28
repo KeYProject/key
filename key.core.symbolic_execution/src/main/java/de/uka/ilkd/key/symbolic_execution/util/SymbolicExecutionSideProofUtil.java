@@ -189,7 +189,7 @@ public final class SymbolicExecutionSideProofUtil {
                 methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract relevant things
-            Set<org.key_project.logic.op.Operator> relevantThingsInSequentToProve =
+            Set<Operator> relevantThingsInSequentToProve =
                 extractRelevantThings(info.getProof().getServices(), sequentToProve);
             // Extract results and conditions from side proof
             List<ResultsAndCondition> conditionsAndResultsMap = new LinkedList<>();
@@ -392,10 +392,10 @@ public final class SymbolicExecutionSideProofUtil {
      * @param sequentToProve The {@link Sequent} to extract relevant things from.
      * @return The found relevant things.
      */
-    public static Set<org.key_project.logic.op.Operator> extractRelevantThings(
+    public static Set<Operator> extractRelevantThings(
             final Services services,
             Sequent sequentToProve) {
-        final Set<org.key_project.logic.op.Operator> result = new HashSet<>();
+        final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
             sf.formula().execPreOrder((DefaultVisitor) visited -> {
                 if (isRelevantThing(services, visited)) {
@@ -446,7 +446,7 @@ public final class SymbolicExecutionSideProofUtil {
      *         {@link SequentFormula} is not a relevant condition.
      */
     public static boolean isIrrelevantCondition(Services services, Sequent initialSequent,
-            Set<org.key_project.logic.op.Operator> relevantThingsInSequentToProve,
+            Set<Operator> relevantThingsInSequentToProve,
             SequentFormula sf) {
         return initialSequent.antecedent().contains(sf) || initialSequent.succedent().contains(sf)
                 || containsModalityOrQuery(sf) // isInOrOfAntecedent(initialSequent, sf) ||
@@ -492,7 +492,7 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static boolean containsIrrelevantThings(Services services,
             SequentFormula sf,
-            Set<org.key_project.logic.op.Operator> relevantThings) {
+            Set<Operator> relevantThings) {
         ContainsIrrelevantThingsVisitor visitor =
             new ContainsIrrelevantThingsVisitor(services, relevantThings);
         sf.formula().execPostOrder(visitor);
@@ -514,7 +514,7 @@ public final class SymbolicExecutionSideProofUtil {
         /**
          * The relevant things.
          */
-        private final Set<org.key_project.logic.op.Operator> relevantThings;
+        private final Set<Operator> relevantThings;
 
         /**
          * The result.
@@ -528,7 +528,7 @@ public final class SymbolicExecutionSideProofUtil {
          * @param relevantThings The relevant things.
          */
         public ContainsIrrelevantThingsVisitor(Services services,
-                Set<org.key_project.logic.op.Operator> relevantThings) {
+                Set<Operator> relevantThings) {
             this.services = services;
             this.relevantThings = relevantThings;
         }

@@ -5,5 +5,6 @@ package org.key_project.prover.rules;
 
 import org.jspecify.annotations.Nullable;
 
+/// Collection of attributes for taclets.
 public record TacletAttributes(@Nullable String displayName, @Nullable Trigger trigger) {
 }
