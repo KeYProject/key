@@ -160,10 +160,7 @@ public class Filenames {
         }
         // @ assert (\forall int i; 0 <= i < k; newa[i] != null);
         // TODO: nullness. This cast cannot be checked, can it? But there is no error message
-        @SuppressWarnings("nullness")
-        @NonNull
-        String[] strings = Arrays.copyOf(newa, k);
-        return strings;
+        return (String[]) Arrays.copyOf(newa, k);
     }
 
     public static String toValidFileName(String s) {
