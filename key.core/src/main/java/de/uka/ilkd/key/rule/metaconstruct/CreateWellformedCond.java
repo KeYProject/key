@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -29,15 +29,15 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
-        final Term anonHeapTerm = term.sub(1);
-        final Term anonSavedHeapTerm = term.sub(2);
-        final Term anonPermissionsHeapTerm = term.sub(3);
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+        final JTerm anonHeapTerm = term.sub(1);
+        final JTerm anonSavedHeapTerm = term.sub(2);
+        final JTerm anonPermissionsHeapTerm = term.sub(3);
 
-        final Operator op = term.sub(0).op();
-        assert op instanceof Modality;
+        final JOperator op = term.sub(0).op();
+        assert op instanceof JModality;
 
-        return createWellformedCond(MiscTools.isTransaction(((Modality) op).kind()),
+        return createWellformedCond(MiscTools.isTransaction(((JModality) op).kind()),
             MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
             anonPermissionsHeapTerm, services);
     }
@@ -53,12 +53,12 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
      * @param services The {@link Services} object.
      * @return The wellformedness condition.
      */
-    private Term createWellformedCond(boolean isTransaction, boolean isPermissions,
-            Term anonHeapTerm, Term anonSavedHeapTerm, Term anonPermissionsHeapTerm,
-            Services services) {
+    private JTerm createWellformedCond(boolean isTransaction, boolean isPermissions,
+                                       JTerm anonHeapTerm, JTerm anonSavedHeapTerm, JTerm anonPermissionsHeapTerm,
+                                       Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        Term result = tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);
+        JTerm result = tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         if (isTransaction) {
             result = tb.and(result, tb.wellFormed(anonSavedHeapTerm));

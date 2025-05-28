@@ -7,7 +7,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
@@ -149,9 +149,9 @@ public class NoPosTacletApp extends TacletApp {
                 continue;
             }
 
-            final ImmutableSet<QuantifiableVariable> boundVarSet =
+            final ImmutableSet<JQuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet((TacletPrefix) prefix, instantiations);
-            final Term inst = (Term) instantiations.getInstantiation(sv);
+            final JTerm inst = (JTerm) instantiations.getInstantiation(sv);
             if (!inst.freeVars().subset(boundVarSet)) {
                 return false;
             }
@@ -169,8 +169,8 @@ public class NoPosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
-            Services services) {
+    public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
+                                      Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(),
                 instantiations().addInteresting(sv, term, services), assumesFormulaInstantiations(),
@@ -265,7 +265,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     @Override
-    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
+    protected ImmutableSet<JQuantifiableVariable> contextVars(SchemaVariable sv) {
         return DefaultImmutableSet.nil();
     }
 
@@ -304,9 +304,9 @@ public class NoPosTacletApp extends TacletApp {
      * current subterm is known anyway).
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
-            Services services, Term t) {
+            Services services, JTerm t) {
         if ((t == null) && (pos != null)) {
-            t = (Term) pos.subTerm();
+            t = (JTerm) pos.subTerm();
         }
 
         MatchConditions mc = setupMatchConditions(pos, services);

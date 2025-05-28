@@ -9,6 +9,7 @@ import java.util.Map;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
@@ -50,7 +51,7 @@ public class NodeData {
         return sum;
     }
 
-    private static int countAST(org.key_project.logic.Term term) {
+    private static int countAST(Term term) {
         int sum = 0;
         for (var t : term.subs()) {
             sum += countAST(t);

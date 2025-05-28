@@ -8,7 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -44,7 +44,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
     /**
      * The method return condition to reach this node from its calling {@link IExecutionMethodCall}.
      */
-    private Term methodReturnCondition;
+    private JTerm methodReturnCondition;
 
     /**
      * The human-readable method return condition to reach this node from its calling
@@ -105,7 +105,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public Term getMethodReturnCondition() throws ProofInputException {
+    public JTerm getMethodReturnCondition() throws ProofInputException {
         if (methodReturnCondition == null) {
             lazyComputeMethodReturnCondition();
         }
@@ -134,7 +134,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         if (initConfig != null) { // Otherwise Proof is disposed.
             final Services services = initConfig.getServices();
             // Collect branch conditions
-            List<Term> bcs = new LinkedList<>();
+            List<JTerm> bcs = new LinkedList<>();
             AbstractExecutionNode<?> parent = getParent();
             while (parent != null && parent != methodCall) {
                 if (parent instanceof IExecutionBranchCondition) {

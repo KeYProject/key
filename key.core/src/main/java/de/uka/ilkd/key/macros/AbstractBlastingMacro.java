@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.SortCollector;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -143,28 +143,28 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
             KeYJavaType kjt, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
-        Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
+        JTerm exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
         RepresentsAxiom ra = (RepresentsAxiom) c;
 
         try {
-            Term t = ra.getAxiom(h, ra.getTarget().isStatic() ? null : o, services);
+            JTerm t = ra.getAxiom(h, ra.getTarget().isStatic() ? null : o, services);
             if (t.op().equals(Equality.EQV)) {
-                Term left = t.sub(0);
-                Term right = t.sub(1);
+                JTerm left = t.sub(0);
+                JTerm right = t.sub(1);
 
-                Term implication;
+                JTerm implication;
 
-                Term[] heaps = new Term[1];
+                JTerm[] heaps = new JTerm[1];
                 heaps[0] = tb.var(h);
 
-                Term inv = tb.inv(heaps, tb.var(o));
+                JTerm inv = tb.inv(heaps, tb.var(o));
 
                 if (left.op().name().equals(inv.op().name())) {
 
                     implication = tb.imp(left, right);
 
-                    Term exactInstanceEquiv = tb.imp(exactInstance, t);
-                    Term instanceImpl = implication;
+                    JTerm exactInstanceEquiv = tb.imp(exactInstance, t);
+                    JTerm instanceImpl = implication;
 
                     exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                     instanceImpl = tb.all(h, tb.all(o, instanceImpl));
@@ -177,8 +177,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 } else if (right.op().name().equals(inv.op().name())) {
                     implication = tb.imp(right, left);
 
-                    Term exactInstanceEquiv = tb.imp(exactInstance, t);
-                    Term instanceImpl = implication;
+                    JTerm exactInstanceEquiv = tb.imp(exactInstance, t);
+                    JTerm instanceImpl = implication;
 
                     exactInstanceEquiv = tb.all(h, tb.all(o, exactInstanceEquiv));
                     instanceImpl = tb.all(h, tb.all(o, instanceImpl));
@@ -190,12 +190,12 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                     }
 
                 } else {
-                    Term f = t;
+                    JTerm f = t;
                     f = tb.all(h, tb.all(o, f));
                     result.add(new SequentFormula(f));
                 }
             } else {
-                Term f = t;
+                JTerm f = t;
                 f = tb.all(h, tb.all(o, f));
                 result.add(new SequentFormula(f));
             }

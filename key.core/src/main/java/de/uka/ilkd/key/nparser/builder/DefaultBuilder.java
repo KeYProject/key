@@ -102,7 +102,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return null;
     }
 
-    protected void unbindVars(Namespace<QuantifiableVariable> orig) {
+    protected void unbindVars(Namespace<JQuantifiableVariable> orig) {
         namespaces().setVariables(orig);
     }
 
@@ -139,18 +139,18 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      *
      * @param varfuncName the String with the symbols name
      */
-    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
-            Sort sort) {
+    protected JOperator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
+                                        Sort sort) {
         Name name = new Name(varfuncName);
-        Operator[] operators =
-            { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
+        JOperator[] operators =
+            { (JOperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
-                (Operator) functions().lookup(name),
+                (JOperator) functions().lookup(name),
                 AbstractTermTransformer.name2metaop(varfuncName),
 
             };
 
-        for (Operator op : operators) {
+        for (JOperator op : operators) {
             if (op != null) {
                 return op;
             }
@@ -160,13 +160,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Name fqName =
                 new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
             operators =
-                new Operator[] { (OperatorSV) schemaVariables().lookup(fqName),
+                new JOperator[] { (JOperatorSV) schemaVariables().lookup(fqName),
                     variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    (Operator) functions().lookup(fqName),
+                    (JOperator) functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };
 
-            for (Operator op : operators) {
+            for (JOperator op : operators) {
                 if (op != null) {
                     return op;
                 }
@@ -243,7 +243,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().ruleSets();
     }
 
-    protected Namespace<QuantifiableVariable> variables() {
+    protected Namespace<JQuantifiableVariable> variables() {
         return namespaces().variables();
     }
 

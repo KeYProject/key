@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
@@ -17,7 +17,7 @@ import org.key_project.logic.sort.Sort;
  * unsound) substitution of non-rigid terms across modal operators. Currently, only the subclass
  * <code>WarySubstOp</code> is used and accessible through the key parser.
  */
-public abstract class SubstOp extends AbstractOperator implements Operator {
+public abstract class SubstOp extends AbstractOperator implements JOperator {
 
     protected SubstOp(Name name) {
         super(name, 2, new Boolean[] { false, true }, true);
@@ -64,10 +64,10 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
      * Apply this substitution operator to <code>term</code>, which has this operator as top-level
      * operator
      *
-     * @param term the {@link Term} on which to apply the substitution
+     * @param term the {@link JTerm} on which to apply the substitution
      * @param tb the {@link TermBuilder} to use for term construction
      */
-    public abstract Term apply(Term term, TermBuilder tb);// {
+    public abstract JTerm apply(JTerm term, TermBuilder tb);// {
     // QuantifiableVariable v = term.varsBoundHere(1).getQuantifiableVariable(0);
     // ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
     // Term res = cfSubst.apply(term.sub(1));

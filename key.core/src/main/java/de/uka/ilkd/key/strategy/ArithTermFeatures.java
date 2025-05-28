@@ -5,7 +5,7 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.JOperator;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
@@ -98,7 +98,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
     final Function jmod;
     final Function jdiv;
 
-    final Operator eq;
+    final JOperator eq;
     final Function leq;
     final Function geq;
 

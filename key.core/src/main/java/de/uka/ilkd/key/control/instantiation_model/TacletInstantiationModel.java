@@ -115,7 +115,7 @@ public class TacletInstantiationModel {
         return proof;
     }
 
-    public Term ifFma(int i) {
+    public JTerm ifFma(int i) {
         return ifChoiceModel(i).ifFma();
     }
 
@@ -131,13 +131,13 @@ public class TacletInstantiationModel {
                 AssumesFormulaInstSeq.createList(seq, false, services);
 
             Iterator<SequentFormula> it = ifseq.iterator();
-            Term ifFma;
+            JTerm ifFma;
             MatchConditions matchCond = app.matchConditions();
 
             ifChoiceModel = new TacletAssumesModel[size];
 
             for (int i = 0; i < size; i++) {
-                ifFma = (Term) it.next().formula();
+                ifFma = (JTerm) it.next().formula();
                 ifChoiceModel[i] =
                     new TacletAssumesModel(
                         ifFma,

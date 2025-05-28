@@ -5,6 +5,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -61,7 +62,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
             SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) s2.formula(),
+            app = app.addCheckedInstantiation(sv, (JTerm) s2.formula(),
                 service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
                 service);
@@ -74,7 +75,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
             SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) s2.formula(),
+            app = app.addCheckedInstantiation(sv, (JTerm) s2.formula(),
                 service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
                 service);

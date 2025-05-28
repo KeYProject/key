@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.op.UpdateableOperator;
 
 /**
  * Operators implementing this interface may stand for locations as well. This means e.g. occur as
  * top level operators on the left side of an assignment pair of an update.
  */
-public interface UpdateableOperator extends org.key_project.logic.op.UpdateableOperator,
-        ParsableVariable, Operator {
+public interface UpdateableJOperator extends UpdateableOperator,
+        ParsableVariable, JOperator {
 
 }

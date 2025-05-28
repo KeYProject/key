@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.informationflow.rule;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
 import org.key_project.logic.ChoiceExpr;
@@ -68,7 +68,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
     public InfFlowContractAppTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find,
+            TacletAttributes attrs, JTerm find,
             ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -80,7 +80,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
     public InfFlowContractAppTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find,
+            TacletAttributes attrs, JTerm find,
             ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -104,7 +104,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
         return new InfFlowContractAppTaclet(new Name(s), applPart,
             goalTemplates(), getRuleSets(),
-            attrs, (Term) find, prefixMap,
+            attrs, (JTerm) find, prefixMap,
             choices, getSurviveSymbExec(),
             tacletAnnotations);
     }

@@ -11,9 +11,9 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -59,19 +59,19 @@ public class HasLoopInvariantCondition implements VariableCondition {
 
         final MethodFrame mf = //
             JavaTools.getInnermostMethodFrame(javaBlock, services);
-        final Term selfTerm = Optional.ofNullable(mf)
+        final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
         // TODO: handle exception!
-        final Modality.JavaModalityKind modalityKind =
-            (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
+        final JModality.JavaModalityKind modalityKind =
+            (JModality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
         boolean hasInv = false;
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
             services)) {
-            final Optional<Term> maybeInvInst = Optional.ofNullable(
+            final Optional<JTerm> maybeInvInst = Optional.ofNullable(
                 loopSpec.getInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
-            final Optional<Term> maybeFreeInvInst = Optional.ofNullable(
+            final Optional<JTerm> maybeFreeInvInst = Optional.ofNullable(
                 loopSpec.getFreeInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
 
             hasInv |= maybeInvInst.isPresent();

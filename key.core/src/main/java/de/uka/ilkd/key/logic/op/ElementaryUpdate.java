@@ -18,16 +18,16 @@ import org.key_project.logic.sort.Sort;
  * operator for every left hand side "x". Each of these operator is unary, accepting a single
  * argument "t".
  */
-public final class ElementaryUpdate extends AbstractSortedOperator {
+public final class ElementaryUpdate extends JAbstractSortedOperator {
 
-    private static final WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>> instances =
+    private static final WeakHashMap<UpdateableJOperator, WeakReference<ElementaryUpdate>> instances =
         new WeakHashMap<>();
 
 
-    private final UpdateableOperator lhs;
+    private final UpdateableJOperator lhs;
 
 
-    private ElementaryUpdate(UpdateableOperator lhs) {
+    private ElementaryUpdate(UpdateableJOperator lhs) {
         super(new Name("elem-update(" + lhs + ")"), new Sort[] { lhs.sort() }, JavaDLTheory.UPDATE,
             false);
         this.lhs = lhs;
@@ -38,7 +38,7 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     /**
      * Returns the elementary update operator for the passed left hand side.
      */
-    public static ElementaryUpdate getInstance(UpdateableOperator lhs) {
+    public static ElementaryUpdate getInstance(UpdateableJOperator lhs) {
         WeakReference<ElementaryUpdate> ref = instances.get(lhs);
         ElementaryUpdate result = null;
         if (ref != null) {
@@ -56,7 +56,7 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     /**
      * Returns the left hand side of this elementary update operator.
      */
-    public UpdateableOperator lhs() {
+    public UpdateableJOperator lhs() {
         return lhs;
     }
 

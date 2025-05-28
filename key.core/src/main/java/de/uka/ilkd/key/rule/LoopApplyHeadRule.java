@@ -7,10 +7,10 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
@@ -78,9 +78,9 @@ public class LoopApplyHeadRule implements BuiltInRule {
         var services = goal.getOverlayServices();
         TermBuilder tb = services.getTermBuilder();
         AbstractLoopContractRule.Instantiation instantiation = ruleApp.instantiation;
-        Modality modality = instantiation.modality();
-        Term update = instantiation.update();
-        Term target = instantiation.formula();
+        JModality modality = instantiation.modality();
+        JTerm update = instantiation.update();
+        JTerm target = instantiation.formula();
 
         JavaBlock newJavaBlock;
         newJavaBlock = JavaBlock.createJavaBlock(
@@ -136,7 +136,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         }
 
         final AbstractLoopContractRule.Instantiation instantiation =
-            new AbstractLoopContractRule.Instantiator((Term) pio.subTerm(), goal).instantiate();
+            new AbstractLoopContractRule.Instantiator((JTerm) pio.subTerm(), goal).instantiate();
 
         if (instantiation == null) {
             return false;

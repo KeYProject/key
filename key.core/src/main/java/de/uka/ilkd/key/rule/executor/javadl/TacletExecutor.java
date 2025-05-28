@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -53,13 +54,13 @@ public abstract class TacletExecutor
 
     @Override
     protected Term not(Term t, Goal goal) {
-        return goal.getOverlayServices().getTermBuilder().not((de.uka.ilkd.key.logic.Term) t);
+        return goal.getOverlayServices().getTermBuilder().not((JTerm) t);
     }
 
     @Override
     protected Term and(Term t1, Term t2, Goal goal) {
-        return goal.getOverlayServices().getTermBuilder().and((de.uka.ilkd.key.logic.Term) t1,
-            (de.uka.ilkd.key.logic.Term) t2);
+        return goal.getOverlayServices().getTermBuilder().and((JTerm) t1,
+            (JTerm) t2);
     }
 
     /**
@@ -108,7 +109,7 @@ public abstract class TacletExecutor
         }
         return goal.getOverlayServices().getTermBuilder()
                 .applyUpdatePairsSequential(svInst.getUpdateContext(),
-                    (de.uka.ilkd.key.logic.Term) formula);
+                    (JTerm) formula);
     }
 
     /**

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 
 /**
  * Extended {@link OpCollector} that also descends into Java blocks
@@ -18,7 +18,7 @@ public class OpCollectorJavaBlock extends OpCollector {
     @Override
     public void visit(org.key_project.logic.Term t) {
         super.visit(t);
-        if (t.op() instanceof Modality mod && !mod.programBlock().isEmpty()) {
+        if (t.op() instanceof JModality mod && !mod.programBlock().isEmpty()) {
             var collect =
                 new JavaASTCollector(mod.programBlock().program(), LocationVariable.class);
             collect.start();

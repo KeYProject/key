@@ -34,7 +34,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * visitor for method {@link Term#execPostOrder(Visitor)}. Called with that
+ * visitor for method {@link JTerm#execPostOrder(Visitor)}. Called with that
  * method
  * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
  * are given as a SVInstantiations object.
@@ -45,7 +45,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     protected final Services services;
     /** the term builder used to construct terms */
     protected final TermBuilder tb;
-    private Term computedResult = null;
+    private JTerm computedResult = null;
     protected final PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
@@ -62,7 +62,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      */
     private final Stack<Object> subStack; // of Term (and Boolean)
     private final Boolean newMarker = Boolean.TRUE;
-    private final Deque<Term> tacletTermStack = new ArrayDeque<>();
+    private final Deque<JTerm> tacletTermStack = new ArrayDeque<>();
 
 
     /**
@@ -208,16 +208,16 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return (result == jb.program()) ? jb : JavaBlock.createJavaBlock((StatementBlock) result);
     }
 
-    private Term[] neededSubs(int n) {
+    private JTerm[] neededSubs(int n) {
         boolean newTerm = false;
-        Term[] result = new Term[n];
+        JTerm[] result = new JTerm[n];
         for (int i = n - 1; i >= 0; i--) {
             Object top = subStack.pop();
             if (top == newMarker) {
                 newTerm = true;
                 top = subStack.pop();
             }
-            result[i] = (Term) top;
+            result[i] = (JTerm) top;
         }
         if (newTerm && (subStack.empty() || subStack.peek() != newMarker)) {
             subStack.push(newMarker);
@@ -245,15 +245,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
 
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
-        final UpdateableOperator originalLhs = op.lhs();
+        final UpdateableJOperator originalLhs = op.lhs();
         if (originalLhs instanceof SchemaVariable originalLhsAsSV) {
             Object lhsInst = svInst.getInstantiation(originalLhsAsSV);
-            if (lhsInst instanceof Term lhsInstAsTerm) {
+            if (lhsInst instanceof JTerm lhsInstAsTerm) {
                 lhsInst = lhsInstAsTerm.op();
             }
 
-            final UpdateableOperator newLhs;
-            if (lhsInst instanceof UpdateableOperator updateableLhs) {
+            final UpdateableJOperator newLhs;
+            if (lhsInst instanceof UpdateableJOperator updateableLhs) {
                 newLhs = updateableLhs;
             } else {
                 assert false : "not updateable: " + lhsInst;
@@ -267,28 +267,28 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
 
-    private Operator instantiateModality(Modality op, JavaBlock jb) {
-        Modality.JavaModalityKind kind = op.kind();
+    private JOperator instantiateModality(JModality op, JavaBlock jb) {
+        JModality.JavaModalityKind kind = op.kind();
         if (op.kind() instanceof ModalOperatorSV) {
-            kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
+            kind = (JModality.JavaModalityKind) svInst.getInstantiation(op.kind());
         }
         if (jb != op.programBlock() || kind != op.kind()) {
-            return Modality.getModality(kind, jb);
+            return JModality.getModality(kind, jb);
         }
         return op;
     }
 
-    private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
-        Operator instantiatedOp = p_operatorToBeInstantiated;
+    private JOperator instantiateOperator(JOperator p_operatorToBeInstantiated, JavaBlock jb) {
+        JOperator instantiatedOp = p_operatorToBeInstantiated;
         if (p_operatorToBeInstantiated instanceof SortDependingFunction sortDependingFunction) {
             instantiatedOp = handleSortDependingSymbol(sortDependingFunction);
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate elementaryUpdate) {
             instantiatedOp = instantiateElementaryUpdate(elementaryUpdate);
-        } else if (p_operatorToBeInstantiated instanceof Modality mod) {
+        } else if (p_operatorToBeInstantiated instanceof JModality mod) {
             instantiatedOp = instantiateModality(mod, jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable opAsSV) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV opAsPSV) || !opAsPSV.isListSV()) {
-                instantiatedOp = (Operator) svInst.getInstantiation(opAsSV);
+                instantiatedOp = (JOperator) svInst.getInstantiation(opAsSV);
             }
         }
         assert instantiatedOp != null;
@@ -296,20 +296,20 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return instantiatedOp;
     }
 
-    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(Term visited) {
-        ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
+    private ImmutableArray<JQuantifiableVariable> instantiateBoundVariables(JTerm visited) {
+        ImmutableArray<JQuantifiableVariable> vBoundVars = visited.boundVars();
         if (!vBoundVars.isEmpty()) {
-            final QuantifiableVariable[] newVars = new QuantifiableVariable[vBoundVars.size()];
+            final JQuantifiableVariable[] newVars = new JQuantifiableVariable[vBoundVars.size()];
             boolean varsChanged = false;
 
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
-                QuantifiableVariable boundVar = vBoundVars.get(j);
+                JQuantifiableVariable boundVar = vBoundVars.get(j);
                 if (boundVar instanceof SchemaVariable boundSchemaVariable) {
-                    final Term instantiationForBoundSchemaVariable =
-                        (Term) svInst.getInstantiation(boundSchemaVariable);
+                    final JTerm instantiationForBoundSchemaVariable =
+                        (JTerm) svInst.getInstantiation(boundSchemaVariable);
                     // instantiation might be null in case of PO generation for taclets
                     if (instantiationForBoundSchemaVariable != null) {
-                        boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
+                        boundVar = (JQuantifiableVariable) instantiationForBoundSchemaVariable.op();
                         varsChanged = true;
                     }
                 }
@@ -328,15 +328,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      */
     @Override
     public void visit(final org.key_project.logic.Term p_visited) {
-        final Term visited = (Term) p_visited;
+        final JTerm visited = (JTerm) p_visited;
         // Sort equality has to be ensured before calling this method
-        final Operator visitedOp = visited.op();
+        final JOperator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
                 && svInst.isInstantiated(visitedSV)
                 && (!(visitedOp instanceof ProgramSV visitedAsPSV && visitedAsPSV.isListSV()))) {
-            final Term newTerm = toTerm(
+            final JTerm newTerm = toTerm(
                 svInst.getTermInstantiation(visitedSV, svInst.getExecutionContext(), services));
-            final Term labeledTerm = TermLabelManager.label(services, termLabelState,
+            final JTerm labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, visited, newTerm);
             pushNew(labeledTerm);
         } else {
@@ -351,22 +351,22 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 }
             }
 
-            final Operator newOp = instantiateOperator(visitedOp, jb);
+            final JOperator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
-            final ImmutableArray<QuantifiableVariable> boundVars =
+            final ImmutableArray<JQuantifiableVariable> boundVars =
                 instantiateBoundVariables(visited);
 
             // instantiate sub terms
-            final Term[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
+            final JTerm[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
                     new ImmutableArray<>(neededsubs), boundVars, visited.getLabels());
-                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
+                final JTerm newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
-                Term t;
+                JTerm t;
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, visitedOp,
                     visited.subs(), visited.boundVars(), visited.getLabels());
                 if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
@@ -385,30 +385,30 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         }
     }
 
-    private ImmutableArray<TermLabel> instantiateLabels(Term tacletTerm, Operator newTermOp,
-            ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars,
-            ImmutableArray<TermLabel> newTermOriginalLabels) {
+    private ImmutableArray<TermLabel> instantiateLabels(JTerm tacletTerm, JOperator newTermOp,
+                                                        ImmutableArray<JTerm> newTermSubs, ImmutableArray<JQuantifiableVariable> newTermBoundVars,
+                                                        ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
             tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
     }
 
-    private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
+    private JOperator handleSortDependingSymbol(SortDependingFunction depOp) {
         final Sort depSort = depOp.getSortDependingOn();
 
         final Sort realDepSort =
             svInst.getGenericSortInstantiations().getRealSort(depSort, services);
 
 
-        final Operator res = depOp.getInstanceFor(realDepSort, services);
+        final JOperator res = depOp.getInstanceFor(realDepSort, services);
         assert res != null
                 : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
         return res;
     }
 
-    private Term resolveSubst(Term t) {
+    private JTerm resolveSubst(JTerm t) {
         if (t.op() instanceof SubstOp) {
-            Term resolved = ((SubstOp) t.op()).apply(t, tb);
+            JTerm resolved = ((SubstOp) t.op()).apply(t, tb);
             resolved = tb.label(resolved, t.sub(1).getLabels());
             if (t.hasLabels()) {
                 resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved,
@@ -423,7 +423,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     /**
      * delivers the new built term
      */
-    public Term getTerm() {
+    public JTerm getTerm() {
         if (computedResult == null) {
             Object o;
             do {
@@ -434,7 +434,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             // = new CollisionDeletingSubstitutionTermApplier();
             // t.execPostOrder(substVisit);
             // t=substVisit.getTerm();
-            computedResult = (Term) o;
+            computedResult = (JTerm) o;
         }
         return computedResult;
     }
@@ -448,7 +448,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      */
     @Override
     public void subtreeEntered(org.key_project.logic.Term subtreeRoot) {
-        tacletTermStack.push((Term) subtreeRoot);
+        tacletTermStack.push((JTerm) subtreeRoot);
     }
 
     /**
@@ -463,9 +463,9 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public void subtreeLeft(org.key_project.logic.Term subtreeRoot) {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer mop) {
-            final Term newTerm = mop.transform((Term) subStack.pop(), svInst, services);
-            final Term labeledTerm = TermLabelManager.label(services, termLabelState,
-                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, (Term) subtreeRoot,
+            final JTerm newTerm = mop.transform((JTerm) subStack.pop(), svInst, services);
+            final JTerm labeledTerm = TermLabelManager.label(services, termLabelState,
+                applicationPosInOccurrence, rule, ruleApp, goal, labelHint, (JTerm) subtreeRoot,
                 newTerm);
             pushNew(labeledTerm);
         }

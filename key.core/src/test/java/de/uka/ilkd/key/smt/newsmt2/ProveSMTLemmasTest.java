@@ -16,7 +16,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -88,7 +88,7 @@ public class ProveSMTLemmasTest {
                 } else {
                     // and check if proofs are actually for the right theorem!
                     KeyIO io = new KeyIO(loadedProof.getServices());
-                    Term parsedLemma = io.parseExpression(lemmaString);
+                    JTerm parsedLemma = io.parseExpression(lemmaString);
                     var actual = loadedProof.root().sequent().succedent().get(0).formula();
                     if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(actual, parsedLemma)) {
                         LOGGER.info("Stored : {}", parsedLemma);

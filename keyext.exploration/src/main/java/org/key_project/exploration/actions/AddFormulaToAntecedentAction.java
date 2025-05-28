@@ -6,7 +6,7 @@ package org.key_project.exploration.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.exploration.ProofExplorationService;
@@ -30,7 +30,7 @@ public class AddFormulaToAntecedentAction extends ExplorationAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Term t = promptForTerm(mainWindow, null);
+        JTerm t = promptForTerm(mainWindow, null);
         if (t == null) {
             return;
         }

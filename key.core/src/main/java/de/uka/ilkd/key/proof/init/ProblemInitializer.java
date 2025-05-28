@@ -295,7 +295,7 @@ public final class ProblemInitializer {
      * See bug report #1185, #1189 (in Mantis)
      */
     private void cleanupNamespaces(InitConfig initConfig) {
-        Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
+        Namespace<JQuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
         Namespace<Function> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {
@@ -348,7 +348,7 @@ public final class ProblemInitializer {
             if (namespaces.programVariables().lookup(pv.name()) == null) {
                 rootGoal.addProgramVariable(pv);
             }
-        } else if (term.op() instanceof Modality mod) {
+        } else if (term.op() instanceof JModality mod) {
             final ProgramElement pe = mod.programBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<LocationVariable> freeProgVars =

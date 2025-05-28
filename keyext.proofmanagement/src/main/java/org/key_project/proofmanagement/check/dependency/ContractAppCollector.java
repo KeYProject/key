@@ -12,7 +12,7 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppIntermediate;
@@ -191,8 +191,8 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         ImmutableSet<Contract> contracts = specRepo.splitContract(c);
 
         // load information about the modality under which the contract was applied
-        Modality.JavaModalityKind modalityKind =
-            Modality.JavaModalityKind.getKind(biApp.getModality());
+        JModality.JavaModalityKind modalityKind =
+            JModality.JavaModalityKind.getKind(biApp.getModality());
         DependencyGraph.EdgeType edgeType;
         if (modalityKind == null) {
             // in default case (e.g. legacy proofs without saved modality information)

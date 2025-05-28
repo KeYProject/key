@@ -7,7 +7,7 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
@@ -34,7 +34,7 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
             ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
 
         // leading update?
-        Term progPost = loopApp.programTerm();
+        JTerm progPost = loopApp.programTerm();
         final While loop = loopApp.getLoopStatement();
 
         LoopSpecification inv = loopApp.getSpec();

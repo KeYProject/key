@@ -92,7 +92,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         }
     }
 
-    static void checkContainsFreeVarSV(Term t, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(JTerm t, Name tacletName, String str) {
         if (containsFreeVarSV(t)) {
             throw new TacletBuilderException(tacletName,
                 "Free Variable found in " + str + " in Taclet / Term: " + t);

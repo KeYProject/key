@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
@@ -19,11 +19,11 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
         this.op = op;
     }
 
-    public MatchConditions match(Term t, MatchConditions mc, LogicServices services) {
-        if (t.op() instanceof Modality mod
+    public MatchConditions match(JTerm t, MatchConditions mc, LogicServices services) {
+        if (t.op() instanceof JModality mod
                 && op.getModalities().contains(mod.kind())) {
             return mc.setInstantiations(
-                mc.getInstantiations().add(op, mod.<Modality.JavaModalityKind>kind(), services));
+                mc.getInstantiations().add(op, mod.<JModality.JavaModalityKind>kind(), services));
         } else {
             return null;
         }

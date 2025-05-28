@@ -12,11 +12,11 @@ import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
@@ -153,8 +153,8 @@ public final class IntegerLDT extends LDT {
     private final Function inRangeLong;
     private final Function inRangeChar;
     private final Function index;
-    private final Term one;
-    private final Term zero;
+    private final JTerm one;
+    private final JTerm zero;
 
 
 
@@ -284,7 +284,7 @@ public final class IntegerLDT extends LDT {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private boolean isNumberLiteral(Operator f) {
+    private boolean isNumberLiteral(JOperator f) {
         String n = f.name().toString();
         if (n.length() == 1) {
             char c = n.charAt(0);
@@ -293,7 +293,7 @@ public final class IntegerLDT extends LDT {
         return false;
     }
 
-    private Term makeDigit(int digit, TermBuilder tb) {
+    private JTerm makeDigit(int digit, TermBuilder tb) {
         return tb.func(getNumberSymbol(),
             tb.func(getNumberLiteralFor(digit), tb.func(getNumberTerminator())));
     }
@@ -736,7 +736,7 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
@@ -744,24 +744,24 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
-            Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left, JTerm right,
+                                 Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         Debug.assertTrue(lit instanceof AbstractIntegerLiteral,
             "Literal '" + lit + "' is not an integer literal.");
 
-        Term result;
+        JTerm result;
         if (lit instanceof CharLiteral) {
             result = services.getTermBuilder().cTerm(((CharLiteral) lit).getValueString());
         } else {
@@ -776,9 +776,9 @@ public final class IntegerLDT extends LDT {
         return containsFunction(f) && (f.arity() == 0 || isNumberLiteral(f));
     }
 
-    public String toNumberString(Term t) {
+    public String toNumberString(JTerm t) {
         StringBuilder sb = new StringBuilder();
-        Operator f = t.op();
+        JOperator f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));
             t = t.sub(0);
@@ -793,14 +793,14 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }
         JFunction f = (JFunction) t.op();
         if (isNumberLiteral(f) || f == numbers || f == charID) {
 
-            Term it = t;
+            JTerm it = t;
             if (f == charID || f == numbers) {
                 it = it.sub(0);
             }
@@ -812,7 +812,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false : "IntegerLDT: Cannot get Java type for term: " + t;
         return null;
     }
@@ -996,11 +996,11 @@ public final class IntegerLDT extends LDT {
         return javaSubInt;
     }
 
-    public Term zero() {
+    public JTerm zero() {
         return zero;
     }
 
-    public Term one() {
+    public JTerm one() {
         return one;
     }
 }

@@ -8,7 +8,8 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Name;
@@ -74,7 +75,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
         private Services services;
-        private Operator binFunc;
+        private JOperator binFunc;
 
         protected SuperTermWithIndexGenerator(TermFeature cond) {
             super(cond);
@@ -102,11 +103,11 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         protected Term generateOneTerm(Term superterm, int child) {
             final var index = services.getTermBuilder().zTerm(String.valueOf(child));
             return services.getTermBuilder().tf().createTerm(binFunc,
-                (de.uka.ilkd.key.logic.Term) superterm, index);
+                (JTerm) superterm, index);
         }
 
         private static class SuperTermGeneratedOp
-                implements SortedOperator, Operator, TerminalSyntaxElement {
+                implements SortedOperator, JOperator, TerminalSyntaxElement {
             private final Name NAME;
             private final IntegerLDT numbers;
 

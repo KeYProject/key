@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -166,7 +166,7 @@ public class NodeInfo {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
-            Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+            JTerm t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();
@@ -330,8 +330,8 @@ public class NodeInfo {
                         tacletApp.rule().name());
                     res = arg; // use sv name instead
                 } else {
-                    if (val instanceof Term) {
-                        val = TermLabelManager.removeIrrelevantLabels((Term) val,
+                    if (val instanceof JTerm) {
+                        val = TermLabelManager.removeIrrelevantLabels((JTerm) val,
                             node.proof().getServices());
                     } else if (val instanceof LocationVariable locVar) {
                         var originTracker = node.proof().lookup(LocationVariableTracker.class);

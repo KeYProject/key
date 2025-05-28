@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
@@ -119,7 +119,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -130,8 +130,8 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
-            Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
+                                 Services services, ExecutionContext ec) {
         if (left != null && left.sort().extendsTrans(targetSort()) && right != null
                 && right.sort().extendsTrans(targetSort())) {
             return getFunctionFor(op, services, ec) != null;
@@ -140,7 +140,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         if (sub != null && sub.sort().extendsTrans(targetSort())) {
             return op instanceof Negative;
@@ -150,7 +150,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof DoubleLiteral : "Literal '" + lit + "' is not a double literal.";
         String s = ((DoubleLiteral) lit).getValue();
         double doubleVal = Double.parseDouble(s);
@@ -201,7 +201,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public DoubleLiteral translateTerm(Term t, ExtList children, Services services) {
+    public DoubleLiteral translateTerm(JTerm t, ExtList children, Services services) {
         Function f = (Function) t.op();
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
@@ -219,7 +219,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_DOUBLE;
         } else {

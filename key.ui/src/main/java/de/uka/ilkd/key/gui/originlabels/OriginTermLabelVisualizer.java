@@ -196,7 +196,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     public OriginTermLabelVisualizer(PosInOccurrence pos, Node node, Services services) {
         super(node,
             "Origin for node " + node.serialNr() + ": " + (pos == null ? "whole sequent"
-                    : LogicPrinter.quickPrintTerm((Term) pos.subTerm(), services).replaceAll("\\s+",
+                    : LogicPrinter.quickPrintTerm((JTerm) pos.subTerm(), services).replaceAll("\\s+",
                         " ")),
             "Node " + node.serialNr());
 
@@ -554,7 +554,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
 
         OriginTermLabel label =
-            (OriginTermLabel) ((Term) pio.subTerm()).getLabel(OriginTermLabel.NAME);
+            (OriginTermLabel) ((JTerm) pio.subTerm()).getLabel(OriginTermLabel.NAME);
         Origin origin = OriginTermLabel.getOrigin(pio);
 
         return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin)
@@ -574,7 +574,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             TreeNode node = (TreeNode) value;
 
             PosInOccurrence pio = node.pos;
-            Term term = node.term;
+            JTerm term = node.term;
             assert pio.subTerm().equals(term);
 
             BasicTreeUI ui = (BasicTreeUI) tree.getUI();
@@ -616,7 +616,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             return origin.specType.toString();
         }
 
-        private String getShortTermText(Term term) {
+        private String getShortTermText(JTerm term) {
             String text;
 
             if (term == null) {
@@ -638,14 +638,14 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private static class TreeNode extends DefaultMutableTreeNode {
         private static final long serialVersionUID = -406981141537547226L;
         private final PosInOccurrence pos;
-        private Term term;
+        private JTerm term;
 
         private TreeNode(PosInOccurrence pos) {
             super(pos);
             this.pos = pos;
 
             if (pos != null) {
-                this.term = (Term) pos.subTerm();
+                this.term = (JTerm) pos.subTerm();
             }
         }
     }

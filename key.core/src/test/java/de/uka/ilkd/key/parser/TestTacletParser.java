@@ -91,11 +91,11 @@ public class TestTacletParser {
         io.setSchemaNamespace(schemaVariableNS);
     }
 
-    public Term parseTerm(String s) {
+    public JTerm parseTerm(String s) {
         return io.parseExpression(s);
     }
 
-    public Term parseFma(String s) {
+    public JTerm parseFma(String s) {
         return parseTerm(s);
     }
 
@@ -320,7 +320,7 @@ public class TestTacletParser {
         FindTaclet taclet =
             (FindTaclet) parseTaclet("variable_declaration{ \\find (\\<{.. #typ #v0; ...}\\>post)"
                 + " \\replacewith (\\<{.. #typ #v0; if (true); ...}\\>post)	}");
-        Term find = taclet.find();
+        JTerm find = taclet.find();
         JavaBlock jb = find.javaBlock();
 
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
@@ -340,7 +340,7 @@ public class TestTacletParser {
         FindTaclet taclet =
             (FindTaclet) parseTaclet("xy{ \\find (\\<{.. boolean #boolv; ...}\\>post)"
                 + " \\replacewith (\\<{.. if (true); ...}\\>post)	}");
-        Term find = taclet.find();
+        JTerm find = taclet.find();
         JavaBlock jb = find.javaBlock();
 
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
@@ -354,7 +354,7 @@ public class TestTacletParser {
         FindTaclet taclet =
             (FindTaclet) parseTaclet("break_test {\\find(\\<{.. #lb0:{ break #lb1; } ...}\\>post)"
                 + " \\replacewith (\\<{..  ...}\\>post)}");
-        Term find = taclet.find();
+        JTerm find = taclet.find();
         JavaBlock jb = find.javaBlock();
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
     }
@@ -363,7 +363,7 @@ public class TestTacletParser {
     public void testSchemaJava10() {
         FindTaclet taclet = (FindTaclet) parseTaclet(
             "array_test {\\find(\\<{..#arr[#e][#e2]=#e2;...}\\>true) \\replacewith (true)}");
-        Term find = taclet.find();
+        JTerm find = taclet.find();
         JavaBlock jb = find.javaBlock();
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
         CopyAssignment ca = (CopyAssignment) ct.getChildAt(0);

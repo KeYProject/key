@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
@@ -335,20 +336,20 @@ public abstract class StaticFeatureCollection {
         return SubtermProjection.create(t, PosInTerm.getTopLevel().down(index));
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(de.uka.ilkd.key.logic.op.Operator op,
-            ProjectionToTerm<Goal>[] subTerms) {
+    protected static ProjectionToTerm<Goal> opTerm(JOperator op,
+                                                   ProjectionToTerm<Goal>[] subTerms) {
         return TermConstructionProjection.create(op, subTerms);
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(de.uka.ilkd.key.logic.op.Operator op,
-            ProjectionToTerm<Goal> subTerm) {
+    protected static ProjectionToTerm<Goal> opTerm(JOperator op,
+                                                   ProjectionToTerm<Goal> subTerm) {
         // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(de.uka.ilkd.key.logic.op.Operator op,
-            ProjectionToTerm<Goal> subTerm0,
-            ProjectionToTerm<Goal> subTerm1) {
+    protected static ProjectionToTerm<Goal> opTerm(JOperator op,
+                                                   ProjectionToTerm<Goal> subTerm0,
+                                                   ProjectionToTerm<Goal> subTerm1) {
         // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
@@ -361,7 +362,7 @@ public abstract class StaticFeatureCollection {
         return TriggerVarInstantiatedFeature.INSTANCE;
     }
 
-    protected static TermFeature op(org.key_project.logic.op.Operator op) {
+    protected static TermFeature op(Operator op) {
         return OperatorTF.create(op);
     }
 
@@ -507,7 +508,7 @@ public abstract class StaticFeatureCollection {
 
     public static TermFeature hasLabel(TermLabel label) {
         return TermPredicateTermFeature.create(
-            (t -> t instanceof Term jTerm &&
+            (t -> t instanceof JTerm jTerm &&
                     jTerm.containsLabel(label)));
     }
 
