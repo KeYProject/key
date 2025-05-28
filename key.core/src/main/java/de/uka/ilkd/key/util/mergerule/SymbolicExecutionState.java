@@ -33,7 +33,8 @@ public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
      * @param pathCondition The path condition (formula).
      * @param correspondingNode The node corresponding to this SE state.
      */
-    public SymbolicExecutionState(JTerm symbolicState, JTerm pathCondition, Node correspondingNode) {
+    public SymbolicExecutionState(JTerm symbolicState, JTerm pathCondition,
+            Node correspondingNode) {
         this(symbolicState, pathCondition);
         this.correspondingNode = correspondingNode;
     }

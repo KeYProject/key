@@ -39,9 +39,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     private final boolean modelField;
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                                  LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-                                  JTerm accessible, Condition ensures, JTerm mby, JTerm rep, Contract contract,
-                                  JTerm globalDefs, JTerm axiom, boolean model, TermBuilder tb) {
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, Contract contract,
+            JTerm globalDefs, JTerm axiom, boolean model, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.contract = contract;
@@ -143,7 +143,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the term array of arguments used to construct the method term
      */
     private JTerm[] getArgs(JOperatorSV sv, JOperatorSV heap, JOperatorSV heapAtPre,
-                            boolean isStatic, boolean twoState, ImmutableList<JOperatorSV> params) {
+            boolean isStatic, boolean twoState, ImmutableList<JOperatorSV> params) {
         JTerm[] args = new JTerm[params.size() + (isStatic ? 1 : 2) + (twoState ? 1 : 0)];
         int i = 0;
         args[i++] = TB.var(heap);
@@ -210,7 +210,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the measured by at pre equation for the precondition
      */
     JTerm generateMbyAtPreDef(LocationVariable self, ImmutableList<LocationVariable> params,
-                              Function mbyAtPreFunc, Services services) {
+            Function mbyAtPreFunc, Services services) {
         final JTerm mbyAtPreDef;
         if (hasMby()) {
             final JTerm mbyAtPre = TB.func(mbyAtPreFunc);

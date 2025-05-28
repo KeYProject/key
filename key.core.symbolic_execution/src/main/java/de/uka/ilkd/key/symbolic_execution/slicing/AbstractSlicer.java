@@ -158,8 +158,8 @@ public abstract class AbstractSlicer {
          * @param thisReference The this-reference if available.
          */
         public SequentInfo(Map<Location, SortedSet<Location>> aliases,
-                           Map<ProgramVariable, JTerm> localValues, ExecutionContext executionContext,
-                           ReferencePrefix thisReference) {
+                Map<ProgramVariable, JTerm> localValues, ExecutionContext executionContext,
+                ReferencePrefix thisReference) {
             assert aliases != null;
             assert localValues != null;
             this.aliases = aliases;
@@ -343,8 +343,8 @@ public abstract class AbstractSlicer {
      *        ({@link ThisReference}).
      */
     protected void analyzeUpdates(ImmutableList<JTerm> updates, Services services, HeapLDT heapLDT,
-                                  Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, JTerm> localValues,
-                                  ExecutionContext ec, ReferencePrefix thisReference) {
+            Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, JTerm> localValues,
+            ExecutionContext ec, ReferencePrefix thisReference) {
         for (JTerm update : updates) {
             analyzeUpdate(update, services, heapLDT, aliases, localValues, ec, thisReference);
         }
@@ -364,8 +364,8 @@ public abstract class AbstractSlicer {
      *        ({@link ThisReference}).
      */
     protected void analyzeUpdate(JTerm term, Services services, HeapLDT heapLDT,
-                                 Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, JTerm> localValues,
-                                 ExecutionContext ec, ReferencePrefix thisReference) {
+            Map<Location, SortedSet<Location>> aliases, Map<ProgramVariable, JTerm> localValues,
+            ExecutionContext ec, ReferencePrefix thisReference) {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE
                 || term.op() == UpdateApplication.UPDATE_APPLICATION) {
             for (int i = 0; i < term.arity(); i++) {
@@ -404,7 +404,7 @@ public abstract class AbstractSlicer {
      *        ({@link ThisReference}).
      */
     protected void analyzeHeapUpdate(JTerm term, Services services, HeapLDT heapLDT,
-                                     Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
+            Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         final Function store = heapLDT.getStore();
         final Function create = heapLDT.getCreate();
         if (term.op() == store) {
@@ -445,8 +445,8 @@ public abstract class AbstractSlicer {
      *        ({@link ThisReference}).
      */
     protected void listModifiedLocations(JTerm term, Services services, HeapLDT heapLDT,
-                                         List<Location> listToFill, ExecutionContext ec, ReferencePrefix thisReference,
-                                         Set<Location> relevantLocations, Node node) throws ProofInputException {
+            List<Location> listToFill, ExecutionContext ec, ReferencePrefix thisReference,
+            Set<Location> relevantLocations, Node node) throws ProofInputException {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE
                 || term.op() == UpdateApplication.UPDATE_APPLICATION) {
             for (int i = 0; i < term.arity(); i++) {
@@ -482,8 +482,8 @@ public abstract class AbstractSlicer {
      *        ({@link ThisReference}).
      */
     protected void listModifiedHeapLocations(JTerm term, Services services, HeapLDT heapLDT,
-                                             List<Location> listToFill, ReferencePrefix thisReference,
-                                             Set<Location> relevantLocations, Node node) throws ProofInputException {
+            List<Location> listToFill, ReferencePrefix thisReference,
+            Set<Location> relevantLocations, Node node) throws ProofInputException {
         if (term.op() == heapLDT.getStore()) {
             // Analyze parent heap
             listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference,
@@ -946,7 +946,7 @@ public abstract class AbstractSlicer {
      * @return The created {@link JTerm}s.
      */
     public static ImmutableArray<JTerm> toTerm(Services services,
-                                               ImmutableArray<Expression> expressions, ExecutionContext ec) {
+            ImmutableArray<Expression> expressions, ExecutionContext ec) {
         JTerm[] terms = new JTerm[expressions.size()];
         int i = 0;
         for (Expression expression : expressions) {

@@ -25,7 +25,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars1,
-                         ProofObligationVars poVars2) throws UnsupportedOperationException {
+            ProofObligationVars poVars2) throws UnsupportedOperationException {
         // get information flow specification terms
         if (d.get(BasicSnippetData.Key.INF_FLOW_SPECS) == null) {
             throw new UnsupportedOperationException(
@@ -59,8 +59,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
 
     private JTerm buildInputOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
-                                           ProofObligationVars vs2, InfFlowSpec infFlowSpecAtPre1, InfFlowSpec infFlowSpecAtPre2,
-                                           InfFlowSpec infFlowSpecAtPost1, InfFlowSpec infFlowSpecAtPost2) {
+            ProofObligationVars vs2, InfFlowSpec infFlowSpecAtPre1, InfFlowSpec infFlowSpecAtPre2,
+            InfFlowSpec infFlowSpecAtPost1, InfFlowSpec infFlowSpecAtPost2) {
         JTerm inputRelation = buildInputRelation(d, vs1, vs2, infFlowSpecAtPre1, infFlowSpecAtPre2);
         JTerm outputRelation =
             buildOutputRelation(d, vs1, vs2, infFlowSpecAtPost1, infFlowSpecAtPost2);
@@ -71,7 +71,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
 
     private JTerm buildInputRelation(BasicSnippetData d, ProofObligationVars vs1,
-                                     ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
+            ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
         JTerm[] eqAtLocs = new JTerm[infFlowSpec1.preExpressions.size()];
 
         Iterator<JTerm> preExp1It = infFlowSpec1.preExpressions.iterator();
@@ -94,7 +94,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
     private JTerm buildOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
-                                      ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
+            ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
         // build equalities for post expressions
         ImmutableList<JTerm> eqAtLocs = ImmutableSLList.nil();
 
@@ -119,8 +119,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
 
     protected JTerm buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
-                                                     InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
-                                                     ProofObligationVars vs2, JTerm eqAtLocsTerm) {
+            InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, JTerm eqAtLocsTerm) {
         // build equalities for newObjects terms
         ImmutableList<JTerm> newObjEqs = ImmutableSLList.nil();
         Iterator<JTerm> newObjects1It = infFlowSpec1.newObjects.iterator();

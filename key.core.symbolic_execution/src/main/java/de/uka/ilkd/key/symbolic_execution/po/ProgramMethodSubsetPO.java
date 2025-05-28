@@ -225,8 +225,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      */
     @Override
     protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
-                           ImmutableList<LocationVariable> paramVars,
-                           Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.getPre(modHeaps, selfVar, paramVarsList, atPreVars, services);
@@ -237,8 +237,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      */
     @Override
     protected JTerm buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
-                                 ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
-                                 Services proofServices) {
+            ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
+            Services proofServices) {
         ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices);
@@ -249,8 +249,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      */
     @Override
     protected JTerm ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
-                                                       ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
-                                                       String name, Services proofServices) {
+            ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
+            String name, Services proofServices) {
         ImmutableList<LocationVariable> paramVarsList =
             convert(undeclaredVariableCollector.result());
         return super.ensureUninterpretedPredicateExists(paramVarsList, formalParamVars,

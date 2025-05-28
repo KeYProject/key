@@ -33,9 +33,9 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.InnerBreakAndContinueReplacer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -156,19 +156,19 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
      * @param services services.
      */
     public LoopContractImpl(final String baseName, final StatementBlock block,
-                            final List<Label> labels, final IProgramMethod method,
-                            final JModality.JavaModalityKind modalityKind,
-                            final Map<LocationVariable, JTerm> preconditions,
-                            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
-                            final Map<LocationVariable, JTerm> postconditions,
-                            final Map<LocationVariable, JTerm> freePostconditions,
-                            final Map<LocationVariable, JTerm> modifiableClauses,
-                            final Map<LocationVariable, JTerm> freeModifiableClauses,
-                            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-                            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasModifiable,
-                            final Map<LocationVariable, Boolean> hasFreeModifiable,
-                            final JTerm decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
-                            Services services) {
+            final List<Label> labels, final IProgramMethod method,
+            final JModality.JavaModalityKind modalityKind,
+            final Map<LocationVariable, JTerm> preconditions,
+            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> postconditions,
+            final Map<LocationVariable, JTerm> freePostconditions,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses,
+            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
+            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasModifiable,
+            final Map<LocationVariable, Boolean> hasFreeModifiable,
+            final JTerm decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
+            Services services) {
         super(baseName, block, labels, method, modalityKind,
             preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
             modifiableClauses, freeModifiableClauses,
@@ -257,20 +257,20 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
      * @param services services.
      */
     public LoopContractImpl(final String baseName, final LoopStatement loop,
-                            final List<Label> labels, final IProgramMethod method,
-                            final JModality.JavaModalityKind modalityKind,
-                            final Map<LocationVariable, JTerm> preconditions,
-                            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
-                            final Map<LocationVariable, JTerm> postconditions,
-                            final Map<LocationVariable, JTerm> freePostconditions,
-                            final Map<LocationVariable, JTerm> modifiableClauses,
-                            final Map<LocationVariable, JTerm> freeModifiableClauses,
-                            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-                            final boolean transactionApplicable,
-                            final Map<LocationVariable, Boolean> hasModifiable,
-                            final Map<LocationVariable, Boolean> hasFreeModifiable,
-                            final JTerm decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
-                            Services services) {
+            final List<Label> labels, final IProgramMethod method,
+            final JModality.JavaModalityKind modalityKind,
+            final Map<LocationVariable, JTerm> preconditions,
+            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> postconditions,
+            final Map<LocationVariable, JTerm> freePostconditions,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses,
+            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
+            final boolean transactionApplicable,
+            final Map<LocationVariable, Boolean> hasModifiable,
+            final Map<LocationVariable, Boolean> hasFreeModifiable,
+            final JTerm decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
+            Services services) {
         super(baseName, new StatementBlock(loop), labels, method, modalityKind,
             preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
             modifiableClauses, freeModifiableClauses,
@@ -558,8 +558,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     private static void replaceVariable(ProgramVariable var, ProgramVariable init,
-                                        Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
-                                        LoopContractImpl r, Services services) {
+            Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
+            LoopContractImpl r, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var), tb.var(init));
@@ -568,8 +568,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     private static void replaceVariable(ProgramVariable var, AbstractIntegerLiteral init,
-                                        Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
-                                        LoopContractImpl r, Services services) {
+            Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
+            LoopContractImpl r, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var),
@@ -579,8 +579,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     private static void replaceVariable(ProgramVariable var, EmptySeqLiteral init,
-                                        Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
-                                        LoopContractImpl r, Services services) {
+            Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
+            LoopContractImpl r, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var),
@@ -590,8 +590,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     private static void replaceVariable(ProgramVariable var, Expression init,
-                                        Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
-                                        LoopContractImpl r, Services services) {
+            Map<JTerm, JTerm> preReplacementMap, Map<JTerm, JTerm> postReplacementMap,
+            LoopContractImpl r, Services services) {
         switch (ReplaceTypes.fromClass(init.getClass())) {
         case PROGRAM_VARIABLE -> replaceVariable(var, (ProgramVariable) init, preReplacementMap,
             postReplacementMap, r, services);
@@ -761,14 +761,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public LoopContract update(final StatementBlock newBlock,
-                               final Map<LocationVariable, JTerm> newPreconditions,
-                               final Map<LocationVariable, JTerm> newFreePreconditions,
-                               final Map<LocationVariable, JTerm> newPostconditions,
-                               final Map<LocationVariable, JTerm> newFreePostconditions,
-                               final Map<LocationVariable, JTerm> newModifiableClauses,
-                               final Map<LocationVariable, JTerm> newFreeModifiableClauses,
-                               final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
-                               final JTerm newMeasuredBy, final JTerm newDecreases) {
+            final Map<LocationVariable, JTerm> newPreconditions,
+            final Map<LocationVariable, JTerm> newFreePreconditions,
+            final Map<LocationVariable, JTerm> newPostconditions,
+            final Map<LocationVariable, JTerm> newFreePostconditions,
+            final Map<LocationVariable, JTerm> newModifiableClauses,
+            final Map<LocationVariable, JTerm> newFreeModifiableClauses,
+            final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
+            final JTerm newMeasuredBy, final JTerm newDecreases) {
         LoopContractImpl result =
             new LoopContractImpl(baseName, newBlock, labels, method, modalityKind,
                 newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
@@ -781,14 +781,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public LoopContract update(final LoopStatement newLoop,
-                               final Map<LocationVariable, JTerm> newPreconditions,
-                               final Map<LocationVariable, JTerm> newFreePreconditions,
-                               final Map<LocationVariable, JTerm> newPostconditions,
-                               final Map<LocationVariable, JTerm> newFreePostconditions,
-                               final Map<LocationVariable, JTerm> newModifiableClauses,
-                               final Map<LocationVariable, JTerm> newFreeModifiableClauses,
-                               final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
-                               final JTerm newMeasuredBy, final JTerm newDecreases) {
+            final Map<LocationVariable, JTerm> newPreconditions,
+            final Map<LocationVariable, JTerm> newFreePreconditions,
+            final Map<LocationVariable, JTerm> newPostconditions,
+            final Map<LocationVariable, JTerm> newFreePostconditions,
+            final Map<LocationVariable, JTerm> newModifiableClauses,
+            final Map<LocationVariable, JTerm> newFreeModifiableClauses,
+            final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
+            final JTerm newMeasuredBy, final JTerm newDecreases) {
         LoopContractImpl result = new LoopContractImpl(
             baseName, newLoop, labels, method, modalityKind,
             newPreconditions, newFreePreconditions, newMeasuredBy,
@@ -966,16 +966,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
          * @param services services.
          */
         public Creator(String baseName, StatementBlock block, List<Label> labels,
-                       IProgramMethod method, Behavior behavior, Variables variables,
-                       Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
-                       JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
-                       Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
-                       Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
-                       JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
-                       Map<LocationVariable, JTerm> modifiablesFree,
-                       Map<LocationVariable, Boolean> hasModifiable,
-                       Map<LocationVariable, Boolean> hasFreeModifiable,
-                       JTerm decreases, Services services) {
+                IProgramMethod method, Behavior behavior, Variables variables,
+                Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
+                JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
+                Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
+                Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
+                JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
+                Map<LocationVariable, JTerm> modifiablesFree,
+                Map<LocationVariable, Boolean> hasModifiable,
+                Map<LocationVariable, Boolean> hasFreeModifiable,
+                JTerm decreases, Services services) {
             super(baseName, block, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
                 infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
@@ -1015,16 +1015,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
          * @param services services.
          */
         public Creator(String baseName, LoopStatement loop, List<Label> labels,
-                       IProgramMethod method, Behavior behavior, Variables variables,
-                       Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
-                       JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
-                       Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
-                       Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
-                       JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
-                       Map<LocationVariable, JTerm> modifiablesFree,
-                       Map<LocationVariable, Boolean> hasModifiable,
-                       Map<LocationVariable, Boolean> hasFreeModifiable,
-                       JTerm decreases, Services services) {
+                IProgramMethod method, Behavior behavior, Variables variables,
+                Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
+                JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
+                Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
+                Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
+                JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
+                Map<LocationVariable, JTerm> modifiablesFree,
+                Map<LocationVariable, Boolean> hasModifiable,
+                Map<LocationVariable, Boolean> hasFreeModifiable,
+                JTerm decreases, Services services) {
             super(baseName, null, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
                 infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
@@ -1035,16 +1035,16 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         @Override
         protected LoopContract build(String baseName, StatementBlock block, List<Label> labels,
-                                     IProgramMethod method, JModality.JavaModalityKind modalityKind,
-                                     Map<LocationVariable, JTerm> preconditions,
-                                     Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
-                                     Map<LocationVariable, JTerm> postconditions,
-                                     Map<LocationVariable, JTerm> freePostconditions,
-                                     Map<LocationVariable, JTerm> modifiableClauses,
-                                     Map<LocationVariable, JTerm> freeModifiableClauses,
-                                     ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                                     boolean transactionApplicable, Map<LocationVariable, Boolean> hasModifiable,
-                                     Map<LocationVariable, Boolean> hasFreeModifiable) {
+                IProgramMethod method, JModality.JavaModalityKind modalityKind,
+                Map<LocationVariable, JTerm> preconditions,
+                Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
+                Map<LocationVariable, JTerm> postconditions,
+                Map<LocationVariable, JTerm> freePostconditions,
+                Map<LocationVariable, JTerm> modifiableClauses,
+                Map<LocationVariable, JTerm> freeModifiableClauses,
+                ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasModifiable,
+                Map<LocationVariable, Boolean> hasFreeModifiable) {
             if (block != null) {
                 return new LoopContractImpl(
                     baseName, block, labels, method, modalityKind,

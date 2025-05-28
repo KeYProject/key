@@ -90,7 +90,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
 
     private JTerm instantiateContApplPredicate(Function pred, ImmutableList<JTerm> termList,
-                                               TermBuilder tb) {
+            TermBuilder tb) {
         final Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         JTerm[] predArgs = new JTerm[predArgSorts.length];
@@ -117,7 +117,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * @return
      */
     private ImmutableList<JTerm> extractTermListForPredicate(IProgramMethod pm,
-                                                             ProofObligationVars poVars, boolean hasMby) {
+            ProofObligationVars poVars, boolean hasMby) {
         ImmutableList<JTerm> relevantPreVars = ImmutableSLList.nil();
         ImmutableList<JTerm> relevantPostVars = ImmutableSLList.nil();
 

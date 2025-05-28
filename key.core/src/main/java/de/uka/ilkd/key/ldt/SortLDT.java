@@ -44,19 +44,20 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm[] subs, Services services,
+            ExecutionContext ec) {
         return op instanceof Subtype;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
-                                 ExecutionContext ec) {
+            ExecutionContext ec) {
         return op instanceof Subtype;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm sub, TermServices services,
-                                 ExecutionContext ec) {
+            ExecutionContext ec) {
         return op instanceof Subtype;
     }
 

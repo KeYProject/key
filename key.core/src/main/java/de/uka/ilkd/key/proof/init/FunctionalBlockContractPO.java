@@ -13,9 +13,9 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
@@ -153,8 +153,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @return the updates.
      */
     private static JTerm[] createUpdates(final BlockContract.Variables variables,
-                                         final List<LocationVariable> heaps, Map<LocationVariable, Function> anonHeaps,
-                                         final Services services) {
+            final List<LocationVariable> heaps, Map<LocationVariable, Function> anonHeaps,
+            final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final JTerm outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
@@ -199,14 +199,14 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @return the validity formula for the contract.
      */
     private static JTerm setUpValidityTerm(final List<LocationVariable> heaps,
-                                           Map<LocationVariable, Function> anonHeaps,
-                                           Map<LocationVariable, Function> anonOutHeaps,
-                                           final ImmutableSet<LocationVariable> localInVariables,
-                                           final ImmutableSet<LocationVariable> localOutVariables,
-                                           final ProgramVariable exceptionParameter, final JTerm[] assumptions,
-                                           final JTerm[] postconditions, final JTerm[] updates, final BlockContract bc,
-                                           final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-                                           final GoalsConfigurator configurator, final Services services, final TermBuilder tb) {
+            Map<LocationVariable, Function> anonHeaps,
+            Map<LocationVariable, Function> anonOutHeaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localOutVariables,
+            final ProgramVariable exceptionParameter, final JTerm[] assumptions,
+            final JTerm[] postconditions, final JTerm[] updates, final BlockContract bc,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
+            final GoalsConfigurator configurator, final Services services, final TermBuilder tb) {
         JTerm validity = configurator.setUpValidityGoal(null, updates, assumptions, postconditions,
             exceptionParameter, conditionsAndClausesBuilder.getTerms());
         JTerm wellFormedAnonymisationHeapsCondition =
@@ -232,10 +232,10 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @return the conjunction of the well-definedness formula and the validity formula.
      */
     private static JTerm addWdToValidityTerm(JTerm validity, final JTerm[] updates,
-                                             final List<LocationVariable> heaps, Map<LocationVariable, Function> anonOutHeaps,
-                                             final ImmutableSet<LocationVariable> localInVariables,
-                                             final ImmutableSet<LocationVariable> localOutVariables, final BlockContract bc,
-                                             final GoalsConfigurator configurator, final Services services, final TermBuilder tb) {
+            final List<LocationVariable> heaps, Map<LocationVariable, Function> anonOutHeaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localOutVariables, final BlockContract bc,
+            final GoalsConfigurator configurator, final Services services, final TermBuilder tb) {
         if (WellDefinednessCheck.isOn()) {
             final JTerm wdUpdate = services.getTermBuilder().parallel(updates[1], updates[2]);
 
@@ -456,10 +456,10 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @return the preconditions.
      */
     private JTerm[] createAssumptions(final IProgramMethod pm, final LocationVariable selfVar,
-                                      final List<LocationVariable> heaps,
-                                      final ImmutableSet<LocationVariable> localInVariables,
-                                      final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-                                      final Services services) {
+            final List<LocationVariable> heaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
+            final Services services) {
         final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
         final JTerm wellFormedHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedHeapsCondition();

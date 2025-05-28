@@ -10,9 +10,9 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
@@ -47,7 +47,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     public InfFlowProgVarRenamer(JTerm[] terms, Map<JTerm, JTerm> preInitialisedReplaceMap,
-                                 String postfix, Goal goalForVariableRegistration, Services services) {
+            String postfix, Goal goalForVariableRegistration, Services services) {
         super(services.getTermFactory(), services);
         this.terms = terms;
         this.postfix = postfix;
@@ -65,7 +65,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     public InfFlowProgVarRenamer(JTerm[] terms, String postfix, Goal goalForVariableRegistration,
-                                 Services services) {
+            Services services) {
         this(terms, null, postfix, goalForVariableRegistration, services);
     }
 
@@ -198,7 +198,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private JTerm applyRenamingsToPrograms(JTerm term,
-                                           Map<LocationVariable, LocationVariable> progVarReplaceMap) {
+            Map<LocationVariable, LocationVariable> progVarReplaceMap) {
 
         if (term == null) {
             return null;
@@ -217,7 +217,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private JTerm[] applyProgramRenamingsToSubs(JTerm term,
-                                                Map<LocationVariable, LocationVariable> progVarReplaceMap) {
+            Map<LocationVariable, LocationVariable> progVarReplaceMap) {
         JTerm[] appliedSubs = new JTerm[term.arity()];
         for (int i = 0; i < appliedSubs.length; i++) {
             appliedSubs[i] = applyRenamingsToPrograms(term.sub(i), progVarReplaceMap);

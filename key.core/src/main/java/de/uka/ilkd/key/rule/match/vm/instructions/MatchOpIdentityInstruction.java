@@ -28,8 +28,9 @@ public class MatchOpIdentityInstruction<T extends JOperator> extends Instruction
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions match(JTerm instantiationCandidate, MatchConditions matchConditions,
-                                       LogicServices services) {
+    public final MatchConditions match(JTerm instantiationCandidate,
+            MatchConditions matchConditions,
+            LogicServices services) {
         if (instantiationCandidate.op() == op) {
             return matchConditions;
         }
@@ -41,7 +42,7 @@ public class MatchOpIdentityInstruction<T extends JOperator> extends Instruction
      */
     @Override
     public MatchConditions match(JOperator instantiationCandidate, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         if (instantiationCandidate == op) {
             return matchConditions;
         }

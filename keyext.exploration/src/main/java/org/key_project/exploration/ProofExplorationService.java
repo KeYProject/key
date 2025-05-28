@@ -143,8 +143,8 @@ public class ProofExplorationService {
     }
 
     public Node applyChangeFormula(@NonNull Goal g,
-                                   @NonNull PosInOccurrence pio,
-                                   @NonNull JTerm term, @NonNull JTerm newTerm) {
+            @NonNull PosInOccurrence pio,
+            @NonNull JTerm term, @NonNull JTerm newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         // taint goal with exploration

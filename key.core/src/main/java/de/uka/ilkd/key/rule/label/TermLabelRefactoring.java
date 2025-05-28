@@ -109,9 +109,9 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @return The required {@link RefactoringScope}.
      */
     RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                                            PosInOccurrence applicationPosInOccurrence,
-                                            JTerm applicationTerm, Rule rule, Goal goal,
-                                            Object hint, JTerm tacletTerm);
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm);
 
     /**
      * This method is used to refactor the labels of the given {@link JTerm}.
@@ -132,9 +132,9 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param labels The new labels the {@link JTerm} will have after the refactoring.
      */
     void refactorLabels(TermLabelState state, Services services,
-                        PosInOccurrence applicationPosInOccurrence,
-                        JTerm applicationTerm, Rule rule, Goal goal,
-                        Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels);
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels);
 
     /**
      * Possible refactoring scopes.

@@ -22,8 +22,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -220,7 +220,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     protected static ImmutableList<JTerm> buildLocalOutsAtPre(ImmutableList<JTerm> varTerms,
-                                                              Services services) {
+            Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
         }
@@ -242,7 +242,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     protected static ImmutableList<JTerm> buildLocalOutsAtPost(ImmutableList<JTerm> varTerms,
-                                                               Services services) {
+            Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
         }
@@ -264,8 +264,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     protected static JTerm buildInfFlowPreAssumption(ProofObligationVars instVars,
-                                                     ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPre, JTerm baseHeap,
-                                                     final TermBuilder tb) {
+            ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPre, JTerm baseHeap,
+            final TermBuilder tb) {
         JTerm beforeAssumptions = tb.equals(instVars.pre.heap, baseHeap);
         Iterator<JTerm> outsAtPre = localOutsAtPre.iterator();
         for (JTerm locOut : localOuts) {
@@ -275,8 +275,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     protected static JTerm buildInfFlowPostAssumption(ProofObligationVars instVars,
-                                                      ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPost, JTerm baseHeap,
-                                                      JTerm applPredTerm, final TermBuilder tb) {
+            ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPost, JTerm baseHeap,
+            JTerm applPredTerm, final TermBuilder tb) {
         JTerm resultEq =
             instVars.pre.result != null ? tb.equals(instVars.post.result, instVars.pre.result)
                     : tb.tt();
@@ -393,8 +393,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     protected void setUpInfFlowPartOfUsageGoal(final Goal usageGoal,
-                                               InfFlowValidityData infFlowValitidyData, final JTerm contextUpdate,
-                                               final JTerm remembranceUpdate, final JTerm anonymisationUpdate, final TermBuilder tb) {
+            InfFlowValidityData infFlowValitidyData, final JTerm contextUpdate,
+            final JTerm remembranceUpdate, final JTerm anonymisationUpdate, final TermBuilder tb) {
         usageGoal.addTaclet(infFlowValitidyData.taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
             true);
         final JTerm uAssumptions =
@@ -468,7 +468,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         final Taclet taclet;
 
         public InfFlowValidityData(final JTerm preAssumption, final JTerm postAssumption,
-                                   final Taclet taclet) {
+                final Taclet taclet) {
             this.preAssumption = preAssumption;
             this.postAssumption = postAssumption;
             this.taclet = taclet;

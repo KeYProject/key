@@ -41,7 +41,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
     public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         JTerm arg1 = term.sub(0);
         JTerm arg2 = term.sub(1); // true or false. If true, than the application of the meta
-                                 // construct
+                                  // construct
         boolean positiveContext;
         if (arg2.op() == Junctor.TRUE) {
             positiveContext = true;

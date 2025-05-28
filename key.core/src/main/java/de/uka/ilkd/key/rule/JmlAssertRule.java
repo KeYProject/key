@@ -162,15 +162,15 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     private void setUpValidityRule(Goal goal,
-                                   PosInOccurrence occurrence, JTerm update,
-                                   JTerm condition, TermBuilder tb) {
+            PosInOccurrence occurrence, JTerm update,
+            JTerm condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
     private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence,
-                                JTerm update, JTerm target,
-                                JTerm condition, TermBuilder tb, Services services) {
+            JTerm update, JTerm target,
+            JTerm condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
         final JTerm newTerm = tb.apply(update,

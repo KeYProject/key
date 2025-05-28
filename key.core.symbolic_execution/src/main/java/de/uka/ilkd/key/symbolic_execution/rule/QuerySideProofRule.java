@@ -167,7 +167,8 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
                     var focus = it.getSubTerm();
-                    if (focus.op() instanceof UpdateApplication || focus.op() instanceof JModality) {
+                    if (focus.op() instanceof UpdateApplication
+                            || focus.op() instanceof JModality) {
                         return false;
                     }
                 }

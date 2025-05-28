@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
  * @author Dominic Scheurer
  */
 public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathCondition,
-                                                JTerm programCounter, @Nullable Node correspondingNode) {
+        JTerm programCounter, @Nullable Node correspondingNode) {
     /**
      * @return The symbolic state.
      */

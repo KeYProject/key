@@ -9,8 +9,8 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.Taclet;
@@ -64,7 +64,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     public ClassAxiomImpl(String name, String displayName, KeYJavaType kjt,
-                          VisibilityModifier visibility, JTerm rep, LocationVariable selfVar) {
+            VisibilityModifier visibility, JTerm rep, LocationVariable selfVar) {
         this(name, kjt, visibility, rep, selfVar);
         this.displayName = displayName;
     }

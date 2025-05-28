@@ -69,9 +69,9 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                                                   PosInOccurrence applicationPosInOccurrence,
-                                                   JTerm applicationTerm, Rule rule, Goal goal,
-                                                   Object hint, JTerm tacletTerm) {
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm) {
         if (goal != null) {
             final String branchLabel = goal.node().getNodeInfo().getBranchLabel();
             return switch (rule) {
@@ -96,8 +96,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-                               PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-                               Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
         labels.removeIf(next -> termLabelNameToRemove.equals(next.name()));
     }
 }

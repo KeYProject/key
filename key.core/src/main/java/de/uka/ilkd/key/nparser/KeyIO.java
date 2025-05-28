@@ -12,8 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.nparser.builder.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.JavaProfile;

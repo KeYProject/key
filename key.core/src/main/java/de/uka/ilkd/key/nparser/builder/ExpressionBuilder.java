@@ -219,7 +219,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private JTerm binaryTerm(ParserRuleContext ctx, Operator operator,
-                             JTerm left, JTerm right) {
+            JTerm left, JTerm right) {
         if (right == null) {
             return updateOrigin(left, ctx, services);
         }
@@ -362,7 +362,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         return last;
     }
 
-    private JTerm binaryLDTSpecificTerm(ParserRuleContext ctx, String opname, JTerm last, JTerm cur) {
+    private JTerm binaryLDTSpecificTerm(ParserRuleContext ctx, String opname, JTerm last,
+            JTerm cur) {
         Sort sort = last.sort();
         if (sort == null) {
             semanticError(ctx, "No sort for %s", last);
@@ -1666,7 +1667,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
 
     protected ImmutableSet<JModality.JavaModalityKind> opSVHelper(String opName,
-                                                                  ImmutableSet<JModality.JavaModalityKind> modalityKinds) {
+            ImmutableSet<JModality.JavaModalityKind> modalityKinds) {
         if (opName.charAt(0) == '#') {
             return lookupOperatorSV(opName, modalityKinds);
         } else {
@@ -1726,7 +1727,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private ImmutableSet<JModality.JavaModalityKind> lookupOperatorSV(String opName,
-                                                                      ImmutableSet<JModality.JavaModalityKind> modalityKinds) {
+            ImmutableSet<JModality.JavaModalityKind> modalityKinds) {
         SchemaVariable sv = schemaVariables().lookup(new Name(opName));
         if (sv instanceof ModalOperatorSV osv) {
             modalityKinds = modalityKinds.union(osv.getModalities());

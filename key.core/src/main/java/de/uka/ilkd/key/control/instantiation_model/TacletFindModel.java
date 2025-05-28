@@ -179,7 +179,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace
      */
     private JTerm parseTerm(String s, Namespace<@NonNull JQuantifiableVariable> varNS,
-                            Namespace<@NonNull Function> functNS) throws ParserException {
+            Namespace<@NonNull Function> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -235,7 +235,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @return the parsed term
      */
     private JTerm parseRow(int irow, Namespace<@NonNull JQuantifiableVariable> varNS,
-                           Namespace<@NonNull Function> functNS)
+            Namespace<@NonNull Function> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);

@@ -233,12 +233,12 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                                                                                // like exc of the
                                                                                // proof obligation.
                 Set<JTerm> updateCreatedObjects = new LinkedHashSet<>(); // Contains all objects
-                                                                        // which are created
-                                                                        // during symbolic
-                                                                        // execution
+                                                                         // which are created
+                                                                         // during symbolic
+                                                                         // execution
                 Set<JTerm> updateValueObjects = new LinkedHashSet<>(); // Contains all objects
-                                                                      // which are the value of
-                                                                      // an update
+                                                                       // which are the value of
+                                                                       // an update
                 collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations,
                     updateCreatedObjects, updateValueObjects, objectsToIgnore);
                 objectsToIgnore.addAll(updateCreatedObjects);
@@ -345,7 +345,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException
      */
     protected Set<JTerm> filterOutObjectsToIgnore(Set<JTerm> objectsToFilter,
-                                                  Set<JTerm> objectsToIgnore) throws ProofInputException {
+            Set<JTerm> objectsToIgnore) throws ProofInputException {
         Set<JTerm> result = new LinkedHashSet<>();
         for (JTerm symbolicObject : objectsToFilter) {
             if (!objectsToIgnore.contains(symbolicObject)) {
@@ -685,7 +685,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         Set<JTerm> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
-                result.addAll(collectSymbolicObjectsFromTerm((JTerm) sf.formula(), objectsToIgnore));
+                result.addAll(
+                    collectSymbolicObjectsFromTerm((JTerm) sf.formula(), objectsToIgnore));
             }
         }
         return result;
@@ -699,7 +700,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * @return The found objects.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Set<JTerm> collectSymbolicObjectsFromTerm(JTerm term, final Set<JTerm> objectsToIgnore)
+    protected Set<JTerm> collectSymbolicObjectsFromTerm(JTerm term,
+            final Set<JTerm> objectsToIgnore)
             throws ProofInputException {
         final Set<JTerm> result = new LinkedHashSet<>();
         term.execPreOrder((DefaultVisitor) p_visited -> {

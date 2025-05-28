@@ -19,7 +19,7 @@ class SelfcomposedBlockSnippet extends ReplaceAndRegisterMethod implements InfFl
 
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars1,
-                         ProofObligationVars poVars2) {
+            ProofObligationVars poVars2) {
         BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, poVars2);
 

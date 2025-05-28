@@ -29,9 +29,9 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -89,11 +89,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final Goal infFlowGoal,
-                                                                 final AnonUpdateData anonUpdateData, final JTerm guardTerm, final Instantiation inst,
-                                                                 LoopSpecification spec, Services services, LoopInvariantBuiltInRuleApp ruleApp,
-                                                                 final ImmutableSet<LocationVariable> localIns,
-                                                                 final ImmutableSet<LocationVariable> localOuts, final JTerm anonUpdate,
-                                                                 final JavaBlock guardJb) throws RuleAbortException {
+            final AnonUpdateData anonUpdateData, final JTerm guardTerm, final Instantiation inst,
+            LoopSpecification spec, Services services, LoopInvariantBuiltInRuleApp ruleApp,
+            final ImmutableSet<LocationVariable> localIns,
+            final ImmutableSet<LocationVariable> localOuts, final JTerm anonUpdate,
+            final JavaBlock guardJb) throws RuleAbortException {
         final TermBuilder tb = services.getTermBuilder();
         final JTerm baseHeap = anonUpdateData.loopHeapAtPre;
         final JTerm selfTerm = inst.selfTerm;
@@ -227,7 +227,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private static JTerm createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
-                                               Services services) {
+            Services services) {
         JTerm anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable pv : localOuts) {
@@ -328,7 +328,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private static ImmutableList<JTerm> buildLocalOutsAtPre(ImmutableList<JTerm> varTerms,
-                                                            Services services) {
+            Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
         }
@@ -350,7 +350,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private static ImmutableList<JTerm> buildLocalOutsAtPost(ImmutableList<JTerm> varTerms,
-                                                             Services services) {
+            Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
         }
@@ -471,7 +471,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     private JTerm conjunctInv(Services services, Instantiation inst,
-                              final Map<LocationVariable, JTerm> atPres, final List<LocationVariable> heapContext) {
+            final Map<LocationVariable, JTerm> atPres, final List<LocationVariable> heapContext) {
         JTerm invTerm = services.getTermBuilder().tt();
         for (LocationVariable heap : heapContext) {
             final JTerm i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
@@ -488,7 +488,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private JTerm conjunctFreeInv(Services services, Instantiation inst,
-                                  final Map<LocationVariable, JTerm> atPres, final List<LocationVariable> heapContext) {
+            final Map<LocationVariable, JTerm> atPres, final List<LocationVariable> heapContext) {
         JTerm freeInvTerm = services.getTermBuilder().tt();
         for (LocationVariable heap : heapContext) {
             final JTerm i = inst.inv.getFreeInvariant(heap, inst.selfTerm, atPres, services);
@@ -505,7 +505,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private Pair<JTerm, JTerm> prepareVariant(Instantiation inst, JTerm variant,
-                                              TermServices services) {
+            TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName = new ProgramElementName(tb.newName("variant"));
         final LocationVariable variantPV = new LocationVariable(variantName, JavaDLTheory.ANY);
@@ -520,10 +520,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private JTerm bodyTerm(TermLabelState termLabelState, Services services,
-                           RuleApp ruleApp,
-                           final Sequent applicationSequent, Instantiation inst, final JTerm invTerm,
-                           JTerm frameCondition, final JTerm variantPO, Goal bodyGoal, final JavaBlock guardJb,
-                           final JTerm guardTrueTerm) {
+            RuleApp ruleApp,
+            final Sequent applicationSequent, Instantiation inst, final JTerm invTerm,
+            JTerm frameCondition, final JTerm variantPO, Goal bodyGoal, final JavaBlock guardJb,
+            final JTerm guardTrueTerm) {
         final WhileInvariantTransformer wir = new WhileInvariantTransformer();
         final TermBuilder tb = services.getTermBuilder();
         SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(null, null,
@@ -543,8 +543,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private SequentFormula initFormula(TermLabelState termLabelState,
-                                       Instantiation inst,
-                                       final JTerm invTerm, JTerm reachableState, Services services, Goal initGoal) {
+            Instantiation inst,
+            final JTerm invTerm, JTerm reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
         JTerm sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
@@ -553,8 +553,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private JTerm useCaseFormula(TermLabelState termLabelState, Services services,
-                                 RuleApp ruleApp,
-                                 Instantiation inst, Goal useGoal, final JavaBlock guardJb, final JTerm guardFalseTerm) {
+            RuleApp ruleApp,
+            Instantiation inst, Goal useGoal, final JavaBlock guardJb, final JTerm guardFalseTerm) {
         final TermBuilder tb = services.getTermBuilder();
         JavaBlock useJavaBlock =
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
@@ -617,11 +617,11 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private void prepareBodyPreservesBranch(TermLabelState termLabelState, Services services,
-                                            RuleApp ruleApp, final Sequent applicationSequent,
-                                            Instantiation inst,
-                                            final JTerm invTerm, JTerm wellFormedAnon, JTerm frameCondition, final JTerm variantPO,
-                                            Goal bodyGoal, final JavaBlock guardJb, final JTerm guardTrueTerm,
-                                            final JTerm[] uBeforeLoopDefAnonVariant, final JTerm uAnonInv) {
+            RuleApp ruleApp, final Sequent applicationSequent,
+            Instantiation inst,
+            final JTerm invTerm, JTerm wellFormedAnon, JTerm frameCondition, final JTerm variantPO,
+            Goal bodyGoal, final JavaBlock guardJb, final JTerm guardTrueTerm,
+            final JTerm[] uBeforeLoopDefAnonVariant, final JTerm uAnonInv) {
         final TermBuilder tb = services.getTermBuilder();
         bodyGoal.setBranchLabel(BODY_PRESERVES_INVARIANT_LABEL);
         bodyGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
@@ -638,10 +638,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private void prepareUseCaseBranch(TermLabelState termLabelState, Services services,
-                                      RuleApp ruleApp, Instantiation inst, JTerm wellFormedAnon,
-                                      Goal useGoal,
-                                      final JavaBlock guardJb, final JTerm guardFalseTerm, final JTerm[] uAnon,
-                                      final JTerm uAnonInv) {
+            RuleApp ruleApp, Instantiation inst, JTerm wellFormedAnon,
+            Goal useGoal,
+            final JavaBlock guardJb, final JTerm guardFalseTerm, final JTerm[] uAnon,
+            final JTerm uAnonInv) {
         useGoal.setBranchLabel("Use Case");
         useGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
@@ -692,9 +692,9 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private void setupWdGoal(final Goal goal, final LoopSpecification inv, final JTerm update,
-                             final JTerm selfTerm, final LocationVariable heap, final JTerm anonHeap,
-                             final JTerm localAnonUpdate, final ImmutableSet<LocationVariable> localIns,
-                             PosInOccurrence pio, Services services) {
+            final JTerm selfTerm, final LocationVariable heap, final JTerm anonHeap,
+            final JTerm localAnonUpdate, final ImmutableSet<LocationVariable> localIns,
+            PosInOccurrence pio, Services services) {
         if (goal == null) {
             return;
         }
@@ -980,7 +980,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         public final ExecutionContext innermostExecutionContext;
 
         public Instantiation(JTerm u, JTerm progPost, While loop, LoopSpecification inv,
-                             JTerm selfTerm, ExecutionContext innermostExecutionContext) {
+                JTerm selfTerm, ExecutionContext innermostExecutionContext) {
             assert u != null;
             assert u.sort() == JavaDLTheory.UPDATE;
             assert progPost != null;
@@ -999,7 +999,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static class AnonUpdateData {
         public final JTerm anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
 
-        public AnonUpdateData(JTerm anonUpdate, JTerm loopHeap, JTerm loopHeapAtPre, JTerm anonHeap) {
+        public AnonUpdateData(JTerm anonUpdate, JTerm loopHeap, JTerm loopHeapAtPre,
+                JTerm anonHeap) {
             this.anonUpdate = anonUpdate;
             this.loopHeap = loopHeap;
             this.loopHeapAtPre = loopHeapAtPre;
@@ -1007,15 +1008,16 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
-    private record InfFlowData(ProofObligationVars symbExecVars, JTerm guardAtPre, JTerm guardAtPost,
-                               JavaBlock guardJb,
-                               JTerm guardTerm, ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPre,
-                               ImmutableList<JTerm> localOutsAtPost, Pair<JTerm, JTerm> updates, JTerm applPredTerm,
-                               Taclet infFlowApp) {
+    private record InfFlowData(ProofObligationVars symbExecVars, JTerm guardAtPre,
+            JTerm guardAtPost,
+            JavaBlock guardJb,
+            JTerm guardTerm, ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPre,
+            ImmutableList<JTerm> localOutsAtPost, Pair<JTerm, JTerm> updates, JTerm applPredTerm,
+            Taclet infFlowApp) {
         private InfFlowData(ProofObligationVars symbExecVars, JTerm guardAtPre, JTerm guardAtPost,
-                            JavaBlock guardJb, JTerm guardTerm, ImmutableList<JTerm> localOuts,
-                            ImmutableList<JTerm> localOutsAtPre, ImmutableList<JTerm> localOutsAtPost,
-                            Pair<JTerm, JTerm> updates, JTerm applPredTerm, Taclet infFlowApp) {
+                JavaBlock guardJb, JTerm guardTerm, ImmutableList<JTerm> localOuts,
+                ImmutableList<JTerm> localOutsAtPre, ImmutableList<JTerm> localOutsAtPost,
+                Pair<JTerm, JTerm> updates, JTerm applPredTerm, Taclet infFlowApp) {
             this.symbExecVars = symbExecVars;
             this.guardAtPre = guardAtPre;
             this.guardAtPost = guardAtPost;

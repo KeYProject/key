@@ -11,6 +11,6 @@ import org.key_project.logic.LogicServices;
 public interface MatchOperatorInstruction extends MatchInstruction {
 
     MatchConditions match(JOperator instantiationCandidate, MatchConditions matchConditions,
-                          LogicServices services);
+            LogicServices services);
 
 }

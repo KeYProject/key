@@ -55,7 +55,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * @return translation
      */
     private JTerm translateReplaceAndAddTerm(TacletGoalTemplate template, JTerm find,
-                                             TermServices services) {
+            TermServices services) {
         TermBuilder tb = services.getTermBuilder();
         JTerm replace = find;
         if (template instanceof RewriteTacletGoalTemplate) {
@@ -84,8 +84,9 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * @param services TODO
      * @return translation
      */
-    private JTerm translateReplaceAndAddFormula(TacletGoalTemplate template, JTerm find, int polarity,
-                                                TermServices services) {
+    private JTerm translateReplaceAndAddFormula(TacletGoalTemplate template, JTerm find,
+            int polarity,
+            TermServices services) {
         TermBuilder tb = services.getTermBuilder();
 
         JTerm replace = find;
@@ -110,7 +111,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     }
 
     private JTerm translateEquivalence(JTerm find, JTerm replace, int polarity,
-                                       TermServices services) {
+            TermServices services) {
         TermBuilder tb = services.getTermBuilder();
         return switch (polarity) {
         case 0 -> tb.equals(find, replace);
@@ -121,7 +122,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     }
 
     private JTerm translateReplaceAndAddSequent(TacletGoalTemplate template, int type,
-                                                TermServices services) {
+            TermServices services) {
         TermBuilder tb = services.getTermBuilder();
         Sequent replace = null;
         if (template instanceof AntecSuccTacletGoalTemplate) {

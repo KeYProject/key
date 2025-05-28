@@ -34,7 +34,7 @@ public class DelayedCut {
     private Goal remainingGoal = null;
 
     public DelayedCut(Proof proof, Node node, JTerm formula, ImmutableList<Node> subtrees,
-                      int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
+            int sideOfDecisionPredicate, RuleApp firstAppliedRuleApp) {
         super();
         assert sideOfDecisionPredicate == DECISION_PREDICATE_IN_ANTECEDENT
                 || sideOfDecisionPredicate == DECISION_PREDICATE_IN_SUCCEDENT;

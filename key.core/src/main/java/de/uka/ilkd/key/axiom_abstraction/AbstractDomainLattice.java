@@ -62,7 +62,7 @@ public abstract class AbstractDomainLattice
      * @return Side condition to prove in order to show that elem abstracts from term.
      */
     public static JTerm getSideConditionForAxiom(SymbolicExecutionState state, JTerm term,
-                                                 AbstractDomainElement elem, Services services) {
+            AbstractDomainElement elem, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         JTerm axiom = elem.getDefiningAxiom(term, services);

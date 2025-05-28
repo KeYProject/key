@@ -165,7 +165,7 @@ public class LogicPrinter {
      * @return the printed term.
      */
     public static String quickPrintTerm(JTerm t, Services services, boolean usePrettyPrinting,
-                                        boolean useUnicodeSymbols) {
+            boolean useUnicodeSymbols) {
         var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
         p.printTerm(t);
         return p.result();
@@ -1399,7 +1399,7 @@ public class LogicPrinter {
      * @param assRight associativity for right subterm
      */
     public void printInfixTermContinuingBlock(JTerm l, int assLeft, String name, JTerm t, JTerm r,
-                                              int assRight) {
+            int assRight) {
         boolean isKeyword = false;
         if (services != null) {
             LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
@@ -1588,7 +1588,7 @@ public class LogicPrinter {
      * @param ass3 the int defining the associativity for phi
      */
     public void printSubstTerm(String l, JQuantifiableVariable v, JTerm t, int ass2, String r,
-                               JTerm phi, int ass3) {
+            JTerm phi, int ass3) {
         layouter.beginC().print(l);
         printVariables(new ImmutableArray<>(v), quantifiableVariablePrintMode);
         layouter.startTerm(2);
@@ -1616,7 +1616,7 @@ public class LogicPrinter {
      * @param ass associativity for phi
      */
     public void printQuantifierTerm(String name, ImmutableArray<JQuantifiableVariable> vars,
-                                    JTerm phi, int ass) {
+            JTerm phi, int ass) {
         layouter.beginC();
         layouter.keyWord(name);
         layouter.print(" ");

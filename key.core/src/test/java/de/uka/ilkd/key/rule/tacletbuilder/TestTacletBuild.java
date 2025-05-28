@@ -6,10 +6,10 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.io.File;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RewriteTaclet;

@@ -211,7 +211,8 @@ public final class SpecificationRepository {
     private static JModality.JavaModalityKind getMatchModalityKind(
             final JModality.JavaModalityKind kind) {
         if (kind.transaction()) {
-            return kind == JModality.JavaModalityKind.DIA_TRANSACTION ? JModality.JavaModalityKind.DIA
+            return kind == JModality.JavaModalityKind.DIA_TRANSACTION
+                    ? JModality.JavaModalityKind.DIA
                     : JModality.JavaModalityKind.BOX;
         } else {
             return kind;
@@ -659,7 +660,7 @@ public final class SpecificationRepository {
      */
     @SuppressWarnings("unchecked")
     private <K, V extends SpecificationElement> void mapValueSets(Map<K, ImmutableSet<V>> map,
-                                                                  UnaryOperator<JTerm> op, Services services) {
+            UnaryOperator<JTerm> op, Services services) {
         for (Entry<K, ImmutableSet<V>> entry : map.entrySet()) {
             final K key = entry.getKey();
             final ImmutableSet<V> oldSet = entry.getValue();
@@ -690,7 +691,7 @@ public final class SpecificationRepository {
      */
     @SuppressWarnings("unchecked")
     private <K, V extends SpecificationElement> void mapValues(Map<K, V> map,
-                                                               UnaryOperator<JTerm> op, Services services) {
+            UnaryOperator<JTerm> op, Services services) {
         for (Entry<K, V> entry : map.entrySet()) {
             final K key = entry.getKey();
             final V oldContract = entry.getValue();

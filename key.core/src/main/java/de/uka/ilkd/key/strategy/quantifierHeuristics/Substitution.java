@@ -9,8 +9,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;

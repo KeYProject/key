@@ -63,9 +63,9 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
      * @return The anonymizing update.
      */
     private static JTerm createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
-                                                JTerm anonHeapTerm, JTerm anonSavedHeapTerm,
-                                                JTerm anonPermissionsHeapTerm,
-                                                Services services) {
+            JTerm anonHeapTerm, JTerm anonSavedHeapTerm,
+            JTerm anonPermissionsHeapTerm,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 

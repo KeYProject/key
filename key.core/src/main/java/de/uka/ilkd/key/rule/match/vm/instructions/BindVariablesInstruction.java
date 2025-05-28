@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
@@ -95,7 +95,7 @@ public class BindVariablesInstruction implements MatchInstruction {
 
         @Override
         public MatchConditions match(JTerm instantiationCandidate, MatchConditions matchCond,
-                                     LogicServices services) {
+                LogicServices services) {
             throw new UnsupportedOperationException();
         }
 

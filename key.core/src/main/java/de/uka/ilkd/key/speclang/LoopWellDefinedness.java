@@ -27,9 +27,9 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     private final LoopSpecification inv;
 
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                                LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-                                JTerm accessible, Condition ensures, JTerm mby, JTerm rep, LoopSpecification inv,
-                                TermBuilder tb) {
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, LoopSpecification inv,
+            TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.inv = inv;

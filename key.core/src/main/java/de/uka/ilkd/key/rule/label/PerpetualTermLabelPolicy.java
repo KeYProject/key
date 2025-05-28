@@ -21,9 +21,9 @@ public class PerpetualTermLabelPolicy implements TermLabelPolicy {
 
     @Override
     public TermLabel keepLabel(TermLabelState state, Services services,
-                               PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-                               Object hint, JTerm tacletTerm,
-                               JTerm newTerm, TermLabel label) {
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm,
+            JTerm newTerm, TermLabel label) {
         return label;
     }
 }

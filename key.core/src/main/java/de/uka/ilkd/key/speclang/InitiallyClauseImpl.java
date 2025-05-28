@@ -10,11 +10,11 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
@@ -72,8 +72,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
      * @param originalSpec
      */
     public InitiallyClauseImpl(String name, String displayName, KeYJavaType kjt,
-                               VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
-                               LabeledParserRuleContext originalSpec) {
+            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
+            LabeledParserRuleContext originalSpec) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
         assert kjt != null;
@@ -94,7 +94,8 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<JOperator, JOperator> getReplaceMap(LocationVariable selfVar, TermServices services) {
+    private Map<JOperator, JOperator> getReplaceMap(LocationVariable selfVar,
+            TermServices services) {
         Map<JOperator, JOperator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {

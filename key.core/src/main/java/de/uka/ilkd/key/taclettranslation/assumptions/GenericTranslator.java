@@ -38,7 +38,7 @@ class GenericTranslator {
      * Translates generic variables.
      */
     public Collection<JTerm> translate(JTerm term, ImmutableSet<Sort> sorts, Taclet t,
-                                       TacletConditions conditions, Services serv, int maxGeneric)
+            TacletConditions conditions, Services serv, int maxGeneric)
             throws IllegalTacletException {
         this.services = serv;
 
@@ -216,7 +216,7 @@ class GenericTranslator {
      * @throws IllegalTacletException
      */
     private ImmutableList<JTerm> instantiateGeneric(JTerm term, Set<GenericSort> genericSorts,
-                                                    ImmutableSet<Sort> instSorts, Taclet t, TacletConditions conditions, int maxGeneric)
+            ImmutableSet<Sort> instSorts, Taclet t, TacletConditions conditions, int maxGeneric)
             throws IllegalTacletException {
         ImmutableList<JTerm> instantiatedTerms = ImmutableSLList.nil();
         if (maxGeneric < genericSorts.size()) {

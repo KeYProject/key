@@ -42,9 +42,9 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public void updateLabels(TermLabelState state, Services services,
-                             PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, JTerm modalityTerm,
-                             Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
-                             Set<TermLabel> labels) {
+            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, JTerm modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
+            Set<TermLabel> labels) {
         if ((rule instanceof BlockContractInternalRule || rule instanceof LoopContractInternalRule)
                 && ((BlockContractInternalRule.BlockContractHint) hint)
                         .getExceptionalVariable() != null

@@ -14,8 +14,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -51,8 +51,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
      * used instead of the initial services form the InitConfig.
      */
     public LoopInvExecutionPO(InitConfig initConfig, LoopSpecification loopInv,
-                              ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
-                              JTerm guardTerm, Services services) {
+            ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
+            JTerm guardTerm, Services services) {
         this(initConfig, loopInv, symbExecVars, initiatingGoal, context, guardTerm);
         this.environmentServices = services;
     }
@@ -216,7 +216,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                                  ImmutableList<JTerm> paramTerms, Services services) {
+            ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
     }
@@ -254,7 +254,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     @Override
     @Deprecated
     protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
-                                        ImmutableList<LocationVariable> paramVars, Services services) {
+            ImmutableList<LocationVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -262,8 +262,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     @Override
     @Deprecated
     protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
-                           ImmutableList<LocationVariable> paramVars,
-                           Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -271,9 +271,9 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     @Override
     @Deprecated
     protected JTerm getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
-                            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
-                            Services services) {
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -281,8 +281,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     @Override
     @Deprecated
     protected JTerm buildFrameClause(List<LocationVariable> modHeaps, Map<JTerm, JTerm> heapToAtPre,
-                                     LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                                     Services services) {
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }

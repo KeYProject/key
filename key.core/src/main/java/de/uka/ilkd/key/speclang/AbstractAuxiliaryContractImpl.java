@@ -15,8 +15,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -150,20 +150,20 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
     protected AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
-                                            final List<Label> labels, final IProgramMethod method,
-                                            final JModality.JavaModalityKind modalityKind,
-                                            final Map<LocationVariable, JTerm> preconditions,
-                                            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
-                                            final Map<LocationVariable, JTerm> postconditions,
-                                            final Map<LocationVariable, JTerm> freePostconditions,
-                                            final Map<LocationVariable, JTerm> modifiableClauses,
-                                            final Map<LocationVariable, JTerm> freeModifiableClauses,
-                                            final ImmutableList<InfFlowSpec> infFlowSpecs,
-                                            final Variables variables,
-                                            final boolean transactionApplicable,
-                                            final Map<LocationVariable, Boolean> hasModifiable,
-                                            final Map<LocationVariable, Boolean> hasFreeModifiable,
-                                            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
+            final List<Label> labels, final IProgramMethod method,
+            final JModality.JavaModalityKind modalityKind,
+            final Map<LocationVariable, JTerm> preconditions,
+            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> postconditions,
+            final Map<LocationVariable, JTerm> freePostconditions,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses,
+            final ImmutableList<InfFlowSpec> infFlowSpecs,
+            final Variables variables,
+            final boolean transactionApplicable,
+            final Map<LocationVariable, Boolean> hasModifiable,
+            final Map<LocationVariable, Boolean> hasFreeModifiable,
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         assert block != null;
         assert labels != null;
         assert method != null;
@@ -298,7 +298,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @return the term with every occurrence of a variable from {@link #getVariables()} replaced.
      */
     public JTerm getTerm(final JTerm term, final JTerm heap, final Terms terms,
-                         final Services services) {
+            final Services services) {
         assert terms != null;
         assert (terms.self == null) == (this.variables.self == null);
         assert services != null;
@@ -327,14 +327,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
-                        Map<LocationVariable, JTerm> atPres, Services services) {
+            Map<LocationVariable, JTerm> atPres, Services services) {
         return getTerm(measuredBy, null,
             new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres), services);
     }
 
     @Override
     public JTerm getPrecondition(final LocationVariable heap, final LocationVariable self,
-                                 final Map<LocationVariable, LocationVariable> atPres, final Services services) {
+            final Map<LocationVariable, LocationVariable> atPres, final Services services) {
         return getTerm(preconditions.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
             services);
@@ -342,7 +342,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getPrecondition(final LocationVariable heapVariable, final JTerm heap,
-                                 final JTerm self, final Map<LocationVariable, JTerm> atPres, final Services services) {
+            final JTerm self, final Map<LocationVariable, JTerm> atPres, final Services services) {
         return getTerm(preconditions.get(heapVariable), heap,
             new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
     }
@@ -359,19 +359,19 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getPrecondition(LocationVariable heapVariable, JTerm heap, Terms terms,
-                                 Services services) {
+            Services services) {
         return getTerm(preconditions.get(heapVariable), heap, terms, services);
     }
 
     @Override
     public JTerm getPostcondition(final LocationVariable heap, final Variables variables,
-                                  final Services services) {
+            final Services services) {
         return getTerm(postconditions.get(heap), variables, services);
     }
 
     @Override
     public JTerm getPostcondition(final LocationVariable heapVariable, final JTerm heap,
-                                  final Terms terms, final Services services) {
+            final Terms terms, final Services services) {
         return getTerm(postconditions.get(heapVariable), heap, terms, services);
     }
 
@@ -382,7 +382,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getFreePrecondition(final LocationVariable heap, final LocationVariable self,
-                                     final Map<LocationVariable, LocationVariable> atPres, final Services services) {
+            final Map<LocationVariable, LocationVariable> atPres, final Services services) {
         return getTerm(freePreconditions.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
             services);
@@ -390,7 +390,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getFreePrecondition(final LocationVariable heapVariable, final JTerm heap,
-                                     final JTerm self, final Map<LocationVariable, JTerm> atPres, final Services services) {
+            final JTerm self, final Map<LocationVariable, JTerm> atPres, final Services services) {
         return getTerm(freePreconditions.get(heapVariable), heap,
             new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
     }
@@ -402,25 +402,26 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public JTerm getFreePrecondition(LocationVariable heap, Variables variables, Services services) {
+    public JTerm getFreePrecondition(LocationVariable heap, Variables variables,
+            Services services) {
         return getTerm(freePreconditions.get(heap), variables, services);
     }
 
     @Override
     public JTerm getFreePrecondition(LocationVariable heapVariable, JTerm heap, Terms terms,
-                                     Services services) {
+            Services services) {
         return getTerm(freePreconditions.get(heapVariable), heap, terms, services);
     }
 
     @Override
     public JTerm getFreePostcondition(final LocationVariable heap, final Variables variables,
-                                      final Services services) {
+            final Services services) {
         return getTerm(freePostconditions.get(heap), variables, services);
     }
 
     @Override
     public JTerm getFreePostcondition(final LocationVariable heapVariable, final JTerm heap,
-                                      final Terms terms, final Services services) {
+            final Terms terms, final Services services) {
         return getTerm(freePostconditions.get(heapVariable), heap, terms, services);
     }
 
@@ -431,7 +432,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getModifiableClause(final LocationVariable heap, final LocationVariable self,
-                                     final Services services) {
+            final Services services) {
         return getTerm(modifiableClauses.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, null, services),
             services);
@@ -439,14 +440,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getModifiableClause(final LocationVariable heapVariable, final JTerm heap,
-                                     final JTerm self, final Services services) {
+            final JTerm self, final Services services) {
         return getTerm(modifiableClauses.get(heapVariable), heap,
             new Terms(self, null, null, null, null, null, null, null, null, null), services);
     }
 
     @Override
     public JTerm getModifiableClause(final LocationVariable heap, final Variables variables,
-                                     final Services services) {
+            final Services services) {
         return getTerm(modifiableClauses.get(heap), variables, services);
     }
 
@@ -457,7 +458,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getFreeModifiableClause(final LocationVariable heap, final LocationVariable self,
-                                         final Services services) {
+            final Services services) {
         return getTerm(
             freeModifiableClauses.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, null, services),
@@ -466,7 +467,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getFreeModifiableClause(final LocationVariable heapVariable, final JTerm heap,
-                                         final JTerm self, final Services services) {
+            final JTerm self, final Services services) {
         return getTerm(
             freeModifiableClauses.get(heapVariable),
             heap,
@@ -767,7 +768,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      *         {@code newTerms}, and from the base heap to {@code heap}.
      */
     protected Map<JTerm, JTerm> createReplacementMap(final JTerm newHeap, final Terms newTerms,
-                                                     final Services services) {
+            final Services services) {
         final TermReplacementMap result = new TermReplacementMap(services.getTermFactory());
         result.replaceHeap(newHeap, services);
         result.replaceSelf(variables.self, newTerms.self, services);
@@ -863,8 +864,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @return a plain text representation of this contract's modifiable clauses.
      */
     private String getPlainModifiables(JTerm self, final LocationVariable baseHeap,
-                                       final HeapLDT heapLDT,
-                                       final Services services) {
+            final HeapLDT heapLDT,
+            final Services services) {
         StringBuilder modifiables = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             JTerm modifiableClause =
@@ -1079,20 +1080,21 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param services services.
          */
         protected Creator(final String baseName, final StatementBlock block,
-                          final List<Label> labels,
-                          final IProgramMethod method, final Behavior behavior, final Variables variables,
-                          final Map<LocationVariable, JTerm> requires,
-                          final Map<LocationVariable, JTerm> requiresFree, final JTerm measuredBy,
-                          final Map<LocationVariable, JTerm> ensures,
-                          final Map<LocationVariable, JTerm> ensuresFree,
-                          final ImmutableList<InfFlowSpec> infFlowSpecs,
-                          final Map<Label, JTerm> breaks, final Map<Label, JTerm> continues, final JTerm returns,
-                          final JTerm signals, final JTerm signalsOnly, final JTerm diverges,
-                          final Map<LocationVariable, JTerm> modifiables,
-                          final Map<LocationVariable, JTerm> modifiablesFree,
-                          final Map<LocationVariable, Boolean> hasModifiable,
-                          final Map<LocationVariable, Boolean> hasFreeModifiable,
-                          final Services services) {
+                final List<Label> labels,
+                final IProgramMethod method, final Behavior behavior, final Variables variables,
+                final Map<LocationVariable, JTerm> requires,
+                final Map<LocationVariable, JTerm> requiresFree, final JTerm measuredBy,
+                final Map<LocationVariable, JTerm> ensures,
+                final Map<LocationVariable, JTerm> ensuresFree,
+                final ImmutableList<InfFlowSpec> infFlowSpecs,
+                final Map<Label, JTerm> breaks, final Map<Label, JTerm> continues,
+                final JTerm returns,
+                final JTerm signals, final JTerm signalsOnly, final JTerm diverges,
+                final Map<LocationVariable, JTerm> modifiables,
+                final Map<LocationVariable, JTerm> modifiablesFree,
+                final Map<LocationVariable, Boolean> hasModifiable,
+                final Map<LocationVariable, Boolean> hasFreeModifiable,
+                final Services services) {
             super(services.getTermFactory(), services);
             this.baseName = baseName;
             this.block = block;
@@ -1293,7 +1295,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return a postcondition created conjunctively from the specified postconditions.
          */
         private JTerm conditionPostconditions(final Map<Label, LocationVariable> flags,
-                                              final Map<Label, JTerm> postconditions) {
+                final Map<Label, JTerm> postconditions) {
             JTerm result = tt();
             for (Label label : flags.keySet()) {
                 result = and(result,
@@ -1308,7 +1310,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param postcondition a postcondition for abrupt termination with the specified flag.
          * @return a part of the postcondition.
          */
-        private JTerm conditionPostcondition(final ProgramVariable flag, final JTerm postcondition) {
+        private JTerm conditionPostcondition(final ProgramVariable flag,
+                final JTerm postcondition) {
             JTerm result = tt();
             if (flag != null) {
                 result =
@@ -1505,17 +1508,17 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,
-                                   IProgramMethod method, JModality.JavaModalityKind modalityKind,
-                                   Map<LocationVariable, JTerm> preconditions,
-                                   Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
-                                   Map<LocationVariable, JTerm> postconditions,
-                                   Map<LocationVariable, JTerm> freePostconditions,
-                                   Map<LocationVariable, JTerm> modifiableClauses,
-                                   Map<LocationVariable, JTerm> freeModifiableClauses,
-                                   ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                                   boolean transactionApplicable,
-                                   Map<LocationVariable, Boolean> hasModifiable,
-                                   Map<LocationVariable, Boolean> hasFreeModifiable);
+                IProgramMethod method, JModality.JavaModalityKind modalityKind,
+                Map<LocationVariable, JTerm> preconditions,
+                Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
+                Map<LocationVariable, JTerm> postconditions,
+                Map<LocationVariable, JTerm> freePostconditions,
+                Map<LocationVariable, JTerm> modifiableClauses,
+                Map<LocationVariable, JTerm> freeModifiableClauses,
+                ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
+                boolean transactionApplicable,
+                Map<LocationVariable, Boolean> hasModifiable,
+                Map<LocationVariable, Boolean> hasFreeModifiable);
 
         /**
          *
@@ -1680,7 +1683,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param heap the heap to use.
          */
         private void addPostconditionFrom(final JTerm precondition, final T contract,
-                                          final LocationVariable heap) {
+                final LocationVariable heap) {
             final JTerm unconditionalPostcondition =
                 contract.getPostcondition(heap, placeholderVariables, services);
             if (unconditionalPostcondition != null) {
@@ -1698,7 +1701,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param heap the heap to use.
          */
         private void addFreePostconditionFrom(final JTerm precondition, final T contract,
-                                              final LocationVariable heap) {
+                final LocationVariable heap) {
             final JTerm unconditionalFreePostcondition =
                 contract.getFreePostcondition(heap, placeholderVariables, services);
             if (unconditionalFreePostcondition != null) {
@@ -1745,7 +1748,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param additionalCondition a condition.
          * @return the disjunction of the conditions.
          */
-        private JTerm orPossiblyNull(final JTerm currentCondition, final JTerm additionalCondition) {
+        private JTerm orPossiblyNull(final JTerm currentCondition,
+                final JTerm additionalCondition) {
             if (currentCondition == null) {
                 return additionalCondition;
             } else {
@@ -1759,7 +1763,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param additionalCondition a condition.
          * @return the conjunction of the conditions.
          */
-        private JTerm andPossiblyNull(final JTerm currentCondition, final JTerm additionalCondition) {
+        private JTerm andPossiblyNull(final JTerm currentCondition,
+                final JTerm additionalCondition) {
             if (currentCondition == null) {
                 return additionalCondition;
             } else {
@@ -1774,7 +1779,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the union of the location sets.
          */
         private JTerm unionPossiblyNull(final JTerm currentLocationSet,
-                                        final JTerm additionalLocationSet) {
+                final JTerm additionalLocationSet) {
             if (currentLocationSet == null) {
                 return additionalLocationSet;
             } else if (additionalLocationSet == null) {

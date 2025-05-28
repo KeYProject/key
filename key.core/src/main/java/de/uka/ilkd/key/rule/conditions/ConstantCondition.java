@@ -5,8 +5,8 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;

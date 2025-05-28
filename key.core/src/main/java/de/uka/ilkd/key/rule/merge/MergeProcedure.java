@@ -65,8 +65,8 @@ public abstract class MergeProcedure {
      * @return The merge result.
      */
     public abstract ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
-                                                          JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
-                                                          JTerm distinguishingFormula, Services services);
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services);
 
     /**
      * Similar to {@link AbstractBuiltInRuleApp#complete()}. Method was introduced for predicate
@@ -114,8 +114,8 @@ public abstract class MergeProcedure {
      * @author Dominic Scheurer
      */
     public record ValuesMergeResult(ImmutableSet<JTerm> newConstraints, JTerm mergeVal,
-                                    LinkedHashSet<Name> newNames,
-                                    LinkedHashSet<JTerm> sideConditions) {
+            LinkedHashSet<Name> newNames,
+            LinkedHashSet<JTerm> sideConditions) {
     }
 
 }

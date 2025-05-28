@@ -60,8 +60,8 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
      */
     protected AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
-                                        IProgramVariable programVariable, IExecutionValue parentValue, JTerm arrayIndex,
-                                        JTerm additionalCondition, PosInOccurrence modalityPIO) {
+            IProgramVariable programVariable, IExecutionValue parentValue, JTerm arrayIndex,
+            JTerm additionalCondition, PosInOccurrence modalityPIO) {
         super(settings, proofNode);
         this.programVariable = programVariable;
         this.parentValue = parentValue;

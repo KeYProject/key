@@ -32,7 +32,7 @@ public class AssumptionFormula implements TacletFormula {
 
 
     public AssumptionFormula(Taclet taclet, Collection<JTerm> formula, String status,
-                             TacletConditions conditions) throws IllegalTacletException {
+            TacletConditions conditions) throws IllegalTacletException {
         super();
         this.taclet = taclet;
         this.formula = formula;

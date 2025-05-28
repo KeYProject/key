@@ -298,7 +298,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @return The {@link IExecutionVariable}s of the current state under the given condition.
      * @throws ProofInputException
      */
-    protected IExecutionVariable[] lazyComputeVariables(JTerm condition) throws ProofInputException {
+    protected IExecutionVariable[] lazyComputeVariables(JTerm condition)
+            throws ProofInputException {
         return SymbolicExecutionUtil.createExecutionVariables(this, condition);
     }
 

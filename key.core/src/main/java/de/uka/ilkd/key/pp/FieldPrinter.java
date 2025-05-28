@@ -108,7 +108,7 @@ class FieldPrinter {
      * @param fieldTerm The field term to analyse.
      */
     protected static @NonNull ProgramVariable getJavaFieldConstant(JTerm fieldTerm, HeapLDT heapLDT,
-                                                                   Services services) {
+            Services services) {
         String name = fieldTerm.op().name().toString();
         if (name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
             String pvName = name.replace("::$", "::");
@@ -128,7 +128,7 @@ class FieldPrinter {
      * @param fieldTerm The target field.
      */
     protected static boolean isJavaFieldConstant(JTerm fieldTerm, HeapLDT heapLDT,
-                                                 Services services) {
+            Services services) {
         try {
             // the called method either returns a ProgramVariable or throws an exception
             // We are only interested in whether the method throws an exception or not, so we

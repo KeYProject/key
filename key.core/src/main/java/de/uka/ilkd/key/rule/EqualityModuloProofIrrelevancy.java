@@ -10,8 +10,8 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 

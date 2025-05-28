@@ -138,7 +138,7 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
     }
 
     private JTerm instantiateTerm(final JTerm term, final Services services,
-                                  SVInstantiations svInst) {
+            SVInstantiations svInst) {
         final SyntacticalReplaceVisitor syn = new SyntacticalReplaceVisitor(new TermLabelState(),
             svInst, services);
         term.execPostOrder(syn);
@@ -146,15 +146,15 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
     }
 
     private void computeAxiomAndCandidateSets(final Sequent seq, final Set<JTerm> terms,
-                                              final Set<JTerm> axioms, Services services) {
+            final Set<JTerm> axioms, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true, services);
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false, services);
     }
 
     private void collectAxiomsAndCandidateTerms(final Set<JTerm> terms, final Set<JTerm> axioms,
-                                                final IntegerLDT integerLDT, Semisequent antecedent, boolean inAntecedent,
-                                                TermServices services) {
+            final IntegerLDT integerLDT, Semisequent antecedent, boolean inAntecedent,
+            TermServices services) {
 
         for (SequentFormula sf : antecedent) {
             JTerm formula = (JTerm) sf.formula();
@@ -168,7 +168,7 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
     }
 
     private boolean isAvoidConditionProvable(JTerm cond, ImmutableSet<JTerm> axioms,
-                                             Services services) {
+            Services services) {
 
         long cost = PredictCostProver.computerInstanceCost(
             new Substitution(DefaultImmutableMap.nilMap()), cond,
@@ -179,9 +179,10 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
     }
 
     private HashSet<org.key_project.logic.Term> computeInstances(Services services,
-                                                                 final JTerm comprehension,
-                                                                 final Metavariable mv, final JTerm trigger, Set<JTerm> terms, ImmutableSet<JTerm> axioms,
-                                                                 TacletApp app) {
+            final JTerm comprehension,
+            final Metavariable mv, final JTerm trigger, Set<JTerm> terms,
+            ImmutableSet<JTerm> axioms,
+            TacletApp app) {
 
         final HashSet<org.key_project.logic.Term> instances = new HashSet<>();
         final HashSet<JTerm> alreadyChecked = new HashSet<>();
@@ -213,7 +214,7 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
     }
 
     private ImmutableList<JTerm> instantiateConditions(Services services, TacletApp app,
-                                                       final JTerm middle) {
+            final JTerm middle) {
         ImmutableList<JTerm> conditions;
         conditions = ImmutableSLList.nil();
         for (var singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {

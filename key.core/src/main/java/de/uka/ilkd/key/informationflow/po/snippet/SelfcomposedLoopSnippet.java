@@ -15,7 +15,7 @@ public class SelfcomposedLoopSnippet extends ReplaceAndRegisterMethod
 
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars1,
-                         ProofObligationVars poVars2) {
+            ProofObligationVars poVars2) {
         BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, poVars2);
         final JTerm exec1 = f1.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC_WITH_INV);

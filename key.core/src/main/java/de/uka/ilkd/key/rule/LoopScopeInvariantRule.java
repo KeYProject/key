@@ -18,9 +18,9 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -127,7 +127,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             return false;
         }
 
-        final JTerm progPost = splitUpdates((JTerm) pio.subTerm(), goal.proof().getServices()).second;
+        final JTerm progPost =
+            splitUpdates((JTerm) pio.subTerm(), goal.proof().getServices()).second;
         final var kind = ((JModality) progPost.op()).<JModality.JavaModalityKind>kind();
 
         return !InfFlowCheckInfo.isInfFlow(goal) && !WellDefinednessCheck.isOn() // TODO: Remove
@@ -199,9 +200,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @param reachableState The reachable state formula.
      */
     private void constructInitiallyGoal(Services services,
-                                        RuleApp ruleApp,
-                                        final TermLabelState termLabelState, Goal initiallyGoal, final Instantiation inst,
-                                        final JTerm invTerm, JTerm reachableState) {
+            RuleApp ruleApp,
+            final TermLabelState termLabelState, Goal initiallyGoal, final Instantiation inst,
+            final JTerm invTerm, JTerm reachableState) {
         initiallyGoal.setBranchLabel("Invariant Initially Valid");
         initiallyGoal.changeFormula(
             initFormula(termLabelState, inst, invTerm, reachableState, services, initiallyGoal),
@@ -233,11 +234,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *        update.
      */
     private void constructPresrvAndUCGoal(Services services,
-                                          RuleApp ruleApp, Goal presrvAndUCGoal,
-                                          final Instantiation inst, Optional<Label> loopLabel, Statement stmtToReplace,
-                                          JTerm anonUpdate, JTerm wellFormedAnon, final JTerm uAnonInv, JTerm frameCondition,
-                                          JTerm variantPO, TermLabelState termLabelState, JTerm invTerm,
-                                          JTerm[] uBeforeLoopDefAnonVariant) {
+            RuleApp ruleApp, Goal presrvAndUCGoal,
+            final Instantiation inst, Optional<Label> loopLabel, Statement stmtToReplace,
+            JTerm anonUpdate, JTerm wellFormedAnon, final JTerm uAnonInv, JTerm frameCondition,
+            JTerm variantPO, TermLabelState termLabelState, JTerm invTerm,
+            JTerm[] uBeforeLoopDefAnonVariant) {
         final While loop = inst.loop();
 
         final JTerm newFormula = formulaWithLoopScope(services, inst, anonUpdate, loop, loopLabel,
@@ -339,8 +340,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @return The {@link SequentFormula} for the "initially valid" goal.
      */
     private SequentFormula initFormula(TermLabelState termLabelState,
-                                       Instantiation inst,
-                                       final JTerm invTerm, JTerm reachableState, Services services, Goal initGoal) {
+            Instantiation inst,
+            final JTerm invTerm, JTerm reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
 
         JTerm sfTerm = tb.apply(inst.u(), tb.and(invTerm, reachableState), null);
@@ -373,10 +374,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @return The formula by which the original formula containing the loop is replaced in the
      *         "preserves and use case" branch.
      */
-    private JTerm formulaWithLoopScope(Services services, final Instantiation inst, JTerm anonUpdate,
-                                       final While loop, Optional<Label> loopLabel, Statement stmtToReplace,
-                                       JTerm frameCondition, JTerm variantPO, TermLabelState termLabelState,
-                                       Goal presrvAndUCGoal, final JTerm[] uBeforeLoopDefAnonVariant, JTerm invTerm) {
+    private JTerm formulaWithLoopScope(Services services, final Instantiation inst,
+            JTerm anonUpdate,
+            final While loop, Optional<Label> loopLabel, Statement stmtToReplace,
+            JTerm frameCondition, JTerm variantPO, TermLabelState termLabelState,
+            Goal presrvAndUCGoal, final JTerm[] uBeforeLoopDefAnonVariant, JTerm invTerm) {
         final TermBuilder tb = services.getTermBuilder();
         final JTerm progPost = splitUpdates(inst.progPost(), services).second;
 

@@ -211,7 +211,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The modified or original {@link JTerm}.
      */
     public static JTerm addAdditionalUninterpretedPredicateIfRequired(Services services, JTerm term,
-                                                                      ImmutableList<LocationVariable> variablesToProtect, JTerm exceptionVar) {
+            ImmutableList<LocationVariable> variablesToProtect, JTerm exceptionVar) {
         ProofOblInput problem =
             services.getSpecificationRepository().getProofOblInput(services.getProof());
         if (problem instanceof AbstractOperationPO operationPO) {
@@ -257,9 +257,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private static JTerm[] createUpdateSubs(final IObserverFunction target,
-                                            final LocationVariable selfVar, final ImmutableList<LocationVariable> paramVars,
-                                            final List<LocationVariable> modifiableHeaps,
-                                            final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
+            final LocationVariable selfVar, final ImmutableList<LocationVariable> paramVars,
+            final List<LocationVariable> modifiableHeaps,
+            final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final JTerm[] updateSubs = new JTerm[target.arity()];
         int i = 0;
         for (LocationVariable heap : modifiableHeaps) {
@@ -284,7 +284,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private static JTerm createPermsFor(final IProgramMethod pm, final List<LocationVariable> heaps,
-                                        final Services proofServices, final TermBuilder tb) {
+            final Services proofServices, final TermBuilder tb) {
         JTerm permsFor = tb.tt();
         if (pm.getHeapCount(proofServices) == 2
                 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
@@ -314,7 +314,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return heaps;
     }
 
-    private static JTerm saveBeforeHeaps(final Map<JTerm, JTerm> heapToBefore, final TermBuilder tb) {
+    private static JTerm saveBeforeHeaps(final Map<JTerm, JTerm> heapToBefore,
+            final TermBuilder tb) {
         JTerm saveBeforeHeaps = null;
         for (JTerm heap : heapToBefore.keySet()) {
             final JTerm bu = tb.elementary(heapToBefore.get(heap), heap);
@@ -327,8 +328,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return saveBeforeHeaps;
     }
 
-    private static Map<JTerm, JTerm> createHeapToAtPres(final List<LocationVariable> modifiableHeaps,
-                                                        final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
+    private static Map<JTerm, JTerm> createHeapToAtPres(
+            final List<LocationVariable> modifiableHeaps,
+            final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<JTerm, JTerm> heapToAtPre = new LinkedHashMap<>();
         for (LocationVariable heap : modifiableHeaps) {
             heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
@@ -337,8 +339,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private static JTerm addTransactionPrecondition(JTerm pre, boolean transactionFlag,
-                                                    final boolean isTransactionApplicable, final Services proofServices,
-                                                    final TermBuilder tb) {
+            final boolean isTransactionApplicable, final Services proofServices,
+            final TermBuilder tb) {
         if (isTransactionApplicable) {
             // Need to add assumptions about the transaction depth
             try {
@@ -357,10 +359,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private static JTerm createProgPost(IObserverFunction target,
-                                        LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                                        LocationVariable resultVar, List<LocationVariable> modifiableHeaps,
-                                        Map<LocationVariable, LocationVariable> atPreVars, JTerm saveBeforeHeaps,
-                                        @Nullable JTerm representsFromContract, JTerm post, TermBuilder tb) {
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            LocationVariable resultVar, List<LocationVariable> modifiableHeaps,
+            Map<LocationVariable, LocationVariable> atPreVars, JTerm saveBeforeHeaps,
+            @Nullable JTerm representsFromContract, JTerm post, TermBuilder tb) {
         if (representsFromContract == null) {
             final JTerm[] updateSubs =
                 createUpdateSubs(target, selfVar, paramVars, modifiableHeaps, atPreVars, tb);
@@ -608,8 +610,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The {@link JTerm} containing the general assumptions.
      */
     protected JTerm buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
-                                 ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
-                                 Services services) {
+            ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
+            Services services) {
         // "self != null"
         final JTerm selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
 
@@ -673,7 +675,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     protected abstract JTerm generateMbyAtPreDef(LocationVariable selfVar,
-                                                 ImmutableList<LocationVariable> paramVars, Services services);
+            ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
      * Creates the precondition.
@@ -686,9 +688,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The {@link Services} to use.
      * @return The {@link JTerm} representing the precondition.
      */
-    protected abstract JTerm getPre(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
-                                    ImmutableList<LocationVariable> paramVars,
-                                    Map<LocationVariable, LocationVariable> atPreVars, Services services);
+    protected abstract JTerm getPre(List<LocationVariable> modifiableHeaps,
+            LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Creates the postcondition.
@@ -704,12 +707,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The {@link JTerm} representing the postcondition.
      */
     protected abstract JTerm getPost(List<LocationVariable> modifiableHeaps,
-                                     LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                                     LocationVariable resultVar, LocationVariable exceptionVar,
-                                     Map<LocationVariable, LocationVariable> atPreVars, Services services);
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            LocationVariable resultVar, LocationVariable exceptionVar,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     protected abstract JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                                           ImmutableList<JTerm> paramTerms, Services services);
+            ImmutableList<JTerm> paramTerms, Services services);
 
     /**
      * Returns the name used for the uninterpreted predicate.
@@ -731,8 +734,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The created uninterpreted predicate.
      */
     protected JTerm ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
-                                                       ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
-                                                       String name, Services services) {
+            ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
+            String name, Services services) {
         // Make sure that the predicate is not already created
         if (uninterpretedPredicate != null) {
             throw new IllegalStateException("The uninterpreted predicate is already available.");
@@ -771,7 +774,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The created uninterpreted predicate.
      */
     protected JTerm createUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
-                                                 JTerm exceptionVar, String name, Services services) {
+            JTerm exceptionVar, String name, Services services) {
         // Create parameters for predicate
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<JTerm> arguments = ImmutableSLList.nil(); // tb.var(paramVars);
@@ -804,8 +807,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The created {@link JTerm} representing the frame clause.
      */
     protected abstract JTerm buildFrameClause(List<LocationVariable> modifiableHeaps,
-                                              Map<JTerm, JTerm> heapToAtPre, LocationVariable selfVar,
-                                              ImmutableList<LocationVariable> paramVars, Services services);
+            Map<JTerm, JTerm> heapToAtPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
      * Creates the {@link JTerm} which contains the modality including the complete program to
@@ -824,10 +827,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The created {@link JTerm}.
      */
     protected JTerm buildProgramTerm(ImmutableList<LocationVariable> paramVars,
-                                     ImmutableList<LocationVariable> formalParamVars, LocationVariable selfVar,
-                                     LocationVariable resultVar, LocationVariable exceptionVar,
-                                     Map<LocationVariable, LocationVariable> atPreVars, JTerm postTerm,
-                                     ImmutableList<StatementBlock> sb, Services services) {
+            ImmutableList<LocationVariable> formalParamVars, LocationVariable selfVar,
+            LocationVariable resultVar, LocationVariable exceptionVar,
+            Map<LocationVariable, LocationVariable> atPreVars, JTerm postTerm,
+            ImmutableList<StatementBlock> sb, Services services) {
 
         // create java block
         final JavaBlock jb = buildJavaBlock(formalParamVars, selfVar, resultVar, exceptionVar,
@@ -957,8 +960,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The {@link JTerm} representing the initial updates.
      */
     protected JTerm buildUpdate(ImmutableList<LocationVariable> paramVars,
-                                ImmutableList<LocationVariable> formalParamVars,
-                                Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> formalParamVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         JTerm update = null;
         for (Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
             final JTerm u = tb.elementary(atPreEntry.getValue(), tb.getBaseHeap());
@@ -1034,10 +1037,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private @Nullable JTerm getRepresentsFromContract(final IProgramMethod pm,
-                                                      final LocationVariable selfVar,
-                                                      final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
-                                                      final List<LocationVariable> heaps,
-                                                      final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
+            final LocationVariable selfVar,
+            final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
+            final List<LocationVariable> heaps,
+            final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
             collectLookupContracts(pm, proofServices);
         JTerm representsFromContract = null;
@@ -1071,8 +1074,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private JTerm createApplyGlobalUpdateTerm(final LocationVariable selfVar,
-                                              final ImmutableList<LocationVariable> paramVars, final JTerm preImpliesProgPost,
-                                              final Services proofServices) {
+            final ImmutableList<LocationVariable> paramVars, final JTerm preImpliesProgPost,
+            final Services proofServices) {
         final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
         final JTerm selfVarTerm = selfVar == null ? null : tb.var(selfVar);
         final JTerm globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
@@ -1083,12 +1086,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private JTerm createPost(final LocationVariable selfVar,
-                             final ImmutableList<LocationVariable> paramVars,
-                             final ImmutableList<LocationVariable> formalParamVars, final LocationVariable resultVar,
-                             final LocationVariable exceptionVar, final List<LocationVariable> modifiableHeaps,
-                             final Map<LocationVariable, LocationVariable> atPreVars,
-                             final List<LocationVariable> heaps, final Map<JTerm, JTerm> heapToBefore,
-                             final Services proofServices) {
+            final ImmutableList<LocationVariable> paramVars,
+            final ImmutableList<LocationVariable> formalParamVars, final LocationVariable resultVar,
+            final LocationVariable exceptionVar, final List<LocationVariable> modifiableHeaps,
+            final Map<LocationVariable, LocationVariable> atPreVars,
+            final List<LocationVariable> heaps, final Map<JTerm, JTerm> heapToBefore,
+            final Services proofServices) {
         JTerm postTerm =
             getPost(modifiableHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
                 proofServices);
@@ -1108,10 +1111,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private JTerm createNonModelPOTerm(final IProgramMethod pm, final LocationVariable selfVar,
-                                       final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
-                                       final LocationVariable exceptionVar, final boolean transactionFlag,
-                                       final List<LocationVariable> modifiableHeaps,
-                                       final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
+            final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
+            final LocationVariable exceptionVar, final boolean transactionFlag,
+            final List<LocationVariable> modifiableHeaps,
+            final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         final ImmutableList<LocationVariable> formalParamVars =
             createFormalParamVars(paramVars, proofServices);
 
@@ -1147,9 +1150,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     private JTerm createModelPOTerm(final IProgramMethod pm, final LocationVariable selfVar,
-                                    final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
-                                    final List<LocationVariable> modifiableHeaps,
-                                    final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
+            final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
+            final List<LocationVariable> modifiableHeaps,
+            final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         final IObserverFunction target = javaInfo.getToplevelPM(getCalleeKeYJavaType(), pm);
         final ImmutableList<LocationVariable> formalParamVars =
             createFormalParamVars(paramVars, proofServices);
@@ -1175,8 +1178,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
             resultVar, heaps, atPreVars, proofServices);
         final JTerm saveBeforeHeaps = saveBeforeHeaps(heapToBefore, tb);
 
-        final JTerm progPost = createProgPost(target, selfVar, paramVars, resultVar, modifiableHeaps,
-            atPreVars, saveBeforeHeaps, representsFromContract, post, tb);
+        final JTerm progPost =
+            createProgPost(target, selfVar, paramVars, resultVar, modifiableHeaps,
+                atPreVars, saveBeforeHeaps, representsFromContract, post, tb);
         final JTerm poTerm = tb.imp(pre, progPost);
         return poTerm;
     }

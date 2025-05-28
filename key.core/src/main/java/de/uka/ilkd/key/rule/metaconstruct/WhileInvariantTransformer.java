@@ -95,10 +95,10 @@ public final class WhileInvariantTransformer {
 
     /** calculates the resulting term. */
     public JTerm transform(TermLabelState termLabelState, Rule rule,
-                           RuleApp ruleApp, Goal goal,
-                           Sequent applicationSequent,
-                           PosInOccurrence applicationPos, JTerm initialPost,
-                           JTerm invariantFramingTermination, SVInstantiations svInst, Services services) {
+            RuleApp ruleApp, Goal goal,
+            Sequent applicationSequent,
+            PosInOccurrence applicationPos, JTerm initialPost,
+            JTerm invariantFramingTermination, SVInstantiations svInst, Services services) {
 
         // global initialisation
         init(initialPost, invariantFramingTermination, services);
@@ -241,10 +241,10 @@ public final class WhileInvariantTransformer {
      * @return The {@link TermLabel}s to add to the loop body modality {@link JTerm}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
-                                                                    Services services, PosInOccurrence applicationPos,
-                                                                    Rule rule, RuleApp ruleApp,
-                                                                    Goal goal, JOperator loopBodyModality, JTerm result, JavaBlock mainJavaBlock,
-                                                                    Sequent applicationSequent, ImmutableArray<TermLabel> newTermOriginalLabels) {
+            Services services, PosInOccurrence applicationPos,
+            Rule rule, RuleApp ruleApp,
+            Goal goal, JOperator loopBodyModality, JTerm result, JavaBlock mainJavaBlock,
+            Sequent applicationSequent, ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyModality", null,
             tf.createTerm(loopBodyModality,
@@ -327,9 +327,9 @@ public final class WhileInvariantTransformer {
     }
 
     private JTerm returnCase(TermLabelState termLabelState, ProgramVariable returnFlag,
-                             KeYJavaType returnType, ProgramVariable returnExpression, JTerm post, Rule rule,
-                             RuleApp ruleApp, Goal goal,
-                             PosInOccurrence applicationPos, Services services) {
+            KeYJavaType returnType, ProgramVariable returnExpression, JTerm post, Rule rule,
+            RuleApp ruleApp, Goal goal,
+            PosInOccurrence applicationPos, Services services) {
         JavaBlock returnJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
         JTerm executeReturn = services.getTermBuilder().prog(modality.kind(), returnJavaBlock, post,
@@ -355,9 +355,9 @@ public final class WhileInvariantTransformer {
     }
 
     private JTerm breakCase(TermLabelState termLabelState, ProgramVariable breakFlag, JTerm post,
-                            ArrayList<If> breakIfCascade, Rule rule, RuleApp ruleApp,
-                            Goal goal,
-                            PosInOccurrence applicationPos, Services services) {
+            ArrayList<If> breakIfCascade, Rule rule, RuleApp ruleApp,
+            Goal goal,
+            PosInOccurrence applicationPos, Services services) {
         JavaBlock executeJavaBlock = addContext(root,
             new StatementBlock(breakIfCascade.toArray(new Statement[0])));
         JTerm executeBreak = services.getTermBuilder().prog(modality.kind(), executeJavaBlock, post,
@@ -372,10 +372,11 @@ public final class WhileInvariantTransformer {
     }
 
     private JTerm normalCaseAndContinue(TermLabelState termLabelState, Services services,
-                                        PosInOccurrence applicationPos, Rule rule,
-                                        RuleApp ruleApp, Goal goal,
-                                        Sequent applicationSequent, JTerm contFlagTerm, JTerm returnFlagTerm, JTerm breakFlagTerm,
-                                        JTerm excFlagTerm, JTerm inv) {
+            PosInOccurrence applicationPos, Rule rule,
+            RuleApp ruleApp, Goal goal,
+            Sequent applicationSequent, JTerm contFlagTerm, JTerm returnFlagTerm,
+            JTerm breakFlagTerm,
+            JTerm excFlagTerm, JTerm inv) {
 
         final TermBuilder TB = services.getTermBuilder();
         final JTerm TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
@@ -432,17 +433,17 @@ public final class WhileInvariantTransformer {
      * @return The {@link TermLabel}s to add to the new {@link JTerm}.
      */
     private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,
-                                                                      Services services, PosInOccurrence applicationPos,
-                                                                      Rule rule, RuleApp ruleApp,
-                                                                      Goal goal, JOperator operator, ImmutableArray<JTerm> subs, Sequent applicationSequent) {
+            Services services, PosInOccurrence applicationPos,
+            Rule rule, RuleApp ruleApp,
+            Goal goal, JOperator operator, ImmutableArray<JTerm> subs, Sequent applicationSequent) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyImplication", null,
             tf.createTerm(operator, subs, null, post.getLabels()));
     }
 
     private JTerm throwCase(TermLabelState termLabelState, ProgramVariable excFlag,
-                            ProgramVariable thrownException, JTerm post, Rule rule, RuleApp ruleApp, Goal goal,
-                            PosInOccurrence applicationPos, Services services) {
+            ProgramVariable thrownException, JTerm post, Rule rule, RuleApp ruleApp, Goal goal,
+            PosInOccurrence applicationPos, Services services) {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));

@@ -201,7 +201,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             }
 
             if (pio != null) {
-                JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive((JTerm) pio.subTerm());
+                JavaBlock theJavaBlock =
+                    MergeRuleUtils.getJavaBlockRecursive((JTerm) pio.subTerm());
                 SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
 
                 if (!(theJavaBlock.program() instanceof StatementBlock)

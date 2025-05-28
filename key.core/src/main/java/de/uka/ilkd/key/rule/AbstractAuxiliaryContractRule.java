@@ -16,8 +16,8 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
@@ -123,7 +123,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @return an anonymizing update for the specified variables.
      */
     protected static JTerm createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
-                                                 Services services) {
+            Services services) {
         JTerm anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable pv : localOuts) {
@@ -166,9 +166,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
     public record Instantiation(@NonNull JTerm update, @NonNull JTerm formula,
-                                @NonNull JModality modality, JTerm self,
-                                @NonNull JavaStatement statement,
-                                ExecutionContext context) {
+            @NonNull JModality modality, JTerm self,
+            @NonNull JavaStatement statement,
+            ExecutionContext context) {
         public Instantiation {
             assert update != null;
             assert update.sort() == JavaDLTheory.UPDATE;

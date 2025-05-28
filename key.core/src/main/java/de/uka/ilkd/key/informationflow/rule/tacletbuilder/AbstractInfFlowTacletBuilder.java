@@ -51,7 +51,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
     ImmutableList<JTerm> createTermSV(ImmutableList<JTerm> ts, String schemaPrefix,
-                                      Services services) {
+            Services services) {
         ImmutableList<JTerm> result = ImmutableSLList.nil();
         for (JTerm t : ts) {
             result = result.append(createTermSV(t, schemaPrefix, services));
@@ -73,7 +73,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
     VariableSV createVariableSV(JQuantifiableVariable v, String schemaPrefix,
-                                Services services) {
+            Services services) {
         if (v == null) {
             return null;
         }
@@ -101,7 +101,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
 
     Map<JQuantifiableVariable, VariableSV> collectQuantifiableVariables(JTerm replaceWithTerm,
-                                                                        Services services) {
+            Services services) {
         QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
         replaceWithTerm.execPreOrder(qvVisitor);
         LinkedList<JQuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
@@ -127,7 +127,8 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      * @param locset2 the first location set term.
      * @return The eqAtLocs function term.
      */
-    public JTerm eqAtLocs(Services services, JTerm heap1, JTerm locset1, JTerm heap2, JTerm locset2) {
+    public JTerm eqAtLocs(Services services, JTerm heap1, JTerm locset1, JTerm heap2,
+            JTerm locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
                 : func(services.getNamespaces().functions().lookup(EQUAL_LOCS), heap1,
                     locset1, heap2, locset2);
@@ -146,7 +147,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      * @return The eqAtLocsPost function term.
      */
     public JTerm eqAtLocsPost(Services services, JTerm heap1Pre, JTerm heap1Post, JTerm locset1,
-                              JTerm heap2Pre, JTerm heap2Post, JTerm locset2) {
+            JTerm heap2Pre, JTerm heap2Post, JTerm locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
                 : func(services.getNamespaces().functions().lookup(EQUAL_LOCS_POST),
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);

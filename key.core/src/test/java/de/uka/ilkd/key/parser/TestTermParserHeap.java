@@ -172,14 +172,16 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         JTerm aDotF = getSelectTerm("int", h, a, f); // a.f
         JTerm aDotArray =
             getSelectTerm("int[]", tb.getBaseHeap(), a, parseTerm("testTermParserHeap.A::$array")); // a.array
-        JTerm expectedParseResult = getSelectTerm("int", tb.getBaseHeap(), aDotArray, tb.arr(aDotF));
+        JTerm expectedParseResult =
+            getSelectTerm("int", tb.getBaseHeap(), aDotArray, tb.arr(aDotF));
         compareStringRepresentationAgainstTermRepresentation("a.array[a.f@h]", expectedParseResult);
 
     }
 
     @Test
     public void testAtOperator_8() throws Exception {
-        JTerm expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
+        JTerm expectedParseResult =
+            getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
         compareStringRepresentationAgainstTermRepresentation("(a.next@heap).next.f@h",

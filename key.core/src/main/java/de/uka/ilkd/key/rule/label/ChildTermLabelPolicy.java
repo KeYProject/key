@@ -51,16 +51,19 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in rules.
+     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
+     *        instantiate
+     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
+     *        rules.
      * @param newTerm the template for the new {@link JTerm} to create
-     * @return {@code true} keep {@link TermLabel} and add it to the new {@link JTerm}. {@code false}
+     * @return {@code true} keep {@link TermLabel} and add it to the new {@link JTerm}.
+     *         {@code false}
      *         drop {@link TermLabel} and do not need it to the new {@link JTerm}.
      */
     boolean isRuleApplicationSupported(TermServices services,
-                                       PosInOccurrence applicationPosInOccurrence,
-                                       JTerm applicationTerm, Rule rule, Goal goal,
-                                       Object hint, JTerm tacletTerm, JTerm newTerm);
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm, JTerm newTerm);
 
     /**
      * <p>
@@ -68,7 +71,8 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      * application {@link JTerm} to the new {@link JTerm} which will be created.
      * </p>
      * <p>
-     * If the child {@link JTerm} is still a child of the new {@link JTerm} the label will still exist
+     * If the child {@link JTerm} is still a child of the new {@link JTerm} the label will still
+     * exist
      * independent from the result of this method on the child. To remove it from the child a
      * refacotring has to be used instead.
      * </p>
@@ -83,8 +87,10 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in rules.
+     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
+     *        instantiate
+     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
+     *        rules.
      * @param newTerm the template for the new {@link JTerm} to create
      * @param childTerm The {@link JTerm} which is a child or grandchild of the application
      *        {@link JTerm} that provides the {@link TermLabel}.
@@ -93,7 +99,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      *         {@link TermLabel} to new {@link JTerm}.
      */
     boolean addLabel(TermServices services,
-                     PosInOccurrence applicationPosInOccurrence,
-                     JTerm applicationTerm, Rule rule, Goal goal, Object hint, JTerm tacletTerm,
-                     JTerm newTerm, JTerm childTerm, TermLabel label);
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+            JTerm newTerm, JTerm childTerm, TermLabel label);
 }

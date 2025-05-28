@@ -51,8 +51,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     // -------------------------------------------------------------------------
 
     private JTerm buildFreePre(List<LocationVariable> heaps, LocationVariable selfVar,
-                               KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, JTerm wellFormedHeaps,
-                               Services services) throws ProofInputException {
+            KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, JTerm wellFormedHeaps,
+            Services services) throws ProofInputException {
         // "self != null"
         final JTerm selfNotNull =
             selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
@@ -223,7 +223,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
         assert heaps.size() == heapCount * contract.getTarget().getStateCount();
         // prepare target term
-        final JTerm[] subs = new JTerm[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
+        final JTerm[] subs =
+            new JTerm[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
         int offset = 0;
         for (LocationVariable heap : heaps) {
             subs[offset++] = tb.var(heap);

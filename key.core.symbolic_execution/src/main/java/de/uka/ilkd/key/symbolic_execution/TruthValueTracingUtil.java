@@ -21,8 +21,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -916,7 +916,7 @@ public final class TruthValueTracingUtil {
          * @return The computed {@link TruthValue}.
          */
         private static TruthValue evaluateTerm(JTerm term, Name termLabelName,
-                                               Map<String, MultiEvaluationResult> results) {
+                Map<String, MultiEvaluationResult> results) {
             TermLabel label = term.getLabel(termLabelName);
             // Return direct label result if available
             if (label instanceof FormulaTermLabel) {

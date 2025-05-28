@@ -174,8 +174,8 @@ class SelectPrinter extends FieldPrinter {
      * Print a non-static field constant.
      */
     private void printNonStaticJavaFieldConstant(LogicPrinter printer, final JTerm heapTerm,
-                                                 final JTerm objectTerm,
-                                                 final JTerm fieldTerm, JTerm tacitHeap) {
+            final JTerm objectTerm,
+            final JTerm fieldTerm, JTerm tacitHeap) {
         printer.layouter.startTerm(3);
         printer.layouter.markStartSub(1);
         printer.printEmbeddedObserver(heapTerm, objectTerm);
@@ -193,8 +193,8 @@ class SelectPrinter extends FieldPrinter {
      * Print a term of the form: any::select(heap, object, field).
      */
     private void printAnySelect(LogicPrinter lp, final JTerm heapTerm, final JTerm objectTerm,
-                                final JTerm fieldTerm,
-                                JTerm tacitHeap) {
+            final JTerm fieldTerm,
+            JTerm tacitHeap) {
         lp.layouter.startTerm(3);
         lp.layouter.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);
@@ -209,8 +209,9 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Print out a select on an array.
      */
-    private void printArraySelect(LogicPrinter lp, JTerm heapTerm, JTerm objectTerm, JTerm fieldTerm,
-                                  JTerm tacitHeap) {
+    private void printArraySelect(LogicPrinter lp, JTerm heapTerm, JTerm objectTerm,
+            JTerm fieldTerm,
+            JTerm tacitHeap) {
 
         lp.layouter.startTerm(3);
         lp.layouter.markStartSub(1);
@@ -238,9 +239,10 @@ class SelectPrinter extends FieldPrinter {
      * Print a select-term of the following form: T::select( ... , ... , java.lang.Object::<...>)
      * For example: boolean::select(heap, object, java.lang.Object::<created>)
      */
-    private void printBuiltinObjectProperty(LogicPrinter lp, JTerm t, JTerm heapTerm, JTerm objectTerm,
-                                            JTerm fieldTerm,
-                                            JTerm tacitHeap) {
+    private void printBuiltinObjectProperty(LogicPrinter lp, JTerm t, JTerm heapTerm,
+            JTerm objectTerm,
+            JTerm fieldTerm,
+            JTerm tacitHeap) {
 
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());

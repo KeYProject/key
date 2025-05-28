@@ -31,8 +31,8 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private Set<Name> newNames;
 
     public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio,
-                                             Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
-                                             SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
+            Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
+            SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
         setCorrespondingMergeNode(correspondingMergeNode);

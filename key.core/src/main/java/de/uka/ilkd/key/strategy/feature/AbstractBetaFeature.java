@@ -7,8 +7,8 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 import org.key_project.prover.proof.ProofGoal;
@@ -161,7 +161,8 @@ public abstract class AbstractBetaFeature implements Feature {
         return !p_positive;
     }
 
-    private static boolean containsNegAtomHelp(JTerm p_t, boolean p_positive, ServiceCaches caches) {
+    private static boolean containsNegAtomHelp(JTerm p_t, boolean p_positive,
+            ServiceCaches caches) {
         if (p_t.op() == Junctor.AND || p_t.op() == Junctor.OR) {
             return containsNegAtom(p_t.sub(0), p_positive, caches)
                     || containsNegAtom(p_t.sub(1), p_positive, caches);

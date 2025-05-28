@@ -144,7 +144,7 @@ public class JmlIO {
      */
     @SuppressWarnings("unchecked")
     public Pair<Label, JTerm> translateLabeledClause(LabeledParserRuleContext parserRuleContext,
-                                                     OriginTermLabel.SpecType type) {
+            OriginTermLabel.SpecType type) {
         Pair<Label, JTerm> t = (Pair<Label, JTerm>) interpret(parserRuleContext.first);
         return new Pair<>(t.first, attachTermLabel(t.second, type));
     }

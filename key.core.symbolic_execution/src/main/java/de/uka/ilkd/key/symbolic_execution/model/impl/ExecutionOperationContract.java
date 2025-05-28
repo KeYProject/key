@@ -146,7 +146,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @return The found self {@link JTerm} or {@code null} if not available.
      */
     protected JTerm searchConstructorSelfDefinition(JTerm term, KeYJavaType staticType,
-                                                    Services services) {
+            Services services) {
         if (term.op() == Junctor.NOT && term.sub(0).op() == Equality.EQUALS
                 && term.sub(0).sub(0).op() instanceof LocationVariable
                 && SymbolicExecutionUtil.isNullSort(term.sub(0).sub(1).sort(), services)
@@ -274,7 +274,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @return The found result {@link JTerm} or {@code null} otherwise.
      */
     protected JTerm searchResultTerm(FunctionalOperationContract contract, Instantiation inst,
-                                     Services services) {
+            Services services) {
         JTerm resultTerm = null;
         if (contract.hasResultVar()) {
             ProgramVariable resultVar =

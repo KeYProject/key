@@ -63,7 +63,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicAssociation(Services services, JTerm arrayIndex, ISymbolicObject target,
-                               JTerm condition, IModelSettings settings) {
+            JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert target != null;
@@ -88,7 +88,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicAssociation(Services services, JTerm arrayIndex, JTerm arrayStartIndex,
-                               JTerm arrayEndIndex, ISymbolicObject target, JTerm condition, IModelSettings settings) {
+            JTerm arrayEndIndex, ISymbolicObject target, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert target != null;
@@ -111,7 +111,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicAssociation(Services services, IProgramVariable programVariable,
-                               ISymbolicObject target, JTerm condition, IModelSettings settings) {
+            ISymbolicObject target, JTerm condition, IModelSettings settings) {
         super(settings);
         assert services != null;
         assert programVariable != null;

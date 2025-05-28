@@ -9,9 +9,9 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -422,7 +422,7 @@ public class SVInstantiations
      *         stored
      */
     public JTerm getTermInstantiation(SchemaVariable sv, ExecutionContext ec,
-                                      LogicServices services) {
+            LogicServices services) {
         final Object inst = getInstantiation(sv);
         if (inst == null) {
             return null;
@@ -442,7 +442,7 @@ public class SVInstantiations
      * @param updateApplicationlabels the TermLabels attached to the application operator term
      */
     public SVInstantiations addUpdate(JTerm update,
-                                      ImmutableArray<TermLabel> updateApplicationlabels) {
+            ImmutableArray<TermLabel> updateApplicationlabels) {
         assert update.sort() == JavaDLTheory.UPDATE;
         return new SVInstantiations(map, interesting(),
             updateContext.append(new UpdateLabelPair(update, updateApplicationlabels)),

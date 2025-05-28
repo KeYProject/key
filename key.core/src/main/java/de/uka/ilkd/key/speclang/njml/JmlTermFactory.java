@@ -157,7 +157,7 @@ public final class JmlTermFactory {
 
     // region quantification
     private JTerm typerestrictMinAndMax(KeYJavaType kjt, final boolean nullable,
-                                        Iterable<LogicVariable> qvs) {
+            Iterable<LogicVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         JTerm res = tb.tt();
@@ -194,7 +194,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression quantifiedMin(JTerm _guard, JTerm body, KeYJavaType declsType,
-                                      boolean nullable, ImmutableList<LogicVariable> qvs) {
+            boolean nullable, ImmutableList<LogicVariable> qvs) {
         JTerm guard = tb.convertToFormula(_guard);
         assert guard.sort() == JavaDLTheory.FORMULA;
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
@@ -209,7 +209,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression quantifiedMax(JTerm _guard, JTerm body, KeYJavaType declsType,
-                                      boolean nullable, ImmutableList<LogicVariable> qvs) {
+            boolean nullable, ImmutableList<LogicVariable> qvs) {
         JTerm guard = tb.convertToFormula(_guard);
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         if (body.sort() != intSort) {
@@ -223,8 +223,9 @@ public final class JmlTermFactory {
         return new SLExpression(max, type);
     }
 
-    public @NonNull SLExpression quantifiedNumOf(@Nullable JTerm t1, JTerm t2, KeYJavaType declsType,
-                                                 boolean nullable, Iterable<LogicVariable> qvs, KeYJavaType resultType) {
+    public @NonNull SLExpression quantifiedNumOf(@Nullable JTerm t1, JTerm t2,
+            KeYJavaType declsType,
+            boolean nullable, Iterable<LogicVariable> qvs, KeYJavaType resultType) {
         BoundedNumericalQuantifier bounded = (qv, lo, hi, body) -> {
             final JTerm cond = tb.ife(tb.convertToFormula(body), tb.one(), tb.zero());
             return tb.bsum(qv, lo, hi, cond);
@@ -238,7 +239,7 @@ public final class JmlTermFactory {
     }
 
     public @NonNull SLExpression quantifiedProduct(KeYJavaType declsType, boolean nullable,
-                                                   Iterable<LogicVariable> qvs, @Nullable JTerm t1, JTerm t2, KeYJavaType resultType) {
+            Iterable<LogicVariable> qvs, @Nullable JTerm t1, JTerm t2, KeYJavaType resultType) {
         BoundedNumericalQuantifier bounded =
             (qv, lo, hi, body) -> tb.bprod(qv, lo, hi, body, services);
 
@@ -250,7 +251,7 @@ public final class JmlTermFactory {
     }
 
     public @NonNull SLExpression quantifiedSum(KeYJavaType javaType, boolean nullable,
-                                               Iterable<LogicVariable> qvs, @Nullable JTerm t1, JTerm t2, KeYJavaType resultType) {
+            Iterable<LogicVariable> qvs, @Nullable JTerm t1, JTerm t2, KeYJavaType resultType) {
         BoundedNumericalQuantifier bounded = tb::bsum;
         UnboundedNumericalQuantifier unbounded = (declsType, n, vars, range, body) -> {
             final JTerm tr = typerestrict(declsType, n, vars);
@@ -260,7 +261,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression forall(JTerm preTerm, JTerm bodyTerm, KeYJavaType declsType,
-                               ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
+            ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
         BiFunction<JQuantifiableVariable, JTerm, JTerm> quantify = tb::all;
         BiFunction<JTerm, JTerm, JTerm> combineGuard = tb::imp;
         return simpleQuantifier(preTerm, bodyTerm, declsType, declVars, nullable, resultType,
@@ -268,7 +269,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression exists(JTerm preTerm, JTerm bodyTerm, KeYJavaType declsType,
-                               ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
+            ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
         boolean isGeneralized = false;
         BiFunction<JQuantifiableVariable, JTerm, JTerm> quantify = tb::ex;
         BiFunction<JTerm, JTerm, JTerm> combineGuard = tb::andSC;
@@ -277,9 +278,9 @@ public final class JmlTermFactory {
     }
 
     private SLExpression simpleQuantifier(JTerm preTerm, JTerm bodyTerm, KeYJavaType declsType,
-                                          ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType,
-                                          BiFunction<JQuantifiableVariable, JTerm, JTerm> combine,
-                                          BiFunction<JTerm, JTerm, JTerm> combineQuantifiedTerms) {
+            ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType,
+            BiFunction<JQuantifiableVariable, JTerm, JTerm> combine,
+            BiFunction<JTerm, JTerm, JTerm> combineQuantifiedTerms) {
         final Type type = declsType.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
 
@@ -355,8 +356,8 @@ public final class JmlTermFactory {
     }
 
     private @NonNull SLExpression numeralQuantifier(KeYJavaType declsType, boolean nullable,
-                                                    Iterable<LogicVariable> qvs, JTerm t1, JTerm t2, @Nullable KeYJavaType resultType,
-                                                    UnboundedNumericalQuantifier unbounded, BoundedNumericalQuantifier bounded) {
+            Iterable<LogicVariable> qvs, JTerm t1, JTerm t2, @Nullable KeYJavaType resultType,
+            UnboundedNumericalQuantifier unbounded, BoundedNumericalQuantifier bounded) {
         Iterator<LogicVariable> it = qvs.iterator();
         LogicVariable lv = it.next();
         JTerm t;
@@ -422,7 +423,7 @@ public final class JmlTermFactory {
 
     private interface UnboundedNumericalQuantifier {
         JTerm apply(KeYJavaType declsType, boolean nullable, ImmutableList<LogicVariable> qvs,
-                    JTerm range, JTerm body);
+                JTerm range, JTerm body);
     }
 
     private interface BoundedNumericalQuantifier {
@@ -871,13 +872,14 @@ public final class JmlTermFactory {
     }
 
     public SLExpression createUnionF(boolean nullable,
-                                     Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars, JTerm expr, JTerm guard) {
+            Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars, JTerm expr, JTerm guard) {
         final JavaInfo javaInfo = services.getJavaInfo();
         final JTerm restr =
             JmlTermFactory.this.typerestrict(declVars.first, nullable, declVars.second);
         guard = guard == null ? restr : tb.and(restr, guard);
         return createIntersect(tb.infiniteUnion(
-            declVars.second.toArray(new JQuantifiableVariable[declVars.second.size()]), guard, expr),
+            declVars.second.toArray(new JQuantifiableVariable[declVars.second.size()]), guard,
+            expr),
             javaInfo);
     }
 
@@ -1013,7 +1015,7 @@ public final class JmlTermFactory {
     }
 
     public JTerm signals(JTerm result, LogicVariable eVar, LocationVariable excVar,
-                         KeYJavaType excType) {
+            KeYJavaType excType) {
         if (result == null) {
             result = tb.tt();
         } else {

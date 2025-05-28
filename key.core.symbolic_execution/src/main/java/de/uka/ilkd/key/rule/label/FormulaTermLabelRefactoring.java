@@ -113,9 +113,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                                                   PosInOccurrence applicationPosInOccurrence,
-                                                   JTerm applicationTerm, Rule rule, Goal goal,
-                                                   Object hint, JTerm tacletTerm) {
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
             return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
         } else if (isParentRefactoringRequired(state)) {
@@ -148,9 +148,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-                               PosInOccurrence applicationPosInOccurrence,
-                               JTerm applicationTerm, Rule rule, Goal goal,
-                               Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
         if (shouldRefactorSpecificationApplication(rule, goal, hint)) {
             refactorSpecificationApplication(term, services, labels, hint);
         } else if (isParentRefactoringRequired(state)) {
@@ -173,7 +173,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param labels The new labels the {@link JTerm} will have after the refactoring.
      */
     private void refactorSpecificationApplication(JTerm term, Services services,
-                                                  LabelCollection labels, Object hint) {
+            LabelCollection labels, Object hint) {
         if (TruthValueTracingUtil.isPredicate(term)
                 || (CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint)
                         && TruthValueTracingUtil.isLogicOperator(term))) {
@@ -224,7 +224,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             PosInOccurrence applicationPosInOccurrence, JTerm term,
             LabelCollection labels) {
         JTerm applicationTerm =
-            applicationPosInOccurrence != null ? (JTerm) applicationPosInOccurrence.subTerm() : null;
+            applicationPosInOccurrence != null ? (JTerm) applicationPosInOccurrence.subTerm()
+                    : null;
         FormulaTermLabel applicationLabel = applicationTerm != null
                 ? (FormulaTermLabel) applicationTerm.getLabel(FormulaTermLabel.NAME)
                 : null;

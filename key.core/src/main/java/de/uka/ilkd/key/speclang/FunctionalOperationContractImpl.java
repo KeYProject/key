@@ -150,19 +150,19 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param services TODO
      */
     FunctionalOperationContractImpl(String baseName, String name, KeYJavaType kjt,
-                                    IProgramMethod pm, KeYJavaType specifiedIn, JModality.JavaModalityKind modalityKind,
-                                    Map<LocationVariable, JTerm> pres, Map<LocationVariable, JTerm> freePres,
-                                    JTerm mby,
-                                    Map<LocationVariable, JTerm> posts, Map<LocationVariable, JTerm> freePosts,
-                                    Map<LocationVariable, JTerm> axioms,
-                                    Map<LocationVariable, JTerm> modifiables, Map<LocationVariable, JTerm> freeModifiables,
-                                    Map<LocationVariable, JTerm> accessibles,
-                                    Map<LocationVariable, Boolean> hasRealModifiable,
-                                    Map<LocationVariable, Boolean> hasRealFreeModifiable,
-                                    LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                                    LocationVariable resultVar, LocationVariable excVar,
-                                    Map<LocationVariable, LocationVariable> atPreVars, JTerm globalDefs, int id,
-                                    boolean toBeSaved, boolean transaction, TermServices services) {
+            IProgramMethod pm, KeYJavaType specifiedIn, JModality.JavaModalityKind modalityKind,
+            Map<LocationVariable, JTerm> pres, Map<LocationVariable, JTerm> freePres,
+            JTerm mby,
+            Map<LocationVariable, JTerm> posts, Map<LocationVariable, JTerm> freePosts,
+            Map<LocationVariable, JTerm> axioms,
+            Map<LocationVariable, JTerm> modifiables, Map<LocationVariable, JTerm> freeModifiables,
+            Map<LocationVariable, JTerm> accessibles,
+            Map<LocationVariable, Boolean> hasRealModifiable,
+            Map<LocationVariable, Boolean> hasRealFreeModifiable,
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            LocationVariable resultVar, LocationVariable excVar,
+            Map<LocationVariable, LocationVariable> atPreVars, JTerm globalDefs, int id,
+            boolean toBeSaved, boolean transaction, TermServices services) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;
@@ -318,14 +318,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Deprecated
     protected Map<JTerm, JTerm> getReplaceMap(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                                              ImmutableList<JTerm> paramTerms, Services services) {
+            ImmutableList<JTerm> paramTerms, Services services) {
         return getReplaceMap(heap, heapTerm, selfTerm, paramTerms, null, null, null, services);
     }
 
     @Deprecated
     protected Map<JTerm, JTerm> getReplaceMap(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                                              ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm, JTerm atPre,
-                                              Services services) {
+            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm, JTerm atPre,
+            Services services) {
         Map<LocationVariable, JTerm> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
         Map<LocationVariable, JTerm> atPres = new LinkedHashMap<>();
@@ -346,9 +346,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param services the services object
      * @return the replacement map
      */
-    protected Map<JTerm, JTerm> getReplaceMap(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
-                                              ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                                              Map<LocationVariable, JTerm> atPres, Services services) {
+    protected Map<JTerm, JTerm> getReplaceMap(Map<LocationVariable, JTerm> heapTerms,
+            JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services) {
         final Map<JTerm, JTerm> result = new LinkedHashMap<>();
 
         // heaps
@@ -461,8 +462,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getPre(LocationVariable heap, LocationVariable selfVar,
-                        ImmutableList<LocationVariable> paramVars,
-                        Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null : "null parameters";
         assert services != null;
@@ -479,8 +480,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
-                        ImmutableList<LocationVariable> paramVars,
-                        Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
             final JTerm p = getPre(heap, selfVar, paramVars, atPreVars, services);
@@ -495,7 +496,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                        ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -515,8 +517,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
-                        JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
-                        Services services) {
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
             final JTerm p =
@@ -535,8 +537,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getFreePre(LocationVariable heap, LocationVariable selfVar,
-                            ImmutableList<LocationVariable> paramVars,
-                            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null : "null parameters";
         assert services != null;
@@ -553,8 +555,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getFreePre(List<LocationVariable> heapContext, LocationVariable selfVar,
-                            ImmutableList<LocationVariable> paramVars,
-                            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
             final JTerm p = getFreePre(heap, selfVar, paramVars, atPreVars, services);
@@ -569,7 +571,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getFreePre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -609,7 +612,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                        Services services) {
+            Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         paramVars = addGhostParams(paramVars);
@@ -624,7 +627,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
-                        ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         assert heapTerms != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -657,10 +661,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     public static String getText(FunctionalOperationContract contract,
-                                 ImmutableList<JTerm> contractParams, JTerm resultTerm, JTerm contractSelf, JTerm excTerm,
-                                 LocationVariable baseHeap, JTerm baseHeapTerm, List<LocationVariable> heapContext,
-                                 Map<LocationVariable, JTerm> atPres, boolean includeHtmlMarkup, Services services,
-                                 boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            ImmutableList<JTerm> contractParams, JTerm resultTerm, JTerm contractSelf,
+            JTerm excTerm,
+            LocationVariable baseHeap, JTerm baseHeapTerm, List<LocationVariable> heapContext,
+            Map<LocationVariable, JTerm> atPres, boolean includeHtmlMarkup, Services services,
+            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         JOperator originalSelfVar = contractSelf != null ? contractSelf.op() : null;
         JOperator originalResultVar = resultTerm != null ? resultTerm.op() : null;
         final TermBuilder tb = services.getTermBuilder();
@@ -746,9 +751,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     private static String getSignatureText(IProgramMethod pm, JOperator originalResultVar,
-                                           JOperator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
-                                           LocationVariable originalExcVar, Services services, boolean usePrettyPrinting,
-                                           boolean useUnicodeSymbols) {
+            JOperator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
+            LocationVariable originalExcVar, Services services, boolean usePrettyPrinting,
+            boolean useUnicodeSymbols) {
         final StringBuilder sig = new StringBuilder();
         if (originalResultVar != null) {
             sig.append(originalResultVar);
@@ -802,8 +807,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private static String getClauseText(final String text,
-                                        Map<LocationVariable, JTerm> originalClause, boolean includeHtmlMarkup,
-                                        Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            Map<LocationVariable, JTerm> originalClause, boolean includeHtmlMarkup,
+            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         String clause = "";
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -820,7 +825,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private static String getGlobalUpdatesText(JTerm globalDefs, boolean includeHtmlMarkup,
-                                               Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         String globalUpdates = "";
         final TermBuilder tb = services.getTermBuilder();
         if (globalDefs != null) {
@@ -858,8 +863,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private static String getPostText(Map<LocationVariable, JTerm> originalPosts,
-                                      Map<LocationVariable, JTerm> originalAxioms, boolean includeHtmlMarkup,
-                                      Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+            Map<LocationVariable, JTerm> originalAxioms, boolean includeHtmlMarkup,
+            Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         String posts = getClauseText("post", originalPosts, includeHtmlMarkup, services,
             usePrettyPrinting, useUnicodeSymbols);
         if (originalAxioms != null) {
@@ -870,17 +875,18 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private static String getText(IProgramMethod pm, JOperator originalResultVar,
-                                  JOperator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
-                                  LocationVariable originalExcVar, boolean hasMby, JTerm originalMby,
-                                  Map<LocationVariable, JTerm> originalModifiables,
-                                  Map<LocationVariable, Boolean> hasRealModifiable, JTerm globalDefs,
-                                  Map<LocationVariable, JTerm> originalPres, Map<LocationVariable, JTerm> originalFreePres,
-                                  Map<LocationVariable, JTerm> originalPosts,
-                                  Map<LocationVariable, JTerm> originalFreePosts,
-                                  Map<LocationVariable, JTerm> originalAxioms, JModality.JavaModalityKind modalityKind,
-                                  boolean transaction,
-                                  boolean includeHtmlMarkup, Services services, boolean usePrettyPrinting,
-                                  boolean useUnicodeSymbols) {
+            JOperator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
+            LocationVariable originalExcVar, boolean hasMby, JTerm originalMby,
+            Map<LocationVariable, JTerm> originalModifiables,
+            Map<LocationVariable, Boolean> hasRealModifiable, JTerm globalDefs,
+            Map<LocationVariable, JTerm> originalPres,
+            Map<LocationVariable, JTerm> originalFreePres,
+            Map<LocationVariable, JTerm> originalPosts,
+            Map<LocationVariable, JTerm> originalFreePosts,
+            Map<LocationVariable, JTerm> originalAxioms, JModality.JavaModalityKind modalityKind,
+            boolean transaction,
+            boolean includeHtmlMarkup, Services services, boolean usePrettyPrinting,
+            boolean useUnicodeSymbols) {
         final String sig = getSignatureText(pm, originalResultVar, originalSelfVar,
             originalParamVars, originalExcVar, services, usePrettyPrinting, useUnicodeSymbols);
 
@@ -997,9 +1003,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getPost(LocationVariable heap, LocationVariable selfVar,
-                         ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                         LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                         Services services) {
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         paramVars = addGhostParams(paramVars);
@@ -1017,9 +1023,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getPost(List<LocationVariable> heapContext, LocationVariable selfVar,
-                         ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                         LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                         Services services) {
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
             final JTerm p =
@@ -1036,8 +1042,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getPost(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                         ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                         Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -1059,8 +1065,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getPost(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
-                         JTerm selfTerm, ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                         Map<LocationVariable, JTerm> atPres, Services services) {
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
             final JTerm p = getPost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm,
@@ -1079,9 +1085,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getFreePost(LocationVariable heap, LocationVariable selfVar,
-                             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                             LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                             Services services) {
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         paramVars = addGhostParams(paramVars);
@@ -1099,8 +1105,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getFreePost(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                             ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                             Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -1122,8 +1128,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getFreePost(List<LocationVariable> heapContext,
-                             Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm, ImmutableList<JTerm> paramTerms,
-                             JTerm resultTerm, JTerm excTerm, Map<LocationVariable, JTerm> atPres, Services services) {
+            Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm, ImmutableList<JTerm> paramTerms,
+            JTerm resultTerm, JTerm excTerm, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
             final JTerm p = getFreePost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm,
@@ -1142,9 +1149,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getFreePost(List<LocationVariable> heapContext, LocationVariable selfVar,
-                             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                             LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                             Services services) {
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
             final JTerm p =
@@ -1161,8 +1168,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getRepresentsAxiom(LocationVariable heap, LocationVariable selfVar,
-                                    ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                                    Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null) : "Illegal instantiation:"
             + (originalSelfVar == null
                     ? "this is a static contract, instantiated with self variable '" + selfVar + "'"
@@ -1184,8 +1191,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getRepresentsAxiom(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                                    ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
-                                    Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -1213,7 +1220,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     public JTerm getAnyModifiable(JTerm modifiable, LocationVariable selfVar,
-                                  ImmutableList<LocationVariable> paramVars, Services services) {
+            ImmutableList<LocationVariable> paramVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         paramVars = addGhostParams(paramVars);
@@ -1228,21 +1235,21 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getModifiable(LocationVariable heap, LocationVariable selfVar,
-                               ImmutableList<LocationVariable> paramVars, Services services) {
+            ImmutableList<LocationVariable> paramVars, Services services) {
         return getAnyModifiable(this.originalModifiables.get(heap), selfVar, paramVars,
             services);
     }
 
     @Override
     public JTerm getFreeModifiable(LocationVariable heap, LocationVariable selfVar,
-                                   ImmutableList<LocationVariable> paramVars, Services services) {
+            ImmutableList<LocationVariable> paramVars, Services services) {
         return getAnyModifiable(this.originalFreeModifiables.get(heap), selfVar, paramVars,
             services);
     }
 
     private JTerm getAnyModifiable(LocationVariable heap, JTerm modifiable, JTerm heapTerm,
-                                   JTerm selfTerm,
-                                   ImmutableList<JTerm> paramTerms, Services services) {
+            JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -1280,7 +1287,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getModifiable(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                               ImmutableList<JTerm> paramTerms, Services services) {
+            ImmutableList<JTerm> paramTerms, Services services) {
         return getAnyModifiable(heap, this.originalModifiables.get(heap), heapTerm, selfTerm,
             paramTerms,
             services);
@@ -1288,7 +1295,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getFreeModifiable(LocationVariable heap, JTerm heapTerm,
-                                   JTerm selfTerm, ImmutableList<JTerm> paramTerms, Services services) {
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Services services) {
         return getAnyModifiable(heap, this.originalFreeModifiables.get(heap), heapTerm, selfTerm,
             paramTerms,
             services);
@@ -1296,8 +1303,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
-                        ImmutableList<LocationVariable> paramVars,
-                        Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
@@ -1324,7 +1331,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
-                        ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -1358,7 +1366,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                               ImmutableList<JTerm> paramTerms, Services services) {
+            ImmutableList<JTerm> paramTerms, Services services) {
         if (globalDefs == null) {
             return null;
         }

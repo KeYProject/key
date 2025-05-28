@@ -91,7 +91,7 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * @return An abstraction predicate encapsulating the given mapping.
      */
     public static AbstractionPredicate create(final Sort argSort,
-                                              final Function<JTerm, JTerm> mapping, Services services) {
+            final Function<JTerm, JTerm> mapping, Services services) {
         LocationVariable placeholder =
             MergeRuleUtils.getFreshLocVariableForPrefix("_ph", argSort, services);
 

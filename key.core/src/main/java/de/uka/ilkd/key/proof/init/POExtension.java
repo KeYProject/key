@@ -38,6 +38,6 @@ public interface POExtension {
      *         performed.
      */
     JTerm modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
-                         Services services, ProgramVariable selfTerm,
-                         JTerm postTerm);
+            Services services, ProgramVariable selfTerm,
+            JTerm postTerm);
 }

@@ -5,8 +5,8 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TacletMatchProgram;
@@ -32,7 +32,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
 
     @Override
     public MatchConditions match(JTerm instantiationCandidate, MatchConditions matchCond,
-                                 LogicServices services) {
+            LogicServices services) {
         final JOperator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {
             if (instantiationCandidateOp instanceof ElementaryUpdate instElUpdate) {

@@ -22,13 +22,14 @@ public abstract class JOperatorSV extends JAbstractSortedOperator
 
 
     protected JOperatorSV(Name name, ImmutableArray<Sort> argSorts, Sort sort, boolean isRigid,
-                          boolean isStrict) {
+            boolean isStrict) {
         super(name, argSorts, sort, isRigid);
         this.isStrict = isStrict;
     }
 
 
-    protected JOperatorSV(Name name, Sort[] argSorts, Sort sort, boolean isRigid, boolean isStrict) {
+    protected JOperatorSV(Name name, Sort[] argSorts, Sort sort, boolean isRigid,
+            boolean isStrict) {
         this(name, new ImmutableArray<>(argSorts), sort, isRigid, isStrict);
     }
 
