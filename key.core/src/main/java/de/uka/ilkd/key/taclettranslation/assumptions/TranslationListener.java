@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -30,7 +30,7 @@ public interface TranslationListener {
      *
      * @param var the quantified variable that has been found.
      */
-    void eventQuantifiedVariable(QuantifiableVariable var);
+    void eventQuantifiedVariable(JQuantifiableVariable var);
 
     /**
      * Called when the translator finds a schema variable of type formula. You can use this event to
@@ -52,6 +52,6 @@ public interface TranslationListener {
      * @return return <code>true</code> if you want to terminate the translation of the taclet,
      *         otherwise <code>false<code>.
      */
-    boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term);
+    boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, JTerm term);
 
 }

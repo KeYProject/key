@@ -5,7 +5,7 @@ package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
@@ -44,7 +44,7 @@ public class ProgramVariableCollection {
     /**
      * A map from every variable {@code var} to {@code \old(var)}.
      */
-    public Map<LocationVariable, Term> atPres;
+    public Map<LocationVariable, JTerm> atPres;
 
     /**
      * A map from every variable {@code var} to {@code \before(var)} (if applicable).
@@ -54,7 +54,7 @@ public class ProgramVariableCollection {
     /**
      * A map from every variable {@code var} to {@code \before(var)} (if applicable).
      */
-    public Map<LocationVariable, Term> atBefores;
+    public Map<LocationVariable, JTerm> atBefores;
 
     /**
      * Create a collection containing the specified variables.
@@ -70,7 +70,7 @@ public class ProgramVariableCollection {
     public ProgramVariableCollection(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-            Map<LocationVariable, Term> atPres) {
+            Map<LocationVariable, JTerm> atPres) {
         this(selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
     }
 
@@ -92,9 +92,9 @@ public class ProgramVariableCollection {
     public ProgramVariableCollection(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-            Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, JTerm> atPres,
             Map<LocationVariable, LocationVariable> atBeforeVars,
-            Map<LocationVariable, Term> atBefores) {
+            Map<LocationVariable, JTerm> atBefores) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;

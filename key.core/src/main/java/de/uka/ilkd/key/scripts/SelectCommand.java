@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -84,7 +84,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return null;
     }
 
-    private Goal findGoalWith(Term formula, Proof proof) throws ScriptException {
+    private Goal findGoalWith(JTerm formula, Proof proof) throws ScriptException {
         return findGoalWith(node -> node.leaf() && contains(node.sequent(), formula),
             node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
@@ -129,11 +129,11 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         throw new ScriptException("There is no such goal");
     }
 
-    private boolean contains(Sequent seq, Term formula) {
+    private boolean contains(Sequent seq, JTerm formula) {
         return contains(seq.antecedent(), formula) || contains(seq.succedent(), formula);
     }
 
-    private boolean contains(Semisequent semiseq, Term formula) {
+    private boolean contains(Semisequent semiseq, JTerm formula) {
         for (SequentFormula sf : semiseq.asList()) {
             org.key_project.logic.Term term = sf.formula();
             if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
@@ -151,7 +151,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
-        public Term formula;
+        public JTerm formula;
         /**
          * The number of the goal to select, starts with 0. Negative indices are also allowed: -1 is
          * the last goal, -2 the second-to-last, etc.

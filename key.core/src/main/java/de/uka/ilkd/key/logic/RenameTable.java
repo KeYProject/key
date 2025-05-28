@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
@@ -16,7 +16,7 @@ public class RenameTable {
      * local map mapping a QuantifiableVariable object to an abstract name. This map is allowed to
      * hide bound renaming of the parent table.
      */
-    private final ImmutableMap<QuantifiableVariable, Integer> localRenamingTable;
+    private final ImmutableMap<JQuantifiableVariable, Integer> localRenamingTable;
 
     /**
      * the maximal value of an abstract name
@@ -27,7 +27,7 @@ public class RenameTable {
     private final RenameTable parent;
 
 
-    public RenameTable(RenameTable parent, ImmutableMap<QuantifiableVariable, Integer> localTable,
+    public RenameTable(RenameTable parent, ImmutableMap<JQuantifiableVariable, Integer> localTable,
             int newMax) {
         this.parent = parent;
         this.localRenamingTable = localTable;
@@ -41,18 +41,18 @@ public class RenameTable {
      * @param n the QuantifiableVariable object the existence of an abstract name is checked.
      * @return true if <code>n</code> has been already assigned to an abstract name
      */
-    public boolean contains(QuantifiableVariable n) {
+    public boolean contains(JQuantifiableVariable n) {
         return localRenamingTable.containsKey(n) || parent.contains(n);
     }
 
     /**
-     * does nearly the same as {@link #contains(QuantifiableVariable)} but performs the test only on
+     * does nearly the same as {@link #contains(JQuantifiableVariable)} but performs the test only on
      * the local table
      *
      * @param n the QuantifiableVariable object the existence of an abstract name is checked.
      * @return true if <code>n</code> has been already locally assigned to an abstract name
      */
-    public boolean containsLocally(QuantifiableVariable n) {
+    public boolean containsLocally(JQuantifiableVariable n) {
         return localRenamingTable.containsKey(n);
     }
 
@@ -65,7 +65,7 @@ public class RenameTable {
      * @param n2 one of the QuantifiableVariables to be tested
      * @return true iff <code>n1</code> and <code>n2</code> are mapped to the same abstract name
      */
-    public boolean sameAbstractName(QuantifiableVariable n1, QuantifiableVariable n2) {
+    public boolean sameAbstractName(JQuantifiableVariable n1, JQuantifiableVariable n2) {
         if (containsLocally(n1)) {
             return localRenamingTable.get(n1).equals(localRenamingTable.get(n2));
         } else {
@@ -86,7 +86,7 @@ public class RenameTable {
     /**
      * assigns both QuantifiableVariable objects the same abstract name
      */
-    public RenameTable assign(QuantifiableVariable n1, QuantifiableVariable n2) {
+    public RenameTable assign(JQuantifiableVariable n1, JQuantifiableVariable n2) {
         final Integer newAbstractName = createNewAbstractName();
         return new RenameTable(parent,
             localRenamingTable.put(n1, newAbstractName).put(n2, newAbstractName),
@@ -122,18 +122,18 @@ public class RenameTable {
          * @param n the QuantifiableVariable object the existence of an abstract name is checked.
          * @return true if <code>n</code> has been already assigned to an abstract name
          */
-        public boolean contains(QuantifiableVariable n) {
+        public boolean contains(JQuantifiableVariable n) {
             return false;
         }
 
         /**
-         * does nearly the same as {@link #contains(QuantifiableVariable)} but performs the test
+         * does nearly the same as {@link #contains(JQuantifiableVariable)} but performs the test
          * only on the local table-
          *
          * @param n the QuantifiableVariable object the existence of an abstract name is checked.
          * @return true if <code>n</code> has been already locally assigned to an abstract name
          */
-        public boolean containsLocally(QuantifiableVariable n) {
+        public boolean containsLocally(JQuantifiableVariable n) {
             return false;
         }
 
@@ -146,7 +146,7 @@ public class RenameTable {
          * @param n2 one of the QuantifiableVariable objects to be tested
          * @return true iff <code>n1</code> and <code>n2</code> are mapped to the same abstract name
          */
-        public boolean sameAbstractName(QuantifiableVariable n1, QuantifiableVariable n2) {
+        public boolean sameAbstractName(JQuantifiableVariable n1, JQuantifiableVariable n2) {
             return false;
         }
 

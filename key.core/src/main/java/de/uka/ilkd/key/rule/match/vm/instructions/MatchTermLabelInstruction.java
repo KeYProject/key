@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -24,7 +24,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
         this.labels = labels;
     }
 
-    private MatchConditions match(TermLabelSV sv, Term instantiationCandidate,
+    private MatchConditions match(TermLabelSV sv, JTerm instantiationCandidate,
             MatchConditions matchCond, LogicServices services) {
 
         final SVInstantiations svInsts = matchCond.getInstantiations();
@@ -50,7 +50,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
             LogicServices services) {
-        final Term term = termPosition.getCurrentSubterm();
+        final JTerm term = termPosition.getCurrentSubterm();
         MatchConditions result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels
         // at the moment any termlabbel SV matches on all labels (or no label) (i.e., t<l1,l2> will

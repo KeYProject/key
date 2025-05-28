@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
@@ -36,6 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -254,10 +255,10 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected void initMethodCallStack(final Node root, Services services) {
         // Find all modalities in the succedent
-        final List<org.key_project.logic.Term> modalityTerms = new LinkedList<>();
+        final List<Term> modalityTerms = new LinkedList<>();
         for (SequentFormula sequentFormula : root.sequent().succedent()) {
             sequentFormula.formula().execPreOrder((DefaultVisitor) visited -> {
-                if (visited.op() instanceof Modality
+                if (visited.op() instanceof JModality
                         && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
                     modalityTerms.add(visited);
                 }
@@ -283,7 +284,7 @@ public class SymbolicExecutionTreeBuilder {
         }
         // Check if modality contains method frames
         if (!modalityTerms.isEmpty()) {
-            final Modality mod = (Modality) modalityTerm.op();
+            final JModality mod = (JModality) modalityTerm.op();
             JavaBlock javaBlock = mod.programBlock();
             final ProgramElement program = javaBlock.program();
             final List<Node> initialStack = new LinkedList<>();
@@ -310,7 +311,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method {@link Node}s of method calls for which its return should be ignored. If
      * not already available an empty method {@link Set} is created.
      *
-     * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a
+     * @param ruleApp The {@link RuleApp} which modifies a modality {@link JTerm} with a
      *        {@link SymbolicExecutionTermLabel}.
      * @return The {@link Set} of {@link Node}s to ignore its return.
      */
@@ -351,9 +352,9 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method call stack. If not already available an empty method call stack is
      * created.
      *
-     * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a
+     * @param ruleApp The {@link RuleApp} which modifies a modality {@link JTerm} with a
      *        {@link SymbolicExecutionTermLabel}.
-     * @return The method call stack of the ID of the modified modality {@link Term} with a
+     * @return The method call stack of the ID of the modified modality {@link JTerm} with a
      *         {@link SymbolicExecutionTermLabel}.
      */
     protected Map<Node, ImmutableList<Node>> getMethodCallStack(
@@ -1126,7 +1127,7 @@ public class SymbolicExecutionTreeBuilder {
                 } else if (SymbolicExecutionUtil.isTerminationNode(node,
                     node.getAppliedRuleApp())) {
                     if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
-                        Term modalityTerm = TermBuilder.goBelowUpdates(
+                        JTerm modalityTerm = TermBuilder.goBelowUpdates(
                             node.getAppliedRuleApp().posInOccurrence().subTerm());
                         BlockContractValidityTermLabel bcLabel =
                             (BlockContractValidityTermLabel) modalityTerm
@@ -1292,7 +1293,7 @@ public class SymbolicExecutionTreeBuilder {
             if (seNodeFound) {
                 int currentStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement currentActiveStatement = NodeInfo.computeActiveStatement(ruleApp);
-                Term term = (Term) ruleApp.posInOccurrence().subTerm();
+                JTerm term = (JTerm) ruleApp.posInOccurrence().subTerm();
                 JavaBlock currentJavaBlock = term.javaBlock();
                 MethodFrame currentInnerMostMethodFrame =
                     JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
@@ -1378,7 +1379,7 @@ public class SymbolicExecutionTreeBuilder {
                 // Compute stack and active statement
                 int stackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-                Term term = (Term) ruleApp.posInOccurrence().subTerm();
+                JTerm term = (JTerm) ruleApp.posInOccurrence().subTerm();
                 JavaBlock javaBlock = term.javaBlock();
                 MethodFrame innerMostMethodFrame =
                     JavaTools.getInnermostMethodFrame(javaBlock, proof.getServices());
@@ -1538,7 +1539,7 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected boolean isNotInImplicitMethod(Node node) {
         var term = node.getAppliedRuleApp().posInOccurrence().subTerm();
-        Term termNoUpdates = TermBuilder.goBelowUpdates(term);
+        JTerm termNoUpdates = TermBuilder.goBelowUpdates(term);
         Services services = proof.getServices();
         IExecutionContext ec =
             JavaTools.getInnermostExecutionContext(termNoUpdates.javaBlock(), services);
@@ -1581,7 +1582,7 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected void initNewMethodCallStack(Node currentNode,
             PosInOccurrence childPIO) {
-        Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
+        JTerm newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);

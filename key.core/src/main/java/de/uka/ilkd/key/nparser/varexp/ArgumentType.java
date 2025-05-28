@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.nparser.varexp;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 
 import org.key_project.logic.ParsableVariable;
@@ -18,7 +18,7 @@ import org.key_project.logic.sort.Sort;
  * @see TacletBuilderCommand
  */
 public enum ArgumentType {
-    TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(Term.class),
+    TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(JTerm.class),
     JAVA_TYPE(KeYJavaType.class), VARIABLE(ParsableVariable.class), STRING(String.class);
 
     public final Class<?> clazz;

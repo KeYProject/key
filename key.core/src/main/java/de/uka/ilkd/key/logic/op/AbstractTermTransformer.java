@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * Abstract class factoring out commonalities of typical term transformer implementations. The
  * available singletons of term transformers are kept here.
  */
-public abstract class AbstractTermTransformer extends AbstractSortedOperator
+public abstract class AbstractTermTransformer extends JAbstractSortedOperator
         implements TermTransformer {
     public static final Logger LOGGER = LoggerFactory.getLogger(AbstractTermTransformer.class);
 
@@ -131,7 +131,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
         var top = term.op();
         IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();
-        final Operator numbers = intModel.getNumberSymbol();
+        final JOperator numbers = intModel.getNumberSymbol();
         final var base = intModel.getNumberTerminator();
         final var minus = intModel.getNegativeNumberSign();
         // check whether term is really a "literal"

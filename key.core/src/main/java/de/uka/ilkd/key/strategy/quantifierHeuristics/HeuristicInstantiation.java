@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -66,7 +67,7 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
                         continue;
                     }
                     nextInst = services.getTermBuilder().func(quantifiedVarSortCast,
-                        (de.uka.ilkd.key.logic.Term) nextInst);
+                        (JTerm) nextInst);
                 }
             }
         }

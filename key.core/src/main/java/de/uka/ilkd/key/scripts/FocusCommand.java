@@ -141,7 +141,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
         TacletApp app =
             PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
-        app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) toHide.formula(),
+        app = app.addCheckedInstantiation(sv, (JTerm) toHide.formula(),
             proof.getServices(), true);
         g.apply(app);
 

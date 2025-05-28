@@ -6,8 +6,8 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
@@ -46,8 +46,8 @@ public class TestGenericRemovingLemmaGenerator {
         Assertions.assertTrue(found, "There is a proxy sort of the name 'G'");
     }
 
-    private void collectSorts(Term term, Set<Sort> sorts) {
-        for (Term t : term.subs()) {
+    private void collectSorts(JTerm term, Set<Sort> sorts) {
+        for (JTerm t : term.subs()) {
             collectSorts(t, sorts);
         }
 
@@ -57,7 +57,7 @@ public class TestGenericRemovingLemmaGenerator {
             sorts.add(sdf.getSortDependingOn());
         }
 
-        for (QuantifiableVariable v : term.boundVars()) {
+        for (JQuantifiableVariable v : term.boundVars()) {
             sorts.add(v.sort());
         }
     }

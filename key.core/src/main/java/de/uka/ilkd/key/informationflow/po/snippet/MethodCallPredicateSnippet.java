@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
@@ -31,14 +31,14 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
     }
 
     @Override
-    protected Sort[] generateContApplArgumentSorts(ImmutableList<Term> termList,
+    protected Sort[] generateContApplArgumentSorts(ImmutableList<JTerm> termList,
             IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
         ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
-        for (final Term arg : termList) {
+        for (final JTerm arg : termList) {
             // bugfix: Take the first argument sorts from the definition of
             // the method rather than from the actually provided arguments.
             // aug 2015 SG + MU

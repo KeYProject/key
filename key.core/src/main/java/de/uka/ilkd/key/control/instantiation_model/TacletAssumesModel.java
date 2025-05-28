@@ -9,7 +9,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -49,7 +49,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
         };
 
     private String manualInput;
-    private final Term ifFma;
+    private final JTerm ifFma;
 
     private final NamespaceSet nss;
     private final AbbrevMap scm;
@@ -57,8 +57,8 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
     private final TacletApp app;
     private final Goal goal;
 
-    public TacletAssumesModel(Term ifFma, ImmutableList<AssumesFormulaInstantiation> candidates,
-            TacletApp app, Goal goal, Services services, NamespaceSet nss, AbbrevMap scm) {
+    public TacletAssumesModel(JTerm ifFma, ImmutableList<AssumesFormulaInstantiation> candidates,
+                              TacletApp app, Goal goal, Services services, NamespaceSet nss, AbbrevMap scm) {
         super(createIfInsts(candidates));
 
         this.ifFma = ifFma;
@@ -76,7 +76,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
         manualInput = s;
     }
 
-    public Term ifFma() {
+    public JTerm ifFma() {
         return ifFma;
     }
 
@@ -101,7 +101,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
      * @return the term encoded in 's'
      * @throws RecognitionException In case an exception occurs during parse.
      */
-    public Term parseFormula(String s) throws RecognitionException {
+    public JTerm parseFormula(String s) throws RecognitionException {
         return new KeyIO(services).parseExpression(s);
     }
 
@@ -124,7 +124,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
                     true);
             }
 
-            Term term = parseFormula(manualInput);
+            JTerm term = parseFormula(manualInput);
             term = services.getTermBuilder().addLabelToAllSubs(term,
                 new NodeOrigin(SpecType.USER_INTERACTION,
                     app.rule().displayName(), goal.node().serialNr()));

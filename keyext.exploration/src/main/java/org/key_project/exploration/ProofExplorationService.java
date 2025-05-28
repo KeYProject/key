@@ -103,7 +103,7 @@ public class ProofExplorationService {
      * @param t Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
      */
-    public @NonNull Node soundAddition(@NonNull Goal g, @NonNull Term t, boolean antecedent) {
+    public @NonNull Node soundAddition(@NonNull Goal g, @NonNull JTerm t, boolean antecedent) {
         Taclet cut =
             g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
@@ -143,8 +143,8 @@ public class ProofExplorationService {
     }
 
     public Node applyChangeFormula(@NonNull Goal g,
-            @NonNull PosInOccurrence pio,
-            @NonNull Term term, @NonNull Term newTerm) {
+                                   @NonNull PosInOccurrence pio,
+                                   @NonNull JTerm term, @NonNull JTerm newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
 
         // taint goal with exploration
@@ -186,8 +186,8 @@ public class ProofExplorationService {
     }
 
     private TacletApp soundChange(@NonNull PosInOccurrence pio,
-            @NonNull Term term,
-            @NonNull Term newTerm) {
+            @NonNull JTerm term,
+            @NonNull JTerm newTerm) {
         Taclet cut = getCutTaclet();
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
@@ -195,7 +195,7 @@ public class ProofExplorationService {
         return app;
     }
 
-    public void soundHide(Goal g, PosInOccurrence pio, Term term) {
+    public void soundHide(Goal g, PosInOccurrence pio, JTerm term) {
         TacletApp app = createHideTerm(pio);
         ExplorationNodeData explorationNodeData = ExplorationNodeData.get(g.node());
         explorationNodeData.setExplorationAction("Hide " + term);

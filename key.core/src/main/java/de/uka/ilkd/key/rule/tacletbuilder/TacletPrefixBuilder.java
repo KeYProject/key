@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
@@ -33,10 +33,10 @@ public class TacletPrefixBuilder {
         this.tacletBuilder = tacletBuilder;
     }
 
-    private void addVarsBoundHere(Term visited, int subTerm) {
-        ImmutableArray<QuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
+    private void addVarsBoundHere(JTerm visited, int subTerm) {
+        ImmutableArray<JQuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
         for (int i = 0; i < bdVars.size(); i++) {
-            QuantifiableVariable boundVar = bdVars.get(i);
+            JQuantifiableVariable boundVar = bdVars.get(i);
             if (boundVar instanceof VariableSV boundSV) {
                 currentlyBoundVars = currentlyBoundVars.add(boundSV);
             }
@@ -65,8 +65,8 @@ public class TacletPrefixBuilder {
         return result;
     }
 
-    private void visit(Term t) {
-        if (t.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV msv) {
+    private void visit(JTerm t) {
+        if (t.op() instanceof JModality mod && mod.kind() instanceof ModalOperatorSV msv) {
             // TODO: Is false correct?
             prefixMap.put(msv, new TacletPrefix(ImmutableSet.empty(), false));
         }
@@ -107,7 +107,7 @@ public class TacletPrefixBuilder {
 
     private void visit(Sequent s) {
         for (final SequentFormula cf : s) {
-            visit((Term) cf.formula());
+            visit((JTerm) cf.formula());
         }
     }
 
@@ -127,7 +127,7 @@ public class TacletPrefixBuilder {
         if (tacletBuilder instanceof FindTacletBuilder findBuilder) {
             @SuppressWarnings("unchecked")
             final SyntaxElement find = findBuilder.getFind();
-            if (find instanceof Term t)
+            if (find instanceof JTerm t)
                 visit(t);
             else if (find instanceof Sequent s)
                 visit(s);

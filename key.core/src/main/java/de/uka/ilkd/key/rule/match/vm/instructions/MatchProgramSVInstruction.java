@@ -5,8 +5,8 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -48,7 +48,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
             }
         } else {
             Object peForCompare = pe;
-            if (inMap instanceof Term) {
+            if (inMap instanceof JTerm) {
                 try {
                     peForCompare =
                         ((Services) services).getTypeConverter().convertToLogicElement(pe,
@@ -69,9 +69,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Operator instantiationCandidate,
-            MatchConditions matchConditions,
-            LogicServices services) {
+    public MatchConditions match(JOperator instantiationCandidate,
+                                 MatchConditions matchConditions,
+                                 LogicServices services) {
         if (instantiationCandidate instanceof ProgramElement) {
             return match((ProgramElement) instantiationCandidate, matchConditions, services);
         }
@@ -82,9 +82,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term instantiationCandidate,
-            MatchConditions matchCond,
-            LogicServices services) {
+    public MatchConditions match(JTerm instantiationCandidate,
+                                 MatchConditions matchCond,
+                                 LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate)) {

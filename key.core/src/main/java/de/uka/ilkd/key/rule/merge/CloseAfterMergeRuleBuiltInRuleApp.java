@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
@@ -27,12 +27,12 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private Node partnerNode, correspondingMergeNode;
     private SymbolicExecutionState mergeNodeState;
     private SymbolicExecutionState partnerState;
-    private Term pc;
+    private JTerm pc;
     private Set<Name> newNames;
 
     public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio,
-            Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
-            SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
+                                             Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
+                                             SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
         this(builtInRule, pio);
         setThePartnerNode(thePartnerNode);
         setCorrespondingMergeNode(correspondingMergeNode);
@@ -103,11 +103,11 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.partnerState = thisSEState;
     }
 
-    public Term getPc() {
+    public JTerm getPc() {
         return pc;
     }
 
-    public void setPc(Term pc) {
+    public void setPc(JTerm pc) {
         this.pc = pc;
     }
 

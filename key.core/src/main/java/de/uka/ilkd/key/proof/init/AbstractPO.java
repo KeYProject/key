@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -47,7 +47,7 @@ public abstract class AbstractPO implements IPersistablePO {
     protected final SpecificationRepository specRepos;
     protected final String name;
     protected ImmutableSet<NoPosTacletApp> taclets;
-    protected Term[] poTerms;
+    protected JTerm[] poTerms;
     protected String[] poNames;
     private String header;
     private ProofAggregate proofAggregate;
@@ -186,7 +186,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
+    protected JTerm generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
     }
@@ -200,17 +200,17 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param services The services instance.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
-            ProgramVariable selfVar, Services services) {
+    protected JTerm generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
+                                        ProgramVariable selfVar, Services services) {
         if (selfVar == null || pm.isConstructor()) {
             return tb.tt();
         }
-        Term created = null;
+        JTerm created = null;
         for (LocationVariable heap : heaps) {
             if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
                 continue;
             }
-            final Term cr = tb.created(tb.var(heap), tb.var(selfVar));
+            final JTerm cr = tb.created(tb.var(heap), tb.var(selfVar));
             if (created == null) {
                 created = cr;
             } else {
@@ -229,8 +229,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfExactType(IProgramMethod pm, ProgramVariable selfVar,
-            KeYJavaType selfKJT) {
+    protected JTerm generateSelfExactType(IProgramMethod pm, ProgramVariable selfVar,
+                                          KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
     }
@@ -243,7 +243,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected Term generateSelfExactType(IProgramMethod pm, Term selfVar, KeYJavaType selfKJT) {
+    protected JTerm generateSelfExactType(IProgramMethod pm, JTerm selfVar, KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.exactInstance(selfKJT.getSort(), selfVar);
     }
@@ -452,7 +452,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param proofConfig the proof configuration
      * @return the created proof
      */
-    protected Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
+    protected Proof createProof(String proofName, JTerm poTerm, InitConfig proofConfig) {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
         }
@@ -466,7 +466,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected Proof createProofObject(String proofName, String proofHeader, Term poTerm,
+    protected Proof createProofObject(String proofName, String proofHeader, JTerm poTerm,
             InitConfig proofConfig) {
         return new Proof(proofName, poTerm, proofHeader, proofConfig);
     }
@@ -507,7 +507,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected void assignPOTerms(Term... poTerms) {
+    protected void assignPOTerms(JTerm... poTerms) {
         this.poTerms = poTerms;
     }
 

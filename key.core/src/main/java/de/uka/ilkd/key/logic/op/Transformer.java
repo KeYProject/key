@@ -101,7 +101,7 @@ public class Transformer extends JFunction {
     public static Transformer getTransformer(PosInOccurrence pio) {
         if (pio.posInTerm() != null) {
             PIOPathIterator it = pio.iterator();
-            Operator op;
+            JOperator op;
 
             while (it.next() != -1) {
                 final var t = it.getSubTerm();

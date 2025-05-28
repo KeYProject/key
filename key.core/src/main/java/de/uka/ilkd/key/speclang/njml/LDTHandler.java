@@ -8,8 +8,8 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperatorHandler;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
@@ -26,7 +26,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
      * @param type type
      * @param operator operator
      */
-    public record TypedOperator(KeYJavaType type, Operator operator) {
+    public record TypedOperator(KeYJavaType type, JOperator operator) {
     }
 
     protected final Services services;
@@ -62,9 +62,9 @@ public abstract class LDTHandler implements JMLOperatorHandler {
             return null;
         }
 
-        Term a = promote(left.getTerm(), promotedType);
-        Term b = promote(right.getTerm(), promotedType);
-        Term resultTerm = services.getTermFactory().createTerm(top.operator, a, b);
+        JTerm a = promote(left.getTerm(), promotedType);
+        JTerm b = promote(right.getTerm(), promotedType);
+        JTerm resultTerm = services.getTermFactory().createTerm(top.operator, a, b);
         if (OverloadedOperatorHandler.PREDICATES.contains(jop)) {
             // should be "formula", but apparently there is no KJT for that.
             return new SLExpression(resultTerm);
@@ -79,11 +79,11 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         if (top == null) {
             return null;
         }
-        Term resultTerm = services.getTermFactory().createTerm(top.operator, left.getTerm());
+        JTerm resultTerm = services.getTermFactory().createTerm(top.operator, left.getTerm());
         return new SLExpression(resultTerm, top.type);
     }
 
-    private Term promote(Term term, KeYJavaType resultType) {
+    private JTerm promote(JTerm term, KeYJavaType resultType) {
         Sort targetSort = resultType.getSort();
         if (term.sort() != targetSort) {
             return services.getTermBuilder().cast(targetSort, term);

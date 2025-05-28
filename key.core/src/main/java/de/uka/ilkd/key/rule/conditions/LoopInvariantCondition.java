@@ -11,10 +11,10 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -68,19 +68,19 @@ public class LoopInvariantCondition implements VariableCondition {
 
         final MethodFrame mf = //
             JavaTools.getInnermostMethodFrame(javaBlock, services);
-        final Term selfTerm = Optional.ofNullable(mf)
+        final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
         // TODO: handle exception
-        final Modality.JavaModalityKind modalityKind =
-            (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
+        final JModality.JavaModalityKind modalityKind =
+            (JModality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
-        Term invInst = tb.tt();
+        JTerm invInst = tb.tt();
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
             services)) {
-            final Term currentInvInst = invInst;
+            final JTerm currentInvInst = invInst;
 
-            final Optional<Term> maybeInvInst = Optional.ofNullable(
+            final Optional<JTerm> maybeInvInst = Optional.ofNullable(
                 loopSpec.getInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
 
             invInst = maybeInvInst.map(inv -> tb.and(currentInvInst, inv)).orElse(invInst);

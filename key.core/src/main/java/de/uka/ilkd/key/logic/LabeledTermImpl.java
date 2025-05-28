@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Property;
@@ -30,7 +30,7 @@ import org.key_project.util.java.CollectionUtil;
  * term structures modulo
  * renaming are compared whilst ignoring annotations. *
  *
- * @see Term
+ * @see JTerm
  * @see TermImpl
  */
 class LabeledTermImpl extends TermImpl {
@@ -49,9 +49,9 @@ class LabeledTermImpl extends TermImpl {
      * @param labels the term's labels (must not be null or empty)
      * @param origin a String with origin information
      */
-    public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
+    public LabeledTermImpl(JOperator op, ImmutableArray<JTerm> subs,
+                           ImmutableArray<JQuantifiableVariable> boundVars,
+                           ImmutableArray<TermLabel> labels, String origin) {
         super(op, subs, boundVars, origin);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
@@ -66,9 +66,9 @@ class LabeledTermImpl extends TermImpl {
      * @param boundVars logic variables bound by the operator
      * @param labels the terms labels (must not be null or empty)
      */
-    public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+    public LabeledTermImpl(JOperator op, ImmutableArray<JTerm> subs,
+                           ImmutableArray<JQuantifiableVariable> boundVars,
+                           ImmutableArray<TermLabel> labels) {
         super(op, subs, boundVars, "");
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";

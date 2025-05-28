@@ -7,7 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
@@ -34,7 +34,7 @@ public class UserDefinedSymbols {
     final Set<Function> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Function> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Sort> usedExtraSorts = new TreeSet<>(NamedComparator.INSTANCE);
-    final Set<QuantifiableVariable> usedExtraVariables =
+    final Set<JQuantifiableVariable> usedExtraVariables =
         new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Named> usedSchemaVariables = new TreeSet<>(NamedComparator.INSTANCE);
     final ImmutableSet<Taclet> axioms;
@@ -93,7 +93,7 @@ public class UserDefinedSymbols {
         }
     }
 
-    public void addVariable(QuantifiableVariable symbol) {
+    public void addVariable(JQuantifiableVariable symbol) {
         addUserDefinedSymbol(symbol, usedExtraVariables, referenceNamespaces.variables());
     }
 

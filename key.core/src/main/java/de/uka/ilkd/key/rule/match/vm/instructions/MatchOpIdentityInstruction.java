@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
@@ -17,7 +17,7 @@ import org.key_project.logic.LogicServices;
  *
  * @param <T> the type of the operator used as template
  */
-public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<T>
+public class MatchOpIdentityInstruction<T extends JOperator> extends Instruction<T>
         implements MatchOperatorInstruction {
 
     public MatchOpIdentityInstruction(T op) {
@@ -28,8 +28,8 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
-            LogicServices services) {
+    public final MatchConditions match(JTerm instantiationCandidate, MatchConditions matchConditions,
+                                       LogicServices services) {
         if (instantiationCandidate.op() == op) {
             return matchConditions;
         }
@@ -40,8 +40,8 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-            LogicServices services) {
+    public MatchConditions match(JOperator instantiationCandidate, MatchConditions matchConditions,
+                                 LogicServices services) {
         if (instantiationCandidate == op) {
             return matchConditions;
         }

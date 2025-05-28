@@ -10,7 +10,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -37,15 +37,15 @@ class GenericTranslator {
     /**
      * Translates generic variables.
      */
-    public Collection<Term> translate(Term term, ImmutableSet<Sort> sorts, Taclet t,
-            TacletConditions conditions, Services serv, int maxGeneric)
+    public Collection<JTerm> translate(JTerm term, ImmutableSet<Sort> sorts, Taclet t,
+                                       TacletConditions conditions, Services serv, int maxGeneric)
             throws IllegalTacletException {
         this.services = serv;
 
         Set<GenericSort> generics = AssumptionGenerator.collectGenerics(term);
-        ImmutableList<Term> list =
+        ImmutableList<JTerm> list =
             instantiateGeneric(term, generics, sorts, t, conditions, maxGeneric);
-        Collection<Term> result = new LinkedList<>();
+        Collection<JTerm> result = new LinkedList<>();
         if (list == null) {
             result.add(term);
             return result;
@@ -57,7 +57,7 @@ class GenericTranslator {
         }
 
         if (list.size() > 0) {
-            for (Term gt : list) {
+            for (JTerm gt : list) {
                 result.add(AssumptionGenerator.quantifyTerm(gt, services));
 
             }
@@ -84,10 +84,10 @@ class GenericTranslator {
      *         <code>instantiation</code> is of type {PrimitiveSort}.
      */
 
-    private Term instantiateGeneric(Term term, GenericSort generic, Sort instantiation, Taclet t)
+    private JTerm instantiateGeneric(JTerm term, GenericSort generic, Sort instantiation, Taclet t)
             throws IllegalArgumentException, IllegalTacletException {
-        Term[] subTerms = new Term[term.arity()];
-        ImmutableArray<QuantifiableVariable> variables = term.boundVars();
+        JTerm[] subTerms = new JTerm[term.arity()];
+        ImmutableArray<JQuantifiableVariable> variables = term.boundVars();
         for (int i = 0; i < term.arity(); i++) {
             subTerms[i] = instantiateGeneric(term.sub(i), generic, instantiation, t);
 
@@ -158,11 +158,11 @@ class GenericTranslator {
         }
 
         if (term.op() instanceof Quantifier) {
-            QuantifiableVariable[] copy = new QuantifiableVariable[term.boundVars().size()];
+            JQuantifiableVariable[] copy = new JQuantifiableVariable[term.boundVars().size()];
             assert copy.length == 1;
             int i = 0;
 
-            for (QuantifiableVariable var : term.boundVars()) {
+            for (JQuantifiableVariable var : term.boundVars()) {
                 copy[i] = var;
                 if (copy[i].sort() instanceof GenericSort) {
 
@@ -215,10 +215,10 @@ class GenericTranslator {
      *         generic variable the original term is returned.
      * @throws IllegalTacletException
      */
-    private ImmutableList<Term> instantiateGeneric(Term term, Set<GenericSort> genericSorts,
-            ImmutableSet<Sort> instSorts, Taclet t, TacletConditions conditions, int maxGeneric)
+    private ImmutableList<JTerm> instantiateGeneric(JTerm term, Set<GenericSort> genericSorts,
+                                                    ImmutableSet<Sort> instSorts, Taclet t, TacletConditions conditions, int maxGeneric)
             throws IllegalTacletException {
-        ImmutableList<Term> instantiatedTerms = ImmutableSLList.nil();
+        ImmutableList<JTerm> instantiatedTerms = ImmutableSLList.nil();
         if (maxGeneric < genericSorts.size()) {
             throw new IllegalTacletException("To many different generic sorts. Found: "
                 + genericSorts.size() + " Allowed: " + maxGeneric);
@@ -246,7 +246,7 @@ class GenericTranslator {
             services);
 
         for (byte[] bytes : referenceTable) {
-            Term temp = null;
+            JTerm temp = null;
             for (int c = 0; c < bytes.length; c++) {
                 int index = bytes[c];
 

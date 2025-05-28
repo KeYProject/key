@@ -118,7 +118,7 @@ public class TestTacletIndex {
     @Test
     @Disabled
     public void disabled_testNonInteractiveIsShownOnlyIfHeuristicIsMissed() {
-        Term term_p1 = TacletForTests.parseTerm("p(one, zero)");
+        JTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
         listofHeuristic = listofHeuristic.prepend(h3);
         PosInOccurrence pos =
@@ -155,7 +155,7 @@ public class TestTacletIndex {
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
         listofHeuristic = listofHeuristic.prepend(h3).prepend(h2);
 
-        Term term_p1 = TacletForTests.parseTerm("p(one, zero)");
+        JTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");
 
         SequentFormula cfma = new SequentFormula(term_p1);
 
@@ -188,7 +188,7 @@ public class TestTacletIndex {
         Services services = new Services(AbstractProfile.getDefaultProfile());
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
 
-        Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
+        JTerm term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 
         PosInOccurrence posAntec =
             new PosInOccurrence(new SequentFormula(term_p2), PosInTerm.getTopLevel(), true);
@@ -220,7 +220,7 @@ public class TestTacletIndex {
         ruleIdx.add(ruleSucc);
         ruleIdx.add(ruleMisMatch);
 
-        Term term_p4 = TacletForTests.parseTerm("p(zero, one)");
+        JTerm term_p4 = TacletForTests.parseTerm("p(zero, one)");
 
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
         PosInOccurrence posAntec =
@@ -238,7 +238,7 @@ public class TestTacletIndex {
         TacletIndex ruleIdx = TacletIndexKit.getKit().createTacletIndex();
         ruleIdx.add(notfreeconflict);
 
-        Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
+        JTerm term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
         SequentFormula cfma_p5 = new SequentFormula(term_p5);
         Sequent seq_p5 = JavaDLSequentKit.createAnteSequent(
             ImmutableSLList.singleton(cfma_p5));
@@ -250,7 +250,7 @@ public class TestTacletIndex {
             isRuleIn(appIdx.getTacletAppAt(TacletFilter.TRUE, pio_p5, null), notfreeconflict),
             "No rule should match");
 
-        Term term_p6 = TacletForTests.parseTerm("\\forall nat z; p(zero, z)");
+        JTerm term_p6 = TacletForTests.parseTerm("\\forall nat z; p(zero, z)");
 
         SequentFormula cfma_p6 = new SequentFormula(term_p6);
         Sequent seq_p6 = JavaDLSequentKit.createAnteSequent(

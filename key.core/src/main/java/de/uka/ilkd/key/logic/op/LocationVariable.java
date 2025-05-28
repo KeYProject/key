@@ -14,7 +14,7 @@ import org.key_project.logic.sort.Sort;
  * This class represents proper program variables, which are not program constants. See the
  * description of the superclass ProgramVariable for more information.
  */
-public final class LocationVariable extends ProgramVariable implements UpdateableOperator {
+public final class LocationVariable extends ProgramVariable implements UpdateableJOperator {
     public LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
             boolean isStatic, boolean isModel, boolean isGhost, boolean isFinal) {
         super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);

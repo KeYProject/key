@@ -8,7 +8,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
@@ -30,8 +30,8 @@ public class TestSyntacticalReplaceVisitor {
 
     SVInstantiations insts = null;
 
-    Term rw;
-    Term t_allxpxpx;
+    JTerm rw;
+    JTerm t_allxpxpx;
 
     @BeforeEach
     public void setUp() {
@@ -44,7 +44,7 @@ public class TestSyntacticalReplaceVisitor {
         RewriteTaclet taclet =
             (RewriteTaclet) index.lookup("testSyntacticalReplaceVisitor_0").taclet();
         rw = ((RewriteTacletGoalTemplate) taclet.goalTemplates().head()).replaceWith();
-        var u = (OperatorSV) rw.varsBoundHere(0).get(0);
+        var u = (JOperatorSV) rw.varsBoundHere(0).get(0);
 
         SchemaVariable b = (SchemaVariable) rw.sub(0).sub(0).op();
 
@@ -58,10 +58,10 @@ public class TestSyntacticalReplaceVisitor {
         LogicVariable y = new LogicVariable(new Name("y"), s);
         JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
 
-        Term t_x = TB.tf().createTerm(x);
-        Term t_px = TB.tf().createTerm(p, new Term[] { t_x }, null, null);
-        Term t_y = TB.tf().createTerm(y);
-        Term t_py = TB.tf().createTerm(p, new Term[] { t_y }, null, null);
+        JTerm t_x = TB.tf().createTerm(x);
+        JTerm t_px = TB.tf().createTerm(p, new JTerm[] { t_x }, null, null);
+        JTerm t_y = TB.tf().createTerm(y);
+        JTerm t_py = TB.tf().createTerm(p, new JTerm[] { t_y }, null, null);
 
         Services services = TacletForTests.services();
         insts = SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px, services).add(v, t_y, services)
@@ -89,8 +89,8 @@ public class TestSyntacticalReplaceVisitor {
 
     @Test
     public void testSubstitutionReplacement() {
-        Term orig = TacletForTests.parseTerm("{\\subst s x; f(const)}(\\forall s y; p(x))");
-        Term result = TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
+        JTerm orig = TacletForTests.parseTerm("{\\subst s x; f(const)}(\\forall s y; p(x))");
+        JTerm result = TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
         var goal = TacletForTests.createGoal();
         SyntacticalReplaceVisitor v = new SyntacticalReplaceVisitor(new TermLabelState(), null,
             null, SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, null, null);

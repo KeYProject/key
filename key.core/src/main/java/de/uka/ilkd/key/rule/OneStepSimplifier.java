@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -90,7 +90,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
     private TacletIndex[] indices;
-    private Map<Term, Term>[] notSimplifiableCaches;
+    private Map<JTerm, JTerm>[] notSimplifiableCaches;
     private boolean active;
 
     // -------------------------------------------------------------------------
@@ -190,7 +190,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             lastProof = proof;
             appsTakenOver = ImmutableSLList.nil();
             indices = new TacletIndex[ruleSets.size()];
-            notSimplifiableCaches = (Map<Term, Term>[]) new LRUCache[indices.length];
+            notSimplifiableCaches = (Map<JTerm, JTerm>[]) new LRUCache[indices.length];
             int i = 0;
             ImmutableList<String> done = ImmutableSLList.nil();
             for (String ruleSet : ruleSets) {
@@ -301,7 +301,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private SequentFormula simplifyPosOrSub(Goal goal,
             PosInOccurrence pos,
             int indexNr, Protocol protocol) {
-        final Term term = (Term) pos.subTerm();
+        final JTerm term = (JTerm) pos.subTerm();
         if (notSimplifiableCaches[indexNr].get(term) != null) {
             return null;
         }
@@ -332,8 +332,8 @@ public final class OneStepSimplifier implements BuiltInRule {
      *
      * @param protocol
      */
-    private Term replaceKnownHelper(
-            Map<TermReplacementKey, PosInOccurrence> map, Term in,
+    private JTerm replaceKnownHelper(
+            Map<TermReplacementKey, PosInOccurrence> map, JTerm in,
             boolean inAntecedent,
             /* out */ List<PosInOccurrence> ifInsts,
             Protocol protocol,
@@ -346,7 +346,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             if (protocol != null) {
                 protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
             }
-            Term result =
+            JTerm result =
                 pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
             // TODO: pos.subTerm() == in should be true which is currently not the case (labels are
             // missing)
@@ -357,11 +357,11 @@ public final class OneStepSimplifier implements BuiltInRule {
                 result = services.getTermBuilder().label(result, labels);
             }
             return result;
-        } else if (in.op() instanceof Modality || in.op() instanceof UpdateApplication
+        } else if (in.op() instanceof JModality || in.op() instanceof UpdateApplication
                 || in.op() instanceof Transformer) {
             return in;
         } else {
-            Term[] subs = new Term[in.arity()];
+            JTerm[] subs = new JTerm[in.arity()];
             boolean changed = false;
             for (int i = 0; i < subs.length; i++) {
                 subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol,
@@ -394,8 +394,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (context == null) {
             return null;
         }
-        final Term formula = (Term) cf.formula();
-        final Term simplifiedFormula = replaceKnownHelper(context, formula, inAntecedent, ifInsts,
+        final JTerm formula = (JTerm) cf.formula();
+        final JTerm simplifiedFormula = replaceKnownHelper(context, formula, inAntecedent, ifInsts,
             protocol, goal, ruleApp);
         if (simplifiedFormula.equals(formula)) {
             return null;
@@ -404,9 +404,9 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private RuleApp makeReplaceKnownTacletApp(Term formula,
-            boolean inAntecedent,
-            PosInOccurrence pio) {
+    private RuleApp makeReplaceKnownTacletApp(JTerm formula,
+                                              boolean inAntecedent,
+                                              PosInOccurrence pio) {
         FindTaclet taclet;
         if (pio.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig()
@@ -418,7 +418,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
-        svi.add(sv, (Term) pio.sequentFormula().formula(), lastProof.getServices());
+        svi.add(sv, (JTerm) pio.sequentFormula().formula(), lastProof.getServices());
 
         PosInOccurrence applicatinPIO =
             new PosInOccurrence(new SequentFormula(formula), PosInTerm.getTopLevel(), // TODO: This
@@ -737,14 +737,14 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private static class TermReplacementKey {
         /**
-         * The {@link Term} to represent.
+         * The {@link JTerm} to represent.
          */
         private final org.key_project.logic.Term term;
 
         /**
          * Constructor.
          *
-         * @param term The {@link Term} to represent.
+         * @param term The {@link JTerm} to represent.
          */
         public TermReplacementKey(org.key_project.logic.Term term) {
             assert term != null;
@@ -768,7 +768,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             if (obj instanceof TermReplacementKey) {
                 obj = ((TermReplacementKey) obj).term;
             }
-            if (obj instanceof Term t) {
+            if (obj instanceof JTerm t) {
                 return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, t); // Ignore naming and
                                                                               // term
                 // labels in the way a

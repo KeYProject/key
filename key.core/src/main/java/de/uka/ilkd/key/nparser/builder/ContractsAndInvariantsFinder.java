@@ -8,10 +8,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -70,8 +70,8 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         Namespace<IProgramVariable> oldProgVars = namespaces().programVariables();
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
-        Term fma = accept(ctx.fma);
-        Term modifiableClause = accept(ctx.modifiableClause);
+        JTerm fma = accept(ctx.fma);
+        JTerm modifiableClause = accept(ctx.modifiableClause);
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             FunctionalOperationContract dlOperationContract =
@@ -88,7 +88,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
 
     @Override
     public Object visitInvariants(KeYParser.InvariantsContext ctx) {
-        Namespace<QuantifiableVariable> orig = variables();
+        Namespace<JQuantifiableVariable> orig = variables();
         selfVar = (LocationVariable) ctx.selfVar.accept(this);
         ctx.one_invariant().forEach(it -> it.accept(this));
         unbindVars(orig);
@@ -98,7 +98,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitOne_invariant(KeYParser.One_invariantContext ctx) {
         String invName = visitSimple_ident(ctx.simple_ident());
-        Term fma = accept(ctx.fma);
+        JTerm fma = accept(ctx.fma);
         String displayName = ctx.displayName != null ? ctx.displayName.getText() : null;
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {

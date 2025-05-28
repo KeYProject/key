@@ -12,8 +12,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
@@ -69,7 +69,7 @@ public final class DefaultTacletSetTranslation
      * @deprecated weigl: This set is never queried only updated.
      */
     @Deprecated
-    private final Set<QuantifiableVariable> usedQuantifiedVariable = new LinkedHashSet<>();
+    private final Set<JQuantifiableVariable> usedQuantifiedVariable = new LinkedHashSet<>();
 
     private final Services services;
 
@@ -223,7 +223,7 @@ public final class DefaultTacletSetTranslation
         return toStore.toString();
     }
 
-    private String convertTerm(Term term) {
+    private String convertTerm(JTerm term) {
         String ret = LogicPrinter.quickPrintTerm(term, null);
         ret = "(" + ret + ")";
         return ret;
@@ -234,7 +234,7 @@ public final class DefaultTacletSetTranslation
 
     }
 
-    public void eventQuantifiedVariable(QuantifiableVariable var) {
+    public void eventQuantifiedVariable(JQuantifiableVariable var) {
         usedQuantifiedVariable.add(var);
     }
 
@@ -243,7 +243,7 @@ public final class DefaultTacletSetTranslation
 
     }
 
-    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term) {
+    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, JTerm term) {
         /*
          * String s = ""; s += "taclet: " + t.name()+"\n"; s += "term: " + term +"\n"; s +=
          * "generic sort: " + dest + "\n"; s += "sort: "+ sort +"\n"; instantiationFailures =

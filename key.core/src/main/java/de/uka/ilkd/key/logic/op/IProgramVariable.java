@@ -12,7 +12,7 @@ import org.key_project.logic.op.SortedOperator;
 
 
 public interface IProgramVariable
-        extends TerminalProgramElement, SortedOperator, Operator {
+        extends TerminalProgramElement, SortedOperator, JOperator {
     KeYJavaType getKeYJavaType();
 
     KeYJavaType getKeYJavaType(Services javaServ);

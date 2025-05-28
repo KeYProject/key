@@ -7,8 +7,8 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -95,8 +95,8 @@ public class PosTacletApp extends TacletApp {
      * @return the set of the logicvariables that are bound for the indicated application position
      *         of the TacletApp.
      */
-    private static ImmutableSet<QuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
-            PosInOccurrence pos) {
+    private static ImmutableSet<JQuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
+                                                                             PosInOccurrence pos) {
 
         if (!(taclet instanceof RewriteTaclet)) {
             return DefaultImmutableSet.nil();
@@ -113,7 +113,7 @@ public class PosTacletApp extends TacletApp {
 
 
     @Override
-    protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
+    protected ImmutableSet<JQuantifiableVariable> contextVars(SchemaVariable sv) {
         if (!taclet().getPrefix(sv).context()) {
             return DefaultImmutableSet.nil();
         }
@@ -131,11 +131,11 @@ public class PosTacletApp extends TacletApp {
             SVInstantiations insts, PosInOccurrence pos, Services services) {
 
         if (taclet.isContextInPrefix()) {
-            ImmutableSet<QuantifiableVariable> k = varsBoundAboveFindPos(taclet, pos);
+            ImmutableSet<JQuantifiableVariable> k = varsBoundAboveFindPos(taclet, pos);
             Iterator<SchemaVariable> it = allVariableSV(taclet);
             while (it.hasNext()) {
                 SchemaVariable varSV = it.next();
-                Term inst = (Term) insts.getInstantiation(varSV);
+                JTerm inst = (JTerm) insts.getInstantiation(varSV);
                 if (inst != null && k.contains(inst.op())) {
                     insts = replaceInstantiation(taclet, insts, varSV, services);
                 }
@@ -153,8 +153,8 @@ public class PosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
-            Services services) {
+    public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
+                                      Services services) {
 
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),

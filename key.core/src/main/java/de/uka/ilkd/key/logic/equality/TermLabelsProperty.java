@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.equality;
 
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
 
 import org.key_project.logic.Property;
@@ -53,8 +53,8 @@ public class TermLabelsProperty implements Property<Term> {
             return false;
         }
 
-        if (term1.op() instanceof Modality mod1
-                && !(mod1.programBlock().equals(((Modality) (term2.op())).programBlock()))) {
+        if (term1.op() instanceof JModality mod1
+                && !(mod1.programBlock().equals(((JModality) (term2.op())).programBlock()))) {
             return false;
         }
 
@@ -88,7 +88,7 @@ public class TermLabelsProperty implements Property<Term> {
                     this::hashCodeModThisProperty);
         hashcode = hashcode * 17 + term.boundVars().hashCode();
         hashcode =
-            hashcode * 17 + (term.op() instanceof Modality mod ? mod.programBlock().hashCode() : 3);
+            hashcode * 17 + (term.op() instanceof JModality mod ? mod.programBlock().hashCode() : 3);
 
         return hashcode;
     }

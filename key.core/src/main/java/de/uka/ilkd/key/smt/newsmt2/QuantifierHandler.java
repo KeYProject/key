@@ -10,7 +10,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
@@ -91,7 +93,7 @@ public class QuantifierHandler implements SMTHandler {
     }
 
     private void collectTriggers(Term term, Set<Term> triggers) {
-        if (((de.uka.ilkd.key.logic.Term) term)
+        if (((JTerm) term)
                 .containsLabel(DefinedSymbolsHandler.TRIGGER_LABEL)) {
             triggers.add(term);
         }
@@ -99,22 +101,22 @@ public class QuantifierHandler implements SMTHandler {
     }
 
     private Term collectQuantifications(Term term) {
-        final var type = (de.uka.ilkd.key.logic.op.Operator) term.op();
+        final var type = (JOperator) term.op();
         assert type == Quantifier.ALL || type == Quantifier.EX;
-        var current = (de.uka.ilkd.key.logic.Term) term.sub(0);
+        var current = (JTerm) term.sub(0);
         if (current.op() != type) {
             return term;
         }
 
-        List<QuantifiableVariable> boundVars =
-            (List<QuantifiableVariable>) term.boundVars().toList();
+        List<JQuantifiableVariable> boundVars =
+            (List<JQuantifiableVariable>) term.boundVars().toList();
         while (current.op() == type) {
             boundVars.addAll(current.boundVars().toList());
             current = current.sub(0);
         }
 
-        ImmutableArray<de.uka.ilkd.key.logic.Term> subs = new ImmutableArray<>(current);
-        ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(boundVars);
+        ImmutableArray<JTerm> subs = new ImmutableArray<>(current);
+        ImmutableArray<JQuantifiableVariable> bvars = new ImmutableArray<>(boundVars);
         return services.getTermFactory().createTerm(type, subs, bvars, null);
     }
 

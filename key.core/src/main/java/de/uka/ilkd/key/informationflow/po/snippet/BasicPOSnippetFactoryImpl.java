@@ -8,7 +8,7 @@ import java.util.EnumMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -60,7 +60,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     }
 
     BasicPOSnippetFactoryImpl(LoopSpecification invariant, ProofObligationVars poVars,
-            ExecutionContext context, Term guardTerm, Services services) {
+                              ExecutionContext context, JTerm guardTerm, Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars = poVars;
         registerFactoryMethods();
@@ -98,7 +98,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     @Override
-    public Term create(Snippet snippet) throws UnsupportedOperationException {
+    public JTerm create(Snippet snippet) throws UnsupportedOperationException {
         try {
             FactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {

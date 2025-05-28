@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
@@ -106,8 +106,8 @@ public class VariableNameProposer implements InstantiationProposer {
 
             final Object inst = p_app.instantiations().getInstantiation(v);
 
-            if (inst instanceof Term) {
-                result = ((Term) inst).op().name().toString();
+            if (inst instanceof JTerm) {
+                result = ((JTerm) inst).op().name().toString();
             } else {
                 result = String.valueOf(inst);
             }

@@ -15,11 +15,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -157,8 +157,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term generateMbyAtPreDef(LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, Services services) {
+    protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
+                                        ImmutableList<LocationVariable> paramVars, Services services) {
         return tb.tt();
     }
 
@@ -166,9 +166,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+    protected JTerm getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+                           ImmutableList<LocationVariable> paramVars,
+                           Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         if (precondition != null && !precondition.isEmpty()) {
             var context = Context.inMethod(getProgramMethod(), services.getTermBuilder());
             JmlIO io = new JmlIO(services).context(context).parameters(paramVars);
@@ -184,10 +184,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
-            Services services) {
+    protected JTerm getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+                            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+                            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+                            Services services) {
         return tb.tt();
     }
 
@@ -195,9 +195,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-            Services services) {
+    protected JTerm buildFrameClause(List<LocationVariable> modHeaps, Map<JTerm, JTerm> heapToAtPre,
+                                     LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+                                     Services services) {
         return tb.tt();
     }
 
@@ -205,8 +205,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
      * {@inheritDoc}
      */
     @Override
-    protected Modality.JavaModalityKind getTerminationMarker() {
-        return Modality.JavaModalityKind.DIA;
+    protected JModality.JavaModalityKind getTerminationMarker() {
+        return JModality.JavaModalityKind.DIA;
     }
 
     /**
@@ -375,8 +375,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
     }
 
     @Override
-    protected Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
-            ImmutableList<Term> paramTerms, Services services) {
+    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+                                  ImmutableList<JTerm> paramTerms, Services services) {
         // TODO Auto-generated method stub
         return null;
     }

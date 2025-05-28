@@ -26,17 +26,17 @@ import org.jspecify.annotations.Nullable;
  * The currently only class implementing the Term interface. TermFactory should be the only class
  * dealing directly with the TermImpl class.
  */
-class TermImpl implements Term {
+class TermImpl implements JTerm {
 
     /**
      * A static empty list of terms used for memory reasons.
      */
-    private static final ImmutableArray<Term> EMPTY_TERM_LIST = new ImmutableArray<>();
+    private static final ImmutableArray<JTerm> EMPTY_TERM_LIST = new ImmutableArray<>();
 
     /**
      * A static empty list of quantifiable variables used for memory reasons.
      */
-    private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
+    private static final ImmutableArray<JQuantifiableVariable> EMPTY_VAR_LIST =
         new ImmutableArray<>();
 
     /**
@@ -49,9 +49,9 @@ class TermImpl implements Term {
     private final int serialNumber = serialNumberCounter.incrementAndGet();
 
     // content
-    private final Operator op;
-    private final ImmutableArray<Term> subs;
-    private final ImmutableArray<QuantifiableVariable> boundVars;
+    private final JOperator op;
+    private final ImmutableArray<JTerm> subs;
+    private final ImmutableArray<JQuantifiableVariable> boundVars;
 
     // caches
     private enum ThreeValuedTruth {
@@ -63,7 +63,7 @@ class TermImpl implements Term {
      * A cached value for computing the term's rigidness.
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
-    private ImmutableSet<QuantifiableVariable> freeVars = null;
+    private ImmutableSet<JQuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
      */
@@ -72,8 +72,8 @@ class TermImpl implements Term {
     private Sort sort;
 
     /**
-     * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
-     * {@link JavaBlock}. {@link Term}s which provides a {@link JavaBlock} directly or indirectly
+     * This flag indicates that the {@link JTerm} itself or one of its children contains a non-empty
+     * {@link JavaBlock}. {@link JTerm}s which provides a {@link JavaBlock} directly or indirectly
      * can't be cached because it is possible that the contained meta information inside the
      * {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
      */
@@ -92,9 +92,9 @@ class TermImpl implements Term {
      *        operator)
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
-    public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            String origin) {
+    public TermImpl(JOperator op, ImmutableArray<JTerm> subs,
+                    ImmutableArray<JQuantifiableVariable> boundVars,
+                    String origin) {
         assert op != null;
         assert subs != null;
         this.op = op;
@@ -103,8 +103,8 @@ class TermImpl implements Term {
         this.origin = origin;
     }
 
-    TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
+    TermImpl(JOperator op, ImmutableArray<JTerm> subs,
+             ImmutableArray<JQuantifiableVariable> boundVars) {
         this(op, subs, boundVars, "");
     }
 
@@ -124,15 +124,15 @@ class TermImpl implements Term {
     // -------------------------------------------------------------------------
 
 
-    private ImmutableSet<QuantifiableVariable> determineFreeVars() {
-        ImmutableSet<QuantifiableVariable> localFreeVars =
+    private ImmutableSet<JQuantifiableVariable> determineFreeVars() {
+        ImmutableSet<JQuantifiableVariable> localFreeVars =
             DefaultImmutableSet.nil();
 
-        if (op instanceof QuantifiableVariable) {
-            localFreeVars = localFreeVars.add((QuantifiableVariable) op);
+        if (op instanceof JQuantifiableVariable) {
+            localFreeVars = localFreeVars.add((JQuantifiableVariable) op);
         }
         for (int i = 0, ar = arity(); i < ar; i++) {
-            ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
+            ImmutableSet<JQuantifiableVariable> subFreeVars = sub(i).freeVars();
             for (int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
                 subFreeVars = subFreeVars.remove(varsBoundHere(i).get(j));
             }
@@ -150,7 +150,7 @@ class TermImpl implements Term {
      * Checks whether the Term is valid on the top level. If this is the case this method returns
      * the Term unmodified. Otherwise, a TermCreationException is thrown.
      */
-    public Term checked() {
+    public JTerm checked() {
         op.validTopLevelException(this);
         return this;
         /*
@@ -160,7 +160,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public Operator op() {
+    public JOperator op() {
         return op;
     }
 
@@ -176,32 +176,32 @@ class TermImpl implements Term {
 
 
     @Override
-    public ImmutableArray<Term> subs() {
+    public ImmutableArray<JTerm> subs() {
         return subs;
     }
 
 
     @Override
-    public Term sub(int nr) {
+    public JTerm sub(int nr) {
         return subs.get(nr);
     }
 
 
     @Override
-    public ImmutableArray<QuantifiableVariable> boundVars() {
+    public ImmutableArray<JQuantifiableVariable> boundVars() {
         return boundVars;
     }
 
 
     @Override
-    public ImmutableArray<QuantifiableVariable> varsBoundHere(int n) {
+    public ImmutableArray<JQuantifiableVariable> varsBoundHere(int n) {
         return op.bindVarsAt(n) ? boundVars : EMPTY_VAR_LIST;
     }
 
 
     @Override
     public @NonNull JavaBlock javaBlock() {
-        if (op instanceof Modality mod) {
+        if (op instanceof JModality mod) {
             return mod.programBlock();
         } else {
             return JavaBlock.EMPTY_JAVABLOCK;
@@ -267,7 +267,7 @@ class TermImpl implements Term {
 
 
     @Override
-    public ImmutableSet<QuantifiableVariable> freeVars() {
+    public ImmutableSet<JQuantifiableVariable> freeVars() {
         if (freeVars == null) {
             freeVars = determineFreeVars();
         }
@@ -347,15 +347,15 @@ class TermImpl implements Term {
     }
 
     @Override
-    public <V> boolean equalsModProperty(Object o, Property<Term> property, V... v) {
-        if (!(o instanceof Term other)) {
+    public <V> boolean equalsModProperty(Object o, Property<JTerm> property, V... v) {
+        if (!(o instanceof JTerm other)) {
             return false;
         }
         return property.equalsModThisProperty(this, other);
     }
 
     @Override
-    public int hashCodeModProperty(Property<? super Term> property) {
+    public int hashCodeModProperty(Property<? super JTerm> property) {
         return property.hashCodeModThisProperty(this);
     }
 
@@ -367,10 +367,10 @@ class TermImpl implements Term {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (!javaBlock().isEmpty()) {
-            var op = (Modality) op();
-            if (op.kind() == Modality.JavaModalityKind.DIA) {
+            var op = (JModality) op();
+            if (op.kind() == JModality.JavaModalityKind.DIA) {
                 sb.append("\\<").append(javaBlock()).append("\\> ");
-            } else if (op.kind() == Modality.JavaModalityKind.BOX) {
+            } else if (op.kind() == JModality.JavaModalityKind.BOX) {
                 sb.append("\\[").append(javaBlock()).append("\\] ");
             } else {
                 sb.append(op()).append("|{").append(javaBlock()).append("}| ");
