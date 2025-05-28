@@ -1,7 +1,7 @@
 plugins {
 }
 
-description "Generic data strutures for terms and formulas without dependencies to a specific target programming language"
+description = "Generic data strutures for terms and formulas without dependencies to a specific target programming language"
 
 configurations { }
 
