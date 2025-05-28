@@ -46,7 +46,8 @@ public class RenameTable {
     }
 
     /**
-     * does nearly the same as {@link #contains(JQuantifiableVariable)} but performs the test only on
+     * does nearly the same as {@link #contains(JQuantifiableVariable)} but performs the test only
+     * on
      * the local table
      *
      * @param n the QuantifiableVariable object the existence of an abstract name is checked.

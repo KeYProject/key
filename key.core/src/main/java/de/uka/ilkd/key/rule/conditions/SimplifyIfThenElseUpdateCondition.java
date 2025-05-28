@@ -86,7 +86,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
 
     private void collectSingleTerm(final TreeMap<UpdateableJOperator, ElementaryUpdateWrapper> map,
-                                   JTerm update, final boolean firstTerm, TermServices services) {
+            JTerm update, final boolean firstTerm, TermServices services) {
         ElementaryUpdate eu = (ElementaryUpdate) update.op();
         ElementaryUpdateWrapper euw = null;
         if (!map.containsKey(eu.lhs())) {
@@ -104,7 +104,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     private boolean collect(final TreeMap<UpdateableJOperator, ElementaryUpdateWrapper> map,
-                            JTerm update, final boolean firstTerm, TermServices services) {
+            JTerm update, final boolean firstTerm, TermServices services) {
         LinkedList<JTerm> updates = new LinkedList<>();
         TreeSet<UpdateableJOperator> collected = createTree();
         updates.add(update);

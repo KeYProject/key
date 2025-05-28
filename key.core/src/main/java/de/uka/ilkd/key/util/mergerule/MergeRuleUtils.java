@@ -210,7 +210,7 @@ public class MergeRuleUtils {
      * @return All program variables of the given term.
      */
     public static ImmutableSet<LocationVariable> getLocationVariables(JTerm term,
-                                                                      Services services) {
+            Services services) {
         ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
 
         if (term.op() instanceof LocationVariable) {
@@ -299,7 +299,8 @@ public class MergeRuleUtils {
      * @return The right side in the update for the given left side. Returns a None value if the
      *         right side could not be determined.
      */
-    public static Optional<JTerm> getUpdateRightSideForSafe(JTerm update, LocationVariable leftSide) {
+    public static Optional<JTerm> getUpdateRightSideForSafe(JTerm update,
+            LocationVariable leftSide) {
         return wrapOption(getUpdateRightSideFor(update, leftSide));
     }
 
@@ -475,7 +476,7 @@ public class MergeRuleUtils {
      * @return A term equal to the input, but with constants substituted by fresh variables.
      */
     public static JTerm substConstantsByFreshVars(JTerm term,
-                                                  HashMap<Function, LogicVariable> replMap, Services services) {
+            HashMap<Function, LogicVariable> replMap, Services services) {
         return substConstantsByFreshVars(term, null, replMap, services);
     }
 
@@ -491,7 +492,7 @@ public class MergeRuleUtils {
      * @return A term equal to the input, but with constants substituted by fresh variables.
      */
     public static JTerm substConstantsByFreshVars(JTerm term, HashSet<Function> restrictTo,
-                                                  HashMap<Function, LogicVariable> replMap, Services services) {
+            HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         if (term.op() instanceof Function constant && constant.isSkolemConstant()
@@ -770,7 +771,7 @@ public class MergeRuleUtils {
      * @see #simplify(Proof, JTerm, int)
      */
     public static JTerm trySimplify(final Proof parentProof, final JTerm term,
-                                    boolean countDisjunctions, int timeout) {
+            boolean countDisjunctions, int timeout) {
 
         try {
             JTerm simplified = simplify(parentProof, term, timeout);
@@ -875,8 +876,9 @@ public class MergeRuleUtils {
      * @return A path condition that is equivalent to the disjunction of the two supplied formulae,
      *         but possibly simpler.
      */
-    public static JTerm createSimplifiedDisjunctivePathCondition(final JTerm cond1, final JTerm cond2,
-                                                                 Services services, int simplificationTimeout) {
+    public static JTerm createSimplifiedDisjunctivePathCondition(final JTerm cond1,
+            final JTerm cond2,
+            Services services, int simplificationTimeout) {
 
         if (cond1.equals(cond2)) {
             return cond1;
@@ -924,7 +926,7 @@ public class MergeRuleUtils {
      *         pathCondition1 that is common with pathCondition2.
      */
     public static Optional<Pair<JTerm, JTerm>> getDistinguishingFormula(JTerm pathCondition1,
-                                                                        JTerm pathCondition2, Services services) {
+            JTerm pathCondition2, Services services) {
 
         return getDistinguishingFormula(getConjunctiveElementsFor(pathCondition1),
             getConjunctiveElementsFor(pathCondition2), services);
@@ -978,8 +980,9 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return True iff the two given path conditions are distinguishable.
      */
-    public static boolean pathConditionsAreDistinguishable(JTerm pathCondition1, JTerm pathCondition2,
-                                                           Services services) {
+    public static boolean pathConditionsAreDistinguishable(JTerm pathCondition1,
+            JTerm pathCondition2,
+            Services services) {
         Optional<Pair<JTerm, JTerm>> distinguishingAndEqualFormula1 =
             getDistinguishingFormula(pathCondition1, pathCondition2, services);
         Optional<Pair<JTerm, JTerm>> distinguishingAndEqualFormula2 =
@@ -997,8 +1000,8 @@ public class MergeRuleUtils {
      * @param newNames The set of new names (of Skolem constants) introduced in the merge.
      */
     public static void closeMergePartnerGoal(Node mergeNodeParent, Goal mergePartner,
-                                             PosInOccurrence pio, SymbolicExecutionState mergeState,
-                                             SymbolicExecutionState mergePartnerState, JTerm pc, Set<Name> newNames) {
+            PosInOccurrence pio, SymbolicExecutionState mergeState,
+            SymbolicExecutionState mergePartnerState, JTerm pc, Set<Name> newNames) {
 
         InitConfig initConfig = mergeNodeParent.proof().getInitConfig();
 
@@ -1071,7 +1074,8 @@ public class MergeRuleUtils {
             if (!sf.formula().equals(selected)) {
                 pathConditionSet = pathConditionSet
                         .prepend(
-                            new SequentFormula(services.getTermBuilder().not((JTerm) sf.formula())));
+                            new SequentFormula(
+                                services.getTermBuilder().not((JTerm) sf.formula())));
             }
         }
 
@@ -1406,7 +1410,7 @@ public class MergeRuleUtils {
      * @return The set of contained program locations.
      */
     private static ImmutableSet<LocationVariable> getProgramLocations(JTerm programCounterTerm,
-                                                                      Services services) {
+            Services services) {
         CollectLocationVariablesVisitor visitor =
             new CollectLocationVariablesVisitor(programCounterTerm.javaBlock().program(), services);
 
@@ -1482,8 +1486,8 @@ public class MergeRuleUtils {
      * @return The proof result.
      */
     private static ProofSearchInformation tryToProve(JTerm toProve, Services services,
-                                                     boolean doSplit,
-                                                     String sideProofName, int timeout) throws ProofInputException {
+            boolean doSplit,
+            String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(// Sequent to prove
             JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
                 ImmutableSLList.singleton(new SequentFormula(toProve))),
@@ -1550,7 +1554,7 @@ public class MergeRuleUtils {
      * @return True iff the given formula has been successfully proven.
      */
     private static boolean isProvable(JTerm toProve, Services services, boolean doSplit,
-                                      int timeout) {
+            int timeout) {
         try {
             final ProofSearchInformation proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
@@ -1585,7 +1589,8 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Simplifies the given {@link JTerm} in a side proof with splits. This code has been copied from
+     * Simplifies the given {@link JTerm} in a side proof with splits. This code has been copied
+     * from
      * {@code SymbolicExecutionUtil} and only been slightly modified (to allow for splitting the
      * proof).
      *
@@ -1688,8 +1693,9 @@ public class MergeRuleUtils {
      * @return The common and specific parts for cond1 and cond2.
      * @see #commonAndSpecificSubformulas(ArrayList, ArrayList, Services)
      */
-    private static CommonAndSpecificSubformulasResult commonAndSpecificSubformulas(final JTerm cond1,
-                                                                                   final JTerm cond2, Services services) {
+    private static CommonAndSpecificSubformulasResult commonAndSpecificSubformulas(
+            final JTerm cond1,
+            final JTerm cond2, Services services) {
         return commonAndSpecificSubformulas(getConjunctiveElementsFor(cond1),
             getConjunctiveElementsFor(cond2), services);
     }

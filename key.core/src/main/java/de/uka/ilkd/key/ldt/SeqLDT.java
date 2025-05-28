@@ -127,7 +127,7 @@ public final class SeqLDT extends LDT {
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right,
-                                 Services services, ExecutionContext ec) {
+            Services services, ExecutionContext ec) {
         return false;
     }
 

@@ -49,7 +49,8 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         final LoopSpecification loopSpec = //
             MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
-        final boolean isTransaction = MiscTools.isTransaction(((JModality) loopFormula.op()).kind());
+        final boolean isTransaction =
+            MiscTools.isTransaction(((JModality) loopFormula.op()).kind());
         final boolean isPermissions = MiscTools.isPermissions(services);
 
         final Map<LocationVariable, Map<JTerm, JTerm>> heapToBeforeLoopMap = //
@@ -73,9 +74,9 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      * @return The frame condition.
      */
     private static JTerm createFrameCondition(final LoopSpecification loopSpec,
-                                              final boolean isTransaction,
-                                              final Map<LocationVariable, Map<JTerm, JTerm>> heapToBeforeLoopMap,
-                                              final Services services) {
+            final boolean isTransaction,
+            final Map<LocationVariable, Map<JTerm, JTerm>> heapToBeforeLoopMap,
+            final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Map<LocationVariable, JTerm> atPres = loopSpec.getInternalAtPres();
@@ -115,9 +116,10 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      *
      * @return A map from heap variables to a map from original terms to the pre-state terms.
      */
-    private Map<LocationVariable, Map<JTerm, JTerm>> createHeapToBeforeLoopMap(boolean isTransaction,
-                                                                               boolean isPermissions, ProgramVariable heapBeforePV, ProgramVariable savedHeapBeforePV,
-                                                                               ProgramVariable permissionsHeapBeforePV, Services services) {
+    private Map<LocationVariable, Map<JTerm, JTerm>> createHeapToBeforeLoopMap(
+            boolean isTransaction,
+            boolean isPermissions, ProgramVariable heapBeforePV, ProgramVariable savedHeapBeforePV,
+            ProgramVariable permissionsHeapBeforePV, Services services) {
         final Map<LocationVariable, Map<JTerm, JTerm>> result = //
             new LinkedHashMap<>();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -139,7 +141,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
     }
 
     private static void put(Map<LocationVariable, Map<JTerm, JTerm>> map, LocationVariable key,
-                            JTerm t1, JTerm t2) {
+            JTerm t1, JTerm t2) {
         map.computeIfAbsent(key, k -> new LinkedHashMap<>());
         map.get(key).put(t1, t2);
     }

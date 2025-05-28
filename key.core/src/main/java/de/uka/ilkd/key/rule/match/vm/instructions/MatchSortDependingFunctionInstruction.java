@@ -74,8 +74,9 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      * @param services the {@link Services}
      */
     @Override
-    public final MatchConditions match(JTerm instantiationCandidate, MatchConditions matchConditions,
-                                       LogicServices services) {
+    public final MatchConditions match(JTerm instantiationCandidate,
+            MatchConditions matchConditions,
+            LogicServices services) {
         MatchConditions result = null;
         if (instantiationCandidate.op() instanceof SortDependingFunction sdp) {
             if (op.isSimilar(sdp)) {

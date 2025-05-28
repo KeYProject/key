@@ -38,7 +38,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
 
     private static JTerm dropEffectlessStoresHelper(JTerm heapTerm, TermServices services,
-                                                    ImmutableSet<Pair<JTerm, JTerm>> overwrittenLocs, Function store) {
+            ImmutableSet<Pair<JTerm, JTerm>> overwrittenLocs, Function store) {
         if (heapTerm.op() == store) {
             final JTerm subHeapTerm = heapTerm.sub(0);
             final JTerm objTerm = heapTerm.sub(1);

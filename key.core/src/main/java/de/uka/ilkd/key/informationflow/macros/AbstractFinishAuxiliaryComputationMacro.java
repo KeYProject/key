@@ -8,8 +8,8 @@ import java.util.Set;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -92,7 +92,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     }
 
     private static JTerm[] buildExecution(ProofObligationVars c, Map<JTerm, JTerm> vsMap,
-                                          ImmutableList<Goal> symbExecGoals, Goal initGoal) {
+            ImmutableList<Goal> symbExecGoals, Goal initGoal) {
         Services services = initGoal.proof().getServices();
         final JTerm[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         final InfFlowProgVarRenamer renamer = new InfFlowProgVarRenamer(goalFormulas, vsMap,

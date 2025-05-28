@@ -9,8 +9,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -54,7 +54,7 @@ public class StateVars {
 
 
     public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm result,
-                     JTerm exception, JTerm heap, JTerm mbyAtPre) {
+            JTerm exception, JTerm heap, JTerm mbyAtPre) {
         this.self = self;
         this.guard = guard;
         this.localVars = localVars;
@@ -86,7 +86,7 @@ public class StateVars {
 
 
     public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm result, JTerm exception,
-                     JTerm heap, JTerm mbyAtPre) {
+            JTerm heap, JTerm mbyAtPre) {
         this(self, null, localVars, result, exception, heap, mbyAtPre);
     }
 
@@ -101,7 +101,7 @@ public class StateVars {
 
 
     private ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list,
-                                                 ImmutableList<JTerm> list2) {
+            ImmutableList<JTerm> list2) {
         ImmutableList<JTerm> result = list;
         for (JTerm t : list2) {
             result = appendIfNotNull(result, t);
@@ -116,13 +116,13 @@ public class StateVars {
 
 
     public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm result,
-                     JTerm exception, JTerm heap) {
+            JTerm exception, JTerm heap) {
         this(self, guard, localVars, result, exception, heap, null);
     }
 
 
     public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm result, JTerm exception,
-                     JTerm heap) {
+            JTerm heap) {
         this(self, localVars, result, exception, heap, null);
     }
 
@@ -144,7 +144,7 @@ public class StateVars {
 
 
     private static ImmutableList<JTerm> copyVariables(ImmutableList<JTerm> ts, String postfix,
-                                                      Services services) {
+            Services services) {
         ImmutableList<JTerm> result = ImmutableSLList.nil();
         for (JTerm t : ts) {
             result = result.append(copyVariable(t, postfix, services));
@@ -296,7 +296,7 @@ public class StateVars {
 
 
     private static JTerm buildSelfVar(Services services, IProgramMethod pm, KeYJavaType kjt,
-                                      String postfix) {
+            String postfix) {
         if (pm.isStatic()) {
             return null;
         }
@@ -308,7 +308,7 @@ public class StateVars {
 
 
     private static ImmutableList<JTerm> buildParamVars(Services services, String postfix,
-                                                       IProgramMethod pm) {
+            IProgramMethod pm) {
         final TermBuilder tb = services.getTermBuilder();
         ImmutableList<JTerm> paramVars = tb.var(tb.paramVars(postfix, pm, true));
         register(ops(paramVars, ProgramVariable.class), services);
@@ -328,7 +328,7 @@ public class StateVars {
 
 
     private static JTerm buildHeapFunc(String postfix, ImmutableArray<TermLabel> labels,
-                                       Services services) {
+            Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
         if ("".equals(postfix)) {

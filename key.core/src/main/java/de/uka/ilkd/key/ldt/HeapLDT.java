@@ -465,8 +465,9 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left, JTerm right,
-                                 Services services, ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left,
+            JTerm right,
+            Services services, ExecutionContext ec) {
         return false;
     }
 

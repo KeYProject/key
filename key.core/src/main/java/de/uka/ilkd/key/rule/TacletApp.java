@@ -104,7 +104,7 @@ public abstract class TacletApp implements RuleApp {
      * @return set of the bound variables
      */
     protected static ImmutableSet<JQuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-                                                                              SVInstantiations instantiations) {
+            SVInstantiations instantiations) {
         return collectPrefixInstantiations(prefix, instantiations);
     }
 
@@ -117,7 +117,7 @@ public abstract class TacletApp implements RuleApp {
      * @return set of the bound variables
      */
     protected static ImmutableSet<JQuantifiableVariable> boundAtOccurrenceSet(TacletPrefix prefix,
-                                                                              SVInstantiations instantiations, PosInOccurrence pos) {
+            SVInstantiations instantiations, PosInOccurrence pos) {
 
         ImmutableSet<JQuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
@@ -137,7 +137,7 @@ public abstract class TacletApp implements RuleApp {
      *         SchemaVariable appearing in the TacletPrefix
      */
     private static ImmutableSet<JQuantifiableVariable> collectPrefixInstantiations(TacletPrefix pre,
-                                                                                   SVInstantiations instantiations) {
+            SVInstantiations instantiations) {
 
         ImmutableSet<JQuantifiableVariable> instanceSet = DefaultImmutableSet.nil();
 
@@ -243,7 +243,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
     private static JTerm getTermBelowQuantifier(org.key_project.prover.rules.Taclet taclet,
-                                                SchemaVariable varSV) {
+            SchemaVariable varSV) {
         for (SequentFormula sequentFormula : taclet.assumesSequent()) {
             JTerm result = getTermBelowQuantifier(varSV, (JTerm) sequentFormula.formula());
             if (result != null) {
@@ -267,8 +267,9 @@ public abstract class TacletApp implements RuleApp {
      *        SchemaVariables
      * @return true iff the instantiation of a Bound Schemavariable contains the given Logicvariable
      */
-    private static boolean contains(ImmutableArray<JQuantifiableVariable> boundVars, LogicVariable x,
-                                    SVInstantiations insts) {
+    private static boolean contains(ImmutableArray<JQuantifiableVariable> boundVars,
+            LogicVariable x,
+            SVInstantiations insts) {
         for (int i = 0; i < boundVars.size(); i++) {
             JTerm instance = (JTerm) insts.getInstantiation((SchemaVariable) boundVars.get(i));
             if (instance.op() == x) {
@@ -417,7 +418,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the new TacletApp
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv, JTerm term, Services services,
-                                             boolean interesting) {
+            boolean interesting) {
         if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
             throw new IllegalInstantiationException("Could not add " + "the instantiation of " + sv
                 + " because " + term + " is no variable.");
@@ -715,7 +716,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the new TacletApp
      */
     public abstract TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
-                                               Services services);
+            Services services);
 
     /**
      * adds a new instantiation to this TacletApp. This method does not check (beside some very

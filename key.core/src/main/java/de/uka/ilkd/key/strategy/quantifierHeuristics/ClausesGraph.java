@@ -8,8 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 import org.key_project.logic.Term;

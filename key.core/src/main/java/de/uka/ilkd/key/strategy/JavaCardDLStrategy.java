@@ -1452,7 +1452,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
             @Override
             public JTerm toTerm(RuleApp app, PosInOccurrence pos,
-                                Goal goal, MutableState mState) {
+                    Goal goal, MutableState mState) {
                 return tOne;
             }
         };
@@ -1469,7 +1469,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
             @Override
             public JTerm toTerm(RuleApp app, PosInOccurrence pos,
-                                Goal goal, MutableState mState) {
+                    Goal goal, MutableState mState) {
                 return tTwo;
             }
         };

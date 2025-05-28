@@ -140,7 +140,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * @param varfuncName the String with the symbols name
      */
     protected JOperator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
-                                        Sort sort) {
+            Sort sort) {
         Name name = new Name(varfuncName);
         JOperator[] operators =
             { (JOperatorSV) schemaVariables().lookup(name), variables().lookup(name),

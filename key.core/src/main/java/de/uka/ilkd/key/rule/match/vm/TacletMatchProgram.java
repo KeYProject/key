@@ -10,11 +10,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.JOperator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -157,7 +157,7 @@ public class TacletMatchProgram {
      * @return {@code null} if no match was found or the match result
      */
     public MatchConditions match(JTerm p_toMatch, MatchConditions p_matchCond,
-                                 LogicServices services) {
+            LogicServices services) {
 
         MatchConditions mc = p_matchCond;
 

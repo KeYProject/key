@@ -118,7 +118,8 @@ public class QueryExpand implements BuiltInRule {
      * @author Richard Bubel
      * @author gladisch
      */
-    public Pair<JTerm, JTerm> queryEvalTerm(Services services, JTerm query, LogicVariable[] instVars) {
+    public Pair<JTerm, JTerm> queryEvalTerm(Services services, JTerm query,
+            LogicVariable[] instVars) {
 
         final IProgramMethod method = (IProgramMethod) query.op();
 
@@ -207,7 +208,8 @@ public class QueryExpand implements BuiltInRule {
         final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));
 
         // Not sure if box or diamond should be used.
-        final JTerm methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result), placeHolderResultTrm)));
+        final JTerm methodCall =
+            tb.dia(jb, tb.not(tb.equals(tb.var(result), placeHolderResultTrm)));
 
         JTerm update =
             tb.elementary(services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
@@ -270,7 +272,7 @@ public class QueryExpand implements BuiltInRule {
      * @author gladisch
      */
     public JTerm evaluateQueries(Services services, JTerm term, boolean positiveContext,
-                                 boolean allowExpandBelowInstQuantifier) {
+            boolean allowExpandBelowInstQuantifier) {
         final int depth = term.depth();
         List<QueryEvalPos> qeps = new ArrayList<>();
         int[] path = new int[depth];
@@ -330,8 +332,8 @@ public class QueryExpand implements BuiltInRule {
      */
     @SuppressWarnings("unchecked")
     private void findQueriesAndEvaluationPositions(JTerm t, int level, int[] pathInTerm,
-                                                   ImmutableList<JQuantifiableVariable> instVars, boolean curPosIsPositive, int qepLevel,
-                                                   boolean qepIsPositive, List<QueryEvalPos> qeps) {
+            ImmutableList<JQuantifiableVariable> instVars, boolean curPosIsPositive, int qepLevel,
+            boolean qepIsPositive, List<QueryEvalPos> qeps) {
         if (t == null) {
             return;
         }
@@ -478,7 +480,7 @@ public class QueryExpand implements BuiltInRule {
         public final LogicVariable[] instVars;
 
         public QueryEvalPos(JTerm query, int[] path, ImmutableList<JQuantifiableVariable> iVars,
-                            boolean isPositive) {
+                boolean isPositive) {
             this.query = query;
             pathInTerm = path;
             positivePosition = isPositive;
@@ -635,7 +637,8 @@ public class QueryExpand implements BuiltInRule {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
                     var focus = it.getSubTerm();
-                    if (focus.op() instanceof UpdateApplication || focus.op() instanceof JModality) {
+                    if (focus.op() instanceof UpdateApplication
+                            || focus.op() instanceof JModality) {
                         return false;
                     }
                 }

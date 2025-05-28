@@ -10,12 +10,12 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
@@ -77,7 +77,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-                              VisibilityModifier visibility, JTerm inv, LocationVariable selfVar) {
+            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar) {
         this(name, displayName, kjt, visibility, inv, selfVar, false);
     }
 
@@ -93,8 +93,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param free whether this contract is free.
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-                              VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
-                              boolean free) {
+            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
+            boolean free) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
         assert kjt != null;
@@ -117,7 +117,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // -------------------------------------------------------------------------
 
     private Map<JOperator, JOperator> getReplaceMap(JAbstractSortedOperator selfVar,
-                                                    TermServices services) {
+            TermServices services) {
         Map<JOperator, JOperator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {

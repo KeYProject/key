@@ -73,7 +73,7 @@ public final class InfFlowMethodContractTacletBuilder
 
     @Override
     JTerm buildContractApplications(ProofObligationVars contAppData,
-                                    ProofObligationVars contAppData2, Services services) {
+            ProofObligationVars contAppData2, Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
             getInformFlowContracts(methodContract.getTarget(), services);
         ImmutableList<JTerm> contractsApplications = ImmutableSLList.nil();

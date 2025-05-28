@@ -166,7 +166,7 @@ public class TestTermLabelManager {
     }
 
     protected void compareTerms(JTerm expected, JTerm current, boolean changed,
-                                RefactoringScope scope) {
+            RefactoringScope scope) {
         assertEquals(expected.arity(), current.arity());
         for (int i = 0; i < expected.arity(); i++) {
             compareTerms(expected.sub(i), current.sub(i), changed, scope);
@@ -728,17 +728,17 @@ public class TestTermLabelManager {
 
         @Override
         public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                                                       PosInOccurrence applicationPosInOccurrence,
-                                                       JTerm applicationTerm, Rule rule,
-                                                       Goal goal, Object hint, JTerm tacletTerm) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule,
+                Goal goal, Object hint, JTerm tacletTerm) {
             return scope;
         }
 
         @Override
         public void refactorLabels(TermLabelState state, Services services,
-                                   PosInOccurrence applicationPosInOccurrence,
-                                   JTerm applicationTerm, Rule rule,
-                                   Goal goal, Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule,
+                Goal goal, Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
             boolean changed = labels.isModified();
             for (TermLabel label : labels.getLabels()) {
@@ -773,11 +773,11 @@ public class TestTermLabelManager {
 
         @Override
         public void updateLabels(TermLabelState state, Services services,
-                                 PosInOccurrence applicationPosInOccurrence,
-                                 JTerm applicationTerm, JTerm modalityTerm,
-                                 org.key_project.prover.rules.Rule rule,
-                                 RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
-                                 Set<TermLabel> labels) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, JTerm modalityTerm,
+                org.key_project.prover.rules.Rule rule,
+                RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
+                Set<TermLabel> labels) {
             labels.add(toAdd);
         }
     }
@@ -800,17 +800,17 @@ public class TestTermLabelManager {
 
         @Override
         public boolean isRuleApplicationSupported(TermServices services,
-                                                  PosInOccurrence applicationPosInOccurrence,
-                                                  JTerm applicationTerm, Rule rule,
-                                                  Goal goal, Object hint, JTerm tacletTerm, JTerm newTerm) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule,
+                Goal goal, Object hint, JTerm tacletTerm, JTerm newTerm) {
             return true;
         }
 
         @Override
         public boolean addLabel(TermServices services,
-                                PosInOccurrence applicationPosInOccurrence,
-                                JTerm applicationTerm, Rule rule, Goal goal, Object hint, JTerm tacletTerm,
-                                JTerm newTerm, JTerm childTerm, TermLabel label) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+                JTerm newTerm, JTerm childTerm, TermLabel label) {
             log.add(label);
             return true;
         }
@@ -825,10 +825,10 @@ public class TestTermLabelManager {
 
         @Override
         public TermLabel keepLabel(TermLabelState state, Services services,
-                                   PosInOccurrence applicationPosInOccurrence,
-                                   JTerm applicationTerm, Rule rule,
-                                   Goal goal, Object hint, JTerm tacletTerm,
-                                   JTerm newTerm, TermLabel label) {
+                PosInOccurrence applicationPosInOccurrence,
+                JTerm applicationTerm, Rule rule,
+                Goal goal, Object hint, JTerm tacletTerm,
+                JTerm newTerm, TermLabel label) {
             log.add(label);
             return label;
         }

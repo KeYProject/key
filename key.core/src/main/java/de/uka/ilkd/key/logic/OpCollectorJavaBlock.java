@@ -5,8 +5,8 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 
 /**
  * Extended {@link OpCollector} that also descends into Java blocks

@@ -381,7 +381,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private TacletGoalTemplate createGoalDtConstructor(KeYParser.Datatype_constructorContext it,
-                                                       VariableSV qvar, JTerm var, Sort sort) {
+            VariableSV qvar, JTerm var, Sort sort) {
         var constr = createQuantifiedFormula(it, qvar, var, sort);
         var goal = new TacletGoalTemplate(
             JavaDLSequentKit
@@ -422,7 +422,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private JTerm createQuantifiedFormula(KeYParser.Datatype_constructorContext context,
-                                          JQuantifiableVariable qvX, JTerm phi, Sort dt) {
+            JQuantifiableVariable qvX, JTerm phi, Sort dt) {
         var tb = services.getTermBuilder();
         var fn = functions().lookup(context.name.getText());
         if (context.argName.isEmpty())
@@ -960,8 +960,8 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     protected JOperatorSV declareSchemaVariable(ParserRuleContext ctx, String name, Sort s,
-                                                boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
-                                                SchemaVariableModifierSet mods) {
+            boolean makeVariableSV, boolean makeSkolemTermSV, boolean makeTermLabelSV,
+            SchemaVariableModifierSet mods) {
         JOperatorSV v;
         if (s == JavaDLTheory.FORMULA && !makeSkolemTermSV) {
             v = SchemaVariableFactory.createFormulaSV(new Name(name), mods.rigid());

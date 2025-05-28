@@ -198,7 +198,7 @@ public abstract class LDT implements Named {
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
     public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left,
-                                          JTerm right, Services services, ExecutionContext ec);
+            JTerm right, Services services, ExecutionContext ec);
 
 
     /**

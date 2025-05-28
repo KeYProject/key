@@ -15,8 +15,8 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -121,10 +121,13 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     public InformationFlowContractImpl(String baseName, KeYJavaType forClass, IProgramMethod pm,
-                                       KeYJavaType specifiedIn, JModality.JavaModalityKind modalityKind, JTerm pre, JTerm freePre,
-                                       JTerm mby, JTerm modifiable,
-                                       boolean hasRealModifiable, JTerm self, ImmutableList<JTerm> params, JTerm result, JTerm exc,
-                                       JTerm heapAtPre, JTerm dep, ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
+            KeYJavaType specifiedIn, JModality.JavaModalityKind modalityKind, JTerm pre,
+            JTerm freePre,
+            JTerm mby, JTerm modifiable,
+            boolean hasRealModifiable, JTerm self, ImmutableList<JTerm> params, JTerm result,
+            JTerm exc,
+            JTerm heapAtPre, JTerm dep, ImmutableList<InfFlowSpec> infFlowSpecs,
+            boolean toBeSaved) {
         this(baseName, null, forClass, pm, specifiedIn, modalityKind, pre, freePre, mby, modifiable,
             hasRealModifiable, self, params, result, exc, heapAtPre, dep, infFlowSpecs, toBeSaved,
             INVALID_ID);
@@ -554,7 +557,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                               ImmutableList<JTerm> paramTerms, Services services) {
+            ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs (yet?)
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -572,8 +575,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     @Deprecated
     public JTerm getPre(LocationVariable heap, LocationVariable selfVar,
-                        ImmutableList<LocationVariable> paramVars,
-                        Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -581,8 +584,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     @Deprecated
     public JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
-                        ImmutableList<LocationVariable> paramVars,
-                        Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
 
@@ -591,7 +594,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     @Deprecated
     public JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                        ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
 
@@ -600,8 +604,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     @Deprecated
     public JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
-                        JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
-                        Services services) {
+            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
 
@@ -610,7 +614,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     @Deprecated
     public JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                        Services services) {
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -619,7 +623,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     @Deprecated
     public JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
-                        ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -634,15 +639,16 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
-                        ImmutableList<LocationVariable> paramVars,
-                        Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         return null;
     }
 
 
     @Override
     public JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
-                        ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         return null;
     }
 

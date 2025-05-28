@@ -44,7 +44,7 @@ public final class RealLDT extends LDT {
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right,
-                                 Services services, ExecutionContext ec) {
+            Services services, ExecutionContext ec) {
         return false;
     }
 

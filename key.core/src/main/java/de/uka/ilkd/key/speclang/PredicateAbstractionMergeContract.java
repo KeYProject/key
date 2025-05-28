@@ -36,8 +36,8 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private final List<AbstractionPredicate> abstractionPredicates;
 
     public PredicateAbstractionMergeContract(MergePointStatement mps,
-                                             Map<LocationVariable, JTerm> atPres, KeYJavaType kjt, String latticeType,
-                                             List<AbstractionPredicate> abstractionPredicates) {
+            Map<LocationVariable, JTerm> atPres, KeYJavaType kjt, String latticeType,
+            List<AbstractionPredicate> abstractionPredicates) {
         this.mps = mps;
         this.atPres = atPres;
         this.kjt = kjt;
@@ -128,7 +128,8 @@ public class PredicateAbstractionMergeContract implements MergeContract {
      * @param services
      * @return
      */
-    private Map<JTerm, JTerm> getReplaceMap(Map<LocationVariable, JTerm> atPres, Services services) {
+    private Map<JTerm, JTerm> getReplaceMap(Map<LocationVariable, JTerm> atPres,
+            Services services) {
         final Map<JTerm, JTerm> result = new LinkedHashMap<>();
 
         if (atPres != null) {

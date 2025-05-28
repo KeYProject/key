@@ -38,21 +38,22 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm[] subs, Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm[] subs, Services services,
+            ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
-                                 ExecutionContext ec) {
+            ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm sub, TermServices services,
-                                 ExecutionContext ec) {
+            ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }

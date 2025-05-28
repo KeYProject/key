@@ -38,8 +38,8 @@ public class ProspectivePartner {
      * @param update2 The second symbolic state.
      */
     public ProspectivePartner(JTerm commonFormula, Node node1,
-                              SequentFormula formula1, JTerm update1,
-                              Node node2, SequentFormula formula2, JTerm update2) {
+            SequentFormula formula1, JTerm update1,
+            Node node2, SequentFormula formula2, JTerm update2) {
         super();
         this.commonFormula = commonFormula;
         formula[0] = formula1;

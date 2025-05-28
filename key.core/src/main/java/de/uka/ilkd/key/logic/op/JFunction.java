@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 

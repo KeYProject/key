@@ -462,9 +462,9 @@ public class MergeRule implements BuiltInRule {
      * @return A merged heap term.
      */
     protected ValuesMergeResult mergeHeaps(final MergeProcedure mergeRule,
-                                           final LocationVariable heapVar, final JTerm heap1, final JTerm heap2,
-                                           final SymbolicExecutionState state1, final SymbolicExecutionState state2,
-                                           JTerm distinguishingFormula, final Services services) {
+            final LocationVariable heapVar, final JTerm heap1, final JTerm heap2,
+            final SymbolicExecutionState state1, final SymbolicExecutionState state2,
+            JTerm distinguishingFormula, final Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<JTerm> newConstraints = DefaultImmutableSet.nil();
@@ -719,7 +719,8 @@ public class MergeRule implements BuiltInRule {
      * @param newSymbolicState the new state
      * @param newIntroducedNames newly introduced names
      * @param sideConditionsToProve side condition required for merging
-     * @see #mergeStates(MergeProcedure, SymbolicExecutionState, SymbolicExecutionState, JTerm, JTerm,
+     * @see #mergeStates(MergeProcedure, SymbolicExecutionState, SymbolicExecutionState, JTerm,
+     *      JTerm,
      *      Services)
      */
     public record MergeStateEntry(SymbolicExecutionState newSymbolicState,

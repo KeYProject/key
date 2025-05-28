@@ -34,7 +34,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      * @param pvs the set of schema variables
      */
     public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-                                     JTerm replacewith, ImmutableSet<SchemaVariable> pvs) {
+            JTerm replacewith, ImmutableSet<SchemaVariable> pvs) {
         super(addedSeq, addedRules, pvs);
         TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith term");
         this.replacewith = replacewith;

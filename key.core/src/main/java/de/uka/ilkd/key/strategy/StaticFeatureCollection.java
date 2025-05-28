@@ -337,19 +337,19 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static ProjectionToTerm<Goal> opTerm(JOperator op,
-                                                   ProjectionToTerm<Goal>[] subTerms) {
+            ProjectionToTerm<Goal>[] subTerms) {
         return TermConstructionProjection.create(op, subTerms);
     }
 
     protected static ProjectionToTerm<Goal> opTerm(JOperator op,
-                                                   ProjectionToTerm<Goal> subTerm) {
+            ProjectionToTerm<Goal> subTerm) {
         // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
     protected static ProjectionToTerm<Goal> opTerm(JOperator op,
-                                                   ProjectionToTerm<Goal> subTerm0,
-                                                   ProjectionToTerm<Goal> subTerm1) {
+            ProjectionToTerm<Goal> subTerm0,
+            ProjectionToTerm<Goal> subTerm1) {
         // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }

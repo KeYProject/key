@@ -11,8 +11,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.Junctor;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -47,7 +47,7 @@ public class PredictCostProver {
     }
 
     public static long computerInstanceCost(Substitution sub, JTerm matrix,
-                                            ImmutableSet<JTerm> assertList, Services services) {
+            ImmutableSet<JTerm> assertList, Services services) {
 
         if (!sub.isGround()) {
             // non-ground substitutions not supported yet
@@ -63,7 +63,8 @@ public class PredictCostProver {
     private void initClauses(JTerm instance) {
 
         for (var t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
-            for (ImmutableSet<JTerm> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR))) {
+            for (ImmutableSet<JTerm> lit : createClause(
+                TriggerUtils.setByOperator(t, Junctor.OR))) {
                 clauses.add(new Clause(lit));
             }
         }

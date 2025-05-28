@@ -13,8 +13,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -305,8 +305,9 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                 for (Entry<JTerm, List<Node>> entry : valueNodeMap.entrySet()) {
                                     List<JTerm> conditions = new LinkedList<>();
                                     for (Node node : entry.getValue()) {
-                                        JTerm condition = SymbolicExecutionUtil.computePathCondition(
-                                            node, getSettings().simplifyConditions(), false);
+                                        JTerm condition =
+                                            SymbolicExecutionUtil.computePathCondition(
+                                                node, getSettings().simplifyConditions(), false);
                                         conditions.add(condition);
                                     }
                                     JTerm condition = services.getTermBuilder().or(conditions);

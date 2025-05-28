@@ -70,8 +70,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      */
     @Override
     public MatchConditions match(JOperator instantiationCandidate,
-                                 MatchConditions matchConditions,
-                                 LogicServices services) {
+            MatchConditions matchConditions,
+            LogicServices services) {
         if (instantiationCandidate instanceof ProgramElement) {
             return match((ProgramElement) instantiationCandidate, matchConditions, services);
         }
@@ -83,8 +83,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      */
     @Override
     public MatchConditions match(JTerm instantiationCandidate,
-                                 MatchConditions matchCond,
-                                 LogicServices services) {
+            MatchConditions matchCond,
+            LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate)) {

@@ -76,7 +76,7 @@ public final class InfFlowBlockContractTacletBuilder
 
     @Override
     JTerm buildContractApplications(ProofObligationVars contAppData,
-                                    ProofObligationVars contAppData2, Services services) {
+            ProofObligationVars contAppData2, Services services) {
         ImmutableSet<BlockContract> ifContracts =
             services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
         ifContracts = filterContracts(ifContracts);

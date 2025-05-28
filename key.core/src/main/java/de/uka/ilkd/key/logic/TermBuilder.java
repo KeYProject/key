@@ -458,7 +458,7 @@ public class TermBuilder {
     }
 
     public JTerm prog(JModality.JavaModalityKind modKind, JavaBlock jb, JTerm t,
-                      ImmutableArray<TermLabel> labels) {
+            ImmutableArray<TermLabel> labels) {
         return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, labels);
     }
 
@@ -486,7 +486,8 @@ public class TermBuilder {
     /**
      * Construct a term with the \ifEx operator.
      */
-    public JTerm ifEx(ImmutableList<JQuantifiableVariable> qvs, JTerm cond, JTerm _then, JTerm _else) {
+    public JTerm ifEx(ImmutableList<JQuantifiableVariable> qvs, JTerm cond, JTerm _then,
+            JTerm _else) {
         if (qvs.isEmpty()) {
             throw new TermCreationException("no quantifiable variables in ifEx term");
         }
@@ -582,7 +583,7 @@ public class TermBuilder {
      * General (unbounded) product
      */
     public JTerm prod(ImmutableList<LogicVariable> qvs, JTerm range, JTerm t,
-                      TermServices services) {
+            TermServices services) {
         final Function prod = services.getNamespaces().functions().lookup("prod");
         final Iterator<LogicVariable> it = qvs.iterator();
         JTerm res = func(prod, new JTerm[] { convertToBoolean(range), t },
@@ -598,7 +599,7 @@ public class TermBuilder {
      * minimum operator
      */
     public JTerm min(ImmutableList<? extends JQuantifiableVariable> qvs, JTerm range, JTerm t,
-                     TermServices services) {
+            TermServices services) {
         final Function min = services.getNamespaces().functions().lookup("min");
         final Iterator<? extends JQuantifiableVariable> it = qvs.iterator();
         JTerm res = func(min, new JTerm[] { convertToBoolean(range), t },
@@ -614,7 +615,7 @@ public class TermBuilder {
      * minimum operator
      */
     public JTerm max(ImmutableList<? extends JQuantifiableVariable> qvs, JTerm range, JTerm t,
-                     TermServices services) {
+            TermServices services) {
         final Function max = services.getNamespaces().functions().lookup("max");
         final Iterator<? extends JQuantifiableVariable> it = qvs.iterator();
         JTerm res = func(max, new JTerm[] { convertToBoolean(range), t },
@@ -803,7 +804,8 @@ public class TermBuilder {
      * @param substTerm the Term that replaces substVar
      * @param origTerm the Term that is substituted
      */
-    public JTerm subst(SubstOp op, JQuantifiableVariable substVar, JTerm substTerm, JTerm origTerm) {
+    public JTerm subst(SubstOp op, JQuantifiableVariable substVar, JTerm substTerm,
+            JTerm origTerm) {
         return tf.createTerm(op, new ImmutableArray<>(substTerm, origTerm),
             new ImmutableArray<>(substVar), null);
     }
@@ -1103,7 +1105,7 @@ public class TermBuilder {
     }
 
     public JTerm applyParallel(ImmutableList<JTerm> updates, JTerm target,
-                               ImmutableArray<TermLabel> labels) {
+            ImmutableArray<TermLabel> labels) {
         return apply(parallel(updates), target, labels);
     }
 

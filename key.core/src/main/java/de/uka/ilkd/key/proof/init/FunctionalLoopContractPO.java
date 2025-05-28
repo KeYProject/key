@@ -13,9 +13,9 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
@@ -290,9 +290,9 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @return the preconditions.
      */
     private JTerm[] createAssumptions(final ProgramVariable selfVar,
-                                      final List<LocationVariable> heaps, final JTerm wellFormedHeapsCondition,
-                                      final Services services,
-                                      final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
+            final List<LocationVariable> heaps, final JTerm wellFormedHeapsCondition,
+            final Services services,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final IProgramMethod pm = getProgramMethod();
         final StatementBlock block = getBlock();
         final ImmutableSet<LocationVariable> localInVariables =
@@ -364,8 +364,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @return a goal configurator.
      */
     private GoalsConfigurator createGoalConfigurator(final ProgramVariable selfVar,
-                                                     final JTerm selfTerm, final BlockContract.Variables variables, final Services services,
-                                                     final TermBuilder tb) {
+            final JTerm selfTerm, final BlockContract.Variables variables, final Services services,
+            final TermBuilder tb) {
         final TermLabelState termLabelState = new TermLabelState();
         final KeYJavaType kjt = getCalleeKeYJavaType();
         final TypeRef ref = new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt);
@@ -402,14 +402,15 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @return the validity formula for the contract.
      */
     private JTerm setUpValidityGoal(final JTerm selfTerm, final List<LocationVariable> heaps,
-                                    final Map<LocationVariable, Function> anonOutHeaps,
-                                    final BlockContract.Variables variables, final LoopContract.Variables nextVariables,
-                                    final Map<LocationVariable, JTerm> modifiableClauses,
-                                    final Map<LocationVariable, JTerm> freeModifiableClauses, final JTerm[] assumptions,
-                                    final JTerm decreasesCheck, final JTerm[] postconditions, final JTerm[] postconditionsNext,
-                                    final JTerm wellFormedHeapsCondition, final GoalsConfigurator configurator,
-                                    final ConditionsAndClausesBuilder conditionsAndClausesBuilder, final Services services,
-                                    final TermBuilder tb) {
+            final Map<LocationVariable, Function> anonOutHeaps,
+            final BlockContract.Variables variables, final LoopContract.Variables nextVariables,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final Map<LocationVariable, JTerm> freeModifiableClauses, final JTerm[] assumptions,
+            final JTerm decreasesCheck, final JTerm[] postconditions,
+            final JTerm[] postconditionsNext,
+            final JTerm wellFormedHeapsCondition, final GoalsConfigurator configurator,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder, final Services services,
+            final TermBuilder tb) {
         final LocationVariable exceptionParameter = KeYJavaASTFactory.localVariable(
             services.getVariableNamer().getTemporaryNameProposal("e"),
             variables.exception.getKeYJavaType());

@@ -48,16 +48,18 @@ public interface TermLabelPolicy {
      * @param goal The optional {@link Goal} on which the {@link JTerm} to create will be used.
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in rules.
+     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
+     *        instantiate
+     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
+     *        rules.
      * @param newTerm the template for the new {@link JTerm} to create
      * @param label The {@link TermLabel} to decide if it should be kept or dropped.
      * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
     TermLabel keepLabel(TermLabelState state, Services services,
-                        PosInOccurrence applicationPosInOccurrence,
-                        JTerm applicationTerm, Rule rule, Goal goal,
-                        Object hint, JTerm tacletTerm,
-                        JTerm newTerm, TermLabel label);
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, JTerm tacletTerm,
+            JTerm newTerm, TermLabel label);
 }

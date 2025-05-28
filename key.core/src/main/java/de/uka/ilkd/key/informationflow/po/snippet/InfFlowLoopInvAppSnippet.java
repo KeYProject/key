@@ -12,7 +12,7 @@ public class InfFlowLoopInvAppSnippet extends ReplaceAndRegisterMethod
 
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars1,
-                         ProofObligationVars poVars2) throws UnsupportedOperationException {
+            ProofObligationVars poVars2) throws UnsupportedOperationException {
         BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, poVars2);
 

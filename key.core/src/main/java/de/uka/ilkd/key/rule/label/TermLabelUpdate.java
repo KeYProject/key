@@ -53,15 +53,17 @@ public interface TermLabelUpdate extends RuleSpecificTask {
      * @param ruleApp The {@link RuleApp} which is currently performed.
      * @param hint An optional hint passed from the active rule to describe the term which should be
      *        created.
-     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to instantiate
-     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in rules.
+     * @param tacletTerm The optional {@link JTerm} in the taclet which is responsible to
+     *        instantiate
+     *        the new {@link JTerm} for the new proof node or {@code null} in case of built in
+     *        rules.
      * @param newTerm the template for the new {@link JTerm} to create
      * @param labels The {@link Set} of {@link TermLabel}s to modify.
      */
     void updateLabels(TermLabelState state, Services services,
-                      PosInOccurrence applicationPosInOccurrence,
-                      JTerm applicationTerm, JTerm modalityTerm,
-                      Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm,
-                      JTerm newTerm,
-                      Set<TermLabel> labels);
+            PosInOccurrence applicationPosInOccurrence,
+            JTerm applicationTerm, JTerm modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm,
+            JTerm newTerm,
+            Set<TermLabel> labels);
 }

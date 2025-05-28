@@ -74,7 +74,8 @@ public abstract class Instruction<OP extends Operator>
         return new BindVariablesInstruction(boundVars);
     }
 
-    public static MatchInstruction unbindVariables(ImmutableArray<JQuantifiableVariable> boundVars) {
+    public static MatchInstruction unbindVariables(
+            ImmutableArray<JQuantifiableVariable> boundVars) {
         return new UnbindVariablesInstruction();
     }
 
@@ -100,5 +101,5 @@ public abstract class Instruction<OP extends Operator>
      *         the pair {@code (sv, instantiationCandidate)} added
      */
     public abstract MatchConditions match(JTerm instantiationCandidate, MatchConditions matchCond,
-                                          LogicServices services);
+            LogicServices services);
 }

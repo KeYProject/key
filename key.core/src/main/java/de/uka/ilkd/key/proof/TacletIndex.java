@@ -7,8 +7,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.*;

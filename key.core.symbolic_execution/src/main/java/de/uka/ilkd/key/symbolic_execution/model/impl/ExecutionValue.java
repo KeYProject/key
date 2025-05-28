@@ -74,8 +74,8 @@ public class ExecutionValue extends AbstractExecutionValue {
      *        human-readable {@link String}
      */
     public ExecutionValue(Node proofNode, ExecutionVariable variable, boolean valueUnknown,
-                          JTerm value, String valueString, String typeString, JTerm condition,
-                          String conditionString) {
+            JTerm value, String valueString, String typeString, JTerm condition,
+            String conditionString) {
         super(variable.getSettings(), proofNode, variable, condition, value);
         this.valueUnknown = valueUnknown;
         this.valueString = valueString;
@@ -158,7 +158,8 @@ public class ExecutionValue extends AbstractExecutionValue {
                                                             .formatTerm(lengthValue.getValue(),
                                                                 services, false, true));
                                             for (int i = 0; i < length; i++) {
-                                                JTerm indexTerm = services.getTermBuilder().zTerm(i);
+                                                JTerm indexTerm =
+                                                    services.getTermBuilder().zTerm(i);
                                                 ExecutionVariable childI = new ExecutionVariable(
                                                     getVariable().getParentNode(),
                                                     getVariable().getProofNode(),

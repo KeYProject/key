@@ -6,8 +6,8 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
@@ -170,7 +170,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, JTerm term, boolean interesting,
-                                      Services services) {
+            Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(),
                 instantiations().addInteresting(sv, term, services), assumesFormulaInstantiations(),

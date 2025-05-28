@@ -171,7 +171,7 @@ public interface Constraint {
 
         @Override
         public Constraint unify(JTerm t1, JTerm t2, Services services,
-                                BooleanContainer unchanged) {
+                BooleanContainer unchanged) {
             unchanged.setVal(true);
             return this;
         }

@@ -40,7 +40,7 @@ public class PermissionLDT extends LDT {
     }
 
     public boolean isResponsible(Operator op, JTerm left, JTerm right,
-                                 Services services, ExecutionContext ec) {
+            Services services, ExecutionContext ec) {
         return false;
     }
 

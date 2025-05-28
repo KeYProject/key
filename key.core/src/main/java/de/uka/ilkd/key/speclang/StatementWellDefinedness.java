@@ -41,8 +41,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                             LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-                             JTerm accessible, Condition ensures, JTerm mby, JTerm rep, TermBuilder tb) {
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
     }
@@ -96,7 +96,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @return the actual terms used in the well-definedness sequent
      */
     final SequentTerms createSeqTerms(POTerms po, Variables vars, JTerm leadingUpdate,
-                                      JTerm localAnon, Services services) {
+            JTerm localAnon, Services services) {
         final JTerm pre =
             getPre(po.pre(), vars.self, vars.heap, vars.params, services).term();
         final JTerm post = getPost(po.post(), vars.result, services);
@@ -124,11 +124,11 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @return The proof sequent for the well-definedness check
      */
     public SequentFormula generateSequent(LocationVariable self,
-                                          LocationVariable exception,
-                                          LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
-                                          JTerm anonHeap,
-                                          ImmutableSet<LocationVariable> ps, JTerm leadingUpdate, JTerm localAnonUpdate,
-                                          Services services) {
+            LocationVariable exception,
+            LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
+            JTerm anonHeap,
+            ImmutableSet<LocationVariable> ps, JTerm leadingUpdate, JTerm localAnonUpdate,
+            Services services) {
         final ImmutableList<LocationVariable> params = convertParams(ps);
         final Map<LocationVariable, LocationVariable> atPres =
             new LinkedHashMap<>();
@@ -157,8 +157,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @return The proof sequent for the well-definedness check
      */
     public SequentFormula generateSequent(LocationVariable self, LocationVariable heap,
-                                          JTerm anonHeap, ImmutableSet<LocationVariable> ps, JTerm leadingUpdate,
-                                          JTerm localAnonUpdate, Services services) {
+            JTerm anonHeap, ImmutableSet<LocationVariable> ps, JTerm leadingUpdate,
+            JTerm localAnonUpdate, Services services) {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,
             localAnonUpdate, services);
     }
@@ -205,7 +205,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final JTerm anonWdPost;
 
         private SequentTerms(JTerm context, JTerm pre, JTerm anonHeap, JTerm modifiable,
-                             ImmutableList<JTerm> rest, JTerm anonWdPost, TermServices services) {
+                ImmutableList<JTerm> rest, JTerm anonWdPost, TermServices services) {
             this.context = context;
             this.pre = pre;
             this.wfAnon = anonHeap != null ? TB.wellFormed(anonHeap) : TB.tt();

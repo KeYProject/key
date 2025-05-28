@@ -51,8 +51,8 @@ public class FinalFieldsPOExtension implements POExtension {
 
     @Override
     public JTerm modifyPostTerm(AbstractOperationPO abstractPO, InitConfig proofConfig,
-                                Services services, ProgramVariable selfVar,
-                                JTerm postTerm) {
+            Services services, ProgramVariable selfVar,
+            JTerm postTerm) {
 
         if (!FinalHeapResolution.isFinalEnabled(proofConfig)) {
             return postTerm;

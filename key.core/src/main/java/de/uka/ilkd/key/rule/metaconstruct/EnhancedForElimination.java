@@ -387,7 +387,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param services The {@link Services} object.
      */
     private void updateInvs(final Map<LocationVariable, JTerm> invs, final JTerm termToReplace,
-                            final ProgramVariable replaceWith, final Services services) {
+            final ProgramVariable replaceWith, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         invs.entrySet().stream().filter(entry -> entry.getValue() != null)
                 .map(entry -> new Pair<>(entry.getKey(),

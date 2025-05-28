@@ -65,8 +65,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
 
     @Override
     public ValuesMergeResult mergeValuesInStates(JTerm v, SymbolicExecutionState state1,
-                                                 JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
-                                                 JTerm distinguishingFormula, Services services) {
+            JTerm valueInState1, SymbolicExecutionState state2, JTerm valueInState2,
+            JTerm distinguishingFormula, Services services) {
 
         return new ValuesMergeResult(DefaultImmutableSet.nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
@@ -99,8 +99,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         are the path conditions of stateI.
      */
     public static JTerm createIfThenElseTerm(final SymbolicExecutionState state1,
-                                             final SymbolicExecutionState state2, final JTerm ifTerm, final JTerm elseTerm,
-                                             JTerm distinguishingFormula, final Services services) {
+            final SymbolicExecutionState state2, final JTerm ifTerm, final JTerm elseTerm,
+            JTerm distinguishingFormula, final Services services) {
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -276,6 +276,6 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *      JTerm, JTerm, Services)
      */
     public record DistanceFormRightSide(JTerm distinguishingFormula, JTerm ifTerm, JTerm elseTerm,
-                                        boolean sideCommuted) {
+            boolean sideCommuted) {
     }
 }

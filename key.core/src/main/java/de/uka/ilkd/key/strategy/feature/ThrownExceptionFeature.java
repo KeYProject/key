@@ -12,9 +12,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.rule.TacletApp;
 

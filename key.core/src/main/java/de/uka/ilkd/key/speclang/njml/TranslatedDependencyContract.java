@@ -12,5 +12,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
  * @author Alexander Weigl
  * @version 1 (23.04.24)
  */
-public record TranslatedDependencyContract(IObserverFunction observerFunction, JTerm rhs, JTerm mby) {
+public record TranslatedDependencyContract(IObserverFunction observerFunction, JTerm rhs,
+        JTerm mby) {
 }

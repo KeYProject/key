@@ -6,8 +6,8 @@ package de.uka.ilkd.key.taclettranslation;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;

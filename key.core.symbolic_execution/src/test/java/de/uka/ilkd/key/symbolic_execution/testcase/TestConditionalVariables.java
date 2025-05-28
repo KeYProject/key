@@ -77,8 +77,8 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
      * @throws ProofInputException Occurred Exception.
      */
     protected static void assertConditionalVariables(IExecutionVariable[] expected,
-                                                     IExecutionNode<?> node, JTerm condition, boolean compareParent, boolean compareChildren,
-                                                     boolean compareConstraints) throws ProofInputException {
+            IExecutionNode<?> node, JTerm condition, boolean compareParent, boolean compareChildren,
+            boolean compareConstraints) throws ProofInputException {
         IExecutionVariable[] current = node.getVariables(condition);
         assertVariables(expected, current, true, true, false);
         IExecutionVariable[] currentAgain = node.getVariables(condition);

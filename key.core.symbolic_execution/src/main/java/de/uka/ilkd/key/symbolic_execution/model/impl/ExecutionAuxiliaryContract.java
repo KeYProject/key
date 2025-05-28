@@ -165,8 +165,8 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      * @param remembranceLocalVariables The {@link Map} to fill.
      */
     protected void collectRemembranceVariables(JTerm term,
-                                               Map<LocationVariable, JTerm> remembranceHeaps,
-                                               Map<LocationVariable, JTerm> remembranceLocalVariables) {
+            Map<LocationVariable, JTerm> remembranceHeaps,
+            Map<LocationVariable, JTerm> remembranceLocalVariables) {
         if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (JTerm sub : term.subs()) {
                 collectRemembranceVariables(sub, remembranceHeaps, remembranceLocalVariables);

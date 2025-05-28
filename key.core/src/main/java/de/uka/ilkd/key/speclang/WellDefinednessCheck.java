@@ -84,8 +84,8 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     WellDefinednessCheck(String name, int id, Type type, IObserverFunction target,
-                         LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-                         JTerm accessible, Condition ensures, JTerm mby, JTerm represents, TermBuilder tb) {
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm represents, TermBuilder tb) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -184,18 +184,18 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private JTerm replaceSV(JTerm t, JOperatorSV selfVar, JOperatorSV resultVar,
-                            JOperatorSV excVar, Map<LocationVariable, JOperatorSV> atPreVars,
-                            ImmutableList<JOperatorSV> paramVars, OriginalVariables origVars,
-                            ImmutableList<LocationVariable> heaps) {
+            JOperatorSV excVar, Map<LocationVariable, JOperatorSV> atPreVars,
+            ImmutableList<JOperatorSV> paramVars, OriginalVariables origVars,
+            ImmutableList<LocationVariable> heaps) {
         var map = getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
     }
 
     private JTerm replace(JTerm t, LocationVariable selfVar, LocationVariable resultVar,
-                          LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
-                          ImmutableList<LocationVariable> paramVars, OriginalVariables origVars,
-                          ImmutableList<LocationVariable> heaps) {
+            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            ImmutableList<LocationVariable> paramVars, OriginalVariables origVars,
+            ImmutableList<LocationVariable> heaps) {
         Map<LocationVariable, LocationVariable> map =
             getReplaceMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
@@ -203,10 +203,10 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private static Map<LocationVariable, JOperatorSV> getSchemaMap(JOperatorSV selfVar,
-                                                                   JOperatorSV resultVar, JOperatorSV excVar,
-                                                                   Map<LocationVariable, JOperatorSV> atPreVars,
-                                                                   ImmutableList<JOperatorSV> paramVars, OriginalVariables vars,
-                                                                   ImmutableList<LocationVariable> heaps) {
+            JOperatorSV resultVar, JOperatorSV excVar,
+            Map<LocationVariable, JOperatorSV> atPreVars,
+            ImmutableList<JOperatorSV> paramVars, OriginalVariables vars,
+            ImmutableList<LocationVariable> heaps) {
         final Map<LocationVariable, JOperatorSV> result =
             new LinkedHashMap<>();
         // self
@@ -478,7 +478,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return specified precondition appended with free precondition
      */
     private JTerm appendFreePre(JTerm pre, ProgramVariable self, ProgramVariable heap,
-                                TermServices services) {
+            TermServices services) {
         final IObserverFunction target = getTarget();
         final KeYJavaType selfKJT = target.getContainerType();
         final JTerm notNull =
@@ -505,7 +505,8 @@ public abstract class WellDefinednessCheck implements Contract {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    private JTerm generateSelfCreated(JAbstractSortedOperator selfVar, JAbstractSortedOperator heap) {
+    private JTerm generateSelfCreated(JAbstractSortedOperator selfVar,
+            JAbstractSortedOperator heap) {
         if (selfVar == null || isConstructor()) {
             return TB.tt();
         } else {
@@ -565,8 +566,8 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return The {@link JTerm} containing the general assumptions.
      */
     private TermListAndFunc buildFreePre(JTerm implicitPre, LocationVariable self,
-                                         LocationVariable heap, ImmutableList<LocationVariable> params,
-                                         Services services) {
+            LocationVariable heap, ImmutableList<LocationVariable> params,
+            Services services) {
         ImmutableList<JTerm> resList = ImmutableSLList.nil();
 
         // "self != null"
@@ -620,8 +621,8 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return The {@link JTerm} containing the general assumptions.
      */
     private TermListAndFunc buildFreePreForTaclet(JTerm implicitPre, TermSV self,
-                                                  TermSV heap, ImmutableList<JOperatorSV> params,
-                                                  Services services) {
+            TermSV heap, ImmutableList<JOperatorSV> params,
+            Services services) {
         ImmutableList<JTerm> resList = ImmutableSLList.nil();
 
         // "self != null"
@@ -664,7 +665,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return conjoined taclet
      */
     static RewriteTaclet createTaclet(String name, JTerm find1, JTerm find2, JTerm goal1,
-                                      JTerm goal2, TermServices services) {
+            JTerm goal2, TermServices services) {
         assert find1.op().name().equals(TermBuilder.WD_ANY.name());
         assert find2.op().name().equals(TermBuilder.WD_ANY.name());
         assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
@@ -699,7 +700,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return created taclet
      */
     static RewriteTaclet createTaclet(String name, JTerm callee, JTerm callTerm, JTerm pre,
-                                      boolean isStatic, TermServices services) {
+            boolean isStatic, TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
         final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         final JTerm notNull = isStatic ? TB.tt() : TB.not(TB.equals(callee, TB.NULL()));
@@ -780,7 +781,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     final void combineModifiable(JTerm modifiables1, JTerm modifiables2,
-                                 TermServices services) {
+            TermServices services) {
         if (modifiables1 == null || TB.strictlyNothing().equalsModProperty(
             modifiables1, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             setModifiable(modifiables2, services);
@@ -1038,7 +1039,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return the full valid post-condition
      */
     public final JTerm getPost(final Condition post, ProgramVariable result,
-                               TermServices services) {
+            TermServices services) {
         final JTerm reachable;
         if (result != null) {
             reachable = TB.reachableValue(TB.var(result), origVars.result.getKeYJavaType());
@@ -1059,8 +1060,9 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return the applicable update term including an update for old-expressions and the
      *         anonymisation update
      */
-    public final JTerm getUpdates(JTerm modifiable, LocationVariable heap, ProgramVariable heapAtPre,
-                                  JTerm anonHeap, TermServices services) {
+    public final JTerm getUpdates(JTerm modifiable, LocationVariable heap,
+            ProgramVariable heapAtPre,
+            JTerm anonHeap, TermServices services) {
         assert modifiable != null;
         assert anonHeap != null
                 || TB.strictlyNothing().equalsModProperty(modifiable,
@@ -1262,8 +1264,8 @@ public abstract class WellDefinednessCheck implements Contract {
     @Override
     @Deprecated
     public final JTerm getPre(LocationVariable heap, LocationVariable selfVar,
-                              ImmutableList<LocationVariable> paramVars,
-                              Map<LocationVariable, LocationVariable> atPreVars, Services services)
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services)
             throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
@@ -1271,8 +1273,8 @@ public abstract class WellDefinednessCheck implements Contract {
     @Override
     @Deprecated
     public final JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
-                              ImmutableList<LocationVariable> paramVars,
-                              Map<LocationVariable, LocationVariable> atPreVars, Services services)
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services)
             throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
@@ -1280,7 +1282,7 @@ public abstract class WellDefinednessCheck implements Contract {
     @Override
     @Deprecated
     public final JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                              ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services)
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services)
             throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
@@ -1288,8 +1290,8 @@ public abstract class WellDefinednessCheck implements Contract {
     @Override
     @Deprecated
     public final JTerm getPre(List<LocationVariable> heapContext,
-                              Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm, ImmutableList<JTerm> paramTerms,
-                              Map<LocationVariable, JTerm> atPres, Services services)
+            Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm, ImmutableList<JTerm> paramTerms,
+            Map<LocationVariable, JTerm> atPres, Services services)
             throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
@@ -1297,36 +1299,37 @@ public abstract class WellDefinednessCheck implements Contract {
     @Override
     @Deprecated
     public final JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
-                              ImmutableList<LocationVariable> paramVars,
-                              Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Override
     @Deprecated
     public final JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
-                              ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services) {
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services) {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Override
     @Deprecated
     public final JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                                     ImmutableList<JTerm> paramTerms, Services services) {
+            ImmutableList<JTerm> paramTerms, Services services) {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Override
     @Deprecated
     public final JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-                              Services services) throws UnsupportedOperationException {
+            Services services) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
     @Override
     @Deprecated
     public final JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
-                              ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services)
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres, Services services)
             throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
@@ -1382,6 +1385,6 @@ public abstract class WellDefinednessCheck implements Contract {
      * @author Michael Kirsten
      */
     public record POTerms(Condition pre, JTerm modifiable, ImmutableList<JTerm> rest,
-                          Condition post) {
+            Condition post) {
     }
 }

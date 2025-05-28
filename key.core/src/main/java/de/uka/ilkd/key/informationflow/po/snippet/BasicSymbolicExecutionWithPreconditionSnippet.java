@@ -25,7 +25,8 @@ class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMe
         final JTerm pre;
 
         final JTerm freePre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
-        final JTerm contractPre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+        final JTerm contractPre =
+            symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
 
         JTerm freeReq = (JTerm) d.get(Key.FREE_PRECONDITION);
         if (freeReq != null) {

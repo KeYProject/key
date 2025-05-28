@@ -86,10 +86,10 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      * @return the preconditions.
      */
     private static JTerm[] createPreconditions(final JTerm selfTerm, final LoopContract contract,
-                                               final List<LocationVariable> heaps,
-                                               final ImmutableSet<LocationVariable> localInVariables,
-                                               final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-                                               final Services services) {
+            final List<LocationVariable> heaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
+            final Services services) {
         final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
         final JTerm wellFormedHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
@@ -160,8 +160,8 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      * @return the update for the validity branch.
      */
     private static JTerm createContext(final List<LocationVariable> heaps,
-                                       final UpdatesBuilder updatesBuilder, final Instantiation instantiation,
-                                       final Services services) {
+            final UpdatesBuilder updatesBuilder, final Instantiation instantiation,
+            final Services services) {
         return services.getTermBuilder().sequential(updatesBuilder.buildOuterRemembranceUpdate(),
             instantiation.update());
     }
@@ -175,9 +175,9 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      * @return preconditions for the usage branch.
      */
     private static JTerm[] createUsageAssumptions(final JTerm[] postconditions,
-                                                  final Map<LocationVariable, Function> anonOutHeaps,
-                                                  final ImmutableSet<LocationVariable> localOutVariables,
-                                                  final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
+            final Map<LocationVariable, Function> anonOutHeaps,
+            final ImmutableSet<LocationVariable> localOutVariables,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final JTerm wellFormedAnonymisationHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonOutHeaps);
         final JTerm reachableOutCondition =
@@ -198,10 +198,10 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      * @return the updates for the usage branch.
      */
     private static JTerm[] createUpdates(final Instantiation instantiation,
-                                         final List<LocationVariable> heaps,
-                                         final Map<LocationVariable, Function> anonOutHeaps,
-                                         final Map<LocationVariable, JTerm> modifiableClauses,
-                                         final UpdatesBuilder updatesBuilder) {
+            final List<LocationVariable> heaps,
+            final Map<LocationVariable, Function> anonOutHeaps,
+            final Map<LocationVariable, JTerm> modifiableClauses,
+            final UpdatesBuilder updatesBuilder) {
         final JTerm contextUpdate = instantiation.update();
         final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final JTerm anonymisationUpdate =

@@ -120,7 +120,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * o.f@h' == o.f@h
      */
     private JTerm buildConditionDependency(JTerm larger, JTerm smaller, DependencyContract contract,
-                                           Services services) {
+            Services services) {
 
 
         TermBuilder tb = services.getTermBuilder();
@@ -154,7 +154,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build a1=a1' /\ ... /\ an=an'
      */
     private JTerm buildConditionSameParams(DependencyContract contract, JTerm term1, JTerm term2,
-                                           Services services) {
+            Services services) {
         TermBuilder tb = services.getTermBuilder();
         JTerm result = tb.tt();
 
@@ -173,7 +173,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * instantiating that part of the contract.
      */
     private JTerm buildConditionPrecondition(JTerm app, DependencyContract contract,
-                                             Services services) {
+            Services services) {
 
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         // static methods do not a self var ==> one argument less to ignore (#1672)
@@ -187,7 +187,8 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
     /*
      * For f(h, a1, ..., an) and f(h', a1', ..., an') build forall o, o.created@h' ==> o.created@h
      */
-    private JTerm buildConditionMonotonicHeap(JTerm largerHeap, JTerm smallerHeap, Services services) {
+    private JTerm buildConditionMonotonicHeap(JTerm largerHeap, JTerm smallerHeap,
+            Services services) {
 
         LogicVariable var = new LogicVariable(new Name("_ov"),
             services.getJavaInfo().getJavaLangObject().getSort());

@@ -118,7 +118,7 @@ public class OpReplacer {
      * @return the terms with all occurences of the sub-term replaced.
      */
     public static ImmutableList<JTerm> replace(JTerm toReplace, JTerm with, ImmutableList<JTerm> in,
-                                               TermFactory tf) {
+            TermFactory tf) {
         return replace(toReplace, with, in, tf, null);
     }
 
@@ -156,7 +156,8 @@ public class OpReplacer {
      * @param proof the currently loaded proof.
      * @return a term with all occurences of the sub-term replaced.
      */
-    public static JTerm replace(JTerm toReplace, JTerm with, JTerm in, TermFactory tf, Proof proof) {
+    public static JTerm replace(JTerm toReplace, JTerm with, JTerm in, TermFactory tf,
+            Proof proof) {
         Map<JTerm, JTerm> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
@@ -176,7 +177,7 @@ public class OpReplacer {
      * @return the terms with all occurences of the sub-term replaced.
      */
     public static ImmutableList<JTerm> replace(JTerm toReplace, JTerm with, ImmutableList<JTerm> in,
-                                               TermFactory tf, Proof proof) {
+            TermFactory tf, Proof proof) {
         Map<JTerm, JTerm> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
@@ -196,7 +197,7 @@ public class OpReplacer {
      * @return a term with all occurences of the operator replaced.
      */
     public static JTerm replace(Operator toReplace, Operator with, JTerm in, TermFactory tf,
-                                Proof proof) {
+            Proof proof) {
         Map<Operator, Operator> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
@@ -342,7 +343,8 @@ public class OpReplacer {
      * @param vars the array in which to perform the replacement.
      * @return the list of transformed variables.
      */
-    public ImmutableArray<JQuantifiableVariable> replace(ImmutableArray<JQuantifiableVariable> vars) {
+    public ImmutableArray<JQuantifiableVariable> replace(
+            ImmutableArray<JQuantifiableVariable> vars) {
         JQuantifiableVariable[] result = new JQuantifiableVariable[vars.size()];
         boolean changed = false;
         for (int i = 0, n = vars.size(); i < n; i++) {

@@ -24,8 +24,8 @@ class InfFlowContractAppInOutRelationSnippet extends InfFlowInputOutputRelationS
     // proof obligation where we have to show that there is an isomorphism.
     @Override
     protected JTerm buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
-                                                     InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
-                                                     ProofObligationVars vs2, JTerm eqAtLocsTerm) {
+            InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, JTerm eqAtLocsTerm) {
         // build equalities for newObjects terms
         ImmutableList<JTerm> newObjEqs = ImmutableSLList.nil();
         Iterator<JTerm> newObjects1It = infFlowSpec1.newObjects.iterator();

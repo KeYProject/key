@@ -18,8 +18,8 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.*;
-import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
@@ -129,7 +129,7 @@ public final class TypeConverter {
     }
 
     private JTerm translateOperator(Operator op,
-                                    ExecutionContext ec) {
+            ExecutionContext ec) {
 
         final JTerm[] subs = new JTerm[op.getArity()];
         for (int i = 0, n = op.getArity(); i < n; i++) {

@@ -42,13 +42,13 @@ public final class MapLDT extends LDT {
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
-                                 ExecutionContext ec) {
+            ExecutionContext ec) {
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, JTerm sub, TermServices services,
-                                 ExecutionContext ec) {
+            ExecutionContext ec) {
         return false;
     }
 

@@ -957,7 +957,7 @@ public class IntermediateProofReplayer {
      * @throws ParserException In case of an error.
      */
     public static JTerm parseTerm(String value, Proof proof, Namespace<JQuantifiableVariable> varNS,
-                                  Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
+            Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
                 varNS, functNS, proof.getNamespaces().sorts(),

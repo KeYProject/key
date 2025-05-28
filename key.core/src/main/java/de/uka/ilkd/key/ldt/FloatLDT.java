@@ -110,7 +110,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public boolean isResponsible(Operator op, JTerm left, JTerm right,
-                                 Services services, ExecutionContext ec) {
+            Services services, ExecutionContext ec) {
         return left != null && left.sort().extendsTrans(targetSort()) && right != null
                 && right.sort().extendsTrans(targetSort())
                 && getFunctionFor(op, services, ec) != null;

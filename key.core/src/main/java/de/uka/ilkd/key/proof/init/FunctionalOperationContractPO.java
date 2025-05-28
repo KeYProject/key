@@ -19,8 +19,8 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
@@ -174,7 +174,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
-                                        ImmutableList<LocationVariable> paramVars, Services services) {
+            ImmutableList<LocationVariable> paramVars, Services services) {
         final JTerm mbyAtPreDef;
         if (contract.hasMby()) {
             /*
@@ -198,8 +198,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected JTerm getPre(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
-                           ImmutableList<LocationVariable> paramVars,
-                           Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         final JTerm freePre =
             contract.getFreePre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
         final JTerm pre = contract.getPre(modifiableHeaps, selfVar, paramVars, atPreVars, services);
@@ -211,9 +211,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected JTerm getPost(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
-                            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-                            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
-                            Services services) {
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services) {
         return contract.getPost(modifiableHeaps, selfVar, paramVars, resultVar, exceptionVar,
             atPreVars,
             services);
@@ -221,7 +221,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     @Override
     protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-                                  ImmutableList<JTerm> paramTerms, Services services) {
+            ImmutableList<JTerm> paramTerms, Services services) {
         return contract.getGlobalDefs(heap, heapTerm, selfTerm, paramTerms, services);
     }
 
@@ -230,8 +230,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected @Nullable JTerm buildFrameClause(List<LocationVariable> modifiableHeaps,
-                                               Map<JTerm, JTerm> heapToAtPre, LocationVariable selfVar,
-                                               ImmutableList<LocationVariable> paramVars, Services services) {
+            Map<JTerm, JTerm> heapToAtPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         JTerm frameTerm = null;
         for (LocationVariable heap : modifiableHeaps) {
             final JTerm ft;
@@ -276,8 +276,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected JTerm buildUpdate(ImmutableList<LocationVariable> paramVars,
-                                ImmutableList<LocationVariable> formalParamVars,
-                                Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+            ImmutableList<LocationVariable> formalParamVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         JTerm update = null;
         for (Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
             final LocationVariable heap = atPreEntry.getKey();

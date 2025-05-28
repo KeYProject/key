@@ -193,9 +193,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @throws ProofInputException Occurred Exception.
      */
     protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
-                                                              Services services, TermBuilder tb, ApplyStrategyInfo<Proof, Goal> info,
-                                                              JOperator resultOperator,
-                                                              JTerm siteProofSelectTerm, JTerm siteProofCondition) throws ProofInputException {
+            Services services, TermBuilder tb, ApplyStrategyInfo<Proof, Goal> info,
+            JOperator resultOperator,
+            JTerm siteProofSelectTerm, JTerm siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
             new ArrayList<>(info.getProof().openGoals().size());
         // Group values of the branches
@@ -256,8 +256,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param services The {@link Services} to use.
      */
     protected void groupGoalsByValue(ImmutableList<Goal> goals, JOperator operator,
-                                     JTerm siteProofSelectTerm, JTerm siteProofCondition, Map<JTerm, List<Goal>> valueMap,
-                                     List<Goal> unknownValues, Services services) throws ProofInputException {
+            JTerm siteProofSelectTerm, JTerm siteProofCondition, Map<JTerm, List<Goal>> valueMap,
+            List<Goal> unknownValues, Services services) throws ProofInputException {
         for (Goal goal : goals) {
             // Extract value
             JTerm value = SymbolicExecutionSideProofUtil.extractOperatorValue(goal, operator);
@@ -299,7 +299,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @throws ProofInputException Occurred Exception.
      */
     protected JTerm computeValueCondition(TermBuilder tb, List<Goal> valueGoals,
-                                          InitConfig initConfig) throws ProofInputException {
+            InitConfig initConfig) throws ProofInputException {
         if (!valueGoals.isEmpty()) {
             List<JTerm> pathConditions = new LinkedList<>();
             Proof proof = null;

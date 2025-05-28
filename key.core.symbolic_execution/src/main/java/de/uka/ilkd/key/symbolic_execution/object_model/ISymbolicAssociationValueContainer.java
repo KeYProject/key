@@ -44,7 +44,7 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      *         {@link ISymbolicAssociation} is available with the given {@link IProgramVariable}.
      */
     ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-                                        boolean isArrayIndex, JTerm arrayIndex, JTerm condition);
+            boolean isArrayIndex, JTerm arrayIndex, JTerm condition);
 
     /**
      * Returns the contained values.
@@ -65,5 +65,5 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      *         available with the given {@link IProgramVariable}.
      */
     ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-                            JTerm arrayIndex, JTerm condition);
+            JTerm arrayIndex, JTerm condition);
 }

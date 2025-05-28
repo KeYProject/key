@@ -336,7 +336,8 @@ public class TacletBuilderManipulators {
             @Override
             public VariableCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                return new StoreTermInCondition((SchemaVariable) arguments[0], (JTerm) arguments[1]);
+                return new StoreTermInCondition((SchemaVariable) arguments[0],
+                    (JTerm) arguments[1]);
             }
         };
 

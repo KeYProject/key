@@ -602,7 +602,7 @@ public class TestCaseGenerator {
     }
 
     private void generateTypeInferenceMapHelper(Term t,
-                                                Map<String, Sort> map) {
+            Map<String, Sort> map) {
         final var op = t.op();
         if (op instanceof ProgramVariable) {
             ProgramVariable pv = (ProgramVariable) t.op();

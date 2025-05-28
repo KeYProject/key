@@ -132,7 +132,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * @param services
      * @return instantiation of the schema variable <code>var</code>.
      */
-    protected final JTerm getInstantiation(Taclet owner, SchemaVariable var, TermServices services) {
+    protected final JTerm getInstantiation(Taclet owner, SchemaVariable var,
+            TermServices services) {
         JTerm instantiation = mapping.get(var);
         if (instantiation == null) {
             instantiation = createInstantiation(owner, var, services);
@@ -242,7 +243,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     }
 
     private JTerm[] computeArgs(Taclet owner, ImmutableSet<SchemaVariable> svSet,
-                                TermServices services) {
+            TermServices services) {
         JTerm[] args = new JTerm[svSet.size()];
         int i = 0;
         for (var sv : svSet) {
@@ -256,7 +257,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * Rebuilds a term recursively and replaces all schema variables with skolem terms/variables.
      */
     private JTerm rebuild(Taclet taclet, JTerm term, TermServices services,
-                          HashSet<JQuantifiableVariable> boundedVariables) {
+            HashSet<JQuantifiableVariable> boundedVariables) {
         JTerm[] newSubs = new JTerm[term.arity()];
         int i = 0;
         LinkedList<JQuantifiableVariable> qvars = new LinkedList<>();

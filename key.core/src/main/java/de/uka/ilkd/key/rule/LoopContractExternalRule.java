@@ -94,10 +94,10 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      * @return the updates for the usage branch.
      */
     private static JTerm[] createUpdates(final JTerm contextUpdate,
-                                         final List<LocationVariable> heaps,
-                                         final Map<LocationVariable, Function> anonymisationHeaps,
-                                         final LoopContract.Variables variables,
-                                         final Map<LocationVariable, JTerm> modifiableClauses, final Services services) {
+            final List<LocationVariable> heaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
+            final LoopContract.Variables variables,
+            final Map<LocationVariable, JTerm> modifiableClauses, final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final JTerm remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final JTerm anonymisationUpdate =
@@ -116,10 +116,10 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      * @return the preconditions.
      */
     private static JTerm[] createPreconditions(final JTerm selfTerm, final LoopContract contract,
-                                               final List<LocationVariable> heaps,
-                                               final ImmutableSet<LocationVariable> localInVariables,
-                                               final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
-                                               final Services services) {
+            final List<LocationVariable> heaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
+            final Services services) {
         final JTerm precondition = conditionsAndClausesBuilder.buildPrecondition();
         final JTerm wellFormedHeapsCondition =
             conditionsAndClausesBuilder.buildWellFormedHeapsCondition();

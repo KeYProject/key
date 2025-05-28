@@ -122,7 +122,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     private static void getRawSteps(JTerm heapTerm, Sequent seq, Services services,
-                                    List<JTerm> result) {
+            List<JTerm> result) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final JOperator op = heapTerm.op();
         assert heapTerm.sort().equals(heapLDT.targetSort());
@@ -232,8 +232,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     private static void collectBaseOccsHelper(JTerm focus,
-                                              PosInOccurrence pos,
-                                              Map<JTerm, PosInOccurrence> result) {
+            PosInOccurrence pos,
+            Map<JTerm, PosInOccurrence> result) {
         final JTerm candidate = (JTerm) pos.subTerm();
         if (isBaseOcc(focus, candidate)) {
             result.put(candidate.sub(0), pos);

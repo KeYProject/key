@@ -30,9 +30,9 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     private final BlockContract block;
 
     private BlockWellDefinedness(String name, int id, Type type, IObserverFunction target,
-                                 LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-                                 JTerm accessible, Condition ensures, JTerm mby, JTerm rep, BlockContract block,
-                                 TermBuilder tb) {
+            LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
+            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, BlockContract block,
+            TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.block = block;
