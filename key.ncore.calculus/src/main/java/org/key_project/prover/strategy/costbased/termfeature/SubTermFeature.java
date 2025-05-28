@@ -11,12 +11,10 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 
-/**
- * Feature for invoking a list of term features on the direct subterms of a given term. The result
- * will be the sum of the individual results. If the arity of the term investigated does not
- * coincide with the number of term features that are given as arguments,
- * <code>arityMismatchCost</code> will be returned
- */
+/// Feature for invoking a list of term features on the direct subterms of a given term. The result
+/// will be the sum of the individual results. If the arity of the term investigated does not
+/// coincide with the number of term features that are given as arguments,
+/// <code>arityMismatchCost</code> will be returned
 public class SubTermFeature implements TermFeature {
 
     private SubTermFeature(TermFeature[] features, RuleAppCost arityMismatchCost) {

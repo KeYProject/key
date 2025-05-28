@@ -14,9 +14,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Term generator that enumerates the formulas of the current sequent/antecedent/succedent.
- */
+/// Term generator that enumerates the formulas of the current sequent/antecedent/succedent.
 public abstract class SequentFormulasGenerator<Goal extends ProofGoal<@NonNull Goal>>
         implements TermGenerator<Goal> {
 
@@ -72,9 +70,7 @@ public abstract class SequentFormulasGenerator<Goal extends ProofGoal<@NonNull G
             return forIt.next().formula();
         }
 
-        /**
-         * throw an unsupported operation exception
-         */
+        /// throw an unsupported operation exception
         public void remove() {
             throw new UnsupportedOperationException();
         }

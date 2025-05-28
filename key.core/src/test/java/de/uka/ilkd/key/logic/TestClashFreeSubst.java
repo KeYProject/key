@@ -130,7 +130,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
             subStack = new Stack<>();
         }
 
-        public void visit(Term visited) {
+        public void visit(final org.key_project.logic.Term p_visited) {
+            final Term visited = (Term) p_visited;
             Operator op = visited.op();
             int arity = visited.arity();
             if (op == Quantifier.ALL) {

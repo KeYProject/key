@@ -3,5 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
-public record TacletAttributes(String displayName, Trigger trigger) {
+import org.jspecify.annotations.Nullable;
+
+/// Collection of attributes for taclets.
+public record TacletAttributes(@Nullable String displayName, @Nullable Trigger trigger) {
 }
