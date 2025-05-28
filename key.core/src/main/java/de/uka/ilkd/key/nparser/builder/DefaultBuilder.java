@@ -22,10 +22,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.nparser.KeYParser;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-import org.key_project.logic.Namespace;
-import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
