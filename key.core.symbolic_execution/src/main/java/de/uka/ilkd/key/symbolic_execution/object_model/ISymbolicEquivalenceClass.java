@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * An equivalence class which defines which {@link Term}s represent the same {@link ISymbolicObject}
+ * An equivalence class which defines which {@link JTerm}s represent the same
+ * {@link ISymbolicObject}
  * in an {@link ISymbolicLayout}.
  *
  * @author Martin Hentschel
@@ -19,15 +20,16 @@ public interface ISymbolicEquivalenceClass extends ISymbolicElement {
      *
      * @return The terms which represents the same {@link ISymbolicObject}.
      */
-    ImmutableList<Term> getTerms();
+    ImmutableList<JTerm> getTerms();
 
     /**
-     * Checks if a {@link Term} is contained.
+     * Checks if a {@link JTerm} is contained.
      *
-     * @param term The {@link Term} to check.
-     * @return {@code true} {@link Term} is contained, {@code false} {@link Term} is not contained.
+     * @param term The {@link JTerm} to check.
+     * @return {@code true} {@link JTerm} is contained, {@code false} {@link JTerm} is not
+     *         contained.
      */
-    boolean containsTerm(Term term);
+    boolean containsTerm(JTerm term);
 
     /**
      * Returns the terms which represents the same {@link ISymbolicObject} as human readable
@@ -43,7 +45,7 @@ public interface ISymbolicEquivalenceClass extends ISymbolicElement {
      *
      * @return The most representative term.
      */
-    Term getRepresentative();
+    JTerm getRepresentative();
 
     /**
      * Returns the most representative term as human readable {@link String}.

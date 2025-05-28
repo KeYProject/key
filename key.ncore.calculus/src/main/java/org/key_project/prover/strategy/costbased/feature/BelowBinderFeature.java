@@ -13,10 +13,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.jspecify.annotations.NonNull;
 
 
-/**
- * Returns zero iff the position of a rule application is not below any operators that bind
- * variables
- */
+/// Returns zero iff the position of a rule application is not below any operators that bind
+/// variables
 public class BelowBinderFeature extends BinaryFeature {
 
     private static final Feature INSTANCE = new BelowBinderFeature();

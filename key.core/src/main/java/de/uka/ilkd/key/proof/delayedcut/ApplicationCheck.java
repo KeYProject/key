@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.logic.Name;
@@ -28,7 +28,7 @@ public interface ApplicationCheck {
      * @return A String representation of a possible conflict affecting a delayed cut application
      *         for the given node and cut formula or null if there is no conflict.
      */
-    String check(Node cutNode, Term cutFormula);
+    String check(Node cutNode, JTerm cutFormula);
 
     /**
      * Implementation of an ApplicationCheck which examines if there are new symbols introduced
@@ -56,7 +56,7 @@ public interface ApplicationCheck {
                     as required by the corresponding rule definitions.""";
 
         @Override
-        public String check(Node cutNode, Term cutFormula) {
+        public String check(Node cutNode, JTerm cutFormula) {
             if (cutNode == null) {
                 throw new IllegalArgumentException("cutNode is null");
             }
@@ -91,15 +91,12 @@ public interface ApplicationCheck {
             }
         }
 
-        private String checkFormula(Term formula) {
+        private String checkFormula(JTerm formula) {
             final List<String> newSymbols = new LinkedList<>();
-            formula.execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    String name = visited.op().name().toString();
-                    if (names.contains(name)) {
-                        newSymbols.add(name);
-                    }
+            formula.execPreOrder((DefaultVisitor) visited -> {
+                String name = visited.op().name().toString();
+                if (names.contains(name)) {
+                    newSymbols.add(name);
                 }
             });
 

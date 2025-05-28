@@ -7,14 +7,16 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.Semisequent;
@@ -80,23 +82,24 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      * collects all found
      * schema variables
      *
-     * @param visited the Term whose schema variables are collected
+     * @param p_visited the Term whose schema variables are collected
      */
     @Override
-    public void visit(@NonNull Term visited) {
+    public void visit(@NonNull Term p_visited) {
+        final var visited = (JTerm) p_visited;
         final Operator op = visited.op();
-        if (op instanceof Modality mod) {
+        if (op instanceof JModality mod) {
             if (mod.kind() instanceof ModalOperatorSV msv) {
                 varList = varList.prepend(msv);
             }
-            varList = collectSVInProgram(visited.javaBlock(), varList);
+            varList = collectSVInProgram(mod.program(), varList);
         } else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate) op, varList);
         }
 
         for (int j = 0, ar = visited.arity(); j < ar; j++) {
             for (int i = 0, sz = visited.varsBoundHere(j).size(); i < sz; i++) {
-                final QuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
+                final JQuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
                 if (qVar instanceof SchemaVariable) {
                     varList = varList.prepend((SchemaVariable) qVar);
                 }
@@ -107,7 +110,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
             varList = varList.prepend((SchemaVariable) op);
         }
 
-        for (TermLabel label : visited.getLabels()) {
+        for (TermLabel label : ((JTerm) visited).getLabels()) {
             if (label instanceof TermLabelSV) {
                 varList = varList.prepend((SchemaVariable) label);
             }

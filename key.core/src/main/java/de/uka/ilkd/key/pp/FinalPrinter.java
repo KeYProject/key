@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.op.Function;
@@ -32,14 +32,14 @@ class FinalPrinter extends FieldPrinter {
     /*
      * Print a term of the form: T::final(object, field).
      */
-    public void printFinal(LogicPrinter lp, Term t) {
+    public void printFinal(LogicPrinter lp, JTerm t) {
         assert t.boundVars().isEmpty();
         assert t.arity() == 2;
         HeapLDT heapLDT = lp.getHeapLDT();
 
         if (lp.notationInfo.isPrettySyntax() && heapLDT != null) {
-            final Term objectTerm = t.sub(0);
-            final Term fieldTerm = t.sub(1);
+            final JTerm objectTerm = t.sub(0);
+            final JTerm fieldTerm = t.sub(1);
             // Array selects are never final, no need to handle them
             if (t.sort().equals(JavaDLTheory.ANY)) {
                 /*
@@ -75,7 +75,7 @@ class FinalPrinter extends FieldPrinter {
     /*
      * Check whether there is a field with the same name as a variable.
      */
-    private boolean isFieldName(String variableName, Term objectTerm) {
+    private boolean isFieldName(String variableName, JTerm objectTerm) {
         Sort sort = objectTerm.sort();
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
@@ -86,7 +86,7 @@ class FinalPrinter extends FieldPrinter {
     /*
      * Get sort of selected field.
      */
-    private Sort getFieldSort(Term fieldTerm) {
+    private Sort getFieldSort(JTerm fieldTerm) {
         String lookup = fieldTerm.op().toString().replace("$", "");
         ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);
         return progVar.sort();
@@ -96,7 +96,7 @@ class FinalPrinter extends FieldPrinter {
      * Print a static field constant.
      */
     private void printStaticJavaFieldConstant(
-            LogicPrinter lp, final Term fieldTerm) {
+            LogicPrinter lp, final JTerm fieldTerm) {
         lp.layouter.startTerm(2);
         /*
          * Is consideration for static arrays missing in this?
@@ -131,8 +131,8 @@ class FinalPrinter extends FieldPrinter {
      * Print a non-static field constant.
      */
     private void printNonStaticJavaFieldConstant(
-            LogicPrinter lp, final Term objectTerm,
-            final Term fieldTerm) {
+            LogicPrinter lp, final JTerm objectTerm,
+            final JTerm fieldTerm) {
         lp.layouter.startTerm(2);
         lp.layouter.markStartSub(0);
         lp.printTerm(objectTerm);
@@ -149,8 +149,8 @@ class FinalPrinter extends FieldPrinter {
      * Print a term of the form: any::final(heap, object, field).
      */
     private void printAnySelect(
-            LogicPrinter lp, final Term objectTerm,
-            final Term fieldTerm) {
+            LogicPrinter lp, final JTerm objectTerm,
+            final JTerm fieldTerm) {
         lp.layouter.startTerm(2);
         lp.layouter.markStartSub(0);
         lp.printTerm(objectTerm);
@@ -168,9 +168,9 @@ class FinalPrinter extends FieldPrinter {
      * boolean::final(heap, object, java.lang.Object::<created>)
      */
     private void printBuiltinObjectProperty(
-            LogicPrinter lp, Term t,
-            Term objectTerm,
-            Term fieldTerm) {
+            LogicPrinter lp, JTerm t,
+            JTerm objectTerm,
+            JTerm fieldTerm) {
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());
         KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());

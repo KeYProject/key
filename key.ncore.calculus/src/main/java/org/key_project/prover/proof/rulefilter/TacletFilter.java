@@ -7,14 +7,10 @@ package org.key_project.prover.proof.rulefilter;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.Taclet;
 
-/**
- * Interface for filtering a list of TacletApps, for example to choose only taclets for interactive
- * application or taclets belonging to some given heuristics.
- */
+/// Interface for filtering a list of TacletApps, for example to choose only taclets for interactive
+/// application or taclets belonging to some given heuristics.
 public abstract class TacletFilter implements RuleFilter {
-    /**
-     * Trival TacletFilter that always returns true;
-     */
+    /// Trival TacletFilter that always returns true;
     public static final TacletFilter TRUE = new TacletFilterTrue();
 
     @Override
@@ -25,14 +21,10 @@ public abstract class TacletFilter implements RuleFilter {
         return false;
     }
 
-    /**
-     * @return true iff <code>taclet</code> should be included in the result
-     */
+    /// @return true iff <code>taclet</code> should be included in the result
     protected abstract boolean filter(Taclet taclet);
 
-    /**
-     * Trival TacletFilter that always returns true;
-     */
+    /// Trival TacletFilter that always returns true;
     static class TacletFilterTrue extends TacletFilter {
         protected boolean filter(Taclet taclet) {
             return true;

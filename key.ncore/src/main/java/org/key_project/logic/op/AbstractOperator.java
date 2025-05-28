@@ -10,9 +10,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * Abstract operator class offering some common functionality.
- */
+/// Abstract operator class offering some common functionality.
 public abstract class AbstractOperator implements Operator {
     private final Name name;
     private final int arity;
@@ -77,13 +75,11 @@ public abstract class AbstractOperator implements Operator {
         return name().toString();
     }
 
-    /**
-     * Checks whether the top level structure of the given @link Term is syntactically valid, given
-     * the assumption that the top level operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal is NOT checked.
-     *
-     * @throws TermCreationException if a construction error was recognised
-     */
+    /// Checks whether the top level structure of the given @link Term is syntactically valid, given
+    /// the assumption that the top level operator of the term is the same as this Operator. The
+    /// assumption that the top level operator and the term are equal is NOT checked.
+    ///
+    /// @throws TermCreationException if a construction error was recognised
     @Override
     public <T extends Term> void validTopLevelException(T term) throws TermCreationException {
         if (arity != term.arity()) {

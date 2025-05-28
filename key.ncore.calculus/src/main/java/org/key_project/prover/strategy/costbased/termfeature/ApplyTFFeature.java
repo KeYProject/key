@@ -15,9 +15,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Feature for invoking a term feature on the instantiation of a schema variable
- */
+/// Feature for invoking a term feature on the instantiation of a schema variable
 public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
 
     private final ProjectionToTerm<Goal> proj;
@@ -25,13 +23,11 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
     private final RuleAppCost noInstCost;
     private final boolean demandInst;
 
-    /**
-     * @param proj the ProjectionToTerm to the instantiation is supposed to be inspected
-     * @param termFeature the term feature to use
-     * @param noInstCost result if <code>schemaVar</code> is not instantiated
-     * @param demandInst if <code>true</code> then raise an exception if <code>schemaVar</code> is
-     *        not instantiated (otherwise: return <code>noInstCost</code>)
-     */
+    /// @param proj the ProjectionToTerm to the instantiation is supposed to be inspected
+    /// @param termFeature the term feature to use
+    /// @param noInstCost result if <code>schemaVar</code> is not instantiated
+    /// @param demandInst if <code>true</code> then raise an exception if <code>schemaVar</code> is
+    /// not instantiated (otherwise: return <code>noInstCost</code>)
     private ApplyTFFeature(ProjectionToTerm<Goal> proj, TermFeature termFeature,
             RuleAppCost noInstCost,
             boolean demandInst) {

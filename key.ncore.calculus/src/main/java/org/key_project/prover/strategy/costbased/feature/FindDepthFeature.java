@@ -13,12 +13,10 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.jspecify.annotations.NonNull;
 
 
-/**
- * A feature that computes the depth of the find-position of a taclet (top-level positions have
- * depth zero or if not a find taclet)
- * <p>
- * TODO: eliminate this class and use term features instead
- */
+/// A feature that computes the depth of the find-position of a taclet (top-level positions have
+/// depth zero or if not a find taclet)
+///
+/// TODO: eliminate this class and use term features instead
 public class FindDepthFeature implements Feature {
 
     private static final Feature INSTANCE = new FindDepthFeature();

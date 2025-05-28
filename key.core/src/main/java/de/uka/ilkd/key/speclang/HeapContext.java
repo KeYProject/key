@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
@@ -45,12 +45,12 @@ public class HeapContext {
         return result;
     }
 
-    public static Map<LocationVariable, Term> getAtPres(
+    public static Map<LocationVariable, JTerm> getAtPres(
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
-        final Map<LocationVariable, Term> result = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> result = new LinkedHashMap<>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             final LocationVariable lv = atPreVars.get(heap);
-            final Term t = lv == null ? null : services.getTermBuilder().var(lv);
+            final JTerm t = lv == null ? null : services.getTermBuilder().var(lv);
             result.put(heap, t);
         }
         return result;

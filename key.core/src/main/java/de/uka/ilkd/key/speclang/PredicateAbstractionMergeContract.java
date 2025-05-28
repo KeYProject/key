@@ -11,7 +11,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -29,14 +29,14 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private final static String NAME = "Predicate Abstraction Merge Contract";
 
     private final MergePointStatement mps;
-    private final Map<LocationVariable, Term> atPres;
+    private final Map<LocationVariable, JTerm> atPres;
     private final KeYJavaType kjt;
     private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
     private final String latticeTypeName;
     private final List<AbstractionPredicate> abstractionPredicates;
 
     public PredicateAbstractionMergeContract(MergePointStatement mps,
-            Map<LocationVariable, Term> atPres, KeYJavaType kjt, String latticeType,
+            Map<LocationVariable, JTerm> atPres, KeYJavaType kjt, String latticeType,
             List<AbstractionPredicate> abstractionPredicates) {
         this.mps = mps;
         this.atPres = atPres;
@@ -47,7 +47,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     }
 
     @Override
-    public PredicateAbstractionMergeContract map(UnaryOperator<Term> op, Services services) {
+    public PredicateAbstractionMergeContract map(UnaryOperator<JTerm> op, Services services) {
         return new PredicateAbstractionMergeContract(mps,
             atPres.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue()))),
@@ -70,7 +70,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
         return mps;
     }
 
-    public Map<LocationVariable, Term> getAtPres() {
+    public Map<LocationVariable, JTerm> getAtPres() {
         return atPres;
     }
 
@@ -90,13 +90,13 @@ public class PredicateAbstractionMergeContract implements MergeContract {
      * @return
      */
     public ArrayList<AbstractionPredicate> getAbstractionPredicates(
-            Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> replaceMap = getReplaceMap(atPres, services);
+            Map<LocationVariable, JTerm> atPres, Services services) {
+        final Map<JTerm, JTerm> replaceMap = getReplaceMap(atPres, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
 
         return abstractionPredicates.stream().map(pred -> {
-            final Term newPred = or.replace(pred.getPredicateFormWithPlaceholder().second);
+            final JTerm newPred = or.replace(pred.getPredicateFormWithPlaceholder().second);
             return AbstractionPredicate.create(newPred,
                 pred.getPredicateFormWithPlaceholder().first, services);
         }).collect(Collectors.toCollection(ArrayList::new));
@@ -128,14 +128,15 @@ public class PredicateAbstractionMergeContract implements MergeContract {
      * @param services
      * @return
      */
-    private Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<>();
+    private Map<JTerm, JTerm> getReplaceMap(Map<LocationVariable, JTerm> atPres,
+            Services services) {
+        final Map<JTerm, JTerm> result = new LinkedHashMap<>();
 
         if (atPres != null) {
-            for (Map.Entry<LocationVariable, Term> en : this.atPres.entrySet()) {
+            for (Map.Entry<LocationVariable, JTerm> en : this.atPres.entrySet()) {
                 LocationVariable var = en.getKey();
-                Term replace = atPres.get(var);
-                Term origReplace = en.getValue();
+                JTerm replace = atPres.get(var);
+                JTerm origReplace = en.getValue();
                 if (replace != null && origReplace != null) {
                     assert replace.sort().equals(origReplace.sort());
                     result.put(origReplace, replace);

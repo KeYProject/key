@@ -5,8 +5,8 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.scripts.meta.Option;
@@ -45,7 +45,7 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
         Name schemaVar = new Name("_SCHEMA_" + args.var.substring(1));
 
         try {
-            OperatorSV sv;
+            JOperatorSV sv;
             if ("Formula".equals(args.type)) {
                 sv = SchemaVariableFactory.createFormulaSV(schemaVar);
             } else {
@@ -53,7 +53,7 @@ public class SchemaVarCommand extends AbstractCommand<SchemaVarCommand.Parameter
                 sv = SchemaVariableFactory.createTermSV(schemaVar, sort);
             }
 
-            Term term = state.getProof().getServices().getTermFactory().createTerm(sv);
+            JTerm term = state.getProof().getServices().getTermFactory().createTerm(sv);
 
             abbrMap.put(term, args.var, true);
         } catch (Exception e) {

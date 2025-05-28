@@ -86,7 +86,7 @@ public final class SMTFocusResults {
                 TacletApp app = PosTacletApp.createPosTacletApp(hideLeft, new MatchConditions(),
                     new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
                     services);
-                app = app.addCheckedInstantiation(schema, (Term) sf.formula(), services, true);
+                app = app.addCheckedInstantiation(schema, (JTerm) sf.formula(), services, true);
                 goal = goal.apply(app).iterator().next();
             }
             i++;
@@ -103,7 +103,7 @@ public final class SMTFocusResults {
                     PosTacletApp.createPosTacletApp(hideRight, new MatchConditions(),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
                         services);
-                app = app.addCheckedInstantiation(schema, (Term) sf.formula(), services, true);
+                app = app.addCheckedInstantiation(schema, (JTerm) sf.formula(), services, true);
                 goal = goal.apply(app).iterator().next();
             }
             i++;

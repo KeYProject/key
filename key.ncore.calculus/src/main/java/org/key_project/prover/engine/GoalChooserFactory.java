@@ -8,17 +8,15 @@ import org.key_project.prover.proof.ProofObject;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Interface to be implemented by builders returning a goal chooser.
- */
+/// Interface to be implemented by builders returning a goal chooser.
 public interface GoalChooserFactory<P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> {
 
-    /** returns a new goal chooser */
+    /// returns a new goal chooser
     GoalChooser<P, G> create();
 
-    /** returns a clone of this goal chooser */
+    /// returns a clone of this goal chooser
     GoalChooserFactory<P, G> copy();
 
-    /** returns the name of the goal chooser */
+    /// returns the name of the goal chooser
     String name();
 }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 
 /**
@@ -22,9 +22,9 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
  */
 public interface IExecutionConstraint extends IExecutionElement {
     /**
-     * Returns the {@link Term} representing the constraint.
+     * Returns the {@link JTerm} representing the constraint.
      *
-     * @return The {@link Term} representing the constraint.
+     * @return The {@link JTerm} representing the constraint.
      */
-    Term getTerm();
+    JTerm getTerm();
 }

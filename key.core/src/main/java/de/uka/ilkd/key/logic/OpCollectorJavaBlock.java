@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 /**
@@ -15,10 +16,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
  */
 public class OpCollectorJavaBlock extends OpCollector {
     @Override
-    public void visit(Term t) {
+    public void visit(org.key_project.logic.Term t) {
         super.visit(t);
-        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
-            var collect = new JavaASTCollector(t.javaBlock().program(), LocationVariable.class);
+        if (t.op() instanceof JModality mod && !mod.program().isEmpty()) {
+            var collect = new JavaASTCollector(mod.program().program(), LocationVariable.class);
             collect.start();
             for (ProgramElement programElement : collect.getNodes()) {
                 if (programElement instanceof LocationVariable locationVariable) {

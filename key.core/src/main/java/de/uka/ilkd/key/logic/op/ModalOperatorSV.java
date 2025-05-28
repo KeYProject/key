@@ -12,13 +12,13 @@ import org.key_project.util.collection.ImmutableSet;
 /**
  * Schema variable matching modal operators.
  */
-public final class ModalOperatorSV extends Modality.JavaModalityKind
+public final class ModalOperatorSV extends JModality.JavaModalityKind
         implements ParsableVariable, SchemaVariable {
 
     /**
      * the set of modalities this sv can match
      */
-    private final ImmutableSet<Modality.JavaModalityKind> modalities;
+    private final ImmutableSet<JModality.JavaModalityKind> modalities;
 
 
     /**
@@ -27,7 +27,7 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind
      * @param name the Name of the SchemaVariable
      * @param modalityKinds modal operators matched by this SV
      */
-    ModalOperatorSV(Name name, ImmutableSet<Modality.JavaModalityKind> modalityKinds) {
+    ModalOperatorSV(Name name, ImmutableSet<JModality.JavaModalityKind> modalityKinds) {
         super(name);
         this.modalities = modalityKinds;
     }
@@ -35,7 +35,7 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind
     /**
      * returns an unmodifiable set of operators this schemavariable can match
      */
-    public ImmutableSet<Modality.JavaModalityKind> getModalities() {
+    public ImmutableSet<JModality.JavaModalityKind> getModalities() {
         return modalities;
     }
 

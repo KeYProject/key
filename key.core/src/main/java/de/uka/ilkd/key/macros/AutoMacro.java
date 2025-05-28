@@ -12,8 +12,8 @@ import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
@@ -224,7 +224,7 @@ public class AutoMacro extends StrategyProofMacro {
             }
 
             if (isJavaPIO(pio)) {
-                var term = (Term) pio.subTerm();final SourceElement activeStmt = //
+                var term = (JTerm) pio.subTerm();final SourceElement activeStmt = //
                         JavaTools.getActiveStatement(term.javaBlock());
                 final String currStmtString = activeStmt.toString();
 
@@ -240,7 +240,7 @@ public class AutoMacro extends StrategyProofMacro {
         }
 
         private boolean isJavaPIO(PosInOccurrence pio) {
-            if(pio==null) return false;var term = (Term) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+            if(pio==null) return false;var term = (JTerm) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
         }
 
         @Override

@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -141,14 +141,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     protected abstract String lazyComputeName() throws ProofInputException;
 
     /**
-     * Converts the given {@link Term} into a {@link String} respecting
+     * Converts the given {@link JTerm} into a {@link String} respecting
      * {@link ITreeSettings#usePrettyPrinting()}.
      *
-     * @param term The {@link Term} to convert.
+     * @param term The {@link JTerm} to convert.
      * @param services The {@link Services} to use.
-     * @return The {@link String} representation of the given {@link Term}.
+     * @return The {@link String} representation of the given {@link JTerm}.
      */
-    protected String formatTerm(Term term, Services services) {
+    protected String formatTerm(JTerm term, Services services) {
         return SymbolicExecutionUtil.formatTerm(term, services, settings.useUnicode(),
             settings.usePrettyPrinting());
     }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
 
@@ -44,7 +44,7 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      *         {@link ISymbolicAssociation} is available with the given {@link IProgramVariable}.
      */
     ISymbolicAssociation getAssociation(IProgramVariable programVariable,
-            boolean isArrayIndex, Term arrayIndex, Term condition);
+            boolean isArrayIndex, JTerm arrayIndex, JTerm condition);
 
     /**
      * Returns the contained values.
@@ -65,5 +65,5 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
      *         available with the given {@link IProgramVariable}.
      */
     ISymbolicValue getValue(IProgramVariable programVariable, boolean isArrayIndex,
-            Term arrayIndex, Term condition);
+            JTerm arrayIndex, JTerm condition);
 }

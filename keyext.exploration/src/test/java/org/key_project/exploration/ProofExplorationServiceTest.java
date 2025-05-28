@@ -57,7 +57,7 @@ public class ProofExplorationServiceTest {
      */
     @Test
     public void testAdditionAntec() {
-        Term add = parseTerm("p");
+        JTerm add = parseTerm("p");
         expService.soundAddition(currentProof.getOpenGoal(currentProof.root()), add, true);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
@@ -102,7 +102,7 @@ public class ProofExplorationServiceTest {
      */
     @Test
     public void testAdditionSucc() {
-        Term added = parseTerm("q");
+        JTerm added = parseTerm("q");
         expService.soundAddition(currentProof.getOpenGoal(currentProof.root()), added, false);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
@@ -148,14 +148,14 @@ public class ProofExplorationServiceTest {
      */
     @Test
     public void testChangeFormula() {
-        Term change = parseTerm("p->p");
+        JTerm change = parseTerm("p->p");
         ImmutableList<Goal> goals = currentProof.openGoals();
         assertSame(1, goals.size(), "Prerequisite for test");
         Sequent sequent = goals.head().node().sequent();
         PosInOccurrence pio =
             new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
         expService.applyChangeFormula(goals.head(), pio,
-            (Term) sequent.succedent().get(0).formula(),
+            (JTerm) sequent.succedent().get(0).formula(),
             change);
         ImmutableList<Goal> newCreatedGoals = currentProof.openGoals();
 
@@ -187,7 +187,7 @@ public class ProofExplorationServiceTest {
     /**
      * Tests that sizes are as expected after addition
      */
-    private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec) {
+    private void testAddition(Goal withAddedTerm, Goal justification, JTerm added, boolean antec) {
         Semisequent semiSeqAdded =
             antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
         Semisequent parentSemiSeqOfAdded =
@@ -239,7 +239,7 @@ public class ProofExplorationServiceTest {
 
     }
 
-    private Term parseTerm(String term) {
+    private JTerm parseTerm(String term) {
         KeyIO io = new KeyIO(env.getServices());
         return io.parseExpression(term);
     }

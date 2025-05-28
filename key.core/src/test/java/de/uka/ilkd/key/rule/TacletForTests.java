@@ -9,10 +9,10 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.*;
@@ -52,7 +52,7 @@ public class TacletForTests {
     public static InitConfig initConfig;
     public static File lastFile = null;
 
-    private static Namespace<QuantifiableVariable> variables = null;
+    private static Namespace<JQuantifiableVariable> variables = null;
     private static Namespace<SchemaVariable> schemaVariables;
 
     public static final Profile profile = new JavaProfile() {
@@ -158,7 +158,7 @@ public class TacletForTests {
     }
 
 
-    public static Namespace<QuantifiableVariable> getVariables() {
+    public static Namespace<JQuantifiableVariable> getVariables() {
         return variables;
     }
 
@@ -186,7 +186,7 @@ public class TacletForTests {
         return getSorts().lookup(new Name(name));
     }
 
-    public static Term parseTerm(String termstr, Services services) {
+    public static JTerm parseTerm(String termstr, Services services) {
         if (termstr.isEmpty()) {
             return null;
         }
@@ -202,14 +202,14 @@ public class TacletForTests {
 
     }
 
-    public static Term parseTerm(String termstr, NamespaceSet set) {
+    public static JTerm parseTerm(String termstr, NamespaceSet set) {
         if (termstr.isEmpty()) {
             return null;
         }
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 
-    public static Term parseTerm(String termstr) {
+    public static JTerm parseTerm(String termstr) {
         return parseTerm(termstr, services());
     }
 

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
@@ -123,19 +123,19 @@ public class FindTacletAppContainer extends TacletAppContainer {
             }
 
             if (changeIndex == -1) {
-                final Term beforeChangeTerm = (Term) changePIO.getSubTerm();
-                final Operator beforeChangeOp = beforeChangeTerm.op();
+                final JTerm beforeChangeTerm = (JTerm) changePIO.getSubTerm();
+                final JOperator beforeChangeOp = beforeChangeTerm.op();
 
                 // special case: a taclet application is not affected by changes
                 // to a preceding program, as long as the post-condition of the
                 // program does not change. this is a pretty common situation
                 // during symbolic program execution; also consider
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
-                if (beforeChangeOp instanceof Modality beforeChangeMod) {
+                if (beforeChangeOp instanceof JModality beforeChangeMod) {
                     final PosInOccurrence afterChangePos =
                         changePos.replaceSequentFormula(newFormula);
-                    final Term afterChangeTerm = (Term) afterChangePos.subTerm();
-                    if (afterChangeTerm.op() instanceof Modality afterChangeMod) {
+                    final JTerm afterChangeTerm = (JTerm) afterChangePos.subTerm();
+                    if (afterChangeTerm.op() instanceof JModality afterChangeMod) {
                         return beforeChangeMod.kind() == afterChangeMod.kind()
                                 && beforeChangeTerm.sub(0)
                                         .equalsModProperty(afterChangeTerm.sub(0),

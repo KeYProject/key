@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -32,7 +32,7 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
         }
 
         Instantiation inst = UseOperationContractRule
-                .computeInstantiation((Term) app.posInOccurrence().subTerm(), services);
+                .computeInstantiation((JTerm) app.posInOccurrence().subTerm(), services);
 
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(inst, services);

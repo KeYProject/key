@@ -10,7 +10,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -60,7 +60,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
                 || goals.head().node().parent() == null) {
             return false;
         }
-        Term subTerm = (Term) posInOcc.subTerm();
+        JTerm subTerm = (JTerm) posInOcc.subTerm();
 
         if (subTerm == null) {
             return false;
@@ -80,7 +80,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
             ifVars.c2, blockRuleApp.getExecutionContext(), services);
-        final Term selfComposedExec =
+        final JTerm selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
 
         return RENAMING_TERM_PROPERTY.equalsModThisProperty(subTerm, selfComposedExec);

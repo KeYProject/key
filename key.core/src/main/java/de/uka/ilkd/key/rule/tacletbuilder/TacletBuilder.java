@@ -15,6 +15,8 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.Choice;
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
@@ -90,7 +92,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         }
     }
 
-    static void checkContainsFreeVarSV(Term t, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(JTerm t, Name tacletName, String str) {
         if (containsFreeVarSV(t)) {
             throw new TacletBuilderException(tacletName,
                 "Free Variable found in " + str + " in Taclet / Term: " + t);

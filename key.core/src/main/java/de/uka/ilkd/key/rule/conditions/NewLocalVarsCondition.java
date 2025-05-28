@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
@@ -82,8 +82,8 @@ public class NewLocalVarsCondition implements VariableCondition {
 
         var vars = MiscTools.getLocalOuts(body, services);
         List<VariableDeclaration> decls = new ArrayList<>(vars.size());
-        ImmutableList<Term> updatesBefore = ImmutableSLList.nil();
-        ImmutableList<Term> updatesFrame = ImmutableSLList.nil();
+        ImmutableList<JTerm> updatesBefore = ImmutableSLList.nil();
+        ImmutableList<JTerm> updatesFrame = ImmutableSLList.nil();
         var tb = services.getTermBuilder();
         for (var v : vars) {
             final var newName =

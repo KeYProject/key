@@ -6,7 +6,7 @@ package de.uka.ilkd.key.symbolic_execution.slicing;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -125,13 +125,13 @@ public class Location {
     }
 
     /**
-     * Converts this {@link Location} into a {@link Term}.
+     * Converts this {@link Location} into a {@link JTerm}.
      *
      * @param services The {@link Services} to use.
-     * @return The created {@link Term}.
+     * @return The created {@link JTerm}.
      */
-    public Term toTerm(Services services) {
-        Term parent = null;
+    public JTerm toTerm(Services services) {
+        JTerm parent = null;
         for (Access access : accesses) {
             if (access.isArrayIndex()) {
                 // Special handling for array indices.

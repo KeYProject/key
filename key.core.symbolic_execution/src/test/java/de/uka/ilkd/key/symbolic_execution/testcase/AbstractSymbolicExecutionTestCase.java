@@ -13,8 +13,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -44,6 +43,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.key_project.logic.Choice;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -1638,9 +1638,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
         Node node = proof.root();
         Sequent sequent = node.sequent();
         assertEquals(1, sequent.succedent().size());
-        Term succedent = (Term) sequent.succedent().get(0).formula();
+        JTerm succedent = (JTerm) sequent.succedent().get(0).formula();
         assertEquals(2, succedent.arity());
-        Term updateApplication = succedent.subs().get(1);
+        JTerm updateApplication = succedent.subs().get(1);
         assertEquals(2, updateApplication.arity());
         JavaProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
         assertTrue(updateContent instanceof StatementBlock);
@@ -2316,12 +2316,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
     }
 
     /**
-     * Makes sure that two {@link Term}s are equal.
+     * Makes sure that two {@link JTerm}s are equal.
      *
-     * @param expected The expected {@link Term}.
-     * @param actual The actual {@link Term}.
+     * @param expected The expected {@link JTerm}.
+     * @param actual The actual {@link JTerm}.
      */
-    protected void assertTerm(Term expected, Term actual) {
+    protected void assertTerm(JTerm expected, JTerm actual) {
         if (expected != null) {
             assertEquals(expected.op(), actual.op());
             assertEquals(expected.javaBlock(), actual.javaBlock());

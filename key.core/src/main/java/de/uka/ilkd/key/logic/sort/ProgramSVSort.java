@@ -39,8 +39,8 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
@@ -283,7 +283,7 @@ public abstract class ProgramSVSort extends SortImpl {
         NAME2SORT.put(name, this);
     }
 
-    public boolean canStandFor(Term t) {
+    public boolean canStandFor(JTerm t) {
         return true;
     }
 
@@ -324,7 +324,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
+        public boolean canStandFor(JTerm t) {
             return t.op() instanceof ProgramVariable;
         }
 
@@ -394,7 +394,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
+        public boolean canStandFor(JTerm t) {
             return t.op() instanceof ProgramVariable && ((ProgramVariable) t.op()).isStatic();
         }
 
@@ -422,7 +422,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
+        public boolean canStandFor(JTerm t) {
             return t.op() instanceof ProgramVariable && !((ProgramVariable) t.op()).isStatic();
         }
 
@@ -575,7 +575,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
         // do not match a term
         @Override
-        public boolean canStandFor(Term t) {
+        public boolean canStandFor(JTerm t) {
             return false;
         }
 
@@ -601,7 +601,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
         // not designed to match on terms
         @Override
-        public boolean canStandFor(Term t) {
+        public boolean canStandFor(JTerm t) {
             return false;
         }
 
@@ -712,7 +712,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
+        public boolean canStandFor(JTerm t) {
             return (t.op() instanceof IProgramMethod && !((IProgramMethod) t.op()).isModel());
         }
     }
@@ -846,7 +846,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
+        public boolean canStandFor(JTerm t) {
             return (t.op() instanceof IProgramMethod);
         }
     }
@@ -1275,7 +1275,7 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
+        public boolean canStandFor(JTerm t) {
             return t.op() instanceof ProgramConstant && isString == t.sort().name().equals(type);
         }
 

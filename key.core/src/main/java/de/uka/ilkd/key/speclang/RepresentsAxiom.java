@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -38,8 +38,8 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final IObserverFunction target;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
-    private final Term originalPre;
-    private final Term originalRep;
+    private final JTerm originalPre;
+    private final JTerm originalRep;
     private final LocationVariable originalSelfVar;
     /**
      * The mapping of the pre-heaps.
@@ -48,14 +48,14 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final ImmutableList<LocationVariable> originalParamVars;
 
     public RepresentsAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-            VisibilityModifier visibility, Term pre, Term rep, LocationVariable selfVar,
+            VisibilityModifier visibility, JTerm pre, JTerm rep, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         this(name, null, target, kjt, visibility, pre, rep, selfVar, paramVars, atPreVars);
     }
 
     public RepresentsAxiom(String name, String displayName, IObserverFunction target,
-            KeYJavaType kjt, VisibilityModifier visibility, Term pre, Term rep,
+            KeYJavaType kjt, VisibilityModifier visibility, JTerm pre, JTerm rep,
             LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         assert name != null;
@@ -76,7 +76,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public SpecificationElement map(UnaryOperator<Term> op, Services services) {
+    public SpecificationElement map(UnaryOperator<JTerm> op, Services services) {
         return new RepresentsAxiom(name, displayName, target, kjt, visibility,
             op.apply(originalPre), op.apply(originalRep), originalSelfVar, originalParamVars,
             atPreVars);
@@ -109,11 +109,11 @@ public final class RepresentsAxiom extends ClassAxiom {
                         .equals(originalSelfVar));
     }
 
-    public Term getAxiom(AbstractSortedOperator heapVar, AbstractSortedOperator selfVar,
+    public JTerm getAxiom(JAbstractSortedOperator heapVar, JAbstractSortedOperator selfVar,
             Services services) {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
-        final Map<ProgramVariable, AbstractSortedOperator> map =
+        final Map<ProgramVariable, JAbstractSortedOperator> map =
             new LinkedHashMap<>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
         if (selfVar != null) {
@@ -230,8 +230,8 @@ public final class RepresentsAxiom extends ClassAxiom {
         VisibilityModifier minVisibility = visibility == null
                 ? (VisibilityModifier.isPrivate(ax.visibility) ? ax.visibility : null)
                 : (visibility.compareTo(ax.visibility) >= 0 ? visibility : ax.visibility);
-        Term newRep = tb.and(originalRep, ax.originalRep);
-        Term newPre = null;
+        JTerm newRep = tb.and(originalRep, ax.originalRep);
+        JTerm newPre = null;
         if (originalPre == null) {
             newPre = ax.originalPre;
         } else if (ax.originalPre == null) {

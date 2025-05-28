@@ -6,6 +6,7 @@ package org.key_project.isabelletranslation.translation;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 
 import org.key_project.logic.Term;
@@ -37,10 +38,10 @@ public class NumberConstantsHandler implements IsabelleHandler {
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         // TODO This needs an updated AbstractTermTransformer to comply with the new ncore package
         // of KeY
-        assert (term instanceof de.uka.ilkd.key.logic.Term);
+        assert (term instanceof JTerm);
 
         String string = AbstractTermTransformer
-                .convertToDecimalString((de.uka.ilkd.key.logic.Term) term, services);
+                .convertToDecimalString((JTerm) term, services);
         return new StringBuilder("(").append(string).append("::int)");
     }
 

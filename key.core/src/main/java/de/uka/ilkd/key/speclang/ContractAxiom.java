@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.Taclet;
@@ -31,27 +31,27 @@ public final class ContractAxiom extends ClassAxiom {
     private final IObserverFunction target;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
-    private final Term originalPre;
-    private final Term originalFreePre;
-    private final Term originalPost;
-    private final Term originalFreePost;
-    private final Term originalMby;
+    private final JTerm originalPre;
+    private final JTerm originalFreePre;
+    private final JTerm originalPost;
+    private final JTerm originalFreePost;
+    private final JTerm originalMby;
     private final LocationVariable originalSelfVar;
     private final LocationVariable originalResultVar;
     private final ImmutableList<LocationVariable> originalParamVars;
     private final Map<LocationVariable, LocationVariable> atPreVars;
 
     public ContractAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-            VisibilityModifier visibility, Term pre, Term freePre, Term post, Term freePost,
-            Term mby, Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
+            VisibilityModifier visibility, JTerm pre, JTerm freePre, JTerm post, JTerm freePost,
+            JTerm mby, Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
             LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
         this(name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
             selfVar, resultVar, paramVars);
     }
 
     public ContractAxiom(String name, String displayName, IObserverFunction target, KeYJavaType kjt,
-            VisibilityModifier visibility, Term originalPre, Term originalFreePre,
-            Term originalPost, Term originalFreePost, Term originalMby,
+            VisibilityModifier visibility, JTerm originalPre, JTerm originalFreePre,
+            JTerm originalPost, JTerm originalFreePost, JTerm originalMby,
             Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
             LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
 
@@ -78,7 +78,7 @@ public final class ContractAxiom extends ClassAxiom {
     }
 
     @Override
-    public ContractAxiom map(UnaryOperator<Term> op, Services services) {
+    public ContractAxiom map(UnaryOperator<JTerm> op, Services services) {
         return new ContractAxiom(name, displayName, target, kjt, visibility, op.apply(originalPre),
             op.apply(originalFreePre), op.apply(originalPost), op.apply(originalFreePost),
             op.apply(originalMby), atPreVars, originalSelfVar, originalResultVar,

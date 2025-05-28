@@ -23,9 +23,9 @@ import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -42,6 +42,8 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
+import org.key_project.logic.Term;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
@@ -642,13 +644,13 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     /**
-     * Checks if the given {@link Term} contains a modality, query, or update.
+     * Checks if the given {@link JTerm} contains a modality, query, or update.
      *
-     * @param term The {@link Term} to check.
+     * @param term The {@link JTerm} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */
-    public static boolean containsModalityOrQuery(Term term) {
+    public static boolean containsModalityOrQuery(JTerm term) {
         ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
         term.execPostOrder(visitor);
         return visitor.containsModOrQuery();
@@ -672,7 +674,7 @@ public class SolverListener implements SolverLauncherListener {
          */
         @Override
         public void visit(Term visited) {
-            if (visited.op() instanceof Modality || visited.op() instanceof IProgramMethod) {
+            if (visited.op() instanceof JModality || visited.op() instanceof IProgramMethod) {
                 containsModQuery = true;
             }
         }

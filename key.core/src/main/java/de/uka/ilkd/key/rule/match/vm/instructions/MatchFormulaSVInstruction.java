@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
@@ -21,7 +21,7 @@ public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<Fo
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, LogicServices services) {
+    public MatchConditions match(JTerm subst, MatchConditions mc, LogicServices services) {
         if (subst.sort() == JavaDLTheory.FORMULA) {
             return addInstantiation(subst, mc, services);
         }

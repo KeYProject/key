@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.axiom_abstraction;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.logic.Named;
 
@@ -35,7 +35,7 @@ public abstract class AbstractDomainElement implements Named {
      * @return A JavaDL formula expressing that the given variable or constant represents an
      *         instance of this abstract domain element.
      */
-    public abstract Term getDefiningAxiom(Term varOrConst, Services services);
+    public abstract JTerm getDefiningAxiom(JTerm varOrConst, Services services);
 
     /**
      * Returns a parseable String representation of this {@link AbstractDomainElement}. It should

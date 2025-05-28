@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-/**
- * This interface is used for AST elements of target languages, e.g., Java, Rust, ...
- */
+/// This interface is used for AST elements of target languages, e.g., Java, Rust, ...
 public interface LanguageElement {
 }

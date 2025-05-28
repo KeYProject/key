@@ -9,11 +9,10 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
-/**
- * Feature for invoking a term feature recursively on all subterms of a term. The result will be the
- * sum of the individual results for subterms. The feature descends to subterms as long as
- * <code>cond</code> returns zero.
- */
+/// Feature for invoking a term feature recursively on all subterms of a term. The result will be
+/// the
+/// sum of the individual results for subterms. The feature descends to subterms as long as
+/// <code>cond</code> returns zero.
 public class RecSubTermFeature implements TermFeature {
 
     private final TermFeature cond, summand;

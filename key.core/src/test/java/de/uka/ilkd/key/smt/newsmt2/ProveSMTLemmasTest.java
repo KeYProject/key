@@ -17,7 +17,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +91,7 @@ public class ProveSMTLemmasTest {
                 } else {
                     // and check if proofs are actually for the right theorem!
                     KeyIO io = new KeyIO(loadedProof.getServices());
-                    Term parsedLemma = io.parseExpression(lemmaString);
+                    JTerm parsedLemma = io.parseExpression(lemmaString);
                     var actual = loadedProof.root().sequent().succedent().get(0).formula();
                     if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(actual, parsedLemma)) {
                         LOGGER.info("Stored : {}", parsedLemma);
@@ -105,7 +106,7 @@ public class ProveSMTLemmasTest {
         }
     }
 
-    public static List<String[]> data() throws IOException {
+    public static List<Arguments> data() throws IOException {
         URL url = DefinedSymbolsHandler.class.getResource("DefinedSymbolsHandler.preamble.xml");
         if (url == null) {
             throw new FileNotFoundException(
@@ -117,12 +118,11 @@ public class ProveSMTLemmasTest {
             props.loadFromXML(in);
         }
 
-        List<String[]> result = new ArrayList<>();
+        List<Arguments> result = new ArrayList<>();
 
         for (String name : props.stringPropertyNames()) {
             if (name.matches(".*\\.dl(\\.[0-9]+)?")) {
-                String[] params = { name, props.getProperty(name) };
-                result.add(params);
+                result.add(Arguments.arguments(name, props.getProperty(name)));
             }
         }
 

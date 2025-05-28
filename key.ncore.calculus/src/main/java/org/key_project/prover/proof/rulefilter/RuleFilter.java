@@ -5,10 +5,8 @@ package org.key_project.prover.proof.rulefilter;
 
 import org.key_project.prover.rules.Rule;
 
-/**
- * Interface for objects that represent sets of rules, and which can be used to distinguish
- * different kinds of rules.
- */
+/// Interface for objects that represent sets of rules, and which can be used to distinguish
+/// different kinds of rules.
 public interface RuleFilter {
 
     boolean filter(Rule rule);

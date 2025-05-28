@@ -7,7 +7,7 @@ import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -41,7 +41,7 @@ public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacle
 
 
     @Override
-    Term createFindTerm(IFProofObligationVars ifVars) {
+    JTerm createFindTerm(IFProofObligationVars ifVars) {
         InfFlowPOSnippetFactory f =
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);

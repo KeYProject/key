@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -46,7 +46,7 @@ public class LoopVariantCondition implements VariableCondition {
         if (loopSpec == null) {
             return null;
         }
-        final Term variant = loopSpec.getVariant(loopSpec.getInternalSelfTerm(),
+        final JTerm variant = loopSpec.getVariant(loopSpec.getInternalSelfTerm(),
             loopSpec.getInternalAtPres(), services);
 
         if (variant == null) {

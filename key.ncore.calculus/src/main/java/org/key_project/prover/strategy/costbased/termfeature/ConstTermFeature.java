@@ -8,9 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-/**
- * A feature that returns a constant value
- */
+/// A feature that returns a constant value
 public class ConstTermFeature implements TermFeature {
     public RuleAppCost compute(Term term, MutableState mState, LogicServices services) {
         return val;

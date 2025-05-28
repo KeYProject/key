@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.jspecify.annotations.NonNull;
@@ -52,7 +52,7 @@ public class MatchConditions extends org.key_project.prover.rules.instantiation.
         return new MatchConditions((SVInstantiations) instantiations, renameTable.extend());
     }
 
-    public MatchConditions addRenaming(QuantifiableVariable q1, QuantifiableVariable q2) {
+    public MatchConditions addRenaming(JQuantifiableVariable q1, JQuantifiableVariable q2) {
         return new MatchConditions((SVInstantiations) instantiations, renameTable.assign(q1, q2));
     }
 

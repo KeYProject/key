@@ -5,7 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms and joins. There are
@@ -50,7 +50,7 @@ public interface Constraint {
      * @param services the Services
      * @return a term the given metavariable can be instantiated with
      */
-    Term getInstantiation(Metavariable p_mv, Services services);
+    JTerm getInstantiation(Metavariable p_mv, Services services);
 
     /**
      * tries to unify the terms t1 and t2
@@ -64,7 +64,7 @@ public interface Constraint {
      *
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services);
+    Constraint unify(JTerm t1, JTerm t2, Services services);
 
     /**
      * tries to unify terms t1 and t2.
@@ -75,7 +75,7 @@ public interface Constraint {
      * @param unchanged true iff the new constraint equals this one
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
-    Constraint unify(Term t1, Term t2, Services services, BooleanContainer unchanged);
+    Constraint unify(JTerm t1, JTerm t2, Services services, BooleanContainer unchanged);
 
     /**
      * @return true iff this constraint is as strong as "co", i.e. every instantiation satisfying
@@ -152,7 +152,7 @@ public interface Constraint {
          * @return the instantiation of the metavariable
          */
         @Override
-        public Term getInstantiation(Metavariable p_mv, Services services) {
+        public JTerm getInstantiation(Metavariable p_mv, Services services) {
             // As there is in fact no instantiation satisfying this
             // constraint, we could return everything
             return services.getTermBuilder().var(p_mv);
@@ -165,12 +165,12 @@ public interface Constraint {
          * @return always this
          */
         @Override
-        public Constraint unify(Term t1, Term t2, Services services) {
+        public Constraint unify(JTerm t1, JTerm t2, Services services) {
             return this;
         }
 
         @Override
-        public Constraint unify(Term t1, Term t2, Services services,
+        public Constraint unify(JTerm t1, JTerm t2, Services services,
                 BooleanContainer unchanged) {
             unchanged.setVal(true);
             return this;
