@@ -8,17 +8,13 @@ import org.key_project.logic.Name;
 import org.jspecify.annotations.Nullable;
 
 
-/**
- * Abstract base class for implementations of the Sort interface.
- */
+/// Abstract base class for implementations of the Sort interface.
 public abstract class AbstractSort implements Sort {
     private final Name name;
     private final boolean isAbstract;
 
-    /**
-     * Documentation for this sort given by the associated documentation comment.
-     * //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
-     */
+    /// Documentation for this sort given by the associated documentation comment.
+    /// //@see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
     private @Nullable String documentation;
 
     protected AbstractSort(Name name, boolean isAbstract) {

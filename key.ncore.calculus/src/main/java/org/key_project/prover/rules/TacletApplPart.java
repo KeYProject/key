@@ -9,12 +9,10 @@ import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
-/**
- * Container for the application part of a Taclet. It contains an assumes-sequent, taclet
- * application restrictions, a list of new
- * variables and a list of variable pairs indicating the NotFreeIn relation, a list of
- * NewDependingOn relations, and a list of general variable conditions.
- */
+/// Container for the application part of a Taclet. It contains an assumes-sequent, taclet
+/// application restrictions, a list of new
+/// variables and a list of variable pairs indicating the NotFreeIn relation, a list of
+/// NewDependingOn relations, and a list of general variable conditions.
 public record TacletApplPart(Sequent assumesSequent, Taclet.ApplicationRestriction restriction,
         ImmutableList<? extends NewVarcond> varsNew,
         ImmutableList<? extends NotFreeIn> varsNotFreeIn,

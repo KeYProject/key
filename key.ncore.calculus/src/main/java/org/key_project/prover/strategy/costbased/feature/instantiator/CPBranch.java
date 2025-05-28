@@ -5,22 +5,16 @@ package org.key_project.prover.strategy.costbased.feature.instantiator;
 
 import org.key_project.prover.rules.RuleApp;
 
-/**
- * One branch of a <code>ChoicePoint</code>. An object of this interface will be notified each time
- * the <code>BackTrackingManager</code> decides to take this branch, and can be asked for the
- * current rule application.
- */
+/// One branch of a <code>ChoicePoint</code>. An object of this interface will be notified each time
+/// the <code>BackTrackingManager</code> decides to take this branch, and can be asked for the
+/// current rule application.
 public interface CPBranch {
 
-    /**
-     * Invoked by branch manager when this branch of a choice point has been chosen
-     */
+    /// Invoked by branch manager when this branch of a choice point has been chosen
     void choose();
 
-    /**
-     * @return the updated <code>RuleApp</code> that results when this branch of a choice point has
-     *         been chosen
-     */
+    /// @return the updated <code>RuleApp</code> that results when this branch of a choice point has
+    /// been chosen
     RuleApp getRuleAppForBranch();
 
 }

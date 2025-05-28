@@ -8,20 +8,16 @@ import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * A choice is an option in a category.
- * <p>
- * A choice is represented by a string, where the category is separated by the option with a colon.
- * <p>
- * Choices can be declared within KeY files. They influence the activation of taclets.
- */
+/// A choice is an option in a category.
+///
+/// A choice is represented by a string, where the category is separated by the option with a colon.
+///
+/// Choices can be declared within KeY files. They influence the activation of taclets.
 public class Choice implements Named {
     private final @NonNull Name name;
     private final @NonNull String category;
 
-    /**
-     * Creates a choice object with name {@code <category>:<choice>}.
-     */
+    /// Creates a choice object with name `<category>:<choice>`.
     public Choice(String choice, String category) {
         this(new Name(category + ":" + choice), category);
     }
