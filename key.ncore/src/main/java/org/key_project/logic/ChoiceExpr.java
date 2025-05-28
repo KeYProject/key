@@ -9,16 +9,14 @@ import java.util.Set;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * A ChoiceExpr is a boolean expression that determines whether a taclet or a goal should be
- * activated. {@link ChoiceExpr} are built over and, or, or not. Its atoms are choices
- * ({@code category:option}).
- * <p>
- * This class provides factory methods for constructing an AST.
- *
- * @author Alexander Weigl
- * @version 1 (09.10.22)
- */
+/// A ChoiceExpr is a boolean expression that determines whether a taclet or a goal should be
+/// activated. [ChoiceExpr] are built over and, or, or not. Its atoms are choices
+/// (`category:option`).
+///
+/// This class provides factory methods for constructing an AST.
+///
+/// @author Alexander Weigl
+/// @version 1 (09.10.22)
 public abstract class ChoiceExpr {
     public static final ChoiceExpr TRUE = new True();
 
@@ -42,12 +40,10 @@ public abstract class ChoiceExpr {
         return new Not(sub);
     }
 
-    /**
-     * Evaluate the expression to a boolean value given the current activated choices.
-     *
-     * @param current activated choices
-     * @return true if the expr is true given the assignment in {@code current}
-     */
+    /// Evaluate the expression to a boolean value given the current activated choices.
+    ///
+    /// @param current activated choices
+    /// @return true if the expr is true given the assignment in `current`
     public abstract boolean eval(@NonNull Set<Choice> current);
 
     @Override

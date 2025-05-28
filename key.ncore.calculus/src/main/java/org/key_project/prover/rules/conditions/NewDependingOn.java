@@ -5,17 +5,13 @@ package org.key_project.prover.rules.conditions;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
-/**
- * <br>
- * class containing a pair of SchemaVariables, the first one being a TermSV, the second one a
- * FormulaSV, representing a "c new depending on phi" statement within a varcond of a taclet
- */
+///
+/// class containing a pair of SchemaVariables, the first one being a TermSV, the second one a
+/// FormulaSV, representing a "c new depending on phi" statement within a varcond of a taclet
 public record NewDependingOn(SchemaVariable first, SchemaVariable second) {
-    /**
-     * constructs a pair of variables given two SchemaVariables. The first SchemaVariable has to
-     * occur bound in the Taclet, while the second one can stand for an arbitrary term of formula,
-     * in order to model a pair of the not-free-in relation of a Taclet.
-     */
+    /// constructs a pair of variables given two SchemaVariables. The first SchemaVariable has to
+    /// occur bound in the Taclet, while the second one can stand for an arbitrary term of formula,
+    /// in order to model a pair of the not-free-in relation of a Taclet.
     public NewDependingOn {
         if (!((first.isSkolemTerm()) && (second.isFormula() || second.isTerm()))) {
             throw new RuntimeException(
@@ -24,16 +20,12 @@ public record NewDependingOn(SchemaVariable first, SchemaVariable second) {
         }
     }
 
-    /**
-     * returns the first SchemaVariable of the pair. This SchemaVariable has to be matched to a
-     * QuantifiableVariable
-     */
+    /// returns the first SchemaVariable of the pair. This SchemaVariable has to be matched to a
+    /// QuantifiableVariable
     @Override
     public SchemaVariable first() { return first; }
 
-    /**
-     * returns the second SchemaVariable of the pair.
-     */
+    /// returns the second SchemaVariable of the pair.
     @Override
     public SchemaVariable second() { return second; }
 

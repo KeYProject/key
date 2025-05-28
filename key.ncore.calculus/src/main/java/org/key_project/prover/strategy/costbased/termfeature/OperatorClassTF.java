@@ -8,9 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-/**
- * Term feature for checking whether the top operator of a term has an instance of a certain class
- */
+/// Term feature for checking whether the top operator of a term has an instance of a certain class
 public class OperatorClassTF extends BinaryTermFeature {
 
     private final Class<? extends Operator> opClass;

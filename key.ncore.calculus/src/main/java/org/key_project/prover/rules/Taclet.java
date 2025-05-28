@@ -25,92 +25,72 @@ import org.jspecify.annotations.Nullable;
 
 import static org.key_project.util.Strings.formatAsList;
 
-/**
- * A taclet (formerly known as schematic theory specific rule) is a rule representation used
- * within the KeY verification system.
- */
+/// A taclet (formerly known as schematic theory specific rule) is a rule representation used
+/// within the KeY verification system.
 public abstract class Taclet implements Rule {
-    /**
-     * Annotations attached to taclets, specifying their kind, e.g., lemma.
-     */
+    /// Annotations attached to taclets, specifying their kind, e.g., lemma.
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
-    /** unique name of the taclet */
+    /// unique name of the taclet
     protected final Name name;
 
-    /** name displayed by the pretty printer */
+    /// name displayed by the pretty printer
     protected final String displayName;
 
-    /** contains the find term */
+    /// contains the find term
     protected final @Nullable SyntaxElement find;
 
-    /**
-     * The restriction(s) for applying this update. {@link ApplicationRestriction}.
-     */
+    /// The restriction(s) for applying this update. [ApplicationRestriction].
     protected final ApplicationRestriction applicationRestriction;
 
-    /**
-     * the <tt>assumes</tt> sequent of the taclet
-     */
+    /// the <tt>assumes</tt> sequent of the taclet
     protected final Sequent assumesSequent;
 
-    /**
-     * Variables that have to be created each time the taclet is applied. Those variables occur in
-     * the varcond part of a taclet description.
-     */
+    /// Variables that have to be created each time the taclet is applied. Those variables occur in
+    /// the varcond part of a taclet description.
     protected final ImmutableList<? extends NewVarcond> varsNew;
 
-    /**
-     * variables with a "x not free in y" variable condition. This means the instantiation of
-     * VariableSV x must not occur free in the instantiation of TermSV y.
-     */
+    /// variables with a "x not free in y" variable condition. This means the instantiation of
+    /// VariableSV x must not occur free in the instantiation of TermSV y.
     protected final ImmutableList<? extends NotFreeIn> varsNotFreeIn;
 
-    /**
-     * variable conditions used to express that a termsv depends on the free variables of a given
-     * formula(SV) Used by skolemization rules.
-     */
+    /// variable conditions used to express that a termsv depends on the free variables of a given
+    /// formula(SV) Used by skolemization rules.
     protected final ImmutableList<? extends NewDependingOn> varsNewDependingOn;
 
-    /** Additional generic conditions for schema variable instantiations. */
+    /// Additional generic conditions for schema variable instantiations.
     protected final ImmutableList<? extends VariableCondition> variableConditions;
 
-    /**
-     * the list of taclet goal descriptions
-     */
+    /// the list of taclet goal descriptions
     protected final ImmutableList<TacletGoalTemplate> goalTemplates;
 
-    /** the set of taclet options for this taclet */
+    /// the set of taclet options for this taclet
     protected final ChoiceExpr choices;
 
-    /**
-     * map from a schemavariable to its prefix. The prefix is used to test correct instantiations of
-     * the schemavariables by resolving/avoiding collisions. Mainly the prefix consists of a list of
-     * all variables that may appear free in the instantiation of the schemavariable (a bit more
-     * complicated for rewrite taclets, see paper of M:Giese)
-     */
+    /// map from a schemavariable to its prefix. The prefix is used to test correct instantiations
+    /// of
+    /// the schemavariables by resolving/avoiding collisions. Mainly the prefix consists of a list
+    /// of
+    /// all variables that may appear free in the instantiation of the schemavariable (a bit more
+    /// complicated for rewrite taclets, see paper of M:Giese)
     protected final ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
 
-    /** cache; contains set of all bound variables */
+    /// cache; contains set of all bound variables
     protected @Nullable ImmutableSet<QuantifiableVariable> boundVariables = null;
 
-    /** tracks state of pre-computation */
+    /// tracks state of pre-computation
     private boolean contextInfoComputed = false;
     private boolean contextIsInPrefix = false;
 
     protected @Nullable String tacletAsString;
 
-    /** Set of schema variables of the {@code assumes} part */
+    /// Set of schema variables of the `assumes` part
     protected @Nullable ImmutableSet<SchemaVariable> assumesVariables = null;
 
-    /**
-     * list of rulesets (formerly known as heuristics) the taclet belongs to
-     */
+    /// list of rulesets (formerly known as heuristics) the taclet belongs to
     protected final ImmutableList<RuleSet> ruleSets;
 
-    /**
-     * trigger of the taclet
-     */
+    /// trigger of the taclet
     protected final @Nullable Trigger trigger;
 
     // The two rule engines for matching and execution (application) of taclets
@@ -118,29 +98,24 @@ public abstract class Taclet implements Rule {
     // such that we gain more flexibility like combined matchers that do not just match one taclet
     // but all at once for a given term.
 
-    /**
-     * The taclet matcher
-     */
+    /// The taclet matcher
     protected TacletMatcher matcher;
 
-    /**
-     * The taclet executor
-     */
+    /// The taclet executor
     protected TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
 
-    /**
-     * creates a Taclet (originally known as Schematic Theory Specific Rules)
-     *
-     * @param name the name of the Taclet
-     * @param find the Term or Sequent that is the pattern that has to be found in a sequent and the
-     *        places
-     *        where it matches the Taclet can be applied
-     * @param applPart contains the application part of a Taclet that is the if-sequence, the
-     *        variable conditions
-     * @param goalTemplates a list of goal descriptions.
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
-     *        or recursive use of the Taclet.
-     */
+    /// creates a Taclet (originally known as Schematic Theory Specific Rules)
+    ///
+    /// @param name the name of the Taclet
+    /// @param find the Term or Sequent that is the pattern that has to be found in a sequent and
+    /// the
+    /// places
+    /// where it matches the Taclet can be applied
+    /// @param applPart contains the application part of a Taclet that is the if-sequence, the
+    /// variable conditions
+    /// @param goalTemplates a list of goal descriptions.
+    /// @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+    /// or recursive use of the Taclet.
     protected Taclet(Name name, SyntaxElement find, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
@@ -192,10 +167,9 @@ public abstract class Taclet implements Rule {
         return matcher;
     }
 
-    /**
-     * creates and initializes the taclet matching and execution engines has to be called at the end
-     * of initialization
-     */
+    /// creates and initializes the taclet matching and execution engines has to be called at the
+    /// end
+    /// of initialization
     protected void createTacletServices() {
         createAndInitializeMatcher();
         createAndInitializeExecutor();

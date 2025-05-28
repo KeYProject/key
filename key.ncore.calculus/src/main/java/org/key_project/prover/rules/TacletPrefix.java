@@ -6,11 +6,9 @@ package org.key_project.prover.rules;
 public interface TacletPrefix {
     boolean context();
 
-    /**
-     * returns a new TacletPrefix with the context flag set to the given boolean value
-     *
-     * @param setTo the boolean to which the TacletPrefix is set to
-     * @return a newly created TacletPrefix
-     */
+    /// returns a new TacletPrefix with the context flag set to the given boolean value
+    ///
+    /// @param setTo the boolean to which the TacletPrefix is set to
+    /// @return a newly created TacletPrefix
     TacletPrefix setContext(boolean setTo);
 }

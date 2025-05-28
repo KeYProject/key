@@ -5,9 +5,7 @@ package org.key_project.prover.proof.rulefilter;
 
 import org.key_project.prover.rules.Rule;
 
-/**
- * Inversion of a rule filter
- */
+/// Inversion of a rule filter
 public class NotRuleFilter implements RuleFilter {
 
     private final RuleFilter a;
