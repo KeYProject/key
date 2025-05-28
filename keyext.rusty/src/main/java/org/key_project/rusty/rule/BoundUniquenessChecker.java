@@ -7,6 +7,7 @@ package org.key_project.rusty.rule;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.sequent.Sequent;
@@ -33,6 +34,14 @@ public class BoundUniquenessChecker {
 
     public BoundUniquenessChecker(Term t, org.key_project.prover.sequent.Sequent seq) {
         addTerm(t);
+        addAll(seq);
+    }
+
+    public BoundUniquenessChecker(SyntaxElement find, Sequent seq) {
+        if (find instanceof Term t)
+            addTerm(t);
+        else if (find instanceof Sequent s)
+            addAll(s);
         addAll(seq);
     }
 

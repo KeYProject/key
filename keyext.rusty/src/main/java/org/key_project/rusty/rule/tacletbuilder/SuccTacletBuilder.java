@@ -4,27 +4,20 @@
 package org.key_project.rusty.rule.tacletbuilder;
 
 
-import org.key_project.logic.Term;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.rule.SuccTaclet;
 
 public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
-    private boolean ignoreTopLevelUpdates = true;
-
     /**
-     * sets the <I>find</I> of the Taclet that is to build to the given term, if the sort of the
-     * given term is of Sort.FORMULA otherwise nothing happens.
+     * sets the <I>find</I> of the Taclet that is to build to the given sequent.
      *
      * @return this SuccTacletBuilder
      */
-    public SuccTacletBuilder setFind(Term findTerm) {
-        if (findTerm.sort() == RustyDLTheory.FORMULA) {
-            find = findTerm;
-        }
-        checkContainsFreeVarSV(findTerm, this.getName(), "find term");
+    public SuccTacletBuilder setFind(Sequent findSeq) {
+        find = findSeq;
+        checkContainsFreeVarSV(findSeq, this.getName(), "find sequent");
         return this;
     }
 
@@ -81,10 +74,5 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      */
     public SuccTaclet getTaclet() {
         return getSuccTaclet();
-    }
-
-
-    public void setIgnoreTopLevelUpdates(boolean ignore) {
-        ignoreTopLevelUpdates = ignore;
     }
 }

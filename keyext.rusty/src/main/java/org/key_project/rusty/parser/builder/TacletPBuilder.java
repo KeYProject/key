@@ -531,20 +531,14 @@ public class TacletPBuilder extends ExpressionBuilder {
             if (findSeq.isEmpty()) {
                 return new NoFindTacletBuilder();
             } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().isEmpty()) {
-                Term findFma = findSeq.antecedent().get(0).formula();
                 AntecTacletBuilder b = new AntecTacletBuilder();
-                b.setFind(findFma);
-                b.setIgnoreTopLevelUpdates(
-                    !applicationRestriction
-                            .matches(Taclet.ApplicationRestriction.IN_SEQUENT_STATE));
+                b.setFind(findSeq);
+                b.setApplicationRestriction(applicationRestriction);
                 return b;
             } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
-                Term findFma = findSeq.succedent().get(0).formula();
                 SuccTacletBuilder b = new SuccTacletBuilder();
-                b.setFind(findFma);
-                b.setIgnoreTopLevelUpdates(
-                    !applicationRestriction
-                            .matches(Taclet.ApplicationRestriction.IN_SEQUENT_STATE));
+                b.setFind(findSeq);
+                b.setApplicationRestriction(applicationRestriction);
                 return b;
             } else {
                 semanticError(ctx, "Unknown find-sequent (perhaps null?):" + findSeq);

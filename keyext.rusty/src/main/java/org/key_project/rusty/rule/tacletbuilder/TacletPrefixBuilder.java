@@ -6,6 +6,7 @@ package org.key_project.rusty.rule.tacletbuilder;
 
 import java.util.Iterator;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.conditions.NotFreeIn;
@@ -126,8 +127,11 @@ public class TacletPrefixBuilder {
         visit(tacletBuilder.ifSequent());
 
         if (tacletBuilder instanceof FindTacletBuilder<? extends FindTaclet> ftb) {
-            final Term find = ftb.getFind();
-            visit(find);
+            final SyntaxElement find = ftb.getFind();
+            if (find instanceof Term t)
+                visit(t);
+            else if (find instanceof Sequent s)
+                visit(s);
         }
 
         for (final org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate tgt : tacletBuilder

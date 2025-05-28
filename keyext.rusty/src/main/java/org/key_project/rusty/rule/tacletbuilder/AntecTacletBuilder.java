@@ -3,28 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
-import org.key_project.logic.Term;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.rule.AntecTaclet;
 
-public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
+import org.jspecify.annotations.NonNull;
 
-    private boolean ignoreTopLevelUpdates = true;
-
+public class AntecTacletBuilder extends FindTacletBuilder<@NonNull AntecTaclet> {
     /**
-     * sets the <I>find</I> of the Taclet that is to build to the given term, if the sort of the
-     * given term is of Sort.FORMULA otherwise nothing happens.
+     * sets the <I>find</I> of the Taclet that is to build to the given sequent.
      *
      * @return this AntecTacletBuilder
      */
-    public AntecTacletBuilder setFind(Term findTerm) {
-        if (findTerm.sort() == RustyDLTheory.FORMULA) {
-            find = findTerm;
-        }
-        checkContainsFreeVarSV(findTerm, getName(), "find term");
+    public AntecTacletBuilder setFind(Sequent findSeq) {
+        find = findSeq;
+        checkContainsFreeVarSV(findSeq, getName(), "find sequent");
         return this;
     }
 
@@ -86,6 +80,5 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
     }
 
     public void setIgnoreTopLevelUpdates(boolean ignore) {
-        ignoreTopLevelUpdates = ignore;
     }
 }

@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
-import org.key_project.logic.Term;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.rusty.rule.BoundUniquenessChecker;
 import org.key_project.rusty.rule.FindTaclet;
 
 public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuilder<T> {
-    protected Term find = null;
+    protected SyntaxElement find = null;
 
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable If the value is equal
@@ -43,12 +43,17 @@ public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuil
         }
     }
 
-    /*
-     * Get the `find' term. This could be a term or a formula for a RewriteTaclet, but only a
+    /**
+     * Get the {@code find} term. This could be a term or a formula for a RewriteTaclet, but only a
      * formula for an Antec/Succ Taclet.
      */
-    public Term getFind() {
+    public SyntaxElement getFind() {
         return find;
     }
 
+    public FindTacletBuilder<T> setApplicationRestriction(
+            Taclet.ApplicationRestriction p_applicationRestriction) {
+        applicationRestriction = p_applicationRestriction;
+        return this;
+    }
 }
