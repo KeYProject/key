@@ -1724,8 +1724,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     expr.getType());
             case JmlLexer.MAX -> termFactory.quantifiedMax(guard, body, declVars.first, nullable,
                     declVars.second);
+
             case JmlLexer.MIN -> termFactory.quantifiedMin(guard, body, declVars.first, nullable,
                     declVars.second);
+            case JmlLexer.MSET -> termFactory.quantifiedMset(declVars.first, nullable, declVars.second, guard, body,
+                    services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_MSET));
             case JmlLexer.NUM_OF -> {
                 KeYJavaType kjtInt =
                         services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);

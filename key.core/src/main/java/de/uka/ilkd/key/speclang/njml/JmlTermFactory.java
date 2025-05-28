@@ -259,6 +259,16 @@ public final class JmlTermFactory {
         return numeralQuantifier(javaType, nullable, qvs, t1, t2, resultType, unbounded, bounded);
     }
 
+    public @NonNull SLExpression quantifiedMset(KeYJavaType javaType, boolean nullable,
+                                               Iterable<LogicVariable> qvs, @Nullable Term t1, Term t2, KeYJavaType resultType) {
+        BoundedNumericalQuantifier bounded = tb::mset;
+        UnboundedNumericalQuantifier unbounded = (declsType, n, vars, range, body) -> {
+            final Term tr = typerestrict(declsType, n, vars);
+            return tb.mset(vars, tb.andSC(tr, range), body);
+        };
+        return nonNumeralQuantifier(javaType, nullable, qvs, t1, t2, resultType, unbounded, bounded);
+    }
+
     public SLExpression forall(Term preTerm, Term bodyTerm, KeYJavaType declsType,
             ImmutableList<LogicVariable> declVars, boolean nullable, KeYJavaType resultType) {
         BiFunction<QuantifiableVariable, Term, Term> quantify = tb::all;
@@ -379,6 +389,33 @@ public final class JmlTermFactory {
         // cast to specific JML type (fixes bug #1347)
         return buildBigintTruncationExpression(resultType, t);
     }
+
+    private @NonNull SLExpression nonNumeralQuantifier(KeYJavaType declsType, boolean nullable,
+                                                    Iterable<LogicVariable> qvs, Term t1, Term t2, @Nullable KeYJavaType resultType,
+                                                    UnboundedNumericalQuantifier unbounded, BoundedNumericalQuantifier bounded) {
+        Iterator<LogicVariable> it = qvs.iterator();
+        LogicVariable lv = it.next();
+        Term t;
+        if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
+            // not interval range, create unbounded comprehension term
+            ImmutableList<LogicVariable> _qvs =
+                    ImmutableSLList.<LogicVariable>nil().prepend(lv);
+            while (it.hasNext()) {
+                _qvs = _qvs.prepend(it.next());
+            }
+            t = unbounded.apply(declsType, nullable, _qvs, t1, t2);
+        } else {
+            t = bounded.apply(lv, lowerBound(t1, lv), upperBound(t1, lv), t2);
+        }
+
+        if (resultType == null) {
+            resultType = services.getTypeConverter().getKeYJavaType(t2);
+        }
+
+        // cast to specific JML type (fixes bug #1347)
+        return new SLExpression(t, resultType);
+    }
+
 
     public ImmutableList<Term> infflowspeclist(ImmutableList<Term> result) {
         return result;
@@ -747,6 +784,19 @@ public final class JmlTermFactory {
         }
     }
 
+    private SLExpression buildMSetTruncationExpression(KeYJavaType resultType, Term term) {
+        assert term.sort() == services.getTypeConverter().getIntegerLDT().targetSort();
+
+        SpecMathMode mode = this.overloadedFunctionHandler.getSpecMathMode();
+        if (mode == SpecMathMode.JAVA) {
+            return buildIntCastExpression(resultType, term);
+        } else {
+            KeYJavaType mset = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_MSET);
+            return new SLExpression(term, mset);
+        }
+    }
+
+
     private SLExpression buildIntCastExpression(KeYJavaType resultType, Term term) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
@@ -869,6 +919,33 @@ public final class JmlTermFactory {
         final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
         return new SLExpression(resultTerm, seqtype);
     }
+
+  /*
+   public SLExpression createMSet(SLExpression a, SLExpression b, SLExpression t,
+
+                                     KeYJavaType declsType, ImmutableList<? extends QuantifiableVariable> declVars) {
+        if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
+                || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
+            throw exc.createException0(
+                    "multiset definition variable must be of type int or \\bigint");
+        } else if (declVars.size() != 1) {
+            throw exc.createException0("multiset definition must declare exactly one variable");
+        }
+        QuantifiableVariable qv = declVars.head();
+        Term tt = t.getTerm();
+        if (tt.sort() == JavaDLTheory.FORMULA) {
+            // bugfix (CS): t.getTerm() delivers a formula instead of a
+            // boolean term; obviously the original boolean terms are
+            // converted to formulas somewhere else; however, we need
+            // boolean terms instead of formulas here
+            tt = tb.convertToBoolean(t.getTerm());
+        }
+        Term resultTerm = tb.mset(qv, a.getTerm(), b.getTerm(), tt);
+        final KeYJavaType msettype = services.getJavaInfo().getPrimitiveKeYJavaType("\\mset");
+        return new SLExpression(resultTerm, msettype);
+    }
+
+   */
 
     public SLExpression createUnionF(boolean nullable,
             Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars, Term expr, Term guard) {

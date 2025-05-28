@@ -34,7 +34,6 @@ public class EmptySeqLiteral extends Literal {
         v.performActionOnEmptySeqLiteral(this);
     }
 
-
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }

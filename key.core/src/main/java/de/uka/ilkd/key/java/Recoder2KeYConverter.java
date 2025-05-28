@@ -23,8 +23,10 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.expression.operator.mst.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.expression.literal.EmptyMSetLiteral;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -722,6 +724,47 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);
         return new SeqPut(children);
     }
+
+
+    public EmptyMSetLiteral convert(de.uka.ilkd.key.java.recoderext.mst.EmptyMSetLiteral e) {
+        return EmptyMSetLiteral.INSTANCE;
+    }
+
+    public MSetUnion convert(de.uka.ilkd.key.java.recoderext.mst.MSetUnion e){
+        ExtList children = collectChildren(e);
+        return new MSetUnion(children);
+    }
+
+    public MSetSum convert(de.uka.ilkd.key.java.recoderext.mst.MSetSum e){
+        ExtList children = collectChildren(e);
+        return new MSetSum(children);
+    }
+
+    public MSetDiff convert(de.uka.ilkd.key.java.recoderext.mst.MSetDiff e){
+        ExtList children = collectChildren(e);
+        return new MSetDiff(children);
+    }
+
+    public MSetIntersect convert(de.uka.ilkd.key.java.recoderext.mst.MSetIntersect e){
+        ExtList children = collectChildren(e);
+        return new MSetIntersect(children);
+    }
+
+    public MSetSingle convert(de.uka.ilkd.key.java.recoderext.mst.MSetSingle e){
+        ExtList children = collectChildren(e);
+        return new MSetSingle(children);
+    }
+
+    public MSetMul convert(de.uka.ilkd.key.java.recoderext.mst.MSetMul e) {
+
+        return new MSetMul(collectChildren(e));
+    }
+
+    public MSetCard convert(de.uka.ilkd.key.java.recoderext.mst.MSetCard e) {
+
+        return new MSetCard(collectChildren(e));
+    }
+
 
     public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
         return EmptyMapLiteral.INSTANCE;
