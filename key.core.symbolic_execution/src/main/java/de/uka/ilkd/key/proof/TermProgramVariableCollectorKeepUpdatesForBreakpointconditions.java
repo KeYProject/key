@@ -10,6 +10,8 @@ import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
+import org.key_project.logic.Term;
+
 public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
         extends TermProgramVariableCollector {
     private final IBreakpointStopCondition breakpointStopCondition;
@@ -24,7 +26,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
      * {@inheritDoc}
      */
     @Override
-    public void visit(org.key_project.logic.Term t) {
+    public void visit(Term t) {
         super.visit(t);
         if (t.op() instanceof Modality) {
             addVarsToKeep();
