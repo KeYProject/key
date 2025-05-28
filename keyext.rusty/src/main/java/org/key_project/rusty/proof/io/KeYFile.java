@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.rusty.parser.*;
 import org.key_project.rusty.parser.builder.ProblemFinder;
 import org.key_project.rusty.parser.builder.TacletPBuilder;
@@ -22,7 +23,6 @@ import org.key_project.rusty.proof.init.InitConfig;
 import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.init.ProofInputException;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
-import org.key_project.rusty.rule.Taclet;
 import org.key_project.rusty.settings.Configuration;
 import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.rusty.util.parsing.BuildingIssue;

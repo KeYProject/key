@@ -4,7 +4,9 @@
 package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.rule.AntecTaclet;
 
@@ -73,9 +75,11 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
         prefixBuilder.build();
 
         AntecTaclet t = new AntecTaclet(name,
-            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+            new TacletApplPart(ifseq,
+                applicationRestriction.combine(Taclet.ApplicationRestriction.ANTECEDENT_POLARITY),
+                varsNew, varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
-            goals, ruleSets, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
+            goals, ruleSets, attrs, (Sequent) find, prefixBuilder.getPrefixMap(),
             choices, tacletAnnotations);
         // t.setOrigin(origin);
         return t;

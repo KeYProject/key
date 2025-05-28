@@ -5,7 +5,9 @@ package org.key_project.rusty.rule.tacletbuilder;
 
 
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.rule.SuccTaclet;
 
@@ -59,9 +61,11 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         final TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         SuccTaclet t = new SuccTaclet(name,
-            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+            new TacletApplPart(ifseq,
+                applicationRestriction.combine(Taclet.ApplicationRestriction.SUCCEDENT_POLARITY),
+                varsNew, varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
-            goals, ruleSets, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
+            goals, ruleSets, attrs, (Sequent) find, prefixBuilder.getPrefixMap(),
             choices, tacletAnnotations);
         // t.setOrigin(origin);
         return t;

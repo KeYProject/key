@@ -5,9 +5,9 @@ package org.key_project.rusty.parser;
 
 import java.util.*;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
-import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.parser.builder.AbstractBuilder;
 
 import org.jspecify.annotations.NonNull;

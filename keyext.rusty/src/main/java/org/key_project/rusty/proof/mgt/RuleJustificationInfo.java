@@ -6,8 +6,8 @@ package org.key_project.rusty.proof.mgt;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.prover.rules.Rule;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.rule.Rule;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.RuleKey;
 

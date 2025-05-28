@@ -13,6 +13,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.instantiation.*;
 import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.sequent.*;
@@ -100,7 +101,7 @@ public abstract class TacletApp implements RuleApp {
      */
     @Override
     public Rule rule() {
-        return taclet;
+        return (Rule) taclet;
     }
 
     /**
@@ -147,7 +148,7 @@ public abstract class TacletApp implements RuleApp {
         return true;
     }
 
-    protected static boolean checkNoFreeVars(Taclet taclet) {
+    protected static boolean checkNoFreeVars(org.key_project.prover.rules.Taclet taclet) {
         // TODO
         return true;
     }
@@ -204,7 +205,8 @@ public abstract class TacletApp implements RuleApp {
      * @param insts the original SVInstantiations
      * @return the resolved SVInstantiations
      */
-    protected static SVInstantiations resolveCollisionVarSV(Taclet taclet, SVInstantiations insts,
+    protected static SVInstantiations resolveCollisionVarSV(
+            org.key_project.prover.rules.Taclet taclet, SVInstantiations insts,
             Services services) {
         HashMap<BoundVariable, SchemaVariable> collMap = new LinkedHashMap<>();
         for (final var pair : insts
@@ -242,7 +244,8 @@ public abstract class TacletApp implements RuleApp {
      * returns a new SVInstantiations that modifies the given SVInstantiations insts at the bound
      * SchemaVariable varSV to a new LogicVariable.
      */
-    protected static SVInstantiations replaceInstantiation(Taclet taclet, SVInstantiations insts,
+    protected static SVInstantiations replaceInstantiation(
+            org.key_project.prover.rules.Taclet taclet, SVInstantiations insts,
             SchemaVariable varSV, Services services) {
         throw new RuntimeException("TODO");
         /*

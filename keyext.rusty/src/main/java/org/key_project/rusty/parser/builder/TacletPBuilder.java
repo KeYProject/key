@@ -7,12 +7,11 @@ package org.key_project.rusty.parser.builder;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Namespace;
-import org.key_project.logic.Term;
+import org.key_project.logic.*;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.Trigger;
 import org.key_project.prover.sequent.Sequent;
@@ -33,7 +32,6 @@ import org.key_project.rusty.parser.varcond.TacletBuilderCommand;
 import org.key_project.rusty.parser.varcond.TacletBuilderManipulators;
 import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.*;
-import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
 import org.key_project.rusty.rule.tacletbuilder.*;
 import org.key_project.rusty.util.parsing.BuildingException;
 import org.key_project.util.collection.*;
@@ -160,8 +158,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             if (!axiomMode) {
                 semanticError(ctx, "formula rules are only permitted for \\axioms");
             }
-            TacletBuilder<?> b = createTacletBuilderFor(null,
-                new ApplicationRestriction(ApplicationRestriction.NONE), ctx);
+            TacletBuilder<?> b =
+                createTacletBuilderFor(null, Taclet.ApplicationRestriction.NONE, ctx);
             currentTBuilder.push(b);
             Sequent addSeq = RustySequentKit
                     .createAnteSequent(ImmutableSLList.singleton(new SequentFormula(form)));
@@ -186,26 +184,28 @@ public class TacletPBuilder extends ExpressionBuilder {
             ifSeq = accept(ctx.ifSeq);
         }
 
-        ApplicationRestriction applicationRestriction =
-            new ApplicationRestriction(ApplicationRestriction.NONE);
+        @Nullable
+        Object find = accept(ctx.find);
+        Sequent seq = find instanceof Sequent ? (Sequent) find : null;
+
+        var applicationRestriction = Taclet.ApplicationRestriction.NONE;
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
             applicationRestriction =
-                applicationRestriction.combine(ApplicationRestriction.SAME_UPDATE_LEVEL);
+                applicationRestriction.combine(Taclet.ApplicationRestriction.SAME_UPDATE_LEVEL);
         }
         if (!ctx.INSEQUENTSTATE().isEmpty()) {
             applicationRestriction =
-                applicationRestriction.combine(ApplicationRestriction.IN_SEQUENT_STATE);
+                applicationRestriction.combine(Taclet.ApplicationRestriction.IN_SEQUENT_STATE);
         }
-        if (!ctx.ANTECEDENTPOLARITY().isEmpty()) {
+        if (!ctx.ANTECEDENTPOLARITY().isEmpty() || (seq != null && !seq.antecedent().isEmpty())) {
             applicationRestriction =
-                applicationRestriction.combine(ApplicationRestriction.ANTECEDENT_POLARITY);
+                applicationRestriction.combine(Taclet.ApplicationRestriction.ANTECEDENT_POLARITY);
         }
-        if (!ctx.SUCCEDENTPOLARITY().isEmpty()) {
+        if (!ctx.SUCCEDENTPOLARITY().isEmpty() || (seq != null && !seq.succedent().isEmpty())) {
             applicationRestriction =
-                applicationRestriction.combine(ApplicationRestriction.SUCCEDENT_POLARITY);
+                applicationRestriction.combine(Taclet.ApplicationRestriction.SUCCEDENT_POLARITY);
         }
-        @Nullable
-        Object find = accept(ctx.find);
+
         TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
         currentTBuilder.push(b);
         b.setIfSequent(ifSeq);
@@ -535,14 +535,16 @@ public class TacletPBuilder extends ExpressionBuilder {
                 AntecTacletBuilder b = new AntecTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
-                    !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE));
+                    !applicationRestriction
+                            .matches(Taclet.ApplicationRestriction.IN_SEQUENT_STATE));
                 return b;
             } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
                 Term findFma = findSeq.succedent().get(0).formula();
                 SuccTacletBuilder b = new SuccTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
-                    !applicationRestriction.matches(ApplicationRestriction.IN_SEQUENT_STATE));
+                    !applicationRestriction
+                            .matches(Taclet.ApplicationRestriction.IN_SEQUENT_STATE));
                 return b;
             } else {
                 semanticError(ctx, "Unknown find-sequent (perhaps null?):" + findSeq);

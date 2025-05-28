@@ -34,7 +34,7 @@ public class SuccTaclet extends FindTaclet {
      * @param applPart contains the application part of a taclet that is the if-sequent, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
-     * @param heuristics a list of heuristics for the Taclet
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values indicating a non-interactive
      *        or recursive use of the Taclet.
      * @param find the find sequent of the Taclet
@@ -43,12 +43,12 @@ public class SuccTaclet extends FindTaclet {
      *        the prefix for each SchemaVariable in the taclet
      */
     public SuccTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> heuristics,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Sequent find,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, heuristics, attrs, find, prefixMap, choices,
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
             tacletAnnotations);
         createTacletServices();
     }
@@ -79,6 +79,5 @@ public class SuccTaclet extends FindTaclet {
             (Sequent) find,
             prefixMap, choices, tacletAnnotations);
     }
-
 
 }

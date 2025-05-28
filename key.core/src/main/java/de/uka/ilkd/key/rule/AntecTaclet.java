@@ -28,10 +28,10 @@ public class AntecTaclet extends FindTaclet {
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
      *
      * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequent, the
+     * @param applPart contains the application part of a Taclet that is the if-sequent, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
-     * @param heuristics a list of heuristics for the Taclet
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values indicating a non-interactive
      *        or recursive use of the Taclet.
      * @param find the find sequent of the Taclet
@@ -39,12 +39,12 @@ public class AntecTaclet extends FindTaclet {
      *        SchemaVariable in the Taclet
      */
     public AntecTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> heuristics,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Sequent find,
             ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, heuristics, attrs, find, prefixMap, choices,
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
             tacletAnnotations);
         createTacletServices();
     }
@@ -59,7 +59,6 @@ public class AntecTaclet extends FindTaclet {
     protected StringBuffer toStringFind(StringBuffer sb) {
         return sb.append("\\find(").append(find().toString()).append("==>)\n");
     }
-
 
     @Override
     protected void createAndInitializeExecutor() {

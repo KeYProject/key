@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -10,20 +11,21 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.TacletPrefix;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
-import org.key_project.rusty.logic.ChoiceExpr;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.rule.executor.rustydl.AntecTacletExecutor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * An AntecTaclet represents a taclet whose find part has to match a top level formula in the
  * antecedent of the sequent.
  */
 public class AntecTaclet extends FindTaclet {
-    private final boolean ignoreTopLevelUpdates;
-
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
      *
@@ -34,32 +36,25 @@ public class AntecTaclet extends FindTaclet {
      * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values indicating a non-interactive
      *        or recursive use of the Taclet.
-     * @param find the find term of the Taclet
+     * @param find the find sequent of the Taclet
      * @param prefixMap a ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
      */
     public AntecTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            TacletAttributes attrs, Sequent find,
+            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            ChoiceExpr choices,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
             tacletAnnotations);
-        this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
     }
 
-    /**
-     * this method is used to determine if top level updates are allowed to be ignored. This may be
-     * the case if we have an Antec or SuccTaclet but not for a RewriteTaclet
-     *
-     * @return true if top level updates shall be ignored
-     */
     @Override
-    public boolean ignoreTopLevelUpdates() {
-        return ignoreTopLevelUpdates;
+    public Term find() {
+        return (Term) ((Sequent) find).antecedent().getFirst().formula();
     }
-
 
     /** toString for the find part */
     @Override
@@ -73,13 +68,14 @@ public class AntecTaclet extends FindTaclet {
     }
 
     @Override
-    public AntecTaclet setName(String s) {
+    public @NonNull AntecTaclet setName(@NonNull String s) {
         final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
+                varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes(displayName(), null);
+        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
-        return new AntecTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs, find,
-            ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
+        return new AntecTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
+            (Sequent) find, prefixMap, choices, tacletAnnotations);
     }
 }

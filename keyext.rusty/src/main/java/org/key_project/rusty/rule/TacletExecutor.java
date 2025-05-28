@@ -93,7 +93,7 @@ public abstract class TacletExecutor extends
         for (var rule : rules) {
             var tacletToAdd = (Taclet) rule;
             final Node n = goal.getNode();
-            tacletToAdd = tacletToAdd
+            tacletToAdd = (Taclet) tacletToAdd
                     .setName(tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId());
 
 

@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import org.key_project.logic.Choice;
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -17,8 +19,6 @@ import org.key_project.prover.rules.conditions.NewDependingOn;
 import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
-import org.key_project.rusty.logic.Choice;
-import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.VariableSV;
 import org.key_project.rusty.proof.calculus.RustySequentKit;

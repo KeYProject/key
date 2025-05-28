@@ -445,7 +445,7 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
-    StringBuffer toStringAttribs(StringBuffer sb) {
+    protected StringBuffer toStringAttribs(StringBuffer sb) {
         // if (noninteractive()) sb = sb.append(" \\noninteractive");
         sb.append("\nChoices: ").append(choices);
         return sb;

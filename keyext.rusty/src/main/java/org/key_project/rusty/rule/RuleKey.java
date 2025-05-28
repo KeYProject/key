@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
-import org.key_project.rusty.logic.ChoiceExpr;
+import org.key_project.prover.rules.Rule;
 
 import org.jspecify.annotations.NonNull;
 

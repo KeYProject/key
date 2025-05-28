@@ -192,7 +192,7 @@ public class TacletPrefixBuilder {
             // RewriteTacletGoalTemplate
             // gt=(RewriteTacletGoalTemplate)tmpl;
             svc.visit(tmpl.sequent());
-            for (org.key_project.rusty.rule.Taclet taclet : tmpl.rules()) { // addrules
+            for (var taclet : tmpl.rules()) { // addrules
                 svc.visit(taclet, true);
             }
         }

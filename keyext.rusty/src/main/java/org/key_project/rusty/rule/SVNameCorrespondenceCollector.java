@@ -25,7 +25,7 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in the taclet
      */
-    private ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.logic.op.sv.SchemaVariable> nameCorrespondences =
+    private ImmutableMap<SchemaVariable, SchemaVariable> nameCorrespondences =
         DefaultImmutableMap.nilMap();
 
     /**
@@ -39,8 +39,8 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
         if (top instanceof SubstOp) {
             final var substTermOp = t.sub(0).op();
             final var substVar = t.varsBoundHere(1).get(0);
-            if (substTermOp instanceof org.key_project.logic.op.sv.SchemaVariable substTermSV
-                    && substVar instanceof org.key_project.logic.op.sv.SchemaVariable substVarSV) {
+            if (substTermOp instanceof SchemaVariable substTermSV
+                    && substVar instanceof SchemaVariable substVarSV) {
                 addNameCorrespondence(substTermSV, substVarSV);
             }
         }
@@ -50,12 +50,12 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
      * @return the found correspondences as a map, mapping schema variable a onto schema variables b
      *         if b is replaced with a somewhere in this taclet
      */
-    public ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.logic.op.sv.SchemaVariable> getCorrespondences() {
+    public ImmutableMap<SchemaVariable, SchemaVariable> getCorrespondences() {
         return nameCorrespondences;
     }
 
-    private void addNameCorrespondence(org.key_project.logic.op.sv.SchemaVariable nameReceiver,
-            org.key_project.logic.op.sv.SchemaVariable nameProvider) {
+    private void addNameCorrespondence(SchemaVariable nameReceiver,
+            SchemaVariable nameProvider) {
         nameCorrespondences = nameCorrespondences.put(nameReceiver, nameProvider);
     }
 
@@ -88,12 +88,12 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
      *        false) or if the visitor descends into them (iff true)
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
-        org.key_project.logic.op.sv.SchemaVariable findSV = null;
+        SchemaVariable findSV = null;
         visit(taclet.assumesSequent());
         if (taclet instanceof FindTaclet) {
             final Term findTerm = ((FindTaclet) taclet).find();
             findTerm.execPostOrder(this);
-            if (findTerm.op() instanceof org.key_project.logic.op.sv.SchemaVariable sv) {
+            if (findTerm.op() instanceof SchemaVariable sv) {
                 findSV = sv;
             }
         }
@@ -112,8 +112,8 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
                 }
             }
             if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
-                    visit(taclet1, true);
+                for (var taclet1 : gt.rules()) {
+                    visit((Taclet) taclet1, true);
                 }
             }
         }

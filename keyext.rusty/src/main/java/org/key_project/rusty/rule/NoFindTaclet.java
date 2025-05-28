@@ -3,22 +3,25 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.TacletAttributes;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
-import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.rule.executor.rustydl.NoFindTacletExecutor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
- * Used to implement a Taclet that has no <I>find</I> part. This useKind of taclet is not attached
- * to
+ * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet is not attached to
  * term or formula, but to a complete sequent. A typical representant is the <code>cut</code> rule.
  */
 public class NoFindTaclet extends Taclet {
@@ -35,16 +38,15 @@ public class NoFindTaclet extends Taclet {
      * @param attrs attributes for the Taclet; these are boolean values
      * @param prefixMap a ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
+     * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            ImmutableList<RuleSet> ruleSets,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-            ChoiceExpr choices,
-            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
-            choices, tacletAnnotations);
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, null, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
+            tacletAnnotations);
         createTacletServices();
     }
 
@@ -54,10 +56,10 @@ public class NoFindTaclet extends Taclet {
     }
 
     /**
-     * @return Set of schemavariables of {@code if} and the (optional) find part
+     * @return Set of schemavariables of {@code assumes} and the (optional) find part
      */
     @Override
-    public ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> getAssumesAndFindVariables() {
+    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
         return getAssumesVariables();
     }
 
@@ -73,14 +75,14 @@ public class NoFindTaclet extends Taclet {
     }
 
     @Override
-    public NoFindTaclet setName(String s) {
+    public @NonNull NoFindTaclet setName(@NonNull String s) {
         final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
+                varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
-        final var attrs = new TacletAttributes(displayName(), null);
+        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
-        return new NoFindTaclet(new Name(s), applPart,
-            goalTemplates(), ruleSets, attrs,
+        return new NoFindTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
             prefixMap, choices, tacletAnnotations);
     }
 }

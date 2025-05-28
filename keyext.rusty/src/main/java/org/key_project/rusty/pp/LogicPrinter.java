@@ -226,7 +226,7 @@ public class LogicPrinter {
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) {
-        final var applicationRestriction = taclet.getApplicationRestriction();
+        final var applicationRestriction = taclet.applicationRestriction();
         if ((applicationRestriction
                 .matches(RewriteTaclet.ApplicationRestriction.SAME_UPDATE_LEVEL))) {
             layouter.nl().print("\\sameUpdateLevel");

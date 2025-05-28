@@ -10,6 +10,7 @@ import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.rusty.ast.visitor.ProgramSVCollector;
 import org.key_project.rusty.logic.RustyBlock;

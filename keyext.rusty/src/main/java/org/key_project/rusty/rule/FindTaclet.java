@@ -3,17 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * An abstract class to represent Taclets with a find part. This means, they have to be attached to
@@ -23,19 +29,8 @@ import org.key_project.util.collection.ImmutableSet;
  * the find part somewhere in the sequent ({@link RewriteTaclet}).
  */
 public abstract class FindTaclet extends Taclet {
-    /** contains the find term */
-    protected final Term find;
-
-    /** Set of schemavariables of the {@code if} and the (optional) {@code find} part */
-    private ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> ifFindVariables = null;
-
-    /**
-     * this method is used to determine if top level updates are allowed to be ignored. This is the
-     * case if we have an Antec or SuccTaclet but not for a RewriteTaclet
-     *
-     * @return true if top level updates shall be ignored
-     */
-    public abstract boolean ignoreTopLevelUpdates();
+    /** Set of schema variables of the assumes sequent and the (optional) find expression/sequent */
+    private ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
 
     /**
      * creates a FindTaclet
@@ -45,7 +40,7 @@ public abstract class FindTaclet extends Taclet {
      *        conditions
      * @param goalTemplates a IList<TacletGoalTemplate> that contains all goaltemplates of the
      *        taclet (these are the instructions used to create new goals when applying the Taclet)
-     * @param ruleSets a list of rule sets for the Taclet
+     * @param ruleSets a ImmutableList that contains all rule sets the Taclet is attached to
      * @param attrs the TacletAttributes encoding if the Taclet is non-interactive, recursive or
      *        something like that
      * @param find the Term that is the pattern that has to be found in a sequent and the places
@@ -54,15 +49,15 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
-            org.key_project.prover.rules.TacletAttributes attrs, Term find,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            TacletAttributes attrs, SyntaxElement find,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSymbExec,
-            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
+            surviveSymbExec,
             tacletAnnotations);
-        this.find = find;
     }
 
     /**
@@ -73,7 +68,7 @@ public abstract class FindTaclet extends Taclet {
      *        conditions
      * @param goalTemplates an ImmutableList that contains all goaltemplates of the
      *        taclet (these are the instructions used to create new goals when applying the Taclet)
-     * @param ruleSets a list of rule sets for the Taclet
+     * @param ruleSets an ImmutableList that contains all rule sets the Taclet is attached to
      * @param attrs the TacletAttributes encoding if the Taclet is non-interactive, recursive or
      *        something like that
      * @param find the Term that is the pattern that has to be found in a sequent and the places
@@ -82,76 +77,36 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
-            org.key_project.prover.rules.TacletAttributes attrs, Term find,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-            ChoiceExpr choices,
-            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+            TacletAttributes attrs, SyntaxElement find,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
     }
 
-    /** returns the find term of the taclet to be matched */
-    public Term find() {
-        return find;
-    }
-
-
-    protected StringBuffer toStringFind(StringBuffer sb) {
-        return sb.append("\\find(").append(find().toString()).append(")\n");
-    }
-
+    /**
+     * returns the find term of the taclet to be matched
+     */
+    public abstract Term find();
 
     /**
-     * returns a representation of the Taclet with find part as String
-     *
-     * @return string representation
+     * @return Set of schemavariables of the if and the (optional) find part
      */
-    public String toString() {
-        if (tacletAsString == null) {
-            StringBuffer sb = new StringBuffer();
-            sb = sb.append(name()).append(" {\n");
-            sb = toStringAssumes(sb);
-            sb = toStringFind(sb);
-            sb = toStringVarCond(sb);
-            sb = toStringGoalTemplates(sb);
-            sb = toStringTriggers(sb);
-            tacletAsString = sb.append("}").toString();
-        }
-        return tacletAsString;
-    }
-
-
-    /**
-     * @return Set of schemavariables of the {@code if} and the (optional) {@code find} part
-     */
-    public ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> getAssumesAndFindVariables() {
-        if (ifFindVariables == null) {
+    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
+        if (assumesAndFindSchemaVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             find().execPostOrder(svc);
 
-            ifFindVariables = getAssumesVariables();
+            assumesAndFindSchemaVariables = getAssumesVariables();
 
             for (final SchemaVariable sv : svc.vars()) {
-                ifFindVariables = ifFindVariables.add(sv);
+                assumesAndFindSchemaVariables = assumesAndFindSchemaVariables.add(sv);
             }
         }
 
-        return ifFindVariables;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
-        }
-        return find.equals(((FindTaclet) o).find);
-    }
-
-
-    public int hashCode() {
-        return 13 * super.hashCode() + find.hashCode();
+        return assumesAndFindSchemaVariables;
     }
 
     /**
@@ -161,5 +116,50 @@ public abstract class FindTaclet extends Taclet {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(find());
         return bvv.getBoundVariables();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+        return find.equals(((FindTaclet) o).find);
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        return 13 * super.hashCode() + find.hashCode();
+    }
+
+    /**
+     * appends a string representation of the find expression to the provided stringbuffer
+     *
+     * @param sb the StringBuffer where to append the find expression
+     * @return the same StringBuffer as the one given as argument
+     */
+    protected StringBuffer toStringFind(StringBuffer sb) {
+        return sb.append("\\find(").append(find().toString()).append(")\n");
+    }
+
+    /**
+     * returns a representation of the Taclet with find part as String
+     *
+     * @return string representation
+     */
+    public @NonNull String toString() {
+        if (tacletAsString == null) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(name()).append(" {\n");
+            sb = toStringAssumes(sb);
+            sb = toStringFind(sb);
+            sb = toStringVarCond(sb);
+            sb = toStringGoalTemplates(sb);
+            sb = toStringRuleSets(sb);
+            sb = toStringAttribs(sb);
+            sb = toStringTriggers(sb);
+            tacletAsString = sb.append("}").toString();
+        }
+        return tacletAsString;
     }
 }

@@ -15,6 +15,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -270,7 +271,7 @@ public class IntermediateProofReplayer {
         PosInOccurrence pos = null;
 
         Name name = new Name(tacletName);
-        Taclet t = proof.getInitConfig().lookupActiveTaclet(name);
+        Taclet t = (Taclet) proof.getInitConfig().lookupActiveTaclet(name);
         if (t == null) {
             ourApp = currGoal.indexOfTaclets().lookup(name);
         } else {
