@@ -11,7 +11,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -57,7 +57,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
             return false;
         }
 
-        Term term = (Term) posInOcc.subTerm();
+        JTerm term = (JTerm) posInOcc.subTerm();
         if (term == null) {
             return false;
         }
@@ -73,11 +73,11 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
             return false;
         }
         final ExecutionContext executionContext = loopInvRuleApp.getExecutionContext();
-        final Term guardTerm = loopInvRuleApp.getGuard();
+        final JTerm guardTerm = loopInvRuleApp.getGuard();
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
             ifVars.c2, executionContext, guardTerm, services);
-        final Term selfComposedExec =
+        final JTerm selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
         return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, selfComposedExec);
@@ -95,7 +95,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         final ExecutionContext executionContext = loopInvRuleApp.getExecutionContext();
-        final Term guardTerm = loopInvRuleApp.getGuard();
+        final JTerm guardTerm = loopInvRuleApp.getGuard();
 
         final LoopInvExecutionPO loopInvExecPO = new LoopInvExecutionPO(initConfig, loopInv,
             ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(), executionContext,

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.JModality;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
@@ -16,10 +16,10 @@ import org.key_project.logic.LogicServices;
  * the <strong>same</strong> modality like the one for which this instruction has been
  * instantiated
  */
-public class MatchModalityInstruction extends Instruction<Modality>
+public class MatchModalityInstruction extends Instruction<JModality>
         implements MatchOperatorInstruction {
 
-    public MatchModalityInstruction(Modality op) {
+    public MatchModalityInstruction(JModality op) {
         super(op);
     }
 
@@ -27,8 +27,8 @@ public class MatchModalityInstruction extends Instruction<Modality>
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions match(Term t, MatchConditions matchConditions,
-            LogicServices services) {
+    public final MatchConditions match(JTerm t, MatchConditions matchConditions,
+                                       LogicServices services) {
         return match(t.op(), matchConditions, services);
     }
 
@@ -36,9 +36,9 @@ public class MatchModalityInstruction extends Instruction<Modality>
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-            LogicServices services) {
-        if (instantiationCandidate instanceof Modality mod1 && mod1.kind() == op.kind()) {
+    public MatchConditions match(JOperator instantiationCandidate, MatchConditions matchConditions,
+                                 LogicServices services) {
+        if (instantiationCandidate instanceof JModality mod1 && mod1.kind() == op.kind()) {
             return matchConditions;
         } else {
             return null;

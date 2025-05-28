@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.PosInTerm;
@@ -32,7 +32,7 @@ public class SubtermProjection implements ProjectionToTerm<Goal> {
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return (Term) pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
+    public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return (JTerm) pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
     }
 }

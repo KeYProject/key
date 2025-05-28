@@ -14,7 +14,7 @@ public interface HasOrigin {
     ///
     /// Should be a human-readable location where the user can find the declaration of the rule.
     ///
-    /// This field is set by the parser with [url]:[lineNumber]
+    /// This field is set by the parser with \[url]:\[lineNumber]
     default @Nullable String getOrigin() {
         return null;
     }

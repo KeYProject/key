@@ -14,8 +14,8 @@ import org.key_project.logic.sort.Sort;
 /**
  * The objects of this class represent logical variables, used e.g. for quantification.
  */
-public final class LogicVariable extends AbstractSortedOperator
-        implements QuantifiableVariable {
+public final class LogicVariable extends JAbstractSortedOperator
+        implements JQuantifiableVariable {
 
     public LogicVariable(Name name, Sort sort) {
         super(name, sort, true);

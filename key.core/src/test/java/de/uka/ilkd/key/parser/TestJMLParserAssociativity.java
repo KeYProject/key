@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestJMLParserAssociativity extends AbstractTestTermParser {
 
     @Override
-    public Term parseTerm(String s) throws Exception {
+    public JTerm parseTerm(String s) throws Exception {
         PositionedString p = new PositionedString(s);
         /*
          * containerType and self variable are not relevant for the tests currently and can be

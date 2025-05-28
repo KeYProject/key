@@ -13,7 +13,7 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 
 import org.key_project.logic.Term;
@@ -100,8 +100,8 @@ public class LexPathOrdering implements TermOrdering {
             return LESS;
         }
 
-        var p__a = (de.uka.ilkd.key.logic.Term) p_a;
-        var p__b = (de.uka.ilkd.key.logic.Term) p_b;
+        var p__a = (JTerm) p_a;
+        var p__b = (JTerm) p_b;
 
         final int opComp =
             compare(p_a.op(), p_a.sort(), p__a.getLabels(), p_b.op(), p_b.sort(), p__b.getLabels());
@@ -470,7 +470,7 @@ public class LexPathOrdering implements TermOrdering {
      * @return true iff <code>op</code> is a logic variable
      */
     private boolean isVar(Operator op) {
-        return op instanceof QuantifiableVariable;
+        return op instanceof JQuantifiableVariable;
     }
 
     /**

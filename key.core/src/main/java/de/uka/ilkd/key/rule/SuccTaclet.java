@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.executor.javadl.SuccTacletExecutor;
 
 import org.key_project.logic.ChoiceExpr;
@@ -54,8 +54,8 @@ public class SuccTaclet extends FindTaclet {
     }
 
     @Override
-    public Term find() {
-        return (Term) ((Sequent) find).succedent().getFirst().formula();
+    public JTerm find() {
+        return (JTerm) ((Sequent) find).succedent().getFirst().formula();
     }
 
     @Override

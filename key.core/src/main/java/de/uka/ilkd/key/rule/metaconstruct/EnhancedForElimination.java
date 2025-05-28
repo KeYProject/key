@@ -28,7 +28,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -354,10 +354,10 @@ public class EnhancedForElimination extends ProgramTransformer {
             return null;
         }
 
-        Optional<Term> maybeVariant = Optional.ofNullable(rawInv.getInternalVariant());
-        final Map<LocationVariable, Term> newInvs = //
+        Optional<JTerm> maybeVariant = Optional.ofNullable(rawInv.getInternalVariant());
+        final Map<LocationVariable, JTerm> newInvs = //
             new LinkedHashMap<>(rawInv.getInternalInvariants());
-        final Map<LocationVariable, Term> newFreeInvs = //
+        final Map<LocationVariable, JTerm> newFreeInvs = //
             new LinkedHashMap<>(rawInv.getInternalFreeInvariants());
 
         // replace index
@@ -386,8 +386,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param replaceWith The program variable from which to create the replacement term.
      * @param services The {@link Services} object.
      */
-    private void updateInvs(final Map<LocationVariable, Term> invs, final Term termToReplace,
-            final ProgramVariable replaceWith, final Services services) {
+    private void updateInvs(final Map<LocationVariable, JTerm> invs, final JTerm termToReplace,
+                            final ProgramVariable replaceWith, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         invs.entrySet().stream().filter(entry -> entry.getValue() != null)
                 .map(entry -> new Pair<>(entry.getKey(),

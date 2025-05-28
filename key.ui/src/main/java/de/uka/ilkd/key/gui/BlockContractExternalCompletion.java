@@ -6,7 +6,7 @@ package de.uka.ilkd.key.gui;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
@@ -45,7 +45,7 @@ public class BlockContractExternalCompletion implements InteractiveRuleApplicati
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation = BlockContractExternalRule.INSTANCE
-                .instantiate((Term) application.posInOccurrence().subTerm(), goal);
+                .instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
         final ImmutableSet<BlockContract> contracts =
             BlockContractExternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<BlockContract> configurator =

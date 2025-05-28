@@ -7,10 +7,10 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
@@ -45,7 +45,7 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the original precondition of the contract.
      */
-    Term getPre();
+    JTerm getPre();
 
 
     /**
@@ -53,20 +53,20 @@ public interface InformationFlowContract extends Contract {
      *
      * @return the original free precondition
      */
-    Term getFreePre();
+    JTerm getFreePre();
 
 
     /**
      * Returns the original modifiable clause of the contract.
      */
-    Term getModifiable();
+    JTerm getModifiable();
 
 
     /**
      * Returns the original measured_by clause of the contract.
      */
     @Override
-    Term getMby();
+    JTerm getMby();
 
 
     /**
@@ -74,9 +74,9 @@ public interface InformationFlowContract extends Contract {
      *
      * @return used exception-variable
      */
-    Term getExc();
+    JTerm getExc();
 
-    Term getAtPre();
+    JTerm getAtPre();
 
 
     boolean isReadOnlyContract();
@@ -85,16 +85,16 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the modality of the contract.
      */
-    Modality.JavaModalityKind getModalityKind();
+    JModality.JavaModalityKind getModalityKind();
 
 
     InformationFlowContract setName(String name);
 
 
-    InformationFlowContract setModality(Modality.JavaModalityKind modalityKind);
+    InformationFlowContract setModality(JModality.JavaModalityKind modalityKind);
 
 
-    InformationFlowContract setModifiable(Term modifiable);
+    InformationFlowContract setModifiable(JTerm modifiable);
 
 
     /**
@@ -109,7 +109,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return originally used self-variable
      */
-    Term getSelf();
+    JTerm getSelf();
 
 
     /**
@@ -117,7 +117,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return originally used parameter-variables
      */
-    ImmutableList<Term> getParams();
+    ImmutableList<JTerm> getParams();
 
 
     /**
@@ -133,7 +133,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return used result-variable
      */
-    Term getResult();
+    JTerm getResult();
 
 
     boolean equals(Contract c);
@@ -150,7 +150,7 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the dependency set of the contract.
      */
-    Term getDep();
+    JTerm getDep();
 
 
     /**
@@ -162,5 +162,5 @@ public interface InformationFlowContract extends Contract {
     boolean hasInfFlowSpec();
 
     @Override
-    InformationFlowContract map(UnaryOperator<Term> op, Services services);
+    InformationFlowContract map(UnaryOperator<JTerm> op, Services services);
 }

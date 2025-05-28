@@ -5,20 +5,21 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 /** Class encoding the instructions of the matching vm */
-public abstract class Instruction<OP extends org.key_project.logic.op.Operator>
+public abstract class Instruction<OP extends Operator>
         implements MatchInstruction {
 
-    public static Instruction<Operator> matchOp(Operator op) {
+    public static Instruction<JOperator> matchOp(JOperator op) {
         return new MatchOpIdentityInstruction<>(op);
     }
 
@@ -32,7 +33,7 @@ public abstract class Instruction<OP extends org.key_project.logic.op.Operator>
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static MatchModalityInstruction matchModalOperator(Modality mod) {
+    public static MatchModalityInstruction matchModalOperator(JModality mod) {
         return new MatchModalityInstruction(mod);
     }
 
@@ -69,11 +70,11 @@ public abstract class Instruction<OP extends org.key_project.logic.op.Operator>
     }
 
     public static MatchInstruction matchAndBindVariables(
-            ImmutableArray<QuantifiableVariable> boundVars) {
+            ImmutableArray<JQuantifiableVariable> boundVars) {
         return new BindVariablesInstruction(boundVars);
     }
 
-    public static MatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
+    public static MatchInstruction unbindVariables(ImmutableArray<JQuantifiableVariable> boundVars) {
         return new UnbindVariablesInstruction();
     }
 
@@ -88,16 +89,16 @@ public abstract class Instruction<OP extends org.key_project.logic.op.Operator>
     }
 
     /**
-     * tries to match the schema variable of this instruction with the specified {@link Term}
+     * tries to match the schema variable of this instruction with the specified {@link JTerm}
      * {@code instantiationCandidate} w.r.t. the given constraints by {@link MatchConditions}
      *
-     * @param instantiationCandidate the {@link Term} to be matched
+     * @param instantiationCandidate the {@link JTerm} to be matched
      * @param matchCond the {@link MatchConditions} with additional constraints (e.g. previous
      *        matches of this schemavariable)
      * @param services the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair {@code (sv, instantiationCandidate)} added
      */
-    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-            LogicServices services);
+    public abstract MatchConditions match(JTerm instantiationCandidate, MatchConditions matchCond,
+                                          LogicServices services);
 }

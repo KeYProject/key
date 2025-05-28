@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
@@ -65,33 +65,33 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
             final SpecificationRepository specifications, final JavaStatement statement,
-            final Modality.JavaModalityKind modalityKind, final Goal goal) {
+            final JModality.JavaModalityKind modalityKind, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
 
         if (statement instanceof StatementBlock block) {
 
             collectedContracts = specifications.getLoopContracts(block, modalityKind);
-            if (modalityKind == Modality.JavaModalityKind.BOX) {
+            if (modalityKind == JModality.JavaModalityKind.BOX) {
                 collectedContracts =
                     collectedContracts.union(
-                        specifications.getLoopContracts(block, Modality.JavaModalityKind.DIA));
-            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
+                        specifications.getLoopContracts(block, JModality.JavaModalityKind.DIA));
+            } else if (modalityKind == JModality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getLoopContracts(block,
-                            Modality.JavaModalityKind.DIA_TRANSACTION));
+                            JModality.JavaModalityKind.DIA_TRANSACTION));
             }
         } else {
             LoopStatement loop = (LoopStatement) statement;
 
             collectedContracts = specifications.getLoopContracts(loop, modalityKind);
-            if (modalityKind == Modality.JavaModalityKind.BOX) {
+            if (modalityKind == JModality.JavaModalityKind.BOX) {
                 collectedContracts =
                     collectedContracts.union(
-                        specifications.getLoopContracts(loop, Modality.JavaModalityKind.DIA));
-            } else if (modalityKind == Modality.JavaModalityKind.BOX_TRANSACTION) {
+                        specifications.getLoopContracts(loop, JModality.JavaModalityKind.DIA));
+            } else if (modalityKind == JModality.JavaModalityKind.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getLoopContracts(loop,
-                            Modality.JavaModalityKind.DIA_TRANSACTION));
+                            JModality.JavaModalityKind.DIA_TRANSACTION));
             }
         }
 
@@ -165,7 +165,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         }
 
         final Instantiation instantiation =
-            instantiate((Term) occurrence.subTerm(), goal);
+            instantiate((JTerm) occurrence.subTerm(), goal);
 
         if (instantiation == null) {
             return false;
@@ -191,7 +191,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param goal the current goal.
      * @return a new instantiation.
      */
-    public Instantiation instantiate(final Term formula, final Goal goal) {
+    public Instantiation instantiate(final JTerm formula, final Goal goal) {
         if (formula == getLastFocusTerm()) {
             return getLastInstantiation();
         } else {
@@ -236,13 +236,13 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
          * @param formula the formula on which the rule is to be applied.
          * @param goal the current goal.
          */
-        public Instantiator(final Term formula, final Goal goal) {
+        public Instantiator(final JTerm formula, final Goal goal) {
             super(formula, goal);
         }
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final JavaStatement statement, final Modality.JavaModalityKind modalityKind,
+                final JavaStatement statement, final JModality.JavaModalityKind modalityKind,
                 Goal goal) {
             ImmutableSet<LoopContract> contracts = getApplicableContracts(
                 services.getSpecificationRepository(), statement, modalityKind, goal);

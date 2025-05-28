@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 /**
@@ -14,14 +14,14 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicPreconditionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.PRECONDITION) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "precondition for a contract without precondition.");
         }
-        assert Term.class.equals(BasicSnippetData.Key.PRECONDITION.getType());
-        Term origPre = (Term) d.get(BasicSnippetData.Key.PRECONDITION);
+        assert JTerm.class.equals(BasicSnippetData.Key.PRECONDITION.getType());
+        JTerm origPre = (JTerm) d.get(BasicSnippetData.Key.PRECONDITION);
         return replace(origPre, d.origVars, poVars.pre, d.tb);
     }
 }

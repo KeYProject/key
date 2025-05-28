@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic;
 
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
@@ -19,7 +19,7 @@ import org.jspecify.annotations.NonNull;
 
 public class NamespaceSet {
 
-    private Namespace<@NonNull QuantifiableVariable> varNS = new Namespace<>();
+    private Namespace<@NonNull JQuantifiableVariable> varNS = new Namespace<>();
     private Namespace<@NonNull IProgramVariable> progVarNS = new Namespace<>();
     // TODO: Operators should not be local to goals
     private Namespace<@NonNull Function> funcNS = new Namespace<>();
@@ -30,7 +30,7 @@ public class NamespaceSet {
     public NamespaceSet() {
     }
 
-    public NamespaceSet(Namespace<@NonNull QuantifiableVariable> varNS,
+    public NamespaceSet(Namespace<@NonNull JQuantifiableVariable> varNS,
             Namespace<@NonNull Function> funcNS,
             Namespace<@NonNull Sort> sortNS, Namespace<@NonNull RuleSet> ruleSetNS,
             Namespace<@NonNull Choice> choiceNS,
@@ -63,11 +63,11 @@ public class NamespaceSet {
             new Namespace<>(programVariables()));
     }
 
-    public Namespace<@NonNull QuantifiableVariable> variables() {
+    public Namespace<@NonNull JQuantifiableVariable> variables() {
         return varNS;
     }
 
-    public void setVariables(Namespace<@NonNull QuantifiableVariable> varNS) {
+    public void setVariables(Namespace<@NonNull JQuantifiableVariable> varNS) {
         this.varNS = varNS;
     }
 

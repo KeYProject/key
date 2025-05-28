@@ -5,7 +5,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.JOperator;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -24,7 +24,7 @@ import org.jspecify.annotations.NonNull;
  * upper/righter/bigger summands in a polynomial that is arranged in a left-associated way.
  */
 public class FindRightishFeature implements Feature {
-    private final Operator add;
+    private final JOperator add;
     private final static RuleAppCost one = NumberRuleAppCost.create(1);
 
     public static Feature create(IntegerLDT numbers) {

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -113,7 +114,7 @@ public class QuanEliminationAnalyser {
      */
     public boolean isEliminableVariableSomePaths(QuantifiableVariable var, Term matrix,
             boolean ex) {
-        if (!((de.uka.ilkd.key.logic.Term) matrix).freeVars()
+        if (!((JTerm) matrix).freeVars()
                 .contains(var)) {
             return true;
         }
@@ -189,8 +190,8 @@ public class QuanEliminationAnalyser {
         if (t.op() != Equality.EQUALS) {
             return false;
         }
-        final var left = (de.uka.ilkd.key.logic.Term) t.sub(0);
-        final var right = (de.uka.ilkd.key.logic.Term) t.sub(1);
+        final var left = (JTerm) t.sub(0);
+        final var right = (JTerm) t.sub(1);
         final var leftOp = left.op();
         final var rightOp = right.op();
         return leftOp == var

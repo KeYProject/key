@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -30,6 +30,7 @@ import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.SequentFormula;
@@ -450,7 +451,7 @@ public class TestCaseGenerator {
     }
 
     protected String getOracleAssertion(List<OracleMethod> oracleMethods) {
-        Term postcondition = getPostCondition();
+        JTerm postcondition = getPostCondition();
 
         OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
 
@@ -466,7 +467,7 @@ public class TestCaseGenerator {
         return "assertTrue(" + oracleCall + ");";
     }
 
-    private Term getPostCondition() {
+    private JTerm getPostCondition() {
         return info.getPostCondition();
     }
 
@@ -535,7 +536,7 @@ public class TestCaseGenerator {
                                 .append(generateTestCase(m, typeInfMap)).append(NEW_LINE)
                                 .append(NEW_LINE);
 
-                        Set<Term> vars = new HashSet<>();
+                        Set<JTerm> vars = new HashSet<>();
                         info.getProgramVariables(info.getPO(), vars);
                         testMethod.append(TAB + "//Other variables").append(NEW_LINE)
                                 .append(getRemainingConstants(m.getConstants().keySet(), vars))
@@ -608,8 +609,8 @@ public class TestCaseGenerator {
         return typeInfMap;
     }
 
-    private void generateTypeInferenceMapHelper(org.key_project.logic.Term t,
-            Map<String, Sort> map) {
+    private void generateTypeInferenceMapHelper(Term t,
+                                                Map<String, Sort> map) {
         final var op = t.op();
         if (op instanceof ProgramVariable) {
             ProgramVariable pv = (ProgramVariable) t.op();
@@ -656,7 +657,7 @@ public class TestCaseGenerator {
         }
     }
 
-    private ProgramVariable getProgramVariable(org.key_project.logic.Term locationTerm) {
+    private ProgramVariable getProgramVariable(Term locationTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         ProgramVariable result = null;
         if (locationTerm.op() instanceof Function function) {
@@ -674,10 +675,10 @@ public class TestCaseGenerator {
     }
 
     private String getRemainingConstants(Collection<String> existingConstants,
-            Collection<Term> newConstants) {
+            Collection<JTerm> newConstants) {
         StringBuilder result = new StringBuilder();
 
-        for (Term c : newConstants) {
+        for (JTerm c : newConstants) {
 
             if (!existingConstants.contains(c.toString())) {
 

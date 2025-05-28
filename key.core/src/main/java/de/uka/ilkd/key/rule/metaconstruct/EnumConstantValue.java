@@ -7,9 +7,9 @@ import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -37,9 +37,9 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      *
      * @throws IllegalArgumentException if the pv is neither a constant nor ntc.
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         term = term.sub(0);
-        Operator op = term.op();
+        JOperator op = term.op();
 
         if (op instanceof ProgramVariable pv) {
             int value;

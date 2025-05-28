@@ -178,8 +178,8 @@ public class TacletFindModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    private Term parseTerm(String s, Namespace<@NonNull QuantifiableVariable> varNS,
-            Namespace<@NonNull Function> functNS) throws ParserException {
+    private JTerm parseTerm(String s, Namespace<@NonNull JQuantifiableVariable> varNS,
+                            Namespace<@NonNull Function> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -234,8 +234,8 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
-    private Term parseRow(int irow, Namespace<@NonNull QuantifiableVariable> varNS,
-            Namespace<@NonNull Function> functNS)
+    private JTerm parseRow(int irow, Namespace<@NonNull JQuantifiableVariable> varNS,
+                           Namespace<@NonNull Function> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);
@@ -288,7 +288,7 @@ public class TacletFindModel extends AbstractTableModel {
         }
     }
 
-    private Term addOrigin(Term term) {
+    private JTerm addOrigin(JTerm term) {
         return services.getTermBuilder().addLabelToAllSubs(
             OriginTermLabel.removeOriginLabels(term, services),
             new NodeOrigin(SpecType.USER_INTERACTION,
@@ -355,7 +355,7 @@ public class TacletFindModel extends AbstractTableModel {
                     sort = idd.sort();
                     if (sort == null) {
                         try {
-                            sort = result.getRealSort((OperatorSV) sv, services);
+                            sort = result.getRealSort((JOperatorSV) sv, services);
                         } catch (SortException e) {
                             throw new MissingSortException(String.valueOf(sv),
                                 createPosition(irow));
@@ -410,13 +410,13 @@ public class TacletFindModel extends AbstractTableModel {
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else {
                     if (isInputAvailable(irow)) {
-                        final Namespace<@NonNull QuantifiableVariable> extVarNS =
+                        final Namespace<@NonNull JQuantifiableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
 
                         Namespace<@NonNull Function> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
 
-                        final Term instance = parseRow(irow, extVarNS, functNS);
+                        final JTerm instance = parseRow(irow, extVarNS, functNS);
                         sort = instance.sort();
 
                         try {

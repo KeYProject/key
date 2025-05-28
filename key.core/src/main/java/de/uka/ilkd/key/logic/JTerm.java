@@ -6,8 +6,8 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
@@ -39,42 +39,42 @@ import org.jspecify.annotations.Nullable;
  * <li>as it is immutable, most (all) attributes should be declared final</li>
  * </ol>
  * Term supports the {@link Visitor} pattern. Two different visit strategies are currently
- * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
+ * supported: {@link JTerm#execPostOrder(Visitor)} and {@link JTerm#execPreOrder(Visitor)}.
  */
-public interface Term
-        extends Sorted, EqualsModProperty<Term>, org.key_project.logic.Term {
+public interface JTerm
+        extends Sorted, EqualsModProperty<JTerm>, org.key_project.logic.Term {
     @Override
-    Operator op();
+    JOperator op();
 
     /**
      * The subterms.
      */
     @Override
-    ImmutableArray<Term> subs();
+    ImmutableArray<JTerm> subs();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    Term sub(int n);
+    JTerm sub(int n);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    ImmutableArray<QuantifiableVariable> boundVars();
+    ImmutableArray<JQuantifiableVariable> boundVars();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
+    ImmutableArray<JQuantifiableVariable> varsBoundHere(int n);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    ImmutableSet<QuantifiableVariable> freeVars();
+    ImmutableSet<JQuantifiableVariable> freeVars();
 
     /**
      * The Java block at top level.
@@ -110,10 +110,10 @@ public interface Term
     TermLabel getLabel(Name termLabelName);
 
     /**
-     * Checks if the {@link Term} or one of its direct or indirect children contains a non-empty
+     * Checks if the {@link JTerm} or one of its direct or indirect children contains a non-empty
      * {@link JavaBlock}.
      *
-     * @return {@code true} The {@link Term} or one of its direct or indirect children contains a
+     * @return {@code true} The {@link JTerm} or one of its direct or indirect children contains a
      *         non-empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
      */
     boolean containsJavaBlockRecursive();

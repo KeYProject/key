@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 import org.key_project.logic.Term;
@@ -149,7 +150,7 @@ class UniTrigger implements Trigger {
             for (var quantifiableVariable : checkForCycle.freeVars()) {
                 final QuantifiableVariable termVar = quantifiableVariable;
                 if (!body.contains(termVar)) {
-                    final var termVarterm = (de.uka.ilkd.key.logic.Term) varMap.get(termVar);
+                    final var termVarterm = (JTerm) varMap.get(termVar);
                     if (termVarterm != null) {
                         if (termVarterm.freeVars().contains(var)) {
                             return true;

@@ -13,6 +13,6 @@ import org.key_project.util.ExtList;
  */
 public interface ProgramInLogic {
 
-    Expression convertToProgram(Term t, ExtList list);
+    Expression convertToProgram(JTerm t, ExtList list);
 
 }

@@ -6,7 +6,7 @@ package org.key_project.exploration.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -48,7 +48,7 @@ public class DeleteFormulaAction extends ExplorationAction {
         if (pio == null) {
             return;
         }
-        Term term = (Term) pio.subTerm();
+        JTerm term = (JTerm) pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
         ProofExplorationService service = ProofExplorationService.get(getMediator());
         service.soundHide(g, pio, term);

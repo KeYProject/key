@@ -7,7 +7,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
@@ -53,7 +53,7 @@ public class OracleGenerator {
 
     private List<OracleVariable> methodArgs;
 
-    private Set<Term> constants;
+    private Set<JTerm> constants;
 
     private final ReflectionClassCreator rflCreator;
 
@@ -112,14 +112,14 @@ public class OracleGenerator {
         ops.put(services.getTypeConverter().getIntegerLDT().getJavaMod(), "%");
     }
 
-    public OracleMethod generateOracleMethod(Term term) {
+    public OracleMethod generateOracleMethod(JTerm term) {
         constants = getConstants(term);
         methodArgs = getMethodArgs(term);
         OracleTerm body = generateOracle(term, false);
         return new OracleMethod("testOracle", methodArgs, "return " + body.toString() + ";");
     }
 
-    public OracleLocationSet getOracleLocationSet(Term modifierset) {
+    public OracleLocationSet getOracleLocationSet(JTerm modifierset) {
 
         ModifiesSetTranslator mst = new ModifiesSetTranslator(services, this);
         return mst.translate(modifierset);
@@ -136,7 +136,7 @@ public class OracleGenerator {
         return oracleMethods;
     }
 
-    private boolean isRelevantConstant(Term c) {
+    private boolean isRelevantConstant(JTerm c) {
         Operator op = c.op();
 
         if (isTrueConstant(op) || isFalseConstant(op)) {
@@ -156,11 +156,11 @@ public class OracleGenerator {
         return s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort);
     }
 
-    private Set<Term> getConstants(Term t) {
-        Set<Term> result = new HashSet<>();
-        Set<Term> temp = new HashSet<>();
+    private Set<JTerm> getConstants(JTerm t) {
+        Set<JTerm> result = new HashSet<>();
+        Set<JTerm> temp = new HashSet<>();
         findConstants(temp, t);
-        for (Term c : temp) {
+        for (JTerm c : temp) {
             if (isRelevantConstant(c)) {
                 result.add(c);
             }
@@ -170,12 +170,12 @@ public class OracleGenerator {
     }
 
 
-    public Set<Term> getConstants() {
+    public Set<JTerm> getConstants() {
         return constants;
     }
 
     /* TODO: The argument t is never used? */
-    private List<OracleVariable> getMethodArgs(Term t) {
+    private List<OracleVariable> getMethodArgs(JTerm t) {
 
         List<OracleVariable> result = new LinkedList<>();
 
@@ -189,7 +189,7 @@ public class OracleGenerator {
         OracleVariable allObj = new OracleVariable(TestCaseGenerator.ALL_OBJECTS, allObjSort);
         OracleVariable oldMap = new OracleVariable(TestCaseGenerator.OLDMap, oldMapSort);
 
-        for (Term c : constants) {
+        for (JTerm c : constants) {
             result.add(new OracleVariable(c.toString(), c.sort()));
             result.add(new OracleVariable(PRE_STRING + c, c.sort()));
         }
@@ -204,7 +204,7 @@ public class OracleGenerator {
     }
 
 
-    private void findConstants(Set<Term> constants, Term term) {
+    private void findConstants(Set<JTerm> constants, JTerm term) {
         LOGGER.debug("FindConstants: {} cls {} ", term, term.getClass().getName());
         if (term.op() instanceof Function && term.arity() == 0) {
             constants.add(term);
@@ -213,7 +213,7 @@ public class OracleGenerator {
             constants.add(term);
         }
 
-        for (Term sub : term.subs()) {
+        for (JTerm sub : term.subs()) {
             findConstants(constants, sub);
         }
 
@@ -225,7 +225,7 @@ public class OracleGenerator {
     }
 
 
-    public OracleTerm generateOracle(Term term, boolean initialSelect) {
+    public OracleTerm generateOracle(JTerm term, boolean initialSelect) {
 
 
         Operator op = term.op();
@@ -269,7 +269,7 @@ public class OracleGenerator {
             return new OracleBinTerm(OR, notLeft, right);
         }
         // quantifiable variable
-        else if (op instanceof QuantifiableVariable qop) {
+        else if (op instanceof JQuantifiableVariable qop) {
             return new OracleVariable(qop.name().toString(), qop.sort());
         }
         // integers
@@ -317,7 +317,7 @@ public class OracleGenerator {
 
     }
 
-    private OracleTerm translateFunction(Term term, boolean initialSelect) {
+    private OracleTerm translateFunction(JTerm term, boolean initialSelect) {
         Operator op = term.op();
         Function fun = (Function) op;
         String name = fun.name().toString();
@@ -357,10 +357,10 @@ public class OracleGenerator {
                     oracleMethods.add(m);
                 }
 
-                Term heap = term.sub(0);
+                JTerm heap = term.sub(0);
                 OracleTerm heapTerm = generateOracle(heap, initialSelect);
 
-                Term object = term.sub(1);
+                JTerm object = term.sub(1);
                 OracleTerm objTerm = generateOracle(object, initialSelect);
 
                 if (isPreHeap(heapTerm) && (!objTerm.toString().startsWith(PRE_STRING))) {
@@ -404,7 +404,7 @@ public class OracleGenerator {
             "Unsupported function found: " + name + " of type " + fun.getClass().getName());
     }
 
-    private OracleTerm translateQuery(Term term, boolean initialSelect, Operator op) {
+    private OracleTerm translateQuery(JTerm term, boolean initialSelect, Operator op) {
 
         ProgramMethod pm = (ProgramMethod) op;
         OracleMethod m = createDummyOracleMethod(pm);
@@ -457,16 +457,16 @@ public class OracleGenerator {
     }
 
 
-    private OracleTerm translateSelect(Term term, boolean initialSelect) {
-        Term heap = term.sub(0);
+    private OracleTerm translateSelect(JTerm term, boolean initialSelect) {
+        JTerm heap = term.sub(0);
         OracleTerm heapTerm = generateOracle(heap, true);
 
-        Term object = term.sub(1);
+        JTerm object = term.sub(1);
 
         OracleTerm objTerm = generateOracle(object, true);
 
 
-        Term field = term.sub(2);
+        JTerm field = term.sub(2);
         OracleTerm fldTerm = generateOracle(field, true);
         String fieldName = fldTerm.toString();
         fieldName = fieldName.substring(fieldName.lastIndexOf(':') + 1);
@@ -573,7 +573,7 @@ public class OracleGenerator {
         args.add(o);
         args.addAll(methodArgs);
         OracleInvariantTranslator oit = new OracleInvariantTranslator(services);
-        Term t = oit.getInvariantTerm(s);
+        JTerm t = oit.getInvariantTerm(s);
 
         OracleTerm invTerm = generateOracle(t, initialSelect);
 
@@ -584,7 +584,7 @@ public class OracleGenerator {
 
     }
 
-    private OracleMethod createIfThenElseMethod(Term term, boolean initialSelect) {
+    private OracleMethod createIfThenElseMethod(JTerm term, boolean initialSelect) {
 
         String methodName = generateMethodName();
         List<OracleVariable> args = new LinkedList<>(methodArgs);
@@ -629,10 +629,10 @@ public class OracleGenerator {
         return TestCaseGenerator.ALL_OBJECTS;
     }
 
-    private OracleMethod createQuantifierMethod(Term term, boolean initialSelect) {
+    private OracleMethod createQuantifierMethod(JTerm term, boolean initialSelect) {
         String methodName = generateMethodName();
-        ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
-        QuantifiableVariable qv = vars.get(0);
+        ImmutableArray<JQuantifiableVariable> vars = term.varsBoundHere(0);
+        JQuantifiableVariable qv = vars.get(0);
         OracleVariable var = new OracleVariable(qv.name().toString(), qv.sort());
 
         String setName = getSetName(qv.sort());
@@ -661,7 +661,7 @@ public class OracleGenerator {
         return new OracleMethod(methodName, args, body);
     }
 
-    private String createForallBody(QuantifiableVariable qv, String setName, OracleUnaryTerm neg) {
+    private String createForallBody(JQuantifiableVariable qv, String setName, OracleUnaryTerm neg) {
         String tab = TestCaseGenerator.TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
             + "\n" + tab + tab + "if(" + neg.toString() + "){" + "\n" + tab + tab + tab
@@ -669,7 +669,7 @@ public class OracleGenerator {
             + "return true;";
     }
 
-    private String createExistsBody(QuantifiableVariable qv, String setName, OracleTerm cond) {
+    private String createExistsBody(JQuantifiableVariable qv, String setName, OracleTerm cond) {
         String tab = TestCaseGenerator.TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
             + "\n" + tab + tab + "if(" + cond.toString() + "){" + "\n" + tab + tab + tab

@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -93,7 +94,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
     }
 
     private Iterator<Term> toIterator(Term res) {
-        if (IRRELEVANT_TERM_LABELS_PROPERTY.equalsModThisProperty((de.uka.ilkd.key.logic.Term) res,
+        if (IRRELEVANT_TERM_LABELS_PROPERTY.equalsModThisProperty((JTerm) res,
             tb.ff())) {
             return emptyIterator();
         }
@@ -101,7 +102,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
     }
 
     private Term breakDownEq(Term p_var, BigInteger lit, int pow) {
-        final var var = (de.uka.ilkd.key.logic.Term) p_var;
+        final var var = (JTerm) p_var;
         final var zero = tb.zero();
 
         if ((pow % 2 == 0)) {
@@ -141,7 +142,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
     }
 
     private Term breakDownGeq(Term p_var, BigInteger lit, int pow) {
-        final var var = (de.uka.ilkd.key.logic.Term) p_var;
+        final var var = (JTerm) p_var;
         if ((pow % 2 == 0)) {
             // the even case
 
@@ -163,7 +164,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
     }
 
     private Term breakDownLeq(Term p_var, BigInteger lit, int pow) {
-        final var var = (de.uka.ilkd.key.logic.Term) p_var;
+        final var var = (JTerm) p_var;
         if ((pow % 2 == 0)) {
             // the even case
 

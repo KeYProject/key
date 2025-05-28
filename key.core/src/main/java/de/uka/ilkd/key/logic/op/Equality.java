@@ -17,7 +17,7 @@ import org.key_project.logic.sort.Sort;
  * It also defines the formula equivalence operator {@code <->} (which could alternatively be seen
  * as a Junctor).
  */
-public final class Equality extends AbstractSortedOperator {
+public final class Equality extends JAbstractSortedOperator {
 
     /**
      * the usual 'equality' operator '='

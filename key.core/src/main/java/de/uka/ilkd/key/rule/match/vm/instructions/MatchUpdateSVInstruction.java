@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
@@ -20,7 +20,7 @@ public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<Upd
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, LogicServices services) {
+    public MatchConditions match(JTerm subst, MatchConditions mc, LogicServices services) {
         return addInstantiation(subst, mc, services);
     }
 

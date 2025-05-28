@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -182,7 +182,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm[] subs,
             Services services, ExecutionContext ec);
 
 
@@ -197,8 +197,8 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterms
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left,
-            Term right, Services services, ExecutionContext ec);
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm left,
+                                          JTerm right, Services services, ExecutionContext ec);
 
 
     /**
@@ -211,7 +211,7 @@ public abstract class LDT implements Named {
      * @param ec the ExecutionContext in which the expression is evaluated
      * @return true if the LDT offers an operation for the given java operator and the subterm
      */
-    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public abstract boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, JTerm sub,
             TermServices services, ExecutionContext ec);
 
 
@@ -221,7 +221,7 @@ public abstract class LDT implements Named {
      * @param lit the Literal to be translated
      * @return the Term that represents the given literal in its logic form
      */
-    public abstract Term translateLiteral(Literal lit, Services services);
+    public abstract JTerm translateLiteral(Literal lit, Services services);
 
     /**
      * returns the function symbol for the given <em>Java</em> operator.
@@ -253,7 +253,7 @@ public abstract class LDT implements Named {
     public abstract boolean hasLiteralFunction(JFunction f);
 
     /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
-    public abstract Expression translateTerm(Term t, ExtList children, Services services);
+    public abstract Expression translateTerm(JTerm t, ExtList children, Services services);
 
-    public abstract Type getType(Term t);
+    public abstract Type getType(JTerm t);
 }

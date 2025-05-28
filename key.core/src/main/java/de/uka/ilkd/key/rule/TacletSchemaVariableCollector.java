@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -85,9 +86,9 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      */
     @Override
     public void visit(@NonNull Term p_visited) {
-        final var visited = (de.uka.ilkd.key.logic.Term) p_visited;
+        final var visited = (JTerm) p_visited;
         final Operator op = visited.op();
-        if (op instanceof Modality mod) {
+        if (op instanceof JModality mod) {
             if (mod.kind() instanceof ModalOperatorSV msv) {
                 varList = varList.prepend(msv);
             }
@@ -98,7 +99,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
         for (int j = 0, ar = visited.arity(); j < ar; j++) {
             for (int i = 0, sz = visited.varsBoundHere(j).size(); i < sz; i++) {
-                final QuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
+                final JQuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
                 if (qVar instanceof SchemaVariable) {
                     varList = varList.prepend((SchemaVariable) qVar);
                 }
@@ -109,7 +110,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
             varList = varList.prepend((SchemaVariable) op);
         }
 
-        for (TermLabel label : ((de.uka.ilkd.key.logic.Term) visited).getLabels()) {
+        for (TermLabel label : ((JTerm) visited).getLabels()) {
             if (label instanceof TermLabelSV) {
                 varList = varList.prepend((SchemaVariable) label);
             }

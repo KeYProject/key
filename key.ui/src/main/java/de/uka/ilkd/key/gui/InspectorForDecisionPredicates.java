@@ -9,7 +9,7 @@ import java.util.List;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
@@ -43,7 +43,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         if (toBeChecked.isEmpty()) {
             return NO_USER_INPUT;
         }
-        Term term = translate(services, toBeChecked);
+        JTerm term = translate(services, toBeChecked);
 
         Semisequent semisequent =
             cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? node.sequent().antecedent()
@@ -74,7 +74,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     }
 
-    public static Term translate(Services services, String toBeChecked) {
+    public static JTerm translate(Services services, String toBeChecked) {
         try {
             return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {

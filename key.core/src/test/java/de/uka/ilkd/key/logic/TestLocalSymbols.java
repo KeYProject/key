@@ -87,7 +87,7 @@ public class TestLocalSymbols {
     @Test
     public void testSkolemization() throws Exception {
 
-        Term target = TacletForTests
+        JTerm target = TacletForTests
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
                     + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 

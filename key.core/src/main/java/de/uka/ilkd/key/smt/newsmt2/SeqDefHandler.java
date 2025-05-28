@@ -15,10 +15,12 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -108,7 +110,7 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     private void collectVars(Term term, Set<ParsableVariable> vars,
-            ImmutableSet<QuantifiableVariable> boundVars) {
+            ImmutableSet<JQuantifiableVariable> boundVars) {
 
         Operator op = term.op();
         if (op instanceof LogicVariable lv && !boundVars.contains(lv)) {
@@ -121,8 +123,8 @@ public class SeqDefHandler implements SMTHandler {
             return;
         }
 
-        ImmutableSet<QuantifiableVariable> localBind = boundVars;
-        for (var boundVar : ((de.uka.ilkd.key.logic.Term) term).boundVars()) {
+        ImmutableSet<JQuantifiableVariable> localBind = boundVars;
+        for (var boundVar : ((JTerm) term).boundVars()) {
             localBind = localBind.add(boundVar);
         }
 
@@ -225,7 +227,7 @@ public class SeqDefHandler implements SMTHandler {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
             SExpr ref =
-                trans.translate(termFactory.createTerm((de.uka.ilkd.key.logic.op.Operator) var));
+                trans.translate(termFactory.createTerm((JOperator) var));
             args.add(SExprs.coerce(ref, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);

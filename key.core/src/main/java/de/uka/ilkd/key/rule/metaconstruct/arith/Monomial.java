@@ -8,10 +8,11 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Term;
@@ -36,7 +37,7 @@ public class Monomial {
 
     public static Monomial create(Term monoTerm, Services services) {
         final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
-        monoTerm = TermLabelManager.removeIrrelevantLabels((de.uka.ilkd.key.logic.Term) monoTerm,
+        monoTerm = TermLabelManager.removeIrrelevantLabels((JTerm) monoTerm,
             services);
         Monomial res;
 
@@ -198,15 +199,15 @@ public class Monomial {
 
 
     public Term toTerm(Services services) {
-        final Operator mul = services.getTypeConverter().getIntegerLDT().getMul();
+        final JOperator mul = services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
 
         final Iterator<Term> it = parts.iterator();
         if (it.hasNext()) {
             res = it.next();
             while (it.hasNext()) {
-                res = services.getTermFactory().createTerm(mul, (de.uka.ilkd.key.logic.Term) res,
-                    (de.uka.ilkd.key.logic.Term) it.next());
+                res = services.getTermFactory().createTerm(mul, (JTerm) res,
+                    (JTerm) it.next());
             }
         }
 
@@ -216,7 +217,7 @@ public class Monomial {
             res = cTerm;
         } else if (!BigInteger.ONE.equals(coefficient)) {
             res = services.getTermFactory().createTerm(mul,
-                (de.uka.ilkd.key.logic.Term) res, cTerm);
+                (JTerm) res, cTerm);
         }
 
         return res;
@@ -238,7 +239,7 @@ public class Monomial {
         public BigInteger coeff = BigInteger.ONE;
         public ImmutableList<Term> parts = ImmutableSLList.nil();
         private final Services services;
-        private final Operator numbers, mul;
+        private final JOperator numbers, mul;
 
         public Analyser(final Services services) {
             this.services = services;

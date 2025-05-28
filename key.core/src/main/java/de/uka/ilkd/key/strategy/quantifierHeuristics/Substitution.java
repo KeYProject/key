@@ -7,8 +7,10 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
@@ -78,7 +80,7 @@ public class Substitution {
                 services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
             Term instance = getSubstitutedTerm(var);
             if (!instance.sort().extendsTrans(quantifiedVarSort)) {
-                instance = tb.func(quantifiedVarSortCast, (de.uka.ilkd.key.logic.Term) instance);
+                instance = tb.func(quantifiedVarSortCast, (JTerm) instance);
             }
             t = applySubst(var, instance, t, tb);
         }
@@ -87,9 +89,9 @@ public class Substitution {
 
     private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermBuilder tb) {
         final ClashFreeSubst subst =
-            new ClashFreeSubst((de.uka.ilkd.key.logic.op.QuantifiableVariable) var,
-                (de.uka.ilkd.key.logic.Term) instance, tb);
-        return subst.apply((de.uka.ilkd.key.logic.Term) t);
+            new ClashFreeSubst((JQuantifiableVariable) var,
+                (JTerm) instance, tb);
+        return subst.apply((JTerm) t);
     }
 
     /**
@@ -111,7 +113,7 @@ public class Substitution {
                     final Function quantifiedVarSortCast =
                         services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
                     instance =
-                        tb.func(quantifiedVarSortCast, (de.uka.ilkd.key.logic.Term) instance);
+                        tb.func(quantifiedVarSortCast, (JTerm) instance);
                     t = applySubst(var, instance, t, tb);
                 } else {
                     throw e;

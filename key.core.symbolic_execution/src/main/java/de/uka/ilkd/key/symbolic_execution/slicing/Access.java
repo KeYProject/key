@@ -5,7 +5,7 @@ package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -19,7 +19,7 @@ public class Access {
     /**
      * The accessed array index or {@code null} if it is not an array access.
      */
-    private final ImmutableArray<Term> dimensionExpressions;
+    private final ImmutableArray<JTerm> dimensionExpressions;
 
     /**
      * Constructor.
@@ -37,7 +37,7 @@ public class Access {
      *
      * @param dimensionExpressions The accessed array index.
      */
-    public Access(ImmutableArray<Term> dimensionExpressions) {
+    public Access(ImmutableArray<JTerm> dimensionExpressions) {
         assert dimensionExpressions != null;
         this.programVariable = null;
         this.dimensionExpressions = dimensionExpressions;
@@ -48,7 +48,7 @@ public class Access {
      *
      * @param dimensionExpressions The accessed array index.
      */
-    public Access(Term... dimensionExpressions) {
+    public Access(JTerm... dimensionExpressions) {
         assert dimensionExpressions != null;
         this.programVariable = null;
         this.dimensionExpressions = new ImmutableArray<>(dimensionExpressions);
@@ -68,7 +68,7 @@ public class Access {
      *
      * @return The accessed array index or {@code null} if it is not an array access.
      */
-    public ImmutableArray<Term> getDimensionExpressions() {
+    public ImmutableArray<JTerm> getDimensionExpressions() {
         return dimensionExpressions;
     }
 

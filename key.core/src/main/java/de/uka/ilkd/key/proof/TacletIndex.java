@@ -8,7 +8,7 @@ import java.util.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.*;
@@ -87,7 +87,7 @@ public abstract class TacletIndex {
 
     private static Object getIndexObj(FindTaclet tac) {
         Object indexObj;
-        final Term indexTerm = tac.find();
+        final JTerm indexTerm = tac.find();
         if (indexTerm.javaBlock().isEmpty()) {
             indexObj = indexTerm.op();
             switch (indexObj) {
@@ -96,8 +96,8 @@ public abstract class TacletIndex {
                 indexObj = sortDependingFunction.getKind();
             case ElementaryUpdate ignored ->
                 indexObj = ElementaryUpdate.class;
-            case Modality ignored ->
-                indexObj = Modality.class;
+            case JModality ignored ->
+                indexObj = JModality.class;
             default -> {
             }
             }
@@ -312,11 +312,11 @@ public abstract class TacletIndex {
 
     @SuppressWarnings("deprecation")
     private ImmutableList<NoPosTacletApp> getListHelp(
-            final HashMap<Object, ImmutableList<NoPosTacletApp>> map, final Term term,
+            final HashMap<Object, ImmutableList<NoPosTacletApp>> map, final JTerm term,
             final boolean ignoreUpdates, final PrefixOccurrences prefixOccurrences) {
 
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
-        final Operator op = term.op();
+        final JOperator op = term.op();
 
         assert !(op instanceof Metavariable)
                 : "metavariables are disabled";
@@ -335,7 +335,7 @@ public abstract class TacletIndex {
         case SortDependingFunction sortDependingFunction ->
             map.get(sortDependingFunction.getKind());
         case ElementaryUpdate ignored -> map.get(ElementaryUpdate.class);
-        case Modality ignored -> map.get(Modality.class);
+        case JModality ignored -> map.get(JModality.class);
         default -> map.get(op);
         };
 
@@ -343,7 +343,7 @@ public abstract class TacletIndex {
 
         // collect taclets for target term, if updates shall be ignored
         if (ignoreUpdates && op instanceof UpdateApplication) {
-            final Term target = UpdateApplication.getTarget(term);
+            final JTerm target = UpdateApplication.getTarget(term);
             if (!(target.op() instanceof UpdateApplication)) {
                 final ImmutableList<NoPosTacletApp> targetIndexed =
                     getListHelp(map, target, false, prefixOccurrences);
@@ -394,7 +394,7 @@ public abstract class TacletIndex {
      * @param term the term that is used to find the selection
      */
     private ImmutableList<NoPosTacletApp> getList(
-            HashMap<Object, ImmutableList<NoPosTacletApp>> map, Term term, boolean ignoreUpdates) {
+            HashMap<Object, ImmutableList<NoPosTacletApp>> map, JTerm term, boolean ignoreUpdates) {
         return getListHelp(map, term, ignoreUpdates, new PrefixOccurrences());
     }
 
@@ -438,9 +438,9 @@ public abstract class TacletIndex {
         assert pos.isTopLevel();
 
         final ImmutableList<NoPosTacletApp> rwTaclets =
-            getFindTaclet(getList(rwList, (Term) pos.subTerm(), true), filter, pos, services);
+            getFindTaclet(getList(rwList, (JTerm) pos.subTerm(), true), filter, pos, services);
         final ImmutableList<NoPosTacletApp> seqTaclets =
-            getFindTaclet(getList(findTaclets, (Term) pos.subTerm(), true), filter, pos, services);
+            getFindTaclet(getList(findTaclets, (JTerm) pos.subTerm(), true), filter, pos, services);
         return !rwTaclets.isEmpty() ? rwTaclets.prependReverse(seqTaclets)
                 : seqTaclets.prependReverse(rwTaclets);
     }
@@ -457,7 +457,7 @@ public abstract class TacletIndex {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, RuleFilter filter,
             Services services) {
-        return matchTaclets(getList(rwList, (Term) pos.subTerm(), false), filter, pos, services);
+        return matchTaclets(getList(rwList, (JTerm) pos.subTerm(), false), filter, pos, services);
     }
 
 

@@ -7,7 +7,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -16,12 +16,12 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 public interface InitiallyClause extends SpecificationElement {
 
     @Override
-    InitiallyClause map(UnaryOperator<Term> op, Services services);
+    InitiallyClause map(UnaryOperator<JTerm> op, Services services);
 
     /**
      * Returns the formula without implicit all-quantification over the receiver object.
      */
-    Term getClause(LocationVariable selfVar, TermServices services);
+    JTerm getClause(LocationVariable selfVar, TermServices services);
 
     LabeledParserRuleContext getOriginalSpec();
 

@@ -124,15 +124,15 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         TermSV var_rn = SchemaVariableFactory.createTermSV(new Name("rn"), nat);
         TermSV var_rm = SchemaVariableFactory.createTermSV(new Name("rm"), nat);
 
-        Term t_rn = tf.createTerm(var_rn);
-        Term t_rm = tf.createTerm(var_rm);
-        Term t_0 = tf.createTerm(func_0);
-        Term t_rnminus1 = tf.createTerm(func_min1, t_rn);
-        Term t_rnminus1plus1 = tf.createTerm(func_plus1, t_rnminus1);
-        Term t_rneq0 = tf.createTerm(func_eq, t_rn, t_0);
+        JTerm t_rn = tf.createTerm(var_rn);
+        JTerm t_rm = tf.createTerm(var_rm);
+        JTerm t_0 = tf.createTerm(func_0);
+        JTerm t_rnminus1 = tf.createTerm(func_min1, t_rn);
+        JTerm t_rnminus1plus1 = tf.createTerm(func_plus1, t_rnminus1);
+        JTerm t_rneq0 = tf.createTerm(func_eq, t_rn, t_0);
         // Term t_0minus1=tf.createTerm(func_min1,
         // new Term[]{t_0});
-        Term t_0plus1 = tf.createTerm(func_plus1, t_0);
+        JTerm t_0plus1 = tf.createTerm(func_plus1, t_0);
 
         // help rule r1: find(rn) replacewith(0) replacewith(0)
         RewriteTacletBuilder<RewriteTaclet> rwb1 = new RewriteTacletBuilder<>();
@@ -185,7 +185,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         // closewitheq
         // find(=> rn=rn)
         SuccTacletBuilder sbuilder = new SuccTacletBuilder();
-        Term t_rneqrn = tf.createTerm(func_eq, t_rn, t_rn);
+        JTerm t_rneqrn = tf.createTerm(func_eq, t_rn, t_rn);
         sbuilder.setFind(t_rneqrn);
         sbuilder.setName(new Name("close-with-eq"));
         closewitheq = sbuilder.getSuccTaclet();
@@ -193,11 +193,11 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
         // switch first succ
         // find((rn +1) + rm) replacewith((rn + rm) +1)
-        Term t_rnplus1 = tf.createTerm(func_plus1, t_rn);
-        Term t_rnplus1plusrm = tf.createTerm(func_plus, t_rnplus1, t_rm);
+        JTerm t_rnplus1 = tf.createTerm(func_plus1, t_rn);
+        JTerm t_rnplus1plusrm = tf.createTerm(func_plus, t_rnplus1, t_rm);
 
-        Term t_rnplusrm = tf.createTerm(func_plus, t_rn, t_rm);
-        Term t_rnplusrmplus1 = tf.createTerm(func_plus1, t_rnplusrm);
+        JTerm t_rnplusrm = tf.createTerm(func_plus, t_rn, t_rm);
+        JTerm t_rnplusrmplus1 = tf.createTerm(func_plus1, t_rnplusrm);
 
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(t_rnplus1plusrm);
@@ -211,8 +211,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
         // switch second succ
         // find(rn + (rm +1)) replacewith((rn + rm) +1)
-        Term t_rmplus1 = tf.createTerm(func_plus1, t_rm);
-        Term t_rnplus_rmplus1 = tf.createTerm(func_plus, t_rn, t_rmplus1);
+        JTerm t_rmplus1 = tf.createTerm(func_plus1, t_rm);
+        JTerm t_rnplus_rmplus1 = tf.createTerm(func_plus, t_rn, t_rmplus1);
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(t_rnplus_rmplus1);
         rwbuilder.addTacletGoalTemplate(
@@ -223,7 +223,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
         // elim-succ
         // find(rn +1 = rm +1) replacewith(rn=rm)
-        Term t_rneqrm = tf.createTerm(func_eq, t_rn, t_rm);
+        JTerm t_rneqrm = tf.createTerm(func_eq, t_rn, t_rm);
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(tf.createTerm(func_eq, t_rnplus1, t_rmplus1));
         rwbuilder.addTacletGoalTemplate(
@@ -259,10 +259,10 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         // problem
 
         String test1 = "\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
-        Term t_test1 = null;
+        JTerm t_test1 = null;
         try {
             t_test1 =
-                (Term) io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
+                (JTerm) io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
                         .get(0).formula();
         } catch (Exception e) {
             LOGGER.error("Parser Error or Input Error", e);
@@ -287,20 +287,20 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         JFunction const_d = new JFunction(new Name("d"), nat, new SortImpl[0]);
         nss.functions().add(const_d);
 
-        Term t_c = tf.createTerm(const_c);
-        Term t_d = tf.createTerm(const_d);
-        Term t_cplusd = tf.createTerm(func_plus, t_c, t_d);
-        Term t_dminus1 = tf.createTerm(func_min1, t_d);
-        Term t_dminus1plus1 = tf.createTerm(func_plus1, t_dminus1);
-        Term t_dminus1plus1plusc = tf.createTerm(func_plus, t_dminus1plus1, t_c);
-        Term t_eq1 = tf.createTerm(func_eq, t_cplusd, t_dminus1plus1plusc);
+        JTerm t_c = tf.createTerm(const_c);
+        JTerm t_d = tf.createTerm(const_d);
+        JTerm t_cplusd = tf.createTerm(func_plus, t_c, t_d);
+        JTerm t_dminus1 = tf.createTerm(func_min1, t_d);
+        JTerm t_dminus1plus1 = tf.createTerm(func_plus1, t_dminus1);
+        JTerm t_dminus1plus1plusc = tf.createTerm(func_plus, t_dminus1plus1, t_c);
+        JTerm t_eq1 = tf.createTerm(func_eq, t_cplusd, t_dminus1plus1plusc);
 
 
-        Term t_cplus1 = tf.createTerm(func_plus1, t_c);
-        Term t_cplus1plusd = tf.createTerm(func_plus, t_cplus1, t_d);
-        Term t_dpluscplus1 = tf.createTerm(func_plus, t_d, t_cplus1);
-        Term t_eq2 = tf.createTerm(func_eq, t_cplus1plusd, t_dpluscplus1);
-        Term tnat = tf.createTerm(Junctor.IMP, t_eq1, t_eq2);
+        JTerm t_cplus1 = tf.createTerm(func_plus1, t_c);
+        JTerm t_cplus1plusd = tf.createTerm(func_plus, t_cplus1, t_d);
+        JTerm t_dpluscplus1 = tf.createTerm(func_plus, t_d, t_cplus1);
+        JTerm t_eq2 = tf.createTerm(func_eq, t_cplus1plusd, t_dpluscplus1);
+        JTerm tnat = tf.createTerm(Junctor.IMP, t_eq1, t_eq2);
 
         // => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
         seq_testNat = JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
@@ -308,8 +308,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
 
         z = new LogicVariable(new Name("z"), sort1);
-        Term t_z = tf.createTerm(z);
-        Term t_allzpz = services.getTermBuilder().all(z, tf.createTerm(func_p, t_z));
+        JTerm t_z = tf.createTerm(z);
+        JTerm t_allzpz = services.getTermBuilder().all(z, tf.createTerm(func_p, t_z));
         SequentFormula cf3 = new SequentFormula(t_allzpz);
         seq_testAll = JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
             ImmutableSLList.singleton(cf3));

@@ -6,7 +6,7 @@ package org.key_project.exploration.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -49,17 +49,17 @@ public class EditFormulaAction extends ExplorationAction {
 
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
-        Term term = (Term) pio.subTerm();
+        JTerm term = (JTerm) pio.subTerm();
         SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
-        Term newTerm = promptForTerm(mainWindow, term);
+        JTerm newTerm = promptForTerm(mainWindow, term);
 
         if (newTerm.equals(term)) {
             return;
         }
 
         ProofExplorationService api = ProofExplorationService.get(getMediator());
-        final Term formula = (Term) sf.formula();
+        final JTerm formula = (JTerm) sf.formula();
         Node toBeSelected = api.applyChangeFormula(g, pio, formula,
             tb.replace(formula, pio.posInTerm(), newTerm));
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);

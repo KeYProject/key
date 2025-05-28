@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -21,11 +21,11 @@ public final class MemberPVToField extends AbstractTermTransformer {
 
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
 
-        Operator op = term.sub(0).op();
+        JOperator op = term.sub(0).op();
         if (op instanceof LocationVariable fieldPV) {
             Function fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
             return services.getTermBuilder().func(fieldSymbol);

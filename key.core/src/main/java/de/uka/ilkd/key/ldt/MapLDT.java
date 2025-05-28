@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
@@ -35,25 +35,25 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
-        return isResponsible(op, (Term) null, services, ec);
+        return isResponsible(op, (JTerm) null, services, ec);
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right, Services services,
-            ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm left, JTerm right, Services services,
+                                 ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub, TermServices services,
-            ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm sub, TermServices services,
+                                 ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof EmptyMapLiteral;
         return services.getTermBuilder().func(mapEmpty);
     }
@@ -70,7 +70,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op().equals(mapEmpty)) {
             return EmptyMapLiteral.INSTANCE;
         }
@@ -79,7 +79,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         assert false;
         return null;
     }

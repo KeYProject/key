@@ -8,7 +8,7 @@ import java.util.EnumMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -62,7 +62,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     }
 
     InfFlowPOSnippetFactoryImpl(LoopSpecification invariant, ProofObligationVars vars1,
-            ProofObligationVars vars2, ExecutionContext context, Term guardTerm,
+            ProofObligationVars vars2, ExecutionContext context, JTerm guardTerm,
             Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
@@ -95,14 +95,14 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
 
 
     @Override
-    public Term create(Snippet snippet) throws UnsupportedOperationException {
+    public JTerm create(Snippet snippet) throws UnsupportedOperationException {
         try {
             InfFlowFactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {
                 throw new UnsupportedOperationException(
                     "Unknown factory " + "method for snippet \"" + snippet.name() + ".");
             }
-            Term result = m.produce(data, poVars1, poVars2);
+            JTerm result = m.produce(data, poVars1, poVars2);
             return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " + "snippet \""

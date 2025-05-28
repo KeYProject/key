@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.JOperatorSV;
 
 import recoder.java.SourceVisitor;
 
@@ -13,17 +13,17 @@ public class ExecCtxtSVWrapper extends ExecutionContext implements KeYRecoderExt
      *
      */
     private static final long serialVersionUID = 2299515454738715766L;
-    private final OperatorSV sv;
+    private final JOperatorSV sv;
 
 
-    public ExecCtxtSVWrapper(OperatorSV sv) {
+    public ExecCtxtSVWrapper(JOperatorSV sv) {
         this.sv = sv;
     }
 
     /**
      * returns the schema variable of this type sv wrapper
      */
-    public OperatorSV getSV() {
+    public JOperatorSV getSV() {
         return sv;
     }
 

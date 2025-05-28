@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
@@ -98,7 +98,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -109,21 +109,21 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term left, Term right,
-            Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, JTerm left, JTerm right,
+                                 Services services, ExecutionContext ec) {
         return left != null && left.sort().extendsTrans(targetSort()) && right != null
                 && right.sort().extendsTrans(targetSort())
                 && getFunctionFor(op, services, ec) != null;
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         return sub != null && sub.sort().extendsTrans(targetSort()) && op instanceof Negative;
     }
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public JTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof FloatLiteral : "Literal '" + lit + "' is not a float literal.";
         String s = ((FloatLiteral) lit).getValue();
         float flValue = Float.parseFloat(s);
@@ -192,7 +192,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public FloatLiteral translateTerm(Term t, ExtList children, Services services) {
+    public FloatLiteral translateTerm(JTerm t, ExtList children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }
@@ -212,7 +212,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_FLOAT;
         } else {

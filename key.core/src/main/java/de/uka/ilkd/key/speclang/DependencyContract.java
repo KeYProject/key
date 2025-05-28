@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 
 /**
  * A contract about the dependencies of an observer symbol, consisting of a precondition, a depends
@@ -15,5 +15,5 @@ import de.uka.ilkd.key.logic.Term;
 public interface DependencyContract extends Contract {
 
     @Override
-    DependencyContract map(UnaryOperator<Term> op, Services services);
+    DependencyContract map(UnaryOperator<JTerm> op, Services services);
 }

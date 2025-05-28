@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -32,13 +32,13 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort sort;
 
-    public FieldTypeToSortCondition(final OperatorSV exprOrTypeSV, final GenericSort sort) {
+    public FieldTypeToSortCondition(final JOperatorSV exprOrTypeSV, final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
         assert checkSortedSV(exprOrTypeSV);
     }
 
-    public static boolean checkSortedSV(final OperatorSV exprOrTypeSV) {
+    public static boolean checkSortedSV(final JOperatorSV exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
         return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE
@@ -56,8 +56,8 @@ public final class FieldTypeToSortCondition implements VariableCondition {
         final SVInstantiations inst =
             (SVInstantiations) matchCond.getInstantiations();
 
-        if (svSubst instanceof Term) {
-            Operator op = ((Term) svSubst).op();
+        if (svSubst instanceof JTerm) {
+            JOperator op = ((JTerm) svSubst).op();
             if (op instanceof Function) {
                 HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
                 if (split == null) {

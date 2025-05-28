@@ -8,7 +8,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
@@ -34,7 +34,7 @@ public class UnparameterizedMergeContract implements MergeContract {
     }
 
     @Override
-    public UnparameterizedMergeContract map(UnaryOperator<Term> op, Services services) {
+    public UnparameterizedMergeContract map(UnaryOperator<JTerm> op, Services services) {
         return this;
     }
 

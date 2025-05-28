@@ -90,7 +90,7 @@ public abstract class FindTaclet extends Taclet {
     /**
      * returns the find term of the taclet to be matched
      */
-    public abstract Term find();
+    public abstract JTerm find();
 
     /**
      * @return Set of schemavariables of the if and the (optional) find part
