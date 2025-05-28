@@ -7,6 +7,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;

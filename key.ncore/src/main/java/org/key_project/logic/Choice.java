@@ -1,15 +1,12 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.logic;
+package org.key_project.logic;
 
-import java.util.List;
 import java.util.Objects;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A choice is an option in a category.
@@ -17,8 +14,6 @@ import org.jspecify.annotations.NonNull;
  * A choice is represented by a string, where the category is separated by the option with a colon.
  * <p>
  * Choices can be declared within KeY files. They influence the activation of taclets.
- *
- * @see de.uka.ilkd.key.nparser.ParsingFacade#getChoices(List)
  */
 public class Choice implements Named {
     private final @NonNull Name name;
@@ -47,7 +42,7 @@ public class Choice implements Named {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

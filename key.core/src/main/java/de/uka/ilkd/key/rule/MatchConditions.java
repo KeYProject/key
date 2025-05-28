@@ -7,13 +7,15 @@ import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
+
 import org.jspecify.annotations.NonNull;
 
 
 /**
  * Simple container class containing the information resulting from a Taclet.match-call
  */
-public class MatchConditions extends org.key_project.prover.rules.instantiation.MatchConditions {
+public class MatchConditions extends MatchResultInfo {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
         new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);

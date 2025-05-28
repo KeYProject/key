@@ -20,7 +20,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSchemaModalOperators {
 
-    public static final MatchConditions EMPTY_MATCHCONDITIONS =
+    public static final MatchResultInfo EMPTY_MATCHCONDITIONS =
         de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
     final String[] strs = { "i=5", "\\<{ while(i>0) {i--;} }\\> i=0", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3", "i=3",
@@ -150,7 +150,7 @@ public class TestSchemaModalOperators {
         RewriteTaclet t = rtb.getRewriteTaclet();
 
         Term goal = TB.prog(Modality.JavaModalityKind.DIA, JavaBlock.EMPTY_JAVABLOCK, TB.ff());
-        MatchConditions mc =
+        MatchResultInfo mc =
             t.getMatcher().matchFind(goal, EMPTY_MATCHCONDITIONS, services);
         assertNotNull(mc);
         assertNotNull(mc.getInstantiations().getInstantiation(osv));

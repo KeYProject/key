@@ -15,7 +15,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 
 /**
@@ -39,8 +39,8 @@ public class StoreStmtInCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            MatchConditions matchCond, LogicServices services) {
+    public MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
+            MatchResultInfo matchCond, LogicServices services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
