@@ -30,6 +30,7 @@
  *
  * @author Mattias Ulbrich, 2015
  *
+ *
  * Modified  to run fully automatically for Retrospective  Path
  * Validation. This is a form of partial verification. We first
  * record a control flow trace (instrumentation for a automatic
@@ -42,10 +43,11 @@
  * KeY Strategy Settings:
  *   Loop Treatment: Expand (Transformation)
  *   Method Treatment: Expand
+ *   tracing: on
  *
  * Or just load quicksort.key
  *
- * Lukas Gra"tz, 2023/24
+ * AUTHOR OF MODIFICATION REMOVED DUE TO DOUBLE-BLIND REVIEW
  */
 
 package quicksort;
@@ -63,11 +65,9 @@ class Quicksort {
       @
       @  //-- the following ensures with seqPerm cannot be shown in auto mode with default options:
       @  //ensures \dl_seqPerm(\dl_array2seq(array), \old(\dl_array2seq(array)));
-      @  //-- equivalent ensures with \num_of:
-      @  ensures (\forall int j; 0<=j && j < array.length;
-      @               (\num_of int i; 0<=i && i < array.length; \old(array[i]) == array[j])
-      @            == (\num_of int i; 0<=i && i < array.length;      array[i]  == array[j])
-      @          );
+      @  //-- equivalent ensures with \mset:
+      @  ensures (\mset int i; 0<=i && i < array.length; \old(array[i]))
+      @       == (\mset int i; 0<=i && i < array.length;      array[i]);
       @
       @  ensures (\forall int i; 0<=i && i<array.length-1; array[i] <= array[i+1]);
       @
