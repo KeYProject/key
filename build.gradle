@@ -103,7 +103,7 @@ subprojects {
 
         testImplementation("ch.qos.logback:logback-classic:1.5.18")
 
-        testImplementation(platform("org.junit:junit-bom:5.13.0"))
+        testImplementation(platform("org.junit:junit-bom:5.12.2"))
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-api")
         testImplementation ("org.junit.jupiter:junit-jupiter-params")
