@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import de.uka.ilkd.key.proof.init.Profile;
@@ -26,7 +26,7 @@ public class EmptyEnvInput extends AbstractEnvInput {
     }
 
     @Override
-    public File getInitialFile() {
+    public Path getInitialFile() {
         // no file availbale. may return null
         return null;
     }

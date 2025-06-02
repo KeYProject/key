@@ -131,7 +131,7 @@ public class MasterHandlerTest {
             Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
             Files.write(tmpKey, lines);
 
-            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
             Proof proof = env.getLoadedProof();
             Sequent sequent = proof.root().sequent();

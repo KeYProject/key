@@ -33,7 +33,7 @@ public final class OpenExampleAction extends MainWindowAction {
         File file = ExampleChooser.showInstance(Main.getExamplesDir());
         if (file != null) {
             KeYFileChooser.getFileChooser("Select file to load").setSelectedFile(file);
-            mainWindow.loadProblem(file);
+            mainWindow.loadProblem(file.toPath());
         }
     }
 }

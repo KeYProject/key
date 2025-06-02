@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -15,8 +15,8 @@ public class TestJavaCardDLJavaExtensions {
 
     private final HelperClassForTests helper = new HelperClassForTests();
 
-    public static final String testpath = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "javacardDLExtensions" + File.separator;
+    public static final Path testpath =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("javacardDLExtensions");
 
 
     public TestJavaCardDLJavaExtensions() {
@@ -26,7 +26,7 @@ public class TestJavaCardDLJavaExtensions {
     @Test
     public void testTypeNotInScopeShouldNotBeFound() {
         try {
-            helper.parseThrowException(new File(testpath + "typeResolutionInMethodFrame.key"));
+            helper.parseThrowException(testpath.resolve("typeResolutionInMethodFrame.key"));
         } catch (Throwable t) {
             return;
         }
@@ -37,10 +37,11 @@ public class TestJavaCardDLJavaExtensions {
 
     @Test
     public void testMethodFrameRedirectsScope() throws ProofInputException {
-        helper.parseThrowException(new File(testpath + "typeResolutionInMethodFrame2.key"));
+        helper.parseThrowException(testpath.resolve("typeResolutionInMethodFrame2.key"));
         /*
          * fail("Something with type resolution in method frames is corrupt. " +
          * "The type Test should be found as the scope to look for " +
          * "is redirected to test.Test");
-         */ }
+         */
+    }
 }

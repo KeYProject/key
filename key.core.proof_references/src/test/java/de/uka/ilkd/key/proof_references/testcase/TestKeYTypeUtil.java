@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.testcase;
 
-import java.io.File;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -26,8 +25,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testIsInnerType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -67,8 +66,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testGetParentName() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -110,8 +109,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testIsType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -145,8 +144,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testGetType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.core.Main;
@@ -392,16 +393,16 @@ public final class CommandLine {
      *
      * @return a read-only list of strings.
      */
-    public ArrayList<File> getFileArguments() {
+    public ArrayList<Path> getFileArguments() {
 
-        ArrayList<File> ret = new ArrayList<>();
+        ArrayList<Path> ret = new ArrayList<>();
         List<String> FileNameList = Collections.unmodifiableList(arguments);
 
         for (String fileArg : FileNameList) {
 
             File tmp = new File(fileArg);
             if (tmp.exists()) {
-                ret.add(tmp);
+                ret.add(tmp.toPath());
             } else {
                 Main.printUsageAndExit(false, "File not found: " + fileArg, -4);
             }
