@@ -60,7 +60,9 @@ public abstract class AbstractPO implements IPersistablePO {
     private final ArrayDeque<Vertex> stack = new ArrayDeque<>();
 
 
-    /** number of currently visited nodes */
+    /**
+     * number of currently visited nodes
+     */
     private int index = 0;
 
 
@@ -256,13 +258,19 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     static class Vertex {
 
-        /** to avoid linear lookup in the stack */
+        /**
+         * to avoid linear lookup in the stack
+         */
         boolean onStack;
 
-        /** the index (number of already visited nodes) and -1 if not yet visited */
+        /**
+         * the index (number of already visited nodes) and -1 if not yet visited
+         */
         int index;
 
-        /** an SCC is identified by the node that was visited first */
+        /**
+         * an SCC is identified by the node that was visited first
+         */
         int lowLink;
 
         private final ClassAxiom axiom;
@@ -396,7 +404,6 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
@@ -409,30 +416,14 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Creates declarations necessary to save/load proof in textual form (helper for createProof()).
      */
-    private void createProofHeader(String javaPath, String classPath, String bootClassPath,
-            String includedFiles, Services services) {
+    private void createProofHeader(
+            JavaModel model, Services services) {
+
         if (header != null) {
             return;
         }
-        final StringBuilder sb = new StringBuilder();
 
-        // bootclasspath
-        if (bootClassPath != null && !bootClassPath.isEmpty()) {
-            sb.append("\\bootclasspath \"").append(bootClassPath).append("\";\n\n");
-        }
-
-        // classpath
-        if (classPath != null && !classPath.isEmpty()) {
-            sb.append("\\classpath ").append(classPath).append(";\n\n");
-        }
-
-        // javaSource
-        sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
-
-        // include
-        if (includedFiles != null && !includedFiles.isEmpty()) {
-            sb.append("\\include ").append(includedFiles).append(";\n\n");
-        }
+        final StringBuilder sb = new StringBuilder(model.asKeyString());
 
         // contracts
         ImmutableSet<Contract> contractsToSave = specRepos.getAllContracts();
@@ -466,8 +457,7 @@ public abstract class AbstractPO implements IPersistablePO {
             proofConfig = environmentConfig.deepCopy();
         }
         final JavaModel javaModel = proofConfig.getServices().getJavaModel();
-        createProofHeader(javaModel.getModelDir(), javaModel.getClassPath(),
-            javaModel.getBootClassPath(), javaModel.getIncludedFiles(), proofConfig.getServices());
+        createProofHeader(javaModel, proofConfig.getServices());
 
         final Proof proof = createProofObject(proofName, header, poTerm, proofConfig);
 

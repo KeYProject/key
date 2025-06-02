@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -50,9 +51,9 @@ public class TestTermTacletAppIndex {
 
     @BeforeEach
     public void setUp() {
-        File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-            + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
-        assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
+        Path tacletFile = HelperClassForTests.TESTCASE_DIRECTORY.resolve(
+            "../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+        assertTrue(Files.exists(tacletFile), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
         ruleRewriteNonH1H2 =

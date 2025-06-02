@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -28,7 +28,7 @@ public class Issue3452Test {
     @Test
     void testNoStateParsedCorrectly() throws ProblemLoaderException, ProofInputException {
         final var input =
-            new File(
+            Paths.get(
                 "src/test/resources/de/uka/ilkd/key/nparser/fix3452/fix/Issue3452Fixture.java");
         var env = KeYEnvironment.load(input, null, null, null);
         final var contract = env.getProofContracts().getFirst();
@@ -42,9 +42,8 @@ public class Issue3452Test {
 
     @Test
     void testIllegalNoState() throws ProblemLoaderException, ProofInputException {
-        final var input =
-            new File(
-                "src/test/resources/de/uka/ilkd/key/nparser/fix3452/problem/Issue3452IllegalNoState.java");
+        final var input = Paths.get(
+            "src/test/resources/de/uka/ilkd/key/nparser/fix3452/problem/Issue3452IllegalNoState.java");
 
         ProblemLoaderException exception = assertThrows(ProblemLoaderException.class, () -> {
             var env = KeYEnvironment.load(input, null, null, null);

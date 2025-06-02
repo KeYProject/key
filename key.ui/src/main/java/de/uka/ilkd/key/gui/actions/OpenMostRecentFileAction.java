@@ -36,15 +36,15 @@ public final class OpenMostRecentFileAction extends MainWindowAction
                 && mainWindow.getRecentFiles().getMostRecent() != null) {
             final String recentFile = mainWindow.getRecentFiles().getMostRecent();
             if (recentFile != null) {
-                File file = new File(recentFile);
-                KeYFileChooser.getFileChooser("Select file to load").setSelectedFile(file);
+                Path file = new File(recentFile).toPath();
+                KeYFileChooser.getFileChooser("Select file to load").setSelectedFile(file.toFile());
 
-                if (ProofSelectionDialog.isProofBundle(file.toPath())) {
-                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+                if (ProofSelectionDialog.isProofBundle(file)) {
+                    Path proofPath = ProofSelectionDialog.chooseProofToLoad(file);
                     if (proofPath == null) {
                         // canceled by user
                     } else {
-                        mainWindow.loadProofFromBundle(file, proofPath.toFile());
+                        mainWindow.loadProofFromBundle(file, proofPath);
                     }
                 } else {
                     mainWindow.loadProblem(file);

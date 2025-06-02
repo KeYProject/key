@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
 import java.util.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -633,8 +632,11 @@ public class TestTermLabelManager {
             final TermLabelRefactoring refactoring) throws ProblemLoaderException {
         KeYEnvironment<?> env = null;
         try {
-            env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY,
-                "termLabels/flatSteps/FlatSteps.java"), null, null, null);
+            env = KeYEnvironment.load(
+                HelperClassForTests.TESTCASE_DIRECTORY.resolve(
+                    "termLabels/flatSteps/FlatSteps.java"),
+                null, null, null);
+
             Profile profile = new JavaProfile() {
                 @Override
                 protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {

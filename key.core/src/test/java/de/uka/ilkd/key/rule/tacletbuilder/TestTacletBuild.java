@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.io.File;
+import java.nio.file.Path;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.OperatorSV;
@@ -142,14 +144,14 @@ public class TestTacletBuild {
 
     private final HelperClassForTests helper = new HelperClassForTests();
 
-    public static final String testRules =
-        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "tacletprefix";
+    public static final Path testRules =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("tacletprefix");
 
     @Test
     public void testSchemavariablesInAddrulesRespectPrefix() {
         try {
             helper.parseThrowException(
-                new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key"));
+                testRules.resolve("schemaVarInAddruleRespectPrefix.key"));
         } catch (BuildingException e) {
             assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:3"),
                 "Position of error message is wrong.");

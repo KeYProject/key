@@ -4,6 +4,8 @@
 package org.key_project.util;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,42 +28,14 @@ public class Filenames {
      * filenames.
      */
     public static List<String> disectFilename(String filename) {
-        final char sep = File.separatorChar;
+
         List<String> res = new ArrayList<>();
-        // if filename contains slashes, take it as UNIX filename, otherwise Windows
-        if (filename.contains("/")) {
-            assert sep == '/' : "\"" + filename + "\" contains both / and \\";
-        } else if (filename.contains("\\")) {
-            assert sep == '\\' : "\"" + filename + "\" contains both / and \\";
-        } else {
-            res.add(filename);
-            return res;
+        Path p = Paths.get(filename);
+        if (p.getRoot() != null) {
+            res.add(p.getRoot().toString());
         }
-        int i = 0;
-        while (i < filename.length()) {
-            int j = filename.indexOf(sep, i);
-            if (j == -1) { // no slash anymore
-                final String s = filename.substring(i);
-                if (!s.equals(".")) {
-                    res.add(s);
-                }
-                break;
-            }
-            if (i == j) {
-                // empty string between slashes
-                if (i == 0)
-                // leading slash
-                {
-                    res.add("");
-                }
-            } else {
-                // contains "/./"
-                final String s = filename.substring(i, j);
-                if (!s.equals(".")) {
-                    res.add(s);
-                }
-            }
-            i = j + 1;
+        for (int i = 0; i < p.getNameCount(); i++) {
+            res.add(p.getName(i).toString());
         }
         return res;
     }

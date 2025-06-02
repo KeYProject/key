@@ -789,7 +789,7 @@ public final class SpecificationRepository {
      * Returns the registered (atomic or combined) contract corresponding to the passed name, or
      * null.
      */
-    public Contract getContractByName(String name) {
+    public @Nullable Contract getContractByName(String name) {
         if (name == null || name.isEmpty()) {
             return null;
         }

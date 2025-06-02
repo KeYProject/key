@@ -59,6 +59,11 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
             Position.fromToken(token));
     }
 
+    public URI getFileUri() { return fileUri; }
+
+    /// @deprecated weigl: Usage of {@link Optional} is discourage.
+    /// @see [#getFileUri()]
+    @Deprecated
     public Optional<URI> getFileURI() { return Optional.ofNullable(fileUri); }
 
     public Position getPosition() { return position; }

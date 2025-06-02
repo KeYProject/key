@@ -40,7 +40,7 @@ public class RunAllProofsTestWithComputeCostProfiling {
      * mode of runallproofs re-executes static initialisation blocks in each created subprocess. Be
      * aware of that in case you intend to change or move this block.
      */
-    static void initDirectories(Date runStart) {
+    static void initDirectories(Date runStart) throws IOException {
         directories = new ProfilingDirectories(runStart);
     }
 

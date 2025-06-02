@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -144,10 +144,9 @@ public class JavacExtension
                 return;
             }
 
-            File bootClassPath =
-                jm.getBootClassPath() != null ? new File(jm.getBootClassPath()) : null;
-            List<File> classpath = jm.getClassPathEntries();
-            File javaPath = new File(jm.getModelDir());
+            Path bootClassPath = jm.getBootClassPath() != null ? jm.getBootClassPath() : null;
+            List<Path> classpath = jm.getClassPath();
+            Path javaPath = jm.getModelDir();
 
             lblStatus.setForeground(Color.black);
             lblStatus.setText("Javac runs");
