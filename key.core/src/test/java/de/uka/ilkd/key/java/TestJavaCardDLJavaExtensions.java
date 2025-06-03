@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 
 public class TestJavaCardDLJavaExtensions {
 
-    public static final String testpath = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "javacardDLExtensions" + File.separator;
+    public static final Path testpath =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("javacardDLExtensions");
 
 
     public TestJavaCardDLJavaExtensions() {
@@ -29,13 +29,13 @@ public class TestJavaCardDLJavaExtensions {
             + "declared inside package test.";
         Assertions.assertThrows(BuildingException.class,
             () -> HelperClassForTests
-                    .parseThrowException(new File(testpath + "typeResolutionInMethodFrame.key")),
+                    .parseThrowException(testpath.resolve("typeResolutionInMethodFrame.key")),
             message);
     }
 
     @Test
     public void testMethodFrameRedirectsScope() throws ProofInputException {
         HelperClassForTests
-                .parseThrowException(new File(testpath + "typeResolutionInMethodFrame2.key"));
+                .parseThrowException(testpath.resolve("typeResolutionInMethodFrame2.key"));
     }
 }

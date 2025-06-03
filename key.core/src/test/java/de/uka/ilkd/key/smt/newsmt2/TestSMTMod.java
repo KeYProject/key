@@ -10,16 +10,14 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SMTTestSettings;
-import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.key_project.util.helper.FindResources;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,18 +40,17 @@ public class TestSMTMod {
                     && it.getName().equals("Z3"))
             .findFirst().orElse(null);
 
-    private static final SolverType CVC4_SOLVER = SolverTypes.getSolverTypes().stream()
+    private static final SolverType CVC5_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
-                    && it.getName().equals("CVC4"))
+                    && it.getName().equals("cvc5"))
             .findFirst().orElse(null);
 
     /**
      * This tests if x mod y is non-negative and x mod y < |y| for y != 0
-     * thus satisfying the definition of euclidean modulo
-     * Tests for Z3 and CVC4
+     * thus satisfying the definition of Euclidean modulo
+     * Tests for Z3 and cvc5
      *
-     * @throws ProblemLoaderException
-     *         Occured Exception during load of problem file
+     * @throws ProblemLoaderException Occurred Exception during load of problem file
      */
     @Test
     public void testModSpec() throws ProblemLoaderException {
@@ -69,13 +66,21 @@ public class TestSMTMod {
                 result = checkGoal(g, Z3_SOLVER);
                 assertSame(SMTSolverResult.ThreeValuedTruth.VALID, result.isValid());
             } else {
-                LOGGER.warn("Warning:Z3 solver not installed, tests skipped.");
+                if (SmtTestUtils.failIfSmtSolverIsUnavailable) {
+                    Assertions.fail("z3 solver not installed");
+                } else {
+                    LOGGER.warn("Warning:Z3 solver not installed, tests skipped.");
+                }
             }
-            if (CVC4_SOLVER.isInstalled(true)) {
-                result = checkGoal(g, CVC4_SOLVER);
+            if (CVC5_SOLVER.isInstalled(true)) {
+                result = checkGoal(g, CVC5_SOLVER);
                 assertSame(SMTSolverResult.ThreeValuedTruth.VALID, result.isValid());
             } else {
-                LOGGER.warn("Warning:CVC4 solver not installed, tests skipped.");
+                if (SmtTestUtils.failIfSmtSolverIsUnavailable) {
+                    Assertions.fail("cvc4 solver not installed");
+                } else {
+                    LOGGER.warn("Warning:cvc5 solver not installed, tests skipped.");
+                }
             }
         } finally {
             env.dispose();

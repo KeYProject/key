@@ -5,6 +5,8 @@ package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A part of the program syntax that carries semantics in the model. taken from COMPOST and changed
  * to achieve an immutable structure
@@ -33,6 +35,6 @@ public interface ProgramElement extends SourceElement, ModelElement {
      *        the MatchConditions found up to this point
      * @return the resulting match conditions or <tt>null</tt> if the match failed
      */
+    @Nullable
     MatchConditions match(SourceData source, MatchConditions matchCond);
-
 }

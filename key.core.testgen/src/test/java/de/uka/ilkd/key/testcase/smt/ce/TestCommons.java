@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.testcase.smt.ce;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -29,8 +31,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * this class directly but derive subclasses to implement tests.
  */
 public abstract class TestCommons {
-    protected static final File folder =
-        new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
+    protected static final Path folder =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("smt/tacletTranslation");
     /**
      * The set of taclets
      */
@@ -84,8 +86,7 @@ public abstract class TestCommons {
     /**
      * check a problem file
      *
-     * @param filepath
-     *        the path to the file
+     * @param filepath the path to the file
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
@@ -145,31 +146,29 @@ public abstract class TestCommons {
      * Use this method if you only need taclets for testing.
      */
     protected ProofAggregate parse() {
-        return parse(new File(folder, "dummyFile.key"));
+        return parse(folder.resolve("dummyFile.key"));
     }
 
     /**
      * Calls <code>parse(File file, Profile profile) with the standard profile for testing.
      */
-    protected ProofAggregate parse(File file) {
+    protected ProofAggregate parse(Path file) {
         return parse(file, profile);
     }
 
     /**
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
-     * @param file
-     *        problem file.
-     * @param pro
-     *        determines the profile that should be used.
+     * @param file problem file.
+     * @param pro determines the profile that should be used.
      * @return ProofAggregate of the problem file.
      */
-    protected ProofAggregate parse(File file, Profile pro) {
-        assertTrue(file.exists());
+    protected ProofAggregate parse(Path file, Profile pro) {
+        assertTrue(Files.exists(file));
         ProofAggregate result = null;
         try {
             KeYUserProblemFile po =
-                new KeYUserProblemFile(file.getName(), file.toPath(), null, pro);
+                new KeYUserProblemFile(file.getFileName().toString(), file, null, pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }

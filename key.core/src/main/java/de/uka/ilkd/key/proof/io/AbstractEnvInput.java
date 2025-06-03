@@ -9,8 +9,8 @@ import java.util.List;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -21,7 +21,7 @@ public abstract class AbstractEnvInput implements EnvInput {
 
     protected final String name;
     protected final Path javaPath;
-    protected final @NonNull List<Path> classPath;
+    protected final List<Path> classPath;
     protected final Path bootClassPath;
     protected final Includes includes;
     protected final Profile profile;
@@ -35,7 +35,8 @@ public abstract class AbstractEnvInput implements EnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
-    public AbstractEnvInput(String name, Path javaPath, List<Path> classPath, Path bootClassPath,
+    protected AbstractEnvInput(String name, Path javaPath, List<Path> classPath,
+            Path bootClassPath,
             Profile profile, List<Path> includes) {
         assert profile != null;
         this.name = name;
@@ -45,7 +46,7 @@ public abstract class AbstractEnvInput implements EnvInput {
         this.profile = profile;
         this.includes = new Includes();
         if (includes != null) {
-            for (Path path : includes) {
+            for (var path : includes) {
                 this.includes.put(path.toString(), RuleSourceFactory.initRuleFile(path));
             }
         }
@@ -75,26 +76,26 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public final Includes readIncludes() {
+    public final Includes readIncludes() throws ProofInputException {
         assert initConfig != null;
         return includes;
     }
 
 
     @Override
-    public final @Nullable Path readJavaPath() {
+    public final @Nullable Path readJavaPath() throws ProofInputException {
         return javaPath;
     }
 
 
     @Override
-    public final @NonNull List<Path> readClassPath() {
+    public final List<Path> readClassPath() {
         return classPath;
     }
 
 
     @Override
-    public Path readBootClassPath() {
+    public @Nullable Path readBootClassPath() {
         return bootClassPath;
     }
 
@@ -113,7 +114,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     }
 
     @Override
-    public Path getJavaFile() {
+    public @Nullable Path getJavaFile() {
         return javaFile;
     }
 

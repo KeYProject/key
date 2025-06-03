@@ -25,7 +25,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return tree;
     }
 
-    public GUIAbstractTreeNode(GUIProofTreeModel tree, Node node) {
+    protected GUIAbstractTreeNode(GUIProofTreeModel tree, Node node) {
         this.tree = tree;
         this.noderef = new WeakReference<>(node);
     }

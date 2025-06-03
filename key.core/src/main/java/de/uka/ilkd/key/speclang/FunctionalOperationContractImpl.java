@@ -119,7 +119,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     /**
      * Creates an operation contract. Using this constructor is discouraged: it may change in the
-     * future. Please use the factory methods in {@link de.uka.ilkd.key.speclang.ContractFactory}.
+     * future. Please use the factory methods in {@link ContractFactory}.
      *
      * @param baseName
      *        base name of the contract (does not have to be unique)
@@ -212,7 +212,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                         + " with return type " + pm.getReturnType();
         }
         assert pm.isModel() || excVar != null;
-        assert atPreVars.size() != 0;
+        assert !atPreVars.isEmpty();
         assert services != null;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -759,6 +759,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             originalFreePosts.put(heap, p);
         }
 
+        // TODO: Why is this never read?
         Map<LocationVariable, LocationVariable> atPresVars =
             new HashMap<>();
         for (Entry<LocationVariable, Term> entry : atPres.entrySet()) {
@@ -1004,7 +1005,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             callStatement = new CopyAssignment(originalResultVar, mr);
         }
         final CatchAllStatement cas = new CatchAllStatement(new StatementBlock(callStatement),
-            (LocationVariable) originalExcVar);
+            originalExcVar);
         final StatementBlock sblock = new StatementBlock(cas);
         final JavaBlock jb = JavaBlock.createJavaBlock(sblock);
 
@@ -1046,7 +1047,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
         assert pm.isModel() || excVar != null;
-        assert atPreVars.size() != 0;
+        assert !atPreVars.isEmpty();
         assert services != null;
         final Map<LocationVariable, LocationVariable> replaceMap =
             getReplaceMap(selfVar, paramVars, resultVar, excVar, atPreVars, services);
@@ -1085,7 +1086,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramTerms.size() == originalParamVars.size();
         assert (resultTerm == null) == (originalResultVar == null);
         assert pm.isModel() || excTerm != null;
-        assert atPres.size() != 0;
+        assert !atPres.isEmpty();
         assert services != null;
         final Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         heapTerms.put(heap, heapTerm);
@@ -1128,7 +1129,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
         assert pm.isModel() || excVar != null;
-        assert atPreVars.size() != 0;
+        assert !atPreVars.isEmpty();
         assert services != null;
         final Map<LocationVariable, LocationVariable> replaceMap =
             getReplaceMap(selfVar, paramVars, resultVar, excVar, atPreVars, services);
@@ -1210,7 +1211,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
-        assert atPreVars.size() != 0;
+        assert !atPreVars.isEmpty();
         assert services != null;
         if (originalAxioms == null) {
             return null;
@@ -1421,18 +1422,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             ((Services) services).getTypeConverter().getHeapLDT().getHeap();
         return (globalDefs == null ? "" : "defs: " + globalDefs + "; ") + "pre: " + originalPres
             + (originalFreePres.get(heap) != null
-                    && !originalFreePres.get(heap).equalsModProperty(tb.tt(),
-                        RENAMING_TERM_PROPERTY)
-                                ? "free pre: " + originalFreePres
-                                : "")
+                    && !originalFreePres.get(heap).equals(tb.tt())
+                            ? "free pre: " + originalFreePres
+                            : "")
             + "; mby: " + originalMby + "; post: " + originalPosts
             + (originalFreePosts.get(heap) != null
-                    && !originalFreePosts.get(heap).equalsModProperty(tb.tt(),
+                    && !originalFreePosts.get(heap).equals(
                         RENAMING_TERM_PROPERTY)
                                 ? "free post: " + originalFreePosts
                                 : "")
             + "; modifiable: " + originalModifiables + "; hasModifiable: " + hasRealModifiable
-            + (originalAxioms != null && originalAxioms.size() > 0 ? ("; axioms: " + originalAxioms)
+            + (originalAxioms != null && !originalAxioms.isEmpty() ? ("; axioms: " + originalAxioms)
                     : "")
             + "; termination: " + getModalityKind() + "; transaction: "
             + transactionApplicableContract();
@@ -1517,14 +1517,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getPre() {
-        assert originalPres.values().size() == 1
+        assert originalPres.size() == 1
                 : "information flow extension not compatible with multi-heap setting";
         return originalPres.values().iterator().next();
     }
 
     @Override
     public Term getPost() {
-        assert originalPosts.values().size() == 1
+        assert originalPosts.size() == 1
                 : "information flow extension not compatible with multi-heap setting";
         return originalPosts.values().iterator().next();
     }

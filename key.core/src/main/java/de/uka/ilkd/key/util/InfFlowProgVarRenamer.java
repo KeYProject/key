@@ -102,7 +102,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void renameAndAddToReplaceMap(Term term) {
         if (term.op() instanceof ProgramVariable) {
             renameProgramVariable(term);
-        } else if (term.op() instanceof JFunction
+        } else if (term.op() instanceof Function
                 && ((Function) term.op()).isSkolemConstant()) {
             renameSkolemConstant(term);
         } else if (term.op() instanceof ElementaryUpdate) {
@@ -162,7 +162,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final Function f = (Function) term.op();
         final Name newName =
             VariableNameProposer.DEFAULT.getNewName(services, new Name(f.name() + postfix));
-        final JFunction renamedF = new JFunction(newName, f.sort(), f.argSorts(),
+        final Function renamedF = new JFunction(newName, f.sort(), f.argSorts(),
             f.whereToBind(), f.isUnique(), f.isSkolemConstant());
         services.getNamespaces().functions().addSafely(renamedF);
         final Term fTerm = label(func(renamedF), term.getLabels());

@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -35,40 +37,40 @@ public class ContractLoadingTests {
 
     @Test
     public void issues1658() throws ProblemLoaderException {
-        final File javaFile =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
-        Assumptions.assumeTrue(javaFile.exists());
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
+        final Path javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("issues/1658/Test.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
         Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
     @Test
     void issues1717() throws ProblemLoaderException, ProofInputException {
-        File javaFile =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1717/UnderscoreZero.java");
-        Assumptions.assumeTrue(javaFile.exists());
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
+        var javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("issues/1717/UnderscoreZero.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
         Assertions.assertFalse(file.getProofContracts().isEmpty());
-        final var contract = file.getProofContracts().get(0);
+        final var contract = file.getProofContracts().getFirst();
         var proof = file.createProof(contract.createProofObl(file.getInitConfig()));
         Assertions.assertNotNull(proof);
     }
 
     @Test
     public void specMathJavaMathTest() throws ProblemLoaderException {
-        final File javaFile =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/java/Test.java");
-        Assumptions.assumeTrue(javaFile.exists());
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
+        final Path javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("specMath/java/Test.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
         Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
     @Test
     public void specMathBigintMathTest() throws ProblemLoaderException {
-        final File javaFile =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/bigint/Test.java");
-        Assumptions.assumeTrue(javaFile.exists());
-        KeYEnvironment<?> file = KeYEnvironment.load(javaFile.toPath());
+        final Path javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("specMath/bigint/Test.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
         Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 }

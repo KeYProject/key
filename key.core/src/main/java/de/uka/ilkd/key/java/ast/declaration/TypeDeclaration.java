@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.abstraction.Package;
-import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
@@ -164,7 +163,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *
      * @return the default value of the given type according to JLS 4.5.5
      */
-    public Literal getDefaultValue() {
+    public NullLiteral getDefaultValue() {
         return NullLiteral.NULL;
     }
 

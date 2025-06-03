@@ -224,7 +224,7 @@ public final class Main {
             if (ui instanceof ConsoleUserInterfaceControl) {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
-        } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined
+        } else if (getExamplesDir() != null && showExampleChooserIfExamplesDirIsDefined
                 && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                         .getShowLoadExamplesDialog()) {
             ui.openExamples();

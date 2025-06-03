@@ -212,7 +212,7 @@ public class PositionInfo {
 
     @Override
     public String toString() {
-        if (this == PositionInfo.UNDEFINED) {
+        if (this == UNDEFINED) {
             return "UNDEFINED";
         } else {
             return ((fileURI == null ? "" : fileURI) + " start Pos: " + startPos

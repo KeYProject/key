@@ -6,14 +6,15 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 
 /**
@@ -39,10 +40,10 @@ public class RewriteTacletBuilderSchemaVarCollector {
             result.addAll(collectSchemaVariables(rtb.getFind()));
         }
 
-        for (TacletGoalTemplate tgt : rtb.goalTemplates()) {
+        for (var tgt : rtb.goalTemplates()) {
             result.addAll(collectSchemaVariables(tgt));
-            for (Taclet tacletInAddrules : tgt.rules()) {
-                result.addAll(tacletInAddrules.collectSchemaVars());
+            for (var tacletInAddrules : tgt.rules()) {
+                result.addAll(((Taclet) tacletInAddrules).collectSchemaVars());
             }
         }
 
@@ -87,7 +88,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
         Set<SchemaVariable> result = new LinkedHashSet<>();
 
         for (final SequentFormula cf : s) {
-            result.addAll(collectSchemaVariables(cf.formula()));
+            result.addAll(collectSchemaVariables((Term) cf.formula()));
         }
 
         return result;

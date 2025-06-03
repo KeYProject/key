@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -112,7 +113,8 @@ public class PrettyPrinterRoundtripTest {
     }
 
     private void assertEqualModAlpha(Term expected, Term actual) {
-        var value = expected.equalsModProperty(actual, RenamingTermProperty.RENAMING_TERM_PROPERTY);
+        var value =
+            RenamingTermProperty.RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, actual);
         if (!value) {
             System.err.println("Expected: " + expected);
             System.err.println("Actual  : " + actual);
@@ -124,7 +126,11 @@ public class PrettyPrinterRoundtripTest {
         URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
         assert url != null : "Could not find roundTripTest.key";
         assert "file".equals(url.getProtocol()) : "URL is not a file URL";
-        File keyFile = new File(url.getPath());
-        return HelperClassForTests.createServices(keyFile);
+        try {
+            var keyFile = Paths.get(url.toURI());
+            return HelperClassForTests.createServices(keyFile);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

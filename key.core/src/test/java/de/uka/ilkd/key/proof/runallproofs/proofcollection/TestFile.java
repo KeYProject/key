@@ -5,18 +5,20 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.util.collection.Pair;
@@ -47,11 +49,9 @@ public class TestFile implements Serializable {
      * In order to ensure that the implementation is independent of working directory, this method
      * can be used to return an absolute {@link File} object.
      *
-     * @param baseDirectory
-     *        Base directory that will be used as start location in case given path
+     * @param baseDirectory Base directory that will be used as start location in case given path
      *        name is a relative path.
-     * @param pathName
-     *        Path whose associated {@link File} object will be returned.
+     * @param pathName Path whose associated {@link File} object will be returned.
      * @return {@link File} object pointing to given path name relative to given base directory.
      */
     static File getAbsoluteFile(File baseDirectory, String pathName) {
@@ -98,8 +98,7 @@ public class TestFile implements Serializable {
     /**
      * Returns a {@link File} object that points to the .key file that will be tested.
      *
-     * @throws IOException
-     *         Is thrown in case given .key-file is not a directory or does not exist.
+     * @throws IOException Is thrown in case given .key-file is not a directory or does not exist.
      */
     public File getKeYFile() throws IOException {
         File baseDirectory = settings.getGroupDirectory();
@@ -134,8 +133,7 @@ public class TestFile implements Serializable {
      * @return Returns a {@link TestResult} object, which consists of a boolean value indicating
      *         whether test run was successful and a message string that can be printed out on
      *         command line to inform the user about the test result.
-     * @throws Exception
-     *         Any exception that may occur during KeY execution will be converted into an
+     * @throws Exception Any exception that may occur during KeY execution will be converted into an
      *         {@link Exception} object with original exception as cause.
      */
     public TestResult runKey() throws Exception {
@@ -155,7 +153,7 @@ public class TestFile implements Serializable {
                 LOGGER.info("Now processing file {}", keyFile);
             }
             // File that the created proof will be saved to.
-            File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
+            var proofFile = new File(keyFile.getAbsolutePath() + ".proof").toPath();
 
             KeYEnvironment<DefaultUserInterfaceControl> env = null;
             Proof loadedProof = null;
@@ -164,7 +162,7 @@ public class TestFile implements Serializable {
                 // Initialize KeY environment and load proof.
                 var pair = load(keyFile);
                 env = pair.first;
-                ProofScriptEntry script = pair.second;
+                var script = pair.second;
                 loadedProof = env.getLoadedProof();
                 ReplayResult replayResult;
 
@@ -205,7 +203,7 @@ public class TestFile implements Serializable {
 
                 if (testProperty == TestProperty.PROVABLE
                         || testProperty == TestProperty.NOTPROVABLE) {
-                    ProofSaver.saveToFile(new File(keyFile.getAbsolutePath() + ".save.proof"),
+                    ProofSaver.saveToFile(Paths.get(keyFile.getAbsolutePath() + ".save.proof"),
                         loadedProof);
                 }
                 boolean closed = loadedProof.closed();
@@ -217,7 +215,7 @@ public class TestFile implements Serializable {
                 // Write statistics.
                 StatisticsFile statisticsFile = settings.getStatisticsFile();
                 if (statisticsFile != null) {
-                    statisticsFile.appendStatistics(loadedProof, keyFile);
+                    statisticsFile.appendStatistics(loadedProof, keyFile.toPath());
                 }
 
                 /*
@@ -246,7 +244,7 @@ public class TestFile implements Serializable {
     /**
      * Override this method in order to change reload behaviour.
      */
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success)
+    protected void reload(boolean verbose, Path proofFile, Proof loadedProof, boolean success)
             throws Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
@@ -263,14 +261,14 @@ public class TestFile implements Serializable {
      * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            ProofScriptEntry script) throws Exception {
+            KeyAst.ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
+            ProofScriptEngine pse = new ProofScriptEngine(script);
             pse.execute(env.getUi(), env.getLoadedProof());
         }
     }
@@ -278,8 +276,8 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> load(
-            File keyFile) throws ProblemLoaderException {
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(File keyFile)
+            throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         return new Pair<>(env, env.getProofScript());
     }
@@ -288,10 +286,9 @@ public class TestFile implements Serializable {
      * Reload proof that was previously saved at the location corresponding to the given
      * {@link File} object.
      *
-     * @param proofFile
-     *        File that contains the proof that will be (re-)loaded.
+     * @param proofFile File that contains the proof that will be (re-)loaded.
      */
-    private void reloadProof(File proofFile) throws Exception {
+    private void reloadProof(Path proofFile) throws Exception {
         /*
          * Reload proof and dispose corresponding KeY environment immediately afterwards. If no
          * exception is thrown it is assumed that loading works properly.
@@ -299,7 +296,7 @@ public class TestFile implements Serializable {
         KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
         Proof reloadedProof = null;
         try {
-            proofLoadEnvironment = KeYEnvironment.load(proofFile.toPath());
+            proofLoadEnvironment = KeYEnvironment.load(proofFile);
 
             ReplayResult result = proofLoadEnvironment.getReplayResult();
 

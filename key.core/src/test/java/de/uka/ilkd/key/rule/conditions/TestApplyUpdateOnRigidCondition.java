@@ -7,13 +7,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,12 +22,16 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestApplyUpdateOnRigidCondition {
+
+    private static MatchConditions EMPTY_MATCHCONDITIONS =
+        de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
+
     @Test
     void updateWithoutVariables() {
         Term term = TacletForTests.parseTerm("{i:=0}\\forall int a; a = i");
         Term result = applyUpdateOnFormula(term);
         Term expected = TacletForTests.parseTerm("\\forall int a; {i:=0}(a = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update without free variables was not properly applied on formula!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -41,7 +46,7 @@ public class TestApplyUpdateOnRigidCondition {
         term = TacletForTests.parseTerm("{i:=0} f(const)");
         result = applyUpdateOnTerm(term);
         expected = TacletForTests.parseTerm("f({i:=0} const)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update without free variables was not properly applied on term!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -58,7 +63,7 @@ public class TestApplyUpdateOnRigidCondition {
         Term result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         Term expected =
             TacletForTests.parseTerm("\\forall int b; \\forall java.lang.Object a; {i:=b} (a = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update is not simply pulled over quantification!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -68,7 +73,7 @@ public class TestApplyUpdateOnRigidCondition {
         b = term.boundVars().get(0);
         result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         expected = TacletForTests.parseTerm("\\forall int b; {i:=b} 0 = {i:=b} i");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update is not simply pulled over equality!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -78,7 +83,7 @@ public class TestApplyUpdateOnRigidCondition {
         b = term.boundVars().get(0);
         result = tb.all(b, tb.equals(applyUpdateOnTerm(term.sub(0).sub(0)), term.sub(0).sub(1)));
         expected = TacletForTests.parseTerm("\\forall int b; f({i:=b} const) = 0");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update is not simply pulled over function symbol!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -95,7 +100,7 @@ public class TestApplyUpdateOnRigidCondition {
         Term result = tb.all(a, applyUpdateOnFormula(term.sub(0)));
         Term expected = TacletForTests
                 .parseTerm("\\forall int a; \\forall java.lang.Object a1; {i:=a} (a1 = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Renaming or applying update afterwards !");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -108,7 +113,7 @@ public class TestApplyUpdateOnRigidCondition {
         result = tb.all(a, tb.all(a1, applyUpdateOnFormula(term.sub(0).sub(0))));
         expected = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; \\forall java.lang.Object a2; {i:=a} (i = a1)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Counter appended to stem was not increased high enough!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -146,7 +151,7 @@ public class TestApplyUpdateOnRigidCondition {
         SchemaVariable result = SchemaVariableFactory.createFormulaSV(new Name("result"));
 
         SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         // u uninstantiated
@@ -156,7 +161,7 @@ public class TestApplyUpdateOnRigidCondition {
 
         Term update = TacletForTests.parseTerm("{i:=0}0").sub(0);
         svInst = svInst.add(u, update, TacletForTests.services());
-        mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
 
         mc = cond.check(null, null, mc, TacletForTests.services());
         assert mc != null;
@@ -178,7 +183,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(phi, term.sub(1), TacletForTests.services());
         svInst = svInst.add(result, preInstResult, TacletForTests.services());
 
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         mc = cond.check(null, null, mc, TacletForTests.services());
@@ -200,7 +205,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(phi, term.sub(1), TacletForTests.services());
         svInst = svInst.add(result, preInstWrongResult, TacletForTests.services());
 
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         mc = cond.check(null, null, mc, TacletForTests.services());
@@ -273,7 +278,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(tOrPhi, arg, TacletForTests.services());
 
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, tOrPhi, result);
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         // First two arguments are not used by this check
         mc = cond.check(null, null, mc, TacletForTests.services());
 
@@ -281,7 +286,8 @@ public class TestApplyUpdateOnRigidCondition {
             return term;
         }
 
-        return mc.getInstantiations().getTermInstantiation(result, null, TacletForTests.services());
+        return ((de.uka.ilkd.key.rule.MatchConditions) mc).getInstantiations()
+                .getTermInstantiation(result, null, TacletForTests.services());
     }
 
 }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -33,9 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Dominic Scheurer
  */
 public class PredicateAbstractionLatticeTests {
-
-    private static final File TEST_RESOURCES_DIR_PREFIX =
-        new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
+    private static final Path TEST_RESOURCES_DIR_PREFIX =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/");
 
     @Test
     public void testCreateSignLatticeWithPredicates() {

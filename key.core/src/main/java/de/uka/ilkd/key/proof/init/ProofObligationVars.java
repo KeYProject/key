@@ -7,7 +7,6 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -15,6 +14,8 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -96,7 +97,7 @@ public class ProofObligationVars {
     }
 
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
-        if (pre.heap.op() instanceof JFunction
+        if (pre.heap.op() instanceof Function
                 && !pre.heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {
             ImmutableArray<TermLabel> labels = pre.heap.getLabels();
             TermLabel[] newLabels = new TermLabel[labels.size() + 1];
@@ -115,8 +116,7 @@ public class ProofObligationVars {
     /**
      * Build variable for try statement.
      *
-     * @param services
-     *        the services object.
+     * @param services the services object.
      * @return the generated variable.
      */
     private Term buildExceptionParameter(Services services) {

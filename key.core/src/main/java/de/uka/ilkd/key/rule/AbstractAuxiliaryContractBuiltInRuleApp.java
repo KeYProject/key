@@ -8,11 +8,11 @@ import java.util.List;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -44,22 +44,18 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
 
     /**
      *
-     * @param rule
-     *        the rule being applied.
-     * @param occurrence
-     *        the position at which the rule is applied.
-     * @param ifInstantiations
-     *        if instantiations.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
      */
-    public AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
+    protected AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 
     /**
      *
-     * @param s
-     *        the statement (block or loop) which the applied contract belongs to.
+     * @param s the statement (block or loop) which the applied contract belongs to.
      */
     public void setStatement(JavaStatement s) {
         this.statement = s;
@@ -111,8 +107,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
     }
 
     /**
-     * @param goal
-     *        the current goal.
+     * @param goal the current goal.
      * @return {@code true} iff the rule application cannot be completed for the current goal.
      */
     public boolean cannotComplete(final Goal goal) {
@@ -122,10 +117,8 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
     /**
      * Sets the proof obligation variables and execution context to new values.
      *
-     * @param vars
-     *        new proof obligation variables.
-     * @param context
-     *        new execution context.
+     * @param vars new proof obligation variables.
+     * @param context new execution context.
      */
     public void update(IFProofObligationVars vars, ExecutionContext context) {
         this.infFlowVars = vars;

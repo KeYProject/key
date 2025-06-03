@@ -9,25 +9,24 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
@@ -61,6 +60,7 @@ public class TacletForTests {
     public static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
         // library (HACK)
+        @Override
         public RuleCollection getStandardRules() {
             return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
                 ImmutableSLList.nil());
@@ -161,7 +161,7 @@ public class TacletForTests {
         return nss.ruleSets();
     }
 
-    public static Namespace<JFunction> getFunctions() {
+    public static Namespace<? extends Function> getFunctions() {
         return nss.functions();
     }
 
@@ -224,5 +224,11 @@ public class TacletForTests {
     public static ProgramElement parsePrg(String prgString) {
         JavaService r2k = services().getJavaService();
         return r2k.readBlockWithEmptyContext(prgString, null).program();
+    }
+
+    public static Goal createGoal() {
+        return new Goal(new Node(new Proof("Some name", initConfig())),
+            TacletIndexKit.getKit().createTacletIndex(),
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), services());
     }
 }

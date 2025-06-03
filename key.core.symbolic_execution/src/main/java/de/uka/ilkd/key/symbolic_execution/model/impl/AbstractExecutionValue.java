@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -17,6 +16,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Provides a basic implementation of {@link IExecutionValue}.
@@ -60,7 +61,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @param value
      *        The value.
      */
-    public AbstractExecutionValue(ITreeSettings settings, Node proofNode,
+    protected AbstractExecutionValue(ITreeSettings settings, Node proofNode,
             IExecutionVariable variable, Term condition, Term value) {
         super(settings, proofNode);
         this.variable = variable;

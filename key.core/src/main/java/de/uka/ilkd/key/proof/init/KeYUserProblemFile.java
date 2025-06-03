@@ -4,12 +4,10 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -22,12 +20,12 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -47,14 +45,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * the physical source of the input, and a graphical representation to call back in order to
      * report the progress while reading.
      *
-     * @param name
-     *        the name of the file
-     * @param file
-     *        the file to read from
-     * @param monitor
-     *        the possibly <tt>null</tt> monitor for progress
-     * @param profile
-     *        the KeY profile under which to load
+     * @param name the name of the file
+     * @param file the file to read from
+     * @param monitor the possibly <tt>null</tt> monitor for progress
+     * @param profile the KeY profile under which to load
      */
     public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
         this(name, file, monitor, profile, false);
@@ -63,16 +57,11 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     /**
      * Instantiates a new user problem file.
      *
-     * @param name
-     *        the name of the file
-     * @param file
-     *        the file to read from
-     * @param monitor
-     *        the possibly <tt>null</tt> monitor for progress
-     * @param profile
-     *        the KeY profile under which to load
-     * @param compressed
-     *        {@code true} iff the file is compressed
+     * @param name the name of the file
+     * @param file the file to read from
+     * @param monitor the possibly <tt>null</tt> monitor for progress
+     * @param profile the KeY profile under which to load
+     * @param compressed {@code true} iff the file is compressed
      */
     public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
             boolean compressed) {
@@ -82,18 +71,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     /**
      * Instantiates a new user problem file.
      *
-     * @param name
-     *        the name of the file
-     * @param file
-     *        the file tp read from
-     * @param fileRepo
-     *        the fileRepo which will store the file
-     * @param monitor
-     *        the possibly <tt>null</tt> monitor for progress
-     * @param profile
-     *        the KeY profile under which to load
-     * @param compressed
-     *        {@code true} iff the file is compressed
+     * @param name the name of the file
+     * @param file the file tp read from
+     * @param fileRepo the fileRepo which will store the file
+     * @param monitor the possibly <tt>null</tt> monitor for progress
+     * @param profile the KeY profile under which to load
+     * @param compressed {@code true} iff the file is compressed
      */
     public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
@@ -122,8 +105,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
-        SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(),
-            readBootClassPath(),
+        SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
             getProfile(), null);
         slEnvInput.setInitConfig(initConfig);
         warnings = warnings.union(slEnvInput.read());
@@ -201,11 +183,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Returns the {@link ProofScriptEntry} in this resource
      *
      * @return {@link ProofScriptEntry} if present otherwise null
-     * @see KeyAst.File#findProofScript(URI)
      */
-    public @Nullable ProofScriptEntry readProofScript() {
-        URI url = getInitialFile().toUri();
-        return getParseContext().findProofScript(url);
+    public KeyAst.@Nullable ProofScript readProofScript() {
+        return getParseContext().findProofScript();
     }
 
     /**
@@ -265,7 +245,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *         is defined by the file.
      */
     private Profile readProfileFromFile() {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.ldt;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -100,10 +102,8 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the cast function for the given sort
      *
-     * @param sort
-     *        the Sort for which to retrieve the cast function
-     * @param services
-     *        the TermServices for lookup
+     * @param sort the Sort for which to retrieve the cast function
+     * @param services the TermServices for lookup
      * @return the found cast function
      */
     public final SortDependingFunction getCastSymbol(Sort sort, TermServices services) {
@@ -120,10 +120,8 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the instanceof function for the given sort
      *
-     * @param sort
-     *        the Sort for which to retrieve the instanceof function
-     * @param services
-     *        the TermServices for lookup
+     * @param sort the Sort for which to retrieve the instanceof function
+     * @param services the TermServices for lookup
      * @return the found instanceof function
      */
     public final SortDependingFunction getInstanceofSymbol(Sort sort, TermServices services) {
@@ -138,10 +136,8 @@ public class JavaDLTheory extends LDT {
     /**
      * retrieves the exactInstance function for the given sort
      *
-     * @param sort
-     *        the Sort for which to retrieve the exactInstance function
-     * @param services
-     *        the TermServices for lookup
+     * @param sort the Sort for which to retrieve the exactInstance function
+     * @param services the TermServices for lookup
      * @return the found exactInstance function
      */
     public final SortDependingFunction getExactInstanceofSymbol(Sort sort, TermServices services) {
@@ -154,23 +150,20 @@ public class JavaDLTheory extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term[] subs,
-            Services services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
         assert false;
         return false;
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term left,
-            Term right, Services services,
+    public boolean isResponsible(Operator op, Term left, Term right, Services services,
             ExecutionContext ec) {
         assert false;
         return false;
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term sub,
-            TermServices services,
+    public boolean isResponsible(Operator op, Term sub, TermServices services,
             ExecutionContext ec) {
         assert false;
         return false;
@@ -183,8 +176,7 @@ public class JavaDLTheory extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op,
-            Services services, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false;
         return null;
     }

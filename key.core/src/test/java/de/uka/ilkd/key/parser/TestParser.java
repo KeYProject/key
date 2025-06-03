@@ -75,15 +75,15 @@ public class TestParser {
 
     @Test
     public void testIssue1566() throws ProblemLoaderException {
-        File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1566/a.key");
-        KeYEnvironment.load(file.toPath());
+        var file = HelperClassForTests.TESTCASE_DIRECTORY.resolve("issues/1566/a.key");
+        KeYEnvironment.load(file);
     }
 
     @Test()
     public void testIssue39() {
         assertThrows(ProblemLoaderException.class, () -> {
-            File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/39/A.java");
-            KeYEnvironment.load(file.toPath(), null, null, null);
+            var file = HelperClassForTests.TESTCASE_DIRECTORY.resolve("issues/39/A.java");
+            KeYEnvironment.load(file, null, null, null);
         });
 
     }
@@ -93,14 +93,14 @@ public class TestParser {
     @Test
     void testConstantEvaluationError() throws MalformedURLException {
         var file =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserErrorTest/AssignToArray.java");
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("parserErrorTest/AssignToArray.java");
         var problemLoaderException = assertThrows(ProblemLoaderException.class, () -> {
-            KeYEnvironment.load(file.toPath(), null, null, null);
+            KeYEnvironment.load(file, null, null, null);
         });
         var error = (HasLocation) problemLoaderException.getCause();
         var location = error.getLocation();
         assertEquals(4, location.getPosition().line());
         assertEquals(9, location.getPosition().column());
-        assertEquals(Optional.of(file.toURI()), location.getFileURI());
+        assertEquals(Optional.of(file.toUri()), location.getFileURI());
     }
 }

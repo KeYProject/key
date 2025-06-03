@@ -16,9 +16,7 @@ import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -27,6 +25,9 @@ import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
+
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;

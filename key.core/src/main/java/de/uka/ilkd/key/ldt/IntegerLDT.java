@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
@@ -41,25 +41,28 @@ public final class IntegerLDT extends LDT {
 
     // public name constants
     public static final String NEGATIVE_LITERAL_STRING = "neglit";
+    public static final String ADD_STRING = "add";
+    public static final String SUB_STRING = "sub";
+    public static final String MUL_STRING = "mul";
     public static final Name NUMBERS_NAME = new Name("Z");
     public static final Name CHAR_ID_NAME = new Name("C");
 
     // the following fields cache the symbols from integerHeader.key.
     // (explanations see there)
-    private final JFunction sharp;
+    private final Function sharp;
     private final JFunction[] numberSymbol = new JFunction[10];
-    private final JFunction neglit;
+    private final Function neglit;
     private final JFunction numbers;
-    private final JFunction charID;
+    private final Function charID;
     private final JFunction add;
     private final JFunction neg;
     private final JFunction sub;
     private final JFunction mul;
-    private final JFunction div;
+    private final Function div;
     private final JFunction mod;
-    private final JFunction pow;
-    private final JFunction bsum;
-    private final JFunction bprod;
+    private final Function pow;
+    private final Function bsum;
+    private final Function bprod;
     // private final JavaDLFunction min; // handled by the \ifEx operator
     // private final JavaDLFunction max;
     private final JFunction jdiv;
@@ -96,11 +99,11 @@ public final class IntegerLDT extends LDT {
     private final JFunction andJlong;
     private final JFunction xorJint;
     private final JFunction xorJlong;
-    private final JFunction moduloByte;
-    private final JFunction moduloShort;
-    private final JFunction moduloInt;
-    private final JFunction moduloLong;
-    private final JFunction moduloChar;
+    private final Function moduloByte;
+    private final Function moduloShort;
+    private final Function moduloInt;
+    private final Function moduloLong;
+    private final Function moduloChar;
     private final JFunction checkedUnaryMinusInt;
     private final JFunction checkedUnaryMinusLong;
     private final JFunction checkedBitwiseNegateInt;
@@ -125,31 +128,31 @@ public final class IntegerLDT extends LDT {
     private final JFunction checkedBitwiseAndLong;
     private final JFunction checkedBitwiseXOrInt;
     private final JFunction checkedBitwiseXOrLong;
-    private final JFunction javaSubInt;
-    private final JFunction javaMulInt;
-    private final JFunction javaMod;
-    private final JFunction javaDivInt;
-    private final JFunction javaDivLong;
-    private final JFunction javaCastByte;
-    private final JFunction javaCastShort;
-    private final JFunction javaCastInt;
-    private final JFunction javaCastLong;
-    private final JFunction javaCastChar;
+    private final Function javaSubInt;
+    private final Function javaMulInt;
+    private final Function javaMod;
+    private final Function javaDivInt;
+    private final Function javaDivLong;
+    private final Function javaCastByte;
+    private final Function javaCastShort;
+    private final Function javaCastInt;
+    private final Function javaCastLong;
+    private final Function javaCastChar;
     private final JFunction lessThan;
     private final JFunction greaterThan;
     private final JFunction greaterOrEquals;
     private final JFunction lessOrEquals;
-    private final JFunction inByte;
-    private final JFunction inShort;
-    private final JFunction inInt;
-    private final JFunction inLong;
-    private final JFunction inChar;
-    private final JFunction inRangeByte;
-    private final JFunction inRangeShort;
-    private final JFunction inRangeInt;
-    private final JFunction inRangeLong;
-    private final JFunction inRangeChar;
-    private final JFunction index;
+    private final Function inByte;
+    private final Function inShort;
+    private final Function inInt;
+    private final Function inLong;
+    private final Function inChar;
+    private final Function inRangeByte;
+    private final Function inRangeShort;
+    private final Function inRangeInt;
+    private final Function inRangeLong;
+    private final Function inRangeChar;
+    private final Function index;
     private final Term one;
     private final Term zero;
 
@@ -281,7 +284,7 @@ public final class IntegerLDT extends LDT {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private boolean isNumberLiteral(Operator f) {
+    private boolean isNumberLiteral(org.key_project.logic.op.Operator f) {
         String n = f.name().toString();
         if (n.length() == 1) {
             char c = n.charAt(0);
@@ -300,7 +303,7 @@ public final class IntegerLDT extends LDT {
     // public interface
     // -------------------------------------------------------------------------
 
-    public JFunction getNumberTerminator() {
+    public Function getNumberTerminator() {
         return sharp;
     }
 
@@ -315,7 +318,7 @@ public final class IntegerLDT extends LDT {
     }
 
 
-    public JFunction getNegativeNumberSign() {
+    public Function getNegativeNumberSign() {
         return neglit;
     }
 
@@ -325,7 +328,7 @@ public final class IntegerLDT extends LDT {
     }
 
 
-    public JFunction getCharSymbol() {
+    public Function getCharSymbol() {
         return charID;
     }
 
@@ -350,7 +353,7 @@ public final class IntegerLDT extends LDT {
     }
 
 
-    public JFunction getDiv() {
+    public Function getDiv() {
         return div;
     }
 
@@ -360,16 +363,16 @@ public final class IntegerLDT extends LDT {
     }
 
 
-    public JFunction getPow() {
+    public Function getPow() {
         return pow;
     }
 
 
-    public JFunction getBsum() {
+    public Function getBsum() {
         return bsum;
     }
 
-    public JFunction getBprod() {
+    public Function getBprod() {
         return bprod;
     }
 
@@ -472,7 +475,7 @@ public final class IntegerLDT extends LDT {
         return bitwiseNegateJlong;
     }
 
-    public JFunction getOrJint() {
+    public Function getOrJint() {
         return orJint;
     }
 
@@ -480,11 +483,11 @@ public final class IntegerLDT extends LDT {
         return orJlong;
     }
 
-    public JFunction getAndJint() {
+    public Function getAndJint() {
         return andJint;
     }
 
-    public JFunction getAndJlong() {
+    public Function getAndJlong() {
         return andJlong;
     }
 
@@ -528,7 +531,7 @@ public final class IntegerLDT extends LDT {
         return binaryAnd;
     }
 
-    public JFunction getModuloInt() {
+    public Function getModuloInt() {
         return moduloInt;
     }
 
@@ -631,13 +634,15 @@ public final class IntegerLDT extends LDT {
     /**
      * Placeholder for the loop index variable in an enhanced for loop over arrays. Follows the
      * proposal by David Cok to adapt JML to Java5.
+     *
+     * @return
      */
-    public JFunction getIndex() {
+    public Function getIndex() {
         return index;
     }
 
 
-    public JFunction getInBounds(Type t) {
+    public Function getInBounds(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return inByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -656,11 +661,10 @@ public final class IntegerLDT extends LDT {
     /**
      * in bounds for specification
      *
-     * @param t
-     *        the type
+     * @param t the type
      * @return in range function
      */
-    public JFunction getSpecInBounds(Type t) {
+    public Function getSpecInBounds(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return inRangeByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -679,11 +683,10 @@ public final class IntegerLDT extends LDT {
     /**
      * Finds the cast to type `t`. This is intended for creating specification only.
      *
-     * @param t
-     *        the type
+     * @param t the type
      * @return the cast
      */
-    public JFunction getSpecCast(Type t) {
+    public Function getSpecCast(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return moduloByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -709,15 +712,14 @@ public final class IntegerLDT extends LDT {
      * @return the function symbol for the given operation
      */
     @Override
-    public JFunction getFunctionFor(
-            de.uka.ilkd.key.java.ast.expression.Operator op, Services serv,
+    public Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         // Dead in all examples, removed in commit 1e72a5709053a87cae8d2
         return null;
     }
 
     @Override
-    public @Nullable JFunction getFunctionFor(String op, Services services) {
+    public @Nullable Function getFunctionFor(String op, Services services) {
         return switch (op) {
         case "gt" -> getGreaterThan();
         case "geq" -> getGreaterOrEquals();
@@ -734,8 +736,7 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(
-            de.uka.ilkd.key.java.ast.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
@@ -743,16 +744,14 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(
-            de.uka.ilkd.key.java.ast.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(
-            de.uka.ilkd.key.java.ast.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -779,7 +778,7 @@ public final class IntegerLDT extends LDT {
 
     public String toNumberString(Term t) {
         StringBuilder sb = new StringBuilder();
-        Operator f = t.op();
+        var f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));
             t = t.sub(0);
@@ -835,7 +834,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return the function symbol used to represent the integer modulo operation
      */
-    public JFunction getArithModulo() {
+    public Function getArithModulo() {
         return mod;
     }
 
@@ -850,32 +849,32 @@ public final class IntegerLDT extends LDT {
     }
 
     /** returns a function mapping an arithmetic integer to its Java long representation */
-    public JFunction getModuloLong() {
+    public Function getModuloLong() {
         return modJlong;
     }
 
     /** maps an integer back into long range */
-    public JFunction getArithModuloLong() {
+    public Function getArithModuloLong() {
         return modJlong;
     }
 
     /** maps an integer back into int range */
-    public JFunction getArithModuloInt() {
+    public Function getArithModuloInt() {
         return moduloInt;
     }
 
     /** maps an integer back into long range */
-    public JFunction getArithModuloShort() {
+    public Function getArithModuloShort() {
         return moduloShort;
     }
 
     /** maps an integer back into byte range */
-    public JFunction getArithModuloByte() {
+    public Function getArithModuloByte() {
         return moduloByte;
     }
 
     /** maps an integer back into char range */
-    public JFunction getArithModuloChar() {
+    public Function getArithModuloChar() {
         return moduloChar;
     }
 
@@ -887,7 +886,7 @@ public final class IntegerLDT extends LDT {
      * @return mathematical interpreted function realising the Java addition on operands of or
      *         promotable to type <code>int</code>
      */
-    public JFunction getArithJavaIntAddition() {
+    public Function getArithJavaIntAddition() {
         return addJint;
     }
 
@@ -895,7 +894,7 @@ public final class IntegerLDT extends LDT {
     /**
      * returns the function symbol representing the bitwise-or for Java int
      */
-    public JFunction getBitwiseOrJavaInt() {
+    public Function getBitwiseOrJavaInt() {
         return orJint;
     }
 
@@ -904,7 +903,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator JavaDLFunction
      */
-    public JFunction getJavaCastByte() {
+    public Function getJavaCastByte() {
         return javaCastByte;
     }
 
@@ -913,7 +912,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaCastChar() {
+    public Function getJavaCastChar() {
         return javaCastChar;
     }
 
@@ -923,7 +922,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaCastInt() {
+    public Function getJavaCastInt() {
         return javaCastInt;
     }
 
@@ -932,7 +931,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaCastLong() {
+    public Function getJavaCastLong() {
         return javaCastLong;
     }
 
@@ -941,7 +940,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaCastShort() {
+    public Function getJavaCastShort() {
         return javaCastShort;
     }
 
@@ -951,7 +950,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaDivInt() {
+    public Function getJavaDivInt() {
         return javaDivInt;
     }
 
@@ -961,7 +960,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaDivLong() {
+    public Function getJavaDivLong() {
         return javaDivLong;
     }
 
@@ -972,7 +971,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaMod() {
+    public Function getJavaMod() {
         return javaMod;
     }
 
@@ -983,7 +982,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaMulInt() {
+    public Function getJavaMulInt() {
         return javaMulInt;
     }
 
@@ -993,7 +992,7 @@ public final class IntegerLDT extends LDT {
      *
      * @return function representing the generic Java operator function
      */
-    public JFunction getJavaSubInt() {
+    public Function getJavaSubInt() {
         return javaSubInt;
     }
 

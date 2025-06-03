@@ -9,6 +9,8 @@ import java.util.*;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * An infrastructure to read string to string maps from files.
  *
@@ -62,7 +64,7 @@ public class LineProperties {
 
     }
 
-    public String get(String key) {
+    public @Nullable String get(String key) {
         return map.get(key);
     }
 

@@ -5,8 +5,7 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
-import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
@@ -18,6 +17,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Generic data type, which has no predefined theory. It is meant as a basis to implement an
  * additional abstract data type, e.g., binary trees, stacks, etc. in <code>.key</code> files.
@@ -25,12 +26,13 @@ import org.key_project.util.ExtList;
  * @author Daniel Grahl
  *
  */
+@NullMarked
 public final class FreeLDT extends LDT {
 
     public static final Name NAME = new Name("Free");
 
     // neutral element, the only pre-defined function
-    private final JFunction atom;
+    private final Function atom;
 
     public FreeLDT(TermServices services) {
         super(NAME, services);
@@ -38,22 +40,19 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isResponsible(Operator op, Term left, Term right, Services services,
-            ExecutionContext ec) {
-        // TODO Auto-generated method stub
+    public boolean isResponsible(Operator op, Term left, Term right,
+            Services services, ExecutionContext ec) {
         return false;
     }
 
     @Override
     public boolean isResponsible(Operator op, Term sub, TermServices services,
             ExecutionContext ec) {
-        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
         return false;
     }
 
@@ -63,8 +62,7 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        // TODO Auto-generated method stub
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false;
         return null;
     }
@@ -76,7 +74,7 @@ public final class FreeLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op() instanceof JFunction && hasLiteralFunction((JFunction) t.op())) {
+        if (t.op() instanceof Function && hasLiteralFunction((JFunction) t.op())) {
             return FreeLiteral.INSTANCE;
         }
         assert false;

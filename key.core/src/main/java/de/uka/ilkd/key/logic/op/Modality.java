@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -17,6 +16,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.WeakValueLinkedHashMap;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
@@ -26,8 +26,8 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     /**
      * keeps track of created modalities
      */
-    private static final Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> modalities =
-        new WeakHashMap<>();
+    private static final WeakValueLinkedHashMap<Pair<JavaModalityKind, JavaProgramElement>, Modality> modalities =
+        new WeakValueLinkedHashMap<>();
 
     /**
      * Retrieves the modality of the given kind and program.
@@ -38,7 +38,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      *        the program of this modality
      * @return the modality of the given kind and program.
      */
-    public static Modality getModality(Modality.JavaModalityKind kind, JavaBlock jb) {
+    public static synchronized Modality getModality(JavaModalityKind kind, JavaBlock jb) {
         var pair = new Pair<>(kind, jb.program());
         Modality mod = modalities.get(pair);
         if (mod == null) {
@@ -132,7 +132,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     public static class JavaModalityKind extends Kind {
         private static final Map<String, JavaModalityKind> kinds = new HashMap<>();
         /**
-         * The diamond operator of dynamic logic. A formula <alpha;>Phi can be read as after
+         * The diamond operator of dynamic logic. A formula {@code <alpha;>Phi} can be read as after
          * processing
          * the program alpha there exists a state such that Phi holds.
          */

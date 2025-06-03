@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.ChoiceExpr;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -45,7 +46,8 @@ public class NoFindTaclet extends Taclet {
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
             tacletAnnotations);
@@ -61,8 +63,8 @@ public class NoFindTaclet extends Taclet {
      * @return Set of schemavariables of the if and the (optional) find part
      */
     @Override
-    public ImmutableSet<SchemaVariable> getIfFindVariables() {
-        return getIfVariables();
+    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
+        return getAssumesVariables();
     }
 
     /**
@@ -78,14 +80,13 @@ public class NoFindTaclet extends Taclet {
 
     @Override
     public NoFindTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes();
-        attrs.setDisplayName(displayName());
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new NoFindTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
             prefixMap, choices, tacletAnnotations);
     }
-
 
 }

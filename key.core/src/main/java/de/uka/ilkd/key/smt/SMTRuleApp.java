@@ -6,14 +6,17 @@ package de.uka.ilkd.key.smt;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -28,12 +31,9 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
     /**
      * Create a new rule app without ifInsts (will be null).
      *
-     * @param rule
-     *        the SMTRule to apply
-     * @param pio
-     *        the pos in term to apply the rule on
-     * @param successfulSolverName
-     *        the name of the solver that was able to close find the proof
+     * @param rule the SMTRule to apply
+     * @param pio the pos in term to apply the rule on
+     * @param successfulSolverName the name of the solver that was able to close find the proof
      */
     SMTRuleApp(SMTRule rule, PosInOccurrence pio, String successfulSolverName) {
         this(rule, pio, null, successfulSolverName);
@@ -66,10 +66,8 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
         /**
          * Create a new rule application with the given solver name and unsat core.
          *
-         * @param successfulSolverName
-         *        solver that produced this result
-         * @param unsatCore
-         *        formulas required to prove the result
+         * @param successfulSolverName solver that produced this result
+         * @param unsatCore formulas required to prove the result
          * @return rule application instance
          */
         @Override
@@ -83,21 +81,25 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
             return new SMTRuleApp(this, null, "");
         }
 
+
+        @Override
+        public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+            return false;
+        }
+
+
         /**
-         * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
+         * Create a new goal (to be closed in
+         * {@link Goal#apply(RuleApp)} directly afterwards)
          * with the same sequent as the given one.
          *
-         * @param goal
-         *        the Goal on which to apply <tt>ruleApp</tt>
-         * @param services
-         *        the Services with the necessary information about the java programs
-         * @param ruleApp
-         *        the rule application to be executed
+         * @param goal the Goal on which to apply <tt>ruleApp</tt>
+         * @param ruleApp the rule application to be executed
          * @return a list with an identical goal as the given <tt>goal</tt>
          */
         @Override
         @NonNull
-        public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+        public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
                 goal.proof().getInitConfig().registerRule(RULE, () -> false);
             }
@@ -126,7 +128,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
     }
 
     @Override
-    public SMTRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public SMTRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -137,8 +139,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
      * Add all top level formulas of the goal
      * to the RuleApp's ifInsts.
      *
-     * @param goal
-     *        the goal to instantiate the current RuleApp on
+     * @param goal the goal to instantiate the current RuleApp on
      * @return a new RuleApp with the same pio and all top level formulas of the goal as ifInsts
      */
     @Override
@@ -152,6 +153,6 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
         for (SequentFormula succ : seq.succedent()) {
             ifInsts.add(new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
         }
-        return app.setIfInsts(ImmutableList.fromList(ifInsts));
+        return app.setAssumesInsts(ImmutableList.fromList(ifInsts));
     }
 }

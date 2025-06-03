@@ -7,14 +7,15 @@ import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.prover.GoalChooser;
-import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.prover.impl.AppliedRuleStopCondition;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.engine.StopCondition;
+import org.key_project.prover.engine.impl.AppliedRuleStopCondition;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,14 +50,14 @@ public class StrategySettings extends AbstractSettings {
      * An optional customized {@link StopCondition} which is used in an {@link ApplyStrategy}
      * instance to determine after each applied rule if more rules should be applied or not.
      */
-    private StopCondition customApplyStrategyStopCondition;
+    private StopCondition<Goal> customApplyStrategyStopCondition;
 
     /**
      * An optional customized {@link GoalChooser} which is used in an {@link ApplyStrategy} instance
      * to select the next {@link Goal} to apply a rule on. If no one is defined the default one of
      * the {@link ApplyStrategy}, which is defined by the user interface, is used.
      */
-    private GoalChooser customApplyStrategyGoalChooser;
+    private GoalChooser<Proof, Goal> customApplyStrategyGoalChooser;
 
     /**
      * returns the maximal amount of heuristics steps before a user interaction is required
@@ -91,7 +92,7 @@ public class StrategySettings extends AbstractSettings {
     /**
      * Set the name of the active strategy
      *
-     * @param name
+     * @param name the name of teh strategy
      */
     public void setStrategy(Name name) {
         var old = this.activeStrategy;
@@ -284,7 +285,7 @@ public class StrategySettings extends AbstractSettings {
      *
      * @return The {@link StopCondition} to use in an {@link ApplyStrategy} instance.
      */
-    public StopCondition getApplyStrategyStopCondition() {
+    public StopCondition<Goal> getApplyStrategyStopCondition() {
         return Objects.requireNonNullElseGet(customApplyStrategyStopCondition,
             AppliedRuleStopCondition::new);
     }
@@ -296,7 +297,7 @@ public class StrategySettings extends AbstractSettings {
      * @return The customized {@link StopCondition} or {@code null} if the default one should be
      *         used.
      */
-    public StopCondition getCustomApplyStrategyStopCondition() {
+    public StopCondition<Goal> getCustomApplyStrategyStopCondition() {
         return customApplyStrategyStopCondition;
     }
 
@@ -309,7 +310,7 @@ public class StrategySettings extends AbstractSettings {
      *        {@code null} to use the default one.
      */
     public void setCustomApplyStrategyStopCondition(
-            StopCondition customApplyStrategyStopCondition) {
+            StopCondition<Goal> customApplyStrategyStopCondition) {
         this.customApplyStrategyStopCondition = customApplyStrategyStopCondition;
     }
 
@@ -321,7 +322,7 @@ public class StrategySettings extends AbstractSettings {
      * @return The customized {@link GoalChooser} to use or {@code null} to use the default one of
      *         the {@link ApplyStrategy}.
      */
-    public GoalChooser getCustomApplyStrategyGoalChooser() {
+    public GoalChooser<Proof, Goal> getCustomApplyStrategyGoalChooser() {
         return customApplyStrategyGoalChooser;
     }
 
@@ -334,7 +335,7 @@ public class StrategySettings extends AbstractSettings {
      *        The customized {@link GoalChooser} to use or {@code null} to use the
      *        default one of the {@link ApplyStrategy}.
      */
-    public void setCustomApplyStrategyGoalChooser(GoalChooser customGoalChooser) {
+    public void setCustomApplyStrategyGoalChooser(GoalChooser<Proof, Goal> customGoalChooser) {
         this.customApplyStrategyGoalChooser = customGoalChooser;
     }
 }

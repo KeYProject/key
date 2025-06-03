@@ -9,11 +9,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.nparser.*;
@@ -62,7 +61,7 @@ public class KeYFile implements EnvInput {
     private final String name;
     private final Profile profile;
     protected InitConfig initConfig;
-    private KeyAst.File fileCtx = null;
+    private KeyAst.@Nullable File fileCtx = null;
     private @Nullable ProblemFinder problemFinder = null;
     private @Nullable ProblemInformation problemInformation = null;
     private Includes includes;
@@ -215,7 +214,8 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 KeyAst.File ctx = getParseContext();
-                includes = ctx.getIncludes(file.url());
+                includes =
+                    ctx.getIncludes(file.file().toAbsolutePath().getParent().toUri().toURL());
             } catch (ParseCancellationException e) {
                 throw new ParseCancellationException(e);
             } catch (Exception e) {
@@ -228,16 +228,15 @@ public class KeYFile implements EnvInput {
 
     @Override
     public Path readBootClassPath() {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) {
             return null;
         }
-        Path bootClassPathFile = Path.of(bootClassPath);
+        Path bootClassPathFile = Paths.get(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
-            var parentDirectory = file.file().getParent();
+            Path parentDirectory = file.file().getParent();
             bootClassPathFile = parentDirectory.resolve(bootClassPath);
         }
 
@@ -255,15 +254,14 @@ public class KeYFile implements EnvInput {
 
     @Override
     public @NonNull List<Path> readClassPath() {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
-        var parentDirectory = file.file().getParent();
+        Path parentDirectory = file.file().getParent();
         List<Path> fileList = new ArrayList<>();
         for (String cp : pi.getClasspath()) {
             if (cp == null) {
                 fileList.add(null);
             } else {
-                var f = Path.of(cp);
+                Path f = Paths.get(cp);
                 if (!f.isAbsolute()) {
                     f = parentDirectory.resolve(cp);
                 }
@@ -275,17 +273,16 @@ public class KeYFile implements EnvInput {
 
     @Override
     public @Nullable Path readJavaPath() throws ProofInputException {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
-            Path absFile = Path.of(javaPath);
+            Path absFile = Paths.get(javaPath);
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file
                 Path parent = file.file().getParent();
                 absFile = parent.resolve(javaPath);
             }
-            if (!absFile.toFile().exists()) {
+            if (!Files.exists(absFile)) {
                 throw new ProofInputException(
                     String.format("Declared Java source %s not found.", javaPath));
             }
@@ -354,7 +351,6 @@ public class KeYFile implements EnvInput {
      * initial configuration
      */
     public Collection<PositionedString> readSorts() {
-        LOGGER.debug("Activate Sorts of {}", file);
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
@@ -374,9 +370,8 @@ public class KeYFile implements EnvInput {
      */
     public List<PositionedString> readFuncAndPred() {
         if (file == null) {
-            return null;
+            return Collections.emptyList();
         }
-        LOGGER.debug("Activate functions and predicates of {}", file);
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);
@@ -391,7 +386,6 @@ public class KeYFile implements EnvInput {
      * @return list of issues that occurred during parsing the taclets
      */
     public List<BuildingIssue> readRules() {
-        LOGGER.debug("Activate rules of {}", file);
         KeyAst.File ctx = getParseContext();
         TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),
             initConfig.namespaces(), initConfig.getTaclet2Builder());
@@ -413,8 +407,7 @@ public class KeYFile implements EnvInput {
      * constructs positioned strings from {@link BuildingIssue}s such that they can be displayed
      * like other issues
      *
-     * @param issues
-     *        the {@link BuildingIssue}s to be converted into {@link PositionedString}s
+     * @param issues the {@link BuildingIssue}s to be converted into {@link PositionedString}s
      * @return list containing a {@link PositionedString} for each {@link BuildingIssue}
      *         in <code>issues</code>
      */

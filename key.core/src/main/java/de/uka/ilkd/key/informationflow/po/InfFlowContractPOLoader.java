@@ -29,6 +29,7 @@ public class InfFlowContractPOLoader implements ProofObligationLoader {
      *        The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
+    @Override
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
         final String contractName = properties.getString("contract");

@@ -28,7 +28,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      * Expression jump statement. May contain: an Expression (as expression of the
      * ExpressionJumpStatement), Comments
      */
-    public ExpressionJumpStatement(ExtList children) {
+    protected ExpressionJumpStatement(ExtList children) {
         super(children);
         expression = children.get(Expression.class);
     }
@@ -36,7 +36,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Expression jump statement.
      */
-    public ExpressionJumpStatement() {
+    protected ExpressionJumpStatement() {
         expression = null;
     }
 
@@ -46,7 +46,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      * @param expr
      *        an Expression used to jump
      */
-    public ExpressionJumpStatement(Expression expr) {
+    protected ExpressionJumpStatement(Expression expr) {
         expression = expr;
     }
 

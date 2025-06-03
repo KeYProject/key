@@ -9,7 +9,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -20,6 +19,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The default implementation of {@link IExecutionBranchCondition}.
@@ -66,13 +67,10 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     /**
      * Constructor.
      *
-     * @param settings
-     *        The {@link ITreeSettings} to use.
-     * @param proofNode
-     *        The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param additionalBranchLabel
-     *        The optional additional branch label.
+     * @param additionalBranchLabel The optional additional branch label.
      */
     public ExecutionBranchCondition(ITreeSettings settings, Node proofNode,
             String additionalBranchLabel) {
@@ -130,8 +128,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * Computes the branch condition lazily when {@link #getBranchCondition()} or
      * {@link #getFormatedBranchCondition()} is called the first time.
      *
-     * @throws ProofInputException
-     *         Occurred Exception
+     * @throws ProofInputException Occurred Exception
      */
     protected void lazyComputeBranchCondition() throws ProofInputException {
         final InitConfig initConfig = getInitConfig();
@@ -194,8 +191,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * Computes the path condition lazily when {@link #getPathCondition()} or
      * {@link #getFormatedPathCondition()} is called the first time.
      *
-     * @throws ProofInputException
-     *         Occurred Exception
+     * @throws ProofInputException Occurred Exception
      */
     protected void lazyComputePathCondition() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
@@ -228,8 +224,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     /**
      * Adds a merged proof {@link Node}.
      *
-     * @param node
-     *        The proof {@link Node} to add.
+     * @param node The proof {@link Node} to add.
      */
     public void addMergedProofNode(Node node) {
         if (mergedProofNodes == null) {
@@ -264,8 +259,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * Computes the branch condition lazily when {@link #getMergedBranchCondtions()} is called the
      * first time.
      *
-     * @throws ProofInputException
-     *         Occurred Exception
+     * @throws ProofInputException Occurred Exception
      */
     protected Term[] lazyComputeMergedBranchCondtions() throws ProofInputException {
         if (isMergedBranchCondition()) {
@@ -319,7 +313,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     @Override
     public SourceElement getActiveStatement() {
-        Term modalityTerm = getModalityPIO().subTerm();
+        Term modalityTerm = (Term) getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);
     }

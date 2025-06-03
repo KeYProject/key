@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -78,14 +78,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * Constructor.
      *
-     * @param initConfig
-     *        The {@link InitConfig} to use.
-     * @param name
-     *        The name to use.
-     * @param pm
-     *        The {@link IProgramMethod} to execute code parts from.
-     * @param precondition
-     *        An optional precondition to use.
+     * @param initConfig The {@link InitConfig} to use.
+     * @param name The name to use.
+     * @param pm The {@link IProgramMethod} to execute code parts from.
+     * @param precondition An optional precondition to use.
      */
     public ProgramMethodPO(InitConfig initConfig, String name, IProgramMethod pm,
             String precondition) {
@@ -98,19 +94,13 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * Constructor.
      *
-     * @param initConfig
-     *        The {@link InitConfig} to use.
-     * @param name
-     *        The name to use.
-     * @param pm
-     *        The {@link IProgramMethod} to execute code parts from.
-     * @param precondition
-     *        An optional precondition to use.
-     * @param addUninterpretedPredicate
-     *        {@code true} postcondition contains uninterpreted predicate,
+     * @param initConfig The {@link InitConfig} to use.
+     * @param name The name to use.
+     * @param pm The {@link IProgramMethod} to execute code parts from.
+     * @param precondition An optional precondition to use.
+     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate,
      *        {@code false} uninterpreted predicate is not contained in postcondition.
-     * @param addSymbolicExecutionLabel
-     *        {@code true} to add the {@link SymbolicExecutionTermLabel}
+     * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
     public ProgramMethodPO(InitConfig initConfig, String name, IProgramMethod pm,
@@ -291,10 +281,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * Returns a human-readable full qualified method signature.
      *
-     * @param pm
-     *        The {@link IProgramMethod} which provides the signature.
-     * @param includeType
-     *        Include the container type?
+     * @param pm The {@link IProgramMethod} which provides the signature.
+     * @param includeType Include the container type?
      * @return The human-readable method signature.
      */
     public static String getProgramMethodSignature(IProgramMethod pm, boolean includeType) {
@@ -314,13 +302,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * Searches the {@link IProgramMethod} defined by the given {@link Properties}.
      *
-     * @param initConfig
-     *        The already loaded {@link InitConfig}.
-     * @param properties
-     *        The settings of the proof obligation to instantiate.
+     * @param initConfig The already loaded {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
      * @return The found {@link IProgramMethod}.
-     * @throws IOException
-     *         Occurred Exception if it was not possible to find the
+     * @throws IOException Occurred Exception if it was not possible to find the
      *         {@link IProgramMethod}.
      */
     public static IProgramMethod getProgramMethod(InitConfig initConfig, Configuration properties)
@@ -330,7 +315,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         if (value == null) {
             throw new IOException("Property \"method\" is not defined.");
         }
-        int classMethodSeparator = value.indexOf("#");
+        int classMethodSeparator = value.indexOf('#');
         if (classMethodSeparator < 0) {
             throw new IOException(
                 "Property \"method\" does not contain the class method separator \"#\".");
@@ -339,12 +324,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
         String signature = value.substring(classMethodSeparator + 1);
         JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         // Split signature in name and parameter type names
-        int breaketsStart = signature.indexOf("(");
+        int breaketsStart = signature.indexOf('(');
         if (breaketsStart < 0) {
             throw new IOException("Method signature \"" + signature
                 + "\" does not contain required character \"(\".");
         }
-        int breaketsEnd = signature.lastIndexOf(")");
+        int breaketsEnd = signature.lastIndexOf(')');
         if (breaketsEnd < 0) {
             throw new IOException("Method signature \"" + signature
                 + "\" does not contain required character \")\".");
@@ -369,7 +354,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
             }
             parameterTypes = parameterTypes.append(paramType);
         }
-        IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes);
+        IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes, type);
         if (pm == null) {
             pm = javaInfo.getConstructor(type, parameterTypes);
             if (pm == null) {
@@ -382,8 +367,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * Returns the optional defined precondition.
      *
-     * @param properties
-     *        The proof obligation settings to read from.
+     * @param properties The proof obligation settings to read from.
      * @return The precondition or {@code null} if not available.
      */
     public static String getPrecondition(Configuration properties) {

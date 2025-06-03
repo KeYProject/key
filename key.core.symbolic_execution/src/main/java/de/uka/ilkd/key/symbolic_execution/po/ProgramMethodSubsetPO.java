@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.ast.statement.BranchStatement;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.Configuration;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

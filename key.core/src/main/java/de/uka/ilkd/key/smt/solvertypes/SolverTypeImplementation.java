@@ -152,7 +152,7 @@ public final class SolverTypeImplementation implements SolverType {
     private final String[] handlerOptions;
 
     /**
-     * The class of the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket} to be created
+     * The class of the {@link AbstractSolverSocket} to be created
      * with {@link #getSocket(ModelExtractor)}.
      */
     private final Class<?> solverSocketClass;
@@ -182,38 +182,25 @@ public final class SolverTypeImplementation implements SolverType {
      * Instantiate the solver type object with all its default values. The changeable values such as
      * {@link #command} and {@link #params} are initially the same as their default values.
      *
-     * @param name
-     *        the name, e.g. "Z3"
-     * @param info
-     *        some information about the solver type
-     * @param defaultParams
-     *        the default command line PARAMETERS used to start the actual solver
+     * @param name the name, e.g. "Z3"
+     * @param info some information about the solver type
+     * @param defaultParams the default command line PARAMETERS used to start the actual solver
      *        program
-     * @param defaultCommand
-     *        the default command line COMMAND used to start the actual solver
+     * @param defaultCommand the default command line COMMAND used to start the actual solver
      *        program
-     * @param versionParameter
-     *        the command line parameter used to get the versionParameter of the
+     * @param versionParameter the command line parameter used to get the versionParameter of the
      *        actual solver program
-     * @param minimumSupportedVersion
-     *        the minimum supported versionParameter of the solver type at
+     * @param minimumSupportedVersion the minimum supported versionParameter of the solver type at
      *        hand
-     * @param defaultTimeout
-     *        the default solver timeout for SMT processes using this solver type
-     * @param delimiters
-     *        the message delimiters used by the actual solver program
-     * @param translatorClass
-     *        the {@link SMTTranslator} class used by this solver type
-     * @param handlerNames
-     *        the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be
+     * @param defaultTimeout the default solver timeout for SMT processes using this solver type
+     * @param delimiters the message delimiters used by the actual solver program
+     * @param translatorClass the {@link SMTTranslator} class used by this solver type
+     * @param handlerNames the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be
      *        used by the {@link SMTTranslator} created by this solver type
-     * @param handlerOptions
-     *        arbitrary String options used by the SMTHandlers
-     * @param solverSocketClass
-     *        the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}
+     * @param handlerOptions arbitrary String options used by the SMTHandlers
+     * @param solverSocketClass the {@link AbstractSolverSocket}
      *        class used by the solver type at hand
-     * @param preamble
-     *        the preamble String for the created {@link SMTTranslator}, may be null
+     * @param preamble the preamble String for the created {@link SMTTranslator}, may be null
      */
     public SolverTypeImplementation(String name, String info, String defaultParams,
             String defaultCommand, String versionParameter, String minimumSupportedVersion,
@@ -264,8 +251,7 @@ public final class SolverTypeImplementation implements SolverType {
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.warn(
                 String.format("Using default ModularSMTLib2Translator for SMT translation due to"
-                    + " exception: %n %s",
-                    e.getMessage()));
+                    + " exception: %n %s", e.getMessage()));
             return new ModularSMTLib2Translator();
         }
     }
@@ -276,8 +262,7 @@ public final class SolverTypeImplementation implements SolverType {
      * for the command whether there is a file with the command's name in any of those paths.
      * If all of these fail, the cmd is also not installed.
      *
-     * @param cmd
-     *        the command whose existence will be checked
+     * @param cmd the command whose existence will be checked
      * @return true iff the command is a non-empty String and a file with the command's name or with
      *         the command as pathname can be found in the file system.
      */

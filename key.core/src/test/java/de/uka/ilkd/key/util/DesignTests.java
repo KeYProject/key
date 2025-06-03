@@ -82,7 +82,7 @@ public class DesignTests {
                     return;
                 }
 
-                var name = relative.toString().substring(0, index).replace(File.separatorChar, '.');
+                var name = relative.substring(0, index).replace(File.separatorChar, '.');
 
                 try {
                     acc.add(Term.class.getClassLoader().loadClass(name));

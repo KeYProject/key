@@ -91,11 +91,11 @@ public class TestTacletEquality {
 
     @BeforeAll
     static void setUp() throws Exception {
-        File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/gcd.closed.proof");
+        var file = HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/gcd.closed.proof");
         if (initConfig == null) {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
             SingleThreadProblemLoader loader =
-                new SingleThreadProblemLoader(file.toPath(), null, null, null,
+                new SingleThreadProblemLoader(file, null, null, null,
                     JavaProfile.getDefaultInstance(), true, control, false, null);
             loader.load();
             initConfig = loader.getInitConfig();

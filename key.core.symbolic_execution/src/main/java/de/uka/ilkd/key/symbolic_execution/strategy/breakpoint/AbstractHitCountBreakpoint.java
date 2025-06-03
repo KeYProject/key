@@ -9,7 +9,8 @@ import java.util.Map;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Adds the hit count functionality to an {@link AbstractBreakpoint}.
@@ -43,7 +44,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      * @param enabled
      *        flag if the Breakpoint is enabled
      */
-    public AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled) {
+    protected AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled) {
         super(proof, enabled);
         this.hitCount = hitCount;
     }
@@ -78,8 +79,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         return hitcountExceeded(node);
     }
 

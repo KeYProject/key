@@ -6,11 +6,11 @@ package de.uka.ilkd.key.rule;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -55,7 +55,7 @@ public class BoundUniquenessChecker {
      */
     public void addAll(Sequent seq) {
         for (final SequentFormula cf : seq) {
-            terms = terms.prepend(cf.formula());
+            terms = terms.prepend((Term) cf.formula());
         }
     }
 

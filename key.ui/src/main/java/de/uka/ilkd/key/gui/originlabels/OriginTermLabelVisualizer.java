@@ -31,7 +31,10 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -196,7 +199,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     public OriginTermLabelVisualizer(PosInOccurrence pos, Node node, Services services) {
         super(node,
             "Origin for node " + node.serialNr() + ": " + (pos == null ? "whole sequent"
-                    : LogicPrinter.quickPrintTerm(pos.subTerm(), services).replaceAll("\\s+", " ")),
+                    : LogicPrinter.quickPrintTerm((Term) pos.subTerm(), services).replaceAll("\\s+",
+                        " ")),
             "Node " + node.serialNr());
 
         this.services = services;
@@ -292,7 +296,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         headPane.add(top);
 
         JPanel bot = new JPanel();
-        JLabel label = new JLabel("Proof: \"" + node.proof().name().toString() + "\"");
+        JLabel label = new JLabel("Proof: \"" + node.proof().name() + "\"");
         label.setMinimumSize(new Dimension(top.getWidth(), label.getMinimumSize().height));
         bot.setLayout(new BoxLayout(bot, BoxLayout.LINE_AXIS));
         bot.add(label);
@@ -418,7 +422,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         } else {
             PosInTerm completePos = termPio.posInTerm();
 
-            IntIterator it = pio.posInTerm().iterator();
+            org.key_project.logic.IntIterator it = pio.posInTerm().iterator();
             while (it.hasNext()) {
                 completePos = completePos.down(it.next());
             }
@@ -434,12 +438,14 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return result;
     }
 
-    private void buildModel(TreeNode parentNode, PosInOccurrence parentPos,
+    private void buildModel(TreeNode parentNode,
+            PosInOccurrence parentPos,
             DefaultTreeModel treeModel) {
         if (parentPos == null) {
             int index = 0;
 
-            ImmutableList<SequentFormula> children = sequent.antecedent().asList();
+            ImmutableList<SequentFormula> children =
+                sequent.antecedent().asList();
 
             for (SequentFormula child : children) {
                 PosInOccurrence childPos =
@@ -465,7 +471,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 ++index;
             }
         } else {
-            ImmutableArray<Term> children = parentPos.subTerm().subs();
+            var children = parentPos.subTerm().subs();
 
             for (int i = 0; i < children.size(); ++i) {
                 TreeNode childNode = new TreeNode(parentPos.down(i));
@@ -497,7 +503,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
-    private ImmutableList<Integer> getPosTablePath(PosInOccurrence pos) {
+    private ImmutableList<Integer> getPosTablePath(
+            PosInOccurrence pos) {
         if (pos == null) {
             return ImmutableSLList.<Integer>nil().prepend(0);
         }
@@ -550,7 +557,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             return null;
         }
 
-        OriginTermLabel label = (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
+        OriginTermLabel label =
+            (OriginTermLabel) ((Term) pio.subTerm()).getLabel(OriginTermLabel.NAME);
         Origin origin = OriginTermLabel.getOrigin(pio);
 
         return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin)
@@ -586,7 +594,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
             if (origin != null) {
                 originTextLabel.setText(getShortOriginText(origin));
-                originTextLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+                originTextLabel.setHorizontalAlignment(TRAILING);
             }
 
             JPanel result = new JPanel(new BorderLayout(TREE_CELL_GAP, TREE_CELL_GAP));
@@ -641,7 +649,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             this.pos = pos;
 
             if (pos != null) {
-                this.term = pos.subTerm();
+                this.term = (Term) pos.subTerm();
             }
         }
     }
@@ -649,7 +657,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
         private final PosInOccurrence pos;
 
-        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni, Services services) {
+        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni,
+                Services services) {
             super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
             this.pos = pos;
         }
@@ -685,7 +694,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         private InitialPositionTable posTable = new InitialPositionTable();
         private final Node node;
 
-        TermView(PosInOccurrence pos, Node node, MainWindow mainWindow) {
+        TermView(PosInOccurrence pos, Node node,
+                MainWindow mainWindow) {
             super(mainWindow);
             this.node = node;
 

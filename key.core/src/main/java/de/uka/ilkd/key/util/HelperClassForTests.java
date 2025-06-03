@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,13 +18,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.RuleCollection;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -42,8 +37,8 @@ import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class HelperClassForTests {
 
-    public static final File TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory();
-    public static final File DUMMY_KEY_FILE = new File(TESTCASE_DIRECTORY, "dummyTrue.key");
+    public static final Path TESTCASE_DIRECTORY = FindResources.getTestCasesDirectory().toPath();
+    public static final Path DUMMY_KEY_FILE = TESTCASE_DIRECTORY.resolve("dummyTrue.key");
 
 
     private static final Profile profile = new JavaProfile() {
@@ -56,11 +51,11 @@ public class HelperClassForTests {
         }
     };
 
-    public static ProofAggregate parse(File file) {
+    public static ProofAggregate parse(Path file) {
         return parse(file, profile);
     }
 
-    public static ProofAggregate parse(File file, Profile profile) {
+    public static ProofAggregate parse(Path file, Profile profile) {
         try {
             return parseThrowException(file, profile);
         } catch (ProofInputException e) {
@@ -68,15 +63,15 @@ public class HelperClassForTests {
         }
     }
 
-    public static ProofAggregate parseThrowException(File file) throws ProofInputException {
+    public static ProofAggregate parseThrowException(Path file) throws ProofInputException {
         return parseThrowException(file, profile);
     }
 
 
-    public static ProofAggregate parseThrowException(File file, Profile profile)
+    public static ProofAggregate parseThrowException(Path file, Profile profile)
             throws ProofInputException {
         KeYUserProblemFile po =
-            new KeYUserProblemFile("Test", file.toPath(), null, profile);
+            new KeYUserProblemFile("Test", file, null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
     }
@@ -84,8 +79,7 @@ public class HelperClassForTests {
     /**
      * Checks if one step simplification is enabled in the given {@link Proof}.
      *
-     * @param proof
-     *        The {@link Proof} to read from or {@code null} to return the general settings
+     * @param proof The {@link Proof} to read from or {@code null} to return the general settings
      *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
@@ -104,10 +98,8 @@ public class HelperClassForTests {
     /**
      * Defines if one step simplification is enabled in general and within the {@link Proof}.
      *
-     * @param proof
-     *        The optional {@link Proof}.
-     * @param enabled
-     *        {@code true} use one step simplification, {@code false} do not use one step
+     * @param proof The optional {@link Proof}.
+     * @param enabled {@code true} use one step simplification, {@code false} do not use one step
      *        simplification.
      */
     public static void setOneStepSimplificationEnabled(Proof proof, boolean enabled) {
@@ -134,15 +126,11 @@ public class HelperClassForTests {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param baseDir
-     *        The base directory which contains the java file.
-     * @param javaPathInBaseDir
-     *        The path in the base directory to the java file.
+     * @param baseDir The base directory which contains the java file.
+     * @param javaPathInBaseDir The path in the base directory to the java file.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException
-     *         Occurred Exception.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptions(File baseDir,
             String javaPathInBaseDir)
@@ -174,17 +162,12 @@ public class HelperClassForTests {
     /**
      * Ensures that the default taclet options are defined.
      *
-     * @param javaFile
-     *        The java file to load.
-     * @param containerTypeName
-     *        The type name which provides the target.
-     * @param targetName
-     *        The target to proof.
+     * @param javaFile The java file to load.
+     * @param containerTypeName The type name which provides the target.
+     * @param targetName The target to proof.
      * @return The original settings which are overwritten.
-     * @throws ProblemLoaderException
-     *         Occurred Exception.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
             String containerTypeName,
@@ -252,8 +235,7 @@ public class HelperClassForTests {
     /**
      * Restores the given taclet options.
      *
-     * @param options
-     *        The taclet options to restore.
+     * @param options The taclet options to restore.
      */
     public static void restoreTacletOptions(Map<String, String> options) {
         if (options != null) {
@@ -271,12 +253,9 @@ public class HelperClassForTests {
     /**
      * Searches a {@link IProgramMethod} in the given {@link Services}.
      *
-     * @param services
-     *        The {@link Services} to search in.
-     * @param containerTypeName
-     *        The name of the type which contains the method.
-     * @param methodFullName
-     *        The method name to search.
+     * @param services The {@link Services} to search in.
+     * @param containerTypeName The name of the type which contains the method.
+     * @param methodFullName The method name to search.
      * @return The first found {@link IProgramMethod} in the type.
      */
     public static IProgramMethod searchProgramMethod(Services services, String containerTypeName,
@@ -296,7 +275,7 @@ public class HelperClassForTests {
         return pm;
     }
 
-    public static Services createServices(File keyFile) {
+    public static Services createServices(Path keyFile) {
         return HelperClassForTests.parse(keyFile).getFirstProof().getServices();
     }
 
@@ -306,7 +285,7 @@ public class HelperClassForTests {
 
     public static KeYEnvironment<DefaultUserInterfaceControl> createKeYEnvironment()
             throws ProblemLoaderException {
-        return KeYEnvironment.load(DUMMY_KEY_FILE.toPath());
+        return KeYEnvironment.load(DUMMY_KEY_FILE);
     }
 
 }

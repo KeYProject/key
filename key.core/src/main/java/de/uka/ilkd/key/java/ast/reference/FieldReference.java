@@ -16,7 +16,7 @@ import org.jspecify.annotations.NonNull;
 
 
 public class FieldReference extends VariableReference
-        implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
+        implements MemberReference, ReferenceSuffix, TypeReferenceContainer {
 
     /**
      * Reference prefix.

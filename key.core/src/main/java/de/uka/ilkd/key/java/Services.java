@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofServices;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.lookup.Lookup;
 
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices, LogicServices {
+public class Services implements TermServices, LogicServices, ProofServices {
     private static final Logger LOGGER = LoggerFactory.getLogger(Services.class);
     /**
      * the proof

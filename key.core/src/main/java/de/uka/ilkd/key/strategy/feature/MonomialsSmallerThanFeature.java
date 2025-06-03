@@ -5,20 +5,22 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
-import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termfeature.BinarySumTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.ConstTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.OperatorTF;
+import org.key_project.prover.strategy.costbased.termfeature.SubTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -30,11 +32,11 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
 
     private final TermFeature hasCoeff;
 
-    private final ProjectionToTerm left, right;
+    private final ProjectionToTerm<Goal> left, right;
     private final Function Z, mul, add;
 
 
-    private MonomialsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+    private MonomialsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         super(numbers);
         this.left = left;
@@ -53,13 +55,14 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
                     OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new MonomialsSmallerThanFeature(left, right, numbers);
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
         m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();

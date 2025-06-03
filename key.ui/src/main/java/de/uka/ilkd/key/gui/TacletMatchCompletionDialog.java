@@ -177,7 +177,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             instPanel.setBorder(indents);
             tabContent.add(instPanel);
 
-            if (!model[i].application().taclet().ifSequent().isEmpty()) {
+            if (!model[i].application().taclet().assumesSequent().isEmpty()) {
 
                 TacletIfSelectionDialog ifSelection = new TacletIfSelectionDialog(model[i], this);
                 dataTable[i].setIfSelectionPanel(ifSelection);
@@ -402,7 +402,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
 
-                                Term term = pis.getPosInOccurrence().subTerm();
+                                Term term = (Term) pis.getPosInOccurrence().subTerm();
 
                                 // Reactivate this when the parser is fully capable again.
                                 // droppedString = LogicPrinter.quickPrintTerm(term,
@@ -500,6 +500,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             return getIfSelectionPanel() != null;
         }
 
+        @Override
         public void modelChanged(ModelEvent me) {
             if (me.getSource() instanceof TacletInstantiationModel) {
                 setModel(((TacletInstantiationModel) me.getSource()).tableModel());
@@ -592,7 +593,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
-                                Term term = pis.getPosInOccurrence().subTerm();
+                                Term term = (Term) pis.getPosInOccurrence().subTerm();
                                 // Reactivate this when the parser is fully capable again.
                                 // String droppedString = LogicPrinter.quickPrintTerm(term,
                                 // mediator.getServices(),

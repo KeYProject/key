@@ -8,15 +8,24 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -82,8 +91,8 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             if (Transformer.inTransformer(pio)) {
                 return false;
             }
-            Term term = pio.subTerm();
-            term = TermBuilder.goBelowUpdates(term);
+            var t = pio.subTerm();
+            Term term = TermBuilder.goBelowUpdates(t);
             if (term.op() instanceof Modality
                     && SymbolicExecutionUtil.getSymbolicExecutionLabel(term) == null) {
                 Term equalityTerm = term.sub(0);
@@ -117,12 +126,12 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         try {
             // Extract required Terms from goal
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            Term topLevelTerm = pio.subTerm();
+            Term topLevelTerm = (Term) pio.subTerm();
             Pair<ImmutableList<Term>, Term> updatesAndTerm =
                 TermBuilder.goBelowUpdates2(topLevelTerm);
             Term modalityTerm = updatesAndTerm.second;
@@ -157,7 +166,8 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true);
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
-                    .computeGeneralSequentToProve(goal.sequent(), pio.sequentFormula());
+                    .computeGeneralSequentToProve(goal.sequent(),
+                        pio.sequentFormula());
             JFunction newPredicate = createResultFunction(sideProofServices, varTerm.sort());
             final TermBuilder tb = sideProofServices.getTermBuilder();
             Term newTerm = tb.func(newPredicate, varTerm);
@@ -170,7 +180,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                     .sequent();
             // Compute results and their conditions
             List<ResultsAndCondition> conditionsAndResultsMap =
-                computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
+                computeResultsAndConditions(goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
             ImmutableList<Goal> goals = goal.split(1);

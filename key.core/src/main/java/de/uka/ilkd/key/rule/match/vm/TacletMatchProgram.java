@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -25,6 +24,8 @@ import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -162,7 +163,8 @@ public class TacletMatchProgram {
      *        the {@link Services}
      * @return {@code null} if no match was found or the match result
      */
-    public MatchConditions match(Term p_toMatch, MatchConditions p_matchCond, Services services) {
+    public MatchConditions match(Term p_toMatch, MatchConditions p_matchCond,
+            LogicServices services) {
 
         MatchConditions mc = p_matchCond;
 

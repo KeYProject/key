@@ -19,9 +19,12 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -42,7 +45,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      */
     private static final Name EQUAL_LOCS_POST = new Name("__EQUALS__LOCS__POST__");
 
-    public AbstractInfFlowTacletBuilder(final Services services) {
+    protected AbstractInfFlowTacletBuilder(final Services services) {
         super(services.getTermFactory(), services);
     }
 
@@ -161,7 +164,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
-    static class QuantifiableVariableVisitor implements Visitor<Term> {
+    static class QuantifiableVariableVisitor implements Visitor<@NonNull Term> {
 
         private final LinkedList<QuantifiableVariable> vars = new LinkedList<>();
 

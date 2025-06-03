@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.sort.Sort;
 
 public class MatchSortDependingFunctionInstruction extends Instruction<SortDependingFunction> {
@@ -40,7 +41,7 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      *         {@link MatchConditions}
      */
     private MatchConditions matchSorts(Sort dependingSortToMatch, MatchConditions matchConditions,
-            Services services) {
+            LogicServices services) {
         // This restriction has been dropped for free generic sorts to prove taclets correct
         // assert !(s2 instanceof GenericSort)
         // : "Sort s2 is not allowed to be of type generic.";
@@ -79,7 +80,7 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      */
     @Override
     public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
-            Services services) {
+            LogicServices services) {
         MatchConditions result = null;
         if (instantiationCandidate.op() instanceof SortDependingFunction sdp) {
             if (op.isSimilar(sdp)) {
@@ -95,7 +96,7 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      */
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
+            LogicServices services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNext();

@@ -26,7 +26,7 @@ public abstract class AbstractElement implements ISymbolicElement {
      * @param settings
      *        The {@link IModelSettings} to use.
      */
-    public AbstractElement(IModelSettings settings) {
+    protected AbstractElement(IModelSettings settings) {
         this.settings = settings;
     }
 

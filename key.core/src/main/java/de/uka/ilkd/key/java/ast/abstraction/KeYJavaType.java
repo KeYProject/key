@@ -93,12 +93,14 @@ public class KeYJavaType implements Type {
 
     public String getFullName() {
         return Optional.ofNullable(getJavaType()).map(Type::getFullName)
-                .orElse(getSort().name().toString());
+                .orElse(
+                    getSort() != null ? getSort().name().toString() : "This should never be seen");
     }
 
     public String getName() {
         return Optional.ofNullable(getJavaType()).map(Type::getName)
-                .orElse(getSort().name().toString());
+                .orElse(
+                    getSort() != null ? getSort().name().toString() : "This should never be seen");
     }
 
     @Override
@@ -119,7 +121,7 @@ public class KeYJavaType implements Type {
 
     @Override
     public int hashCode() {
-        return 0;
+        return getFullName().hashCode();
     }
 
 

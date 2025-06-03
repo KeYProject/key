@@ -30,7 +30,7 @@ public abstract class JavaSourceElement implements SourceElement {
     /**
      * Java source element.
      */
-    public JavaSourceElement() {
+    protected JavaSourceElement() {
         posInfo = PositionInfo.UNDEFINED;
     }
 
@@ -41,7 +41,7 @@ public abstract class JavaSourceElement implements SourceElement {
      * @param pi
      *        PositionInfo the PositionInfo of the element
      */
-    public JavaSourceElement(PositionInfo pi) {
+    protected JavaSourceElement(@Nullable PositionInfo pi) {
         posInfo = getPosInfo(pi);
     }
 
@@ -51,12 +51,12 @@ public abstract class JavaSourceElement implements SourceElement {
      * @param children
      *        a list of the children of this element. May contain: PositionInfo
      */
-    public JavaSourceElement(ExtList children) {
+    protected JavaSourceElement(ExtList children) {
         posInfo = getPosInfo(children.get(PositionInfo.class));
 
     }
 
-    public JavaSourceElement(ExtList children, PositionInfo pos) {
+    protected JavaSourceElement(ExtList children, PositionInfo pos) {
         posInfo = getPosInfo(pos);
     }
 

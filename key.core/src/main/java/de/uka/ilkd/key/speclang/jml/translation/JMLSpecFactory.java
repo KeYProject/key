@@ -50,7 +50,6 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.*;
-import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
@@ -71,8 +70,8 @@ import static java.lang.String.format;
 public class JMLSpecFactory {
 
     public static final String AT_PRE = "AtPre";
-    protected final de.uka.ilkd.key.logic.TermBuilder tb;
-    protected final de.uka.ilkd.key.java.Services services;
+    protected final TermBuilder tb;
+    protected final Services services;
     protected final ContractFactory cf;
 
     /**
@@ -1053,14 +1052,17 @@ public class JMLSpecFactory {
 
         boolean createContract = true;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
-            if (clauses.accessibles.get(heap).equalsModProperty(tb.allLocs(),
-                RENAMING_TERM_PROPERTY)) {
+            org.key_project.logic.Term term1 = clauses.accessibles.get(heap);
+            org.key_project.logic.Term formula1 = tb.allLocs();
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, formula1)) {
                 createContract = false;
                 break;
             }
             if (pm.isModel() && pm.getStateCount() > 1) {
-                if (clauses.accessibles.get(progVars.atPreVars.get(heap))
-                        .equalsModProperty(tb.allLocs(), RENAMING_TERM_PROPERTY)) {
+                org.key_project.logic.Term term =
+                    clauses.accessibles.get(progVars.atPreVars.get(heap));
+                org.key_project.logic.Term formula = tb.allLocs();
+                if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
                     createContract = false;
                     break;
                 }

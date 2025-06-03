@@ -39,7 +39,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      * Variable declaration.
      */
 
-    public VariableDeclaration() {
+    protected VariableDeclaration() {
         typeReference = null;
         parentIsInterfaceDeclaration = false;
     }
@@ -55,7 +55,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
      */
-    public VariableDeclaration(Modifier[] mods, TypeReference typeRef,
+    protected VariableDeclaration(Modifier[] mods, TypeReference typeRef,
             boolean parentIsInterfaceDeclaration) {
         super(mods);
         typeReference = typeRef;
@@ -73,7 +73,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
      */
-    public VariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
+    protected VariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
             boolean parentIsInterfaceDeclaration) {
         super(mods);
         typeReference = typeRef;
@@ -91,7 +91,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
      */
-    public VariableDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
+    protected VariableDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
         super(children);
         typeReference = children.get(TypeReference.class);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;

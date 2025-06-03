@@ -48,7 +48,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
      * @param services
      *        the services instance
      */
-    public CreatingASTVisitor(ProgramElement root, boolean preservesPos, Services services) {
+    protected CreatingASTVisitor(ProgramElement root, boolean preservesPos, Services services) {
         super(root, services);
         this.preservesPositionInfo = preservesPos;
     }

@@ -17,7 +17,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -133,7 +132,7 @@ public class TestTermFactory {
         try {
             Term t_px_or_py = tf.createTerm(Junctor.OR, invalidBuilt, t1());
         } catch (Exception e) {
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -341,10 +340,10 @@ public class TestTermFactory {
         Term withJBChildAgain = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChildAgain = tf.createTerm(Junctor.NOT, withJBChild);
         // Test caching
-        Assertions.assertSame(noJB, noJBAgain);
-        Assertions.assertSame(noJBWithChild, noJBWithChildAgain);
-        Assertions.assertNotSame(withJB, withJBAgain);
-        Assertions.assertNotSame(withJBChild, withJBChildAgain);
-        Assertions.assertNotSame(withJBChildChild, withJBChildChildAgain);
+        assertSame(noJB, noJBAgain);
+        assertSame(noJBWithChild, noJBWithChildAgain);
+        assertNotSame(withJB, withJBAgain);
+        assertNotSame(withJBChild, withJBChildAgain);
+        assertNotSame(withJBChildChild, withJBChildChildAgain);
     }
 }

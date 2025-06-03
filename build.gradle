@@ -92,7 +92,7 @@ subprojects {
 
         compileOnly("org.jspecify:jspecify:1.0.0")
         testCompileOnly("org.jspecify:jspecify:1.0.0")
-        def eisop_version = "3.49.1-eisop1"
+        def eisop_version = "3.49.3-eisop1"
         compileOnly "io.github.eisop:checker-qual:$eisop_version"
         compileOnly "io.github.eisop:checker-util:$eisop_version"
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
@@ -370,9 +370,9 @@ subprojects {
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
-            if(project.name == 'recoder') {
+            if (project.name == 'recoder') {
                 licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
-            }else {
+            } else {
                 licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
             }
         }

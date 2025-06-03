@@ -58,7 +58,7 @@ public abstract class NodeInfoVisualizer extends JComponent
      * @param shortName
      *        the visualizer's short name.
      */
-    public NodeInfoVisualizer(Node node, String longName, String shortName) {
+    protected NodeInfoVisualizer(Node node, String longName, String shortName) {
         this.node = node;
         this.longName = longName;
         this.shortName = shortName;

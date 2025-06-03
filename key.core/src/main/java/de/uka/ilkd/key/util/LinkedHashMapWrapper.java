@@ -7,8 +7,8 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
-import de.uka.ilkd.key.logic.equality.Property;
 
+import org.key_project.logic.Property;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
@@ -18,10 +18,8 @@ import org.jspecify.annotations.Nullable;
  * This class is a wrapper for {@link LinkedHashMap} where the keys are elements that implement
  * {@link EqualsModProperty}.
  *
- * @param <K>
- *        the type of the keys in the wrapped LinkedHashMap
- * @param <V>
- *        the type of the values in the wrapped LinkedHashMap
+ * @param <K> the type of the keys in the wrapped LinkedHashMap
+ * @param <V> the type of the values in the wrapped LinkedHashMap
  */
 public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /*
@@ -35,18 +33,17 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     private final LinkedHashMap<ElementWrapper<K>, @Nullable V> map;
 
     /**
-     * The {@link Property<K>} that is used for equality checks and hash codes.
+     * The {@link Property} that is used for equality checks and hash codes.
      */
-    private final Property<K> property;
+    private final Property<? super K> property;
 
     /**
      * Constructs a new empty {@link LinkedHashMapWrapper}.
      *
-     * @param property
-     *        the {@link Property<Term>} that is used internally for equality checks and
+     * @param property the {@link Property<Term>} that is used internally for equality checks and
      *        hash codes
      */
-    public LinkedHashMapWrapper(Property<K> property) {
+    public LinkedHashMapWrapper(Property<? super K> property) {
         this.property = property;
         map = new LinkedHashMap<>();
     }
@@ -54,15 +51,12 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /**
      * Constructs a new {@link LinkedHashMapWrapper} and inserts the given key-value pair.
      *
-     * @param key
-     *        the key to be inserted
-     * @param value
-     *        the value corresponding to {@code key}
-     * @param property
-     *        the {@link Property<Term>} that is used internally for equality checks and
+     * @param key the key to be inserted
+     * @param value the value corresponding to {@code key}
+     * @param property the {@link Property<Term>} that is used internally for equality checks and
      *        hash codes
      */
-    public LinkedHashMapWrapper(K key, V value, Property<K> property) {
+    public LinkedHashMapWrapper(K key, V value, Property<? super K> property) {
         this(property);
         put(key, value);
     }
@@ -74,15 +68,12 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * If there are more keys than values, the remaining keys are mapped to {@code null}.
      * If there are more values than keys, the remaining values are ignored.
      *
-     * @param keys
-     *        the array of keys to be inserted
-     * @param values
-     *        the array of values corresponding to the keys
-     * @param property
-     *        the {@link Property<Term>} that is used internally for equality checks and
+     * @param keys the array of keys to be inserted
+     * @param values the array of values corresponding to the keys
+     * @param property the {@link Property<Term>} that is used internally for equality checks and
      *        hash codes
      */
-    public LinkedHashMapWrapper(K[] keys, V[] values, Property<K> property) {
+    public LinkedHashMapWrapper(K[] keys, V[] values, Property<? super K> property) {
         this(property);
         putAll(keys, values);
     }
@@ -94,15 +85,13 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * If there are more keys than values, the remaining keys are mapped to {@code null}.
      * If there are more values than keys, the remaining values are ignored.
      *
-     * @param keys
-     *        the iterable of keys to be inserted
-     * @param values
-     *        the iterable of values corresponding to the keys
-     * @param property
-     *        the {@link Property<Term>} that is used internally for equality checks and
+     * @param keys the iterable of keys to be inserted
+     * @param values the iterable of values corresponding to the keys
+     * @param property the {@link Property<Term>} that is used internally for equality checks and
      *        hash codes
      */
-    public LinkedHashMapWrapper(Iterable<K> keys, Iterable<V> values, Property<K> property) {
+    public LinkedHashMapWrapper(Iterable<K> keys, Iterable<V> values,
+            Property<? super K> property) {
         this(property);
         putAll(keys, values);
     }
@@ -128,8 +117,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /**
      * Returns true if this map contains a mapping for the specified key.
      *
-     * @param key
-     *        the key whose presence in this map is to be tested
+     * @param key the key whose presence in this map is to be tested
      * @return true if this map contains a mapping for the specified key
      */
     public boolean containsKey(K key) {
@@ -140,8 +128,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * Returns the value to which the specified key is mapped, or {@code null} if this map contains
      * no mapping for the key.
      *
-     * @param key
-     *        the key whose associated value is to be returned
+     * @param key the key whose associated value is to be returned
      * @return the value to which the specified key is mapped
      */
     public @Nullable V get(K key) {
@@ -154,10 +141,8 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * If the map previously contained a mapping for the key, the old value is replaced by the given
      * value.
      *
-     * @param key
-     *        the key to be inserted
-     * @param value
-     *        the value corresponding to {@code key}
+     * @param key the key to be inserted
+     * @param value the value corresponding to {@code key}
      * @return the previous value associated with {@code key}, or {@code null} if there was no
      *         mapping for {@code key}
      */
@@ -172,10 +157,8 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * If there are more keys than values, the remaining keys are mapped to {@code null}.
      * If there are more values than keys, the remaining values are ignored.
      *
-     * @param keys
-     *        the array of keys to be inserted
-     * @param vals
-     *        the array of values corresponding to the keys
+     * @param keys the array of keys to be inserted
+     * @param vals the array of values corresponding to the keys
      */
     public void putAll(K[] keys, V[] vals) {
         for (int i = 0; i < keys.length; i++) {
@@ -194,10 +177,8 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * If there are more keys than values, the remaining keys are mapped to {@code null}.
      * If there are more values than keys, the remaining values are ignored.
      *
-     * @param keys
-     *        the iterable of keys to be inserted
-     * @param vals
-     *        the iterable of values corresponding to the keys
+     * @param keys the iterable of keys to be inserted
+     * @param vals the iterable of values corresponding to the keys
      */
     public void putAll(Iterable<K> keys, Iterable<V> vals) {
         Iterator<V> itVals = vals.iterator();
@@ -214,8 +195,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * Removes the mapping for the specified key from this map if present and returns the previously
      * associated value.
      *
-     * @param key
-     *        the key whose mapping is to be removed from the map
+     * @param key the key whose mapping is to be removed from the map
      * @return the previous value associated with {@code key}, or {@code null} if there was no
      *         mapping for {@code key}
      */
@@ -226,8 +206,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /**
      * Returns true if this map contains a mapping to the specified value.
      *
-     * @param value
-     *        the value whose presence in this map is to be tested
+     * @param value the value whose presence in this map is to be tested
      * @return true if this map contains a mapping to the specified value
      */
     public boolean containsValue(V value) {
@@ -253,8 +232,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * instead of the usual {@code equals} and {@code hashCode} methods in the internal
      * {@link LinkedHashMap}.
      *
-     * @param key
-     *        the key to be wrapped
+     * @param key the key to be wrapped
      * @return the wrapped key
      */
     private ElementWrapper<K> wrapKey(K key) {
@@ -272,8 +250,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * {@link EqualsModProperty#hashCodeModProperty(Property)} instead of the normal
      * {@code equals} implementation.
      *
-     * @param <K>
-     *        the type of the wrapped element
+     * @param <K> the type of the wrapped element
      */
     private static class ElementWrapper<K extends EqualsModProperty<K>> {
         /**
@@ -282,19 +259,17 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         K key;
 
         /**
-         * The {@link Property<K>} that is used for equality checks and hash codes.
+         * The {@link Property} that is used for equality checks and hash codes.
          */
-        Property<K> property;
+        Property<? super K> property;
 
         /**
          * Creates a new wrapper for the given element.
          *
-         * @param key
-         *        the element to be wrapped
-         * @param property
-         *        the {@link Property<K>} that is used for equality checks and hash codes
+         * @param key the element to be wrapped
+         * @param property the {@link Property} that is used for equality checks and hash codes
          */
-        public ElementWrapper(K key, Property<K> property) {
+        public ElementWrapper(K key, Property<? super K> property) {
             this.key = key;
             this.property = property;
         }
@@ -302,7 +277,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof ElementWrapper<?> other) {
-                return key.equalsModProperty(other.key, property);
+                return property.equalsModThisProperty(key, (K) other.key);
             }
             return false;
         }
@@ -320,10 +295,8 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * <p>
      * The keys in the pairs are unwrapped before returning them.
      *
-     * @param <K>
-     *        the type of the keys in the {@link LinkedHashMapWrapper}
-     * @param <V>
-     *        the type of the values in the {@link LinkedHashMapWrapper}
+     * @param <K> the type of the keys in the {@link LinkedHashMapWrapper}
+     * @param <V> the type of the values in the {@link LinkedHashMapWrapper}
      */
     private static class PairIterator<K extends EqualsModProperty<K>, V>
             implements Iterator<Pair<K, V>> {
@@ -345,8 +318,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         /**
          * Creates a new iterator over the key-value pairs in the {@link LinkedHashMapWrapper}.
          *
-         * @param map
-         *        the internal map of the {@link LinkedHashMapWrapper} to iterate over
+         * @param map the internal map of the {@link LinkedHashMapWrapper} to iterate over
          */
         public PairIterator(final LinkedHashMap<ElementWrapper<K>, V> map) {
             this.map = map;

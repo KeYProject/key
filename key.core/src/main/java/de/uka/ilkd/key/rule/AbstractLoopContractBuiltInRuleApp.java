@@ -7,13 +7,14 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -33,14 +34,11 @@ public abstract class AbstractLoopContractBuiltInRuleApp
 
     /**
      *
-     * @param rule
-     *        the rule being applied.
-     * @param occurrence
-     *        the position at which the rule is applied.
-     * @param ifInstantiations
-     *        if instantiations.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
      */
-    public AbstractLoopContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
+    protected AbstractLoopContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
             ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
@@ -52,10 +50,8 @@ public abstract class AbstractLoopContractBuiltInRuleApp
 
     /**
      *
-     * @param goal
-     *        the current goal.
-     * @param rule
-     *        the rule being applied.
+     * @param goal the current goal.
+     * @param rule the rule being applied.
      * @return this.
      */
     public AbstractLoopContractBuiltInRuleApp tryToInstantiate(final Goal goal,
@@ -65,7 +61,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
         }
         final Services services = goal.proof().getServices();
         final AbstractLoopContractRule.Instantiation instantiation =
-            rule.instantiate(posInOccurrence().subTerm(), goal, services);
+            rule.instantiate((Term) posInOccurrence().subTerm(), goal);
         final ImmutableSet<LoopContract> contracts =
             AbstractLoopContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement());
@@ -86,12 +82,9 @@ public abstract class AbstractLoopContractBuiltInRuleApp
 
     /**
      *
-     * @param statement
-     *        the new statement.
-     * @param contract
-     *        the new contract.
-     * @param heaps
-     *        the new heap context.
+     * @param statement the new statement.
+     * @param contract the new contract.
+     * @param heaps the new heap context.
      */
     public void update(final JavaStatement statement, final LoopContract contract,
             final List<LocationVariable> heaps) {

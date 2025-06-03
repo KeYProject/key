@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -59,7 +60,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    JFunction generateMbyAtPreFunc(Services services) {
+    Function generateMbyAtPreFunc(Services services) {
         return null;
     }
 
@@ -79,14 +80,14 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     public static ImmutableSet<RewriteTaclet> createInvTaclet(Services services) {
         final TermBuilder TB = services.getTermBuilder();
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
-        final String prefix = WellDefinednessCheck.INV_TACLET;
+        final String prefix = INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         final TermSV heapSV =
             SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
         final TermSV sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
         final Term var = TB.var(sv);
         final Term wdSelf = TB.wd(var);
-        final Term[] heaps = new Term[] { TB.var(heapSV) };
+        final Term[] heaps = { TB.var(heapSV) };
         final Term staticInvTerm = TB.staticInv(heaps, kjt);
         final Term invTerm = TB.inv(heaps, var);
         final Term wdHeaps = TB.and(TB.wd(heaps));
@@ -94,8 +95,8 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
         final Term staticPre = TB.and(wdHeaps, wellFormed);
         final RewriteTaclet inv =
-            WellDefinednessCheck.createTaclet(prefix, var, invTerm, pre, false, services);
-        final RewriteTaclet staticInv = WellDefinednessCheck.createTaclet(prefix + "_Static", var,
+            createTaclet(prefix, var, invTerm, pre, false, services);
+        final RewriteTaclet staticInv = createTaclet(prefix + "_Static", var,
             staticInvTerm, staticPre, true, services);
         return DefaultImmutableSet.<RewriteTaclet>nil().add(inv).add(staticInv);
     }

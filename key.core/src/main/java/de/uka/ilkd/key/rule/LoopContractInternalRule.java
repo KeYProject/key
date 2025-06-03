@@ -7,21 +7,24 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -68,23 +71,18 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      */
     private Instantiation lastInstantiation;
 
-    private LoopContractInternalRule() {}
+    private LoopContractInternalRule() {
+    }
 
     /**
      * Creates preconditions.
      *
-     * @param selfTerm
-     *        the self term.
-     * @param contract
-     *        the loop contract being applied.
-     * @param heaps
-     *        the heaps.
-     * @param localInVariables
-     *        all free program variables in the block.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder.
-     * @param services
-     *        services.
+     * @param selfTerm the self term.
+     * @param contract the loop contract being applied.
+     * @param heaps the heaps.
+     * @param localInVariables all free program variables in the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
+     * @param services services.
      * @return the preconditions.
      */
     private static Term[] createPreconditions(final Term selfTerm, final LoopContract contract,
@@ -106,12 +104,9 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     /**
      * Creates postconditions for the current loop iteration.
      *
-     * @param modifiableClauses
-     *        the loop's modifiable clauses.
-     * @param freeModifiableClauses
-     *        the loop's free modifiable clauses.
-     * @param conditionsAndClausesBuilder
-     *        ConditionsAndClausesBuilder.
+     * @param modifiableClauses the loop's modifiable clauses.
+     * @param freeModifiableClauses the loop's free modifiable clauses.
+     * @param conditionsAndClausesBuilder ConditionsAndClausesBuilder.
      * @return the postconditions for the current loop iteration.
      */
     private static Term[] createPostconditions(
@@ -130,20 +125,13 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     /**
      * Creates postconditions for the next loop iteration.
      *
-     * @param selfTerm
-     *        the self term.
-     * @param contract
-     *        the loop contract being applied.
-     * @param heaps
-     *        the heaps.
-     * @param nextVariables
-     *        the variables for the next loop iteration.
-     * @param modifiableClauses
-     *        the modified clauses.
-     * @param freeModifiableClauses
-     *        the free modified clauses.
-     * @param services
-     *        services.
+     * @param selfTerm the self term.
+     * @param contract the loop contract being applied.
+     * @param heaps the heaps.
+     * @param nextVariables the variables for the next loop iteration.
+     * @param modifiableClauses the modified clauses.
+     * @param freeModifiableClauses the free modified clauses.
+     * @param services services.
      *        * @return the postconditions for the next loop iteration.
      */
     private static Term[] createPostconditionsNext(
@@ -165,14 +153,10 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
     /**
      *
-     * @param heaps
-     *        the heaps.
-     * @param updatesBuilder
-     *        an update builder.
-     * @param instantiation
-     *        the instantiation for the current rule application.
-     * @param services
-     *        services.
+     * @param heaps the heaps.
+     * @param updatesBuilder an update builder.
+     * @param instantiation the instantiation for the current rule application.
+     * @param services services.
      * @return the update for the validity branch.
      */
     private static Term createContext(final List<LocationVariable> heaps,
@@ -184,18 +168,14 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
     /**
      *
-     * @param postconditions
-     *        the postconditions.
-     * @param anonOutHeaps
-     *        the heaps used in the anonOut update.
-     * @param localOutVariables
-     *        all free program variables modified by the block.
-     * @param conditionsAndClausesBuilder
-     *        a ConditionsAndClausesBuilder.
+     * @param postconditions the postconditions.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param localOutVariables all free program variables modified by the block.
+     * @param conditionsAndClausesBuilder a ConditionsAndClausesBuilder.
      * @return preconditions for the usage branch.
      */
     private static Term[] createUsageAssumptions(final Term[] postconditions,
-            final Map<LocationVariable, JFunction> anonOutHeaps,
+            final Map<LocationVariable, Function> anonOutHeaps,
             final ImmutableSet<LocationVariable> localOutVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term wellFormedAnonymisationHeapsCondition =
@@ -210,21 +190,16 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
     /**
      *
-     * @param instantiation
-     *        the instantiation.
-     * @param heaps
-     *        the heaps.
-     * @param anonOutHeaps
-     *        the heaps used in the anonOut update.
-     * @param modifiableClauses
-     *        the modifiable clauses.
-     * @param updatesBuilder
-     *        an update builder
+     * @param instantiation the instantiation.
+     * @param heaps the heaps.
+     * @param anonOutHeaps the heaps used in the anonOut update.
+     * @param modifiableClauses the modifiable clauses.
+     * @param updatesBuilder an update builder
      * @return the updates for the usage branch.
      */
     private static Term[] createUpdates(final Instantiation instantiation,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, JFunction> anonOutHeaps,
+            final Map<LocationVariable, Function> anonOutHeaps,
             final Map<LocationVariable, Term> modifiableClauses,
             final UpdatesBuilder updatesBuilder) {
         final Term contextUpdate = instantiation.update();
@@ -235,25 +210,19 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     /**
-     *
-     * @param goal
-     *        the current goal.
-     * @param selfTerm
-     *        the self term.
-     * @param contract
-     *        the contract being applied.
-     * @param services
-     *        services.
+     * @param goal the current goal.
+     * @param selfTerm the self term.
+     * @param contract the contract being applied.
      * @return the variables for both the current and the next loop iteration.
      */
-    private static LoopContract.Variables[] createVars(final Goal goal, final Term selfTerm,
-            final LoopContract contract, final Services services) {
+    private static AuxiliaryContract.Variables[] createVars(final Goal goal, final Term selfTerm,
+            final LoopContract contract) {
         final LoopContract.Variables variables =
-            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
+            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
                     .createAndRegister(selfTerm, true);
 
         final LoopContract.Variables nextVariables =
-            new VariablesCreatorAndRegistrar(goal, variables, services)
+            new VariablesCreatorAndRegistrar(goal, variables)
                     .createAndRegisterCopies("_NEXT");
         return new LoopContract.Variables[] { variables, nextVariables };
     }
@@ -290,19 +259,20 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
         LoopContractInternalBuiltInRuleApp application =
             (LoopContractInternalBuiltInRuleApp) ruleApp;
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal, services);
+            instantiate((Term) application.posInOccurrence().subTerm(), goal);
         LoopContract contract = application.getContract();
 
         assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement())
                 || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
 
+        var services = goal.getOverlayServices();
         contract = contract.replaceEnhancedForVariables(contract.getBlock(), services);
         contract.setInstantiationSelf(instantiation.self());
 
@@ -311,10 +281,10 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, JFunction> anonOutHeaps =
+        final Map<LocationVariable, Function> anonOutHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables[] vars =
-            createVars(goal, instantiation.self(), contract, services);
+            createVars(goal, instantiation.self(), contract);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
             new ConditionsAndClausesBuilder(contract, heaps, vars[0], instantiation.self(),

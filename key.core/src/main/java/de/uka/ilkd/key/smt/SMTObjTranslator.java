@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaDLFieldNames;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
@@ -21,7 +20,9 @@ import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
@@ -744,10 +745,8 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Casts a term to the specified sort, if the term is not already of that sort.
      *
-     * @param term
-     *        the term to be casted
-     * @param target
-     *        the sort to which the term must be casted
+     * @param term the term to be casted
+     * @param target the sort to which the term must be casted
      * @return the casted term, or the original term if no cast was necessary
      */
     private SMTTerm castTermIfNecessary(SMTTerm term, SMTSort target) {
@@ -790,12 +789,9 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Adds the necessary assertions for a cast function
      *
-     * @param source
-     *        source sort of the cast function
-     * @param target
-     *        target sort of the cast function
-     * @param id
-     *        key where the cast function can be found in the function table
+     * @param source source sort of the cast function
+     * @param target target sort of the cast function
+     * @param id key where the cast function can be found in the function table
      */
     private void addCastAssertions(SMTSort source, SMTSort target, String id) {
         SMTTermVariable v = new SMTTermVariable("v", source);
@@ -901,21 +897,14 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Recursively finds all sorts in a term
      *
-     * @param sorts
-     *        list of accumulated sorts
-     * @param term
-     *        the term where we look for the sorts
+     * @param sorts list of accumulated sorts
+     * @param term the term where we look for the sorts
      */
     private void findSorts(Set<Sort> sorts, Term term) {
-        Sort s = term.sort();
-
-
-        addSingleSort(sorts, s);
+        addSingleSort(sorts, term.sort());
         if (term.op() instanceof SortDependingFunction sdf) {
-            Sort d = sdf.getSortDependingOn();
-            addSingleSort(sorts, d);
+            addSingleSort(sorts, sdf.getSortDependingOn());
         }
-
         for (Term sub : term.subs()) {
             findSorts(sorts, sub);
         }
@@ -941,8 +930,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a KeY problem into a SMTFile.
      *
-     * @param problem
-     *        The KeY proof obligation.
+     * @param problem The KeY proof obligation.
      */
     private SMTFile translateProblem(Term problem) throws IllegalFormulaException {
         SMTFile file = new SMTFile();
@@ -1022,8 +1010,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a KeY term to an SMT term.
      *
-     * @param term
-     *        the KeY term.
+     * @param term the KeY term.
      * @return the SMT term.
      */
     private SMTTerm translateTerm(Term term) throws IllegalFormulaException {
@@ -1068,8 +1055,8 @@ public class SMTObjTranslator implements SMTTranslator {
                 falseCase = castTermIfNecessary(falseCase, sorts.get(ANY_SORT));
             }
             return SMTTerm.ite(condition, trueCase, falseCase);
-        } else if (op == Quantifier.ALL) {
-            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
+        } else if (op == Quantifier.ALL || op == Quantifier.EX) {
+            var vars = term.varsBoundHere(0);
             Debug.assertTrue(vars.size() == 1);
             SMTTermVariable var = translateVariable(vars.get(0));
             List<SMTTermVariable> variables = new LinkedList<>();
@@ -1083,25 +1070,8 @@ public class SMTObjTranslator implements SMTTranslator {
                 SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
                 sub = call.implies(sub);
             }
-            SMTTerm result = SMTTerm.forall(variables, sub, null);
-            quantifiedVariables.remove(quantifiedVariables.size() - 1);
-            return result;
-        } else if (op == Quantifier.EX) {
-            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
-            Debug.assertTrue(vars.size() == 1);
-            SMTTermVariable var = translateVariable(vars.get(0));
-            List<SMTTermVariable> variables = new LinkedList<>();
-            quantifiedVariables.add(var);
-            variables.add(var);
-            Sort sort = vars.get(0).sort();
-            String sortName = sort.name().toString();
-            String id = getTypePredicateName(sortName);
-            SMTTerm sub = translateTerm(term.sub(0));
-            if (typePredicates.containsKey(id) && !sort.equals(objectSort)) {
-                SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
-                sub = call.and(sub);
-            }
-            SMTTerm result = SMTTerm.exists(variables, sub, null);
+            SMTTerm result = op == Quantifier.ALL ? SMTTerm.forall(variables, sub, null)
+                    : SMTTerm.exists(variables, sub, null);
             quantifiedVariables.remove(quantifiedVariables.size() - 1);
             return result;
         } else if (op == Junctor.TRUE) {
@@ -1112,7 +1082,7 @@ public class SMTObjTranslator implements SMTTranslator {
             return nullConstant;
         } else if (op instanceof QuantifiableVariable qop) {
             // translate as variable or constant
-            SMTTermVariable var = translateVariable((QuantifiableVariable) op);
+            SMTTermVariable var = translateVariable(qop);
             if (quantifiedVariables.contains(var)) {
                 return var;
             } else {
@@ -1136,7 +1106,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 return new SMTTermNumber(num, size, sorts.get(BINT_SORT));
             }
 
-        } else if (op instanceof JFunction fun) {
+        } else if (op instanceof Function fun) {
             if (isTrueConstant(fun, services)) {
                 return SMTTerm.TRUE;
             } else if (isFalseConstant(fun, services)) {
@@ -1157,7 +1127,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a quantified variable.
      */
-    private SMTTermVariable translateVariable(QuantifiableVariable q)
+    private SMTTermVariable translateVariable(org.key_project.logic.op.QuantifiableVariable q)
             throws IllegalFormulaException {
         SMTSort s = translateSort(q.sort());
         return new SMTTermVariable(q.name().toString(), s);
@@ -1436,7 +1406,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a function call of function f with argument subs.
      */
-    private SMTTerm translateCall(Function fun, ImmutableArray<Term> subs)
+    private SMTTerm translateCall(Function fun, ImmutableArray<? extends Term> subs)
             throws IllegalFormulaException {
         String name = fun.name().toString();
         // handle sort constants
@@ -1736,7 +1706,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Creates an SMTTermCall using the given function and arguments.
      */
-    private SMTTerm call(SMTFunction function, ImmutableArray<Term> subs)
+    private SMTTerm call(SMTFunction function, ImmutableArray<? extends Term> subs)
             throws IllegalFormulaException {
         List<SMTTerm> subTerms = new LinkedList<>();
         int i = 0;

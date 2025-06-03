@@ -73,15 +73,11 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         Term term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
-        assertFalse(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
+        assertFalse(RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, term2),
             "Terms are different to begin with, so they shouldn't be equal");
-        assertFalse(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
+        assertFalse(RENAMING_TERM_PROPERTY.equalsModThisProperty(term2, term1),
             "Terms are different to begin with, so they shouldn't be equal");
         // other tests for equality already in TestTerm.java
-
-        // ------------ comparison with something that is not a term
-        assertFalse(term1.equalsModProperty(1, RENAMING_TERM_PROPERTY),
-            "Should be false as other object is not a term");
 
         // ------------ differing labels
         term1 =
@@ -90,9 +86,9 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         ImmutableArray<TermLabel> labels1 = new ImmutableArray<>(irrelevantLabel);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, term2),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(term2, term1),
             "Should be true as labels do not matter");
         assertEquals(term1.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             term2.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -101,9 +97,9 @@ public class TestEqualsModProperty {
 
         labels1 = new ImmutableArray<>(relevantLabel1);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, term2),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(term2, term1),
             "Should be true as labels do not matter");
         assertEquals(term1.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             term2.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -111,9 +107,9 @@ public class TestEqualsModProperty {
 
         ImmutableArray<TermLabel> labels2 = new ImmutableArray<>(relevantLabel2);
         term2 = tb.label(term2, labels2);
-        assertTrue(term1.equalsModProperty(term2, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, term2),
             "Should be true as labels do not matter");
-        assertTrue(term2.equalsModProperty(term1, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(term2, term1),
             "Should be true as labels do not matter");
         assertEquals(term1.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             term2.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -195,14 +191,10 @@ public class TestEqualsModProperty {
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
         Term term2 =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.TRUE));
-        assertFalse(term1.equalsModProperty(term2, TERM_LABELS_PROPERTY),
+        assertFalse(TERM_LABELS_PROPERTY.equalsModThisProperty(term1, term2),
             "Terms are different to begin with, so they shouldn't be equal");
-        assertFalse(term2.equalsModProperty(term1, TERM_LABELS_PROPERTY),
+        assertFalse(TERM_LABELS_PROPERTY.equalsModThisProperty(term2, term1),
             "Terms are different to begin with, so they shouldn't be equal");
-
-        // ------------ comparison with something that is not a term
-        assertFalse(term1.equalsModProperty(1, TERM_LABELS_PROPERTY),
-            "Should be false as other object is not a term");
 
         // base terms stay the same for the rest of the tests
         term1 =
@@ -214,9 +206,9 @@ public class TestEqualsModProperty {
         ImmutableArray<TermLabel> labels1 =
             new ImmutableArray<>(relevantLabel1, irrelevantLabel);
         term1 = tb.label(term1, labels1);
-        assertTrue(term1.equalsModProperty(term2, TERM_LABELS_PROPERTY),
+        assertTrue(TERM_LABELS_PROPERTY.equalsModThisProperty(term1, term2),
             "Should be true as underlying terms are equal");
-        assertTrue(term2.equalsModProperty(term1, TERM_LABELS_PROPERTY),
+        assertTrue(TERM_LABELS_PROPERTY.equalsModThisProperty(term2, term1),
             "Should be true as underlying terms are equal");
         assertEquals(term1.hashCodeModProperty(TERM_LABELS_PROPERTY),
             term2.hashCodeModProperty(TERM_LABELS_PROPERTY),
@@ -228,9 +220,9 @@ public class TestEqualsModProperty {
             new ImmutableArray<>(relevantLabel1, relevantLabel2, irrelevantLabel);
         term1 = tb.label(term1, labels1);
         term2 = tb.label(term2, labels2);
-        assertTrue(term1.equalsModProperty(term2, TERM_LABELS_PROPERTY),
+        assertTrue(TERM_LABELS_PROPERTY.equalsModThisProperty(term1, term2),
             "Should be true as underlying terms are equal");
-        assertTrue(term2.equalsModProperty(term1, TERM_LABELS_PROPERTY),
+        assertTrue(TERM_LABELS_PROPERTY.equalsModThisProperty(term2, term1),
             "Should be true as underlying terms are equal");
         assertEquals(term1.hashCodeModProperty(TERM_LABELS_PROPERTY),
             term2.hashCodeModProperty(TERM_LABELS_PROPERTY),
@@ -241,9 +233,9 @@ public class TestEqualsModProperty {
         labels2 = new ImmutableArray<>(relevantLabel1, relevantLabel2);
         term1 = tb.label(term1, labels1);
         term2 = tb.label(term2, labels2);
-        assertTrue(term1.equalsModProperty(term2, TERM_LABELS_PROPERTY),
+        assertTrue(TERM_LABELS_PROPERTY.equalsModThisProperty(term1, term2),
             "Should be true as underlying terms are equal");
-        assertTrue(term2.equalsModProperty(term1, TERM_LABELS_PROPERTY),
+        assertTrue(TERM_LABELS_PROPERTY.equalsModThisProperty(term2, term1),
             "Should be true as underlying terms are equal");
         assertEquals(term1.hashCodeModProperty(TERM_LABELS_PROPERTY),
             term2.hashCodeModProperty(TERM_LABELS_PROPERTY),

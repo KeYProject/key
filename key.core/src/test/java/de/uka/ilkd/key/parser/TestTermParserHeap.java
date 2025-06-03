@@ -4,12 +4,10 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -47,8 +45,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
-        Operator op = Objects.requireNonNull(lookup_func(sort + "::select"));
-        Term[] params = new Term[] { heap, object, field };
+        Operator op = (Operator) lookup_func(sort + "::select");
+        Term[] params = { heap, object, field };
         return tf.createTerm(op, params);
     }
 
@@ -59,30 +57,30 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Test
     public void testLocationSets() throws Exception {
-        String pp = "{(a, testTermParserHeap.A::#f)}";
-        String verbose = "singleton(a,testTermParserHeap.A::#f)";
+        String pp = "{(a, testTermParserHeap.A::$f)}";
+        String verbose = "singleton(a,testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(pp, verbose);
 
         comparePrettySyntaxAgainstVerboseSyntax("{}", "empty");
 
-        pp = "{(a, testTermParserHeap.A::#f), (a, testTermParserHeap.A::#f), (a, testTermParserHeap.A::#f)}";
+        pp = "{(a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f)}";
         Term expected = parseTerm(
-            "union(union(singleton(a,testTermParserHeap.A::#f),singleton(a,testTermParserHeap.A::#f)),singleton(a,testTermParserHeap.A::#f))");
+            "union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
         verifyParsing(expected, pp);
     }
 
     @Test
     public void testParsePrettyPrintedSelect() throws Exception {
         String prettySyntax = "a.f";
-        String verboseSyntax = "int::select(heap, a, testTermParserHeap.A::#f)";
+        String verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         prettySyntax = "a1.f";
-        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A1::#f)";
+        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A1::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         prettySyntax = "a1.(testTermParserHeap.A::f)";
-        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A::#f)";
+        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
@@ -91,11 +89,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         String complicatedHeapPretty =
             "heap[a.f := 4][create(a)][memset({}, 1)][anon(allLocs, heap)]";
         String complicatedHeapVerbose =
-            "anon(memset(create(store(heap, a, testTermParserHeap.A::#f, 4), a), empty, 1), allLocs, heap)";
+            "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
         comparePrettySyntaxAgainstVerboseSyntax(complicatedHeapPretty, complicatedHeapVerbose);
 
         String prettySyntax = "a.f@h[anon({}, h2)]";
-        String verboseSyntax = "int::select(anon(h, empty, h2), a, testTermParserHeap.A::#f)";
+        String verboseSyntax = "int::select(anon(h, empty, h2), a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         /*
@@ -106,8 +104,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         verboseSyntax = "int::select(" + complicatedHeapVerbose + ", " + "int[]::select("
             + complicatedHeapVerbose + ", " + "testTermParserHeap.A::select("
             + complicatedHeapVerbose + ", " + "testTermParserHeap.A::select("
-            + complicatedHeapVerbose + ", " + " a, testTermParserHeap.A::#next)"
-            + ", testTermParserHeap.A::#next)" + ", testTermParserHeap.A::#array)" + ", arr(i))";
+            + complicatedHeapVerbose + ", " + " a, testTermParserHeap.A::$next)"
+            + ", testTermParserHeap.A::$next)" + ", testTermParserHeap.A::$array)" + ", arr(i))";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
@@ -202,7 +200,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            @NonNull
             Term t = io.parseExpression("(a.f + a.f)@h2");
             LOGGER.info("Out: {}", t);
             fail();
@@ -244,15 +241,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Test
     public void testGenericObjectProperties() throws Exception {
         // test pretty syntax
-        comparePrettySyntaxAgainstVerboseSyntax("a.$created",
-            "boolean::select(heap,a,java.lang.Object::$$created)");
-        comparePrettySyntaxAgainstVerboseSyntax("a.$initialized",
-            "boolean::select(heap,a,java.lang.Object::$$initialized)");
-        comparePrettySyntaxAgainstVerboseSyntax("a.$transient",
-            "int::select(heap,a,java.lang.Object::$$transient)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<created>",
+            "boolean::select(heap,a,java.lang.Object::<created>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<initialized>",
+            "boolean::select(heap,a,java.lang.Object::<initialized>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<transient>",
+            "int::select(heap,a,java.lang.Object::<transient>)");
 
         // test fallback mode in case non-default select-type is used
-        parseAndPrint("int::select(heap,a,java.lang.Object::$$created)");
+        parseAndPrint("int::select(heap,a,java.lang.Object::<created>)");
 
     }
 
@@ -457,8 +454,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
 
         // object property
-        pretty = "heap[create(a)][a.$initialized := FALSE]";
-        verbose = "store(create(heap,a),a,java.lang.Object::$$initialized,FALSE)";
+        pretty = "heap[create(a)][a.<initialized> := FALSE]";
+        verbose = "store(create(heap,a),a,java.lang.Object::<initialized>,FALSE)";
         comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
 
     }
@@ -466,8 +463,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     /**
      * Test whether printing is inverse to parsing on a specific {@link String}.
      *
-     * @param s
-     *        Pretty-printed String representation of a term.
+     * @param s Pretty-printed String representation of a term.
      * @throws IOException
      */
     private void parseAndPrint(String s) throws Exception {

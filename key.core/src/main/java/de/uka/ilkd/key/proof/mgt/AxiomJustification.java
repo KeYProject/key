@@ -14,6 +14,7 @@ public class AxiomJustification implements RuleJustification {
         return "axiom justification";
     }
 
+    @Override
     public boolean isAxiomJustification() {
         return true;
     }

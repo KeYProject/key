@@ -324,6 +324,7 @@ public class TaskTree extends JPanel {
         /**
          * invoked if all goals of the proof are closed
          */
+        @Override
         public void proofClosed(ProofTreeEvent e) {
             delegateView.repaint();
         }
@@ -331,6 +332,7 @@ public class TaskTree extends JPanel {
         /**
          * invoked if a proof has been pruned, potentially reopening branches
          */
+        @Override
         public void proofPruned(ProofTreeEvent e) {
             delegateView.repaint();
         }
@@ -340,14 +342,14 @@ public class TaskTree extends JPanel {
          * proof
          * tree.
          */
+        @Override
         public void proofStructureChanged(ProofTreeEvent e) {
             delegateView.repaint();
         }
     } // end of prooftreelistener
 
 
-    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
-            implements java.io.Serializable {
+    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer {
         private static final long serialVersionUID = 2423935787625012908L;
         private static final Icon KEY_ICON = IconFactory.keyHole(20, 20);
         private static final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);

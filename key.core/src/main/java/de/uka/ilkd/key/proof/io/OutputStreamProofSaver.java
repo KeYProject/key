@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -32,9 +31,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -48,9 +45,18 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,8 +182,9 @@ public class OutputStreamProofSaver {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                     StrategyProperties.INF_FLOW_CHECK_TRUE);
                 strategySettings.setActiveStrategyProperties(strategyProperties);
-                for (final SequentFormula s : proof.root().sequent().succedent().asList()) {
-                    ((InfFlowProof) proof).addLabeledTotalTerm(s.formula());
+                for (final SequentFormula s : proof.root().sequent()
+                        .succedent().asList()) {
+                    ((InfFlowProof) proof).addLabeledTotalTerm((Term) s.formula());
                 }
             } else {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
@@ -250,7 +257,7 @@ public class OutputStreamProofSaver {
      */
     private String makePathsRelative(String header) {
         final String[] search =
-            new String[] { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
+            { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
         final String basePath;
         String tmp = header;
         try {
@@ -354,9 +361,10 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
         output.append(getInteresting(appliedRuleApp.instantiations()));
-        final ImmutableList<IfFormulaInstantiation> l = appliedRuleApp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> l =
+            appliedRuleApp.assumesFormulaInstantiations();
         if (l != null) {
-            output.append(ifFormulaInsts(node, l));
+            output.append(assumesFormulaInsts(node, l));
         }
         output.append("");
         userInteraction2Proof(node, output);
@@ -565,7 +573,7 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
 
         output.append(newNames2Proof(node));
-        output.append(builtinRuleIfInsts(node, appliedRuleApp.ifInsts()));
+        output.append(builtinRuleAssumesInsts(node, appliedRuleApp.assumesInsts()));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
@@ -738,11 +746,13 @@ public class OutputStreamProofSaver {
         ps.append(")\n");
     }
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(Sequent seq,
+            PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
-        return " (formula \"" + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
+        return " (formula \""
+            + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
             + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
@@ -769,8 +779,7 @@ public class OutputStreamProofSaver {
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
-        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst
-                .interesting()) {
+        for (final var pair : inst.interesting()) {
             final SchemaVariable var = pair.key();
 
             final Object value = pair.value().getInstantiation();
@@ -799,35 +808,38 @@ public class OutputStreamProofSaver {
         return s.toString();
     }
 
-    public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
+    public String assumesFormulaInsts(Node node,
+            ImmutableList<AssumesFormulaInstantiation> instantiations) {
         StringBuilder s = new StringBuilder();
-        for (final IfFormulaInstantiation aL : l) {
-            if (aL instanceof IfFormulaInstSeq) {
-                final SequentFormula f = aL.getConstrainedFormula();
+        for (final AssumesFormulaInstantiation assumesFormulaInstantiation : instantiations) {
+            final SequentFormula sequentFormula = assumesFormulaInstantiation.getSequentFormula();
+            if (assumesFormulaInstantiation instanceof AssumesFormulaInstSeq assumesFormulaInSequent) {
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
-                                .formulaNumberInSequent(((IfFormulaInstSeq) aL).inAntec(), f))
+                                .formulaNumberInSequent(assumesFormulaInSequent.inAntecedent(),
+                                    sequentFormula))
                         .append("\")");
-            } else if (aL instanceof IfFormulaInstDirect) {
+            } else if (assumesFormulaInstantiation instanceof AssumesFormulaInstDirect) {
 
                 final String directInstantiation =
-                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices());
+                    printTerm((Term) sequentFormula.formula(), node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");
             } else {
-                throw new IllegalArgumentException("Unknown If-Seq-Formula type");
+                throw new IllegalArgumentException("Unknown Assumes-Seq-Formula type");
             }
         }
 
         return s.toString();
     }
 
-    public String builtinRuleIfInsts(Node node, ImmutableList<PosInOccurrence> ifInsts) {
+    public String builtinRuleAssumesInsts(Node node,
+            ImmutableList<PosInOccurrence> assumesInstantiations) {
         StringBuilder s = new StringBuilder();
-        for (final PosInOccurrence ifInst : ifInsts) {
+        for (final PosInOccurrence posOfAssumesInstatiation : assumesInstantiations) {
             s.append(" (ifInst \"\" ");
-            s.append(posInOccurrence2Proof(node.sequent(), ifInst));
+            s.append(posInOccurrence2Proof(node.sequent(), posOfAssumesInstatiation));
             s.append(")");
         }
         return s.toString();
@@ -882,8 +894,8 @@ public class OutputStreamProofSaver {
             return printSequent((Sequent) val, services);
         } else if (val instanceof Name) {
             return val.toString();
-        } else if (val instanceof TermInstantiation) {
-            return printTerm(((TermInstantiation) val).getInstantiation(), services);
+        } else if (val instanceof InstantiationEntry<?> entry) {
+            return printAnything(entry.getInstantiation(), services);
         } else if (val == null) {
             return null;
         } else {

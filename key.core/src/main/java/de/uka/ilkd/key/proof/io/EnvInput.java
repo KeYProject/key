@@ -14,7 +14,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -63,12 +62,12 @@ public interface EnvInput {
     /**
      * gets the classpath elements to be considered here.
      */
-    @NonNull
     List<Path> readClassPath();
 
     /**
      * gets the boot classpath element, null if none set.
      */
+    @Nullable
     Path readBootClassPath();
 
     /**

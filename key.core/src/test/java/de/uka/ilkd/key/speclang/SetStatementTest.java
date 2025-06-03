@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
@@ -40,8 +40,9 @@ public class SetStatementTest {
     /**
      * the filename of the key file which is needed to create Services and JavaInfo
      */
-    private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-        + "setStatements" + File.separator + "testFile.key";
+    private static final Path TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY
+            .resolve("setStatements")
+            .resolve("testFile.key");
 
     /**
      * JavaInfo containing information about the available datatypes and methods
@@ -69,7 +70,7 @@ public class SetStatementTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo = HelperClassForTests.parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
+            javaInfo = HelperClassForTests.parse(TEST_FILE).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
@@ -112,7 +113,7 @@ public class SetStatementTest {
         ImmutableList<TextualJMLConstruct> constructs =
             new de.uka.ilkd.key.speclang.njml.PreParser(true).parseMethodLevel(statementText, null,
                 Position.newOneBased(1, 1));
-        assertEquals(constructs.size(), 1);
+        assertEquals(1, constructs.size());
         assertInstanceOf(TextualJMLSetStatement.class, constructs.head());
         var statement = (TextualJMLSetStatement) constructs.head();
         JmlParser.Set_statementContext context = statement.getAssignment();

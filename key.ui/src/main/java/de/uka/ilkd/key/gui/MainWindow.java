@@ -55,11 +55,9 @@ import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.LruCached;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -70,6 +68,8 @@ import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
 
 import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
@@ -299,7 +299,7 @@ public final class MainWindow extends JFrame {
         setIconImages(IconFactory.applicationLogos());
 
 
-        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);

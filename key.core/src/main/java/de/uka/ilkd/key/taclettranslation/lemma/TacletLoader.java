@@ -34,7 +34,7 @@ public abstract class TacletLoader {
     protected final Profile profile;
     protected ProofEnvironment proofEnvironment;
 
-    public TacletLoader(ProgressMonitor monitor, ProblemInitializerListener listener,
+    protected TacletLoader(ProgressMonitor monitor, ProblemInitializerListener listener,
             Profile profile) {
         super();
         this.monitor = monitor;

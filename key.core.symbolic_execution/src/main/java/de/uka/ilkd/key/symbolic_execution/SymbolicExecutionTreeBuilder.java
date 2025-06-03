@@ -26,7 +26,6 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -40,6 +39,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -59,7 +61,8 @@ import org.key_project.util.java.ArrayUtil;
  * {@link IExecutionStart} which is available via {@link #getProof()}.
  * </p>
  * <p>
- * Some assumptions about how {@link Sequent}s in the proof tree looks like are required to extract
+ * Some assumptions about how {@link org.key_project.prover.sequent.Sequent}s in the proof tree
+ * looks like are required to extract
  * the symbolic execution tree. To make sure that they hold (otherwise exceptions are thrown) it is
  * required to execute the {@link SymbolicExecutionStrategy} in KeY's auto mode and not to apply
  * rules manually or to use other strategies.
@@ -206,24 +209,18 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Constructor.
      *
-     * @param proof
-     *        The {@link Proof} to extract the symbolic execution tree from.
-     * @param mergeBranchConditions
-     *        {@code true} merge branch conditions which means that a branch
+     * @param proof The {@link Proof} to extract the symbolic execution tree from.
+     * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch
      *        condition never contains another branch condition or {@code false} allow that branch
      *        conditions contains branch conditions.
-     * @param useUnicode
-     *        {@code true} use unicode characters, {@code false} do not use unicode
+     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting
-     *        {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param variablesAreOnlyComputedFromUpdates
-     *        {@code true} {@link IExecutionVariable} are only
+     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only
      *        computed from updates, {@code false} {@link IExecutionVariable}s are computed
      *        according to the type structure of the visible memory.
-     * @param simplifyConditions
-     *        {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      */
     public SymbolicExecutionTreeBuilder(Proof proof, boolean mergeBranchConditions,
@@ -243,24 +240,26 @@ public class SymbolicExecutionTreeBuilder {
 
     /**
      * <p>
-     * This method initializes {@link #getMethodCallStack} in case that the initial {@link Sequent}
+     * This method initializes {@link #getMethodCallStack} in case that the initial
+     * {@link org.key_project.prover.sequent.Sequent}
      * contains {@link MethodFrame}s in its modality.
      * </p>
      * <p>
      * This is required because if a block of statements is executed instead of a method the initial
-     * {@link Sequent} contains also a {@link MethodFrame}. This initial {@link MethodFrame} is
+     * {@link org.key_project.prover.sequent.Sequent} contains also a {@link MethodFrame}. This
+     * initial {@link MethodFrame} is
      * required to simulate an execution context which is required to access class members.
      * </p>
      *
-     * @param root
-     *        The root {@link Node} with the initial {@link Sequent}.
-     * @param services
-     *        The {@link Services} to use.
+     * @param root The root {@link Node} with the initial
+     *        {@link org.key_project.prover.sequent.Sequent}.
+     * @param services The {@link Services} to use.
      */
     protected void initMethodCallStack(final Node root, Services services) {
         // Find all modalities in the succedent
         final List<Term> modalityTerms = new LinkedList<>();
-        for (SequentFormula sequentFormula : root.sequent().succedent()) {
+        for (SequentFormula sequentFormula : root.sequent()
+                .succedent()) {
             sequentFormula.formula().execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
@@ -296,7 +295,8 @@ public class SymbolicExecutionTreeBuilder {
             final List<Node> initialStack = new LinkedList<>();
             new JavaASTVisitor(program, services) {
                 @Override
-                protected void doDefaultAction(SourceElement node) {}
+                protected void doDefaultAction(SourceElement node) {
+                }
 
                 @Override
                 public void performActionOnMethodFrame(MethodFrame x) {
@@ -316,8 +316,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method {@link Node}s of method calls for which its return should be ignored. If
      * not already available an empty method {@link Set} is created.
      *
-     * @param ruleApp
-     *        The {@link RuleApp} which modifies a modality {@link Term} with a
+     * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a
      *        {@link SymbolicExecutionTermLabel}.
      * @return The {@link Set} of {@link Node}s to ignore its return.
      */
@@ -330,8 +329,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method {@link Node}s of method calls for which its return should be ignored. If
      * not already available an empty method {@link Set} is created.
      *
-     * @param label
-     *        The {@link SymbolicExecutionTermLabel} which provides the ID.
+     * @param label The {@link SymbolicExecutionTermLabel} which provides the ID.
      * @return The {@link Set} of {@link Node}s to ignore its return.
      */
     protected Set<Node> getMethodReturnsToIgnore(SymbolicExecutionTermLabel label) {
@@ -343,8 +341,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method {@link Node}s of method calls for which its return should be ignored. If
      * not already available an empty method {@link Set} is created.
      *
-     * @param id
-     *        The ID.
+     * @param id The ID.
      * @return The {@link Set} of {@link Node}s to ignore its return.
      */
     protected Set<Node> getMethodReturnsToIgnore(int id) {
@@ -360,13 +357,13 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method call stack. If not already available an empty method call stack is
      * created.
      *
-     * @param ruleApp
-     *        The {@link RuleApp} which modifies a modality {@link Term} with a
+     * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a
      *        {@link SymbolicExecutionTermLabel}.
      * @return The method call stack of the ID of the modified modality {@link Term} with a
      *         {@link SymbolicExecutionTermLabel}.
      */
-    protected Map<Node, ImmutableList<Node>> getMethodCallStack(RuleApp ruleApp) {
+    protected Map<Node, ImmutableList<Node>> getMethodCallStack(
+            RuleApp ruleApp) {
         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
         return getMethodCallStack(label);
     }
@@ -375,8 +372,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method call stack. If not already available an empty method call stack is
      * created.
      *
-     * @param label
-     *        The {@link SymbolicExecutionTermLabel} which provides the ID.
+     * @param label The {@link SymbolicExecutionTermLabel} which provides the ID.
      * @return The method call stack of the ID of the given {@link SymbolicExecutionTermLabel}.
      */
     protected Map<Node, ImmutableList<Node>> getMethodCallStack(SymbolicExecutionTermLabel label) {
@@ -388,8 +384,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the method call stack used for the given ID. If not already available an empty method
      * call stack is created.
      *
-     * @param id
-     *        The ID.
+     * @param id The ID.
      * @return The method call stack of the given ID.
      */
     protected Map<Node, ImmutableList<Node>> getMethodCallStack(int id) {
@@ -480,8 +475,7 @@ public class SymbolicExecutionTreeBuilder {
      * Prunes the symbolic execution tree at the first {@link IExecutionNode} in the parent
      * hierarchy of the given {@link Node} (including the Node itself).
      *
-     * @param node
-     *        {@link Node} to be pruned.
+     * @param node {@link Node} to be pruned.
      * @author Anna Filighera
      * @return The {@link AbstractExecutionNode}'s which where deleted.
      */
@@ -643,8 +637,7 @@ public class SymbolicExecutionTreeBuilder {
         /**
          * Registers the newly completed block.
          *
-         * @param blockCompletion
-         *        The new block completion.
+         * @param blockCompletion The new block completion.
          */
         private void addBlockCompletion(IExecutionNode<?> blockCompletion) {
             if (blockCompletion != null) {
@@ -664,8 +657,7 @@ public class SymbolicExecutionTreeBuilder {
         /**
          * Registers the newly methods return.
          *
-         * @param methodReturn
-         *        The method return.
+         * @param methodReturn The method return.
          */
         private void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
             if (methodReturn != null) {
@@ -708,8 +700,7 @@ public class SymbolicExecutionTreeBuilder {
         /**
          * Constructor.
          *
-         * @param completions
-         *        The {@link SymbolicExecutionCompletions} to update.
+         * @param completions The {@link SymbolicExecutionCompletions} to update.
          */
         public AnalyzerProofVisitor(SymbolicExecutionCompletions completions) {
             this.completions = completions;
@@ -887,13 +878,10 @@ public class SymbolicExecutionTreeBuilder {
      * {@code \add (!(#v=null) & lt(#se, length(#v)) & geq(#se,0) & arrayStoreValid(#v, #se0)==>)}.
      * </p>
      *
-     * @param node
-     *        The {@link Node} to analyze.
-     * @param parentToAddTo
-     *        The parent {@link IExecutionNode} to add the created execution tree
+     * @param node The {@link Node} to analyze.
+     * @param parentToAddTo The parent {@link IExecutionNode} to add the created execution tree
      *        model representation ({@link IExecutionNode}) of the given {@link Node} to.
-     * @param completions
-     *        The {@link SymbolicExecutionCompletions} to update.
+     * @param completions The {@link SymbolicExecutionCompletions} to update.
      * @return The {@link IExecutionNode} to which children of the current {@link Node} should be
      *         added. If no execution tree model representation was created the return value is
      *         identical to the given one (parentToAddTo).
@@ -908,7 +896,8 @@ public class SymbolicExecutionTreeBuilder {
             // Update call stack
             updateCallStack(node, statement);
             // Update block map
-            RuleApp currentOrFutureRuleApplication = node.getAppliedRuleApp();
+            RuleApp currentOrFutureRuleApplication =
+                node.getAppliedRuleApp();
             if (currentOrFutureRuleApplication == null && node != proof.root()) { // Executing
                                                                                   // peekNext() on
                                                                                   // the root
@@ -1005,8 +994,7 @@ public class SymbolicExecutionTreeBuilder {
      * Searches the direct parent {@link IExecutionBranchCondition} representing the 'Body Preserves
      * Invariant' branch.
      *
-     * @param current
-     *        The {@link IExecutionNode} to check its parent
+     * @param current The {@link IExecutionNode} to check its parent
      *        {@link IExecutionBranchCondition}s.
      * @return The found {@link IExecutionBranchCondition} or {@code null} if not available.
      */
@@ -1049,12 +1037,9 @@ public class SymbolicExecutionTreeBuilder {
      * Adds the new created {@link AbstractExecutionNode} to the symbolic execution tree if
      * available and returns the new parent for future detected nodes.
      *
-     * @param node
-     *        The {@link Node}.
-     * @param parentToAddTo
-     *        The parent {@link AbstractExecutionNode}.
-     * @param executionNode
-     *        The new child {@link AbstractExecutionNode}.
+     * @param node The {@link Node}.
+     * @param parentToAddTo The parent {@link AbstractExecutionNode}.
+     * @param executionNode The new child {@link AbstractExecutionNode}.
      * @return The new parent {@link AbstractExecutionNode}.
      */
     protected AbstractExecutionNode<?> addNodeToTreeAndUpdateParent(Node node,
@@ -1086,10 +1071,8 @@ public class SymbolicExecutionTreeBuilder {
      * Updates the call stack ({@link #getMethodCallStack}) if the given {@link Node} in KeY's proof
      * tree is a method call.
      *
-     * @param node
-     *        The current {@link Node}.
-     * @param statement
-     *        The statement ({@link SourceElement}).
+     * @param node The current {@link Node}.
+     * @param statement The statement ({@link SourceElement}).
      */
     protected void updateCallStack(Node node, SourceElement statement) {
         SymbolicExecutionTermLabel label =
@@ -1127,12 +1110,9 @@ public class SymbolicExecutionTreeBuilder {
      * Creates a new execution tree model representation ({@link IExecutionNode}) if possible for
      * the given {@link Node} in KeY's proof tree.
      *
-     * @param parent
-     *        The parent {@link IExecutionNode}.
-     * @param node
-     *        The {@link Node} in the proof tree of KeY.
-     * @param statement
-     *        The actual statement ({@link SourceElement}).
+     * @param parent The parent {@link IExecutionNode}.
+     * @param node The {@link Node} in the proof tree of KeY.
+     * @param statement The actual statement ({@link SourceElement}).
      * @return The created {@link IExecutionNode} or {@code null} if the {@link Node} should be
      *         ignored in the symbolic execution tree.
      */
@@ -1214,10 +1194,8 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Adds the given {@link AbstractExecutionNode} add reason for a new block to the block maps.
      *
-     * @param node
-     *        The current {@link Node}.
-     * @param blockStartNode
-     *        The {@link AbstractExecutionNode} to add.
+     * @param node The current {@link Node}.
+     * @param blockStartNode The {@link AbstractExecutionNode} to add.
      */
     protected void addToBlockMap(Node node, AbstractExecutionBlockStartNode<?> blockStartNode) {
         Pair<Integer, SourceElement> secondPair =
@@ -1228,14 +1206,10 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Adds the given {@link AbstractExecutionNode} add reason for a new block to the block maps.
      *
-     * @param node
-     *        The current {@link Node}.
-     * @param blockStartNode
-     *        The {@link AbstractExecutionNode} to add.
-     * @param stackSize
-     *        TODO
-     * @param sourceElements
-     *        TODO
+     * @param node The current {@link Node}.
+     * @param blockStartNode The {@link AbstractExecutionNode} to add.
+     * @param stackSize TODO
+     * @param sourceElements TODO
      */
     protected void addToBlockMap(Node node, AbstractExecutionBlockStartNode<?> blockStartNode,
             int stackSize, SourceElement... sourceElements) {
@@ -1272,12 +1246,9 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Checks if it possible that the current {@link Node} opens a block.
      *
-     * @param node
-     *        The current {@link Node}.
-     * @param expectedStackSize
-     *        The expected stack size.
-     * @param expectedSourceElements
-     *        The expected after block {@link SourceElement}s.
+     * @param node The current {@link Node}.
+     * @param expectedStackSize The expected stack size.
+     * @param expectedSourceElements The expected after block {@link SourceElement}s.
      * @return {@code false} A block is definitively not possible, {@code true} a block is or might
      *         be possible.
      */
@@ -1327,7 +1298,8 @@ public class SymbolicExecutionTreeBuilder {
             if (seNodeFound) {
                 int currentStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement currentActiveStatement = NodeInfo.computeActiveStatement(ruleApp);
-                JavaBlock currentJavaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
+                Term term = (Term) ruleApp.posInOccurrence().subTerm();
+                JavaBlock currentJavaBlock = term.javaBlock();
                 MethodFrame currentInnerMostMethodFrame =
                     JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
                 return !isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame,
@@ -1344,10 +1316,8 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Searches the relevant after block {@link Map} in the given once for the given {@link Node}.
      *
-     * @param afterBlockMaps
-     *        The available after sblock {@link Map}s.
-     * @param node
-     *        The {@link Node} for which the block {@link Map} is requested.
+     * @param afterBlockMaps The available after sblock {@link Map}s.
+     * @param node The {@link Node} for which the block {@link Map} is requested.
      * @return The found after block {@link Map} or {@code null} if not available.
      */
     protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> findAfterBlockMap(
@@ -1367,8 +1337,7 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Returns the after block map. If not already available an empty block map is created.
      *
-     * @param label
-     *        The {@link SymbolicExecutionTermLabel} which provides the ID.
+     * @param label The {@link SymbolicExecutionTermLabel} which provides the ID.
      * @return The after block map of the ID of the given {@link SymbolicExecutionTermLabel}.
      */
     protected Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> getAfterBlockMaps(
@@ -1381,8 +1350,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the after block map used for the given ID. If not already available an empty block
      * map is created.
      *
-     * @param id
-     *        The ID.
+     * @param id The ID.
      * @return The after block map of the given ID.
      */
     protected Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> getAfterBlockMaps(int id) {
@@ -1397,10 +1365,8 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Updates the after block maps when a symbolic execution tree node is detected.
      *
-     * @param node
-     *        The {@link Node} which is a symbolic execution tree node.
-     * @param ruleApp
-     *        The {@link RuleApp} to consider.
+     * @param node The {@link Node} which is a symbolic execution tree node.
+     * @param ruleApp The {@link RuleApp} to consider.
      * @return The now completed blocks.
      */
     protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(Node node,
@@ -1418,7 +1384,8 @@ public class SymbolicExecutionTreeBuilder {
                 // Compute stack and active statement
                 int stackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-                JavaBlock javaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
+                Term term = (Term) ruleApp.posInOccurrence().subTerm();
+                JavaBlock javaBlock = term.javaBlock();
                 MethodFrame innerMostMethodFrame =
                     JavaTools.getInnermostMethodFrame(javaBlock, proof.getServices());
                 // Create copy with values below level
@@ -1450,10 +1417,8 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Checks if one of the give {@link IExecutionNode}s represents the given {@link Node}.
      *
-     * @param list
-     *        The {@link IExecutionNode}s to check.
-     * @param node
-     *        The {@link Node} to check for.
+     * @param list The {@link IExecutionNode}s to check.
+     * @param node The {@link Node} to check for.
      * @return {@code true} is contained, {@code false} is not contained.
      */
     protected boolean isContained(ImmutableList<IExecutionNode<?>> list, Node node) {
@@ -1471,14 +1436,10 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Checks if the after block condition is fulfilled.
      *
-     * @param currentStackSize
-     *        The current stack size.
-     * @param currentInnerMostMethodFrame
-     *        The current inner most {@link MethodFrame}.
-     * @param currentActiveStatement
-     *        The current active statement.
-     * @param expectedPair
-     *        The {@link JavaPair} specifying the after block statements.
+     * @param currentStackSize The current stack size.
+     * @param currentInnerMostMethodFrame The current inner most {@link MethodFrame}.
+     * @param currentActiveStatement The current active statement.
+     * @param expectedPair The {@link JavaPair} specifying the after block statements.
      * @return {@code true} after block is reached, {@code false} after block is not reached.
      */
     protected boolean isAfterBlockReached(int currentStackSize,
@@ -1491,16 +1452,11 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Checks if the after block condition is fulfilled.
      *
-     * @param currentStackSize
-     *        The current stack size.
-     * @param currentInnerMostMethodFrame
-     *        The current inner most {@link MethodFrame}.
-     * @param currentActiveStatement
-     *        The current active statement.
-     * @param expectedStackSize
-     *        The expected stack size.
-     * @param expectedStatementsIterator
-     *        An {@link Iterator} with the expected after block
+     * @param currentStackSize The current stack size.
+     * @param currentInnerMostMethodFrame The current inner most {@link MethodFrame}.
+     * @param currentActiveStatement The current active statement.
+     * @param expectedStackSize The expected stack size.
+     * @param expectedStatementsIterator An {@link Iterator} with the expected after block
      *        statements.
      * @return {@code true} after block is reached, {@code false} after block is not reached.
      */
@@ -1531,14 +1487,10 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Creates an method return node.
      *
-     * @param parent
-     *        The parent {@link AbstractExecutionNode}.
-     * @param node
-     *        The {@link Node} which represents a method return.
-     * @param statement
-     *        The currently active {@link SourceElement}.
-     * @param completions
-     *        The {@link SymbolicExecutionCompletions} to update.
+     * @param parent The parent {@link AbstractExecutionNode}.
+     * @param node The {@link Node} which represents a method return.
+     * @param statement The currently active {@link SourceElement}.
+     * @param completions The {@link SymbolicExecutionCompletions} to update.
      * @return The created {@link AbstractExecutionMethodReturn}.
      */
     protected AbstractExecutionMethodReturn<?> createMehtodReturn(AbstractExecutionNode<?> parent,
@@ -1587,15 +1539,15 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Checks if the given {@link Node} is not in an implicit method.
      *
-     * @param node
-     *        The {@link Node} to check.
+     * @param node The {@link Node} to check.
      * @return {@code true} is not implicit, {@code false} is implicit
      */
     protected boolean isNotInImplicitMethod(Node node) {
-        Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
-        term = TermBuilder.goBelowUpdates(term);
+        var term = node.getAppliedRuleApp().posInOccurrence().subTerm();
+        Term termNoUpdates = TermBuilder.goBelowUpdates(term);
         Services services = proof.getServices();
-        IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
+        IExecutionContext ec =
+            JavaTools.getInnermostExecutionContext(termNoUpdates.javaBlock(), services);
         IProgramMethod pm = ec.getMethodContext();
         return SymbolicExecutionUtil.isNotImplicit(services, pm);
     }
@@ -1605,8 +1557,7 @@ public class SymbolicExecutionTreeBuilder {
      * the original call stack. For each {@link MethodFrame} in the new modality is its method call
      * {@link Node} added to the new method call stack.
      *
-     * @param node
-     *        The {@link Node} on which the loop invariant rule is applied.
+     * @param node The {@link Node} on which the loop invariant rule is applied.
      */
     protected void initNewLoopBodyMethodCallStack(Node node) {
         PosInOccurrence childPIO = SymbolicExecutionUtil
@@ -1619,8 +1570,7 @@ public class SymbolicExecutionTreeBuilder {
      * original call stack. For each {@link MethodFrame} in the new modality is its method call
      * {@link Node} added to the new method call stack.
      *
-     * @param node
-     *        The {@link Node} on which the block contract rule is applied.
+     * @param node The {@link Node} on which the block contract rule is applied.
      */
     protected void initNewValidiityMethodCallStack(Node node) {
         PosInOccurrence childPIO = SymbolicExecutionUtil
@@ -1631,13 +1581,12 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Initializes a new method call stack.
      *
-     * @param currentNode
-     *        The current {@link Node}.
-     * @param childPIO
-     *        The {@link PosInOccurrence} where the modality has a new symbolic execution
+     * @param currentNode The current {@link Node}.
+     * @param childPIO The {@link PosInOccurrence} where the modality has a new symbolic execution
      *        label counter.
      */
-    protected void initNewMethodCallStack(Node currentNode, PosInOccurrence childPIO) {
+    protected void initNewMethodCallStack(Node currentNode,
+            PosInOccurrence childPIO) {
         Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =
@@ -1647,7 +1596,7 @@ public class SymbolicExecutionTreeBuilder {
         MethodFrameCounterJavaASTVisitor newCounter =
             new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
         int newCount = newCounter.run();
-        Term oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
+        var oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
         oldModality = TermBuilder.goBelowUpdates(oldModality);
         Map<Node, ImmutableList<Node>> currentMethodCallStackMap =
             getMethodCallStack(currentNode.getAppliedRuleApp());
@@ -1693,10 +1642,8 @@ public class SymbolicExecutionTreeBuilder {
         /**
          * Constructor.
          *
-         * @param root
-         *        The {@link ProgramElement} to count the contained {@link MethodFrame}s.
-         * @param services
-         *        The {@link Services} to use.
+         * @param root The {@link ProgramElement} to count the contained {@link MethodFrame}s.
+         * @param services The {@link Services} to use.
          */
         public MethodFrameCounterJavaASTVisitor(ProgramElement root, Services services) {
             super(root, services);
@@ -1706,7 +1653,8 @@ public class SymbolicExecutionTreeBuilder {
          * {@inheritDoc}
          */
         @Override
-        protected void doDefaultAction(SourceElement node) {}
+        protected void doDefaultAction(SourceElement node) {
+        }
 
         /**
          * {@inheritDoc}
@@ -1730,8 +1678,7 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Computes the method call stack of the given {@link Node}.
      *
-     * @param node
-     *        The {@link Node}.
+     * @param node The {@link Node}.
      * @return The computed method call stack.
      */
     protected IExecutionNode<?>[] createCallStack(Node node) {
@@ -1765,11 +1712,11 @@ public class SymbolicExecutionTreeBuilder {
      * Finds the {@link Node} in the proof tree of KeY which has called the method that is now
      * executed or returned in the {@link Node}.
      *
-     * @param currentNode
-     *        The {@link Node} for that the method call {@link Node} is needed.
+     * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
      * @return The found call {@link Node} or {@code null} if no one was found.
      */
-    protected Node findMethodCallNode(Node currentNode, RuleApp ruleApp) {
+    protected Node findMethodCallNode(Node currentNode,
+            RuleApp ruleApp) {
         // Compute the stack frame size before the method is called
         int returnStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
         // Return the method from the call stack
@@ -1785,8 +1732,7 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Checks if the given {@link Node} handles something in an implicit method.
      *
-     * @param node
-     *        The {@link Node} to check.
+     * @param node The {@link Node} to check.
      * @return {@code true} is in implicit method, {@code false} is not in implicit method.
      */
     protected boolean isInImplicitMethod(Node node) {
@@ -1796,8 +1742,7 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Checks if the given {@link Node} has a branch condition.
      *
-     * @param node
-     *        The {@link Node} to check.
+     * @param node The {@link Node} to check.
      * @return {@code true} has branch condition, {@code false} has no branch condition.
      */
     protected boolean hasBranchCondition(Node node) {
@@ -1827,8 +1772,7 @@ public class SymbolicExecutionTreeBuilder {
      * Searches the first node in the parent hierarchy (including the given node) which executes a
      * statement.
      *
-     * @param node
-     *        The {@link Node} to start search in.
+     * @param node The {@link Node} to start search in.
      * @return The found {@link Node} with the symbolic statement or {@code null} if no one was
      *         found.
      */
@@ -1842,10 +1786,8 @@ public class SymbolicExecutionTreeBuilder {
     /**
      * Adds the child to the parent.
      *
-     * @param parent
-     *        The parent to add to.
-     * @param child
-     *        The child to add.
+     * @param parent The parent to add to.
+     * @param child The child to add.
      */
     protected void addChild(AbstractExecutionNode<?> parent, AbstractExecutionNode<?> child) {
         child.setParent(parent);
@@ -1856,8 +1798,7 @@ public class SymbolicExecutionTreeBuilder {
      * Returns the best matching {@link IExecutionNode} for the given proof {@link Node} in the
      * parent hierarchy.
      *
-     * @param proofNode
-     *        The proof {@link Node}.
+     * @param proofNode The proof {@link Node}.
      * @return The best matching {@link IExecutionNode} or {@code null} if not available.
      */
     public IExecutionNode<?> getBestExecutionNode(Node proofNode) {
@@ -1878,8 +1819,7 @@ public class SymbolicExecutionTreeBuilder {
      * a return statement and a method return, the last node is returned.
      * </p>
      *
-     * @param proofNode
-     *        The {@link Node} in KeY's proof tree.
+     * @param proofNode The {@link Node} in KeY's proof tree.
      * @return The {@link IExecutionNode} representation or {@code null} if no one is available.
      */
     public IExecutionNode<?> getExecutionNode(Node proofNode) {
@@ -1916,10 +1856,8 @@ public class SymbolicExecutionTreeBuilder {
         /**
          * Constructor.
          *
-         * @param stackSize
-         *        The call stack size.
-         * @param elementsOfInterest
-         *        The {@link SourceElement}s of interest.
+         * @param stackSize The call stack size.
+         * @param elementsOfInterest The {@link SourceElement}s of interest.
          */
         public JavaPair(Integer stackSize, ImmutableList<SourceElement> elementsOfInterest) {
             super(stackSize, elementsOfInterest);

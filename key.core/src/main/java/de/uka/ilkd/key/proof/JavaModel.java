@@ -35,7 +35,7 @@ public final class JavaModel {
             Path bootClassPath, Includes includes, Path initialFile) {
         JavaModel result;
         if (javaPath == null) {
-            result = JavaModel.NO_MODEL;
+            result = NO_MODEL;
         } else {
             result = new JavaModel(javaPath, classPath, bootClassPath, includes, initialFile);
         }

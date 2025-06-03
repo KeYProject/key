@@ -43,7 +43,7 @@ public abstract class ProofTreeViewFilter {
     /**
      * All ProofTreeViewFilters.
      */
-    public final static ProofTreeViewFilter[] ALL = new ProofTreeViewFilter[] { HIDE_INTERMEDIATE,
+    public final static ProofTreeViewFilter[] ALL = { HIDE_INTERMEDIATE,
         ONLY_INTERACTIVE, HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
 
     /**
@@ -51,7 +51,7 @@ public abstract class ProofTreeViewFilter {
      * which operate on single nodes.
      */
     public final static ProofTreeViewFilter[] ALL_GLOBAL_FILTERS =
-        new ProofTreeViewFilter[] { HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
+        { HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
 
     /**
      *
@@ -227,7 +227,7 @@ public abstract class ProofTreeViewFilter {
             }
 
             // count if child is inlined because of a hidden subtree
-            for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL_GLOBAL_FILTERS) {
+            for (ProofTreeViewFilter filter : ALL_GLOBAL_FILTERS) {
                 if (filter.isActive() && !(parent.getChildAt(pos + 1) instanceof GUIBranchNode)
                         && node.getNode().childrenCount() != 1) {
                     return true;
@@ -274,7 +274,7 @@ public abstract class ProofTreeViewFilter {
             }
 
             // count if child is inlined because of a hidden subtree
-            for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL_GLOBAL_FILTERS) {
+            for (ProofTreeViewFilter filter : ALL_GLOBAL_FILTERS) {
                 if (filter.isActive() && !(parent.getChildAt(pos + 1) instanceof GUIBranchNode)
                         && node.getNode().childrenCount() != 1) {
                     return true;

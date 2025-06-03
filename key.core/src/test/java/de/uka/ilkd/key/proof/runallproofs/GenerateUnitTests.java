@@ -100,10 +100,8 @@ public class GenerateUnitTests {
      * Generates the test classes for the given proof collection, and writes the
      * java files.
      *
-     * @param unit
-     *        a group of proof collection units
-     * @throws IOException
-     *         if the file is not writable
+     * @param unit a group of proof collection units
+     * @throws IOException if the file is not writable
      */
     private static void createUnitClass(RunAllProofsTestUnit unit)
             throws IOException {
@@ -118,12 +116,15 @@ public class GenerateUnitTests {
         Map<String, String> vars = new TreeMap<>();
         vars.put("className", className);
         vars.put("packageName", packageName);
-        vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath());
+        vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath()
+                .replaceAll("\\\\", "/"));
         vars.put("statisticsFile",
-            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath());
+            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath()
+                    .replaceAll("\\\\", "/"));
         vars.put("name", name);
         vars.put("reloadEnabled", String.valueOf(settings.reloadEnabled()));
-        vars.put("tempDir", settings.getTempDir().getAbsolutePath());
+        vars.put("tempDir", settings.getTempDir().getAbsolutePath()
+                .replaceAll("\\\\", "/"));
 
         vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
         vars.put("localSettings",
@@ -166,16 +167,16 @@ public class GenerateUnitTests {
 
             switch (file.getTestProperty()) {
             case PROVABLE -> methods.append("assertProvability(\"")
-                    .append(keyFile.getAbsolutePath())
+                    .append(keyFile.getAbsolutePath().replaceAll("\\\\", "/"))
                     .append("\");");
             case NOTPROVABLE -> methods.append("assertUnProvability(\"")
-                    .append(keyFile.getAbsolutePath())
+                    .append(keyFile.getAbsolutePath().replaceAll("\\\\", "/"))
                     .append("\");");
             case LOADABLE -> methods.append("assertLoadability(\"")
-                    .append(keyFile.getAbsolutePath())
+                    .append(keyFile.getAbsolutePath().replaceAll("\\\\", "/"))
                     .append("\");");
             case NOTLOADABLE -> methods.append("assertUnLoadability(\"")
-                    .append(keyFile.getAbsolutePath())
+                    .append(keyFile.getAbsolutePath().replaceAll("\\\\", "/"))
                     .append("\");");
             }
             methods.append("}");

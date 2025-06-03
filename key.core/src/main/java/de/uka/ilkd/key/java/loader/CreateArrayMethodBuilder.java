@@ -210,7 +210,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     public IProgramMethod getArrayInstanceAllocatorMethod(TypeReference arrayTypeReference) {
 
-        final Modifier[] modifiers = new Modifier[] { new Private(), new Static() };
+        final Modifier[] modifiers = { new Private(), new Static() };
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
@@ -247,7 +247,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 arrayRef)));
 
         body.add(new MethodReference(new ImmutableArray<>(),
-            new ProgramElementName(CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
+            new ProgramElementName(IMPLICIT_ARRAY_CREATION_HELPER),
             newObject));
 
         body.add(new Return(newObject));
@@ -314,7 +314,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public IProgramMethod getCreateArrayHelperMethod(TypeReference arrayTypeReference,
             ProgramVariable length, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = new Modifier[] { new Private() };
+        final Modifier[] modifiers = { new Private() };
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
@@ -333,7 +333,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public IProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
             IProgramMethod prepare, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = new Modifier[] { new Protected(), new Static() };
+        final Modifier[] modifiers = { new Protected(), new Static() };
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
@@ -375,7 +375,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
 
         final LocalVariableDeclaration forInit =
-            KeYJavaASTFactory.declare(new ProgramElementName("i"), zero, integerType);
+            declare(new ProgramElementName("i"), zero, integerType);
 
         final ProgramVariable pv =
             (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();

@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 /**
@@ -35,24 +35,22 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(
-            Operator op, Term[] subs,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(
-            Operator op, Term left, Term right,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term left,
+            Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(
-            Operator op, Term sub,
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -61,7 +59,7 @@ public final class RealLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
         // return skolem term
-        final JFunction sk =
+        final Function sk =
             new JFunction(new Name(String.valueOf(NAME) + lit), targetSort());
         return services.getTermBuilder().func(sk);
     }
@@ -82,8 +80,7 @@ public final class RealLDT extends LDT {
     // }
 
     @Override
-    public JFunction getFunctionFor(
-            Operator op,
+    public Function getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op,
             Services services,
             ExecutionContext ec) {
         assert false;

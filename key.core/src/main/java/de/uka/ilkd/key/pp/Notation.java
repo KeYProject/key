@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulate the concrete syntax used to print a term. The {@link NotationInfo} class associates a
- * Notation with every {@link de.uka.ilkd.key.logic.op.Operator}. The various inner classes of this
+ * Notation with every {@link Operator}. The various inner classes of this
  * class represent different kinds of concrete syntax, like prefix, infix, postfix, function style,
  * attribute style, etc.
  */
@@ -188,7 +189,7 @@ public abstract class Notation {
     /**
      * The concrete syntax for DL modalities represented with a SchemaVariable.
      */
-    public static final class ModalSVNotation extends Notation {
+    public static final class ModalSVNotation extends SchemaVariableNotation {
         private final int ass;
 
         public ModalSVNotation(int prio, int ass) {
@@ -197,7 +198,7 @@ public abstract class Notation {
         }
 
         public void print(Term t, LogicPrinter sp) {
-            sp.printModalityTerm("\\modality{" + t.op().name().toString() + "}", t.javaBlock(),
+            sp.printModalityTerm("\\modality{" + t.op().name() + "}", t.javaBlock(),
                 "\\endmodality", t, ass);
         }
     }
@@ -486,9 +487,15 @@ public abstract class Notation {
      * The standard concrete syntax for all kinds of variables.
      */
     public static class VariableNotation extends Notation {
+
         public VariableNotation() {
             super(1000);
         }
+
+        protected VariableNotation(int priority) {
+            super(priority);
+        }
+
 
         public void print(Term t, LogicPrinter sp) {
             if (t.op() instanceof ProgramVariable) {
@@ -503,7 +510,69 @@ public abstract class Notation {
     }
 
 
-    public static final class SchemaVariableNotation extends VariableNotation {
+    public static class SchemaVariableNotation extends VariableNotation {
+
+        public SchemaVariableNotation() {
+            super();
+        }
+
+        protected SchemaVariableNotation(int prio) {
+            super(prio);
+        }
+
+        public void printDeclaration(SchemaVariable v, LogicPrinter sp) {
+
+            String svType;
+            String specificSort = "";
+            if (v instanceof OperatorSV) {
+                switch (v) {
+                case ProgramSV psv -> {
+                    svType = "\\program";
+                    specificSort = psv.sort().declarationString();
+                }
+                case TermSV tsv -> {
+                    svType = "\\term";
+                    specificSort = tsv.sort().name().toString();
+                }
+                case FormulaSV fsv -> {
+                    svType = "\\formula";
+                    specificSort = fsv.sort().name().toString();
+                }
+                case VariableSV varSV -> {
+                    svType = "\\variables";
+                    specificSort = varSV.sort().name().toString();
+                }
+                case UpdateSV ignored -> svType = "\\update";
+                case SkolemTermSV skolemTermSV -> {
+                    if (skolemTermSV.sort() == JavaDLTheory.FORMULA) {
+                        svType = "\\skolemFormula";
+                    } else {
+                        svType = "\\skolemTerm";
+                        specificSort = skolemTermSV.sort().name().toString();
+                    }
+                }
+                case TermLabelSV ignored -> svType = "\\termlabel";
+                default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
+                }
+                sp.layouter().print("\\schemaVar ").print(svType + " ").print(specificSort)
+                        .print(" ").print(v.name().toString());
+            } else if (v instanceof ModalOperatorSV modalOperatorSV) {
+                sp.layouter().beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
+                boolean first = true;
+                for (Modality.JavaModalityKind modality : modalOperatorSV.getModalities()) {
+                    if (!first) {
+                        sp.layouter().print(",").brk();
+                    } else {
+                        first = false;
+                    }
+                    sp.layouter().print(modality.name().toString());
+                }
+                sp.layouter().end().brk(0).print("}").end().print(" ")
+                        .print(modalOperatorSV.name().toString());
+            } else {
+                throw new RuntimeException("Unknown variable type: " + v.getClass());
+            }
+        }
 
         @SuppressWarnings("unchecked")
         public void print(Term t, LogicPrinter sp) {

@@ -5,12 +5,16 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -19,7 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * Cache that is used for accelerating <code>TermTacletAppIndex</code>. Basically, this is a mapping
  * from terms to objects of <code>TermTacletAppIndex</code>, following the idea that the same
  * taclets will be applicable to an occurrence of the same term in different places.
- *
+ * <p>
  * There are different categories of locations/areas in a term that have to be separated, because
  * different taclets could be applicable. These are:
  * <ul>
@@ -33,7 +37,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * <li>Below programs. Again, we also have to distinguish different prefixes of a position.</li>
  * <li>Below other "bad" operators. We do not cache at all in such places.</li>
  * </ul>
- *
+ * </p>
  * We identify these different areas with an automaton that walks from the root of a formula to a
  * subformula or subterm, roughly following the state design pattern. The transition function is
  * realised by the method <code>ITermTacletAppIndexCache.descend</code>.
@@ -49,14 +53,17 @@ public class TermTacletAppIndexCacheSet {
      * dummy cache that is not caching at all, and from which no other cache is reachable
      */
     private final static ITermTacletAppIndexCache noCache = new ITermTacletAppIndexCache() {
+        @Override
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             return this;
         }
 
+        @Override
         public TermTacletAppIndex getIndexForTerm(Term t) {
             return null;
         }
 
+        @Override
         public void putIndexForTerm(Term t, TermTacletAppIndex index) {}
     };
 
@@ -136,7 +143,7 @@ public class TermTacletAppIndexCacheSet {
     }
 
     /**
-     * @return <code>true</code> iff <code>t</code> is a taclet that might possibly be cached by any
+     * @return <code>true</code> iff <code>t</code> is a taclet that might be cached by any
      *         of the caches of this set
      */
     public boolean isRelevantTaclet(Taclet t) {
@@ -206,7 +213,7 @@ public class TermTacletAppIndexCacheSet {
      */
     private boolean isAcceptedOperator(Operator op) {
         return op instanceof IfThenElse
-                || (op instanceof JFunction && !(op instanceof Transformer))
+                || (op instanceof Function && !(op instanceof Transformer))
                 || op instanceof Junctor || op instanceof Equality || op instanceof Quantifier
                 || op instanceof UpdateApplication || op instanceof Modality;
     }
@@ -219,6 +226,7 @@ public class TermTacletAppIndexCacheSet {
             super(prefix, cache);
         }
 
+        @Override
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             if (isUpdateTargetPos(t, subtermIndex)) {
                 return getBelowUpdateCache(getExtendedPrefix(t, subtermIndex));
@@ -236,6 +244,7 @@ public class TermTacletAppIndexCacheSet {
             return noCache;
         }
 
+        @Override
         protected String name() {
             return "TopLevelCache" + getPrefix();
         }
@@ -248,6 +257,7 @@ public class TermTacletAppIndexCacheSet {
             super(prefix);
         }
 
+        @Override
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             final Operator op = t.op();
             if (op instanceof Modality) {
@@ -261,10 +271,12 @@ public class TermTacletAppIndexCacheSet {
             return noCache;
         }
 
+        @Override
         public TermTacletAppIndex getIndexForTerm(Term t) {
             return null;
         }
 
+        @Override
         public void putIndexForTerm(Term t, TermTacletAppIndex index) {}
     }
 
@@ -276,6 +288,7 @@ public class TermTacletAppIndexCacheSet {
             super(prefix, cache);
         }
 
+        @Override
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             if (isAcceptedOperator(t.op())) {
                 return getBelowProgCache(getExtendedPrefix(t, subtermIndex));
@@ -284,6 +297,7 @@ public class TermTacletAppIndexCacheSet {
             return noCache;
         }
 
+        @Override
         protected String name() {
             return "BelowProgCache" + getPrefix();
         }

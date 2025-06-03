@@ -132,8 +132,7 @@ public final class TypeConverter {
         return LDTs.values();
     }
 
-    private Term translateOperator(
-            Operator op,
+    private Term translateOperator(Operator op,
             ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
@@ -232,7 +231,7 @@ public final class TypeConverter {
                 || exact && !context.getSort().equals(s)) {
             inst = (LocationVariable) services.getJavaInfo()
                     .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, context);
-            final JFunction fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
+            final Function fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
             result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
@@ -271,20 +270,20 @@ public final class TypeConverter {
         } else if (var == services.getJavaInfo().getArrayLength()) {
             return tb.dotLength(convertReferencePrefix(prefix, ec));
         } else if (var.isStatic()) {
-            final JFunction fieldSymbol =
+            final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.staticDot(var.sort(), fieldSymbol);
         } else if (prefix == null) {
             if (var.isMember()) {
-                final JFunction fieldSymbol =
+                final Function fieldSymbol =
                     heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
                 return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
                     fieldSymbol);
             } else {
-                return tb.var((LocationVariable) var);
+                return tb.var(var);
             }
         } else if (!(prefix instanceof PackageReference)) {
-            final JFunction fieldSymbol =
+            final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
         }
@@ -306,7 +305,7 @@ public final class TypeConverter {
     private Term convertToInstanceofTerm(Instanceof io, ExecutionContext ec) {
         final KeYJavaType type = ((TypeReference) io.getChildAt(1)).getKeYJavaType();
         final Term obj = convertToLogicElement(io.getChildAt(0), ec);
-        final JFunction instanceOfSymbol =
+        final Function instanceOfSymbol =
             getJavaDLTheory().getInstanceofSymbol(type.getSort(), services);
 
         // in JavaDL S::instance(o) is also true if o (for reference types S)
@@ -356,8 +355,7 @@ public final class TypeConverter {
     /**
      * dispatches the given literal and converts it
      *
-     * @param lit
-     *        the Literal to be converted
+     * @param lit the Literal to be converted
      * @return the Term representing <tt>lit</tt> in the logic
      */
     private Term convertLiteralExpression(Literal lit) {
@@ -386,7 +384,6 @@ public final class TypeConverter {
 
 
     // TODO Adapt for @Reals
-
     /**
      * performs binary numeric promotion on the argument types
      */
@@ -516,10 +513,8 @@ public final class TypeConverter {
      * retrieves the type of the expression <tt>e</tt> with respect to the context in which it is
      * evaluated
      *
-     * @param e
-     *        the Expression whose type has to be retrieved
-     * @param ec
-     *        the ExecutionContext of expression <tt>e</tt>
+     * @param e the Expression whose type has to be retrieved
+     * @param ec the ExecutionContext of expression <tt>e</tt>
      * @return the KeYJavaType of expression <tt>e</tt>
      */
     public KeYJavaType getKeYJavaType(Expression e, ExecutionContext ec) {
@@ -534,11 +529,9 @@ public final class TypeConverter {
      * converts a logical term to an AST node if possible. If this fails it throws a runtime
      * exception.
      *
-     * @param term
-     *        the Term to be converted
+     * @param term the Term to be converted
      * @return the Term as a program AST node of type expression
-     * @throws RuntimeException
-     *         iff a conversion is not possible
+     * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
         assert term != null;
@@ -598,7 +591,7 @@ public final class TypeConverter {
         KeYJavaType result = null;
         if (t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
             result = services.getJavaInfo().getKeYJavaType(t.sort());
-        } else if (t.op() instanceof JFunction) {
+        } else if (t.op() instanceof Function) {
             for (LDT ldt : LDTs.values()) {
                 if (ldt.containsFunction((Function) t.op())) {
                     Type type = ldt.getType(t);
@@ -749,6 +742,7 @@ public final class TypeConverter {
 
 
     public boolean isImplicitNarrowing(Expression expr, PrimitiveType to) {
+
         int minValue, maxValue;
         if (to == PrimitiveType.JAVA_BYTE) {
             minValue = Byte.MIN_VALUE;
@@ -972,8 +966,7 @@ public final class TypeConverter {
         return TC;
     }
 
-    private LDT getResponsibleLDT(
-            Operator op, Term[] subs,
+    private LDT getResponsibleLDT(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.java;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -34,7 +35,7 @@ public class TestJavaInfo {
     @BeforeAll
     static void setUp() {
         if (services == null || javaInfo == null) {
-            final ProofAggregate agg = HelperClassForTests.parse(new File(testfile));
+            final ProofAggregate agg = HelperClassForTests.parse(Paths.get(testfile));
             services = agg.getFirstProof().getServices();
             javaInfo = services.getJavaInfo();
         }
@@ -91,12 +92,12 @@ public class TestJavaInfo {
 
     }
 
-    private static final String[] implictFieldsClassOnly = new String[] {
+    private static final String[] implictFieldsClassOnly = {
         PipelineConstants.IMPLICIT_CLASS_ERRONEOUS,
         PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS,
         PipelineConstants.IMPLICIT_CLASS_INITIALIZED, PipelineConstants.IMPLICIT_CLASS_PREPARED };
 
-    private static final String[] generalImplicitFields = new String[] {
+    private static final String[] generalImplicitFields = {
         PipelineConstants.IMPLICIT_CREATED, PipelineConstants.IMPLICIT_INITIALIZED };
 
 
@@ -177,7 +178,7 @@ public class TestJavaInfo {
     @Test
     public void testGetPrimitiveKJT() {
         final String[] primitiveTypeNames =
-            new String[] { "long", "int", "short", "byte", "char", "boolean" };
+            { "long", "int", "short", "byte", "char", "boolean" };
 
         for (String primitiveTypeName : primitiveTypeNames) {
             assertNotNull(javaInfo.getPrimitiveKeYJavaType(primitiveTypeName),

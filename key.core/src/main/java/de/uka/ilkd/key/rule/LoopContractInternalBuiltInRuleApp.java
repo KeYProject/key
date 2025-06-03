@@ -6,11 +6,11 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -22,10 +22,8 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
 
     /**
      *
-     * @param rule
-     *        the rule being applied.
-     * @param occurrence
-     *        the position at which the rule is applied.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
      */
     public LoopContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
@@ -34,21 +32,16 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
 
     /**
      *
-     * @param rule
-     *        the rule being applied.
-     * @param occurrence
-     *        the position at which the rule is applied.
-     * @param ifInstantiations
-     *        if instantiations.
-     * @param statement
-     *        the statement which the applied contract belongs to.
-     * @param contract
-     *        the contract being applied.
-     * @param heaps
-     *        the heap context.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
+     * @param statement the statement which the applied contract belongs to.
+     * @param contract the contract being applied.
+     * @param heaps the heap context.
      */
     public LoopContractInternalBuiltInRuleApp(final BuiltInRule rule,
-            final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,
+            final PosInOccurrence occurrence,
+            final ImmutableList<PosInOccurrence> ifInstantiations,
             final JavaStatement statement, final LoopContract contract,
             final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
@@ -67,7 +60,7 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
     }
 
     @Override
-    public LoopContractInternalBuiltInRuleApp setIfInsts(
+    public LoopContractInternalBuiltInRuleApp setAssumesInsts(
             final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;

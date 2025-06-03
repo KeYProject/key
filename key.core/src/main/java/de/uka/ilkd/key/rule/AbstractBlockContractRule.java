@@ -22,9 +22,7 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -43,6 +41,10 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -61,12 +63,9 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param instantiation
-     *        an instantiation.
-     * @param goal
-     *        the current goal.
-     * @param services
-     *        services.
+     * @param instantiation an instantiation.
+     * @param goal the current goal.
+     * @param services services.
      * @return all applicable block contracts for the instantiation.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
@@ -79,14 +78,10 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     /**
-     * @param specifications
-     *        a specification repository.
-     * @param statement
-     *        a block.
-     * @param modalityKind
-     *        the current goal's modality.
-     * @param goal
-     *        the current goal.
+     * @param specifications a specification repository.
+     * @param statement a block.
+     * @param modalityKind the current goal's modality.
+     * @param goal the current goal.
      * @return all applicable block contracts for the block from the repository.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
@@ -113,10 +108,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param collectedContracts
-     *        a set of block contracts.
-     * @param goal
-     *        the current goal.
+     * @param collectedContracts a set of block contracts.
+     * @param goal the current goal.
      * @return the set with all non-applicable contracts filtered out.
      */
     protected static ImmutableSet<BlockContract> filterAppliedContracts(
@@ -132,10 +125,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param contract
-     *        a block contract.
-     * @param goal
-     *        the current goal.
+     * @param contract a block contract.
+     * @param goal the current goal.
      * @return {@code true} if the contract has already been applied.
      */
     protected static boolean contractApplied(final BlockContract contract, final Goal goal) {
@@ -179,24 +170,21 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param variables
-     *        variables.
-     * @param contract
-     *        a block contract.
-     * @param services
-     *        services.
+     * @param variables variables.
+     * @param contract a block contract.
+     * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
-    protected static Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
+    protected static Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final BlockContract contract,
             final TermServices services) {
-        Map<LocationVariable, JFunction> result = new LinkedHashMap<>(40);
+        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiableClause(variable)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final JFunction anonymisationFunction =
+                final Function anonymisationFunction =
                     new JFunction(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
@@ -308,7 +296,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         return afterAssumptions;
     }
 
-    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
+    static SequentFormula buildBodyPreservesSequent(
+            InfFlowPOSnippetFactory f, InfFlowProof proof) {
         Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
@@ -361,7 +350,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         InfFlowPOSnippetFactory infFlowFactory =
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, ec, services);
 
-        final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
+        final SequentFormula poFormula =
+            buildBodyPreservesSequent(infFlowFactory, proof);
 
         // add proof obligation to goal
         infFlowGoal.addFormula(poFormula, false, true);
@@ -377,7 +367,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return false;
         }
         final Instantiation instantiation =
-            instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+            instantiate((Term) occurrence.subTerm(), goal);
         if (instantiation == null) {
             return false;
         }
@@ -387,20 +377,15 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     /**
-     *
-     * @param formula
-     *        the formula on which the rule is to be applied.
-     * @param goal
-     *        the current goal.
-     * @param services
-     *        services.
+     * @param formula the formula on which the rule is to be applied.
+     * @param goal the current goal.
      * @return a new instantiation.
      */
-    public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
+    public Instantiation instantiate(final Term formula, final Goal goal) {
         if (formula == getLastFocusTerm()) {
             return getLastInstantiation();
         } else {
-            final Instantiation result = new Instantiator(formula, goal, services).instantiate();
+            final Instantiation result = new Instantiator(formula, goal).instantiate();
             setLastFocusTerm(formula);
             setLastInstantiation(result);
             return result;
@@ -421,7 +406,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
             final BlockContract contract,
-            final Map<LocationVariable, JFunction> anonymisationHeaps,
+            final Map<LocationVariable, Function> anonymisationHeaps,
             final Services services, final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
@@ -497,15 +482,11 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
         /**
          *
-         * @param formula
-         *        the formula on which the rule is to be applied.
-         * @param goal
-         *        the current goal.
-         * @param services
-         *        services.
+         * @param formula the formula on which the rule is to be applied.
+         * @param goal the current goal.
          */
-        public Instantiator(final Term formula, final Goal goal, final Services services) {
-            super(formula, goal, services);
+        public Instantiator(final Term formula, final Goal goal) {
+            super(formula, goal);
         }
 
         @Override

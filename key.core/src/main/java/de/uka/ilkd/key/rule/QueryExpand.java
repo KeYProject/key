@@ -19,14 +19,20 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -63,15 +69,15 @@ public class QueryExpand implements BuiltInRule {
     private final WeakHashMap<Term, Long> timeOfTerm = new WeakHashMap<>(DEFAULT_MAP_SIZE);
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         final PosInOccurrence pio = ruleApp.posInOccurrence();
-        final Term query = pio.subTerm();
+        final Term query = (Term) pio.subTerm();
 
         // new goal
         ImmutableList<Goal> newGoal = goal.split(1);
         Goal g = newGoal.head();
-
+        var services = goal.getOverlayServices();
         Pair<Term, Term> queryEval = queryEvalTerm(services, query, null);
 
         // The following additional rewrite taclet increases performance
@@ -158,7 +164,7 @@ public class QueryExpand implements BuiltInRule {
         final MethodReference mr =
             new MethodReference(args, method.getProgramElementName(), callee);
 
-        final JFunction placeHolderResult;
+        final Function placeHolderResult;
         final Term placeHolderResultTrm;
 
         if (instVars == null || instVars.length == 0) {
@@ -290,7 +296,7 @@ public class QueryExpand implements BuiltInRule {
 
         for (QueryEvalPos qep : qeps) {
             Pair<Term, Term> queryExp =
-                QueryExpand.INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
+                INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
             Term queryExpTerm = tb.and(queryExp.first, tb.equals(qep.query, queryExp.second));
             final Term termToInsert;
             if (qep.positivePosition) {
@@ -629,7 +635,7 @@ public class QueryExpand implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         if (pio != null && pio.subTerm().op() instanceof IProgramMethod
                 && pio.subTerm().freeVars().isEmpty()) {
-            final Term pmTerm = pio.subTerm();
+            final var pmTerm = pio.subTerm();
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
             if (pm.isModel()) {
                 return false;
@@ -644,12 +650,12 @@ public class QueryExpand implements BuiltInRule {
                             && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
-                    Term focus = it.getSubTerm();
+                    var focus = it.getSubTerm();
                     if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
                         return false;
                     }
                 }
-                storeTimeOfQuery(pio.subTerm(), goal);
+                storeTimeOfQuery((Term) pio.subTerm(), goal);
                 return true;
             }
         }

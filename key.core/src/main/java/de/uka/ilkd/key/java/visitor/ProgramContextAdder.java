@@ -16,10 +16,10 @@ import de.uka.ilkd.key.java.ast.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.ast.statement.SynchronizedBlock;
 import de.uka.ilkd.key.java.ast.statement.Try;
-import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.util.collection.ImmutableArray;
 
 /**

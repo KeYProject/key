@@ -204,7 +204,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         return counter < stack.length
-                ? createMap(stack, counter, DefaultImmutableMap.nilMap())
+                ? createMap(stack, counter, nilMap())
                 : this;
     }
 

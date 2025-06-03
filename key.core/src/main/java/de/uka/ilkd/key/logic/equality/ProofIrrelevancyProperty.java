@@ -9,8 +9,9 @@ import java.util.Objects;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
+import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.logic.Property;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -44,7 +45,7 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for attributes
      * that are not relevant for the purpose of these terms in the proof.
      * <p>
-     * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
+     * Combines the prior implementations of {@code EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
      * </p>
      *
@@ -65,11 +66,14 @@ public class ProofIrrelevancyProperty implements Property<Term> {
             return true;
         }
 
-        final boolean opResult = term1.op().equalsModProofIrrelevancy(term2.op());
+        final boolean opResult =
+            EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(term1.op(), term2.op());
         if (!(opResult
                 && EqualsModProofIrrelevancyUtil.compareImmutableArrays(term1.boundVars(),
-                    term2.boundVars())
-                && term1.javaBlock().equalsModProofIrrelevancy(term2.javaBlock()))) {
+                    term2.boundVars(),
+                    EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)
+                && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(term1.javaBlock(),
+                    term2.javaBlock()))) {
             return false;
         }
 
@@ -102,8 +106,6 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * <p>
      * Computes a hashcode that represents the proof-relevant fields of {@code term}.
      * </p>
-     * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
-     * LabeledTermImpl.
      *
      * @param term
      *        the term to compute the hashcode for
@@ -112,8 +114,10 @@ public class ProofIrrelevancyProperty implements Property<Term> {
     @Override
     public int hashCodeModThisProperty(Term term) {
         int hashcode = Objects.hash(term.op(),
-            EqualityUtils.hashCodeModPropertyOfIterable(PROOF_IRRELEVANCY_PROPERTY, term.subs()),
-            EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars()), term.javaBlock());
+            EqualityUtils.hashCodeModPropertyOfIterable(term.subs(), this::hashCodeModThisProperty),
+            EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars(),
+                EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
+            term.javaBlock());
 
         // part from LabeledTermImpl
         final ImmutableArray<TermLabel> labels = term.getLabels();

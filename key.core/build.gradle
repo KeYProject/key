@@ -9,6 +9,7 @@ configurations { antlr4 }
 dependencies {
     api project(':key.util')
     api project(':key.ncore')
+    api project(':key.ncore.calculus')
 
     implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'
     implementation group: 'antlr', name: 'antlr', version: '2.7.7'

@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -220,7 +220,7 @@ public abstract class AbstractProblemLoader {
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
      */
-    public AbstractProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
+    protected AbstractProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
             List<Path> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
             ProblemLoaderControl control,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
@@ -258,14 +258,13 @@ public abstract class AbstractProblemLoader {
      * Executes the loading process and tries to instantiate a proof and to re-apply rules on it if
      * possible.
      *
-     * @param callbackProofLoaded
-     *        optional callback, called when the proof is loaded but not yet
+     * @param callbackProofLoaded optional callback, called when the proof is loaded but not yet
      *        replayed
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public final void load(Consumer<Proof> callbackProofLoaded)
+    public final void load(@Nullable Consumer<Proof> callbackProofLoaded)
             throws Exception {
         control.loadingStarted(this);
 
@@ -334,7 +333,7 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-            Consumer<Proof> callbackProofLoaded) {
+            @Nullable Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
@@ -454,11 +453,11 @@ public abstract class AbstractProblemLoader {
                 try (ZipFile bundle = new ZipFile(file.toFile())) {
                     proofs = bundle.stream().filter(e -> !e.isDirectory())
                             .filter(e -> e.getName().endsWith(".proof"))
-                            .map(e -> Paths.get(e.getName())).collect(Collectors.toList());
+                            .map(e -> Paths.get(e.getName())).toList();
                 }
                 if (!proofs.isEmpty()) {
                     // load first proof found in file
-                    proofFilename = proofs.get(0);
+                    proofFilename = proofs.getFirst();
                 } else {
                     // no proof found in bundle!
                     throw new IOException("The bundle contains no proof to load!");
@@ -498,7 +497,7 @@ public abstract class AbstractProblemLoader {
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
                 || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename.toString(), file, fileRepo, control,
+            return new KeYUserProblemFile(filename, file, fileRepo, control,
                 profileOfNewProofs,
                 filename.endsWith(".proof.gz"));
         } else if (file.toFile().isDirectory()) {
@@ -507,9 +506,9 @@ public abstract class AbstractProblemLoader {
             return new SLEnvInput(file, classPath, bootClassPath, profileOfNewProofs,
                 includes);
         } else {
-            if (filename.toString().lastIndexOf('.') != -1) {
+            if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension '"
-                    + filename.toString().substring(filename.toString().lastIndexOf('.'))
+                    + filename.substring(filename.lastIndexOf('.'))
                     + "' of read-in file "
                     + filename + ". Allowed extensions are: .key, .proof, .java or "
                     + "complete directories.");
@@ -550,7 +549,7 @@ public abstract class AbstractProblemLoader {
      * @return The {@link LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
-    protected LoadedPOContainer createProofObligationContainer() throws Exception {
+    protected @Nullable LoadedPOContainer createProofObligationContainer() throws Exception {
         final String chooseContract;
         final Configuration proofObligation;
 
@@ -664,7 +663,7 @@ public abstract class AbstractProblemLoader {
     /**
      * Returns a {@link ProofScriptEntry} if {@code \proofscript} is given with the problem.
      */
-    public @Nullable ProofScriptEntry getProofScript() {
+    public @Nullable ProofScript getProofScript() {
         if (!hasProofScript()) {
             return null;
         }

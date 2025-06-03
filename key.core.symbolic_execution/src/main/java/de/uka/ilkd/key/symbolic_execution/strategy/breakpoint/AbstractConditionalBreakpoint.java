@@ -10,11 +10,8 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.StatementContainer;
-import de.uka.ilkd.key.java.ast.abstraction.Field;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.*;
@@ -25,8 +22,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -36,6 +31,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -101,25 +100,17 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Creates a new {@link AbstractConditionalBreakpoint}. Call setCondition immediately after
      * calling the constructor!
      *
-     * @param hitCount
-     *        the number of hits after which the execution should hold at this breakpoint
-     * @param pm
-     *        the {@link IProgramMethod} representing the Method which the Breakpoint is located
+     * @param hitCount the number of hits after which the execution should hold at this breakpoint
+     * @param pm the {@link IProgramMethod} representing the Method which the Breakpoint is located
      *        at
-     * @param proof
-     *        the {@link Proof} that will be executed and should stop
-     * @param enabled
-     *        flag if the Breakpoint is enabled
-     * @param conditionEnabled
-     *        flag if the condition is enabled
-     * @param methodStart
-     *        the line the containing method of this breakpoint starts at
-     * @param methodEnd
-     *        the line the containing method of this breakpoint ends at
-     * @param containerType
-     *        the type of the element containing the breakpoint
+     * @param proof the {@link Proof} that will be executed and should stop
+     * @param enabled flag if the Breakpoint is enabled
+     * @param conditionEnabled flag if the condition is enabled
+     * @param methodStart the line the containing method of this breakpoint starts at
+     * @param methodEnd the line the containing method of this breakpoint ends at
+     * @param containerType the type of the element containing the breakpoint
      */
-    public AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
+    protected AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
             boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd,
             KeYJavaType containerType) {
         super(hitCount, proof, enabled);
@@ -135,9 +126,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * {@inheritDoc}
      */
     @Override
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
-        super.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
+    public void updateState(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
+        super.updateState(goal, maxApplications, timeout, startTime, countApplied);
         if (goal != null) {
             Node node = goal.node();
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
@@ -195,7 +186,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param ruleApp
      * @param inScope
      */
-    private void freeVariablesAfterReturn(Node node, RuleApp ruleApp, boolean inScope) {
+    private void freeVariablesAfterReturn(Node node, RuleApp ruleApp,
+            boolean inScope) {
         if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) && inScope) {
             toKeep.clear();
@@ -205,18 +197,15 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * put relevant values from the current nodes renamings in toKeep and variableNamingMap
      *
-     * @param varForCondition
-     *        the variable that might be relevant for the condition
-     * @param node
-     *        the current
-     * @param inScope
-     *        the flag to determine if the current statement is in the scope of the
+     * @param varForCondition the variable that might be relevant for the condition
+     * @param node the current
+     * @param inScope the flag to determine if the current statement is in the scope of the
      *        breakpoint
-     * @param oldMap
-     *        the oldMap variableNamings
+     * @param oldMap the oldMap variableNamings
      */
     private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope,
-            Map<SyntaxElement, SyntaxElement> oldMap, RuleApp ruleApp) {
+            Map<SyntaxElement, SyntaxElement> oldMap,
+            RuleApp ruleApp) {
         // look for renamings KeY did
         boolean found = false;
         // get current renaming tables
@@ -273,10 +262,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Modifies toKeep and variableNamingMap to hold the correct parameters after execution of the
      * given ruleApp on the given node
      *
-     * @param ruleApp
-     *        the applied rule app
-     * @param node
-     *        the current node
+     * @param ruleApp the applied rule app
+     * @param node the current node
      */
     protected void refreshVarMaps(RuleApp ruleApp, Node node) {
         boolean inScope = isInScope(node);
@@ -298,8 +285,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Computes the Term that can be evaluated, from the user given condition
      *
-     * @param condition
-     *        the condition given by the user
+     * @param condition the condition given by the user
      * @return the {@link Term} that represents the condition
      */
     private Term computeTermForCondition(String condition) {
@@ -331,8 +317,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             }
         }
         JavaInfo info = getProof().getServices().getJavaInfo();
+        List<KeYJavaType> kjts = info.getAllSupertypes(containerType);
         ImmutableList<LocationVariable> globalVars = ImmutableSLList.nil();
-        for (KeYJavaType kjtloc : info.getAllSupertypes(containerType)) {
+        for (KeYJavaType kjtloc : kjts) {
             if (kjtloc.getJavaType() instanceof TypeDeclaration) {
                 ImmutableList<Field> fields =
                     info.getAllFields((TypeDeclaration) kjtloc.getJavaType());
@@ -361,42 +348,37 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * Checks if the condition, that was given by the user, evaluates to true with the current of
      * the proof
      *
-     * @param ruleApp
-     *        the {@link RuleApp} to be executed next
-     * @param proof
-     *        the current {@link Proof}
-     * @param node
-     *        the current {@link Node}
+     * @param ruleApp the {@link RuleApp} to be executed next
+     * @param node the current {@link Node}
      * @return true if the condition evaluates to true
      */
-    protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+    protected boolean conditionMet(RuleApp ruleApp, Node node) {
         ApplyStrategyInfo info = null;
         try {
             // initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            Term term = pio.subTerm();
-            getProof().getServices().getTermBuilder();
-            term = TermBuilder.goBelowUpdates(term);
+            var t = pio.subTerm();
+            Term term = TermBuilder.goBelowUpdates(t);
             IExecutionContext ec =
-                JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+                JavaTools.getInnermostExecutionContext(term.javaBlock(), getProof().getServices());
             // put values into map which have to be replaced
             if (ec != null) {
                 getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
             }
             // replace renamings etc.
+            final TermBuilder tb = getProof().getServices().getTermBuilder();
             OpReplacer replacer =
-                new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
+                new OpReplacer(getVariableNamingMap(), tb.tf());
             Term termForSideProof = replacer.replace(condition);
             // start side proof
-            Term toProof = getProof().getServices().getTermBuilder()
-                    .equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+            Term toProof = tb.equals(tb.tt(), termForSideProof);
             // New OneStepSimplifier is required because it has an internal state and the default
             // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false);
             Sequent sequent =
                 SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
-            info = SymbolicExecutionSideProofUtil.startSideProof(proof, sideProofEnv, sequent,
+            info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
                 StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
                 StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
             return info.getProof().closed();
@@ -412,18 +394,17 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
-        return (!conditionEnabled || conditionMet(ruleApp, proof, node))
-                && super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+    public boolean isBreakpointHit(SourceElement activeStatement,
+            RuleApp ruleApp, Node node) {
+        return (!conditionEnabled || conditionMet(ruleApp, node))
+                && super.isBreakpointHit(activeStatement, ruleApp, node);
     }
 
     /**
      * For a given {@link StatementContainer} this method computes the {@link StatementBlock} that
      * contains all lines before the line the Breakpoint is at, including the line itself.
      *
-     * @param statementContainer
-     *        the {@link StatementContainer} to build the block from
+     * @param statementContainer the {@link StatementContainer} to build the block from
      * @return the {@link StatementBlock} representing the container without the line below the
      *         Breakpoint
      */
@@ -432,8 +413,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Checks if the statement of a given {@link Node} is in the scope of this breakpoint.
      *
-     * @param node
-     *        the {@link Node} to be checked
+     * @param node the {@link Node} to be checked
      * @return true if the node represents a statement in the scope of this breakpoint.
      */
     protected abstract boolean isInScope(Node node);
@@ -441,8 +421,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Checks if the statement of a given {@link Node} is in the scope of this breakpoint.
      *
-     * @param node
-     *        the {@link Node} to be checked
+     * @param node the {@link Node} to be checked
      * @return true if the node represents a statement in the scope of this breakpoint.
      */
     protected abstract boolean isInScopeForCondition(Node node);
@@ -465,8 +444,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Sets the new conditionEnabled value.
      *
-     * @param conditionEnabled
-     *        the new value
+     * @param conditionEnabled the new value
      */
     public void setConditionEnabled(boolean conditionEnabled) {
         this.conditionEnabled = conditionEnabled;
@@ -493,10 +471,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Sets the condition to the Term that is parsed from the given String.
      *
-     * @param condition
-     *        the String to be parsed
-     * @throws SLTranslationException
-     *         if the parsing failed
+     * @param condition the String to be parsed
+     * @throws SLTranslationException if the parsing failed
      */
     public void setCondition(String condition) throws SLTranslationException {
         this.conditionString = condition;
@@ -530,8 +506,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     }
 
     /**
-     * @param variableNamingMap
-     *        the variableNamingMap to set
+     * @param variableNamingMap the variableNamingMap to set
      */
     public void setVariableNamingMap(Map<SyntaxElement, SyntaxElement> variableNamingMap) {
         this.variableNamingMap = variableNamingMap;
@@ -545,8 +520,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     }
 
     /**
-     * @param selfVar
-     *        the selfVar to set
+     * @param selfVar the selfVar to set
      */
     public void setSelfVar(LocationVariable selfVar) {
         this.selfVar = selfVar;
@@ -560,8 +534,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     }
 
     /**
-     * @param varsForCondition
-     *        the varsForCondition to set
+     * @param varsForCondition the varsForCondition to set
      */
     public void setVarsForCondition(ImmutableList<LocationVariable> varsForCondition) {
         this.varsForCondition = varsForCondition;
@@ -575,8 +548,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     }
 
     /**
-     * @param pm
-     *        the pm to set
+     * @param pm the pm to set
      */
     public void setPm(IProgramMethod pm) {
         this.pm = pm;

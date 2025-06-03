@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mattias ulbrich
  */
-public class TacletProofObligationInput implements ProofOblInput, IPersistablePO {
+public class TacletProofObligationInput implements IPersistablePO {
     static final Logger LOGGER = LoggerFactory.getLogger(TacletProofObligationInput.class);
     public static final String AXIOM_FILE = "axiomFile";
 
@@ -114,8 +114,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     @Override
     public Configuration createLoaderConfig() throws IOException {
         var c = new Configuration();
-        c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
-        c.set(IPersistablePO.PROPERTY_NAME, name());
+        c.set(PROPERTY_CLASS, getClass().getCanonicalName());
+        c.set(PROPERTY_NAME, name());
 
         // TODO MU ----- make the file names relative
         // MiscTools.makeFilenamesRelative. However ... I need the store save name ...
@@ -201,7 +201,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     void setLoadInfo(Configuration properties) {
         final var pathname =
-            Objects.requireNonNull(properties.getString(IPersistablePO.PROPERTY_FILENAME));
+            Objects.requireNonNull(properties.getString(PROPERTY_FILENAME));
         this.baseDir = new File(pathname).getParent();
         this.tacletFile = properties.getString("tacletFile");
         this.definitionFile = properties.getString("definitionFile");

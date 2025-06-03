@@ -11,9 +11,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -89,18 +89,11 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
             info.getClosedGoals());
     }
 
-    ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo) {
+    ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ProofSearchInformation stratInfo) {
         this(info.getMacro(), info.getGoals(), info.getProof(),
             info.getTime() + stratInfo.getTime(),
-            info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
-            info.getClosedGoals() + stratInfo.getClosedGoals());
-    }
-
-    ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo,
-            ImmutableList<Goal> goals) {
-        this(info.getMacro(), goals, stratInfo.getProof(), info.getTime() + stratInfo.getTime(),
-            info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
-            goals.size() <= info.getGoals().size() ? (info.getGoals().size() - goals.size()) : 0);
+            info.getAppliedRules() + stratInfo.getNumberOfAppliedRuleApps(),
+            info.getClosedGoals() + stratInfo.getNumberOfClosedGoals());
     }
 
     public void addInfo(String key, Object value) {

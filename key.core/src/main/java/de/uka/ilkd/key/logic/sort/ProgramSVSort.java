@@ -7,45 +7,22 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.Label;
-import de.uka.ilkd.key.java.ast.NamedProgramElement;
-import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.Statement;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.ast.abstraction.Type;
-import de.uka.ilkd.key.java.ast.declaration.ConstructorDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.literal.Literal;
-import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.ast.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.ast.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.ast.expression.operator.Intersect;
-import de.uka.ilkd.key.java.ast.expression.operator.Negative;
-import de.uka.ilkd.key.java.ast.expression.operator.New;
-import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.*;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
-import de.uka.ilkd.key.java.ast.statement.Catch;
-import de.uka.ilkd.key.java.ast.statement.Ccatch;
-import de.uka.ilkd.key.java.ast.statement.For;
-import de.uka.ilkd.key.java.ast.statement.ForUpdates;
-import de.uka.ilkd.key.java.ast.statement.Guard;
-import de.uka.ilkd.key.java.ast.statement.LoopInit;
-import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.ast.statement.Switch;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -277,7 +254,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
     // --------------------------------------------------------------------------
 
-    public ProgramSVSort(Name name) {
+    protected ProgramSVSort(Name name) {
         super(name, DefaultImmutableSet.nil(), false, "", "");
         NAME2SORT.put(name, this);
     }

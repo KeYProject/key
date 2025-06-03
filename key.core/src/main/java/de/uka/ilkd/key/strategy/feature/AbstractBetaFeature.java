@@ -4,15 +4,21 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
+
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -92,6 +98,7 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     private static class MaxPosPathHelper extends MaxPathHelper {
+        @Override
         protected int computeDefault(Term p_t, boolean p_positive) {
             if (alwaysReplace(p_t)) {
                 return 1;
@@ -102,6 +109,7 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     private static class MaxDPathHelper extends MaxPathHelper {
+        @Override
         protected int computeDefault(Term p_t, boolean p_positive) {
             return 1;
         }
@@ -336,15 +344,18 @@ public abstract class AbstractBetaFeature implements Feature {
      * @param mState
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    @Override
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final Term findTerm = pos.sequentFormula().formula();
+        final Term findTerm = (Term) pos.sequentFormula().formula();
 
-        return doComputation(pos, findTerm, goal.proof().getServices().getCaches());
+        return doComputation(pos, findTerm, ((Services) goal.proof().getServices()).getCaches());
     }
 
-    protected abstract RuleAppCost doComputation(PosInOccurrence pos, Term findTerm,
+    protected abstract RuleAppCost doComputation(PosInOccurrence pos,
+            Term findTerm,
             ServiceCaches caches);
 }

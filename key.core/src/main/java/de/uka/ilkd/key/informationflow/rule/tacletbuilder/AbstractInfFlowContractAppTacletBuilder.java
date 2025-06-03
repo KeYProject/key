@@ -15,17 +15,20 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApplPart;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -41,7 +44,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     static final String USE_IF = InfFlowContractAppTaclet.USE_IF;
     private static final String IF_CONTRACT_APPLICATION = "information_flow_contract_appl";
 
-    public AbstractInfFlowContractAppTacletBuilder(final Services services) {
+    protected AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
     }
 
@@ -257,9 +260,11 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         // create sequents
         Sequent assumesSeq =
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(schemaAssumes)));
+            JavaDLSequentKit.createAnteSequent(
+                ImmutableSLList.singleton(new SequentFormula(schemaAssumes)));
         Sequent replaceWithSeq =
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(replaceWithTerm)));
+            JavaDLSequentKit.createAnteSequent(
+                ImmutableSLList.singleton(new SequentFormula(replaceWithTerm)));
 
         // create taclet
         InfFlowContractAppRewriteTacletBuilder tacletBuilder =

@@ -18,8 +18,8 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -94,6 +94,7 @@ public class EqualityConstraint implements Constraint {
         return metaVars;
     }
 
+    @Override
     protected synchronized Object clone() {
         EqualityConstraint res = new EqualityConstraint((HashMap<Metavariable, Term>) map.clone());
         res.instantiationCache = instantiationCache == null ? null
@@ -106,6 +107,7 @@ public class EqualityConstraint implements Constraint {
      *
      * @return true if Bottom
      */
+    @Override
     final public boolean isBottom() {
         return map.isEmpty();
     }
@@ -117,6 +119,7 @@ public class EqualityConstraint implements Constraint {
      *
      * @return true always
      */
+    @Override
     final public boolean isSatisfiable() {
         return true;
     }
@@ -150,6 +153,7 @@ public class EqualityConstraint implements Constraint {
      *        the Services
      * @return a term the given metavariable can be instantiated with
      */
+    @Override
     public synchronized Term getInstantiation(Metavariable p_mv, Services services) {
         Term t = null;
         if (instantiationCache == null) {
@@ -188,9 +192,10 @@ public class EqualityConstraint implements Constraint {
      * @return the instantiated term
      */
     private Term instantiate(Term p, Services services) {
+
         ConstraintAwareSyntacticalReplaceVisitor srVisitor =
             new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(), services, this, null,
-                null, null, null, null);
+                null, null, null);
         p.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
@@ -208,10 +213,10 @@ public class EqualityConstraint implements Constraint {
      *        introducing intersection sorts)
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
+    @Override
     public Constraint unify(Term t1, Term t2, Services services) {
         return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
-
 
     /**
      * executes unification for terms t1 and t2.
@@ -228,12 +233,13 @@ public class EqualityConstraint implements Constraint {
      * @return TOP if not possible, else a new constraint unifying t1 and t2 ( == this iff this
      *         subsumes the unification )
      */
+    @Override
     public Constraint unify(Term t1, Term t2, Services services, BooleanContainer unchanged) {
         final Constraint newConstraint = unifyHelp(t1, t2, false, services);
 
         if (!newConstraint.isSatisfiable()) {
             unchanged.setVal(false);
-            return Constraint.TOP;
+            return TOP;
         }
 
         if (newConstraint == this) {
@@ -349,28 +355,28 @@ public class EqualityConstraint implements Constraint {
                 return normalize((Metavariable) op1, t0, modifyThis, services);
             }
 
-            return Constraint.TOP;
+            return TOP;
         } else if (op0 instanceof Metavariable) {
             if (t1.sort().extendsTrans(t0.sort())) {
                 return normalize((Metavariable) op0, t1, modifyThis, services);
             }
 
-            return Constraint.TOP;
+            return TOP;
         }
 
         if (!(op0 instanceof ProgramVariable) && op0 != op1) {
-            return Constraint.TOP;
+            return TOP;
         }
 
 
         if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
-            return Constraint.TOP;
+            return TOP;
         }
 
 
         nat = handleJava(t0, t1, nat);
         if (nat == FAILED) {
-            return Constraint.TOP;
+            return TOP;
         }
 
 
@@ -398,7 +404,7 @@ public class EqualityConstraint implements Constraint {
          * DefaultImmutableSet.<Sort>nil().add(t0.sort()).add(t1.sort());
          */
         // assert false : "metavariables disabled";
-        return Constraint.TOP;
+        return TOP;
         // final Sort intersectionSort =
         // IntersectionSort.getIntersectionSort(set, services);
         //
@@ -467,13 +473,13 @@ public class EqualityConstraint implements Constraint {
             ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
 
             if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size()) {
-                return Constraint.TOP;
+                return TOP;
             }
             for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
                 final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
                 final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
                 if (ownVar.sort() != cmpVar.sort()) {
-                    return Constraint.TOP;
+                    return TOP;
                 }
 
                 subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
@@ -484,7 +490,7 @@ public class EqualityConstraint implements Constraint {
                 subOwnBoundVars, subCmpBoundVars, nat, modifyThis, services);
 
             if (!newConstraint.isSatisfiable()) {
-                return Constraint.TOP;
+                return TOP;
             }
             modifyThis = modifyThis || newConstraint != this;
         }
@@ -529,7 +535,7 @@ public class EqualityConstraint implements Constraint {
         if (!((t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
                     (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
-            return Constraint.TOP;
+            return TOP;
         }
         return this;
     }
@@ -575,14 +581,14 @@ public class EqualityConstraint implements Constraint {
         // correct
 
         if (!t.isRigid()) {
-            return Constraint.TOP;
+            return TOP;
         }
 
         // metavariable instantiations must not contain free variables
         if (!t.freeVars().isEmpty() ||
                 (modifyThis ? hasCycle(mv, t, services) : hasCycleByInst(mv, t, services))) {
             // cycle
-            return Constraint.TOP;
+            return TOP;
         } else if (map.containsKey(mv)) {
             return unifyHelp(valueOf(mv), t, modifyThis, services);
         }
@@ -622,6 +628,7 @@ public class EqualityConstraint implements Constraint {
      * @return true iff this constraint is as strong as "co", i.e. every instantiation satisfying
      *         "this" also satisfies "co".
      */
+    @Override
     public boolean isAsStrongAs(Constraint co) {
         if (this == co) {
             return true;
@@ -640,6 +647,7 @@ public class EqualityConstraint implements Constraint {
      * @return true iff this constraint is as weak as "co", i.e. every instantiation satisfying "co"
      *         also satisfies "this".
      */
+    @Override
     public boolean isAsWeakAs(Constraint co) {
         if (this == co) {
             return true;
@@ -661,6 +669,7 @@ public class EqualityConstraint implements Constraint {
      *        Constraint to be joined with this one
      * @return the joined constraint
      */
+    @Override
     public Constraint join(Constraint co, Services services) {
         return join(co, services, CONSTRAINTBOOLEANCONTAINER);
     }
@@ -679,6 +688,7 @@ public class EqualityConstraint implements Constraint {
      *        the BooleanContainers value set true, if this constraint is as strong as co
      * @return the joined constraint
      */
+    @Override
     public synchronized Constraint join(Constraint co, Services services,
             BooleanContainer unchanged) {
         if (co.isBottom() || co == this) {
@@ -740,7 +750,7 @@ public class EqualityConstraint implements Constraint {
             newConstraint = ((EqualityConstraint) newConstraint).normalize(entry.getKey(),
                 entry.getValue(), newCIsNew, services);
             if (!newConstraint.isSatisfiable()) {
-                return Constraint.TOP;
+                return TOP;
             }
             newCIsNew = newCIsNew || newConstraint != this;
         }

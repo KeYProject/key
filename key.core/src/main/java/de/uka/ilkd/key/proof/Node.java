@@ -14,15 +14,16 @@ import java.util.List;
 import java.util.ListIterator;
 
 import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -59,7 +60,7 @@ public class Node implements Iterable<Node> {
      */
     private BranchLocation branchLocation = null;
 
-    private Sequent seq = Sequent.EMPTY_SEQUENT;
+    private Sequent seq = JavaDLSequentKit.getInstance().getEmptySequent();
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 
@@ -77,7 +78,7 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<JFunction> localFunctions = ImmutableSLList.nil();
+    private ImmutableList<Function> localFunctions = ImmutableSLList.nil();
 
     private boolean closed = false;
 
@@ -111,7 +112,6 @@ public class Node implements Iterable<Node> {
     private String cachedName = null;
 
     private @Nullable Lookup userData = null;
-
 
     /**
      * If the rule base has been extended e.g. by loading a new taclet as lemma or by applying a
@@ -196,7 +196,8 @@ public class Node implements Iterable<Node> {
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
-            SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
+            SequentChangeInfo oldSeqChangeInfo =
+                this.nodeInfo.getSequentChangeInfo();
             this.nodeInfo = new NodeInfo(this);
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
         } else {
@@ -253,12 +254,12 @@ public class Node implements Iterable<Node> {
      *
      * @return a non-null immutable list of function symbols.
      */
-    public Iterable<JFunction> getLocalFunctions() {
+    public Iterable<Function> getLocalFunctions() {
         return localFunctions;
     }
 
-    public void addLocalFunctions(Collection<? extends JFunction> elements) {
-        for (JFunction op : elements) {
+    public void addLocalFunctions(Collection<Function> elements) {
+        for (Function op : elements) {
             localFunctions = localFunctions.prepend(op);
         }
     }
@@ -266,8 +267,7 @@ public class Node implements Iterable<Node> {
     /**
      * adds a new NoPosTacletApp to the set of available NoPosTacletApps at this node
      *
-     * @param s
-     *        the app to add.
+     * @param s the app to add.
      */
     public void addNoPosTacletApp(NoPosTacletApp s) {
         localIntroducedRules = localIntroducedRules.add(s);
@@ -310,8 +310,7 @@ public class Node implements Iterable<Node> {
      * Search for the root of the smallest subtree containing <code>this</code> and
      * <code>other</code>; we assume that the two nodes are part of the same proof tree
      *
-     * @param other
-     *        a node.
+     * @param other a node.
      * @return the most recent common ancestor of {@code this} and the specified node.
      */
     public Node commonAncestor(Node other) {
@@ -365,8 +364,7 @@ public class Node implements Iterable<Node> {
     /**
      * Makes the given node a child of this node.
      *
-     * @param newChild
-     *        the node to make a child of this node.
+     * @param newChild the node to make a child of this node.
      */
     public void add(Node newChild) {
         newChild.siblingNr = children.size();
@@ -378,8 +376,7 @@ public class Node implements Iterable<Node> {
     /**
      * Makes the given node children of this node.
      *
-     * @param newChildren
-     *        the node to make into children of this node.
+     * @param newChildren the node to make into children of this node.
      */
     public void addAll(Node[] newChildren) {
         final int size = children.size();
@@ -408,8 +405,7 @@ public class Node implements Iterable<Node> {
      * Removes child/parent relationship between the given node and this node; if the given node is
      * not child of this node, nothing happens and then and only then false is returned.
      *
-     * @param child
-     *        the child to remove.
+     * @param child the child to remove.
      * @return false iff the given node was not child of this node and nothing has been done.
      */
     boolean remove(Node child) {
@@ -482,8 +478,7 @@ public class Node implements Iterable<Node> {
 
     /**
      *
-     * @param i
-     *        an index (starting at 0).
+     * @param i an index (starting at 0).
      * @return the i-th child of this node.
      */
     public Node child(int i) {
@@ -491,8 +486,7 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @param child
-     *        a child of this node.
+     * @param child a child of this node.
      * @return the number of the node <code>child</code>, if it is a child of this node (starting
      *         with <code>0</code>), <code>-1</code> otherwise
      */
@@ -533,17 +527,12 @@ public class Node implements Iterable<Node> {
     /**
      * Helper for {@link #toString()}
      *
-     * @param prefix
-     *        needed to keep track if a line has to be printed
-     * @param tree
-     *        the tree representation we want to add this subtree " @param preEnumeration the
+     * @param prefix needed to keep track if a line has to be printed
+     * @param tree the tree representation we want to add this subtree " @param preEnumeration the
      *        enumeration of the parent without the last number
-     * @param postNr
-     *        the last number of the parents enumeration
-     * @param maxNr
-     *        the number of nodes at this level
-     * @param ownNr
-     *        the place of this node at this level
+     * @param postNr the last number of the parents enumeration
+     * @param maxNr the number of nodes at this level
+     * @param ownNr the place of this node at this level
      * @return the string representation of this node.
      */
 
@@ -771,17 +760,16 @@ public class Node implements Iterable<Node> {
      *
      * @return iterator over children.
      */
-    public Iterator<Node> iterator() {
+    @Override
+    public Iterator<@NonNull Node> iterator() {
         return childrenIterator();
     }
 
     /**
      * Retrieves a user-defined data.
      *
-     * @param service
-     *        the class for which the data were registered
-     * @param <T>
-     *        any class
+     * @param service the class for which the data were registered
+     * @param <T> any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
@@ -799,11 +787,9 @@ public class Node implements Iterable<Node> {
     /**
      * Register a user-defined data in this node info.
      *
-     * @param obj
-     *        an object to be registered
-     * @param service
-     *        the key under it should be registered
-     * @param <T>
+     * @param obj an object to be registered
+     * @param service the key under it should be registered
+     * @param <T> the type of the object to be registered
      */
     public <T> void register(T obj, Class<T> service) {
         getUserData().register(obj, service);
@@ -812,12 +798,9 @@ public class Node implements Iterable<Node> {
     /**
      * Remove a previous registered user-defined data.
      *
-     * @param obj
-     *        registered object
-     * @param service
-     *        the key under which the data was registered
-     * @param <T>
-     *        arbitray object
+     * @param obj registered object
+     * @param service the key under which the data was registered
+     * @param <T> arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {
@@ -828,7 +811,7 @@ public class Node implements Iterable<Node> {
     /**
      * Get the assocated lookup of user-defined data.
      *
-     * @return
+     * @return the lookup table for the user data
      */
     public @NonNull Lookup getUserData() {
         if (userData == null) {

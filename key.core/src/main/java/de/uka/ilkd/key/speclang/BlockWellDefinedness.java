@@ -8,13 +8,13 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -41,14 +41,10 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     /**
      * Creates a contract to check well-definedness of a block contract
      *
-     * @param block
-     *        the block belonging to the block contract
-     * @param variables
-     *        the variables of the block contract
-     * @param params
-     *        the parameters of the block
-     * @param services
-     *        the services instance
+     * @param block the block belonging to the block contract
+     * @param variables the variables of the block contract
+     * @param params the parameters of the block
+     * @param services the services instance
      */
     public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
             ImmutableSet<LocationVariable> params, Services services) {
@@ -72,7 +68,8 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, TermServices services) {
+    SequentFormula generateSequent(SequentTerms seq,
+            TermServices services) {
         // wd(pre) & (pre & wf(anon) -> wd(modifiable) & {anon^modifiable}(wd(post)))
         final Term imp =
             TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdModifiable, seq.anonWdPost));

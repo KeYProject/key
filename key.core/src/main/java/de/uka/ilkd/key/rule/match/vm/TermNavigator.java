@@ -74,7 +74,6 @@ public class TermNavigator {
         return stack.size() > 1;
     }
 
-
     public Term getCurrentSubterm() {
         return stack.peek().first;
     }

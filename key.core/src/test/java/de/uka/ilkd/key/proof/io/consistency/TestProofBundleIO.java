@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -48,8 +47,7 @@ public class TestProofBundleIO {
      */
     @BeforeAll
     public static void prepare() {
-        testDir =
-            Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
+        testDir = HelperClassForTests.TESTCASE_DIRECTORY.toAbsolutePath().resolve("proofBundle");
 
         // remember settings to be able to reset after the test
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()

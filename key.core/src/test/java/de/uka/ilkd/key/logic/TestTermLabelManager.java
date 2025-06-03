@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.io.File;
 import java.util.*;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -14,13 +13,11 @@ import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -29,6 +26,14 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleExecutor;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -120,10 +125,13 @@ public class TestTermLabelManager {
         Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
         one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
         two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
-        Sequent sequent = Sequent.EMPTY_SEQUENT;
-        sequent = sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
-        sequent = sequent.addFormula(pos.sequentFormula(), true, false).sequent();
-        sequent = sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
+        Sequent sequent = JavaDLSequentKit.getInstance().getEmptySequent();
+        sequent =
+            sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
+        sequent = sequent.addFormula(pos.sequentFormula(), true, false)
+                .sequent();
+        sequent =
+            sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
         // Test supported rule
         Rule rule = new DummyRule("rule");
         Term taclet = TB.tt();
@@ -154,7 +162,7 @@ public class TestTermLabelManager {
         while (expectedIter.hasNext() && currentIter.hasNext()) {
             SequentFormula expectedSF = expectedIter.next();
             SequentFormula currentSF = currentIter.next();
-            compareTerms(expectedSF.formula(), currentSF.formula(), changed, scope);
+            compareTerms((Term) expectedSF.formula(), (Term) currentSF.formula(), changed, scope);
         }
         assertFalse(expectedIter.hasNext());
         assertFalse(currentIter.hasNext());
@@ -173,7 +181,7 @@ public class TestTermLabelManager {
         if (changed) {
             for (int i = 0; i < expected.getLabels().size(); i++) {
                 if (RefactoringScope.SEQUENT.equals(scope)) {
-                    assertEquals(expected.getLabels().get(i).name().toString() + "-CHANGED",
+                    assertEquals(expected.getLabels().get(i).name() + "-CHANGED",
                         current.getLabels().get(i).name().toString());
                 } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
                         .equals(scope)) {
@@ -494,7 +502,8 @@ public class TestTermLabelManager {
         assertTrue(labels.isEmpty());
     }
 
-    protected PosInOccurrence createTestPosInOccurrence(Services services) {
+    protected PosInOccurrence createTestPosInOccurrence(
+            Services services) {
         Term testTerm = createTestTerm(services);
         Term inInt = services.getTermBuilder().inInt(testTerm);
         return new PosInOccurrence(new SequentFormula(inInt), PosInTerm.parseReverseString("0"),
@@ -572,7 +581,7 @@ public class TestTermLabelManager {
      */
     @Test
     public void testGetTermLabelManager() {
-        Assertions.assertNull(TermLabelManager.getTermLabelManager(null));
+        assertNull(TermLabelManager.getTermLabelManager(null));
         Services services = new Services(JavaProfile.getDefaultProfile());
         TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
         assertSame(services.getProfile().getTermLabelManager(), manager);
@@ -588,8 +597,11 @@ public class TestTermLabelManager {
         if (CONFIG == null) {
             KeYEnvironment<?> env = null;
             try {
-                env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY,
-                    "termLabels/flatSteps/FlatSteps.java").toPath(), null, null, null);
+                env =
+                    KeYEnvironment.load(HelperClassForTests.TESTCASE_DIRECTORY.resolve("termLabels")
+                            .resolve("flatSteps")
+                            .resolve("FlatSteps.java"),
+                        null, null, null);
             } finally {
                 if (env != null) {
                     env.dispose();
@@ -683,14 +695,16 @@ public class TestTermLabelManager {
 
         @Override
         public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+                PosInOccurrence applicationPosInOccurrence,
+                Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm) {
             return scope;
         }
 
         @Override
         public void refactorLabels(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+                PosInOccurrence applicationPosInOccurrence,
+                Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm, Term term, LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
             boolean changed = labels.isModified();
@@ -699,7 +713,7 @@ public class TestTermLabelManager {
                     changedLabels.add(label);
                 } else {
                     changed |= changedLabels.add(
-                        new ParameterlessTermLabel(new Name(label.name().toString() + "-CHANGED")));
+                        new ParameterlessTermLabel(new Name(label.name() + "-CHANGED")));
                 }
             }
             labels.replaceWith(changedLabels, changed);
@@ -726,8 +740,10 @@ public class TestTermLabelManager {
 
         @Override
         public void updateLabels(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
-                Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+                PosInOccurrence applicationPosInOccurrence,
+                Term applicationTerm, Term modalityTerm,
+                org.key_project.prover.rules.Rule rule,
+                RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
                 Set<TermLabel> labels) {
             labels.add(toAdd);
         }
@@ -751,13 +767,15 @@ public class TestTermLabelManager {
 
         @Override
         public boolean isRuleApplicationSupported(TermServices services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+                PosInOccurrence applicationPosInOccurrence,
+                Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm, Term newTerm) {
             return true;
         }
 
         @Override
-        public boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence,
+        public boolean addLabel(TermServices services,
+                PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm,
                 Term newTerm, Term childTerm, TermLabel label) {
             log.add(label);
@@ -774,7 +792,8 @@ public class TestTermLabelManager {
 
         @Override
         public TermLabel keepLabel(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+                PosInOccurrence applicationPosInOccurrence,
+                Term applicationTerm, Rule rule,
                 Goal goal, Object hint, Term tacletTerm,
                 Term newTerm, TermLabel label) {
             log.add(label);
@@ -834,13 +853,13 @@ public class TestTermLabelManager {
         }
 
         @Override
-        public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+        public @NonNull RuleExecutor getExecutor()
                 throws RuleAbortException {
             throw new RuleAbortException("no implementation");
         }
 
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return new Name(name);
         }
 

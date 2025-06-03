@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
 
-    public VariableSpecification(IProgramVariable programVariable, Expression init, Type type) {
+    public VariableSpecification(IProgramVariable programVariable, @Nullable Expression init,
+            Type type) {
         this(programVariable, 0, init, type, null);
     }
 
@@ -75,9 +77,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         this(programVariable, dim, init, type, PositionInfo.UNDEFINED);
     }
 
-    public VariableSpecification(IProgramVariable programVariable, int dim, Expression init,
+    public VariableSpecification(IProgramVariable programVariable, int dim,
+            @Nullable Expression init,
             Type type,
-            PositionInfo pi) {
+            @Nullable PositionInfo pi) {
         super(pi);
         this.programVariable = programVariable;
         this.initializer = init;

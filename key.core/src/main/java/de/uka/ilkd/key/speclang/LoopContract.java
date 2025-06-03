@@ -176,7 +176,7 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return the index variable if {@link #getLoop()} is an enhanced for-loop, {@code null}
      *         otherwise.
-     * @see EnhancedForElimination#getIndexVariable()
+     * @see EnhancedForElimination.TransformationData#indexVariable()
      */
     ProgramVariable getIndexVariable();
 
@@ -184,7 +184,7 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return the values variable if {@link #getLoop()} is an enhanced for-loop, {@code null}
      *         otherwise.
-     * @see EnhancedForElimination#getValuesVariable()
+     * @see EnhancedForElimination.TransformationData#valuesVariable()
      */
     ProgramVariable getValuesVariable();
 

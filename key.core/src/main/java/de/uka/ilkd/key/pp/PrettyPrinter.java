@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.Subtype;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * A configurable pretty printer for Java source elements originally from COMPOST.
  *
  * @author AL
- *
+ *         <p>
  *         CHANGED FOR KeY. Comments are not printed!
  */
 @NullMarked
@@ -62,7 +62,9 @@ public class PrettyPrinter implements Visitor {
     private final boolean usePrettyPrinting;
     private final boolean useUnicodeSymbols;
 
-    /** creates a new PrettyPrinter */
+    /**
+     * creates a new PrettyPrinter
+     */
     public PrettyPrinter(PosTableLayouter out) {
         this(out, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, true, true);
     }
@@ -99,8 +101,7 @@ public class PrettyPrinter implements Visitor {
      * Entry method for this class.
      * Be careful when using other method directly since they might need an enclosing block.
      *
-     * @param e
-     *        what to print
+     * @param e what to print
      */
     public void print(SourceElement e) {
         layouter.beginRelativeC(0);
@@ -111,8 +112,7 @@ public class PrettyPrinter implements Visitor {
     /**
      * Alternative entry method for this class. Omits the trailing semicolon in the output.
      *
-     * @param s
-     *        source element to print
+     * @param s source element to print
      */
     public void printFragment(SourceElement s) {
         layouter.beginRelativeC(0);
@@ -125,8 +125,7 @@ public class PrettyPrinter implements Visitor {
     /**
      * Marks the start of the first executable statement ...
      *
-     * @param stmt
-     *        current statement;
+     * @param stmt current statement;
      */
     protected void markStart(Object stmt) {
         if (!startAlreadyMarked) {
@@ -149,8 +148,7 @@ public class PrettyPrinter implements Visitor {
     /**
      * Replace all unicode characters above ? by their explicit representation.
      *
-     * @param str
-     *        the input string.
+     * @param str the input string.
      * @return the encoded string.
      */
     protected static String encodeUnicodeChars(String str) {
@@ -174,8 +172,7 @@ public class PrettyPrinter implements Visitor {
     /**
      * Write keyword list.
      *
-     * @param list
-     *        a program element list.
+     * @param list a program element list.
      */
     protected void writeKeywordList(ImmutableArray<Modifier> list) {
         for (int i = 0; i < list.size(); i++) {
@@ -189,8 +186,7 @@ public class PrettyPrinter implements Visitor {
     /**
      * Write comma list.
      *
-     * @param list
-     *        a program element list.
+     * @param list a program element list.
      */
     protected void writeCommaList(ImmutableArray<? extends ProgramElement> list) {
         for (int i = 0; i < list.size(); i++) {
@@ -516,6 +512,7 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnFieldSpecification(FieldSpecification x) {
         performActionOnVariableSpecification(x);
     }
+
 
     @Override
     public void performActionOnSchematicFieldReference(SchematicFieldReference x) {
@@ -1177,8 +1174,8 @@ public class PrettyPrinter implements Visitor {
             }
         }
 
-        if (exec instanceof ExecutionContext) {
-            performActionOnExecutionContext((ExecutionContext) exec);
+        if (exec instanceof ExecutionContext executionContext) {
+            performActionOnExecutionContext(executionContext);
         } else if (exec != null) {
             performActionOnSchemaVariable((SchemaVariable) exec);
         }
@@ -1216,8 +1213,8 @@ public class PrettyPrinter implements Visitor {
         final TypeReference tr = x.getBodySourceAsTypeReference();
         if (tr instanceof SchemaTypeReference) {
             performActionOnSchemaTypeReference((SchemaTypeReference) tr);
-        } else if (tr instanceof SchemaVariable) {
-            performActionOnSchemaVariable((SchemaVariable) tr);
+        } else if (tr instanceof SchemaVariable sv) {
+            performActionOnSchemaVariable(sv);
         } else {
             tr.visit(this);
         }
@@ -1822,7 +1819,8 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void performActionOnEmptyStatement(EmptyStatement x) {}
+    public void performActionOnEmptyStatement(EmptyStatement x) {
+    }
 
     @Override
     public void performActionOnComment(Comment x) {
@@ -1941,8 +1939,7 @@ public class PrettyPrinter implements Visitor {
     /**
      * Prints the JML assert statement.
      *
-     * @param jmlAssert
-     *        the statement to print
+     * @param jmlAssert the statement to print
      */
     @Override
     public void performActionOnJmlAssert(JmlAssert jmlAssert) {
@@ -1971,8 +1968,7 @@ public class PrettyPrinter implements Visitor {
     /**
      * Prints a JML set statement
      *
-     * @param x
-     *        the set statement
+     * @param x the set statement
      */
     public void performActionOnSetStatement(SetStatement x) {
         layouter.print("//@ ");

@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.ast.declaration.Modifier;
 public abstract class VisibilityModifier extends Modifier
         implements Comparable<VisibilityModifier> {
 
-    public VisibilityModifier() {}
+    protected VisibilityModifier() {}
 
     public VisibilityModifier(PositionInfo pi, List<Comment> c) {
         super(pi, c);

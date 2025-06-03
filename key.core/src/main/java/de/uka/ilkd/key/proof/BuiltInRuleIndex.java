@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
+import java.io.Serializable;
+
 import de.uka.ilkd.key.rule.BuiltInRule;
 
 import org.key_project.util.collection.ImmutableList;
@@ -11,7 +13,7 @@ import org.key_project.util.collection.ImmutableSLList;
 /**
  * Index for managing built-in rules such as integer decision or update simplification rule.
  */
-public class BuiltInRuleIndex implements java.io.Serializable {
+public class BuiltInRuleIndex implements Serializable {
 
     /**
      *

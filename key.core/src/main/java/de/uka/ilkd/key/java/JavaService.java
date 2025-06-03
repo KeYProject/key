@@ -24,10 +24,8 @@ import de.uka.ilkd.key.java.transformations.pipeline.ConstantStringExpressionEva
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaLogger;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;
@@ -35,6 +33,8 @@ import de.uka.ilkd.key.util.ZipFileCollection;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;

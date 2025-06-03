@@ -156,16 +156,14 @@ public class DLEmbeddedExpression extends Operator {
     }
 
     public Term makeTerm(LocationVariable heap, Term[] subs, Services services) {
-        JFunction f = getFunctionSymbol();
         // we silently assume that check has been called earlier
-
-        if (f.arity() == subs.length) {
-            return services.getTermFactory().createTerm(f, subs);
+        if (functionSymbol.arity() == subs.length) {
+            return services.getTermFactory().createTerm(functionSymbol, subs);
         } else {
             Term[] extSubs = new Term[subs.length + 1];
             System.arraycopy(subs, 0, extSubs, 1, subs.length);
             extSubs[0] = services.getTermBuilder().var(heap);
-            return services.getTermFactory().createTerm(f, extSubs);
+            return services.getTermFactory().createTerm(functionSymbol, extSubs);
         }
     }
 }

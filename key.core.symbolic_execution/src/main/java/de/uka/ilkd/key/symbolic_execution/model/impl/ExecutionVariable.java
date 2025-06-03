@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -22,7 +21,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -31,6 +29,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -66,7 +66,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      *        An optional additional condition to consider.
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-            PosInOccurrence modalityPIO, IProgramVariable programVariable,
+            PosInOccurrence modalityPIO,
+            IProgramVariable programVariable,
             Term additionalCondition) {
         this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
     }
@@ -213,7 +214,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      *         Occurred Exception.
      */
     protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
-            Services services, TermBuilder tb, ApplyStrategyInfo info, Operator resultOperator,
+            Services services, TermBuilder tb, ApplyStrategyInfo<Proof, Goal> info,
+            Operator resultOperator,
             Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
             new ArrayList<>(info.getProof().openGoals().size());

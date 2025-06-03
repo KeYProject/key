@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Top level implementation of a Java {@link NonTerminalProgramElement}. taken from COMPOST and
  * changed to achieve an immutable structure
@@ -31,7 +33,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     }
 
 
-    public JavaNonTerminalProgramElement(PositionInfo pos) {
+    public JavaNonTerminalProgramElement(@Nullable PositionInfo pos) {
         super(pos);
     }
 

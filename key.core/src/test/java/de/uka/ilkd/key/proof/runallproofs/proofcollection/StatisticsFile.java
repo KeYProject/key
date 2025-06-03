@@ -31,7 +31,7 @@ public class StatisticsFile implements Serializable {
     private final File statisticsFile;
 
     @SuppressWarnings("rawtypes")
-    private static final Column[] columns = new Column[] { new Column<String>("Name") {
+    private static final Column[] columns = { new Column<String>("Name") {
         @Override
         String addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
             String name = keyFile.getAbsolutePath();
@@ -197,12 +197,12 @@ public class StatisticsFile implements Serializable {
      * @throws IOException
      *         Thrown in case statistics file is not accessible.
      */
-    public void appendStatistics(Proof proof, File keyFile) throws IOException {
+    public void appendStatistics(Proof proof, Path keyFile) throws IOException {
         Statistics statistics = proof.getStatistics();
         boolean proofClosed = proof.closed();
         List<String> entries = new LinkedList<>();
         for (Column<?> column : columns) {
-            entries.add(column.addEntry(statistics, keyFile, proofClosed).toString());
+            entries.add(column.addEntry(statistics, keyFile.toFile(), proofClosed).toString());
         }
         writeLine(entries);
     }
@@ -283,7 +283,7 @@ public class StatisticsFile implements Serializable {
                 // Create *.sum.properties file
                 Path sumFile =
                     new File(statisticsDir, columns[i].name + ".sum.properties").toPath();
-                String[] lines = new String[] { "YVALUE=" + sums.get(i), url };
+                String[] lines = { "YVALUE=" + sums.get(i), url };
                 Files.write(sumFile, Arrays.asList(lines), Charset.defaultCharset());
                 LOGGER.info("{} is written", sumFile);
 
@@ -301,7 +301,7 @@ public class StatisticsFile implements Serializable {
              */
             int countFiles = lists[0].size();
             Path countFilesPath = new File(statisticsDir, "NumberTestFiles.properties").toPath();
-            String[] lines = new String[] { "YVALUE=" + countFiles, url };
+            String[] lines = { "YVALUE=" + countFiles, url };
             Files.write(countFilesPath, Arrays.asList(lines), Charset.defaultCharset());
             LOGGER.info("{} is written", countFilesPath);
         }

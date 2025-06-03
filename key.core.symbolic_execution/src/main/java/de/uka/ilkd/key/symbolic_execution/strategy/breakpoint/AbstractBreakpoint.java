@@ -25,12 +25,10 @@ public abstract class AbstractBreakpoint implements IBreakpoint {
     /**
      * Constructor.
      *
-     * @param proof
-     *        The {@link Proof} in which this {@link IBreakpoint} is used.
-     * @param enabled
-     *        The enabled state.
+     * @param proof The {@link Proof} in which this {@link IBreakpoint} is used.
+     * @param enabled The enabled state.
      */
-    public AbstractBreakpoint(Proof proof, boolean enabled) {
+    protected AbstractBreakpoint(Proof proof, boolean enabled) {
         this.proof = proof;
         this.enabled = enabled;
     }
@@ -39,8 +37,9 @@ public abstract class AbstractBreakpoint implements IBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {}
+    public void updateState(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
+    }
 
     /**
      * {@inheritDoc}
@@ -53,8 +52,7 @@ public abstract class AbstractBreakpoint implements IBreakpoint {
     /**
      * Sets the new enabled value.
      *
-     * @param enabled
-     *        the new value
+     * @param enabled the new value
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;

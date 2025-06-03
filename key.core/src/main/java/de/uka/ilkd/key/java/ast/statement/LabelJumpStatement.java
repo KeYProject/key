@@ -31,7 +31,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * Label jump statement.
      */
 
-    public LabelJumpStatement() {
+    protected LabelJumpStatement() {
         name = null;
     }
 
@@ -42,7 +42,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *        the Label of this jump statement
      */
 
-    public LabelJumpStatement(Label label) {
+    protected LabelJumpStatement(Label label) {
         super();
         name = label;
 
@@ -54,7 +54,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * @param children
      *        the children of this AST element as KeY classes.
      */
-    public LabelJumpStatement(ExtList children) {
+    protected LabelJumpStatement(ExtList children) {
         super(children);
         name = children.get(Label.class);
     }

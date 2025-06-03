@@ -21,10 +21,10 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -60,7 +60,8 @@ public class TriggersSet {
     }
 
     static TriggersSet create(Term allTerm, Services services) {
-        final Map<Term, TriggersSet> triggerSetCache = services.getCaches().getTriggerSetCache();
+        final Map<org.key_project.logic.Term, TriggersSet> triggerSetCache =
+            services.getCaches().getTriggerSetCache();
         allTerm = TermLabelManager.removeIrrelevantLabels(allTerm, services);
         TriggersSet trs;
 
@@ -83,7 +84,7 @@ public class TriggersSet {
      * @return return all univesal variables of <code>allterm</code>
      */
     private ImmutableSet<QuantifiableVariable> getAllUQS(Term allterm) {
-        final Operator op = allterm.op();
+        final var op = allterm.op();
         if (op == Quantifier.ALL) {
             QuantifiableVariable v = allterm.varsBoundHere(0).get(0);
             return getAllUQS(allterm.sub(0)).add(v);
@@ -99,10 +100,10 @@ public class TriggersSet {
      */
     private void initTriggers(Services services) {
         final QuantifiableVariable var = allTerm.varsBoundHere(0).get(0);
-        final Iterator<Term> it =
+        final var it =
             TriggerUtils.iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm), Junctor.AND);
         while (it.hasNext()) {
-            final Term clause = it.next();
+            final var clause = (de.uka.ilkd.key.logic.Term) it.next();
             // a trigger should contain the first variable of allTerm
             if (clause.freeVars().contains(var)) {
                 ClauseTrigger ct = new ClauseTrigger(clause);
@@ -162,7 +163,7 @@ public class TriggersSet {
      */
     private class ClauseTrigger {
 
-        final Term clause;
+        final de.uka.ilkd.key.logic.Term clause;
         /** all unversal variables of <code>clause</code> */
         final ImmutableSet<QuantifiableVariable> selfUQVS;
         /**
@@ -173,7 +174,7 @@ public class TriggersSet {
 
         public ClauseTrigger(Term clause) {
             this.clause = clause;
-            selfUQVS = TriggerUtils.intersect(uniQuantifiedVariables, clause.freeVars());
+            selfUQVS = TriggerUtils.intersect(this.clause.freeVars(), uniQuantifiedVariables);
 
         }
 
@@ -183,9 +184,9 @@ public class TriggersSet {
          * multi-triggers from those elements.
          */
         public void createTriggers(Services services) {
-            final Iterator<Term> it = TriggerUtils.iteratorByOperator(clause, Junctor.OR);
+            final var it = TriggerUtils.iteratorByOperator(clause, Junctor.OR);
             while (it.hasNext()) {
-                final Term oriTerm = it.next();
+                final Term oriTerm = (Term) it.next();
                 for (Term term : expandIfThenElse(oriTerm, services)) {
                     Term t = term;
                     if (t.op() == Junctor.NOT) {
@@ -257,7 +258,8 @@ public class TriggersSet {
         }
 
         private Set<Term> combineSubterms(Term oriTerm, Set<Term>[] possibleSubs, Term[] chosenSubs,
-                ImmutableArray<QuantifiableVariable> boundVars, int i, TermServices services) {
+                ImmutableArray<de.uka.ilkd.key.logic.op.QuantifiableVariable> boundVars, int i,
+                TermServices services) {
             final HashSet<Term> set = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {
                 final Term res = services.getTermFactory().createTerm(oriTerm.op(), chosenSubs,
@@ -386,7 +388,8 @@ public class TriggersSet {
             ImmutableSet<QuantifiableVariable> mulqvs =
                 DefaultImmutableSet.nil();
             for (Trigger tr : trs) {
-                mulqvs = mulqvs.union(tr.getTriggerTerm().freeVars());
+                mulqvs =
+                    mulqvs.union(((de.uka.ilkd.key.logic.Term) tr.getTriggerTerm()).freeVars());
             }
             if (selfUQVS.subset(mulqvs)) {
                 Trigger mt = createMultiTrigger(trs, clause, selfUQVS);

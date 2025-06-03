@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.File;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+
+import org.key_project.prover.engine.ProofSearchInformation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -63,15 +63,15 @@ public class TestProofStarter {
         boolean originalOneStepSimplification =
             HelperClassForTests.isOneStepSimplificationEnabled(null);
         try {
-            File file =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "proofStarter/CC/project.key");
-            env = KeYEnvironment.load(file.toPath(), null, null, null);
+            var file =
+                HelperClassForTests.TESTCASE_DIRECTORY.resolve("proofStarter/CC/project.key");
+            env = KeYEnvironment.load(file, null, null, null);
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);
             ProofStarter ps = new ProofStarter(false);
             ps.init(proof);
             HelperClassForTests.setOneStepSimplificationEnabled(proof, oneStepSimplification);
-            ApplyStrategyInfo info = ps.start();
+            ProofSearchInformation<Proof, Goal> info = ps.start();
             assertNotNull(info);
             assertTrue(proof.closed());
         } finally {

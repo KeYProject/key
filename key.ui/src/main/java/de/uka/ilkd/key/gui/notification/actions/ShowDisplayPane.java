@@ -24,7 +24,7 @@ public abstract class ShowDisplayPane implements NotificationAction {
     /**
      * creates an instance of this action kind
      */
-    public ShowDisplayPane(Frame parentComponent) {
+    protected ShowDisplayPane(Frame parentComponent) {
         this.parentComponent = parentComponent;
     }
 

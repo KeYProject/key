@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
@@ -47,10 +46,11 @@ public class ParserMessageTest {
      * constructor parameters.
      */
     public static Collection<Arguments> data() {
-        File testDataDir = new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserMessageTest");
+        var testDataDir =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("parserMessageTest").toFile();
         var data = new LinkedList<Arguments>();
         final var files = testDataDir.listFiles();
-        Assertions.assertNotNull(files);
+        assertNotNull(files);
         for (File file : files) {
             if (file.isDirectory()) {
                 if (!new File(file, "IGNORE").exists()) {

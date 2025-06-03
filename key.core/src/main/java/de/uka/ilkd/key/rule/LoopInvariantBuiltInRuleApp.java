@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
@@ -20,7 +19,6 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.IGuard;
 import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -31,6 +29,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -55,7 +54,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, LoopSpecification inv,
+            ImmutableList<PosInOccurrence> ifInsts,
+            LoopSpecification inv,
             List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
@@ -76,8 +76,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * where <code>v</code> is a ghost variable of type sequence, values is instantiated with
      * <code>v</code>, otherwise <code>rawInv</code> is returned.
      *
-     * @param services
-     *        TODO
+     * @param services TODO
      */
     private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
             TermServices services) {
@@ -292,7 +291,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public LoopInvariantBuiltInRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
 

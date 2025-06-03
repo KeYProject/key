@@ -10,13 +10,18 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,8 +49,7 @@ public class TestCollisionResolving {
 
         // build a goal (needed for creating TacletInstantiationsTableModel)
         Proof proof = new Proof("TestCollisionResolving", TacletForTests.initConfig());
-        Semisequent empty = Semisequent.EMPTY_SEMISEQUENT;
-        Sequent seq = Sequent.createSequent(empty, empty);
+        Sequent seq = JavaDLSequentKit.getInstance().getEmptySequent();
 
         Node node = new Node(proof, seq);
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
@@ -217,13 +221,13 @@ public class TestCollisionResolving {
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_name_conflict").taclet();
-        Semisequent semiseq = Semisequent.EMPTY_SEMISEQUENT
-                .insert(0, new SequentFormula(TacletForTests.parseTerm("\\forall s x; p(x)")))
-                .semisequent()
-                .insert(1, new SequentFormula(TacletForTests.parseTerm("\\exists s x; p(x)")))
-                .semisequent();
-        Sequent seq = Sequent.createSuccSequent(semiseq);
-        PosInOccurrence pos = new PosInOccurrence(semiseq.get(0), PosInTerm.getTopLevel(), false);
+        final ImmutableList<SequentFormula> semiseq =
+            ImmutableSLList
+                    .singleton(new SequentFormula(TacletForTests.parseTerm("\\forall s x; p(x)")))
+                    .append(new SequentFormula(TacletForTests.parseTerm("\\exists s x; p(x)")));
+        Sequent seq = JavaDLSequentKit.createSuccSequent(semiseq);
+        PosInOccurrence pos =
+            new PosInOccurrence(semiseq.get(0), PosInTerm.getTopLevel(), false);
 
         NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp(taclet);
         app0 = app0.matchFind(pos, services);
@@ -332,7 +336,8 @@ public class TestCollisionResolving {
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
         MatchConditions mc =
-            taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null);
+            (MatchConditions) taclet.getMatcher().matchFind(term.sub(0),
+                MatchConditions.EMPTY_MATCHCONDITIONS, null);
         TacletApp app = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertSame(app, app1, "Actually there are no conflicts yet.");

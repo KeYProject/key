@@ -154,28 +154,18 @@ public final class PrimitiveType implements Type {
      */
     public ProgramElementName getArrayElementName() {
         if (arrayElementName == null) {
-            if (this.getName().equals("byte")) {
-                arrayElementName = new ProgramElementName("[B");
-            } else if (this.getName().equals("char")) {
-                arrayElementName = new ProgramElementName("[C");
-            } else if (this.getName().equals("double")) {
-                arrayElementName = new ProgramElementName("[D");
-            } else if (this.getName().equals("float")) {
-                arrayElementName = new ProgramElementName("[F");
-            } else if (this.getName().equals("int")) {
-                arrayElementName = new ProgramElementName("[I");
-            } else if (this.getName().equals("long")) {
-                arrayElementName = new ProgramElementName("[J");
-            } else if (this.getName().equals("short")) {
-                arrayElementName = new ProgramElementName("[S");
-            } else if (this.getName().equals("boolean")) {
-                arrayElementName = new ProgramElementName("[Z");
-            } else if (this.getName().equals("\\locset")) {
-                arrayElementName = new ProgramElementName("[X");
-            } else if (this.getName().equals("\\bigint")) {
-                arrayElementName = new ProgramElementName("[Y");
-            } else if (this.getName().equals("\\real")) {
-                arrayElementName = new ProgramElementName("[R");
+            switch (this.getName()) {
+            case "byte" -> arrayElementName = new ProgramElementName("[B");
+            case "char" -> arrayElementName = new ProgramElementName("[C");
+            case "double" -> arrayElementName = new ProgramElementName("[D");
+            case "float" -> arrayElementName = new ProgramElementName("[F");
+            case "int" -> arrayElementName = new ProgramElementName("[I");
+            case "long" -> arrayElementName = new ProgramElementName("[J");
+            case "short" -> arrayElementName = new ProgramElementName("[S");
+            case "boolean" -> arrayElementName = new ProgramElementName("[Z");
+            case "\\locset" -> arrayElementName = new ProgramElementName("[X");
+            case "\\bigint" -> arrayElementName = new ProgramElementName("[Y");
+            case "\\real" -> arrayElementName = new ProgramElementName("[R");
             }
         }
         assert arrayElementName != null;

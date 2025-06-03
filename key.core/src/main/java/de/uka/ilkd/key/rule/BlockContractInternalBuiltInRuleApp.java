@@ -6,11 +6,11 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -22,10 +22,8 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     /**
      *
-     * @param rule
-     *        the rule being applied.
-     * @param occurrence
-     *        the position at which the rule is applied.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
             final PosInOccurrence occurrence) {
@@ -34,21 +32,16 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
 
     /**
      *
-     * @param rule
-     *        the rule being applied.
-     * @param occurrence
-     *        the position at which the rule is applied.
-     * @param ifInstantiations
-     *        if instantiations.
-     * @param statement
-     *        the statement which the applied contract belongs to.
-     * @param contract
-     *        the contract being applied.
-     * @param heaps
-     *        the heap context.
+     * @param rule the rule being applied.
+     * @param occurrence the position at which the rule is applied.
+     * @param ifInstantiations if instantiations.
+     * @param statement the statement which the applied contract belongs to.
+     * @param contract the contract being applied.
+     * @param heaps the heap context.
      */
     public BlockContractInternalBuiltInRuleApp(final BuiltInRule rule,
-            final PosInOccurrence occurrence, final ImmutableList<PosInOccurrence> ifInstantiations,
+            final PosInOccurrence occurrence,
+            final ImmutableList<PosInOccurrence> ifInstantiations,
             final JavaStatement statement, final BlockContract contract,
             final List<LocationVariable> heaps) {
         super(rule, occurrence, ifInstantiations);
@@ -67,7 +60,7 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp setIfInsts(
+    public BlockContractInternalBuiltInRuleApp setAssumesInsts(
             final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;

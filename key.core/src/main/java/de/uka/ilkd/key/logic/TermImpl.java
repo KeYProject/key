@@ -6,11 +6,11 @@ package de.uka.ilkd.key.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.logic.equality.Property;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Property;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
@@ -87,13 +87,10 @@ class TermImpl implements Term {
      * Constructs a term for the given operator, with the given sub terms, bounded variables and (if
      * applicable) the code block on this term.
      *
-     * @param op
-     *        the operator of the term, e.g., some arithmetic operation
-     * @param subs
-     *        the sub terms of the constructed term (whose type is constrained by the used
+     * @param op the operator of the term, e.g., some arithmetic operation
+     * @param subs the sub terms of the constructed term (whose type is constrained by the used
      *        operator)
-     * @param boundVars
-     *        the bounded variables (if applicable), e.g., for quantifiers
+     * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
@@ -358,7 +355,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public int hashCodeModProperty(Property<Term> property) {
+    public int hashCodeModProperty(Property<? super Term> property) {
         return property.hashCodeModThisProperty(this);
     }
 
@@ -381,7 +378,7 @@ class TermImpl implements Term {
             sb.append("(").append(sub(0)).append(")");
             return sb.toString();
         } else {
-            sb.append(op().name().toString());
+            sb.append(op().name());
             if (!boundVars.isEmpty()) {
                 sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
             }

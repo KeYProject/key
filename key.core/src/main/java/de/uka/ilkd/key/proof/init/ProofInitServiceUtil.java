@@ -94,7 +94,7 @@ public final class ProofInitServiceUtil {
      */
     public static Profile getDefaultProfile(String profileName) {
         DefaultProfileResolver resolver =
-            ProofInitServiceUtil.getDefaultProfileResolver(profileName);
+            getDefaultProfileResolver(profileName);
         if (resolver != null) {
             return resolver.getDefaultProfile();
         } else {

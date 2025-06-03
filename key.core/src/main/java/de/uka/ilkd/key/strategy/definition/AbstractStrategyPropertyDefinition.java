@@ -48,7 +48,7 @@ public abstract class AbstractStrategyPropertyDefinition {
      * @param subProperties
      *        Optional children which edits related properties to this.
      */
-    public AbstractStrategyPropertyDefinition(String apiKey, String name, String tooltip,
+    protected AbstractStrategyPropertyDefinition(String apiKey, String name, String tooltip,
             AbstractStrategyPropertyDefinition... subProperties) {
         this.apiKey = apiKey;
         this.name = name;

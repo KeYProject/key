@@ -7,6 +7,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,8 +35,8 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @throws IOException
      *         on any I/O error
      */
-    public static void saveToFile(File file, Proof proof) throws IOException {
-        ProofSaver saver = new ProofSaver(proof, file);
+    public static void saveToFile(Path file, Proof proof) throws IOException {
+        ProofSaver saver = new ProofSaver(proof, file.toFile());
         saver.save();
     }
 

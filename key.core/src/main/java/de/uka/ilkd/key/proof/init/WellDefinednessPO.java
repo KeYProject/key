@@ -21,6 +21,7 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -31,7 +32,7 @@ import org.key_project.util.collection.ImmutableSet;
  * The proof obligation for well-definedness checks.
  * </p>
  * <p>
- * The generated {@link Sequent} has the following form:
+ * The generated {@link org.key_project.prover.sequent.Sequent} has the following form:
  *
  * <pre>
  * {@code
@@ -70,11 +71,11 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     // Internal Methods
     // -------------------------------------------------------------------------
 
-    private static JFunction createAnonHeap(LocationVariable heap, Services services) {
+    private static Function createAnonHeap(LocationVariable heap, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name anonHeapName =
             new Name(services.getTermBuilder().newName("anon_" + heap.toString()));
-        final JFunction anonHeap = new JFunction(anonHeapName, heapLDT.targetSort());
+        final Function anonHeap = new JFunction(anonHeapName, heapLDT.targetSort());
         return anonHeap;
     }
 
@@ -154,7 +155,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         } else {
             pm = null;
         }
-        final JFunction anonHeap = createAnonHeap(heap, services);
+        final Function anonHeap = createAnonHeap(heap, services);
         final LocationVariable self;
         if (vars.self != null) {
             self = createSelf(pm, kjt, services);
@@ -190,7 +191,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      *        variables to be used in the check
      */
     private void register(Variables vars, Services proofServices) {
-        register((JFunction) vars.anonHeap.op(), proofServices);
+        register((Function) vars.anonHeap.op(), proofServices);
         register(vars.self, proofServices);
         register(vars.result, proofServices);
         register(vars.exception, proofServices);
@@ -338,7 +339,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                 final LocationVariable exception,
                 final Map<LocationVariable, LocationVariable> atPres,
                 final ImmutableList<LocationVariable> params, final LocationVariable heap,
-                final JFunction anonHeap, TermServices services) {
+                final Function anonHeap, TermServices services) {
             this(self, result, exception, atPres, params, heap, services.getTermBuilder().label(
                 services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }

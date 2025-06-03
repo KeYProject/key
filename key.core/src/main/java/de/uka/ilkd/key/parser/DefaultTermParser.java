@@ -7,17 +7,17 @@ import java.io.IOException;
 import java.io.Reader;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.RecognitionException;
@@ -46,7 +46,7 @@ public final class DefaultTermParser {
      */
     public Term parse(Reader in, Sort sort, Services services,
             Namespace<QuantifiableVariable> var_ns,
-            Namespace<JFunction> func_ns,
+            Namespace<Function> func_ns,
             Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
         return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,

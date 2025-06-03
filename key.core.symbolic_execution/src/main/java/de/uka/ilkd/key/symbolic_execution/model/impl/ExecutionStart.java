@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -33,10 +33,8 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Constructor.
      *
-     * @param settings
-     *        The {@link ITreeSettings} to use.
-     * @param proofNode
-     *        The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings The {@link ITreeSettings} to use.
+     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public ExecutionStart(ITreeSettings settings, Node proofNode) {
@@ -78,8 +76,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Registers the given {@link IExecutionTermination}.
      *
-     * @param termination
-     *        The {@link IExecutionTermination} to register.
+     * @param termination The {@link IExecutionTermination} to register.
      */
     public void addTermination(IExecutionTermination termination) {
         if (termination != null) {
@@ -101,7 +98,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      */
     @Override
     public SourceElement getActiveStatement() {
-        Term modalityTerm = getModalityPIO().subTerm();
+        Term modalityTerm = (Term) getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);
     }
@@ -109,8 +106,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * Removes the given termination.
      *
-     * @param termination
-     *        The termination to be deleted.
+     * @param termination The termination to be deleted.
      * @author Anna Filighera
      */
     public void removeTermination(IExecutionTermination termination) {

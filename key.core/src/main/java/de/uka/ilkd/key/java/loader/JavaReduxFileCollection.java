@@ -31,7 +31,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  *
  * <p>
  * There is a text file whose name is given by
- * {@link de.uka.ilkd.key.proof.init.Profile#getInternalClasslistFilename()} which enumerates all
+ * {@link Profile#getInternalClasslistFilename()} which enumerates all
  * java files that have to be read.
  *
  * @author mulbrich

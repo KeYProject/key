@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqPut;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -31,18 +31,18 @@ public final class SeqLDT extends LDT {
 
     // getters
     private final SortDependingFunction seqGet;
-    private final JFunction seqLen;
-    private final JFunction seqIndexOf;
+    private final Function seqLen;
+    private final Function seqIndexOf;
 
     // constructors
-    private final JFunction seqEmpty;
-    private final JFunction seqSingleton;
-    private final JFunction seqConcat;
-    private final JFunction seqSub;
-    private final JFunction seqReverse;
-    private final JFunction seqUpd;
-    private final JFunction seqDef;
-    private final JFunction values;
+    private final Function seqEmpty;
+    private final Function seqSingleton;
+    private final Function seqConcat;
+    private final Function seqSub;
+    private final Function seqReverse;
+    private final Function seqUpd;
+    private final Function seqDef;
+    private final Function values;
 
     public SeqLDT(TermServices services) {
         super(NAME, services);
@@ -65,40 +65,40 @@ public final class SeqLDT extends LDT {
     }
 
 
-    public JFunction getSeqLen() {
+    public Function getSeqLen() {
         return seqLen;
     }
 
 
-    public JFunction getSeqEmpty() {
+    public Function getSeqEmpty() {
         return seqEmpty;
     }
 
 
-    public JFunction getSeqSingleton() {
+    public Function getSeqSingleton() {
         return seqSingleton;
     }
 
 
-    public JFunction getSeqConcat() {
+    public Function getSeqConcat() {
         return seqConcat;
     }
 
 
-    public JFunction getSeqSub() {
+    public Function getSeqSub() {
         return seqSub;
     }
 
-    public JFunction getSeqUpd() {
+    public Function getSeqUpd() {
         return seqUpd;
     }
 
-    public JFunction getSeqReverse() {
+    public Function getSeqReverse() {
         return seqReverse;
     }
 
 
-    public JFunction getSeqDef() {
+    public Function getSeqDef() {
         return seqDef;
     }
 
@@ -106,30 +106,27 @@ public final class SeqLDT extends LDT {
      * Placeholder for the sequence of values observed through the execution of an enhanced for
      * loop. Follows David Cok's proposal to adapt JML to Java5.
      */
-    public JFunction getValues() {
+    public Function getValues() {
         return values;
     }
 
 
     @Override
-    public boolean isResponsible(
-            Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return isResponsible(op, (Term) null, services, ec);
     }
 
 
     @Override
-    public boolean isResponsible(
-            Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(
-            Operator op, Term sub,
+    public boolean isResponsible(Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return op instanceof SeqSingleton || op instanceof SeqConcat || op instanceof SeqSub
                 || op instanceof SeqReverse || op instanceof SeqIndexOf || op instanceof SeqGet
@@ -145,32 +142,22 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public JFunction getFunctionFor(
-            Operator op, Services serv,
-            ExecutionContext ec) {
-        if (op instanceof SeqSingleton) {
-            return seqSingleton;
-        } else if (op instanceof SeqConcat) {
-            return seqConcat;
-        } else if (op instanceof SeqSub) {
-            return seqSub;
-        } else if (op instanceof SeqReverse) {
-            return seqReverse;
-        } else if (op instanceof SeqPut) {
-            return seqUpd;
-        } else if (op instanceof SeqIndexOf) {
-            return seqIndexOf;
-        } else if (op instanceof SeqGet) {
-            return seqGet;
-        } else if (op instanceof SeqLength) {
-            return seqLen;
-        }
-        assert false;
-        return null;
+    public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
+        return switch (op) {
+        case SeqSingleton ignored -> seqSingleton;
+        case SeqConcat ignored -> seqConcat;
+        case SeqSub ignored -> seqSub;
+        case SeqReverse ignored -> seqReverse;
+        case SeqPut ignored -> seqUpd;
+        case SeqIndexOf ignored -> seqIndexOf;
+        case SeqGet ignored -> seqGet;
+        case SeqLength ignored -> seqLen;
+        default -> throw new AssertionError();
+        };
     }
 
     @Override
-    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
         if (operationName.equals("add")) {
             return getSeqConcat();
         }
@@ -201,7 +188,7 @@ public final class SeqLDT extends LDT {
     }
 
 
-    public JFunction getSeqIndexOf() {
+    public Function getSeqIndexOf() {
         return seqIndexOf;
     }
 }

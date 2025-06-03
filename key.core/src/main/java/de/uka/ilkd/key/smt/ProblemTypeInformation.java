@@ -55,7 +55,7 @@ public class ProblemTypeInformation {
     /**
      * @param key
      * @return
-     * @see java.util.Map#get(java.lang.Object)
+     * @see Map#get(Object)
      */
     public SMTSort getTypeForConstant(Object key) {
         return constantsTypes.get(key);
@@ -65,7 +65,7 @@ public class ProblemTypeInformation {
      * @param key
      * @param value
      * @return
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+     * @see Map#put(Object, Object)
      */
     public SMTSort putConstantType(String key, SMTSort value) {
         return constantsTypes.put(key, value);
@@ -85,7 +85,7 @@ public class ProblemTypeInformation {
     /**
      * @param key
      * @return
-     * @see java.util.Map#get(java.lang.Object)
+     * @see Map#get(Object)
      */
     public SMTSort getTypeForField(Object key) {
         return fieldTypes.get(key);
@@ -95,7 +95,7 @@ public class ProblemTypeInformation {
      * @param key
      * @param value
      * @return
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+     * @see Map#put(Object, Object)
      */
     public SMTSort putFieldType(String key, SMTSort value) {
 

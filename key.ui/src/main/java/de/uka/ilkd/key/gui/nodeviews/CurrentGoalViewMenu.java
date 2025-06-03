@@ -28,11 +28,9 @@ import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -42,7 +40,6 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -51,6 +48,10 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -205,7 +206,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         if (getPos() != null) {
             PosInOccurrence occ = getPos().getPosInOccurrence();
             if (occ != null && occ.posInTerm() != null) {
-                Term t = occ.subTerm();
+                Term t = (Term) occ.subTerm();
                 createAbbrevSection(t, control);
 
                 if (t.op() instanceof ProgramVariable var) {
@@ -553,13 +554,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 switch (((JMenuItem) e.getSource()).getText()) {
                 case DISABLE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
+                        mediator.getNotationInfo().getAbbrevMap().setEnabled((Term) occ.subTerm(),
+                            false);
                         getSequentView().printSequent();
                     }
                 }
                 case ENABLE_ABBREVIATION -> {
                     if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), true);
+                        mediator.getNotationInfo().getAbbrevMap().setEnabled((Term) occ.subTerm(),
+                            true);
                         getSequentView().printSequent();
                     }
                 }
@@ -580,7 +583,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                         "Only letters, numbers and '_' are allowed for Abbreviations",
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
-                                    mediator.getNotationInfo().getAbbrevMap().put(occ.subTerm(),
+                                    mediator.getNotationInfo().getAbbrevMap().put(
+                                        (Term) occ.subTerm(),
                                         abbreviation, true);
                                     getSequentView().printSequent();
                                 }
@@ -596,7 +600,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                         String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
                             "Enter abbreviation for term: \n" + occ.subTerm().toString(),
                             "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
-                            mediator.getNotationInfo().getAbbrevMap().getAbbrev(occ.subTerm())
+                            mediator.getNotationInfo().getAbbrevMap()
+                                    .getAbbrev((Term) occ.subTerm())
                                     .substring(1));
                         try {
                             if (abbreviation != null) {
@@ -607,7 +612,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     mediator.getNotationInfo().getAbbrevMap()
-                                            .changeAbbrev(occ.subTerm(), abbreviation);
+                                            .changeAbbrev((Term) occ.subTerm(), abbreviation);
                                     getSequentView().printSequent();
                                 }
                             }
@@ -773,7 +778,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             cmpVar1 = cmpVar1 - formulaSV1;
             map.put("sans_formula_sv", -cmpVar1);
 
-            map.put("if_seq", taclet1.ifSequent().isEmpty() ? 1 : -1);
+            map.put("if_seq", taclet1.assumesSequent().isEmpty() ? 1 : -1);
 
             map.put("num_goals", taclet1.goalTemplates().size());
 
