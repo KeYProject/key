@@ -10,7 +10,7 @@ repositories {
 dependencies {
     api project(':key.util')
     api project(':key.ncore')
-    implementation 'org.jspecify:jspecify:0.3.0'
+    implementation 'org.jspecify:jspecify:1.0.0'
 }
 
 tasks.withType(Test) {
