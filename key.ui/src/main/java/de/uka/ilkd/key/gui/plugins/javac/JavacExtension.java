@@ -5,6 +5,8 @@ package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -147,6 +149,10 @@ public class JavacExtension
             File bootClassPath =
                 jm.getBootClassPath() != null ? new File(jm.getBootClassPath()) : null;
             List<File> classpath = jm.getClassPathEntries();
+            if (false) {
+            if (classpath == null) classpath = new ArrayList<>();
+            classpath.addAll(Arrays.asList("build/classes/java/main:./build/libs/checker-3.42.0-eisop3.jar:./build/libs/checker-qual-3.42.0-eisop3.jar:./build/libs/checker-util-3.42.0-eisop3.jar:./build/libs/universe.jar:./build/resources/main".split(":./")).stream().map(p -> new File("/home/boby/Dev/java/universe/" + p)).toList());
+            }
             File javaPath = new File(jm.getModelDir());
 
             lblStatus.setForeground(Color.black);
@@ -154,7 +160,8 @@ public class JavacExtension
             lblStatus.setIcon(ICON_WAIT.get(16));
 
             CompletableFuture<List<PositionedIssueString>> task =
-                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath);
+                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath, 
+                false ? Arrays.asList("universe.UniverseChecker"): null);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");

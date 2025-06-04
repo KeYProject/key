@@ -56,11 +56,12 @@ public class JavaCompilerCheckFacade {
      * @param classPath the {@link List} of {@link File}s referring to the directory that make up
      *        the target Java programs classpath
      * @param javaPath the {@link String} with the path to the source of the target Java program
+     * @param processors the {@link List} of {@link File}s referring to the annotation processors to run
      * @return future providing the list of diagnostics
      */
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
             ProblemInitializer.ProblemInitializerListener listener,
-            File bootClassPath, List<File> classPath, File javaPath) {
+            File bootClassPath, List<File> classPath, File javaPath, List<String> processors) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -86,6 +87,20 @@ public class JavaCompilerCheckFacade {
 
         // gather configured bootstrap classpath and regular classpath
         List<String> options = new ArrayList<>();
+        if (false) {
+        options.addAll(Arrays.asList(
+            "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+            "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+            "--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED"
+        ));
+        }
+
         if (bootClassPath != null) {
             options.add("-Xbootclasspath");
             options.add(bootClassPath.getAbsolutePath());
@@ -95,6 +110,14 @@ public class JavaCompilerCheckFacade {
             options.add(
                 classPath.stream().map(File::getAbsolutePath).collect(Collectors.joining(":")));
         }
+
+        if (processors != null && !processors.isEmpty()) {
+            options.add("-processor");
+            options.add(processors.stream().collect(Collectors.joining(",")));
+        }
+
+        LOGGER.info("{}", options);
+
         ArrayList<Path> files = new ArrayList<>();
         if (javaPath.isDirectory()) {
             try (var s = Files.walk(javaPath.toPath())) {
