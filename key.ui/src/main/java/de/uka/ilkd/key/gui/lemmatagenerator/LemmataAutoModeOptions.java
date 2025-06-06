@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -23,7 +25,7 @@ public class LemmataAutoModeOptions {
      * The path of the file containing the rules that should be proven.
      */
     @CommandLine.Option(names = "--jr-rules", paramLabel = "FILE")
-    private File pathOfRuleFile;
+    private Path pathOfRuleFile;
 
     /**
      * The maximum number of rules that are used within a proof.
@@ -63,7 +65,7 @@ public class LemmataAutoModeOptions {
 
     @CommandLine.Option(names = "--jr-signature", paramLabel = "FILE",
         description = "read definitions from given file")
-    public @Nullable File signature = null;
+    public @Nullable Path signature = null;
 
 
     private final Collection<String> filesForAxioms = new LinkedList<>();
@@ -96,7 +98,7 @@ public class LemmataAutoModeOptions {
         return saveResultsToFile;
     }
 
-    public File getPathOfRuleFile() {
+    public Path getPathOfRuleFile() {
         return pathOfRuleFile;
     }
 
@@ -117,7 +119,7 @@ public class LemmataAutoModeOptions {
     }
 
     private void checkForValidity() {
-        if (pathOfRuleFile != null && !pathOfRuleFile.isFile()) {
+        if (pathOfRuleFile != null && !Files.exists(pathOfRuleFile)) {
             throwError(String.format("Error while setting the file containing the rules:\n"
                 + "'%s' is not a valid file in your system.", pathOfRuleFile));
         }

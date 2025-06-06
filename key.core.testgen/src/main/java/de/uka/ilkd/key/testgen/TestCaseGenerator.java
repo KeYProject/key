@@ -3,19 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.lang.model.element.Modifier;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,7 +18,10 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -85,16 +82,10 @@ public class TestCaseGenerator {
     private final boolean rflAsInternalClass;
     private final AssignmentCreator assignmentCreator;
     private final ReflectionClassCreator rflCreator;
-    private final String modDirName;
+    private final Path modDirName;
     private final OutputEnvironment outputFolder;
     private final Path outputModDir;
     private final Path outputDontCopy;
-    private final boolean rflAsInternalClass;
-    protected final boolean useRFL;
-    protected final ReflectionClassCreator rflCreator;
-    private final Path dontCopy;
-    protected final Path modDir;
-    protected final String directory;
     private final TGReporter reporter;
     private final String fileName;
     private final String packageName;
@@ -120,7 +111,8 @@ public class TestCaseGenerator {
                 : TestgenUtils::createAssignmentWithoutRfl;
 
 
-        modDirName = services.getJavaModel().getModelDir();
+        modDirName = Objects.requireNonNull(services.getJavaModel().getModelDir(),
+            "No Java Source given in the JavaModel");
         outputFolder = new OutputEnvironment(Paths.get(settings.getOutputFolderPath()));
         outputModDir = outputFolder.getSourceDir();
         outputDontCopy = outputModDir.resolve(TestCaseGenerator.DONT_COPY);
@@ -279,7 +271,7 @@ public class TestCaseGenerator {
      * Copy the involved classes without modification
      */
     public void exportCodeUnderTest() throws IOException {
-        copyFiles(Paths.get(modDirName), outputModDir);
+        copyFiles(modDirName, outputModDir);
     }
 
     public String getOracleAssertion(List<MethodSpec> oracleMethods) {
