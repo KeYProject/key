@@ -146,7 +146,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         if (op.kind() instanceof ModalOperatorSV) {
             kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
         }
-        if (jb != op.program() || kind != op.kind()) {
+        if (jb != op.programBlock() || kind != op.kind()) {
             return Modality.getModality(kind, jb);
         }
         return op;
@@ -217,7 +217,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
             boolean jblockChanged = false;
             JavaBlock jb = JavaBlock.EMPTY_JAVABLOCK;
             if (visited.op() instanceof final Modality mod) {
-                final JavaBlock originalBlock = mod.program();
+                final JavaBlock originalBlock = mod.programBlock();
                 jb = replacePrg(svInst, originalBlock);
                 if (jb != originalBlock) {
                     jblockChanged = true;

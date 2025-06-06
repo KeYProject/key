@@ -151,7 +151,7 @@ public class RenamingTermProperty implements Property<Term> {
             if (mod0.kind() != mod1.kind()) {
                 return false;
             }
-            nat = handleJava(mod0.program(), mod1.program(), nat);
+            nat = handleJava(mod0.programBlock(), mod1.programBlock(), nat);
             if (nat == FAILED) {
                 return false;
             }
@@ -366,7 +366,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @return the hash code
      */
     private int hashJavaBlock(Modality mod) {
-        final JavaBlock jb = mod.program();
+        final JavaBlock jb = mod.programBlock();
         if (!jb.isEmpty()) {
             final JavaProgramElement jpe = jb.program();
             return jpe != null ? jpe.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY) : 0;
