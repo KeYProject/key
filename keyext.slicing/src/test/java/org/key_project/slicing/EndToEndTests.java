@@ -79,7 +79,7 @@ class EndToEndTests {
     @Test
     void sliceMultipleIterations() throws Exception {
         // simple Java proof
-        var iteration1 = sliceProofFullFilename(
+        Pair<Proof, Path> iteration1 = sliceProofFullFilename(
             testCaseDirectory
                     .getParent().getParent().getParent().getParent().getParent()
                     .resolve("key.ui")
@@ -165,7 +165,7 @@ class EndToEndTests {
         sliceProof("ifThenElseSplit.proof", 12, 6, true, false);
 
         // duplicate analysis: merge duplicated steps (one at a time)
-        var iteration1 = sliceProofFullFilename(
+        Pair<Proof, Path> iteration1 = sliceProofFullFilename(
             testCaseDirectory.resolve("ifThenElseSplit.proof"),
             12, 11, false, true, true);
         var iteration2 =
@@ -216,7 +216,7 @@ class EndToEndTests {
      */
     @Test
     void sliceDuplicatesAway() throws Exception {
-        var iteration1 = sliceProofFullFilename(
+        Pair<Proof, Path> iteration1 = sliceProofFullFilename(
             testCaseDirectory.resolve("exampleDuplicate.proof"), 10, 9, false, true,
             true);
         var iteration2 =
