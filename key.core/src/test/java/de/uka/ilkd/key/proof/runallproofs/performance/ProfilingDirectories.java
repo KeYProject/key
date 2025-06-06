@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,10 +20,10 @@ public class ProfilingDirectories extends RunAllProofsDirectories {
     public final File instantiateAppDataDir;
     private final File runDir;
 
-    public ProfilingDirectories(Date runStart) {
+    public ProfilingDirectories(Date runStart) throws IOException {
         SimpleDateFormat format = new SimpleDateFormat("dd.MMM_yyyy____HH:mm:ss");
         String date = format.format(runStart);
-        runDir = new File(RUNALLPROOFS_DIR, "run-" + date);
+        runDir = RUNALLPROOFS_DIR.resolve("run-" + date).toFile();
 
         profilingDataDir = new File(runDir, "profilingData");
         ruleIndependentDataDir = new File(profilingDataDir, "ruleIndependentData");

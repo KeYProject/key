@@ -5,6 +5,8 @@ package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,14 +62,14 @@ public class LemmataHandler implements TacletFilter {
         println("Start problem creation:");
         println(options.toString());
 
-        File file = new File(options.getPathOfRuleFile());
-        Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
+        Path file = new File(options.getPathOfRuleFile()).toPath();
+        Collection<Path> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
 
         final ProblemInitializer problemInitializer =
             new ProblemInitializer(null, new Services(profile), new Listener());
 
-        TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null, new Listener(),
-            problemInitializer, profile, file, filesForAxioms);
+        TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(
+            null, new Listener(), problemInitializer, profile, file, filesForAxioms);
 
 
         LoaderListener loaderListener = new LoaderListener() {
@@ -122,10 +124,10 @@ public class LemmataHandler implements TacletFilter {
         loader.start();
     }
 
-    private Collection<File> createFilesForAxioms(Collection<String> filenames) {
-        Collection<File> list = new LinkedList<>();
+    private Collection<Path> createFilesForAxioms(Collection<String> filenames) {
+        Collection<Path> list = new LinkedList<>();
         for (String filename : filenames) {
-            list.add(new File(filename));
+            list.add(Paths.get(filename));
         }
         return list;
     }
@@ -150,7 +152,7 @@ public class LemmataHandler implements TacletFilter {
         }
     }
 
-    private void saveProof(Proof p) throws IOException {
+    private void saveProof(Proof p) {
         ProofSaver saver =
             new ProofSaver(p, options.createProofPath(p), options.getInternalVersion());
         saver.save();

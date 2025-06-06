@@ -62,7 +62,7 @@ public class FunctionPerformanceData {
                 String description = "Profiling data for rule " + ruleName;
                 table = new DataRecordingTable(ruleDataLocation, columns, description);
                 tables.put(ruleName, table);
-                table.writeComment("# " + dataRecordingTestFile.getKeYFile().getName() + "\n");
+                table.writeComment("# " + dataRecordingTestFile.getKeYFile().getFileName() + "\n");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

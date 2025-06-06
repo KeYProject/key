@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.rule;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -50,7 +52,7 @@ public class TacletForTests {
     public static TacletIndex rules = null;
     public static Services services;
     public static InitConfig initConfig;
-    public static File lastFile = null;
+    public static Path lastFile = null;
 
     private static Namespace<QuantifiableVariable> variables = null;
     private static Namespace<SchemaVariable> schemaVariables;
@@ -75,7 +77,7 @@ public class TacletForTests {
         nss = new NamespaceSet();
     }
 
-    public static void parse(File file) {
+    public static void parse(Path file) {
         try {
             if (!file.equals(lastFile)) {
                 KeYFileForTests envInput = new KeYFileForTests("Test", file, profile);
@@ -125,7 +127,7 @@ public class TacletForTests {
     }
 
     public static void parse(String filename) {
-        parse(new File(filename));
+        parse(Paths.get(filename));
     }
 
     public static void parse() {
