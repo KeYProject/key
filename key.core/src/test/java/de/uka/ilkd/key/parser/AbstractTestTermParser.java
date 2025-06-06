@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -171,8 +174,9 @@ public class AbstractTestTermParser {
     }
 
     protected Services getServices() {
-        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "termParser" + File.separator + "parserTest.key");
+        Path keyFile = HelperClassForTests.TESTCASE_DIRECTORY
+                .resolve("termParser")
+                .resolve("parserTest.key");
         return HelperClassForTests.createServices(keyFile);
     }
 

@@ -3,15 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.io.File;
-import java.net.URL;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Choice;
 
@@ -95,10 +92,6 @@ public class FinalPrinterTest {
     }
 
     private static Services getServices() {
-        URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
-        assert url != null : "Could not find roundTripTest.key";
-        assert "file".equals(url.getProtocol()) : "URL is not a file URL";
-        File keyFile = new File(url.getPath());
-        return HelperClassForTests.createServices(keyFile);
+        return PrettyPrinterRoundtripTest.getServices();
     }
 }

@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -22,7 +24,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Pretty printer roundtrip test.
@@ -84,7 +86,7 @@ public class PrettyPrinterRoundtripTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getCases")
-    public void roundtrip(String termString) throws Exception {
+    public void roundtrip(String termString) {
         services.getProof().getSettings().getChoiceSettings().updateWith(List.of(WITH_FINAL));
         Term term = io.parseExpression(termString);
         System.out.println("Original: " + term);
@@ -99,7 +101,7 @@ public class PrettyPrinterRoundtripTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getHeapCases")
-    void roundtripWithoutFinal(String termString) throws Exception {
+    void roundtripWithoutFinal(String termString) {
         services.getProof().getSettings().getChoiceSettings().updateWith(List.of(WITHOUT_FINAL));
         Term term = io.parseExpression(termString);
         System.out.println("Original: " + term);
@@ -122,11 +124,13 @@ public class PrettyPrinterRoundtripTest {
         assertTrue(value, "Expected: " + expected + " but was: " + actual);
     }
 
-    private static Services getServices() {
-        URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
-        assert url != null : "Could not find roundTripTest.key";
-        assert "file".equals(url.getProtocol()) : "URL is not a file URL";
-        File keyFile = new File(url.getPath());
-        return HelperClassForTests.createServices(keyFile);
+    static Services getServices() {
+        try {
+            URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
+            Path keyFile = Paths.get(url.toURI());
+            return HelperClassForTests.createServices(keyFile);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

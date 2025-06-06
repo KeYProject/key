@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -157,7 +158,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * The {@link File} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
-    private @Nullable File proofFile;
+    private @Nullable Path proofFile;
 
     private @Nullable Lookup userData;
 
@@ -236,7 +237,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     public Proof(String name, Sequent problem, String header, InitConfig initConfig,
-            File proofFile) {
+            Path proofFile) {
         this(name, problem, initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
             initConfig);
         problemHeader = header;
@@ -1239,7 +1240,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * @return The {@link File} under which the {@link Proof} was saved the last time or
      *         {@code null} if not available.
      */
-    public File getProofFile() {
+    public @Nullable Path getProofFile() {
         return proofFile;
     }
 
@@ -1248,7 +1249,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
      */
-    public void setProofFile(File proofFile) {
+    public void setProofFile(@Nullable Path proofFile) {
         this.proofFile = proofFile;
     }
 
@@ -1333,8 +1334,9 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param callbackTotal callback that gets the total number of branches to complete
      * @param callbackBranch callback notified every time a branch has been copied
      */
-    public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
-            Runnable callbackBranch) {
+    public void copyCachedGoals(Proof referencedFrom,
+            @Nullable Consumer<Integer> callbackTotal,
+            @Nullable Runnable callbackBranch) {
         // first, ensure that all cached goals are copied over
         List<Goal> goals = closedGoals().toList();
         List<Goal> todo = new ArrayList<>();
