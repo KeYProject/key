@@ -9,8 +9,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
@@ -57,7 +55,7 @@ import recoder.ParserException;
  */
 public final class Main implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-    private static File workingDir;
+    private static Path workingDir;
 
 
     // @Option(names = "--help", description = "display this text")
@@ -129,7 +127,7 @@ public final class Main implements Callable<Integer> {
     @Option(names = "--tacletDir",
         description = "load base taclets from a directory, not from internal structures",
         paramLabel = "FOLDER")
-    private @Nullable File tacletDir = null;
+    private @Nullable Path tacletDir = null;
 
     @Option(names = "--examples", paramLabel = "FOLDER",
         description = "load the directory containing the example files on startup")
@@ -140,7 +138,7 @@ public final class Main implements Callable<Integer> {
      */
     @Option(names = "--rifl", paramLabel = "FILE",
         description = "load RIFL specifications from file (requires GUI and startup file)")
-    public @Nullable File riflFileName = null;
+    public @Nullable Path riflFileName = null;
 
     /**
      * Save all contracts in selected location to automate the creation of multiple
@@ -223,7 +221,7 @@ public final class Main implements Callable<Integer> {
      * The file names provided on the command line
      */
     @Parameters(arity = "*")
-    private List<File> inputFiles = List.of();
+    private List<Path> inputFiles = List.of();
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
@@ -244,7 +242,7 @@ public final class Main implements Callable<Integer> {
 
         if (tacletDir != null) {
             System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY,
-                tacletDir.getAbsolutePath());
+                tacletDir.toAbsolutePath().toString());
         }
 
         GeneralSettings.noPruningClosed = isNoPruningClosed;
@@ -312,7 +310,7 @@ public final class Main implements Callable<Integer> {
 
         if (riflFileName != null) {
             LOGGER.info("Loading RIFL specification from {}", riflFileName);
-            if (!riflFileName.exists()) {
+            if (!Files.exists(riflFileName)) {
                 LOGGER.info("RIFL does not exists {}", riflFileName);
                 return 2;
             }
@@ -331,7 +329,7 @@ public final class Main implements Callable<Integer> {
 
         if (macro != null) {
             for (ProofMacro m : ClassLoaderUtil.loadServices(ProofMacro.class)) {
-                if (macro.equals(m.getScriptCommandName())) {
+                if (macro.equals(m.getClass().getSimpleName())) {
                     // memorize macro for later
                     try {
                         autoMacro = m.getClass().getDeclaredConstructor().newInstance();
@@ -352,7 +350,6 @@ public final class Main implements Callable<Integer> {
             }
         }
 
-
         AbstractMediatorUserInterfaceControl ui = createUserInterface(inputFiles);
         if (inputFiles.isEmpty()) {
             if (examplesFolder != null
@@ -364,7 +361,7 @@ public final class Main implements Callable<Integer> {
         } else {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(isSaveAllContracts);
-            for (File f : inputFiles) {
+            for (Path f : inputFiles) {
                 ui.loadProblem(f);
             }
 
@@ -512,7 +509,7 @@ public final class Main implements Callable<Integer> {
      *
      * @return {@link File} object representing working directory.
      */
-    public static File getWorkingDir() {
+    public static Path getWorkingDir() {
         return workingDir;
     }
 
@@ -539,11 +536,11 @@ public final class Main implements Callable<Integer> {
         }
 
         if (inputFiles != null && !inputFiles.isEmpty()) {
-            File f = inputFiles.get(0);
-            if (f.isDirectory()) {
+            Path f = inputFiles.get(0);
+            if (Files.isDirectory(f)) {
                 workingDir = f;
             } else {
-                workingDir = f.getParentFile();
+                workingDir = f.getParent();
             }
         } else {
             workingDir = IOUtil.getCurrentDirectory();

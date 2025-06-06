@@ -97,8 +97,8 @@ public final class Main implements Callable<Integer> {
         }
     }
 
-    private void processFile(File proofFile, boolean overwrite) throws Exception {
-        LOGGER.info("Processing proof: {}", proofFile.getName());
+    private void processFile(Path proofFile, boolean overwrite) throws Exception {
+        LOGGER.info("Processing proof: {}", proofFile.getFileName());
         GeneralSettings.noPruningClosed = false;
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         KeYEnvironment<?> environment =

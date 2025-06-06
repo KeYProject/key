@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.testgen;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class TGMain implements Callable<Integer> {
     }
 
     @CommandLine.Parameters(description = "KeY or Java file.", arity = "1..*")
-    private List<File> files = new LinkedList<>();
+    private List<Path> files = new LinkedList<>();
 
     @CommandLine.Option(names = "-T", description = "Number of parallel jobs", defaultValue = "4")
     private int numberOfThreads = 4;
@@ -107,7 +108,7 @@ public class TGMain implements Callable<Integer> {
         }
 
 
-        for (File file : files) {
+        for (Path file : files) {
             List<Proof> proofs = new LinkedList<>();
             var env = KeYEnvironment.load(file);
             Proof proof = env.getLoadedProof();
@@ -130,7 +131,7 @@ public class TGMain implements Callable<Integer> {
 
             LOGGER.info("Number of proof found: {}", proofs.size());
 
-            try (var exec = Executors.newFixedThreadPool(numberOfThreads);) {
+            try (var exec = Executors.newFixedThreadPool(numberOfThreads)) {
                 LOGGER.info("Start processing with {} threads", numberOfThreads);
                 var tasks = proofs.stream().map(
                     p -> TestgenFacade.generateTestcasesTask(env, p, settings, log)).toList();
