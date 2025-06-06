@@ -204,7 +204,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
             return null;
         } else if (term.op() instanceof Modality mod) {
             final JavaBlock renamedJavaBlock =
-                renameJavaBlock(progVarReplaceMap, mod.program().program(), services);
+                renameJavaBlock(progVarReplaceMap, mod.programBlock().program(), services);
             final Term[] appliedSubs = applyProgramRenamingsToSubs(term, progVarReplaceMap);
 
             return tf().createTerm(Modality.getModality(mod.kind(), renamedJavaBlock), appliedSubs,

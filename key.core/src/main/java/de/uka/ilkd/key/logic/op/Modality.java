@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
@@ -59,7 +60,8 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     }
 
     @Override
-    public JavaBlock program() {
+    @NonNull
+    public JavaBlock programBlock() {
         return javaBlock;
     }
 

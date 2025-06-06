@@ -358,7 +358,7 @@ public final class ProblemInitializer {
                 rootGoal.addProgramVariable(pv);
             }
         } else if (term.op() instanceof Modality mod) {
-            final ProgramElement pe = mod.program().program();
+            final ProgramElement pe = mod.programBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<LocationVariable> freeProgVars =
                 MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));

@@ -31,7 +31,7 @@ public abstract class Modality extends AbstractSortedOperator {
     /// The program contained in this modality.
     ///
     /// @return the program.
-    public abstract Program program();
+    public abstract Program programBlock();
 
     @Override
     public int getChildCount() {
@@ -42,7 +42,7 @@ public abstract class Modality extends AbstractSortedOperator {
     public SyntaxElement getChild(int n) {
         return switch (n) {
         case 0 -> kind;
-        case 1 -> program();
+        case 1 -> programBlock();
         default -> throw new IndexOutOfBoundsException(
             "Modality " + name() + " has only two children");
         };

@@ -36,9 +36,9 @@ public class TermProgramVariableCollector implements DefaultVisitor {
             result.add(variable);
         }
 
-        if (visited.op() instanceof Modality mod && !mod.program().isEmpty()) {
+        if (visited.op() instanceof Modality mod && !mod.programBlock().isEmpty()) {
             ProgramVariableCollector pvc =
-                new ProgramVariableCollector(mod.program().program(), services);
+                new ProgramVariableCollector(mod.programBlock().program(), services);
             pvc.start();
             result.addAll(pvc.result());
         }

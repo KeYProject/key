@@ -58,8 +58,8 @@ public class EqualityModuloProofIrrelevancy {
             return equalsModProofIrrelevancy(_thisLoc, (LocationVariable) that);
         } else if (_this instanceof Modality _thisMod) {
             return _thisMod.kind().equals(((Modality) that).kind()) &&
-                    equalsModProofIrrelevancy(_thisMod.program(),
-                        ((Modality) that).program());
+                    equalsModProofIrrelevancy(_thisMod.programBlock(),
+                        ((Modality) that).programBlock());
         }
 
         // assume name and arity uniquely identifies operator

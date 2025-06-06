@@ -272,7 +272,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         if (op.kind() instanceof ModalOperatorSV) {
             kind = (Modality.JavaModalityKind) svInst.getInstantiation(op.kind());
         }
-        if (jb != op.program() || kind != op.kind()) {
+        if (jb != op.programBlock() || kind != op.kind()) {
             return Modality.getModality(kind, jb);
         }
         return op;
