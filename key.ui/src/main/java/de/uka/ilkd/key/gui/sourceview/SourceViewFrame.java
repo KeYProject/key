@@ -20,9 +20,6 @@ import de.uka.ilkd.key.gui.utilities.ClosableTabComponent;
  * @author lanzinger
  */
 public class SourceViewFrame extends JSplitPane {
-
-    private static final long serialVersionUID = 382427737154314400L;
-
     /** The source view contained in this frame. */
     private final SourceView sourceView;
 

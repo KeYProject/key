@@ -77,8 +77,6 @@ import org.slf4j.LoggerFactory;
 public final class SourceView extends JComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceView.class);
 
-    private static final long serialVersionUID = -94424677425561025L;
-
     /**
      * the only instance of this singleton
      */

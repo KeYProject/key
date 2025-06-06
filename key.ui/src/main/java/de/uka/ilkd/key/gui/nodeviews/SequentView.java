@@ -27,6 +27,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.DoNothingCaret;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -44,16 +45,27 @@ import org.slf4j.LoggerFactory;
 public abstract class SequentView extends JEditorPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
-    public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
+    public static final ColorSettings.ColorProperty PERMANENT_HIGHLIGHT_COLOR =
+            ColorSettings.define("[currentGoal]permaHighlight",
+                    "",
+                    new Color(110, 85, 181, 76),
+                    new Color(210, 185, 201, 200));
 
     public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
+        ColorSettings.define("[currentGoal]defaultHighlight", "",
+                new Color(70, 100, 170, 76),
+                new Color(140, 200, 255, 180));
 
     public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
+        ColorSettings.define("[currentGoal]addtionalHighlight", "",
+                new Color(0, 0, 0, 38),
+                new Color(240, 220, 255, 180));
 
     public static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
+        ColorSettings.define("[currentGoal]updateHighlight", "",
+                new Color(0, 150, 130, 38),
+                new Color(0, 150, 130, 255)
+                );
 
     public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
         ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 255));
@@ -66,8 +78,7 @@ public abstract class SequentView extends JEditorPane {
         "[currentGoal]mouseSelectionColor", "Color of the mouse selection in the sequent view.",
         new Color(230, 230, 230, 255));
 
-    protected static Color INACTIVE_BACKGROUND_COLOR =
-            new Color(UIManager.getColor("Panel.background").getRGB());
+    protected static Color INACTIVE_BACKGROUND_COLOR = UIManager.getColor("Panel.background");
 
     private static final HighlightPainter MOUSE_SELECTION_PAINTER =
         new DefaultHighlightPainter(MOUSE_SELECTION_COLOR.get());
@@ -132,9 +143,9 @@ public abstract class SequentView extends JEditorPane {
 
     private final SequentViewInputListener sequentViewInputListener;
 
-    private Object userSelectionHighlight = null;
-    private Range userSelectionHighlightRange = null;
-    private PosInSequent userSelectionHighlightPis = null;
+    private @Nullable Object userSelectionHighlight = null;
+    private @Nullable Range userSelectionHighlightRange = null;
+    private @Nullable PosInSequent userSelectionHighlightPis = null;
 
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -199,7 +210,7 @@ public abstract class SequentView extends JEditorPane {
     }
 
     @Override
-    public String getToolTipText(MouseEvent event) {
+    public @Nullable String getToolTipText(MouseEvent event) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .isShowSequentViewTooltips()) {
             return null;
@@ -345,14 +356,14 @@ public abstract class SequentView extends JEditorPane {
     /**
      * @return the initial position table
      */
-    protected InitialPositionTable getInitialPositionTable() {
+    protected @Nullable InitialPositionTable getInitialPositionTable() {
         return printer == null ? null : printer.layouter().getInitialPositionTable();
     }
 
     /**
      * Get a PosInSequent object for a given coordinate of the displayed sequent.
      */
-    protected synchronized PosInSequent getPosInSequent(Point p) {
+    protected synchronized @Nullable PosInSequent getPosInSequent(Point p) {
         String seqText = getText();
         if (seqText != null && !seqText.isEmpty()) {
             final InitialPositionTable initialPositionTable = getInitialPositionTable();
@@ -586,7 +597,7 @@ public abstract class SequentView extends JEditorPane {
             userSelectionHighlightRange = new Range(range.start() + 1, range.end() + 1);
             userSelectionHighlight = getHighlighter().addHighlight(
                 userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR.getCurrentColor()));
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {
@@ -602,7 +613,7 @@ public abstract class SequentView extends JEditorPane {
             userSelectionHighlightRange = getHighlightRange(point);
             userSelectionHighlight = getHighlighter().addHighlight(
                 userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR.getCurrentColor()));
 
             sequentViewInputListener.highlightOriginInSourceView(userSelectionHighlightPis);
         } catch (BadLocationException e) {
@@ -657,7 +668,7 @@ public abstract class SequentView extends JEditorPane {
             userSelectionHighlightRange = new Range(pis.getBounds().start(), pis.getBounds().end());
             userSelectionHighlight = getHighlighter().addHighlight(
                 userSelectionHighlightRange.start(), userSelectionHighlightRange.end(),
-                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR));
+                new DefaultHighlightPainter(PERMANENT_HIGHLIGHT_COLOR.getCurrentColor()));
 
             sequentViewInputListener.highlightOriginInSourceView(pis);
         } catch (BadLocationException e) {

@@ -39,6 +39,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -56,31 +57,37 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
 
     public static final ColorSettings.ColorProperty GRAY_COLOR =
-        ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
+        ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY, Color.LIGHT_GRAY);
+
     public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
         ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
     /**
      * Color used for closed goals.
      */
     public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
-        ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
+        ColorSettings.define("[proofTree]darkGreen", "",
+                new Color(0, 128, 51),
+                new Color(100, 255, 102));
+
     public static final ColorSettings.ColorProperty DARK_RED_COLOR =
-        ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0));
+        ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0),
+                new Color(191, 120, 120));
     /**
      * Color used for linked goals.
      */
     public static final ColorSettings.ColorProperty PINK_COLOR =
-        ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
+        ColorSettings.define("[proofTree]pink", "",
+                new Color(255, 0, 240));
     public static final ColorSettings.ColorProperty ORANGE_COLOR =
-        ColorSettings.define("[proofTree]orange", "", new Color(255, 140, 0));
+        ColorSettings.define("[proofTree]orange", "",
+                new Color(255, 140, 0),
+                new Color(255, 180, 40));
 
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
      */
     public static final KeyStroke SEARCH_KEY_STROKE = KeyStroke.getKeyStroke(KeyEvent.VK_F,
         KeyStrokeManager.MULTI_KEY_MASK);
-
-    private static final long serialVersionUID = 3732875161168302809L;
 
     /**
      * Whether to expand oss nodes when using expand all
@@ -175,10 +182,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
         delegateView = new JTree(new DefaultMutableTreeNode("No proof loaded")) {
-            private static final long serialVersionUID = 6555955929759162324L;
-
             @Override
-            public String getToolTipText(MouseEvent mouseEvent) {
+            public @Nullable String getToolTipText(MouseEvent mouseEvent) {
                 /*
                  * For performance reasons, we want to make sure that the tooltips are only rendered
                  * when they are really needed. Therefore, they are now lazily generated and can
@@ -1303,8 +1308,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
          */
         public Style initStyleForNode(GUIAbstractTreeNode node) {
             Style style = new Style();
-            style.foreground = getForeground();
-            style.background = getBackground();
+            style.foreground = UIManager.getColor("Label.foreground");
+            style.background = UIManager.getColor("Label.background");
             // Normalize whitespace
             style.text = node.toString().replaceAll("\\s+", " ");
             style.border = null;
