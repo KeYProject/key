@@ -12,10 +12,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * This feature checks if a rule may be applied automatically. Currently, this does not apply to
- * rules which are not member of any rule set.
- */
+/// This feature checks if a rule may be applied automatically. Currently, this does not apply to
+/// rules which are not member of any rule set.
 public class AutomatedRuleFeature
         extends BinaryFeature {
 

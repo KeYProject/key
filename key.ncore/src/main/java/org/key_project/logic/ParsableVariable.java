@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-/**
- * This interface represents the variables that can be recognized by one of the parsers.
- */
+/// This interface represents the variables that can be recognized by one of the parsers.
 public interface ParsableVariable extends Named {
 }

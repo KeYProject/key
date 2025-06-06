@@ -767,7 +767,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
         Modality modality = Modality.getModality(inst.modality.kind(), postJavaBlock);
         final Term normalPost = tb.apply(anonUpdate,
-            tb.prog(modality.kind(), modality.program(), inst.progPost.sub(0),
+            tb.prog(modality.kind(), modality.programBlock(), inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
                     tb.tf().createTerm(modality,
@@ -789,7 +789,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Modality instantiatedModality =
             Modality.getModality(inst.modality.kind(), excJavaBlock);
         final Term originalExcPost = tb.apply(anonUpdate, tb.prog(instantiatedModality.kind(),
-            instantiatedModality.program(), inst.progPost.sub(0),
+            instantiatedModality.programBlock(), inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
                 this, ruleApp, excPostGoal, "ExceptionalPostModality", null,
                 tb.tf().createTerm(instantiatedModality,

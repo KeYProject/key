@@ -10,20 +10,17 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableList;
 
-/**
- * Filter that selects taclets using the method <code>admissible</code> of the <code>Taclet</code>
- * class, i.e. with respect to active heuristics and the <code>interactive</code> flag. If the
- * interactive flag is set the following procedure is used: the non-interactive marked rules are
- * only taken if the given list of heuristics contains at least one heuristic of that rule. If the
- * interactive flag is not set, a rule is taken if the intersection between the given heuristics and
- * the heuristics of the rule is not empty.
- */
+/// Filter that selects taclets using the method <code>admissible</code> of the <code>Taclet</code>
+/// class, i.e. with respect to active heuristics and the <code>interactive</code> flag. If the
+/// interactive flag is set the following procedure is used: the non-interactive marked rules are
+/// only taken if the given list of heuristics contains at least one heuristic of that rule. If the
+/// interactive flag is not set, a rule is taken if the intersection between the given heuristics
+/// and
+/// the heuristics of the rule is not empty.
 public class IHTacletFilter extends TacletFilter {
 
-    /**
-     * @return true iff <code>this</code> taclet may be applied for the given mode
-     *         (interactive/non-interactive, activated rule sets)
-     */
+    /// @return true iff <code>this</code> taclet may be applied for the given mode
+    /// (interactive/non-interactive, activated rule sets)
     public static boolean admissible(Taclet taclet, boolean interactive,
             ImmutableList<RuleSet> admissibleRuleSets) {
         if (interactive) {
@@ -43,9 +40,7 @@ public class IHTacletFilter extends TacletFilter {
         this.heuristics = heuristics;
     }
 
-    /**
-     * @return true iff <code>taclet</code> should be included in the result
-     */
+    /// @return true iff <code>taclet</code> should be included in the result
     public boolean filter(Taclet taclet) {
         if (!interactive) {
             Boolean b = filterCache.get(taclet);

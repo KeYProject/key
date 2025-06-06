@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.BoundUniquenessChecker;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.TacletApplPart;
 
 
@@ -31,7 +32,11 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         NoFindTaclet t = new NoFindTaclet(this.name,
-            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+            new TacletApplPart(ifseq,
+                new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE),
+                varsNew,
+                varsNotFreeIn,
+                varsNewDependingOn,
                 variableConditions),
             goals, ruleSets, attrs, prefixBuilder.getPrefixMap(), choices, tacletAnnotations);
         t.setOrigin(origin);

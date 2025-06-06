@@ -7,9 +7,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-/**
- * this termfeature returns <tt>ZERO</tt> costs if the given term is non-rigid
- */
+/// this termfeature returns <tt>ZERO</tt> costs if the given term is non-rigid
 public class IsNonRigidTermFeature extends BinaryTermFeature {
 
     public static final TermFeature INSTANCE = new IsNonRigidTermFeature();
