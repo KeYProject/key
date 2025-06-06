@@ -54,7 +54,7 @@ public class TermLabelsProperty implements Property<Term> {
         }
 
         if (term1.op() instanceof Modality mod1
-                && !(mod1.program().equals(((Modality) (term2.op())).program()))) {
+                && !(mod1.programBlock().equals(((Modality) (term2.op())).programBlock()))) {
             return false;
         }
 
@@ -88,7 +88,7 @@ public class TermLabelsProperty implements Property<Term> {
                     this::hashCodeModThisProperty);
         hashcode = hashcode * 17 + term.boundVars().hashCode();
         hashcode =
-            hashcode * 17 + (term.op() instanceof Modality mod ? mod.program().hashCode() : 3);
+            hashcode * 17 + (term.op() instanceof Modality mod ? mod.programBlock().hashCode() : 3);
 
         return hashcode;
     }

@@ -10,16 +10,14 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
-/**
- * Abstract superclass for features that have either zero cost or top cost.
- */
+/// Abstract superclass for features that have either zero cost or top cost.
 public abstract class BinaryTermFeature implements TermFeature {
 
     protected BinaryTermFeature() {}
 
-    /** Constant that represents the boolean value true */
+    /// Constant that represents the boolean value true
     public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
-    /** Constant that represents the boolean value false */
+    /// Constant that represents the boolean value false
     public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
     final public RuleAppCost compute(Term term, MutableState mState, LogicServices services) {

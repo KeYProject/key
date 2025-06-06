@@ -8,9 +8,7 @@ import java.util.LinkedHashSet;
 
 import org.key_project.prover.rules.Rule;
 
-/**
- * Rule filter that selects taclets which are members of a given explicit set
- */
+/// Rule filter that selects taclets which are members of a given explicit set
 public class SetRuleFilter implements RuleFilter {
 
     private final HashSet<Rule> set = new LinkedHashSet<>();

@@ -254,16 +254,12 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected void initMethodCallStack(final Node root, Services services) {
         // Find all modalities in the succedent
-        final List<Term> modalityTerms = new LinkedList<>();
-        for (SequentFormula sequentFormula : root.sequent()
-                .succedent()) {
-            sequentFormula.formula().execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    if (visited.op() instanceof Modality
-                            && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
-                        modalityTerms.add(visited);
-                    }
+        final List<org.key_project.logic.Term> modalityTerms = new LinkedList<>();
+        for (SequentFormula sequentFormula : root.sequent().succedent()) {
+            sequentFormula.formula().execPreOrder((DefaultVisitor) visited -> {
+                if (visited.op() instanceof Modality
+                        && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
+                    modalityTerms.add(visited);
                 }
             });
         }
@@ -278,7 +274,7 @@ public class SymbolicExecutionTreeBuilder {
                 "Sequent contains multiple modalities with symbolic execution label.");
         }
         // Make sure that modality has symbolic execution label
-        Term modalityTerm = modalityTerms.get(0);
+        var modalityTerm = modalityTerms.get(0);
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         if (label == null) {
@@ -287,7 +283,8 @@ public class SymbolicExecutionTreeBuilder {
         }
         // Check if modality contains method frames
         if (!modalityTerms.isEmpty()) {
-            JavaBlock javaBlock = modalityTerm.javaBlock();
+            final Modality mod = (Modality) modalityTerm.op();
+            JavaBlock javaBlock = mod.programBlock();
             final ProgramElement program = javaBlock.program();
             final List<Node> initialStack = new LinkedList<>();
             new JavaASTVisitor(program, services) {

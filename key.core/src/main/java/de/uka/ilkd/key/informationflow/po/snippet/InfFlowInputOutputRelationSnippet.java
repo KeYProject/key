@@ -168,7 +168,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         }
 
         @Override
-        public void visit(Term visited) {
+        public void visit(org.key_project.logic.Term visited) {
             for (Term searchTerm : searchTerms) {
                 termFound = termFound || visited.equals(searchTerm);
             }

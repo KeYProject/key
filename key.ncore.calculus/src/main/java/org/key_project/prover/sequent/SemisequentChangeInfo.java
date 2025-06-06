@@ -7,21 +7,19 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 public class SemisequentChangeInfo {
-    /** contains the added formulas to the semisequent */
+    /// contains the added formulas to the semisequent
     private ImmutableList<SequentFormula> added = ImmutableSLList.nil();
-    /** contains the removed formulas from the semisequent */
+    /// contains the removed formulas from the semisequent
     private ImmutableList<SequentFormula> removed = ImmutableSLList.nil();
-    /** contains the modified formulas from the semisequent */
+    /// contains the modified formulas from the semisequent
     private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.nil();
-    /** stores the redundance free formula list of the semisequent */
+    /// stores the redundance free formula list of the semisequent
     private ImmutableList<SequentFormula> modifiedSemisequent = ImmutableSLList.nil();
-    /**
-     * contains formulas that have been tried to add, but which have been rejected due to already
-     * existing formulas in the sequent subsuming these formulas
-     */
+    /// contains formulas that have been tried to add, but which have been rejected due to already
+    /// existing formulas in the sequent subsuming these formulas
     private ImmutableList<SequentFormula> rejected = ImmutableSLList.nil();
 
-    /** */
+    ///
     private int lastFormulaIndex = -1;
 
     public SemisequentChangeInfo() {
@@ -48,39 +46,29 @@ public class SemisequentChangeInfo {
         return modifiedSemisequent;
     }
 
-    /**
-     * returns true if the semisequent has changed
-     */
+    /// returns true if the semisequent has changed
     public boolean hasChanged() {
         return !added.isEmpty() || !removed.isEmpty() || !modified.isEmpty();
     }
 
-    /**
-     * sets the list of constrained formula containing all formulas of the semisequent after the
-     * operation
-     */
+    /// sets the list of constrained formula containing all formulas of the semisequent after the
+    /// operation
     public void setFormulaList(ImmutableList<SequentFormula> list) {
         modifiedSemisequent = list;
     }
 
-    /**
-     * returns the list of constrained formula of the new semisequent
-     */
+    /// returns the list of constrained formula of the new semisequent
     public ImmutableList<SequentFormula> getFormulaList() {
         return modifiedSemisequent;
     }
 
-    /**
-     * logs an added formula at position idx
-     */
+    /// logs an added formula at position idx
     public void addedFormula(int idx, SequentFormula cf) {
         added = added.prepend(cf);
         lastFormulaIndex = idx;
     }
 
-    /**
-     * logs a modified formula at position idx
-     */
+    /// logs a modified formula at position idx
     public void modifiedFormula(int idx, FormulaChangeInfo fci) {
         // This information can overwrite older records about removed
         // formulas
@@ -89,57 +77,46 @@ public class SemisequentChangeInfo {
         lastFormulaIndex = idx;
     }
 
-    /**
-     * returns the list of all added constrained formulas
-     *
-     * @return IList<SequentFormula> added to the semisequent
-     */
+    /// returns the list of all added constrained formulas
+    ///
+    /// @return IList<SequentFormula> added to the semisequent
     public ImmutableList<SequentFormula> addedFormulas() {
         return added;
     }
 
-    /**
-     * returns the list of all removed constrained formulas
-     *
-     * @return IList<SequentFormula> removed from the semisequent
-     */
+    /// returns the list of all removed constrained formulas
+    ///
+    /// @return IList<SequentFormula> removed from the semisequent
     public ImmutableList<SequentFormula> removedFormulas() {
         return removed;
     }
 
-    /**
-     * returns a list of formulas that have been tried to add to the semisequent but got rejected as
-     * they were redundant
-     *
-     * @return list of formulas rejected due to redundancy
-     */
+    /// returns a list of formulas that have been tried to add to the semisequent but got rejected
+    /// as
+    /// they were redundant
+    ///
+    /// @return list of formulas rejected due to redundancy
     public ImmutableList<SequentFormula> rejectedFormulas() {
         return this.rejected;
     }
 
 
-    /**
-     * adding formula <tt>f</tt> to the semisequent failed due to a redundance check. This means an
-     * equal or stronger formula is already present in the semisequent
-     *
-     * @param f the SequentFormula
-     */
+    /// adding formula <tt>f</tt> to the semisequent failed due to a redundance check. This means an
+    /// equal or stronger formula is already present in the semisequent
+    ///
+    /// @param f the SequentFormula
     public void rejectedFormula(SequentFormula f) {
         this.rejected = this.rejected.append(f);
     }
 
-    /**
-     * returns the list of all modification positions
-     *
-     * @return IList<SequentFormula> modified within the semisequent
-     */
+    /// returns the list of all modification positions
+    ///
+    /// @return IList<SequentFormula> modified within the semisequent
     public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
         return modified;
     }
 
-    /**
-     * logs an added formula at position idx
-     */
+    /// logs an added formula at position idx
     public void removedFormula(int idx, SequentFormula cf) {
         removed = removed.prepend(cf);
 
@@ -152,13 +129,11 @@ public class SemisequentChangeInfo {
 
     }
 
-    /**
-     * This method combines this change information from this info and its successor. ATTENTION: it
-     * takes over ownership over <code>succ</code> and does not release it. This means when
-     * invoking the method it must be snsured that succ is never used afterwards.
-     *
-     * @param succ the SemisequentChangeInfo to combine with
-     */
+    /// This method combines this change information from this info and its successor. ATTENTION: it
+    /// takes over ownership over <code>succ</code> and does not release it. This means when
+    /// invoking the method it must be snsured that succ is never used afterwards.
+    ///
+    /// @param succ the SemisequentChangeInfo to combine with
     public void combine(SemisequentChangeInfo succ) {
         final SemisequentChangeInfo predecessor = this;
         if (succ == predecessor) {
@@ -211,16 +186,12 @@ public class SemisequentChangeInfo {
         predecessor.modifiedSemisequent = succ.modifiedSemisequent;
     }
 
-    /**
-     * returns the index of the last added formula
-     */
+    /// returns the index of the last added formula
     public int getIndex() {
         return lastFormulaIndex;
     }
 
-    /**
-     * returns the semisequent that is the result of the change operation
-     */
+    /// returns the semisequent that is the result of the change operation
     // public Semisequent semisequent() {
     // final Semisequent semisequent;
     // if (modifiedSemisequent().isEmpty()) {
@@ -231,9 +202,7 @@ public class SemisequentChangeInfo {
     // return semisequent;
     // }
 
-    /**
-     * toString
-     */
+    /// toString
     public String toString() {
         return "changed:" + hasChanged() + "\n  added (pos):" + added + "(" + lastFormulaIndex + ")"
             + "\n  removed:" + removed + "\n  modified:" + modified + "\n  rejected:" + rejected

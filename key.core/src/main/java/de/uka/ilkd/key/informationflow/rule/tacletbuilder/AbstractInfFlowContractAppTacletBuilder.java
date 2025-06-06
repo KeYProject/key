@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.sequent.Sequent;
@@ -261,7 +261,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             new InfFlowContractAppRewriteTacletBuilder();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.ANTECEDENT_POLARITY));
         tacletBuilder.setIfSequent(assumesSeq);
         RewriteTacletGoalTemplate goalTemplate = new RewriteTacletGoalTemplate(replaceWithSeq,
             ImmutableSLList.nil(), schemaFind);
@@ -299,9 +300,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
             prefixBuilder.build();
             return new InfFlowContractAppTaclet(name,
-                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                new TacletApplPart(ifseq, applicationRestriction, varsNew, varsNotFreeIn,
+                    varsNewDependingOn,
                     variableConditions),
-                goals, ruleSets, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
+                goals, ruleSets, attrs, (Term) find, prefixBuilder.getPrefixMap(),
                 choices, surviveSmbExec, tacletAnnotations);
 
         }

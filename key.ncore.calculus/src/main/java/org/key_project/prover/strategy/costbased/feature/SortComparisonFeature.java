@@ -26,9 +26,7 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
     private final ProjectionToTerm<Goal> s2;
     private final int comparator;
 
-    /**
-     * creates a new comparison term feature
-     */
+    /// creates a new comparison term feature
     private SortComparisonFeature(ProjectionToTerm<Goal> s1, ProjectionToTerm<Goal> s2,
             int comparator) {
         this.s1 = s1;
@@ -45,10 +43,8 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
         return compare(sort1, sort2);
     }
 
-    /**
-     * @param sort1
-     * @param sort2
-     */
+    /// @param sort1
+    /// @param sort2
     protected boolean compare(final Sort sort1, final Sort sort2) {
         if (comparator == SUBSORT) {
             return sort1.extendsTrans(sort2);

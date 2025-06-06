@@ -35,6 +35,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
@@ -135,7 +136,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                     || !tac.assumesSequent().isEmpty() || tac.goalTemplates().size() != 1
                     || !tac.goalTemplates().head().sequent().isEmpty() || !tac.varsNew().isEmpty()
                     || !tac.varsNewDependingOn().isEmpty()
-                    || ((RewriteTaclet) tac).getApplicationRestriction() != RewriteTaclet.NONE
+                    || !tac.applicationRestriction().equals(ApplicationRestriction.NONE)
                     || !proof.getInitConfig().getJustifInfo().getJustification(tac)
                             .isAxiomJustification()) {
                 continue;
