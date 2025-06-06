@@ -7,7 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.SuccTaclet;
 
-import org.key_project.prover.rules.Taclet.ApplicationRestriction;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;

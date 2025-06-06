@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableList;
 /// application restrictions, a list of new
 /// variables and a list of variable pairs indicating the NotFreeIn relation, a list of
 /// NewDependingOn relations, and a list of general variable conditions.
-public record TacletApplPart(Sequent assumesSequent, Taclet.ApplicationRestriction restriction,
+public record TacletApplPart(Sequent assumesSequent, ApplicationRestriction restriction,
         ImmutableList<? extends NewVarcond> varsNew,
         ImmutableList<? extends NotFreeIn> varsNotFreeIn,
         ImmutableList<? extends NewDependingOn> varsNewDependingOn,
