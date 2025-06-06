@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testcase.smt.ce;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -22,11 +22,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCE extends TestCommons {
-    public static final File testFile =
-        new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/ce/");
+    public static final Path testFile =
+        HelperClassForTestgenTests.TESTCASE_DIRECTORY.resolve("smt").resolve("ce/");
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
     private static final Logger LOGGER = LoggerFactory.getLogger(TestCE.class);
     private static boolean isInstalled = false;
@@ -67,67 +68,67 @@ public class TestCE extends TestCommons {
     }
 
     @Test
-    public void testOverFlow1() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "overflow1.key"), true));
+    public void testOverFlow1() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("overflow1.key"), true));
     }
 
-    private boolean correctResult(File file, boolean b) throws ProblemLoaderException {
-        return correctResult(file.getAbsolutePath(), b);
-    }
-
-    @Test
-    public void testOverFlow2() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "overflow2.key"), true));
+    private boolean correctResult(Path file, boolean b) throws ProblemLoaderException {
+        return super.correctResult(file.toAbsolutePath().toString(), b);
     }
 
     @Test
-    public void testTypes1() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types1.key"), true));
+    public void testOverFlow2() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("overflow2.key"), true));
     }
 
     @Test
-    public void testTypes2() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types2.key"), true));
+    public void testTypes1() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types1.key"), true));
     }
 
     @Test
-    public void testTypes3() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types3.key"), false));
+    public void testTypes2() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types2.key"), true));
     }
 
     @Test
-    public void testTypes4() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types4.key"), true));
+    public void testTypes3() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types3.key"), false));
     }
 
     @Test
-    public void testTypes5() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types5.key"), false));
+    public void testTypes4() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types4.key"), true));
     }
 
     @Test
-    public void testTypes6() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types6.key"), true));
+    public void testTypes5() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types5.key"), false));
     }
 
     @Test
-    public void testTypes7() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types7.key"), true));
+    public void testTypes6() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types6.key"), true));
     }
 
     @Test
-    public void testTypes8() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types8.key"), true));
+    public void testTypes7() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types7.key"), true));
     }
 
     @Test
-    public void testTypes9() throws Exception {
-        assertTrue(this.correctResult(new File(testFile, "types9.key"), true));
+    public void testTypes8() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types8.key"), true));
+    }
+
+    @Test
+    public void testTypes9() throws ProblemLoaderException {
+        assertTrue(this.correctResult(testFile.resolve("types9.key"), true));
     }
 
     @Test
     public void testMiddle() throws Exception {
-        File file = new File(testFile, "middle.key");
+        var file = testFile.resolve("middle.key");
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(file, null, null, null);
         try {
@@ -138,7 +139,7 @@ public class TestCE extends TestCommons {
             TryCloseMacro close = new TryCloseMacro();
             close.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             // should not be provable
-            assertTrue(proof.openGoals().size() > 0);
+            assertFalse(proof.openGoals().isEmpty());
             // there should be a counterexample for each goal...
             for (Goal g : proof.openGoals()) {
                 SemanticsBlastingMacro sb = new SemanticsBlastingMacro();

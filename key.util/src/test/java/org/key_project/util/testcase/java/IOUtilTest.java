@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
 import javax.xml.parsers.SAXParser;
@@ -39,7 +40,7 @@ public class IOUtilTest {
      */
     @Test
     public void testGetCurrentDirectory() {
-        File currentDir = IOUtil.getCurrentDirectory();
+        Path currentDir = IOUtil.getCurrentDirectory();
         assertNotNull(currentDir);
     }
 

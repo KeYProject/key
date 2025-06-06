@@ -5,6 +5,8 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.java.*;
@@ -203,29 +205,18 @@ public final class ProblemInitializer {
      * get a vector of Strings containing all .java file names in the cfile directory. Helper for
      * readJava().
      */
-    private List<String> getClasses(String f) throws ProofInputException {
-        File cfile = new File(f);
-        List<String> v = new ArrayList<>();
-        if (cfile.isDirectory()) {
-            String[] list = cfile.list();
-            // mu(2008-jan-28): if the directory is not readable for the current user
-            // list is set to null, which results in a NullPointerException.
-            if (list != null) {
-                for (String s : list) {
-                    String fullName = cfile.getPath() + File.separator + s;
-                    File n = new File(fullName);
-                    if (n.isDirectory()) {
-                        v.addAll(getClasses(fullName));
-                    } else if (s.endsWith(".java")) {
-                        v.add(fullName);
-                    }
-                }
+    private Collection<Path> getClasses(Path javaRoot) throws ProofInputException {
+        if (Files.isDirectory(javaRoot)) {
+            try (var walker = Files.walk(javaRoot)) {
+                return walker.filter(it -> it.getFileName().toString().endsWith(".java")).toList();
+            } catch (IOException e) {
+                throw new ProofInputException(
+                    "Reading java model path " + javaRoot + " resulted into an error.", e);
             }
-            return v;
         } else {
-            throw new ProofInputException("Java model path " + f + " not found.");
+            throw new ProofInputException(
+                "Java model path " + javaRoot + " not found or is not a directory.");
         }
-
     }
 
 
@@ -239,11 +230,9 @@ public final class ProblemInitializer {
 
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
-        final String javaPath = envInput.readJavaPath();
-        final List<File> classPath = envInput.readClassPath();
-        final File bootClassPath;
-        bootClassPath = envInput.readBootClassPath();
-
+        final Path javaPath = envInput.readJavaPath();
+        final List<Path> classPath = envInput.readClassPath();
+        final Path bootClassPath = envInput.readBootClassPath();
         final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {
@@ -256,8 +245,9 @@ public final class ProblemInitializer {
         // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
         // this allows to use included symbols inside JML.
         for (var fileName : includes.getRuleSets()) {
-            KeYFile keyFile = new KeYFile(fileName.file().getName(), fileName, progMon,
-                envInput.getProfile(), fileRepo);
+            KeYFile keyFile =
+                new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
+                    envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
         }
 
@@ -271,18 +261,19 @@ public final class ProblemInitializer {
             final ProjectSettings settings = initConfig.getServices().getJavaInfo()
                     .getKeYProgModelInfo().getServConf().getProjectSettings();
             final PathList searchPathList = settings.getSearchPathList();
-            if (searchPathList.find(javaPath) == null) {
-                searchPathList.add(javaPath);
+            if (searchPathList.find(javaPath.toString()) == null) {
+                searchPathList.add(javaPath.toString());
             }
-            Collection<String> var = getClasses(javaPath);
+            Collection<Path> var = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
-                String file = envInput.getJavaFile();
+                Path file = envInput.getJavaFile();
                 if (var.contains(file)) {
                     var = Collections.singletonList(file);
                 }
             }
             // support for single file loading
-            final String[] cus = var.toArray(new String[0]);
+            final String[] cus = var.stream().map(Objects::toString).toList()
+                    .toArray(String[]::new);
             try {
                 r2k.readCompilationUnitsAsFiles(cus, fileRepo);
             } catch (ParseExceptionInFile e) {
@@ -292,7 +283,7 @@ public final class ProblemInitializer {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses(fileRepo);
         }
-        File initialFile = envInput.getInitialFile();
+        var initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
             JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
     }
@@ -583,7 +574,6 @@ public final class ProblemInitializer {
             initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
 
 
-
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
             po.readProblem();
@@ -668,6 +658,7 @@ public final class ProblemInitializer {
 
         void reportException(Object sender, ProofOblInput input, Exception e);
 
-        default void showIssueDialog(Collection<PositionedString> issues) {}
+        default void showIssueDialog(Collection<PositionedString> issues) {
+        }
     }
 }

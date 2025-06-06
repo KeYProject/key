@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -36,15 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Dominic Scheurer
  */
 public class MergeRuleTests {
-
-    private static final File TEST_RESOURCES_DIR_PREFIX =
-        new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
+    private static final Path TEST_RESOURCES_DIR_PREFIX =
+        HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/");
 
     /**
      * Simple regression test case loading an existing closed proof (standard Gcd example)
      * including two merges with ITE antecedent merges and trying to replay it.
-     *
-     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProof() {
@@ -56,7 +54,6 @@ public class MergeRuleTests {
      * Simple regression test case loading an existing closed proof (standard Gcd example) including
      * two merges with predicate abstraction and trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstr() {
@@ -69,7 +66,6 @@ public class MergeRuleTests {
      * two merges with predicate abstraction (with lattice elements manually chosen by the user) and
      * trying to replay it.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
     public void testLoadGcdProofWithPredAbstrAndUserChoices() {
@@ -172,10 +168,9 @@ public class MergeRuleTests {
      * <p>
      * At the end, the proof should be closed.
      *
-     * @throws ProblemLoaderException If the proof could not be loaded.
      */
     @Test
-    public void testDoManualGcdProof() throws Exception {
+    public void testDoManualGcdProof() {
         final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.key");
 
         for (int i = 0; i < 2; i++) {
@@ -202,7 +197,7 @@ public class MergeRuleTests {
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             Assertions.fail("The merge operation should not be applicable.");
-        } catch (IncompleteRuleAppException e) {
+        } catch (IncompleteRuleAppException ignored) {
         }
     }
 
@@ -217,7 +212,7 @@ public class MergeRuleTests {
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             Assertions.fail("The merge operation should not be applicable.");
-        } catch (IncompleteRuleAppException e) {
+        } catch (IncompleteRuleAppException ignored) {
         }
     }
 
@@ -301,22 +296,18 @@ public class MergeRuleTests {
         }
     }
 
-    public static Proof loadProof(String directory, String proofFileName) {
-        return loadProof(new File(directory), proofFileName);
-    }
-
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof is not null, and
      * fails if the proof could not be loaded.
      *
-     * @param directory
+     * @param directory directory in which the {@code proofFileName} exists
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    public static @NonNull Proof loadProof(File directory, String proofFileName) {
-        File proofFile = new File(directory, proofFileName);
-        assertTrue(proofFile.exists(),
-            "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");
+    public static @NonNull Proof loadProof(Path directory, String proofFileName) {
+        Path proofFile = directory.resolve(proofFileName);
+        assertTrue(Files.exists(proofFile),
+            "Proof file: " + proofFile.toAbsolutePath() + " could not be found!");
 
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),

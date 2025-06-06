@@ -35,40 +35,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestMiscTools {
 
     @Test
-    public void testDisectFilenameUnix() {
-        // run only on UNIX-like systems
-        if (File.separatorChar != '/') {
-            return;
-        }
-        String s = "/home/daniel//workspace/key";
-        Object[] ls = MiscTools.disectFilename(s).toArray();
-        assertEquals("", ls[0]);
-        assertEquals("key", ls[4]);
-        s = s.substring(1);
-        ls = MiscTools.disectFilename(s).toArray();
-        assertEquals("home", ls[0]);
-        s = s + "/";
-        ls = MiscTools.disectFilename(s).toArray();
-        assertEquals(4, ls.length);
-        assertEquals("key", ls[3]);
-        s = "." + s;
-        ls = MiscTools.disectFilename(s).toArray();
-        assertEquals(4, ls.length);
-        assertEquals("key", ls[3]);
-    }
-
-    @Test
-    public void testDisectFilenameWindows() {
-        // run only on Windows systems
-        if (File.separatorChar != '\\') {
-            return;
-        }
-        String s = "C:\\Windows\\Users\\";
-        Object[] ls = MiscTools.disectFilename(s).toArray();
-        assertEquals("C:", ls[0]);
-    }
-
-    @Test
     public void testMakeFilenameRelativeUnix() {
         // run only on UNIX-like systems
         if (File.separatorChar != '/') {

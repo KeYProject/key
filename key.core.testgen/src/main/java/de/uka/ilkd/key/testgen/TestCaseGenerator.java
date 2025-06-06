@@ -5,6 +5,7 @@ package de.uka.ilkd.key.testgen;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -87,8 +88,8 @@ public class TestCaseGenerator {
     private final boolean rflAsInternalClass;
     protected final boolean useRFL;
     protected final ReflectionClassCreator rflCreator;
-    private final String dontCopy;
-    protected final String modDir;
+    private final Path dontCopy;
+    protected final Path modDir;
     protected final String directory;
     private TestGenerationLog logger;
     private String fileName;
@@ -168,7 +169,7 @@ public class TestCaseGenerator {
         junitFormat = settings.useJunit();
         useRFL = settings.useRFL();
         modDir = computeProjectSubPath(services.getJavaModel().getModelDir());
-        dontCopy = modDir + File.separator + DONT_COPY;
+        dontCopy = modDir.resolve(DONT_COPY);
         directory = settings.getOutputFolderPath();
         sortDummyClass = new HashMap<>();
         info = new ProofInfo(proof);
@@ -192,17 +193,8 @@ public class TestCaseGenerator {
      * @param modelDir The path to the source files of the performed {@link Proof}.
      * @return The computed sub path.
      */
-    protected String computeProjectSubPath(String modelDir) {
-        if (modelDir.startsWith("/")) {
-            return modelDir;
-        } else {
-            int index = modelDir.indexOf(File.separator);
-            if (index >= 0) {
-                return modelDir.substring(index); // Remove drive letter, e.g. Microsoft Windows
-            } else {
-                return modelDir;
-            }
-        }
+    protected Path computeProjectSubPath(Path modelDir) {
+        return modelDir;
     }
 
     public String getMUTCall() {
@@ -251,7 +243,7 @@ public class TestCaseGenerator {
                 .append(sort.declarationString()).append("{").append(NEW_LINE);
         // TODO:extends or implements depending if it is a class or interface.
         sb.append(" public ").append(className).append("(){ };").append(NEW_LINE); // default
-                                                                                   // constructor
+        // constructor
 
         for (IProgramMethod m : jinfo.getAllProgramMethods(kjt)) {
             if (m.getFullName().indexOf('<') > -1) {
@@ -344,7 +336,7 @@ public class TestCaseGenerator {
         return className;
     }
 
-    private void copyFiles(final String srcName, final String targName) throws IOException {
+    private void copyFiles(final Path srcName, final String targName) throws IOException {
         // We don't want to copy the Folder with API Reference
         // Implementation
         if (srcName.equals(dontCopy)) {
@@ -352,7 +344,7 @@ public class TestCaseGenerator {
         }
         // Create the File with given filename and check if it exists and if
         // it's readable
-        final File srcFile = new File(srcName);
+        final File srcFile = srcName.toFile();
         if (!srcFile.exists()) {
             throw new IOException("FileCopy: " + "no such source file: " + srcName);
         }
@@ -367,7 +359,7 @@ public class TestCaseGenerator {
                 newTarget = targName + File.separator + srcFile.getName();
             }
             for (final String subName : srcFile.list()) {
-                copyFiles(srcName + File.separator + subName, newTarget);
+                copyFiles(srcName.resolve(subName), newTarget);
             }
         } else if (srcFile.isFile()) {
             final File targDir = new File(targName);

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -14,7 +14,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
  * Represents an entity read to produce an environment to read a proof obligation. Environment means
  * the initial configuration of a prover containing namespaces and Java model.
  */
+@NullMarked
 public interface EnvInput {
 
     /**
@@ -48,27 +49,28 @@ public interface EnvInput {
     /**
      * Reads the Java path.
      */
-    String readJavaPath() throws ProofInputException;
+    @Nullable
+    Path readJavaPath() throws ProofInputException;
 
     /**
      * Returns the file path to specific requested Java file.
      *
      * @see #isIgnoreOtherJavaFiles()
      */
-    default @Nullable String getJavaFile() throws ProofInputException {
+    default @Nullable Path getJavaFile() throws ProofInputException {
         return null;
     }
 
     /**
      * gets the classpath elements to be considered here.
      */
-    @NonNull
-    List<File> readClassPath() throws ProofInputException;
+    List<Path> readClassPath() throws ProofInputException;
 
     /**
      * gets the boot classpath element, null if none set.
      */
-    File readBootClassPath();
+    @Nullable
+    Path readBootClassPath();
 
     /**
      * Reads the input using the given modification strategy, i.e., parts of the input do not modify
@@ -86,11 +88,11 @@ public interface EnvInput {
     Profile getProfile();
 
     /**
-     * Returns the initial {@link File} which is loaded if available.
+     * Returns the initial {@link Path} which is loaded if available.
      *
-     * @return The initial {@link File} which is loaded or {@code null} otherwise.
+     * @return The initial {@link Path} which is loaded or {@code null} otherwise.
      */
-    File getInitialFile();
+    Path getInitialFile();
 
     /**
      * This flag determines whether the given path to the Java source should be considered as a

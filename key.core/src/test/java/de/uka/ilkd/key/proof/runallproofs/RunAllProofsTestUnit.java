@@ -127,7 +127,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             TestFile file = testFiles.get(i);
             var time = System.currentTimeMillis() - start;
             TestResult testResult = testResults.get(i);
-            xml.addTestcase(file.getKeYFile().getName(), this.testName,
+            xml.addTestcase(file.getKeYFile().getFileName().toString(), this.testName,
                 (testResult.success() ? JunitXmlWriter.TestCaseState.SUCCESS
                         : JunitXmlWriter.TestCaseState.FAILED),
                 "",
@@ -135,7 +135,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             success &= testResult.success();
             message.append(testResult.message()).append("\n");
             summary.append(String.format("  %s (%s): %s%n",
-                file.getKeYFile().getName(),
+                file.getKeYFile().getFileName().toString(),
                 file.getTestProperty(),
                 testResult.success() ? "success" : "FAILURE"));
         }
