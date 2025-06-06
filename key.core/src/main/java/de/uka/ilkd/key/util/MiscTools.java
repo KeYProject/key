@@ -292,21 +292,6 @@ public final class MiscTools {
     // =======================================================
 
     /**
-     * Separates the single directory entries in a filename. The first element is an empty String
-     * iff the filename is absolute. (For a Windows filename, it contains a drive letter and a
-     * colon). Ignores double slashes and slashes at the end, removes references to the cwd. E.g.,
-     * "/home//daniel/./key/" yields {"","home","daniel","key"}. Tries to automatically detect UNIX
-     * or Windows directory delimiters. There is no check whether all other characters are valid for
-     * filenames.
-     *
-     * @param filename a file name.
-     * @return all directory entries in the file name.
-     */
-    static List<String> disectFilename(String filename) {
-        return Filenames.disectFilename(filename);
-    }
-
-    /**
      * Returns a filename relative to another one. The second parameter needs to be absolute and is
      * expected to refer to a directory. This method only operates on Strings, not on real files!
      * Note that it treats Strings case-sensitive. The resulting filename always uses UNIX directory
