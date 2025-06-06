@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
 /// Restricts where a taclet may be applied. Any combination of these restrictions in possible.
@@ -6,7 +9,7 @@ public record ApplicationRestriction(int value) {
         if ((value & ANTECEDENT_POLARITY) == ANTECEDENT_POLARITY
                 && (value & SUCCEDENT_POLARITY) == SUCCEDENT_POLARITY) {
             throw new IllegalArgumentException(
-                    "Polarity cannot be antecedent and succedent at the same time");
+                "Polarity cannot be antecedent and succedent at the same time");
         }
     }
 

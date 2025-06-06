@@ -23,8 +23,8 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.ApplicationRestriction;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;

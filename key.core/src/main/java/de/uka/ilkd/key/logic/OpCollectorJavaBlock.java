@@ -19,7 +19,8 @@ public class OpCollectorJavaBlock extends OpCollector {
     public void visit(org.key_project.logic.Term t) {
         super.visit(t);
         if (t.op() instanceof Modality mod && !mod.programBlock().isEmpty()) {
-            var collect = new JavaASTCollector(mod.programBlock().program(), LocationVariable.class);
+            var collect =
+                new JavaASTCollector(mod.programBlock().program(), LocationVariable.class);
             collect.start();
             for (ProgramElement programElement : collect.getNodes()) {
                 if (programElement instanceof LocationVariable locationVariable) {

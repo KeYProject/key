@@ -12,12 +12,13 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.collection.WeakValueLinkedHashMap;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
