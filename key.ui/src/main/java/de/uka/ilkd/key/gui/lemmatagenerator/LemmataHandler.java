@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -62,7 +61,7 @@ public class LemmataHandler implements TacletFilter {
         println("Start problem creation:");
         println(options.toString());
 
-        Path file = new File(options.getPathOfRuleFile()).toPath();
+        Path file = options.getPathOfRuleFile();
         Collection<Path> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
 
         final ProblemInitializer problemInitializer =

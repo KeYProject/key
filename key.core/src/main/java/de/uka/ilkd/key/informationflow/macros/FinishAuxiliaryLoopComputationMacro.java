@@ -24,6 +24,7 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+
 public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
