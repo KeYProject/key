@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.*;
@@ -30,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProofExplorationServiceTest {
     ProofExplorationService expService;
     Proof currentProof;
-    File location;
+    Path location;
     KeYEnvironment<?> env;
 
     @BeforeEach
     public void setup() throws ProblemLoaderException {
-        location = new File("src/test/resources//org/key_project/exploration/testAdditions.key");
-        Assumptions.assumeTrue(location.exists(), "File testAdditions.key not found.");
+        location = Paths.get("src/test/resources//org/key_project/exploration/testAdditions.key");
+        Assumptions.assumeTrue(Files.exists(location), "File testAdditions.key not found.");
         env = KeYEnvironment.load(location);
         currentProof = env.getLoadedProof();
         expService = new ProofExplorationService(currentProof, env.getServices());

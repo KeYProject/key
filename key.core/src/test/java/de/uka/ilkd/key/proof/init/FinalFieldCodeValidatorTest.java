@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -26,21 +28,23 @@ import org.junit.jupiter.api.TestFactory;
 class FinalFieldCodeValidatorTest {
 
     @TestFactory
-    public Stream<DynamicTest> testCodeValidatorParse() throws ProblemLoaderException {
+    public Stream<DynamicTest> testCodeValidatorParse()
+            throws ProblemLoaderException, URISyntaxException {
         return testContracts(false, "final/shouldparse");
     }
 
     @TestFactory
-    public Stream<DynamicTest> testCodeValidatorFail() throws ProblemLoaderException {
+    public Stream<DynamicTest> testCodeValidatorFail()
+            throws ProblemLoaderException, URISyntaxException {
         return testContracts(true, "final/shouldfail");
     }
 
     private Stream<DynamicTest> testContracts(boolean shouldfail, String directory)
-            throws ProblemLoaderException {
+            throws ProblemLoaderException, URISyntaxException {
         URL url = getClass().getResource(directory);
         assert url != null : directory + " not found.";
         assert "file".equals(url.getProtocol()) : "Test cases must be in file system";
-        File dir = new File(url.getPath());
+        Path dir = Paths.get(url.toURI());
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(dir, null, null, null);
 

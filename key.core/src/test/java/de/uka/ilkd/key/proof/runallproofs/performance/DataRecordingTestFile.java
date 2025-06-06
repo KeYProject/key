@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -44,7 +44,7 @@ class DataRecordingTestFile extends TestFile {
     }
 
     @Override
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success) {
+    protected void reload(boolean verbose, Path proofFile, Proof loadedProof, boolean success) {
         // we skip reloading for these test cases
     }
 

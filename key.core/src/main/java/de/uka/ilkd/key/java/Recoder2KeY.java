@@ -6,6 +6,8 @@ package de.uka.ilkd.key.java;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -89,14 +91,14 @@ public class Recoder2KeY implements JavaReader {
      * the set of File objects that describes the classpath to be searched for classes. it may
      * contain a null file which indicates that the default classes are not to be read.
      */
-    private List<File> classPath;
+    private List<Path> classPath;
 
     /**
      * the File object that describes the directory from which the internal classes are to be read.
      * They are read in differently - therefore the second category. A null value indicates that the
      * boot classes are to be read from an internal repository.
      */
-    private File bootClassPath;
+    private Path bootClassPath;
 
     /**
      * this mapping stores the relation between recoder and KeY entities in a bidirectional way.
@@ -492,7 +494,7 @@ public class Recoder2KeY implements JavaReader {
 
     // ----- parsing libraries
 
-    public void setClassPath(File bootClassPath, List<File> classPath) {
+    public void setClassPath(Path bootClassPath, List<Path> classPath) {
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
     }
@@ -594,8 +596,8 @@ public class Recoder2KeY implements JavaReader {
         parseInternalClasses(pf, rcuList, fileRepo);
 
         if (classPath != null) {
-            for (File cp : classPath) {
-                if (cp.isDirectory()) {
+            for (Path cp : classPath) {
+                if (Files.isDirectory(cp)) {
                     sources.add(new DirectoryFileCollection(cp));
                 } else {
                     sources.add(new ZipFileCollection(cp));

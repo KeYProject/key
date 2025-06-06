@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.zip.ZipFile;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.io.DataLocation;
@@ -30,27 +32,23 @@ import recoder.io.DataLocation;
  */
 
 
-public class ZipFileCollection implements FileCollection {
+public class ZipFileCollection implements FileCollection, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
-    final File file;
-    ZipFile zipFile;
+    private final File file;
+    private ZipFile zipFile;
 
-    public ZipFileCollection(File file) {
-        this.file = file;
+    public ZipFileCollection(Path file) throws IOException {
+        this.file = file.toFile();
+        try {
+            zipFile = new ZipFile(this.file);
+        } catch (ZipException ex) {
+            throw new IOException("can't open " + file + ": " + ex.getMessage(), ex);
+        }
     }
 
 
     public Walker createWalker(String[] extensions) throws IOException {
-        if (zipFile == null) {
-            try {
-                zipFile = new ZipFile(file);
-            } catch (ZipException ex) {
-                IOException iox =
-                    new IOException("can't open " + file + ": " + ex.getMessage(), ex);
-                throw iox;
-            }
-        }
         return new Walker(extensions);
     }
 
@@ -58,10 +56,15 @@ public class ZipFileCollection implements FileCollection {
         return createWalker(new String[] { extension });
     }
 
-    class Walker implements FileCollection.Walker {
+    @Override
+    public void close() throws Exception {
+        zipFile.close();
+    }
+
+    public class Walker implements FileCollection.Walker {
 
         private final Enumeration<? extends ZipEntry> enumeration;
-        private ZipEntry currentEntry;
+        private @Nullable ZipEntry currentEntry;
         private final List<String> extensions;
 
         public Walker(String[] extensions) {

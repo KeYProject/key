@@ -67,7 +67,7 @@ public class TestProofScriptCommand {
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
         Files.write(tmpKey, lines);
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
         Proof proof = env.getLoadedProof();
 

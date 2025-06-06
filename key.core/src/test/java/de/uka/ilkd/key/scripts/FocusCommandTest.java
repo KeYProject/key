@@ -29,7 +29,7 @@ public class FocusCommandTest {
                 \\functions { int i; } \\problem { i=1&i=2 -> i=3|i=4 }\
                 \\proofScript { macro "prop-simp"; }
                 """);
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp);
         Proof p = env.getLoadedProof();
         var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 4);");
         ProofScriptEngine pse = new ProofScriptEngine(script);
@@ -50,7 +50,7 @@ public class FocusCommandTest {
                         \\proofScript { macro "prop-simp"; }
                     """);
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp);
         Proof p = env.getLoadedProof();
         var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 3);");
         ProofScriptEngine pse = new ProofScriptEngine(script);

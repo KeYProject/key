@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -32,7 +32,7 @@ public class KeYFileForTests extends KeYFile {
      * creates a new representation for a given file by indicating a name and a file representing
      * the physical source of the .key file.
      */
-    public KeYFileForTests(String name, File file, Profile profile) {
+    public KeYFileForTests(String name, Path file, Profile profile) {
         super(name, file, null, profile);
     }
 
