@@ -217,6 +217,7 @@ public class ColorSettings {
             if (v == null) {
                 setLightValue(defaultLightValue);
                 setDarkValue(defaultDarkValue);
+                return;
             }
 
             if (v instanceof Color c) {

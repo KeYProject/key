@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.settings;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -253,6 +254,18 @@ public class ViewSettings extends AbstractPropertiesSettings {
         isDarkMode = getLookAndFeel().contains("FlatDark")
                 || getLookAndFeel().contains("FlatDarcula")
                 || getLookAndFeel().contains("FlatMacDarkLaf");
+    }
+
+    @Override
+    public void readSettings(Configuration props) {
+        super.readSettings(props);
+        updateIsDarkMode();
+    }
+
+    @Override
+    public void readSettings(Properties props) {
+        super.readSettings(props);
+        updateIsDarkMode();
     }
 
     /**

@@ -3,22 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.Serial;
-import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.List;
-import java.util.WeakHashMap;
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -29,6 +13,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -36,27 +21,38 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.*;
-
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.List;
+import java.util.WeakHashMap;
 
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
-    public static final Icon GOAL_LIST_ICON = IconFontSwing
-            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindow.TAB_ICON_SIZE);
-
-    @Serial
-    private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
     private final static Icon linkedGoalIcon = IconFactory.keyHoleLinked(20, 20);
+
     private final static int MAX_DISPLAYED_SEQUENT_LENGTH = 100;
+    private static final IconFontProvider GOAL_LIST_ICON = new IconFontProvider(FontAwesomeSolid.FLAG_CHECKERED);
     /**
      * the model used by this view
      */
@@ -107,7 +103,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
         updateUI();
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
-            KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
+                KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
         setMediator(mediator);
     }
 
@@ -118,7 +114,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return GOAL_LIST_ICON;
+        return GOAL_LIST_ICON.get(MainWindow.TAB_ICON_SIZE);
     }
 
     @Override
@@ -154,7 +150,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             setFont(myFont);
         } else {
             LOGGER.debug("goallist: Warning: Use standard font. Could not find font: {}",
-                Config.KEY_FONT_GOAL_LIST_VIEW);
+                    Config.KEY_FONT_GOAL_LIST_VIEW);
         }
     }
 
@@ -217,19 +213,19 @@ public class GoalList extends JList<Goal> implements TabPanel {
         String res = seqToString.get(seq);
         if (res == null) {
             LogicPrinter sp =
-                SequentViewLogicPrinter.purePrinter(mediator.getNotationInfo(),
-                    mediator.getServices(),
-                    new VisibleTermLabels() {
-                        @Override
-                        public boolean contains(TermLabel label) {
-                            return false;
-                        }
+                    SequentViewLogicPrinter.purePrinter(mediator.getNotationInfo(),
+                            mediator.getServices(),
+                            new VisibleTermLabels() {
+                                @Override
+                                public boolean contains(TermLabel label) {
+                                    return false;
+                                }
 
-                        @Override
-                        public boolean contains(Name name) {
-                            return false;
-                        }
-                    }); // do not print term labels
+                                @Override
+                                public boolean contains(Name name) {
+                                    return false;
+                                }
+                            }); // do not print term labels
             sp.printSequent(seq);
             res = sp.result().replace('\n', ' ');
             res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
@@ -432,12 +428,12 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 final Goal g = getSelectedValue();
                 putValue(NAME, g.isAutomatic() ? "Interactive Goal" : "Automatic Goal");
                 putValue(SHORT_DESCRIPTION,
-                    g.isAutomatic()
-                            ? "No automatic rules "
+                        g.isAutomatic()
+                                ? "No automatic rules "
                                 + "will be applied when goal is set to interactive."
-                            : "Re-enable automatic rule application for this goal.");
+                                : "Re-enable automatic rule application for this goal.");
                 putValue(SMALL_ICON,
-                    g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : KEY_HOLE_PULL_DOWN_MENU);
+                        g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : KEY_HOLE_PULL_DOWN_MENU);
                 enableGoals = !g.isAutomatic();
                 setEnabled(true);
             } else {
@@ -480,12 +476,12 @@ public class GoalList extends JList<Goal> implements TabPanel {
             if (getSelectedValue() != null) {
                 final Goal g = getSelectedValue();
                 putValue(NAME,
-                    g.isAutomatic() ? "Set Other Goals Interactive" : "Set Other Goals Automatic");
+                        g.isAutomatic() ? "Set Other Goals Interactive" : "Set Other Goals Automatic");
                 putValue(SHORT_DESCRIPTION,
-                    g.isAutomatic() ? "No automatic rules " + "will be applied on all other goals."
-                            : "Re-enable automatic rule application for other goals.");
+                        g.isAutomatic() ? "No automatic rules " + "will be applied on all other goals."
+                                : "Re-enable automatic rule application for other goals.");
                 putValue(SMALL_ICON,
-                    g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : KEY_HOLE_PULL_DOWN_MENU);
+                        g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : KEY_HOLE_PULL_DOWN_MENU);
                 enableGoals = !g.isAutomatic();
 
                 setEnabled(getModel().getSize() > 1);
@@ -598,8 +594,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
      * used to prevent the display of goals that appear closed for the present user constraint.
      */
     private class SelectingGoalListModel extends AbstractListModel<Goal> {
-        @Serial
-        private static final long serialVersionUID = 7395134147866131926L;
         private final GoalListModel delegate;
         /**
          * List of <code>Integer</code> objects that determine the (strictly monotonic) mapping of
@@ -798,11 +792,11 @@ public class GoalList extends JList<Goal> implements TabPanel {
         }
 
         public Component getListCellRendererComponent(JList<?> list, Object value, // value
-                // to
-                // display
-                int index, // cell index
-                boolean isSelected, // is the cell selected
-                boolean cellHasFocus) // the list and the cell have the focus
+                                                      // to
+                                                      // display
+                                                      int index, // cell index
+                                                      boolean isSelected, // is the cell selected
+                                                      boolean cellHasFocus) // the list and the cell have the focus
         {
             String valueStr;
             Color col = Color.black;
@@ -824,8 +818,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
             }
 
             DefaultListCellRenderer sup =
-                (DefaultListCellRenderer) super.getListCellRendererComponent(list, valueStr, index,
-                    isSelected, cellHasFocus);
+                    (DefaultListCellRenderer) super.getListCellRendererComponent(list, valueStr, index,
+                            isSelected, cellHasFocus);
 
             sup.setIcon(statusIcon);
 
