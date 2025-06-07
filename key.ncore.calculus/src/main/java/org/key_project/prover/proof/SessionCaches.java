@@ -5,14 +5,10 @@ package org.key_project.prover.proof;
 
 import org.key_project.prover.rules.instantiation.caches.AssumesFormulaInstantiationCache;
 
-/**
- * Provides access to caches used during proof search
- */
+/// Provides access to caches used during proof search
 public interface SessionCaches {
-    /**
-     * returns the cache relevant for matching assumes formulas
-     *
-     * @return the cache relevant for matching assumes formulas
-     */
+    /// returns the cache relevant for matching assumes formulas
+    ///
+    /// @return the cache relevant for matching assumes formulas
     AssumesFormulaInstantiationCache getAssumesFormulaInstantiationCache();
 }

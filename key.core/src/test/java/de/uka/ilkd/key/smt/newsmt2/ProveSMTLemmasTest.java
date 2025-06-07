@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +103,7 @@ public class ProveSMTLemmasTest {
         }
     }
 
-    public static List<String[]> data() throws IOException {
+    public static List<Arguments> data() throws IOException {
         URL url = DefinedSymbolsHandler.class.getResource("DefinedSymbolsHandler.preamble.xml");
         if (url == null) {
             throw new FileNotFoundException(
@@ -114,12 +115,11 @@ public class ProveSMTLemmasTest {
             props.loadFromXML(in);
         }
 
-        List<String[]> result = new ArrayList<>();
+        List<Arguments> result = new ArrayList<>();
 
         for (String name : props.stringPropertyNames()) {
             if (name.matches(".*\\.dl(\\.[0-9]+)?")) {
-                String[] params = { name, props.getProperty(name) };
-                result.add(params);
+                result.add(Arguments.arguments(name, props.getProperty(name)));
             }
         }
 

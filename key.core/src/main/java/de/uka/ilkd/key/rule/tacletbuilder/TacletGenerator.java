@@ -21,9 +21,11 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -348,7 +350,8 @@ public class TacletGenerator {
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs, selfSV, paramSVs,
                 schemaRepresents, tacletBuilder);
         }
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         result = result.add(tacletBuilder.getTaclet());
         // return
         return result;
@@ -563,7 +566,8 @@ public class TacletGenerator {
         }
 
         tacletBuilder.setFind(find);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         tacletBuilder.addTacletGoalTemplate(
             new TacletGoalTemplate(addedSeq, ImmutableSLList.nil()));
         tacletBuilder.setName(name);
@@ -647,7 +651,8 @@ public class TacletGenerator {
             new RewriteTacletBuilder<>();
 
         replaceTacletBuilder.setFind(findTerm);
-        replaceTacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        replaceTacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         replaceTacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceTerm));
         replaceTacletBuilder.setName(name);
         replaceTacletBuilder.addRuleSet(new RuleSet(new Name("simplify_prog"))); // TODO ?
@@ -835,7 +840,7 @@ public class TacletGenerator {
         final OpCollector oc = new OpCollector();
         oc.visit(t);
         final Set<Name> usedNames = new LinkedHashSet<>();
-        for (Operator op : oc.ops()) {
+        for (final var op : oc.ops()) {
             usedNames.add(op.name());
         }
 

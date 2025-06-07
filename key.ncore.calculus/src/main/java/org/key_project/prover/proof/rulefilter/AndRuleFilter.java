@@ -5,11 +5,7 @@ package org.key_project.prover.proof.rulefilter;
 
 import org.key_project.prover.rules.Rule;
 
-import org.jspecify.annotations.NonNull;
-
-/**
- * Intersection (conjunction) of two rule filters
- */
+/// Intersection (conjunction) of two rule filters
 public class AndRuleFilter implements RuleFilter {
 
     private final RuleFilter a;
@@ -25,7 +21,7 @@ public class AndRuleFilter implements RuleFilter {
     }
 
 
-    public @NonNull String toString() {
+    public String toString() {
         return a + " AND " + b;
     }
 

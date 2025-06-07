@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.key_project.logic.Choice;
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;

@@ -8,9 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-/**
- * Interface for computing a cost for a given term or formula
- */
+/// Interface for computing a cost for a given term or formula
 @FunctionalInterface
 public interface TermFeature {
     RuleAppCost compute(Term term, MutableState mState, LogicServices services);

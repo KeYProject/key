@@ -3,20 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic;
 
-import org.checkerframework.dataflow.qual.Pure;
-
-/**
- * This interface has to be implemented by all logic signature elements, which are identified by
- * their name.
- */
+/// This interface has to be implemented by all logic signature elements, which are identified by
+/// their name.
 public interface Named {
 
-    /**
-     * returns the name of this element
-     *
-     * @return the name of the element
-     */
-    @Pure
+    /// returns the name of this element
+    ///
+    /// @return the name of the element
     Name name();
 
 }

@@ -204,7 +204,7 @@ class TermImpl implements Term {
     @Override
     public @NonNull JavaBlock javaBlock() {
         if (op instanceof Modality mod) {
-            return mod.program();
+            return mod.programBlock();
         } else {
             return JavaBlock.EMPTY_JAVABLOCK;
         }

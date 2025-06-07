@@ -23,8 +23,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * Creates for a given set of taclets the corresponding set of proof obligation. For more
@@ -33,7 +31,7 @@ import org.jspecify.annotations.NonNull;
  */
 public class ProofObligationCreator {
 
-    private @NonNull String createName(ProofAggregate @NonNull [] singleProofs) {
+    private String createName(ProofAggregate[] singleProofs) {
         return "Side proofs for " + singleProofs.length + " taclets.";
     }
 
@@ -49,8 +47,8 @@ public class ProofObligationCreator {
      * @param listeners a listener that observes the single steps. Used for status information.
      * @return A proof aggregate containing the proofs created by this method.
      */
-    public ProofAggregate create(@NonNull ImmutableSet<Taclet> taclets, InitConfig[] initConfigs,
-            @NonNull ImmutableSet<Taclet> axioms, @NonNull Collection<LoaderListener> listeners) {
+    public ProofAggregate create(ImmutableSet<Taclet> taclets, InitConfig[] initConfigs,
+            ImmutableSet<Taclet> axioms, Collection<LoaderListener> listeners) {
 
         ProofAggregate[] singleProofs = new ProofAggregate[taclets.size()];
 
@@ -86,14 +84,14 @@ public class ProofObligationCreator {
 
 
 
-    private @NonNull UserDefinedSymbols analyzeTaclets(@NonNull ImmutableSet<Taclet> taclets,
+    private UserDefinedSymbols analyzeTaclets(ImmutableSet<Taclet> taclets,
             NamespaceSet referenceNamespaces) {
         final UserDefinedSymbols userDefinedSymbols =
             new UserDefinedSymbols(referenceNamespaces, taclets);
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
-            public void visit(@NonNull Term visited) {
+            public void visit(org.key_project.logic.Term visited) {
                 collectUserDefinedSymbols(visited, userDefinedSymbols);
 
             }
@@ -106,12 +104,12 @@ public class ProofObligationCreator {
 
 
 
-    private void collectUserDefinedSymbols(@NonNull Term term,
-            @NonNull UserDefinedSymbols userDefinedSymbols) {
-        for (Term sub : term.subs()) {
+    private void collectUserDefinedSymbols(org.key_project.logic.Term term,
+            UserDefinedSymbols userDefinedSymbols) {
+        for (var sub : term.subs()) {
             collectUserDefinedSymbols(sub, userDefinedSymbols);
         }
-        if (term.op() instanceof final @NonNull SortedOperator op) {
+        if (term.op() instanceof final SortedOperator op) {
             final Sort sort = op.sort();
             userDefinedSymbols.addSort(sort);
 
@@ -132,8 +130,8 @@ public class ProofObligationCreator {
         }
     }
 
-    private @NonNull ProofAggregate create(@NonNull Taclet taclet, @NonNull InitConfig initConfig,
-            @NonNull UserDefinedSymbols symbolsForAxioms) {
+    private ProofAggregate create(Taclet taclet, InitConfig initConfig,
+            UserDefinedSymbols symbolsForAxioms) {
         LemmaGenerator generator = new GenericRemovingLemmaGenerator();
         TacletFormula tacletFormula = generator.translate(taclet, initConfig.getServices());
         Term formula = tacletFormula.getFormula(initConfig.getServices());

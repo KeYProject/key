@@ -9,10 +9,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.strategy.costbased.MutableState;
 
 
-/**
- * Term feature for testing whether the sort of a term is a subsort of a given sort (or exactly the
- * given sort).
- */
+/// Term feature for testing whether the sort of a term is a subsort of a given sort (or exactly the
+/// given sort).
 public class SortExtendsTransTermFeature extends BinaryTermFeature {
 
     private final Sort sort;

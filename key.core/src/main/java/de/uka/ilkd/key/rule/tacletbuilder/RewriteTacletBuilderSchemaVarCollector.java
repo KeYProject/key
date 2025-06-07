@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
@@ -52,6 +53,14 @@ public class RewriteTacletBuilderSchemaVarCollector {
         return result;
     }
 
+    private Set<SchemaVariable> collectSchemaVariables(SyntaxElement se) {
+        if (se instanceof Term t)
+            return collectSchemaVariables(t);
+        else if (se instanceof Sequent s)
+            return collectSchemaVariables(s);
+        else
+            throw new IllegalArgumentException("Unhandled syntax element: " + se);
+    }
 
     private @NonNull Set<SchemaVariable> collectSchemaVariables(@NonNull Term t) {
         final Set<SchemaVariable> result = new LinkedHashSet<>();

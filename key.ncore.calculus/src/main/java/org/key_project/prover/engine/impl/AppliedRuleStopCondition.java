@@ -10,48 +10,38 @@ import org.key_project.prover.proof.ProofGoal;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * <p>
- * Implementation of {@link StopCondition} which stops the strategy after a reached limit of rules
- * or after a timeout in ms.
- * </p>
- * <p>
- * This is the default {@link StopCondition} used during verification.
- * </p>
- *
- * @author Martin Hentschel
- */
+///
+/// Implementation of [StopCondition] which stops the strategy after a reached limit of rules
+/// or after a timeout in ms.
+///
+///
+/// This is the default [StopCondition] used during verification.
+///
+///
+/// @author Martin Hentschel
 public final class AppliedRuleStopCondition<Goal extends ProofGoal<@NonNull Goal>>
         implements StopCondition<Goal> {
-    /**
-     * {@inheritDoc}
-     */
+    /// {@inheritDoc}
     @Override
     public int getMaximalWork(int maxApplications, long timeout) {
         return maxApplications;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /// {@inheritDoc}
     @Override
     public boolean isGoalAllowed(Goal goal, int maxApplications, long timeout, long startTime,
             int countApplied) {
         return true; // Default behavior is to accept all rules.
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /// {@inheritDoc}
     @Override
     public @Nullable String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
             long startTime, int countApplied) {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /// {@inheritDoc}
     @Override
     public boolean shouldStop(int maxApplications, long timeout, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -59,9 +49,7 @@ public final class AppliedRuleStopCondition<Goal extends ProofGoal<@NonNull Goal
                 || timeout >= 0 && System.currentTimeMillis() - startTime >= timeout;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /// {@inheritDoc}
     @Override
     public @NonNull String getStopMessage(int maxApplications, long timeout,
             long startTime,

@@ -708,15 +708,13 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             final @NonNull Set<Term> objectsToIgnore)
             throws ProofInputException {
         final Set<Term> result = new LinkedHashSet<>();
-        term.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                visited = OriginTermLabel.removeOriginLabels(visited, getServices());
-                if (SymbolicExecutionUtil.hasReferenceSort(getServices(), visited)
-                        && visited.freeVars().isEmpty() && !objectsToIgnore.contains(visited)
-                        && !SymbolicExecutionUtil.isSkolemConstant(visited)) {
-                    result.add(visited);
-                }
+        term.execPreOrder((DefaultVisitor) p_visited -> {
+            Term visited = (Term) p_visited;
+            visited = OriginTermLabel.removeOriginLabels(visited, getServices());
+            if (SymbolicExecutionUtil.hasReferenceSort(getServices(), visited)
+                    && visited.freeVars().isEmpty() && !objectsToIgnore.contains(visited)
+                    && !SymbolicExecutionUtil.isSkolemConstant(visited)) {
+                result.add(visited);
             }
         });
         return result;

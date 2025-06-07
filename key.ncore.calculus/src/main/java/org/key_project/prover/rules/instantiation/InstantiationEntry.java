@@ -6,32 +6,27 @@ package org.key_project.prover.rules.instantiation;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * This is an abstract class that encapsulates an instantiation of a SchemaVariable. It is needed
- * because SchemaVariables can be instantiated as ProgramElements and as Terms according to their
- * type. But we have to put the pair (SchemaVariable, term/program-element) in one map. Therefore a
- * map from SchemaVariable to InstantiationEntry is used TODO: Simplify subclasses further or remove
- * them completely as possible.
- */
+/// This is an abstract class that encapsulates an instantiation of a SchemaVariable. It is needed
+/// because SchemaVariables can be instantiated as ProgramElements and as Terms according to their
+/// type. But we have to put the pair (SchemaVariable, term/program-element) in one map. Therefore a
+/// map from SchemaVariable to InstantiationEntry is used TODO: Simplify subclasses further or
+/// remove
+/// them completely as possible.
 public class InstantiationEntry<E> {
 
     private final @NonNull E instantiation;
 
-    /**
-     * creates a new instantiation entry for the instantiation to be stored
-     *
-     * @param instantiation the instantiation to be stored
-     */
+    /// creates a new instantiation entry for the instantiation to be stored
+    ///
+    /// @param instantiation the instantiation to be stored
     public InstantiationEntry(@NonNull E instantiation) {
         assert instantiation != null : "An instantiation for a SchemaVariable cannot be null.";
         this.instantiation = instantiation;
     }
 
-    /**
-     * returns the instantiation of the SchemaVariable
-     *
-     * @return the instantiation of the SchemaVariable
-     */
+    /// returns the instantiation of the SchemaVariable
+    ///
+    /// @return the instantiation of the SchemaVariable
     public @NonNull E getInstantiation() {
         return instantiation;
     }

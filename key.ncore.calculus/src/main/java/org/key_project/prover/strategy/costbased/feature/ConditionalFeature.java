@@ -13,10 +13,8 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * A feature that evaluates one of two given features, depending on the result of a
- * <code>RuleFilter</code>
- */
+/// A feature that evaluates one of two given features, depending on the result of a
+/// <code>RuleFilter</code>
 public class ConditionalFeature implements Feature {
 
     private ConditionalFeature(RuleFilter p_cond, Feature p_thenFeature,
@@ -27,7 +25,7 @@ public class ConditionalFeature implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(@NonNull RuleApp app,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, Goal goal, MutableState mState) {
         if (cond.filter(app.rule())) {
             return thenFeature.computeCost(app, pos, goal, mState);
@@ -36,68 +34,52 @@ public class ConditionalFeature implements Feature {
         }
     }
 
-    /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenValue the value of the feature, if <code>filter</code> returns true
-     */
-    public static @NonNull Feature createConditional(RuleFilter cond, RuleAppCost thenValue) {
+    /// @param cond the filter that decides which value is to be returned
+    /// @param thenValue the value of the feature, if <code>filter</code> returns true
+    public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue) {
         return createConditional(cond, ConstFeature.createConst(thenValue));
     }
 
-    /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenValue the value of the feature, if <code>filter</code> returns true
-     * @param elseValue the value of the feature, if <code>filter</code> returns false
-     */
-    public static @NonNull Feature createConditional(RuleFilter cond, RuleAppCost thenValue,
+    /// @param cond the filter that decides which value is to be returned
+    /// @param thenValue the value of the feature, if <code>filter</code> returns true
+    /// @param elseValue the value of the feature, if <code>filter</code> returns false
+    public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue,
             RuleAppCost elseValue) {
         return createConditional(cond, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
     }
 
-    /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true returns
-     *        false
-     */
-    public static @NonNull Feature createConditional(
+    /// @param cond the filter that decides which value is to be returned
+    /// @param thenFeature the feature that is evaluted, if <code>filter</code> returns true returns
+    /// false
+    public static Feature createConditional(
             RuleFilter cond, Feature thenFeature) {
         return createConditional(cond, thenFeature, NumberRuleAppCost.getZeroCost());
     }
 
-    /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
-     * @param elseValue the value of the feature, if <code>filter</code> returns false
-     */
-    public static @NonNull Feature createConditional(
+    /// @param cond the filter that decides which value is to be returned
+    /// @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
+    /// @param elseValue the value of the feature, if <code>filter</code> returns false
+    public static Feature createConditional(
             RuleFilter cond, Feature thenFeature,
             RuleAppCost elseValue) {
         return createConditional(cond, thenFeature, ConstFeature.createConst(elseValue));
     }
 
-    /**
-     * @param cond the filter that decides which value is to be returned
-     * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
-     * @param elseFeature the feature that is evaluted, if <code>filter</code> returns false
-     */
-    public static @NonNull Feature createConditional(RuleFilter cond, Feature thenFeature,
+    /// @param cond the filter that decides which value is to be returned
+    /// @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
+    /// @param elseFeature the feature that is evaluted, if <code>filter</code> returns false
+    public static Feature createConditional(RuleFilter cond, Feature thenFeature,
             Feature elseFeature) {
         return new ConditionalFeature(cond, thenFeature, elseFeature);
     }
 
-    /**
-     * The filter that decides which sub-feature is to be evaluated
-     */
+    /// The filter that decides which sub-feature is to be evaluated
     private final RuleFilter cond;
 
-    /**
-     * The feature for positive results of <code>filter</code>
-     */
+    /// The feature for positive results of <code>filter</code>
     private final Feature thenFeature;
 
-    /**
-     * The feature for negative results of <code>filter</code>
-     */
+    /// The feature for negative results of <code>filter</code>
     private final Feature elseFeature;
 }

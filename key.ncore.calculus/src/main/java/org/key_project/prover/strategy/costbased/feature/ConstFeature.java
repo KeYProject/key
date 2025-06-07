@@ -11,9 +11,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * A feature that returns a constant value
- */
+/// A feature that returns a constant value
 public class ConstFeature implements Feature {
 
     @Override

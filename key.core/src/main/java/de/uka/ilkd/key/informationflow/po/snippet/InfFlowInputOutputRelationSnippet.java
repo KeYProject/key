@@ -16,8 +16,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Generate term "self != null".
  *
@@ -26,8 +24,8 @@ import org.jspecify.annotations.NonNull;
 class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
     @Override
-    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars1,
-            @NonNull ProofObligationVars poVars2) throws UnsupportedOperationException {
+    public Term produce(BasicSnippetData d, ProofObligationVars poVars1,
+            ProofObligationVars poVars2) throws UnsupportedOperationException {
         // get information flow specification terms
         if (d.get(BasicSnippetData.Key.INF_FLOW_SPECS) == null) {
             throw new UnsupportedOperationException(
@@ -60,11 +58,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private @NonNull Term buildInputOutputRelation(@NonNull BasicSnippetData d,
-            @NonNull ProofObligationVars vs1,
-            @NonNull ProofObligationVars vs2, @NonNull InfFlowSpec infFlowSpecAtPre1,
-            @NonNull InfFlowSpec infFlowSpecAtPre2,
-            @NonNull InfFlowSpec infFlowSpecAtPost1, @NonNull InfFlowSpec infFlowSpecAtPost2) {
+    private Term buildInputOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, InfFlowSpec infFlowSpecAtPre1, InfFlowSpec infFlowSpecAtPre2,
+            InfFlowSpec infFlowSpecAtPost1, InfFlowSpec infFlowSpecAtPost2) {
         Term inputRelation = buildInputRelation(d, vs1, vs2, infFlowSpecAtPre1, infFlowSpecAtPre2);
         Term outputRelation =
             buildOutputRelation(d, vs1, vs2, infFlowSpecAtPost1, infFlowSpecAtPost2);
@@ -74,10 +70,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private @NonNull Term buildInputRelation(@NonNull BasicSnippetData d,
-            @NonNull ProofObligationVars vs1,
-            ProofObligationVars vs2, @NonNull InfFlowSpec infFlowSpec1,
-            @NonNull InfFlowSpec infFlowSpec2) {
+    private Term buildInputRelation(BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
         Term[] eqAtLocs = new Term[infFlowSpec1.preExpressions.size()];
 
         Iterator<Term> preExp1It = infFlowSpec1.preExpressions.iterator();
@@ -85,7 +79,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         for (int i = 0; i < infFlowSpec1.preExpressions.size(); i++) {
             Term preExp1Term = preExp1It.next();
             Term preExp2Term = preExp2It.next();
-            SearchVisitor search = new SearchVisitor(vs1.pre.resultTerm, vs1.post.resultTerm);
+            SearchVisitor search = new SearchVisitor(vs1.pre.result, vs1.post.result);
             preExp1Term.execPreOrder(search);
             if (!search.termFound) {
                 eqAtLocs[i] = d.tb.equals(preExp1Term, preExp2Term);
@@ -99,10 +93,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         return d.tb.and(eqAtLocs);
     }
 
-    private @NonNull Term buildOutputRelation(@NonNull BasicSnippetData d,
-            @NonNull ProofObligationVars vs1,
-            @NonNull ProofObligationVars vs2, @NonNull InfFlowSpec infFlowSpec1,
-            @NonNull InfFlowSpec infFlowSpec2) {
+    private Term buildOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
         // build equalities for post expressions
         ImmutableList<Term> eqAtLocs = ImmutableSLList.nil();
 
@@ -126,10 +118,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    protected @NonNull Term buildObjectSensitivePostRelation(@NonNull InfFlowSpec infFlowSpec1,
-            @NonNull InfFlowSpec infFlowSpec2, @NonNull BasicSnippetData d,
-            @NonNull ProofObligationVars vs1,
-            @NonNull ProofObligationVars vs2, @NonNull Term eqAtLocsTerm) {
+    protected Term buildObjectSensitivePostRelation(InfFlowSpec infFlowSpec1,
+            InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
+            ProofObligationVars vs2, Term eqAtLocsTerm) {
         // build equalities for newObjects terms
         ImmutableList<Term> newObjEqs = ImmutableSLList.nil();
         Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
@@ -177,7 +168,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         }
 
         @Override
-        public void visit(@NonNull Term visited) {
+        public void visit(org.key_project.logic.Term visited) {
             for (Term searchTerm : searchTerms) {
                 termFound = termFound || visited.equals(searchTerm);
             }
