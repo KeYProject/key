@@ -32,25 +32,25 @@ public class JavaDocument extends DefaultStyledDocument {
 
     /** highight color for Java keywords (dark red/violet) */
     private static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
-        ColorSettings.define("[java]keyword", "", new Color(0x7f0055));
-
-    // private static final Color JAVA_STRING_COLOR = new Color(0x000000);
+        ColorSettings.define("[java]keyword", "", new Color(0x7f0055), new Color(0xCf50A5));
 
     /** highight color for comments (dull green) */
     private static final ColorSettings.ColorProperty COMMENT_COLOR =
-        ColorSettings.define("[java]comment", "", new Color(0x3f7f5f));
+        ColorSettings.define("[java]comment", "", new Color(0x3f7f5f),new Color(0x9fBf9f));
 
     /** highight color for JavaDoc (dull green) */
     private static final ColorSettings.ColorProperty JAVADOC_COLOR =
-        ColorSettings.define("[java]javadoc", "", new Color(0x3f7f5f));
+        ColorSettings.define("[java]javadoc", "", new Color(0x3f7f5f), new Color(0x9fBf9f));
 
     /** highight color for JML (dark blue) */
     private static final ColorSettings.ColorProperty JML_COLOR =
-        ColorSettings.define("[java]jml", "", new Color(0x0000c0));
+        ColorSettings.define("[java]jml", "",
+                new Color(0x0000c0),
+                new Color(0x8888cf));
 
     /** highight color for JML keywords (blue) */
     private static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
-        ColorSettings.define("[java]jmlKeyword", "", new Color(0x0000f0));
+        ColorSettings.define("[java]jmlKeyword", "", new Color(0x0000f0), new Color(0x8888cf));
 
     /**
      * Enum to indicate the current mode (environment) of the parser. Examples are STRING ("..."),

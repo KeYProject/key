@@ -33,14 +33,7 @@ import org.slf4j.LoggerFactory;
  * rules (in particular taclets) and drag'n drop instantiation of taclets.
  */
 public final class CurrentGoalView extends SequentView implements Autoscroll {
-
-    private static final long serialVersionUID = 8494000234215913553L;
-
-    // The color constants that used to be here have been moved to SequentView to collect them in
-    // one place.
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
-
 
     // the mediator
     private final KeYMediator mediator;
@@ -63,7 +56,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
-        setBackground(Color.white);
+
         // disables selection
         setSelectionColor(getBackground());
         listener = new CurrentGoalViewListener(this, getMediator());
