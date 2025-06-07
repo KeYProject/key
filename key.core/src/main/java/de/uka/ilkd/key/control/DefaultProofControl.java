@@ -19,6 +19,8 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link ProofControl}.
  *
@@ -33,7 +35,7 @@ public class DefaultProofControl extends AbstractProofControl {
     /**
      * The currently running {@link Thread}.
      */
-    private Thread autoModeThread;
+    private @Nullable Thread autoModeThread;
 
     /**
      * Constructor.
@@ -74,7 +76,7 @@ public class DefaultProofControl extends AbstractProofControl {
 
     @Override
     public synchronized void stopAutoMode() {
-        if (isInAutoMode()) {
+        if (isInAutoMode() && autoModeThread != null) {
             autoModeThread.interrupt();
         }
     }
@@ -111,11 +113,9 @@ public class DefaultProofControl extends AbstractProofControl {
         public void run() {
             try {
                 fireAutoModeStarted(new ProofEvent(proof));
-                ProofStarter starter = ptl != null
-                        ? new ProofStarter(
-                            new CompositePTListener(getDefaultProverTaskListener(), ptl), false)
-                        : new ProofStarter(getDefaultProverTaskListener(), false);
-                starter.init(proof);
+                ProofStarter starter = new ProofStarter.Builder(
+                    new CompositePTListener(getDefaultProverTaskListener(), ptl), false)
+                        .build(proof);
                 if (goals != null) {
                     starter.start(goals);
                 } else {

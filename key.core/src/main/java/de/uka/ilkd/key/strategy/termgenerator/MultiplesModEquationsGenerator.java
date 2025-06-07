@@ -25,6 +25,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+
 /**
  * Try to rewrite a monomial (term) <code>source</code> so that it becomes a multiple of another
  * monomial <code>target</code>, using the integer equations of the antecedent. The output of the

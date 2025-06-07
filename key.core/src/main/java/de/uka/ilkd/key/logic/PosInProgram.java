@@ -137,7 +137,8 @@ public class PosInProgram {
      * compares this PosInProgram with another PosInProgram and returns true if both describe the
      * same position
      */
-    public boolean equals(Object obj) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (this == obj) {
             return true;
         }

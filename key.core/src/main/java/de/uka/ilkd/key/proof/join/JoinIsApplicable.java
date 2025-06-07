@@ -14,6 +14,9 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -36,8 +39,8 @@ public class JoinIsApplicable {
      * @return The list of possible join partner objects -- may be empty (then, the join is not
      *         applicable).
      */
-    public List<ProspectivePartner> isApplicable(Goal goal,
-            PosInOccurrence pio) {
+    public @NonNull List<ProspectivePartner> isApplicable(@NonNull Goal goal,
+            @Nullable PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return new LinkedList<>();
         }
@@ -51,8 +54,8 @@ public class JoinIsApplicable {
      * @param pio Selected formula (symblic state - program counter part) for the join.
      * @return The list of possible join partners.
      */
-    public List<ProspectivePartner> computeProspecitvePartner(Goal goal,
-            PosInOccurrence pio) {
+    public @NonNull List<ProspectivePartner> computeProspecitvePartner(@NonNull Goal goal,
+            @NonNull PosInOccurrence pio) {
         assert !pio.isInAntec();
         List<ProspectivePartner> partners = new LinkedList<>();
 
@@ -77,7 +80,8 @@ public class JoinIsApplicable {
      * @param g2 Second goal for the join.
      * @return A ProspectivePartner object if the given goals may be joined or null otherwise.
      */
-    private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio, Goal g2) {
+    private @Nullable ProspectivePartner areProspectivePartners(@NonNull Goal g1,
+            @NonNull PosInOccurrence pio, @NonNull Goal g2) {
         Term referenceFormula = (Term) pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();

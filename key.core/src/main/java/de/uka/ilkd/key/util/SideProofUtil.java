@@ -124,10 +124,9 @@ public final class SideProofUtil {
             Sequent sequentToProve, String proofName) throws ProofInputException {
         // Make sure that valid parameters are given
         // Create ProofStarter
-        ProofStarter starter = new ProofStarter(false);
-        // Configure ProofStarter
         // TODO: Avoid proof environment use only InitConfig
-        starter.init(sequentToProve, sideProofEnvironment, proofName);
+        ProofStarter starter = new ProofStarter.Builder(false)
+                .build(sequentToProve, sideProofEnvironment, proofName);
         return starter;
     }
 }

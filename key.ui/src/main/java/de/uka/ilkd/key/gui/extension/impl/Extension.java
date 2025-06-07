@@ -10,6 +10,8 @@ import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +21,11 @@ import org.slf4j.LoggerFactory;
  */
 public class Extension<T> implements Comparable<Extension<T>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Extension.class);
-    private final Class<T> clazz;
-    private final KeYGuiExtension.Info info;
-    private T instance = null;
+    private final @NonNull Class<T> clazz;
+    private final KeYGuiExtension.@Nullable Info info;
+    private @Nullable T instance = null;
 
-    public Extension(Class<T> clazz) {
+    public Extension(@NonNull Class<T> clazz) {
         this.clazz = clazz;
         this.info = clazz.getAnnotation(KeYGuiExtension.Info.class);
     }
@@ -74,18 +76,18 @@ public class Extension<T> implements Comparable<Extension<T>> {
         return info == null || info.experimental();
     }
 
-    public Class<T> getType() {
+    public @NonNull Class<T> getType() {
         return clazz;
     }
 
     @Override
-    public int compareTo(Extension o) {
+    public int compareTo(@NonNull Extension o) {
         return Integer.compare(getPriority(), o.getPriority());
     }
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (this == o) {
             return true;
         }
@@ -104,7 +106,7 @@ public class Extension<T> implements Comparable<Extension<T>> {
         return info == null ? "" : info.description();
     }
 
-    public boolean supports(Class<?> c) {
+    public boolean supports(@NonNull Class<?> c) {
         return c.isAssignableFrom(getType());
     }
 

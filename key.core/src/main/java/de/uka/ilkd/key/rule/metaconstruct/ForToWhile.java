@@ -13,6 +13,8 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * converts a for-loop to a while loop. Invariant and other rules cannot be performed on for but
  * only on while loops.
@@ -79,8 +81,9 @@ public class ForToWhile extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(@NonNull ProgramElement pe,
+            @NonNull Services services,
+            @NonNull SVInstantiations svInst) {
 
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
             (ProgramElementName) svInst.getInstantiation(outerLabel),
@@ -97,7 +100,7 @@ public class ForToWhile extends ProgramTransformer {
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override
-    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+    public @NonNull ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
 
         if (innerLabel != null) {

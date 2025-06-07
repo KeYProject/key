@@ -4,16 +4,18 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -73,7 +75,7 @@ public final class IfThenElse extends AbstractOperator implements Operator {
         }
     }
 
-    public <T extends Term> void validTopLevelException(T term)
+    public <T extends Term> void validTopLevelException(@NonNull T term)
             throws TermCreationException {
         super.validTopLevelException(term);
 

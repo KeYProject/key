@@ -18,6 +18,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Replaces a local variable declaration <code> #t #v[]; </code> with <code>#t[] #v;</code>
  *
@@ -30,7 +32,7 @@ public class ArrayPostDecl extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public ProgramElement @NonNull [] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
 
         final LocalVariableDeclaration declaration = (LocalVariableDeclaration) pe;

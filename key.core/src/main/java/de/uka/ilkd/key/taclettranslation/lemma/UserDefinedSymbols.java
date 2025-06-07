@@ -20,17 +20,20 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class UserDefinedSymbols {
     static class NamedComparator implements Comparator<Named> {
         static final NamedComparator INSTANCE = new NamedComparator();
 
         @Override
-        public int compare(Named o1, Named o2) {
+        public int compare(@NonNull Named o1, @NonNull Named o2) {
             return o1.name().compareTo(o2.name());
         }
     }
 
-    final UserDefinedSymbols parent;
+    final @Nullable UserDefinedSymbols parent;
     final Set<Function> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Function> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Sort> usedExtraSorts = new TreeSet<>(NamedComparator.INSTANCE);
@@ -49,14 +52,14 @@ public class UserDefinedSymbols {
 
     }
 
-    public UserDefinedSymbols(UserDefinedSymbols parent) {
+    public UserDefinedSymbols(@NonNull UserDefinedSymbols parent) {
         this.parent = parent;
         this.axioms = parent.axioms;
         this.referenceNamespaces = parent.referenceNamespaces;
     }
 
-    private <T extends Named> void addUserDefinedSymbol(T symbol, Set<T> set,
-            Namespace<T> excludeNamespace) {
+    private <T extends Named> void addUserDefinedSymbol(T symbol, @NonNull Set<T> set,
+            @NonNull Namespace<T> excludeNamespace) {
         if (!contains(symbol, set)) {
             if (symbol instanceof SchemaVariable
                     || excludeNamespace.lookup(symbol.name()) == null) {
@@ -65,7 +68,7 @@ public class UserDefinedSymbols {
         }
     }
 
-    private <T extends Named> boolean contains(T symbol, Set<T> set) {
+    private <T extends Named> boolean contains(T symbol, @NonNull Set<T> set) {
         if (parent != null && parent.contains(symbol, set)) {
             return true;
         }
@@ -104,15 +107,15 @@ public class UserDefinedSymbols {
             (Namespace) referenceNamespaces.variables());
     }
 
-    public void addSymbolsToNamespaces(NamespaceSet namespaces) {
+    public void addSymbolsToNamespaces(@NonNull NamespaceSet namespaces) {
         addSymbolsToNamespace(namespaces.functions(), usedExtraFunctions);
         addSymbolsToNamespace(namespaces.functions(), usedExtraPredicates);
         addSymbolsToNamespace(namespaces.sorts(), usedExtraSorts);
         addSymbolsToNamespace(namespaces.variables(), usedExtraVariables);
     }
 
-    private <T extends Named> void addSymbolsToNamespace(Namespace<T> namespace,
-            Collection<T> symbols) {
+    private <T extends Named> void addSymbolsToNamespace(@NonNull Namespace<T> namespace,
+            @NonNull Collection<T> symbols) {
         for (T symbol : symbols) {
             namespace.addSafely(symbol);
         }
@@ -134,7 +137,7 @@ public class UserDefinedSymbols {
         usedExtraSorts.addAll(result);
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         StringBuilder symbols = new StringBuilder("functions:\n");
         for (Named named : usedExtraFunctions) {
             symbols.append(named.name()).append(", ");

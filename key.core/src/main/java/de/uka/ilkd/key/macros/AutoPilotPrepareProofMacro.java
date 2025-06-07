@@ -25,6 +25,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES =
@@ -151,8 +152,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new AutoPilotStrategy(proof);
     }
 }

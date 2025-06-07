@@ -16,6 +16,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Generic removing lemma generator adds the default implementation only that all
  * {@link GenericSort}s are replaced to equally named {@link ProxySort}s.
@@ -41,7 +43,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * is a generic sort.
      */
     @Override
-    protected Operator replaceOp(Operator op, TermServices services) {
+    protected Operator replaceOp(Operator op, @NonNull TermServices services) {
 
         if (op instanceof SortDependingFunction sdf) {
             Sort sort = sdf.getSortDependingOn();
@@ -86,7 +88,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * @param services the services
      * @return the immutable set
      */
-    private ImmutableSet<Sort> replaceSorts(ImmutableSet<Sort> extendsSorts,
+    private @NonNull ImmutableSet<Sort> replaceSorts(@NonNull ImmutableSet<Sort> extendsSorts,
             TermServices services) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
         for (Sort sort : extendsSorts) {

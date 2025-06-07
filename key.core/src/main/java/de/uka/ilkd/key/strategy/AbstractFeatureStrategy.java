@@ -31,6 +31,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         implements Strategy<Goal> {
@@ -54,21 +55,21 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
      * @return the conditional feature return true when the rule belongs to one of the given
      *         heuristics
      */
-    protected Feature ifHeuristics(String[] heuristics, Feature thenFeature) {
+    protected @NonNull Feature ifHeuristics(String @NonNull [] heuristics, Feature thenFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature);
     }
 
-    protected Feature ifHeuristics(String[] heuristics, Feature thenFeature,
+    protected @NonNull Feature ifHeuristics(String @NonNull [] heuristics, Feature thenFeature,
             Feature elseFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature,
             elseFeature);
     }
 
-    protected Feature ifHeuristics(String[] names, int priority) {
+    protected @NonNull Feature ifHeuristics(String @NonNull [] names, int priority) {
         return ConditionalFeature.createConditional(getFilterFor(names), cost(priority), cost(0));
     }
 
-    protected TacletFilter getFilterFor(String[] p_names) {
+    protected @NonNull TacletFilter getFilterFor(String @NonNull [] p_names) {
         ImmutableList<RuleSet> heur = ImmutableSLList.nil();
         for (int i = 0; i != p_names.length; ++i) {
             heur = heur.prepend(getHeuristic(p_names[i]));
@@ -76,7 +77,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         return new IHTacletFilter(false, heur);
     }
 
-    protected RuleSet getHeuristic(String p_name) {
+    protected @NonNull RuleSet getHeuristic(@NonNull String p_name) {
         final NamespaceSet nss = getProof().getNamespaces();
         final Namespace<@NonNull RuleSet> ns = nss.ruleSets();
         final RuleSet h = ns.lookup(new Name(p_name));
@@ -86,27 +87,30 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         return h;
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature f) {
+    protected void bindRuleSet(@NonNull RuleSetDispatchFeature d, RuleSet ruleSet, Feature f) {
         d.add(ruleSet, f);
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, long cost) {
+    protected void bindRuleSet(@NonNull RuleSetDispatchFeature d, RuleSet ruleSet, long cost) {
         bindRuleSet(d, ruleSet, longConst(cost));
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, String ruleSet, Feature f) {
+    protected void bindRuleSet(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet,
+            Feature f) {
         bindRuleSet(d, getHeuristic(ruleSet), f);
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, String ruleSet, long cost) {
+    protected void bindRuleSet(@NonNull RuleSetDispatchFeature d, @NonNull String ruleSet,
+            long cost) {
         bindRuleSet(d, getHeuristic(ruleSet), longConst(cost));
     }
 
-    protected void clearRuleSetBindings(RuleSetDispatchFeature d, RuleSet ruleSet) {
+    protected void clearRuleSetBindings(@NonNull RuleSetDispatchFeature d, RuleSet ruleSet) {
         d.clear(ruleSet);
     }
 
-    protected void clearRuleSetBindings(RuleSetDispatchFeature d, String ruleSet) {
+    protected void clearRuleSetBindings(@NonNull RuleSetDispatchFeature d,
+            @NonNull String ruleSet) {
         d.clear(getHeuristic(ruleSet));
     }
 
@@ -114,7 +118,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio,
             Goal goal,
-            RuleAppCostCollector collector) {
+            @NonNull RuleAppCostCollector collector) {
         final MutableState mState = new MutableState();
         final BackTrackingManager btManager = mState.getBacktrackingManager();
         btManager.setup(app);
@@ -131,18 +135,19 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         } while (btManager.backtrack());
     }
 
-    protected abstract RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+    protected abstract @Nullable RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
+            Goal goal,
             MutableState mState);
 
-    protected Feature forEach(TermBuffer<Goal> x, TermGenerator gen, Feature body) {
+    protected @NonNull Feature forEach(TermBuffer<Goal> x, TermGenerator gen, Feature body) {
         return ForEachCP.create(x, gen, body);
     }
 
-    protected Feature oneOf(Feature[] features) {
+    protected @NonNull Feature oneOf(Feature[] features) {
         return OneOfCP.create(features);
     }
 
-    protected Feature oneOf(Feature feature0, Feature feature1) {
+    protected @NonNull Feature oneOf(Feature feature0, Feature feature1) {
         // noinspection unchecked
         return oneOf(new Feature[] { feature0, feature1 });
     }
@@ -161,7 +166,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         instantiateActive = false;
     }
 
-    protected Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
+    protected @NonNull Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
         if (instantiateActive) {
             return SVInstantiationCP.create(sv, value);
         } else {
@@ -169,7 +174,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         }
     }
 
-    protected Feature instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
+    protected @NonNull Feature instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
         if (instantiateActive) {
             return SVInstantiationCP.createTriggeredVarCP(value);
         } else {
@@ -177,7 +182,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         }
     }
 
-    protected Feature instantiate(String sv, ProjectionToTerm<Goal> value) {
+    protected @NonNull Feature instantiate(@NonNull String sv, ProjectionToTerm<Goal> value) {
         return instantiate(new Name(sv), value);
     }
 }

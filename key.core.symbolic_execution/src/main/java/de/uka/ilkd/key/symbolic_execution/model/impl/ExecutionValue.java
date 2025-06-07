@@ -28,6 +28,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The default implementation of {@link IExecutionValue}.
  *
@@ -73,7 +75,8 @@ public class ExecutionValue extends AbstractExecutionValue {
      * @param conditionString the condition under which the variable has this value as
      *        human-readable {@link String}
      */
-    public ExecutionValue(Node proofNode, ExecutionVariable variable, boolean valueUnknown,
+    public ExecutionValue(@NonNull Node proofNode, @NonNull ExecutionVariable variable,
+            boolean valueUnknown,
             Term value, String valueString, String typeString, Term condition,
             String conditionString) {
         super(variable.getSettings(), proofNode, variable, condition, value);
@@ -127,7 +130,8 @@ public class ExecutionValue extends AbstractExecutionValue {
      * @return The contained child {@link IExecutionVariable}s.
      * @throws ProofInputException Occurred Exception.
      */
-    protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
+    protected IExecutionVariable @NonNull [] lazyComputeChildVariables()
+            throws ProofInputException {
         List<IExecutionVariable> children = new LinkedList<>();
         if (!isDisposed()) {
             final Services services = getServices();

@@ -11,14 +11,18 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 public class FocusFormulaProjection implements ProjectionToTerm<Goal> {
 
-    public static final ProjectionToTerm<Goal> INSTANCE = new FocusFormulaProjection();
+    public static final ProjectionToTerm<Goal> INSTANCE =
+        new de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection();
 
     private FocusFormulaProjection() {}
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public @NonNull Term toTerm(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         return (Term) pos.sequentFormula().formula();

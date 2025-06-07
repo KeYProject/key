@@ -13,6 +13,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Returns zero iff a term contains a program or (optionally) a query expression
@@ -30,11 +32,11 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
         new ContainsExecutableCodeTermFeature(true);
 
     @Override
-    protected boolean filter(Term t, MutableState mState, LogicServices services) {
+    protected boolean filter(@NonNull Term t, MutableState mState, LogicServices services) {
         return containsExec(t, mState, services);
     }
 
-    private boolean containsExec(Term t, MutableState mState, LogicServices services) {
+    private boolean containsExec(@NonNull Term t, MutableState mState, LogicServices services) {
         if (t.isRigid()) {
             return false;
         }

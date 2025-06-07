@@ -37,6 +37,8 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,14 +57,14 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
 
     private final MediatorProofControl proofControl = createProofControl();
 
-    private ProofMacro autoMacro = new SkipMacro();
+    private @NonNull ProofMacro autoMacro = new SkipMacro();
 
     @Override
-    public MediatorProofControl getProofControl() {
+    public @NonNull MediatorProofControl getProofControl() {
         return proofControl;
     }
 
-    protected MediatorProofControl createProofControl() {
+    protected @NonNull MediatorProofControl createProofControl() {
         return new MediatorProofControl(this);
     }
 
@@ -74,12 +76,12 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         return this.saveOnly;
     }
 
-    public void setMacro(ProofMacro macro) {
+    public void setMacro(@NonNull ProofMacro macro) {
         assert macro != null;
         this.autoMacro = macro;
     }
 
-    public ProofMacro getMacro() {
+    public @NonNull ProofMacro getMacro() {
         return this.autoMacro;
     }
 
@@ -114,8 +116,11 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     public abstract void loadProofFromBundle(Path proofBundle, Path proofFilename);
 
-    public ProblemLoader getProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
-            List<Path> includes, KeYMediator mediator) {
+    public ProblemLoader getProblemLoader(@NonNull Path file,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
+            KeYMediator mediator) {
         final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
             AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
         return pl;
@@ -160,7 +165,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
                     .getValueFor(StartSideProofMacro.PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF);
             info.getProof().addProofDisposedListener(new ProofDisposedListener() {
                 @Override
-                public void proofDisposing(final ProofDisposedEvent e) {
+                public void proofDisposing(final @NonNull ProofDisposedEvent e) {
                     e.getSource().removeProofDisposedListener(this);
                     macroSideProofDisposing(info, initiatingProof, e.getSource());
                 }
@@ -180,7 +185,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     }
 
     protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo,
-            final Proof initiatingProof, final Proof sideProof) {
+            final @NonNull Proof initiatingProof, final @NonNull Proof sideProof) {
         ThreadUtilities.invokeAndWait(() -> {
             saveSideProof(sideProof);
             // make everyone listen to the proof remove
@@ -202,7 +207,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      *
      * @param proof
      */
-    private void saveSideProof(Proof proof) {
+    private void saveSideProof(@NonNull Proof proof) {
         String proofName = proof.name().toString();
         proofName = MiscTools.removeFileExtension(proofName);
         final String filename = MiscTools.toValidFileName(proofName) + ".proof";
@@ -225,7 +230,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * {@inheritDoc}
      */
     @Override
-    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput,
+    public @NonNull ProofEnvironment createProofEnvironmentAndRegisterProof(
+            ProofOblInput proofOblInput,
             ProofAggregate proofList, InitConfig initConfig) {
         final ProofEnvironment env = new ProofEnvironment(initConfig);
         env.addProofEnvironmentListener(this);
@@ -234,7 +240,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     }
 
     @Override
-    public void proofUnregistered(ProofEnvironmentEvent event) {
+    public void proofUnregistered(@NonNull ProofEnvironmentEvent event) {
         if (event.getSource().getProofs().isEmpty()) {
             event.getSource().removeProofEnvironmentListener(this);
         }
@@ -271,7 +277,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * {@inheritDoc}
      */
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
+    public void proofDisposing(@NonNull ProofDisposedEvent e) {
         e.getSource().removeProofDisposedListener(this);
     }
 
@@ -287,7 +293,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * {@inheritDoc}
      */
     @Override
-    public void proofRegistered(ProofEnvironmentEvent event) {
+    public void proofRegistered(@NonNull ProofEnvironmentEvent event) {
         registerProofAggregate(event.getProofList());
     }
 
@@ -295,7 +301,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * {@inheritDoc}
      */
     @Override
-    public void registerProofAggregate(ProofAggregate pa) {
+    public void registerProofAggregate(@NonNull ProofAggregate pa) {
         for (Proof proof : pa.getProofs()) {
             proof.addProofDisposedListener(this);
         }

@@ -8,6 +8,7 @@ import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.proof.ProofGoal;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 ///
 /// Implementation of [StopCondition] which stops the strategy after a reached limit of rules
@@ -35,7 +36,7 @@ public final class AppliedRuleStopCondition<Goal extends ProofGoal<@NonNull Goal
 
     /// {@inheritDoc}
     @Override
-    public String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
+    public @Nullable String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
             long startTime, int countApplied) {
         return null;
     }
@@ -50,7 +51,8 @@ public final class AppliedRuleStopCondition<Goal extends ProofGoal<@NonNull Goal
 
     /// {@inheritDoc}
     @Override
-    public String getStopMessage(int maxApplications, long timeout, long startTime,
+    public @NonNull String getStopMessage(int maxApplications, long timeout,
+            long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return "Maximal number of rule applications reached or timed out.";
     }

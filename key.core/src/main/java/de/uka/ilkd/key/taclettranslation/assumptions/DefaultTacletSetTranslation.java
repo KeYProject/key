@@ -29,6 +29,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public final class DefaultTacletSetTranslation
         implements TacletSetTranslation, TranslationListener {
 
@@ -42,12 +45,12 @@ public final class DefaultTacletSetTranslation
      * Translation of the taclets stored in <code>taclets</code>.
      *
      */
-    private ImmutableList<TacletFormula> translation = ImmutableSLList.nil();
+    private @NonNull ImmutableList<TacletFormula> translation = ImmutableSLList.nil();
 
     /**
      * Taclets can not be translated because checking the taclet failed.
      */
-    private ImmutableList<TacletFormula> notTranslated = ImmutableSLList.nil();
+    private @NonNull ImmutableList<TacletFormula> notTranslated = ImmutableSLList.nil();
 
     /**
      * If a instantiation failure occurs the returned information is stored in a String.
@@ -55,7 +58,7 @@ public final class DefaultTacletSetTranslation
     private final ImmutableList<String> instantiationFailures = ImmutableSLList.nil();
 
 
-    private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
+    private @NonNull ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
 
     /**
      * Sorts that have been used while translating the set of taclets.
@@ -87,7 +90,8 @@ public final class DefaultTacletSetTranslation
 
 
     @Override
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
+    public @NonNull ImmutableList<TacletFormula> getTranslation(
+            @Nullable ImmutableSet<Sort> sorts) {
 
         // only translate once.
         if (!translate) {
@@ -123,7 +127,7 @@ public final class DefaultTacletSetTranslation
 
 
 
-    public ImmutableList<TacletFormula> getNotTranslated() {
+    public @NonNull ImmutableList<TacletFormula> getNotTranslated() {
         return notTranslated;
     }
 
@@ -153,7 +157,7 @@ public final class DefaultTacletSetTranslation
 
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         ImmutableList<TacletFormula> list = getTranslation(usedFormulaSorts);
         StringBuilder toStore = new StringBuilder();
         toStore = new StringBuilder("//" + Calendar.getInstance().getTime() + "\n");
@@ -223,7 +227,7 @@ public final class DefaultTacletSetTranslation
         return toStore.toString();
     }
 
-    private String convertTerm(Term term) {
+    private @NonNull String convertTerm(@NonNull Term term) {
         String ret = LogicPrinter.quickPrintTerm(term, null);
         ret = "(" + ret + ")";
         return ret;

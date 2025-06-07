@@ -13,6 +13,8 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
  * loop. It unwinds the loop: e.g.
@@ -55,8 +57,8 @@ public class UnwindLoop extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
+            @NonNull SVInstantiations svInst) {
         if (!(pe instanceof LoopStatement originalLoop)) {
             return new ProgramElement[] { pe };
         }
@@ -85,7 +87,7 @@ public class UnwindLoop extends ProgramTransformer {
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override
-    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+    public @NonNull ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
 
         if (innerLabel != null) {

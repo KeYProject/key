@@ -19,6 +19,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (10.05.19)
@@ -37,12 +39,12 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Colors";
     }
 
     @Override
-    public JPanel getPanel(MainWindow window) {
+    public @NonNull JPanel getPanel(MainWindow window) {
         List<ColorPropertyData> properties = ColorSettings.getInstance().getProperties()
                 .map(it -> new ColorPropertyData(it, it.get())).collect(Collectors.toList());
 
@@ -64,7 +66,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
             private static final long serialVersionUID = -7602735597024671100L;
 
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
+            public @NonNull Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 Color c = (Color) value;
                 String s = ColorSettings.toHex(c);
@@ -74,7 +76,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
                 return lbl;
             }
 
-            private Icon drawRect(Color c, int size) {
+            private @NonNull Icon drawRect(Color c, int size) {
                 /*
                  * Not sure if the alpha channel is used. Highlights seem to be blended correctly
                  * even if the color is not transparent at all. However, make sure to use ARGB to
@@ -116,7 +118,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         }
 
         @Override
-        public String getColumnName(int column) {
+        public @NonNull String getColumnName(int column) {
             return COLUMNS[column];
         }
 
@@ -131,7 +133,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         }
 
         @Override
-        public Class<?> getColumnClass(int columnIndex) {
+        public @NonNull Class<?> getColumnClass(int columnIndex) {
             if (columnIndex == 2) {
                 return Color.class;
             }
@@ -139,7 +141,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         }
 
         @Override
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        public void setValueAt(@NonNull Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 2) {
                 colorData.get(rowIndex).color = ColorSettings.fromHex(aValue.toString());
             } else {
@@ -170,7 +172,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 class HexColorCellEditor extends DefaultCellEditor {
     private static final long serialVersionUID = -4352607386521686931L;
 
-    HexColorCellEditor(JTextField textField) {
+    HexColorCellEditor(@NonNull JTextField textField) {
         super(textField);
 
         // this is somehow important to avoid visual artifacts such as overlapping text:
@@ -207,14 +209,15 @@ class HexColorCellEditor extends DefaultCellEditor {
         });
     }
 
-    public static HexColorCellEditor make() {
+    public static @NonNull HexColorCellEditor make() {
         JTextField field = new JTextField();
         field.setBorder(null);
         return new HexColorCellEditor(field);
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+    public @NonNull Component getTableCellEditorComponent(JTable table, Object value,
+            boolean isSelected,
             int row, int column) {
         Component txt = super.getTableCellEditorComponent(table, ColorSettings.toHex((Color) value),
             isSelected, row, column);

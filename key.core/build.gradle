@@ -267,3 +267,26 @@ task generateRAPUnitTests(type: JavaExec) {
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
 
 sourcesJar.dependsOn(runAntlr4Jml, runAntlr4Key, compileJavacc, generateGrammarSource)
+
+
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                ///home/weigl/work/key/key.core/src/main/java/de/uka/ilkd/key/nparser/varexp
+                //"-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.(nparser\\.varexp|ldt|util|proof|control|macros|settings)(\\.*)?",
+                //"-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.proof(\\.*)?",
+                "-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.util(\\.*)?",
+                "-AassumeAssertionsAreEnabled",
+                "-AassumePureGetters",
+                "-AassumeInitialized",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework${File.pathSeparatorChar}permit-nullness-assertion-exception.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}

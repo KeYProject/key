@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This interface is implemented by items to be displayed in the @link TacletMenu.
  */
@@ -20,6 +22,7 @@ interface TacletMenuItem {
      *
      * @return the attached Taclet
      */
+    @Nullable
     TacletApp connectedTo();
 
 }

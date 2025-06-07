@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
@@ -38,7 +40,7 @@ public final class TermFactory {
 
 
     public TermFactory() {
-        this.cache = null;
+        this.cache = new HashMap<>();
     }
 
     public TermFactory(Map<Term, Term> cache) {
@@ -55,9 +57,10 @@ public final class TermFactory {
      * Master method for term creation. Should be the only place where terms are created in the
      * entire system.
      */
-    public Term createTerm(@NonNull Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+    public Term createTerm(Operator op,
+            @Nullable ImmutableArray<Term> subs,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -79,8 +82,9 @@ public final class TermFactory {
         return createTerm(op, createSubtermArray(subs), null, null);
     }
 
-    public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+    public Term createTerm(Operator op, Term[] subs,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 
@@ -109,13 +113,13 @@ public final class TermFactory {
     // private interface
     // -------------------------------------------------------------------------
 
-    private ImmutableArray<Term> createSubtermArray(Term[] subs) {
-        return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<>(subs);
+    private ImmutableArray<Term> createSubtermArray(Term @Nullable [] subs) {
+        return (subs == null || subs.length == 0) ? NO_SUBTERMS : new ImmutableArray<>(subs);
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels, String origin) {
 
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()

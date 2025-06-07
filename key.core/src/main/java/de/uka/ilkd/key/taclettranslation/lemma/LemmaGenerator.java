@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A Lemma Generator translates a taclet to its corresponding first order logic formula thats
  * validity implies the validity of the taclet.
@@ -41,12 +43,12 @@ class LemmaFormula implements TacletFormula {
     }
 
     @Override
-    public String getStatus() {
+    public @NonNull String getStatus() {
         return "";
     }
 
     @Override
-    public Collection<Term> getInstantiations() {
+    public @NonNull Collection<Term> getInstantiations() {
         return formula;
     }
 

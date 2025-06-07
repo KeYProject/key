@@ -7,6 +7,8 @@ import de.uka.ilkd.key.informationflow.po.snippet.BasicSnippetData.Key;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  *
@@ -16,7 +18,7 @@ class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMe
         implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public @NonNull Term produce(@NonNull BasicSnippetData d, @NonNull ProofObligationVars poVars)
             throws UnsupportedOperationException {
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory = POSnippetFactory.getBasicFactory(d, poVars);

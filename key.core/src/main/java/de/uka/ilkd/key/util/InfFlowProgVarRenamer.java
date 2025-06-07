@@ -5,6 +5,7 @@ package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -20,6 +21,9 @@ import de.uka.ilkd.key.proof.VariableNameProposer;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+
+import org.checkerframework.checker.nullness.util.NullnessUtil;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -46,7 +50,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private final Goal goalForVariableRegistration;
 
 
-    public InfFlowProgVarRenamer(Term[] terms, Map<Term, Term> preInitialisedReplaceMap,
+    public InfFlowProgVarRenamer(Term[] terms, @Nullable Map<Term, Term> preInitialisedReplaceMap,
             String postfix, Goal goalForVariableRegistration, Services services) {
         super(services.getTermFactory(), services);
         this.terms = terms;
@@ -88,14 +92,10 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private Term renameFormulasWithoutPrograms(Term term) {
-        if (term == null) {
-            return null;
-        }
-
         if (!replaceMap.containsKey(term)) {
             renameAndAddToReplaceMap(term);
         }
-        return replaceMap.get(term);
+        return Objects.requireNonNull(replaceMap.get(term));
     }
 
 
@@ -147,8 +147,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
             }
         } else if (pv instanceof ProgramConstant pc) {
             return new ProgramConstant(new ProgramElementName(newName.toString()),
-                pc.getKeYJavaType(),
-                pc.getContainerType(), pc.isStatic(), pc.getCompileTimeConstant());
+                NullnessUtil.castNonNull(pc.getKeYJavaType()),
+                NullnessUtil.castNonNull(pc.getContainerType()),
+                pc.isStatic(), pc.getCompileTimeConstant());
         } else {
             throw new IllegalArgumentException("Unknown type for pv: " + pv);
         }
@@ -200,9 +201,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Term applyRenamingsToPrograms(Term term,
             Map<LocationVariable, LocationVariable> progVarReplaceMap) {
 
-        if (term == null) {
-            return null;
-        } else if (term.op() instanceof Modality mod) {
+        if (term.op() instanceof Modality mod) {
             final JavaBlock renamedJavaBlock =
                 renameJavaBlock(progVarReplaceMap, mod.programBlock().program(), services);
             final Term[] appliedSubs = applyProgramRenamingsToSubs(term, progVarReplaceMap);

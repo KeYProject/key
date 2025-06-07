@@ -13,6 +13,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Feature that decides whether the multiplication of two inequations (using rules of set
  * inEqSimp_nonLin_multiply) is allowed. We only do this if the product of the left sides of the
@@ -34,11 +36,12 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
      * @param targetCandidate the left side of the inequation that is supposed to bound the other
      *        two inequations
      */
-    public static Feature partiallyBounded(ProjectionToTerm<Goal> mult1Candidate,
+    public static @NonNull Feature partiallyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             @Override
-            protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
+            protected boolean filter(@NonNull Monomial targetM, @NonNull Monomial mult1M,
+                    @NonNull Monomial mult2M) {
                 return !mult2M.reduce(targetM).variablesDisjoint(mult1M)
                         && !mult1M.reduce(targetM).variablesDisjoint(mult2M);
             }
@@ -48,11 +51,12 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     /**
      * Return zero iff the product of mult1 and mult2 is a factor of target
      */
-    public static Feature totallyBounded(ProjectionToTerm<Goal> mult1Candidate,
+    public static @NonNull Feature totallyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             @Override
-            protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
+            protected boolean filter(@NonNull Monomial targetM, @NonNull Monomial mult1M,
+                    @NonNull Monomial mult2M) {
                 return targetM.variablesSubsume(mult1M.multiply(mult2M));
             }
         };
@@ -61,11 +65,12 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     /**
      * Return zero iff the product of mult1 and mult2 is target
      */
-    public static Feature exactlyBounded(ProjectionToTerm<Goal> mult1Candidate,
+    public static @NonNull Feature exactlyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             @Override
-            protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
+            protected boolean filter(@NonNull Monomial targetM, @NonNull Monomial mult1M,
+                    @NonNull Monomial mult2M) {
                 return targetM.variablesEqual(mult1M.multiply(mult2M));
             }
         };
@@ -79,7 +84,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected final boolean filter(TacletApp app, PosInOccurrence pos, Goal goal,
+    protected final boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
             MutableState mState) {
         final Services services = goal.proof().getServices();
         final Monomial targetM =

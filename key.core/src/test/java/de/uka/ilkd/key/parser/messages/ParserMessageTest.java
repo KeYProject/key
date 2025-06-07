@@ -19,6 +19,8 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
@@ -38,16 +40,16 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ParserMessageTest {
     private static final String DOC_FILE = "key/doc/README.parserMessageTest";
 
-    private final List<String> lines;
-    private final ProblemLoaderException exception;
-    private final Location location;
+    private final @NonNull List<String> lines;
+    private final @NonNull ProblemLoaderException exception;
+    private final @Nullable Location location;
     private Path javaFile;
 
     /**
      * Method for creating parameters for a parameterized test run. Returned collection is a set of
      * constructor parameters.
      */
-    public static Collection<Arguments> data() throws IOException {
+    public static @NonNull Collection<Arguments> data() throws IOException {
         Path testDataDir = HelperClassForTests.TESTCASE_DIRECTORY.resolve("parserMessageTest");
         var data = new LinkedList<Arguments>();
         final var files = Files.list(testDataDir).filter(Files::isDirectory).toList();

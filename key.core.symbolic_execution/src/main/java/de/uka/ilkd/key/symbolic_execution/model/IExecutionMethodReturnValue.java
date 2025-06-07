@@ -8,6 +8,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturnValue;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A return value of an {@link IExecutionMethodReturn}.
@@ -27,6 +29,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return The return value.
      * @throws ProofInputException Occurred Exception.
      */
+    @Nullable
     Term getReturnValue() throws ProofInputException;
 
     /**
@@ -52,6 +55,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return The optional condition under which the return value is valid.
      * @throws ProofInputException Occurred Exception.
      */
+    @Nullable
     Term getCondition() throws ProofInputException;
 
     /**

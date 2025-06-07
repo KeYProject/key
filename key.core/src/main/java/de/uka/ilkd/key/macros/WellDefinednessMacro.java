@@ -47,7 +47,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     public String getCategory() {
-        return null;
+        return "";
     }
 
     @Override

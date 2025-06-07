@@ -24,10 +24,10 @@ public final class JavaModel {
     private final @Nullable Path modelDir;
     private final @Nullable String modelTag;
     private final String descr;
-    private final List<Path> classPath;
-    private final Path bootClassPath;
-    private final List<Path> includedFiles;
-    private final Path initialFile;
+    private final @Nullable List<Path> classPath;
+    private final @Nullable Path bootClassPath;
+    private final @Nullable List<Path> includedFiles;
+    private final @Nullable Path initialFile;
 
     public static final JavaModel NO_MODEL = new JavaModel();
 
@@ -36,9 +36,11 @@ public final class JavaModel {
      *
      */
     public static JavaModel createJavaModel(
-            Path javaPath,
-            List<Path> classPath,
-            Path bootClassPath, Includes includes, Path initialFile) {
+            @Nullable Path javaPath,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath,
+            @Nullable Includes includes,
+            @Nullable Path initialFile) {
         JavaModel result;
         if (javaPath == null) {
             result = NO_MODEL;
@@ -82,23 +84,23 @@ public final class JavaModel {
         return modelDir;
     }
 
-    public String getModelTag() {
+    public @Nullable String getModelTag() {
         return modelTag;
     }
 
-    public List<Path> getClassPath() {
+    public @Nullable List<Path> getClassPath() {
         return classPath;
     }
 
-    public Path getBootClassPath() {
+    public @Nullable Path getBootClassPath() {
         return bootClassPath;
     }
 
-    public List<Path> getIncludedFiles() {
+    public @Nullable List<Path> getIncludedFiles() {
         return includedFiles;
     }
 
-    public Path getInitialFile() {
+    public @Nullable Path getInitialFile() {
         return initialFile;
     }
 
@@ -112,7 +114,7 @@ public final class JavaModel {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }

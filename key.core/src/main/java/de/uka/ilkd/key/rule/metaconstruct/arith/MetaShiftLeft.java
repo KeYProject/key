@@ -7,6 +7,8 @@ import java.math.BigInteger;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+
 public class MetaShiftLeft extends MetaShift {
 
     public MetaShiftLeft() {
@@ -14,7 +16,7 @@ public class MetaShiftLeft extends MetaShift {
     }
 
     @Override
-    protected BigInteger shiftOp(BigInteger left, BigInteger right) {
+    protected @NonNull BigInteger shiftOp(@NonNull BigInteger left, @NonNull BigInteger right) {
         return left.shiftLeft(right.intValue());
     }
 

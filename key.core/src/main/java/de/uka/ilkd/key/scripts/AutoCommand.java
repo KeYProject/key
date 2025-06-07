@@ -23,6 +23,9 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The AutoCommand invokes the automatic strategy "Auto".
  *
@@ -36,17 +39,17 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "auto";
     }
 
     @Override
-    public String getDocumentation() {
+    public @NonNull String getDocumentation() {
         return "The AutoCommand invokes the automatic strategy \"Auto\"";
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws ConversionException, ArgumentRequiredException, InjectionReflectionException,
             NoSpecifiedConverterException {
         Parameters args = new Parameters();
@@ -55,8 +58,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters arguments,
-            EngineState state) throws ScriptException, InterruptedException {
+    @SuppressWarnings("override.param.invalid")
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters arguments,
+            @NonNull EngineState state) throws ScriptException, InterruptedException {
         final Services services = state.getProof().getServices();
         final Profile profile = services.getProfile();
 
@@ -117,9 +121,10 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * @param services The {@link Services} object.
      * @throws ScriptException
      */
-    private void setupFocussedBreakpointStrategy(final Optional<String> maybeMatchesRegEx,
-            final Optional<String> breakpointArg, final Goal goal, final ProverCore proverCore,
-            final Services services) throws ScriptException {
+    private void setupFocussedBreakpointStrategy(final @NonNull Optional<String> maybeMatchesRegEx,
+            final Optional<String> breakpointArg, final @NonNull Goal goal,
+            final @NonNull ProverCore proverCore,
+            final @NonNull Services services) throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
                 ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
                     maybeMatchesRegEx.get(), services))
@@ -137,6 +142,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option(value = "all", required = false)
         public boolean onAllOpenGoals = false;
@@ -148,12 +154,14 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
          * Run on formula matching the given regex
          */
         @Option(value = "matches", required = false)
+        @Nullable
         public String matches = null;
 
         /**
          * Run on formula matching the given regex
          */
         @Option(value = "breakpoint", required = false)
+        @Nullable
         public String breakpoint = null;
 
         public boolean isOnAllOpenGoals() {

@@ -9,6 +9,9 @@ import java.util.Map.Entry;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides the basic functionality for classes like {@link ExecutionNodeWriter} and
  * {@link SymbolicLayoutWriter} which encodes an object structure as XML.
@@ -49,8 +52,9 @@ public abstract class AbstractWriter {
      * @param attributeValues The attributes.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues,
-            StringBuilder sb) {
+    protected void appendEmptyTag(int level, @NonNull String tagName,
+            @NonNull Map<String, String> attributeValues,
+            @NonNull StringBuilder sb) {
         XMLUtil.appendEmptyTag(level, tagName, attributeValues, sb);
     }
 
@@ -62,8 +66,9 @@ public abstract class AbstractWriter {
      * @param attributeValues The attributes.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendStartTag(int level, String tagName, Map<String, String> attributeValues,
-            StringBuilder sb) {
+    protected void appendStartTag(int level, String tagName,
+            @NonNull Map<String, String> attributeValues,
+            @NonNull StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("<");
         sb.append(tagName);
@@ -81,7 +86,7 @@ public abstract class AbstractWriter {
      * @param tagName The tag name.
      * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendEndTag(int level, String tagName, StringBuilder sb) {
+    protected void appendEndTag(int level, String tagName, @NonNull StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("</");
         sb.append(tagName);
@@ -95,7 +100,7 @@ public abstract class AbstractWriter {
      * @param level The level in the tree used for leading white space (formatting).
      * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendWhiteSpace(int level, StringBuilder sb) {
+    protected void appendWhiteSpace(int level, @NonNull StringBuilder sb) {
         sb.append(LEADING_WHITE_SPACE_PER_LEVEL.repeat(Math.max(0, level)));
     }
 
@@ -106,7 +111,8 @@ public abstract class AbstractWriter {
      * @param value The attribute value.
      * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendAttribute(String attributeName, String value, StringBuilder sb) {
+    protected void appendAttribute(@Nullable String attributeName, @Nullable String value,
+            @NonNull StringBuilder sb) {
         if (attributeName != null && value != null) {
             sb.append(" ");
             sb.append(attributeName);
@@ -122,7 +128,7 @@ public abstract class AbstractWriter {
      * @param encoding The encoding to use.
      * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendXmlHeader(String encoding, StringBuilder sb) {
+    protected void appendXmlHeader(String encoding, @NonNull StringBuilder sb) {
         sb.append("<?xml version=\"1.0\"");
         appendAttribute(ATTRIBUTE_ENCODING, encoding, sb);
         sb.append("?>");
@@ -134,7 +140,7 @@ public abstract class AbstractWriter {
      *
      * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendNewLine(StringBuilder sb) {
+    protected void appendNewLine(@NonNull StringBuilder sb) {
         sb.append(NEW_LINE);
     }
 }

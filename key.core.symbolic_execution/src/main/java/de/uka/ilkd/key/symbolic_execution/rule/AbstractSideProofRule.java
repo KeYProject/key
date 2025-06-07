@@ -29,6 +29,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Provides the basic functionality of {@link BuiltInRule} which computes something in a side proof.
  *
@@ -64,7 +66,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param sort The {@link Sort} to use.
      * @return The created result {@link JFunction}.
      */
-    protected JFunction createResultFunction(Services services, Sort sort) {
+    protected @NonNull JFunction createResultFunction(@NonNull Services services, Sort sort) {
         return new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
             JavaDLTheory.FORMULA, sort);
     }
@@ -103,8 +105,9 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param newTerm The new {@link Term}.
      * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
      */
-    protected static SequentFormula replace(PosInOccurrence pio,
-            Term newTerm, Services services) {
+    protected static @NonNull SequentFormula replace(@NonNull PosInOccurrence pio,
+            Term newTerm,
+            @NonNull Services services) {
         // Iterate along the PosInOccurrence and collect the parents and indices
         Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<>();
         Term root = (Term) pio.sequentFormula().formula();

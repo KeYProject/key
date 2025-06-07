@@ -14,6 +14,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -178,8 +179,8 @@ public class TestGenericSortInstantiations {
         }
     }
 
-    public static ImmutableList<GenericSort> sorts(
-            ImmutableList<GenericSortCondition> p_conditions) {
+    public static @NonNull ImmutableList<GenericSort> sorts(
+            @NonNull ImmutableList<GenericSortCondition> p_conditions) {
         Iterator<GenericSortCondition> it = p_conditions.iterator();
         ImmutableList<GenericSort> res = ImmutableSLList.nil();
 

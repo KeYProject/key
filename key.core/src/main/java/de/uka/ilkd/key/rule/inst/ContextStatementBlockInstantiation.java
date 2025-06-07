@@ -7,22 +7,33 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInProgram;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * this class is created if the scheme given by a context term has matched to a java program. The
  * ContextStatementBlockInstantiation class stores the instantiations of the prefix and the suffix.
  */
 public class ContextStatementBlockInstantiation {
 
-    /** the end position of the prefix omega */
+    /**
+     * the end position of the prefix omega
+     */
     private final PosInProgram prefixEnd;
 
-    /** the start position of the suffix omega */
+    /**
+     * the start position of the suffix omega
+     */
     private final PosInProgram suffixStart;
 
-    /** the execution context of the first active statement */
+    /**
+     * the execution context of the first active statement
+     */
     private final ExecutionContext activeStatementContext;
 
-    /** the whole program element this context term inst refers to */
+    /**
+     * the whole program element this context term inst refers to
+     */
     private final ProgramElement programElement;
 
     /**
@@ -75,7 +86,8 @@ public class ContextStatementBlockInstantiation {
         return programElement;
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof ContextStatementBlockInstantiation inst)) {
             return false;
         }
@@ -96,7 +108,7 @@ public class ContextStatementBlockInstantiation {
 
     }
 
-    private boolean isDifferent(Object self, Object other) {
+    private boolean isDifferent(@Nullable Object self, @Nullable Object other) {
         if (self != null && other != null) {
             return !self.equals(other);
         } else {
@@ -121,8 +133,10 @@ public class ContextStatementBlockInstantiation {
         return hashCode;
     }
 
-    /** toString */
-    public String toString() {
+    /**
+     * toString
+     */
+    public @NonNull String toString() {
         String result = "ContextStatementBlockInstantiation:\n";
         result += "Prefix ends before " + prefixEnd.toString();
         result += "\nSuffix starts after " + suffixStart.toString();

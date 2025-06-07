@@ -23,6 +23,9 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author christoph
@@ -41,8 +44,10 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
+    public @NonNull ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+            final @NonNull Proof proof,
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener) {
 
         final ProofOblInput poForProof =
             proof.getServices().getSpecificationRepository().getProofOblInput(proof);

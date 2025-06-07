@@ -25,6 +25,9 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelVisualizer}s.
  *
@@ -41,7 +44,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     /** @see ToggleOriginHighlightAction */
     private ToggleOriginHighlightAction toggleSourceViewHighlightAction;
 
-    private ToggleTermOriginTrackingAction getToggleTrackingAction(MainWindow mainWindow) {
+    private @NonNull ToggleTermOriginTrackingAction getToggleTrackingAction(
+            @NonNull MainWindow mainWindow) {
         if (toggleTrackingAction == null) {
             toggleTrackingAction = new ToggleTermOriginTrackingAction(mainWindow);
         }
@@ -49,7 +53,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
         return toggleTrackingAction;
     }
 
-    private ToggleOriginHighlightAction getToggleSourceViewHighlightAction(MainWindow mainWindow) {
+    private @NonNull ToggleOriginHighlightAction getToggleSourceViewHighlightAction(
+            @NonNull MainWindow mainWindow) {
         if (toggleSourceViewHighlightAction == null) {
             toggleSourceViewHighlightAction = new ToggleOriginHighlightAction(mainWindow);
         }
@@ -58,7 +63,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public List<Action> getMainMenuActions(MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         List<Action> result = new LinkedList<>();
         result.add(getToggleTrackingAction(mainWindow));
         result.add(getToggleSourceViewHighlightAction(mainWindow));
@@ -66,7 +71,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+    public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
             Object underlyingObject) {
         if (kind == DefaultContextMenuKind.SEQUENT_VIEW) {
             return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
@@ -80,7 +85,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos) {
+    public @NonNull List<String> getTermInfoStrings(MainWindow mainWindow,
+            @NonNull PosInSequent pos) {
         Origin origin = OriginTermLabel.getOrigin(pos);
 
         List<String> result = new LinkedList<>();
@@ -93,7 +99,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos) {
+    public @NonNull List<String> getTooltipStrings(MainWindow mainWindow,
+            @Nullable PosInSequent pos) {
         if (pos == null || pos.isSequent()) {
             return Collections.emptyList();
         }
@@ -130,9 +137,9 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
         private static final long serialVersionUID = -2936000510977056583L;
         /** The visualizer shown by this action. */
-        private final NodeInfoVisualizer vis;
+        private final @NonNull NodeInfoVisualizer vis;
 
-        private OpenVisualizerAction(NodeInfoVisualizer vis) {
+        private OpenVisualizerAction(@NonNull NodeInfoVisualizer vis) {
             setName(vis.getLongName());
             setMenuPath("Windows");
             setIcon(IconFactory.WINDOW_ICON.get());

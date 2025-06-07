@@ -41,7 +41,7 @@ public class ForEachCP implements Feature {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static Feature create(TermBuffer var, TermGenerator generator,
+    public static @NonNull Feature create(TermBuffer var, TermGenerator generator,
             Feature body) {
         return new ForEachCP(var, generator, body);
     }
@@ -55,7 +55,7 @@ public class ForEachCP implements Feature {
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(final RuleApp app,
             final PosInOccurrence pos, final Goal goal,
-            MutableState mState) {
+            @NonNull MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
 
@@ -93,7 +93,7 @@ public class ForEachCP implements Feature {
             }
 
             @Override
-            public CPBranch next() {
+            public @NonNull CPBranch next() {
                 final Term generatedTerm = terms.next();
                 return new CPBranch() {
                     @Override
@@ -128,7 +128,7 @@ public class ForEachCP implements Feature {
         }
 
         @Override
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
+        public @NonNull Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator(generator.generate(app, pos, goal, mState), oldApp, mState);
         }
     }

@@ -33,22 +33,22 @@ public abstract class ContextMenuAdapter implements KeYGuiExtension.ContextMenu 
         };
     }
 
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+    public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
             Proof underlyingObject) {
         return Collections.emptyList();
     }
 
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+    public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
             Node underlyingObject) {
         return Collections.emptyList();
     }
 
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+    public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
             PosInSequent underlyingObject) {
         return Collections.emptyList();
     }
 
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+    public @NonNull List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
             Rule underlyingObject) {
         return Collections.emptyList();
     }

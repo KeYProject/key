@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Addition or string concatenation operator "+".
  */
@@ -22,11 +24,11 @@ public class Plus extends BinaryOperator {
      *
      * @param children the children of this AST element as KeY classes.
      */
-    public Plus(ExtList children) {
+    public Plus(@NonNull ExtList children) {
         super(children);
     }
 
-    public Plus(Expression lhs, Expression rhs) {
+    public Plus(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 
@@ -57,7 +59,7 @@ public class Plus extends BinaryOperator {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnPlus(this);
     }
 }

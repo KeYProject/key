@@ -13,15 +13,17 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Feature that returns zero iff a certain schema variable is instantiated. If the schemavariable is
  * not instantiated schema variable or does not occur in the taclet infinity costs are returned.
  */
 public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 
-    private final ProjectionToTerm<Goal> instProj;
+    private final @NonNull ProjectionToTerm<Goal> instProj;
 
-    public static Feature create(Name svName) {
+    public static @NonNull Feature create(Name svName) {
         return new InstantiatedSVFeature(svName);
     }
 

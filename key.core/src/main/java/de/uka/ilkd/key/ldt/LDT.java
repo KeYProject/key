@@ -24,6 +24,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -47,21 +48,18 @@ public abstract class LDT implements Named {
     // -------------------------------------------------------------------------
 
     protected LDT(Name name, TermServices services) {
-        sort = services.getNamespaces().sorts().lookup(name);
-        if (sort == null) {
+        var s = services.getNamespaces().sorts().lookup(name);
+        if (s == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
         }
+        this.sort = s;
         this.name = name;
     }
 
 
     protected LDT(Name name, Sort targetSort, TermServices services) {
         sort = targetSort;
-        if (sort == null) {
-            throw new RuntimeException("LDT " + name + " not found.\n"
-                + "It seems that there are definitions missing from the .key files.");
-        }
         this.name = name;
     }
 
@@ -74,7 +72,7 @@ public abstract class LDT implements Named {
      *
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(Function f) {
+    protected final Function addFunction(@UnknownInitialization LDT this, Function f) {
         functions.addSafely(f);
         return f;
     }
@@ -85,7 +83,10 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final <F extends Function> F addFunction(TermServices services, String funcName) {
+    @SuppressWarnings("unchecked")
+    protected final <F extends Function> F addFunction(@UnknownInitialization LDT this,
+            TermServices services,
+            String funcName) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name(funcName));
         if (f == null) {
@@ -95,8 +96,8 @@ public abstract class LDT implements Named {
         return (F) addFunction(f);
     }
 
-    protected final SortDependingFunction addSortDependingFunction(TermServices services,
-            String kind) {
+    protected final SortDependingFunction addSortDependingFunction(@UnknownInitialization LDT this,
+            TermServices services, String kind) {
         final SortDependingFunction f =
             SortDependingFunction.getFirstInstance(new Name(kind), services);
         assert f != null : "LDT: Sort depending function " + kind + " not found";
@@ -221,7 +222,7 @@ public abstract class LDT implements Named {
      * @param lit the Literal to be translated
      * @return the Term that represents the given literal in its logic form
      */
-    public abstract Term translateLiteral(Literal lit, Services services);
+    public abstract @Nullable Term translateLiteral(Literal lit, Services services);
 
     /**
      * returns the function symbol for the given <em>Java</em> operator.
@@ -229,7 +230,7 @@ public abstract class LDT implements Named {
      * @return the function symbol for the given operation, null if not supported in general or not
      *         supported for this particular operator.
      */
-    public abstract Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public abstract @Nullable Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
             Services services, ExecutionContext ec);
 
     /**
@@ -253,7 +254,7 @@ public abstract class LDT implements Named {
     public abstract boolean hasLiteralFunction(JFunction f);
 
     /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
-    public abstract Expression translateTerm(Term t, ExtList children, Services services);
+    public abstract @Nullable Expression translateTerm(Term t, ExtList children, Services services);
 
-    public abstract Type getType(Term t);
+    public abstract @Nullable Type getType(Term t);
 }

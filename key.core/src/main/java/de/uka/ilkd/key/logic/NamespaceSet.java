@@ -16,6 +16,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class NamespaceSet {
 
@@ -165,7 +166,7 @@ public class NamespaceSet {
      * @return the first element with the given name if found in the given namespaces, otherwise
      *         <tt>null</tt>
      */
-    private Named lookup(Name name, final Namespace<?>[] spaces) {
+    private @Nullable Named lookup(Name name, final Namespace<?>[] spaces) {
         for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
             if (n != null) {

@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
@@ -51,7 +54,6 @@ public final class HeapLDT extends LDT {
         { BASE_HEAP_NAME, SAVED_HEAP_NAME, PERMISSION_HEAP_NAME };
 
 
-
     // additional sorts
     private final Sort fieldSort;
 
@@ -84,9 +86,13 @@ public final class HeapLDT extends LDT {
     private final Function reach;
     private final Function prec;
 
+    // heaps
+    final LocationVariable heapBase;
+    final LocationVariable heapSaved;
+    final @Nullable LocationVariable heapPermission;
+
     // heap pv
     private ImmutableList<LocationVariable> heaps;
-
 
 
     // -------------------------------------------------------------------------
@@ -99,7 +105,7 @@ public final class HeapLDT extends LDT {
         final Namespace<@NonNull IProgramVariable> progVars =
             services.getNamespaces().programVariables();
 
-        fieldSort = sorts.lookup(new Name("Field"));
+        fieldSort = Objects.requireNonNull(sorts.lookup(new Name("Field")));
         select = addSortDependingFunction(services, SELECT_NAME.toString());
         finalFunction = addSortDependingFunction(services, FINAL_NAME.toString());
         store = addFunction(services, STORE_NAME.toString());
@@ -119,15 +125,17 @@ public final class HeapLDT extends LDT {
         acc = addFunction(services, "acc");
         reach = addFunction(services, "reach");
         prec = addFunction(services, "prec");
+        heapBase = (LocationVariable) Objects.requireNonNull(progVars.lookup(BASE_HEAP_NAME));
+        heapSaved = (LocationVariable) Objects.requireNonNull(progVars.lookup(SAVED_HEAP_NAME));
         heaps = ImmutableSLList.<LocationVariable>nil()
-                .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
-                .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
-        if (services instanceof Services s) {
-            if (s.getProfile() instanceof JavaProfile) {
-                if (((JavaProfile) s.getProfile()).withPermissions()) {
-                    heaps = heaps.append((LocationVariable) progVars.lookup(PERMISSION_HEAP_NAME));
-                }
-            }
+                .append(heapBase)
+                .append(heapSaved);
+        if (services instanceof Services s && s.getProfile() instanceof JavaProfile jp
+                && jp.withPermissions()) {
+            heapPermission = (LocationVariable) progVars.lookup(PERMISSION_HEAP_NAME);
+            heaps = heaps.append(Objects.requireNonNull(heapPermission));
+        } else {
+            heapPermission = null;
         }
         wellFormed = addFunction(services, "wellFormed");
     }
@@ -146,7 +154,6 @@ public final class HeapLDT extends LDT {
             return fieldPVName.substring(0, index) + "::$" + fieldPVName.substring(index + 2);
         }
     }
-
 
 
     // -------------------------------------------------------------------------
@@ -214,7 +221,7 @@ public final class HeapLDT extends LDT {
      * Extracts the name of the enclosing class from the name of a constant symbol representing a
      * field.
      */
-    public static String getClassName(Function fieldSymbol) {
+    public static @Nullable String getClassName(Function fieldSymbol) {
         String name = fieldSymbol.name().toString();
         int index = name.indexOf("::");
         if (index == -1) {
@@ -268,7 +275,7 @@ public final class HeapLDT extends LDT {
      * If the passed operator is an instance of "select", this method returns the sort of the
      * function (identical to its return type); otherwise, returns null.
      */
-    public Sort getSortOfSelect(Operator op) {
+    public @Nullable Sort getSortOfSelect(Operator op) {
         if (isSelectOp(op)) {
             return ((SortDependingFunction) op).getSortDependingOn();
         } else {
@@ -368,19 +375,18 @@ public final class HeapLDT extends LDT {
 
 
     public LocationVariable getHeap() {
-        return heaps.head();
+        return heapBase;
     }
 
     public LocationVariable getSavedHeap() {
-        return heaps.tail().head();
+        return heapSaved;
     }
-
 
     public ImmutableList<LocationVariable> getAllHeaps() {
         return heaps;
     }
 
-    public LocationVariable getHeapForName(Name name) {
+    public @Nullable LocationVariable getHeapForName(Name name) {
         for (LocationVariable h : getAllHeaps()) {
             if (h.name().equals(name)) {
                 return h;
@@ -389,7 +395,7 @@ public final class HeapLDT extends LDT {
         return null;
     }
 
-    public LocationVariable getPermissionHeap() {
+    public @Nullable LocationVariable getPermissionHeap() {
         return heaps.size() > 2 ? heaps.tail().tail().head() : null;
     }
 
@@ -403,6 +409,12 @@ public final class HeapLDT extends LDT {
     public Function getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
         assert fieldPV.isMember();
         assert fieldPV != services.getJavaInfo().getArrayLength();
+        // container type of a field program variable can never be null
+        assert fieldPV.getContainerType() != null;
+        KeYJavaType containerType = fieldPV.getContainerType();
+        // sort of a field program variable can never be null
+        assert fieldPV.sort() != null;
+        Sort sort = fieldPV.sort();
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
         Function result = services.getNamespaces().functions().lookup(name);
@@ -414,7 +426,9 @@ public final class HeapLDT extends LDT {
             SortDependingFunction firstInstance =
                 SortDependingFunction.getFirstInstance(kind, services);
             if (firstInstance != null) {
-                Sort sortDependingOn = fieldPV.getContainerType().getSort();
+                Sort sortDependingOn = containerType.getSort();
+                // container sort must be initialized here
+                assert sortDependingOn != null;
                 result = firstInstance.getInstanceFor(sortDependingOn, services);
             } else {
                 if (fieldPV.isModel()) {
@@ -426,7 +440,7 @@ public final class HeapLDT extends LDT {
                         heapCount++;
                     }
                     result = new ObserverFunction(kind.toString(), fieldPV.sort(),
-                        fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
+                        fieldPV.getKeYJavaType(), targetSort(), containerType,
                         fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
                 } else {
                     result = new JFunction(name, fieldSort, new Sort[0], null, true);
@@ -480,16 +494,14 @@ public final class HeapLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        assert false;
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
-        assert false;
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
 
@@ -517,7 +529,7 @@ public final class HeapLDT extends LDT {
         } else if (t.sort() == getFieldSort() && t.op() instanceof Function
                 && ((Function) t.op()).isUnique()) {
             return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()),
-                getClassName((Function) t.op()));
+                Objects.requireNonNull(getClassName((Function) t.op())));
         }
         throw new IllegalArgumentException(
             "Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
@@ -526,8 +538,7 @@ public final class HeapLDT extends LDT {
 
     @Override
     public Type getType(Term t) {
-        assert false;
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 
 

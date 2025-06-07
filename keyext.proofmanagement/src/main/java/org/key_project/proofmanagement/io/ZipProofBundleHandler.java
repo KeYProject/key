@@ -14,6 +14,9 @@ import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A ProofBundleHandler for a proof bundle stored inside a zip file
  * (usually the file extension will be "zproof").
@@ -28,7 +31,7 @@ import org.key_project.util.java.IOUtil;
  */
 public class ZipProofBundleHandler extends ProofBundleHandler {
     /** path of the actual proof bundle file */
-    private final Path zipPath;
+    private final @NonNull Path zipPath;
 
     /** indicates if the close() method has already been called */
     private boolean closed = false;
@@ -42,7 +45,7 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     private final Path tmpDir;
 
     /**  */
-    private final DirectoryProofBundleHandler dbh;
+    private final @NonNull DirectoryProofBundleHandler dbh;
 
     /**
      * Create a new ZipProofBundleHandler for the zipped bundle with the given path.
@@ -50,7 +53,7 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
      * @param zipPath the path of the zip (usually, the file extension is "zproof")
      * @throws IOException if an I/O error occurs
      */
-    ZipProofBundleHandler(Path zipPath) throws IOException {
+    ZipProofBundleHandler(@NonNull Path zipPath) throws IOException {
         this.zipPath = zipPath;
         // fs = FileSystems.newFileSystem(zipPath, null);
 
@@ -62,17 +65,17 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
 
     // IMPORTANT: get... methods return paths to unzipped files!
     @Override
-    public String getBundleName() {
+    public @NonNull String getBundleName() {
         return zipPath.getFileName().toString();
     }
 
     @Override
-    public Path getBundlePath() {
+    public @NonNull Path getBundlePath() {
         return zipPath.toAbsolutePath().normalize();
     }
 
     @Override
-    public Path relativize(Path path) {
+    public @NonNull Path relativize(@NonNull Path path) {
         // we might need both cases
         if (path.startsWith(zipPath)) {
             return zipPath.relativize(path);
@@ -82,31 +85,31 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public List<Path> getProofFiles() throws ProofManagementException {
+    public @NonNull List<Path> getProofFiles() throws ProofManagementException {
         // return getFiles(fs.getPath("/"), ProofBundleHandler.PROOF_MATCHER);
         return dbh.getProofFiles();
     }
 
     @Override
-    public List<Path> getKeYFiles() throws IOException {
+    public @NonNull List<Path> getKeYFiles() throws IOException {
         // return getFiles(fs.getPath("/"), ProofBundleHandler.KEY_MATCHER);
         return dbh.getKeYFiles();
     }
 
     @Override
-    public List<Path> getSourceFiles() throws IOException {
+    public @NonNull List<Path> getSourceFiles() throws IOException {
         // return getFiles(fs.getPath("/src"), ProofBundleHandler.SRC_MATCHER);
         return dbh.getSourceFiles();
     }
 
     @Override
-    public List<Path> getClasspathFiles() throws IOException {
+    public @NonNull List<Path> getClasspathFiles() throws IOException {
         // return getFiles(fs.getPath("/classpath"), ProofBundleHandler.SRC_MATCHER);
         return dbh.getClasspathFiles();
     }
 
     @Override
-    public Path getBootclasspath() throws IOException {
+    public @Nullable Path getBootclasspath() throws IOException {
         // return getFiles(fs.getPath("/bootclasspath"), ProofBundleHandler.BOOTCLASSPATH_MATCHER);
         return dbh.getBootclasspath();
     }
@@ -124,7 +127,7 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public Path getPath(String entryName) {
+    public @NonNull Path getPath(@NonNull String entryName) {
         // return fs.getPath(pathString);
         return dbh.getPath(entryName);
     }

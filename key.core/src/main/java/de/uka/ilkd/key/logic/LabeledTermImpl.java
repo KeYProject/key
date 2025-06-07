@@ -17,6 +17,9 @@ import org.key_project.logic.Property;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * The labeled term class is used for terms that have a label attached.
@@ -50,10 +53,9 @@ class LabeledTermImpl extends TermImpl {
      * @param origin a String with origin information
      */
     public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels, String origin) {
         super(op, subs, boundVars, origin);
-        assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
     }
@@ -115,12 +117,12 @@ class LabeledTermImpl extends TermImpl {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }
 
-        if (o instanceof final LabeledTermImpl cmp) {
+        if (o instanceof final @NonNull LabeledTermImpl cmp) {
             if (labels.size() != cmp.labels.size()) {
                 return false;
             }

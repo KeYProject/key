@@ -39,6 +39,9 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class provides static methods to access the prover (KeY).
  *
@@ -55,7 +58,7 @@ public final class KeYFacade {
      *
      * @param data the CheckerData object to store the result
      */
-    public static void ensureDependencyGraphBuilt(CheckerData data) {
+    public static void ensureDependencyGraphBuilt(@NonNull CheckerData data) {
         if (data.getDependencyGraph() == null) {
             // construct dependency graph from data stored in CheckerData object
             // TODO: the analysis as currently implemented assumes there is
@@ -73,7 +76,8 @@ public final class KeYFacade {
      * @param data the CheckerData object to store the result
      * @throws ProofManagementException
      */
-    public static void ensureProofsLoaded(CheckerData data) throws ProofManagementException {
+    public static void ensureProofsLoaded(@NonNull CheckerData data)
+            throws ProofManagementException {
         List<Path> proofPaths = data.getProofPaths();
         try {
             // for each proof: parse and construct intermediate AST
@@ -100,7 +104,8 @@ public final class KeYFacade {
         }
     }
 
-    private static CheckerData.ProofEntry ensureProofEntryExists(Path proofPath, CheckerData data) {
+    private static CheckerData.@NonNull ProofEntry ensureProofEntryExists(Path proofPath,
+            @NonNull CheckerData data) {
         CheckerData.ProofEntry line = findProofLine(proofPath, data);
         if (line == null) {
             line = data.new ProofEntry();
@@ -109,7 +114,8 @@ public final class KeYFacade {
         return line;
     }
 
-    private static CheckerData.ProofEntry findProofLine(Path proofPath, CheckerData data) {
+    private static CheckerData.@Nullable ProofEntry findProofLine(Path proofPath,
+            @NonNull CheckerData data) {
         for (CheckerData.ProofEntry line : data.getProofEntries()) {
             if (line.proofFile != null && line.proofFile.equals(proofPath)) {
                 return line;
@@ -118,7 +124,8 @@ public final class KeYFacade {
         return null;
     }
 
-    private static boolean loadProofTree(Path path, CheckerData.ProofEntry line, Logger logger)
+    private static boolean loadProofTree(@NonNull Path path, CheckerData.@NonNull ProofEntry line,
+            @NonNull Logger logger)
             throws Exception {
 
         logger.print(LogLevel.DEBUG, "Loading proof from " + path);
@@ -150,7 +157,8 @@ public final class KeYFacade {
         return true;
     }
 
-    private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line)
+    private static Proof @Nullable [] loadProofFile(@NonNull Path path,
+            CheckerData.@NonNull ProofEntry line)
             throws Exception {
         Profile profile = AbstractProfile.getDefaultProfile();
 
@@ -226,8 +234,9 @@ public final class KeYFacade {
      * @return The {@link IPersistablePO.LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
-    private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
-            InitConfig initConfig, Configuration properties) throws Exception {
+    private static IPersistablePO.@NonNull LoadedPOContainer createProofObligationContainer(
+            @NonNull KeYFile keyFile,
+            @NonNull InitConfig initConfig, @NonNull Configuration properties) throws Exception {
         final String chooseContract = keyFile.chooseContract();
         final Configuration proofObligation = keyFile.getProofObligation();
 
@@ -289,7 +298,8 @@ public final class KeYFacade {
      * @param data the CheckerData object to store the result
      * @throws ProofManagementException
      */
-    public static void ensureProofsReplayed(CheckerData data) throws ProofManagementException {
+    public static void ensureProofsReplayed(@NonNull CheckerData data)
+            throws ProofManagementException {
         List<Path> proofPaths = data.getProofPaths();
         ensureProofsLoaded(data);
 
@@ -317,8 +327,9 @@ public final class KeYFacade {
         }
     }
 
-    private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
-            Logger logger) throws ProofInputException {
+    private static @NonNull ReplayResult replayProof(CheckerData.@NonNull ProofEntry line,
+            EnvInput envInput,
+            @NonNull Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 
@@ -416,7 +427,8 @@ public final class KeYFacade {
      * @param data the CheckerData object to store the results
      * @throws ProofManagementException
      */
-    public static void ensureSourceLoaded(CheckerData data) throws ProofManagementException {
+    public static void ensureSourceLoaded(@NonNull CheckerData data)
+            throws ProofManagementException {
         data.print(LogLevel.DEBUG, "Loading Java sources ...");
         try {
             // load all contracts from source files

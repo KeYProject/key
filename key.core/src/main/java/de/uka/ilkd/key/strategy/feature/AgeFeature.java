@@ -25,7 +25,7 @@ public class AgeFeature implements Feature {
 
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+            PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         return NumberRuleAppCost.create(((de.uka.ilkd.key.proof.Goal) goal).getTime());
         // return LongRuleAppCost.create ( goal.getTime() / goal.sequent ().size () );
         // return LongRuleAppCost.create ( (long)Math.sqrt ( goal.getTime () ) );

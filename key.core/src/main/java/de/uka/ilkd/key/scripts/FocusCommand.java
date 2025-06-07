@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.*;
@@ -23,6 +24,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -46,24 +49,20 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         super(Parameters.class);
     }
 
-    static class Parameters {
+    @SuppressWarnings("initialization")
+    public static class Parameters {
         @Option("#2")
         public Sequent toKeep;
     }
 
     @Override
-    public void execute(Parameters s) throws ScriptException, InterruptedException {
-        if (s == null) {
-            throw new ScriptException("Missing 'sequent' argument for focus");
-        }
-
+    public void execute(@NonNull Parameters s) throws ScriptException, InterruptedException {
         Sequent toKeep = s.toKeep;
-
         hideAll(toKeep);
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "focus";
     }
 
@@ -73,8 +72,8 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param toKeep sequent containing formulas to keep
      * @throws ScriptException if no goal is currently open
      */
-    private void hideAll(Sequent toKeep) throws ScriptException {
-        Goal goal = state.getFirstOpenAutomaticGoal();
+    private void hideAll(@NonNull Sequent toKeep) throws ScriptException {
+        Goal goal = Objects.requireNonNull(state).getFirstOpenAutomaticGoal();
         assert goal != null : "not null by contract of the method";
 
         // The formulas to keep in the antecedent
@@ -112,9 +111,10 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
     }
 
     // determine where formula in sequent and apply either hide_left or hide_right
-    private Taclet getHideTaclet(String pos) {
+    private @NonNull Taclet getHideTaclet(String pos) {
         String ruleName = "hide_" + pos;
-        return proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(ruleName));
+        return Objects.requireNonNull(proof).getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name(ruleName));
     }
 
     /**
@@ -125,8 +125,8 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param tac the taclet top apply (either hide_left or hide_right)
      * @param antec whether the formula is in the antecedent
      */
-    private void makeTacletApp(Goal g, SequentFormula toHide,
-            Taclet tac, boolean antec) {
+    private void makeTacletApp(@NonNull Goal g, @NonNull SequentFormula toHide, @NonNull Taclet tac,
+            boolean antec) {
         // hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();
 
@@ -140,9 +140,10 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
         TacletApp app =
-            PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
+            PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio,
+                Objects.requireNonNull(proof).getServices());
         app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) toHide.formula(),
-            proof.getServices(), true);
+            Objects.requireNonNull(proof).getServices(), true);
         g.apply(app);
 
     }

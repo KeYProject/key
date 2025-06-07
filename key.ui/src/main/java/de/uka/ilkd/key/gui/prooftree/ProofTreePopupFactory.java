@@ -39,6 +39,9 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 public class ProofTreePopupFactory {
@@ -52,7 +55,7 @@ public class ProofTreePopupFactory {
     /**
      * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.
      */
-    public static boolean ossPathFilter(TreePath tp) {
+    public static boolean ossPathFilter(@NonNull TreePath tp) {
         // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
@@ -65,11 +68,12 @@ public class ProofTreePopupFactory {
     /**
      * A predicate that filters oss nodes if filterOss is true
      */
-    public static Predicate<TreePath> ossPathFilter(boolean filterOss) {
+    public static @NonNull Predicate<TreePath> ossPathFilter(boolean filterOss) {
         return filterOss ? n -> true : ProofTreePopupFactory::ossPathFilter;
     }
 
-    public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
+    public static @NonNull ProofTreeContext createContext(@NonNull ProofTreeView view,
+            @NonNull TreePath selectedPath) {
         ProofTreeContext context = new ProofTreeContext();
         context.proofTreeView = view;
         context.path = selectedPath;
@@ -90,14 +94,14 @@ public class ProofTreePopupFactory {
         return context;
     }
 
-    private static void initMacroMenu(JPopupMenu menu, ProofTreeContext ctx) {
+    private static void initMacroMenu(@NonNull JPopupMenu menu, @NonNull ProofTreeContext ctx) {
         ProofMacroMenu macroMenu = new ProofMacroMenu(ctx.mediator, null);
         if (!macroMenu.isEmpty()) {
             menu.add(macroMenu);
         }
     }
 
-    private static void initMenu(JPopupMenu menu, ProofTreeContext ctx) {
+    private static void initMenu(@NonNull JPopupMenu menu, @NonNull ProofTreeContext ctx) {
         menu.add(new RunStrategyOnNode(ctx));
         menu.add(new Prune(ctx));
 
@@ -138,7 +142,8 @@ public class ProofTreePopupFactory {
         menu.add(new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
     }
 
-    public static JPopupMenu create(ProofTreeView view, TreePath selectedPath) {
+    public static @NonNull JPopupMenu create(@NonNull ProofTreeView view,
+            @NonNull TreePath selectedPath) {
         final String menuName = "Choose Action";
         JPopupMenu menu = new JPopupMenu(menuName);
         ProofTreeContext context = createContext(view, selectedPath);
@@ -168,11 +173,14 @@ public class ProofTreePopupFactory {
      */
 
     public static class ProofTreeContext {
+        @Nullable
         GUIProofTreeModel delegateModel;
         ProofTreeView proofTreeView;
         MainWindow window;
+        @Nullable
         Proof proof;
         KeYMediator mediator;
+        @Nullable
         Node invokedNode;
         TreePath path, branch;
         JTree delegateView;
@@ -384,7 +392,7 @@ public class ProofTreePopupFactory {
     static class Prune extends ProofTreeAction {
         private static final long serialVersionUID = -1744963704210861370L;
 
-        public Prune(ProofTreeContext context) {
+        public Prune(@NonNull ProofTreeContext context) {
             super(context);
             setName("Prune Proof");
             setIcon(IconFactory.pruneLogo(ICON_SIZE));
@@ -415,7 +423,7 @@ public class ProofTreePopupFactory {
     static class DelayedCut extends ProofTreeAction {
         private static final long serialVersionUID = 2264044175802298829L;
 
-        public DelayedCut(ProofTreeContext context) {
+        public DelayedCut(@NonNull ProofTreeContext context) {
             super(context);
             setName("Delayed Cut");
             setEnabled(false);
@@ -437,7 +445,7 @@ public class ProofTreePopupFactory {
             context.proofTreeView.makeNodeVisible(context.mediator.getSelectedNode());
         }
 
-        public boolean processDelayedCut(final Node invokedNode) {
+        public boolean processDelayedCut(final @NonNull Node invokedNode) {
             KeYMediator mediator = context.mediator;
             if (mediator.ensureProofLoaded()) {
                 final Proof proof = mediator.getSelectedProof();
@@ -526,7 +534,7 @@ public class ProofTreePopupFactory {
     static class RunStrategyOnNode extends ProofTreeAction {
         private static final long serialVersionUID = -7028621462695539683L;
 
-        protected RunStrategyOnNode(ProofTreeContext context) {
+        protected RunStrategyOnNode(@NonNull ProofTreeContext context) {
             super(context);
             setName("Apply Strategy");
             setIcon(IconFactory.strategyStartLogo(ICON_SIZE));
@@ -577,7 +585,7 @@ public class ProofTreePopupFactory {
          * return all subgoals of the current node.
          */
         @Override
-        public Iterable<Goal> getGoalList() {
+        public @NonNull Iterable<Goal> getGoalList() {
             return context.proof.getSubtreeGoals(context.invokedNode);
         }
 

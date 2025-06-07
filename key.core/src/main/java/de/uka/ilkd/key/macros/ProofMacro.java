@@ -16,6 +16,8 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The interface ProofMacro is the entry point to a general strategy extension system.
  *
@@ -93,6 +95,7 @@ public interface ProofMacro {
      *
      * @return a constant string, or <code>null</code>
      */
+    @Nullable
     String getCategory();
 
     /**
@@ -143,8 +146,7 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc);
+    boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc);
 
     /**
      * Can this macro be applied on the given node?
@@ -164,7 +166,7 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    boolean canApplyTo(Node node, PosInOccurrence posInOcc);
+    boolean canApplyTo(Node node, @Nullable PosInOccurrence posInOcc);
 
     /**
      * Apply this macro on the given goals.
@@ -187,9 +189,10 @@ public interface ProofMacro {
      * @param listener the listener to use for progress reports (may be <code>null</code>)
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
-    ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+    ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Proof proof,
+            ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception;
 
     /**
@@ -212,8 +215,8 @@ public interface ProofMacro {
      * @param listener the listener to use for progress reports (may be <code>null</code>)
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
-    ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
-            PosInOccurrence posInOcc, ProverTaskListener listener)
+    ProofMacroFinishedInfo applyTo(@Nullable UserInterfaceControl uic, Node node,
+            @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception;
 
     /**
@@ -230,13 +233,15 @@ public interface ProofMacro {
         private final int numberSteps;
         private int completedGoals;
 
-        ProgressBarListener(String name, int numberGoals, int numberSteps, ProverTaskListener l) {
+        ProgressBarListener(String name, int numberGoals, int numberSteps,
+                @Nullable ProverTaskListener l) {
             super(name, l);
             this.numberGoals = numberGoals;
             this.numberSteps = numberSteps;
         }
 
-        public ProgressBarListener(int size, int numberSteps, ProverTaskListener listener) {
+        public ProgressBarListener(int size, int numberSteps,
+                @Nullable ProverTaskListener listener) {
             this("", size, numberSteps, listener);
         }
 

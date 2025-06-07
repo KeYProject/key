@@ -14,6 +14,8 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This item groups all insert hidden taclets and offers a more convienient user interface to add
  * them.
@@ -45,7 +47,7 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
      * @param t the Taclet
      * @return the sequent with the formulas to be added or null
      */
-    protected Sequent checkTaclet(Taclet t) {
+    protected @Nullable Sequent checkTaclet(Taclet t) {
         if (!(t instanceof NoFindTaclet) || !t.displayName().startsWith("insert_hidden")) {
             return null;
         }

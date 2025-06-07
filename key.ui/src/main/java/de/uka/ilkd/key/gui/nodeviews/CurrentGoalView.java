@@ -24,6 +24,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,24 +45,24 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
 
 
     // the mediator
-    private final KeYMediator mediator;
+    private final @NonNull KeYMediator mediator;
 
     // the mouse/mouseMotion listener
-    private final CurrentGoalViewListener listener;
+    private final @NonNull CurrentGoalViewListener listener;
 
     // enables this component to be a Drag Source
-    private final DragSource dragSource;
+    private final @NonNull DragSource dragSource;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
 
-    private final LinkedList<Object> updateHighlights;
+    private final @NonNull LinkedList<Object> updateHighlights;
 
     /**
      * creates a viewer for a sequent
      *
      * @param mainWindow the MainWindow allowing access to the current system status
      */
-    public CurrentGoalView(MainWindow mainWindow) {
+    public CurrentGoalView(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
         setBackground(Color.white);
@@ -73,7 +75,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if a frame that wants modal access is opened
              */
             @Override
-            public void modalDialogOpened(EventObject e) {
+            public void modalDialogOpened(@NonNull EventObject e) {
 
                 // enable textual DnD in case that the opened model dialog
                 // is the ApplyTacletDialog
@@ -89,7 +91,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if a frame that wants modal access is closed
              */
             @Override
-            public void modalDialogClosed(EventObject e) {
+            public void modalDialogClosed(@NonNull EventObject e) {
                 if (e.getSource() instanceof ApplyTacletDialog) {
                     // disable drag'n'drop ...
                     listener.setModalDragNDropEnabled(false);
@@ -163,6 +165,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         }
     }
 
+    @NonNull
     DragSource getDragSource() {
         return dragSource;
     }
@@ -212,7 +215,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private int lastHighlightedCaretPos;
 
     @Override
-    public void highlight(Point p) {
+    public void highlight(@NonNull Point p) {
         super.highlight(p);
         lastHighlightedCaretPos = correctedViewToModel(p);
     }
@@ -228,7 +231,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     /**
      * sets the LogicPrinter to use
      */
-    public void setPrinter(Goal goal) {
+    public void setPrinter(@NonNull Goal goal) {
         getFilter().setSequent(goal.sequent());
         setLogicPrinter(SequentViewLogicPrinter.positionPrinter(getMediator().getNotationInfo(),
             mediator.getServices(), getVisibleTermLabels()));
@@ -239,7 +242,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      *
      * @return the KeYMediator
      */
-    public KeYMediator getMediator() {
+    public @NonNull KeYMediator getMediator() {
         return mediator;
     }
 
@@ -249,7 +252,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * @param taclet the selected Taclet
      * @param pos the PosInSequent describes the position where to apply the rule
      */
-    void selectedTaclet(TacletApp taclet, PosInSequent pos) {
+    void selectedTaclet(@NonNull TacletApp taclet, @NonNull PosInSequent pos) {
         KeYMediator r = getMediator();
         // This method delegates the request only to the UserInterfaceControl which implements the
         // functionality.
@@ -259,7 +262,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         r.getUI().getProofControl().selectedTaclet(taclet.taclet(), goal, pos.getPosInOccurrence());
     }
 
-    public PosInSequent getMousePosInSequent() {
+    public @Nullable PosInSequent getMousePosInSequent() {
         return getPosInSequent(getMousePosition());
     }
 
@@ -268,7 +271,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * made visible.
      */
     @Override
-    public void autoscroll(Point loc) {
+    public void autoscroll(@NonNull Point loc) {
         final Insets insets = getAutoscrollInsets();
         final Rectangle outer = getVisibleRect();
         final Rectangle inner = new Rectangle(outer.x + insets.left, outer.y + insets.top,
@@ -291,7 +294,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Current Goal";
     }
 

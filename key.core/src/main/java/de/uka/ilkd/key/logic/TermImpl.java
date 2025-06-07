@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -63,13 +64,13 @@ class TermImpl implements Term {
      * A cached value for computing the term's rigidness.
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
-    private ImmutableSet<QuantifiableVariable> freeVars = null;
+    private @Nullable ImmutableSet<QuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
      */
     private int hashcode = -1;
 
-    private Sort sort;
+    private @Nullable Sort sort;
 
     /**
      * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
@@ -92,8 +93,9 @@ class TermImpl implements Term {
      *        operator)
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
-    public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
+    public TermImpl(Operator op,
+            ImmutableArray<Term> subs,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
             String origin) {
         assert op != null;
         assert subs != null;
@@ -183,7 +185,7 @@ class TermImpl implements Term {
 
     @Override
     public Term sub(int nr) {
-        return subs.get(nr);
+        return Objects.requireNonNull(subs.get(nr));
     }
 
 
@@ -303,7 +305,7 @@ class TermImpl implements Term {
      * true iff <code>o</code> is syntactically equal to this term
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -408,7 +410,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public TermLabel getLabel(Name termLabelName) {
+    public @Nullable TermLabel getLabel(Name termLabelName) {
         return null;
     }
 

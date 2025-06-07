@@ -15,6 +15,9 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Operator base class.
  *
@@ -23,7 +26,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 public abstract class Operator extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
-    protected final ImmutableArray<Expression> children;
+    protected final @Nullable ImmutableArray<Expression> children;
 
     /**
      * Relative positioning of the operator.
@@ -54,7 +57,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      *        hand side, the second as right hand side), Comments
      *
      */
-    protected Operator(ExtList children) {
+    protected Operator(@NonNull ExtList children) {
         super(children);
         this.children = new ImmutableArray<>(children.collect(Expression.class));
     }
@@ -95,7 +98,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @return true, if a has a higher priority (a lower precendence value) than b.
      */
 
-    public static boolean precedes(Operator a, Operator b) {
+    public static boolean precedes(@NonNull Operator a, @NonNull Operator b) {
         return a.getPrecedence() < b.getPrecedence();
     }
 
@@ -115,7 +118,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
         return true;
     }
 
-    public SourceElement getFirstElement() {
+    public @NonNull SourceElement getFirstElement() {
         return switch (getNotation()) {
         case INFIX, POSTFIX -> children.get(0).getFirstElement();
         default -> this;
@@ -123,14 +126,14 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public SourceElement getFirstElementIncludingBlocks() {
+    public @NonNull SourceElement getFirstElementIncludingBlocks() {
         return switch (getNotation()) {
         case INFIX, POSTFIX -> children.get(0).getFirstElementIncludingBlocks();
         default -> this;
         };
     }
 
-    public SourceElement getLastElement() {
+    public @NonNull SourceElement getLastElement() {
         return switch (getNotation()) {
         case INFIX, PREFIX -> children.get(getArity() - 1).getLastElement();
         default -> this;
@@ -154,7 +157,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
-    public ProgramElement getChildAt(int index) {
+    public @NonNull ProgramElement getChildAt(int index) {
         if (children != null) {
             return children.get(index);
         }
@@ -181,7 +184,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
 
-    public Expression getExpressionAt(int index) {
+    public @NonNull Expression getExpressionAt(int index) {
         if (children != null) {
             return children.get(index);
         }
@@ -201,11 +204,11 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     /**
      * overriden from JavaProgramElement.
      */
-    public String reuseSignature(Services services, ExecutionContext ec) {
+    public @NonNull String reuseSignature(Services services, ExecutionContext ec) {
         return super.reuseSignature(services, ec) + "("
             + services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
     }
 
-    public abstract KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
+    public abstract @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
 
 }

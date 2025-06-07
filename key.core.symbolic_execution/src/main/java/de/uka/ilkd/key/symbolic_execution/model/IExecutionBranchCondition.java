@@ -10,6 +10,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A node in the symbolic execution tree which represents a branch condition, e.g. {@code x < 0}.
@@ -50,6 +52,7 @@ public interface IExecutionBranchCondition extends IExecutionNode<SourceElement>
      *
      * @return The branch condition as {@link Term}.
      */
+    @Nullable
     Term getBranchCondition() throws ProofInputException;
 
     /**
@@ -77,12 +80,12 @@ public interface IExecutionBranchCondition extends IExecutionNode<SourceElement>
      *
      * @return The merged proof nodes.
      */
-    Node[] getMergedProofNodes();
+    Node @Nullable [] getMergedProofNodes();
 
     /**
      * Returns the branch condition {@link Term}s.
      *
      * @return The branch condition {@link Term}s.
      */
-    Term[] getMergedBranchCondtions() throws ProofInputException;
+    Term @Nullable [] getMergedBranchCondtions() throws ProofInputException;
 }

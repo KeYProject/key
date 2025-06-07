@@ -19,6 +19,8 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ public class TestTacletTranslator {
     private NamespaceSet nss;
     private Services services;
     private KeyIO io;
-    private Namespace<SchemaVariable> lastSchemaNamespace;
+    private @Nullable Namespace<SchemaVariable> lastSchemaNamespace;
 
 
     // some methods essentially "stolen" from TestTacletParser
@@ -54,12 +56,12 @@ public class TestTacletTranslator {
         io = new KeyIO(services, nss);
     }
 
-    private Term parseTerm(String s) {
+    private @NonNull Term parseTerm(@NonNull String s) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
         return (Term) ctx.accept(new ExpressionBuilder(services, nss, lastSchemaNamespace));
     }
 
-    private Taclet parseTaclet(String s) {
+    private Taclet parseTaclet(@NonNull String s) {
         try {
             KeyIO.Loader load = io.load(s);
             List<Taclet> taclets =
@@ -71,7 +73,7 @@ public class TestTacletTranslator {
         }
     }
 
-    private void testTaclet(String tacletString, String termString) {
+    private void testTaclet(String tacletString, @NonNull String termString) {
         tacletString = DECLS + "\n\\rules { " + tacletString + "; }";
 
         Taclet taclet = parseTaclet(tacletString);

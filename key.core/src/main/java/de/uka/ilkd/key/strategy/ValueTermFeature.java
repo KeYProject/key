@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.op.Junctor;
 
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.op;
 
 class ValueTermFeature {
@@ -19,8 +21,8 @@ class ValueTermFeature {
         this.nullTerm = nullTerm;
     }
 
-    final TermFeature equals;
-    final TermFeature tt;
-    final TermFeature ff;
+    final @NonNull TermFeature equals;
+    final @NonNull TermFeature tt;
+    final @NonNull TermFeature ff;
     final TermFeature nullTerm;
 }

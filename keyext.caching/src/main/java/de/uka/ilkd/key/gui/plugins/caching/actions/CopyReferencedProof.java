@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public final class CopyReferencedProof extends KeyAction {
     /**
      * The node to copy the steps to.
      */
-    private final Node node;
+    private final @NonNull Node node;
 
     /**
      * Construct a new action.
@@ -40,7 +41,7 @@ public final class CopyReferencedProof extends KeyAction {
      * @param mediator the mediator
      * @param node the node
      */
-    public CopyReferencedProof(KeYMediator mediator, Node node) {
+    public CopyReferencedProof(KeYMediator mediator, @NonNull Node node) {
         this.mediator = mediator;
         this.node = node;
         setName("Copy referenced proof steps here");

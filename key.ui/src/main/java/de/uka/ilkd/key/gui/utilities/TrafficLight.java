@@ -7,6 +7,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * A traffic light: It can be either green or red.
@@ -31,7 +33,7 @@ class TrafficLight extends JPanel {
 
 
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(@NonNull Graphics g) {
         super.paintComponent(g);
         Graphics2D g2D = (Graphics2D) g.create();
 

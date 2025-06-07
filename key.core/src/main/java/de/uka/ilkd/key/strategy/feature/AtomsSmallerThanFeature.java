@@ -15,6 +15,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
+
 /**
  * Feature that returns zero iff each variable/atom of one monomial is smaller than all variables of
  * a second monomial

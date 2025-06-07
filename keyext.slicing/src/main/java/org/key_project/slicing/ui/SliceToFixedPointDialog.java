@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,19 +48,19 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     /**
      * Active KeY mediator.
      */
-    private final KeYMediator mediator;
+    private final @NonNull KeYMediator mediator;
     /**
      * Close button of this dialog.
      */
-    private final JButton closeButton;
+    private final @NonNull JButton closeButton;
     /**
      * Text panel showing slicing progress in tabular form.
      */
-    private final JEditorPane logPane;
+    private final @NonNull JEditorPane logPane;
     /**
      * Function that provides the analysis results of the last loaded proof.
      */
-    private final Function<Void, AnalysisResults> analyzeButton;
+    private final @NonNull Function<Void, AnalysisResults> analyzeButton;
     /**
      * Function that slices the currently loaded proof.
      */
@@ -87,8 +88,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
      * @param analyzeCallback function that provides analysis results on the last loaded proof
      * @param sliceButton function that slices the last loaded proof
      */
-    public SliceToFixedPointDialog(KeYMediator mediator, Window window,
-            Function<Void, AnalysisResults> analyzeCallback,
+    public SliceToFixedPointDialog(@NonNull KeYMediator mediator, Window window,
+            @NonNull Function<Void, AnalysisResults> analyzeCallback,
             Runnable sliceButton) {
         super(window, "Slice to fixed point");
 
@@ -149,8 +150,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
      * @param analyzeCallback callback to provide analysis results
      * @return function that provides analysis results
      */
-    private Function<Void, AnalysisResults> wrapAnalysisCallback(
-            Function<Void, AnalysisResults> analyzeCallback) {
+    private @NonNull Function<Void, AnalysisResults> wrapAnalysisCallback(
+            @NonNull Function<Void, AnalysisResults> analyzeCallback) {
         return x -> {
             AnalysisResults results = null;
             try {
@@ -231,7 +232,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
         if (e.getSource().getSelectedProof() != null
                 && e.getSource().getSelectedProof().closed()) {
             if (e.getSource().getSelectedProof() == worker.getSlicedProof()) {

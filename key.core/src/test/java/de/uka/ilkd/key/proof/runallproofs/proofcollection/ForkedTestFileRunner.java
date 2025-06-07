@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.IOForwarder;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,15 +33,15 @@ public abstract class ForkedTestFileRunner implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    private static Path getLocationOfSerializedTestFiles(Path tempDirectory) {
+    private static @NonNull Path getLocationOfSerializedTestFiles(@NonNull Path tempDirectory) {
         return Paths.get(tempDirectory.toString(), "TestFiles.serialized");
     }
 
-    private static Path getLocationOfSerializedException(Path tempDirectory) {
+    private static @NonNull Path getLocationOfSerializedException(@NonNull Path tempDirectory) {
         return Paths.get(tempDirectory.toString(), "Exception.serialized");
     }
 
-    private static Path getLocationOfSerializedTestResults(Path tempDirectory) {
+    private static @NonNull Path getLocationOfSerializedTestResults(@NonNull Path tempDirectory) {
         return Paths.get(tempDirectory.toString(), "TestResults.serialized");
     }
 
@@ -48,7 +49,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * Converts a {@link Serializable} object into a byte array and stores it in a file at given
      * location.
      */
-    private static void writeObject(Path path, Serializable s) throws IOException {
+    private static void writeObject(@NonNull Path path, Serializable s) throws IOException {
 
         try (ObjectOutputStream objectOutputStream =
             new ObjectOutputStream(Files.newOutputStream(path))) {
@@ -59,7 +60,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
     /**
      * Converts contents of a file back into an object.
      */
-    private static <S> S readObject(Path path, Class<S> type)
+    private static <S> S readObject(@NonNull Path path, @NonNull Class<S> type)
             throws IOException, ClassNotFoundException {
         try (ObjectInputStream objectInputStream =
             new ObjectInputStream(Files.newInputStream(path))) {
@@ -71,7 +72,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
     /**
      * Process a single {@link TestFile} in a separate subprocess.
      */
-    public static TestResult processTestFile(TestFile testFile, Path pathToTempDir)
+    public static TestResult processTestFile(@NonNull TestFile testFile,
+            @NonNull Path pathToTempDir)
             throws Exception {
         List<TestFile> files = List.of(testFile);
         return processTestFiles(files, pathToTempDir).get(0);
@@ -83,7 +85,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * @param testFiles files to be tested
      * @param pathToTempDir a path to the temporary data directory
      */
-    public static List<TestResult> processTestFiles(List<TestFile> testFiles, Path pathToTempDir)
+    public static @NonNull List<TestResult> processTestFiles(@NonNull List<TestFile> testFiles,
+            @NonNull Path pathToTempDir)
             throws Exception {
         if (testFiles.isEmpty()) {
             return new ArrayList<>();
@@ -152,7 +155,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         return Arrays.asList(array);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String @NonNull [] args) throws IOException {
         /*
          * Check for existence of temp dir before entering try-catch block. Throwables occuring in
          * this block are written to temp dir, so its existence needs to be confirmed beforehand.
@@ -206,8 +209,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * @param settings the (non-null) settings to take the timeout from.
      * @param tempDirectory
      */
-    private static void installTimeoutWatchdog(ProofCollectionSettings settings,
-            final Path tempDirectory) {
+    private static void installTimeoutWatchdog(@NonNull ProofCollectionSettings settings,
+            final @NonNull Path tempDirectory) {
 
         String timeoutString = settings.getForkTimeout();
         if (timeoutString == null) {

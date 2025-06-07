@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +29,8 @@ public abstract class RuleSource {
      */
     public abstract URL url() throws IOException;
 
+    public abstract URI uri();
+
     public boolean isDirectory() {
         return Files.isDirectory(file());
     }
@@ -38,22 +41,12 @@ public abstract class RuleSource {
 
     public abstract InputStream getNewStream();
 
-    public final boolean isAvailable() {
-        InputStream inputStream = null;
-        try {
-            inputStream = getNewStream();
-        } catch (final RuntimeException exception) {
+    public final boolean isAvailable() throws IOException {
+        try (InputStream ignored = getNewStream()) {
+            return true;
+        } catch (final IOException exception) {
             return false;
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (final IOException exception) {
-                    return false;
-                }
-            }
         }
-        return inputStream != null;
     }
 
     @Override

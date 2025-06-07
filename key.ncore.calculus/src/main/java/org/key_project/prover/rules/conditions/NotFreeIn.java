@@ -31,7 +31,8 @@ public record NotFreeIn(SchemaVariable first, SchemaVariable second) {
 
     public String toString() { return "\\notFreeIn(" + first() + "," + second() + ")"; }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof NotFreeIn(SchemaVariable first1, SchemaVariable second1))) {
             return false;
         }

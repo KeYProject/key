@@ -13,6 +13,9 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Abstract sorted operator class offering some common functionality.
@@ -21,12 +24,12 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
         implements Operator, Sorted {
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+            @Nullable ImmutableArray<Boolean> whereToBind, Modifier modifier) {
         super(name, argSorts, sort, whereToBind, modifier);
     }
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, boolean isRigid) {
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean isRigid) {
         this(name, argSorts, sort, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
@@ -74,7 +77,7 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
      * such demands. protected boolean additionalValidTopLevel2(Term term) { return true; }
      */
     @Override
-    public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
+    public <T extends org.key_project.logic.Term> void validTopLevelException(@NonNull T term)
             throws TermCreationException {
         super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {

@@ -6,6 +6,7 @@ package org.key_project.prover.strategy.costbased;
 import org.key_project.util.LRUCache;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
@@ -14,11 +15,11 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     private static final LRUCache<Integer, NumberRuleAppCost> cache =
         new LRUCache<>(255);
 
-    public static RuleAppCost getZeroCost() {
+    public static @NonNull RuleAppCost getZeroCost() {
         return ZERO_COST;
     }
 
-    public static RuleAppCost create(int p_cost) {
+    public static @NonNull RuleAppCost create(int p_cost) {
         if (p_cost == 0) {
             return getZeroCost();
         }
@@ -38,7 +39,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return ac;
     }
 
-    public static RuleAppCost create(long p_cost) {
+    public static @NonNull RuleAppCost create(long p_cost) {
 
         if (p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
             return create((int) p_cost);
@@ -70,7 +71,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
 
 
-    public int compareTo(NumberRuleAppCost c) {
+    public int compareTo(@NonNull NumberRuleAppCost c) {
         final long this_cost = getValue();
         final long other_cost = c.getValue();
         return (Long.compare(this_cost, other_cost));
@@ -78,7 +79,8 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
 
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof RuleAppCost) {
             return compareTo((RuleAppCost) o) == 0;
         }
@@ -89,7 +91,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return (int) getValue();
     }
 
-    public final RuleAppCost add(RuleAppCost cost2) {
+    public final @Nullable RuleAppCost add(RuleAppCost cost2) {
         if (cost2 instanceof NumberRuleAppCost) {
             return add((NumberRuleAppCost) cost2);
         } else if (cost2 instanceof TopRuleAppCost) {
@@ -101,7 +103,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         }
     }
 
-    public final RuleAppCost add(NumberRuleAppCost cost2) {
+    public final @NonNull RuleAppCost add(@NonNull NumberRuleAppCost cost2) {
         if (getValue() == 0) {
             return cost2;
         } else if (cost2.getValue() == 0) {
@@ -112,7 +114,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return String.valueOf(getValue());
     }
 

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.Nullable;
+
 public class CountingBufferedReader extends BufferedReader {
 
     private long chars;
@@ -69,7 +71,7 @@ public class CountingBufferedReader extends BufferedReader {
     }
 
     @Override
-    public String readLine() throws IOException {
+    public @Nullable String readLine() throws IOException {
         final String line = super.readLine();
         if (line != null) {
             incCharCounter(line.length());

@@ -39,6 +39,9 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.proof.io.OutputStreamProofSaver.printAnything;
 
 /**
@@ -76,7 +79,8 @@ public abstract class AbstractProofReplayer {
      * @return the new goals added by this rule application
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    protected ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
+    protected @Nullable ImmutableList<Goal> reApplyRuleApp(@NonNull Node node,
+            @NonNull Goal openGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         RuleApp ruleApp = node.getAppliedRuleApp();
         ImmutableList<Goal> nextGoals;
@@ -103,7 +107,7 @@ public abstract class AbstractProofReplayer {
      * @return built-in rule app
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    private IBuiltInRuleApp constructBuiltinApp(Node originalStep, Goal currGoal)
+    private IBuiltInRuleApp constructBuiltinApp(@NonNull Node originalStep, @NonNull Goal currGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         final RuleApp ruleApp = originalStep.getAppliedRuleApp();
         final String ruleName = ruleApp.rule().displayName();
@@ -212,7 +216,8 @@ public abstract class AbstractProofReplayer {
      * @param currGoal open goal in proof slice
      * @return new taclet app equivalent to {@code originalStep}
      */
-    private TacletApp constructTacletApp(Node originalStep, Goal currGoal) {
+    private @Nullable TacletApp constructTacletApp(@NonNull Node originalStep,
+            @NonNull Goal currGoal) {
         TacletApp originalTacletApp = null;
         if (originalStep.getAppliedRuleApp() instanceof TacletApp tacletApp) {
             originalTacletApp = tacletApp;
@@ -322,8 +327,8 @@ public abstract class AbstractProofReplayer {
      * @param newSequent sequent
      * @return the formula in the sequent, or null if not found
      */
-    private PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
-            Sequent newSequent) {
+    private @Nullable PosInOccurrence findInNewSequent(@NonNull PosInOccurrence oldPos,
+            @NonNull Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();
@@ -342,7 +347,8 @@ public abstract class AbstractProofReplayer {
      * @param inst instantiations
      * @return the "interesting" instantiations (serialized)
      */
-    public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
+    public @NonNull Collection<String> getInterestingInstantiations(
+            @NonNull SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
         for (final var pair : inst.interesting()) {

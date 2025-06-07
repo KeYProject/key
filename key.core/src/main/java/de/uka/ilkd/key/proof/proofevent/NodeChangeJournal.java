@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -32,19 +33,19 @@ public class NodeChangeJournal implements GoalListener {
     /**
      * The original node
      */
-    private final Node node;
+    private final @NonNull Node node;
 
     /**
      * This is a map storing the leaves that are currently below the original node, and all changes
      * applied to each of them
      */
-    private ImmutableMap<@NonNull Node, NodeChangesHolder> changes =
+    private @NonNull ImmutableMap<@NonNull Node, NodeChangesHolder> changes =
         DefaultImmutableMap.nilMap();
 
     /**
      * @param p_goal the original goal/node
      */
-    public NodeChangeJournal(Proof p_proof, Goal p_goal) {
+    public NodeChangeJournal(Proof p_proof, @NonNull Goal p_goal) {
         proof = p_proof;
         node = p_goal.node();
         putChangeObj(node, new NodeChangesHolder());
@@ -55,7 +56,7 @@ public class NodeChangeJournal implements GoalListener {
      * Create an RuleAppInfo object containing all changes stored within this object; remove all
      * listeners
      */
-    public RuleAppInfo getRuleAppInfo(RuleApp p_ruleApp) {
+    public @NonNull RuleAppInfo getRuleAppInfo(RuleApp p_ruleApp) {
         ImmutableList<NodeReplacement> nrs = ImmutableSLList.nil();
 
         for (final ImmutableMapEntry<Node, NodeChangesHolder> entry : changes) {
@@ -81,7 +82,7 @@ public class NodeChangeJournal implements GoalListener {
      * informs the listener about a change that occured to the sequent of goal
      */
     @Override
-    public void sequentChanged(Goal source, SequentChangeInfo sci) {
+    public void sequentChanged(@NonNull Goal source, SequentChangeInfo sci) {
         NodeChangesHolder nc = getChangeObj(source.node());
 
         if (nc != null) {
@@ -115,15 +116,15 @@ public class NodeChangeJournal implements GoalListener {
     }
 
 
-    private void putChangeObj(Node p_node, NodeChangesHolder p_obj) {
+    private void putChangeObj(@NonNull Node p_node, NodeChangesHolder p_obj) {
         changes = changes.put(p_node, p_obj);
     }
 
-    private NodeChangesHolder getChangeObj(Node p_node) {
+    private @Nullable NodeChangesHolder getChangeObj(@NonNull Node p_node) {
         return changes.get(p_node);
     }
 
-    private NodeChangesHolder removeChangeObj(Node p_node) {
+    private @Nullable NodeChangesHolder removeChangeObj(@NonNull Node p_node) {
         final NodeChangesHolder res = changes.get(p_node);
         changes = changes.remove(p_node);
         return res;

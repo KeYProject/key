@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This variable condition checks if an instantiation is a constant formula or term, i.e. its arity
  * is equal to zero.
@@ -51,7 +53,7 @@ public class ConstantCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negated ? "\\not" : "") + "\\isConstant (" + t + ")";
     }
 }

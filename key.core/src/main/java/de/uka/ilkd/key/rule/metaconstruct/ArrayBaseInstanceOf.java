@@ -16,6 +16,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Creates an <tt>Type::instance(..)</tt> term for the component type of the array. The component
  * type has to be a reference type.
@@ -31,7 +33,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
      * It is assumed that <tt>term.sub(0)</tt> is either a term of reference array sort or a term
      * with an <tt>exactInstance</tt> symbol as top level depending on a reference array sort.
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public @NonNull Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         final Term array = term.sub(0);
         final Term element = term.sub(1);
 

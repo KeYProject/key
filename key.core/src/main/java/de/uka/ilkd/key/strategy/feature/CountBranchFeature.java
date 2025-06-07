@@ -36,7 +36,7 @@ public class CountBranchFeature implements Feature {
      * @return the cost of <code>app</code>
      */
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(@NonNull RuleApp app,
             PosInOccurrence pos, Goal goal,
             MutableState mState) {
         if (app.rule() instanceof Taclet tac) {

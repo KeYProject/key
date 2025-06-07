@@ -5,6 +5,8 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Checks, whether the position in occurrence is in the succedent.
  *
@@ -13,7 +15,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 class SuccChecker implements Checker {
 
     @Override
-    public boolean check(PosInOccurrence pio) {
+    public boolean check(@NonNull PosInOccurrence pio) {
         return !pio.isInAntec();
     }
 

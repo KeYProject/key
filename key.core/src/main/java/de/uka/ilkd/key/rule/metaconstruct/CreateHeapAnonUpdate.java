@@ -22,6 +22,9 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -38,7 +41,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public @Nullable Term transform(@NonNull Term term, SVInstantiations svInst,
+            Services services) {
         final Term loopTerm = term.sub(0);
         final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
         if (loopSpec == null) {
@@ -69,9 +73,10 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
-    private static Term createHeapAnonUpdate(LoopSpecification loopSpec, boolean isTransaction,
-            boolean isPermissions, Term anonHeapTerm, Term anonSavedHeapTerm,
-            Term anonPermissionsHeapTerm, Services services) {
+    private static @NonNull Term createHeapAnonUpdate(@NonNull LoopSpecification loopSpec,
+            boolean isTransaction,
+            boolean isPermissions, @NonNull Term anonHeapTerm, Term anonSavedHeapTerm,
+            @NonNull Term anonPermissionsHeapTerm, @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
@@ -119,8 +124,9 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
      * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return An elementary anonymizing heap update.
      */
-    private static Term createElementaryAnonUpdate(LocationVariable heap, Term anonHeap, Term mod,
-            Services services) {
+    private static @NonNull Term createElementaryAnonUpdate(@NonNull LocationVariable heap,
+            @NonNull Term anonHeap, @NonNull Term mod,
+            @NonNull Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Term anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);

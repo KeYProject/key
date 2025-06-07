@@ -27,8 +27,8 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 
 public final class DependencyContractFeature extends BinaryFeature {
 
-    private void removePreviouslyUsedSteps(Term focus, Goal goal,
-            List<PosInOccurrence> steps) {
+    private void removePreviouslyUsedSteps(@NonNull Term focus, @NonNull Goal goal,
+            @NonNull List<PosInOccurrence> steps) {
         for (RuleApp app : goal.appliedRuleApps()) {
             Term term = (Term) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule
@@ -43,8 +43,8 @@ public final class DependencyContractFeature extends BinaryFeature {
 
     @Override
     protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            PosInOccurrence pos,
-            Goal p_goal, MutableState mState) {
+            @NonNull PosInOccurrence pos, @NonNull Goal p_goal,
+            MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
         final Term focus = (Term) pos.subTerm();
 

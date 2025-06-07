@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.abstraction;
 
+
 import de.uka.ilkd.key.java.NamedModelElement;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * An entity of the program meta model.
@@ -18,6 +21,7 @@ public interface ProgramModelElement extends NamedModelElement {
      *
      * @return the full name of this program model element.
      */
+    @Nullable
     String getFullName();
 
 

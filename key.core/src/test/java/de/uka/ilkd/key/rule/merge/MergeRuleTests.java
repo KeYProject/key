@@ -238,9 +238,8 @@ public class MergeRuleTests {
      *
      * @param proof Proof to prove automatically.
      */
-    public static void startAutomaticStrategy(final Proof proof) {
-        ProofStarter starter = new ProofStarter(false);
-        starter.init(proof);
+    public static void startAutomaticStrategy(final @NonNull Proof proof) {
+        ProofStarter starter = new ProofStarter.Builder(false).build(proof);
         starter.start();
     }
 
@@ -250,7 +249,7 @@ public class MergeRuleTests {
      *
      * @param proof The proof the first goal of which to merge with suitable partner(s).
      */
-    private void mergeFirstGoal(final Proof proof, MergeProcedure mergeProc) {
+    private void mergeFirstGoal(final @NonNull Proof proof, MergeProcedure mergeProc) {
         final Services services = proof.getServices();
         final MergeRule mergeRule = MergeRule.INSTANCE;
 
@@ -278,7 +277,7 @@ public class MergeRuleTests {
      * @param sequent Sequent to get the PIO of the first succedent formula for.
      * @return The PIO for the first succedent formula of the given sequent.
      */
-    private PosInOccurrence getPioFirstFormula(Sequent sequent) {
+    private @NonNull PosInOccurrence getPioFirstFormula(@NonNull Sequent sequent) {
         return new PosInOccurrence(sequent.succedent().getFirst(), PosInTerm.getTopLevel(), false);
     }
 
@@ -288,7 +287,7 @@ public class MergeRuleTests {
      * @param macro The macro to execute.
      * @param node The node to execute the macro on.
      */
-    private void runMacro(AbstractProofMacro macro, Node node) {
+    private void runMacro(@NonNull AbstractProofMacro macro, @NonNull Node node) {
         try {
             macro.applyTo(null, node, null, null);
         } catch (Exception e) {
@@ -304,7 +303,7 @@ public class MergeRuleTests {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    public static @NonNull Proof loadProof(Path directory, String proofFileName) {
+    public static @NonNull Proof loadProof(Path directory, @NonNull String proofFileName) {
         Path proofFile = directory.resolve(proofFileName);
         assertTrue(Files.exists(proofFile),
             "Proof file: " + proofFile.toAbsolutePath() + " could not be found!");

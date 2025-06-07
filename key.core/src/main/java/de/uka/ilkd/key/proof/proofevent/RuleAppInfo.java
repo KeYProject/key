@@ -9,6 +9,8 @@ import de.uka.ilkd.key.proof.Node;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * More specific information about a rule application: the original proof node and the new proof
  * node(s) created by this rule application.
@@ -64,7 +66,7 @@ public class RuleAppInfo {
     }
 
 
-    public String toString() {
+    public @NonNull String toString() {
         return "RuleApp: " + getRuleApp() + "\nNode: " + getOriginalNode() + "\nResulting nodes: "
             + newNodes;
     }

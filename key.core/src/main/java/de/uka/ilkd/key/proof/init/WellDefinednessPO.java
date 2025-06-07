@@ -27,6 +27,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * The proof obligation for well-definedness checks.
@@ -50,9 +52,9 @@ import org.key_project.util.collection.ImmutableSet;
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private final WellDefinednessCheck check;
-    private Term mbyAtPre;
-    private InitConfig proofConfig;
-    private TermBuilder tb;
+    private @Nullable Term mbyAtPre;
+    private @Nullable InitConfig proofConfig;
+    private @Nullable TermBuilder tb;
 
     /**
      * Constructor
@@ -77,7 +79,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return anonHeap;
     }
 
-    private static LocationVariable createSelf(IProgramMethod pm, KeYJavaType selfKJT,
+    private static LocationVariable createSelf(@Nullable IProgramMethod pm, KeYJavaType selfKJT,
             TermServices services) {
         if (pm == null) {
             return services.getTermBuilder().selfVar(selfKJT, false);
@@ -86,7 +88,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static LocationVariable createResult(IProgramMethod pm, TermServices services) {
+    private static @Nullable LocationVariable createResult(@Nullable IProgramMethod pm,
+            TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -94,7 +97,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static LocationVariable createException(IProgramMethod pm, TermServices services) {
+    private static @Nullable LocationVariable createException(@Nullable IProgramMethod pm,
+            TermServices services) {
         if (pm == null) {
             return null;
         } else {

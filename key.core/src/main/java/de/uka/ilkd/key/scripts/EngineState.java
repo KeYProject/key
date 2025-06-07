@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
@@ -34,6 +33,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -133,7 +133,7 @@ public class EngineState {
         }
     }
 
-    protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
+    protected static @Nullable Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
             if (goal.node() == node) {
                 return goal;
@@ -142,11 +142,12 @@ public class EngineState {
         return null;
     }
 
-    public void setGoal(Goal g) {
+    public void setGoal(@Nullable Goal g) {
         goal = g;
-        lastSetGoalNode = Optional.ofNullable(g).map(Goal::node).orElse(null);
+        lastSetGoalNode = g != null ? g.node() : null;
     }
 
+    @Pure
     public Proof getProof() {
         return proof;
     }
@@ -162,7 +163,7 @@ public class EngineState {
      *         wrong.
      */
     @SuppressWarnings("unused")
-    public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
+    public Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }
@@ -201,10 +202,9 @@ public class EngineState {
         return getFirstOpenGoal(true);
     }
 
-    private static Node goUpUntilOpen(final Node start) {
+    private static @Nullable Node goUpUntilOpen(@Nullable Node start) {
         Node currNode = start;
-
-        while (currNode.isClosed()) {
+        while (currNode != null && currNode.isClosed()) {
             /*
              * There should always be a non-closed parent since we check whether the proof is closed
              * at the beginning.
@@ -215,7 +215,7 @@ public class EngineState {
         return currNode;
     }
 
-    private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
+    private @Nullable Goal findGoalFromRoot(final @Nullable Node rootNode, boolean checkAutomatic) {
         final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
@@ -302,11 +302,11 @@ public class EngineState {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 
-    public Consumer<ProofScriptEngine.Message> getObserver() {
+    public @Nullable Consumer<ProofScriptEngine.Message> getObserver() {
         return observer;
     }
 
-    public void setObserver(Consumer<ProofScriptEngine.Message> observer) {
+    public void setObserver(@Nullable Consumer<ProofScriptEngine.Message> observer) {
         this.observer = observer;
     }
 

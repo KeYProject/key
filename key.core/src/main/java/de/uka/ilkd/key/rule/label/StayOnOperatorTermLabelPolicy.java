@@ -13,6 +13,9 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long the new {@link Term} has the
  * same {@link Operator} as the previous best matching {@link Term} from which it was created.
@@ -24,10 +27,11 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
      * {@inheritDoc}
      */
     @Override
-    public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+    public @Nullable TermLabel keepLabel(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence, @Nullable Term applicationTerm, Rule rule,
+            Goal goal,
             Object hint, Term tacletTerm,
-            Term newTerm, TermLabel label) {
+            @NonNull Term newTerm, TermLabel label) {
         return applicationTerm != null && Operator.opEquals(newTerm.op(), applicationTerm.op())
                 ? label
                 : null;

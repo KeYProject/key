@@ -8,6 +8,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * User action for "Apply rules automatically here" (i.e. focussed auto mode).
  *
@@ -26,14 +28,15 @@ public class FocussedAutoModeUserAction extends ProofModifyingUserAction {
      * @param proof selected proof
      * @param focus formula to apply rules on
      */
-    public FocussedAutoModeUserAction(KeYMediator mediator, Proof proof, PosInOccurrence focus) {
+    public FocussedAutoModeUserAction(@NonNull KeYMediator mediator, @NonNull Proof proof,
+            PosInOccurrence focus) {
         super(mediator, proof);
         this.focus = focus;
     }
 
 
     @Override
-    public String name() {
+    public @NonNull String name() {
         return "Strategy: Focussed Auto Mode";
     }
 

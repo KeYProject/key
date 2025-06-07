@@ -18,6 +18,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The proof object used by Information Flow Proofs.
  *
@@ -35,7 +37,7 @@ public class InfFlowProof extends Proof {
     /**
      * Aggregated proof statistics from other proofs which contributed to this one.
      */
-    private SideProofStatistics sideProofStatistics = null;
+    private @Nullable SideProofStatistics sideProofStatistics = null;
 
     public InfFlowProof(String name, Sequent sequent, String header, TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
@@ -57,12 +59,10 @@ public class InfFlowProof extends Proof {
     }
 
     public InfFlowProofSymbols getIFSymbols() {
-        assert infFlowSymbols != null;
         return infFlowSymbols;
     }
 
     public void addIFSymbol(Object s) {
-        assert s != null;
         if (s instanceof Term) {
             infFlowSymbols.add((Term) s);
         } else if (s instanceof Named) {
@@ -73,7 +73,6 @@ public class InfFlowProof extends Proof {
     }
 
     public void addLabeledIFSymbol(Object s) {
-        assert s != null;
         if (s instanceof Term) {
             infFlowSymbols.addLabeled((Term) s);
         } else if (s instanceof Named) {
@@ -84,19 +83,15 @@ public class InfFlowProof extends Proof {
     }
 
     public void addTotalTerm(Term p) {
-        assert p != null;
         infFlowSymbols.addTotalTerm(p);
     }
 
     public void addLabeledTotalTerm(Term p) {
-        assert p != null;
         infFlowSymbols.addLabeledTotalTerm(p);
     }
 
     public void addGoalTemplates(Taclet t) {
-        assert t != null;
         ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
-        assert temps != null;
         for (TacletGoalTemplate tgt : temps) {
             for (SequentFormula sf : tgt.sequent().antecedent()
                     .asList()) {
@@ -109,12 +104,10 @@ public class InfFlowProof extends Proof {
     }
 
     public void unionIFSymbols(InfFlowProofSymbols symbols) {
-        assert symbols != null;
         infFlowSymbols = infFlowSymbols.union(symbols);
     }
 
     public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
-        assert symbols != null;
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
@@ -127,7 +120,6 @@ public class InfFlowProof extends Proof {
     }
 
     public void addSideProof(InfFlowProof proof) {
-        assert proof != null;
         if (proof.hasSideProofs()) {
             if (this.hasSideProofs()) {
                 sideProofStatistics = sideProofStatistics.add(proof.sideProofStatistics);
@@ -140,7 +132,6 @@ public class InfFlowProof extends Proof {
     }
 
     private void addSideProofStatistics(Statistics stat) {
-        assert stat != null;
         if (this.hasSideProofs()) {
             sideProofStatistics = sideProofStatistics.add(stat);
         } else {

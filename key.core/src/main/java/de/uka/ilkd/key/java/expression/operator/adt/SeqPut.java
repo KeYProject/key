@@ -12,9 +12,11 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 public class SeqPut extends Operator {
 
-    public SeqPut(ExtList children) {
+    public SeqPut(@NonNull ExtList children) {
         super(children);
     }
 
@@ -32,7 +34,7 @@ public class SeqPut extends Operator {
 
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnSeqPut(this);
     }
 
@@ -44,7 +46,7 @@ public class SeqPut extends Operator {
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ, ExecutionContext ec) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 }

@@ -11,6 +11,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Projection of a rule application to its focus (the term or formula that the rule operates on,
  * that for taclets is described using <code>\find</code>, and that can be modified by the rule).
@@ -27,12 +29,13 @@ public class FocusProjection implements ProjectionToTerm<Goal> {
         this.stepsUpwards = stepsUpwards;
     }
 
-    public static ProjectionToTerm<Goal> create(int stepsUpwards) {
+    public static @NonNull ProjectionToTerm<Goal> create(int stepsUpwards) {
         return new FocusProjection(stepsUpwards);
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public @NonNull Term toTerm(RuleApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;

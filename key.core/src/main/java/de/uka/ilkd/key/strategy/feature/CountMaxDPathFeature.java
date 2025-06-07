@@ -11,6 +11,8 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Feature that returns the maximum number of literals occurring within a d-path of the find-formula
@@ -23,7 +25,8 @@ public class CountMaxDPathFeature extends AbstractBetaFeature {
     private CountMaxDPathFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected @NonNull RuleAppCost doComputation(@NonNull PosInOccurrence pos,
+            @NonNull Term findTerm, @NonNull ServiceCaches caches) {
         return NumberRuleAppCost.create(maxDPath(findTerm, !pos.isInAntec(), caches));
     }
 

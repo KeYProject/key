@@ -13,6 +13,8 @@ import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NonNull;
+
 public class OpenFileAction extends MainWindowAction {
 
     /**
@@ -20,7 +22,7 @@ public class OpenFileAction extends MainWindowAction {
      */
     private static final long serialVersionUID = -8548805965130100236L;
 
-    public OpenFileAction(MainWindow mainWindow) {
+    public OpenFileAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Load...");
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));

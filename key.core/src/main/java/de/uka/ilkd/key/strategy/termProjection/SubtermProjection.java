@@ -12,6 +12,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Projection for computing a subterm of a given term. The position of the subterm within the
  * complete term is described using a <code>PosInTerm</code>.
@@ -21,7 +23,7 @@ public class SubtermProjection implements ProjectionToTerm<Goal> {
     private final PosInTerm pit;
     private final ProjectionToTerm<Goal> completeTerm;
 
-    public static ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> completeTerm,
+    public static @NonNull ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> completeTerm,
             PosInTerm pit) {
         return new SubtermProjection(completeTerm, pit);
     }
@@ -32,7 +34,7 @@ public class SubtermProjection implements ProjectionToTerm<Goal> {
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return (Term) pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
     }
 }

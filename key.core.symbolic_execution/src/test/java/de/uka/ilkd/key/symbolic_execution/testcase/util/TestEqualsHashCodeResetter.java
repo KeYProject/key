@@ -10,6 +10,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.symbolic_execution.util.EqualsHashCodeResetter;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -251,7 +252,7 @@ public class TestEqualsHashCodeResetter {
          * Overwritten to make {@link MyBean}s equal if they have the same value.
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj instanceof MyBean) {
                 return value.equals(((MyBean) obj).value);
             } else {

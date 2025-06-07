@@ -17,6 +17,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm<Goal> {
 
     private final ProjectionToTerm leftCoefficient, polynomial;
@@ -28,7 +30,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal, MutableState mState) {
         final Term coeffT = leftCoefficient.toTerm(app, pos, goal, mState);
         final Term polyT = polynomial.toTerm(app, pos, goal, mState);
 
@@ -41,8 +43,8 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
     protected abstract Term divide(Monomial numerator, BigInteger denominator, Services services);
 
-    private de.uka.ilkd.key.logic.Term quotient(BigInteger monoCoeff, Term rightPoly,
-            Services services) {
+    private de.uka.ilkd.key.logic.Term quotient(BigInteger monoCoeff, @NonNull Term rightPoly,
+            @NonNull Services services) {
         final Function add = services.getTypeConverter().getIntegerLDT().getAdd();
         if (rightPoly.op() == add) {
             final var left = quotient(monoCoeff, rightPoly.sub(0), services);

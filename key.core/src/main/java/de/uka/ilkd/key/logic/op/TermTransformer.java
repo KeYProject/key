@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.SortedOperator;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * TermTransformer perform complex term transformation which cannot be (efficiently or at all)
  * described by taclets.
@@ -21,5 +23,6 @@ public interface TermTransformer extends SortedOperator, Operator,
      * initiates term transformation of <tt>term</tt>. Note the top level operator of of parameter
      * <tt>term</tt> has to be <em>this</em> term transformer.
      */
+    @Nullable
     Term transform(Term term, SVInstantiations svInst, Services services);
 }

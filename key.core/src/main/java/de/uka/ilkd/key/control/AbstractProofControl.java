@@ -31,6 +31,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,7 @@ public abstract class AbstractProofControl implements ProofControl {
     /**
      * Optionally, the {@link RuleCompletionHandler} to use.
      */
-    private final RuleCompletionHandler ruleCompletionHandler;
+    private final @Nullable RuleCompletionHandler ruleCompletionHandler;
 
     /**
      * The default {@link ProverTaskListener} which will be added to all started
@@ -83,7 +84,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      */
     protected AbstractProofControl(ProverTaskListener defaultProverTaskListener,
-            RuleCompletionHandler ruleCompletionHandler) {
+            @Nullable RuleCompletionHandler ruleCompletionHandler) {
         this.ruleCompletionHandler = ruleCompletionHandler;
         this.defaultProverTaskListener = defaultProverTaskListener;
     }
@@ -157,8 +158,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * TacletApps
      */
     private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal,
-            ImmutableList<NoPosTacletApp> tacletInstances,
-            PosInOccurrence pos) {
+            ImmutableList<NoPosTacletApp> tacletInstances, @Nullable PosInOccurrence pos) {
         HashSet<Taclet> applicableRules = new HashSet<>();
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp app : tacletInstances) {

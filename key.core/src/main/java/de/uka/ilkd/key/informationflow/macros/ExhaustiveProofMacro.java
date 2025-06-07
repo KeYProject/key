@@ -25,6 +25,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply
  * the macro given by {@link #getProofMacro()} directly, or --if not directly applicable-- search on
@@ -35,9 +38,10 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
-    private PosInOccurrence getApplicablePosInOcc(Proof proof,
-            Goal goal, PosInOccurrence posInOcc,
-            ProofMacro macro) {
+    private PosInOccurrence getApplicablePosInOcc(@NonNull Proof proof,
+            Goal goal,
+            @Nullable PosInOccurrence posInOcc,
+            @NonNull ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
         } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
@@ -58,7 +62,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getName()
      */
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "Apply macro on first applicable position in the sequent.";
     }
 
@@ -68,13 +72,13 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
      * @see de.uka.ilkd.key.gui.macros.ProofMacro#getDescription()
      */
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return "Applies specificed macro --if it is applicable anywhere on"
             + "the sequent-- either directly or on the first applicable" + "position found.";
     }
 
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+    public boolean canApplyTo(@NonNull Proof proof, @NonNull ImmutableList<Goal> goals,
             PosInOccurrence posInOcc) {
         final Services services = proof.getServices();
 
@@ -107,9 +111,9 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+    public @NonNull ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, @NonNull Proof proof,
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =

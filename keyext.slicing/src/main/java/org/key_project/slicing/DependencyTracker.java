@@ -47,6 +47,9 @@ import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Tracks proof steps as they are applied on the proof.
  * Each proof step is recorded in the dependency graph ({@link DependencyGraph}).
@@ -57,7 +60,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     /**
      * The proof this tracker monitors.
      */
-    private final Proof proof;
+    private final @NonNull Proof proof;
     /**
      * The dependency graph this tracker creates.
      */
@@ -72,7 +75,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      *
      * @see DependencyAnalyzer
      */
-    private AnalysisResults analysisResults = null;
+    private @Nullable AnalysisResults analysisResults = null;
 
     /**
      * Construct a new tracker for a proof.
@@ -80,7 +83,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      *
      * @param proof the proof to track
      */
-    public DependencyTracker(Proof proof) {
+    public DependencyTracker(@NonNull Proof proof) {
         this.proof = proof;
         proof.addProofTreeListener(this);
         proof.register(this, DependencyTracker.class);
@@ -103,8 +106,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param node node corresponding to the rule application
      * @return all formulas used by the rule application
      */
-    private static Set<PosInOccurrence> inputsOfRuleApp(
-            RuleApp ruleApp, Node node) {
+    private static @NonNull Set<PosInOccurrence> inputsOfRuleApp(@NonNull RuleApp ruleApp,
+            @NonNull Node node) {
         Set<PosInOccurrence> inputs = new HashSet<>();
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
@@ -122,8 +125,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param removed formulas removed by this node
      * @return pairs of graph nodes and whether the graph node was removed
      */
-    private List<Pair<GraphNode, Boolean>> inputsOfNode(Node n,
-            Set<PosInOccurrence> removed) {
+    private @NonNull List<Pair<GraphNode, Boolean>> inputsOfNode(@NonNull Node n,
+            @NonNull Set<PosInOccurrence> removed) {
         RuleApp ruleApp = n.getAppliedRuleApp();
         List<Pair<GraphNode, Boolean>> input = new ArrayList<>();
 
@@ -182,8 +185,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param ruleAppInfo some rule application
      * @return formulas removed by that rule application
      */
-    private Set<PosInOccurrence> formulasRemovedBy(
-            RuleAppInfo ruleAppInfo) {
+    private @NonNull Set<PosInOccurrence> formulasRemovedBy(@NonNull RuleAppInfo ruleAppInfo) {
         Set<PosInOccurrence> removed = new HashSet<>();
         for (NodeReplacement newNode : ruleAppInfo.getReplacementNodes()) {
             newNode.getNodeChanges().forEachRemaining(nodeChange -> {
@@ -195,7 +197,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return removed;
     }
 
-    private Set<PosInOccurrence> formulasRemovedBy(Node node) {
+    private @NonNull Set<PosInOccurrence> formulasRemovedBy(@NonNull Node node) {
         Set<PosInOccurrence> removed = new HashSet<>();
         // compare parent sequent to new sequent
         Node parent = node.parent();
@@ -222,10 +224,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param ruleAppInfo rule application info
      * @return formulas added
      */
-    private List<Pair<PosInOccurrence, Integer>> outputsOfNode(
-            RuleAppInfo ruleAppInfo) {
-        List<Pair<PosInOccurrence, Integer>> outputs =
-            new ArrayList<>();
+    private @NonNull List<Pair<PosInOccurrence, Integer>> outputsOfNode(
+            @NonNull RuleAppInfo ruleAppInfo) {
+        List<Pair<PosInOccurrence, Integer>> outputs = new ArrayList<>();
         int sibling = ruleAppInfo.getReplacementNodes().size() - 1;
         for (NodeReplacement b : ruleAppInfo.getReplacementNodes()) {
             int id = ruleAppInfo.getReplacementNodes().size() > 1 ? sibling : -1;
@@ -239,10 +240,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return outputs;
     }
 
-    private List<Pair<PosInOccurrence, Integer>> outputsOfNode(
-            Node node) {
-        List<Pair<PosInOccurrence, Integer>> outputs =
-            new ArrayList<>();
+    private @NonNull List<Pair<PosInOccurrence, Integer>> outputsOfNode(@NonNull Node node) {
+        List<Pair<PosInOccurrence, Integer>> outputs = new ArrayList<>();
         int sibling = 0;
         for (Node b : node.children()) {
             // compare sequents
@@ -263,7 +262,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     @Override
-    public void ruleApplied(ProofEvent e) {
+    public void ruleApplied(@NonNull ProofEvent e) {
         if (e.getSource() != proof) {
             throw new IllegalStateException(
                 "dependency tracker received rule application on wrong proof");
@@ -351,7 +350,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      *
      * @param n the node
      */
-    public void trackNode(Node n) {
+    public void trackNode(@NonNull Node n) {
         if (n.proof() != proof) {
             throw new IllegalStateException("dependency tracker received node of wrong proof");
         }
@@ -430,7 +429,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     @Override
-    public void proofIsBeingPruned(ProofTreeEvent e) {
+    public void proofIsBeingPruned(@NonNull ProofTreeEvent e) {
         // clean up removed formulas / nodes /...
         analysisResults = null;
         graph.prune(e.getNode());
@@ -444,7 +443,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param abbreviateChains whether to reduce long chains to one link
      * @return DOT string
      */
-    public String exportDot(boolean abbreviateFormulas, boolean abbreviateChains) {
+    public @NonNull String exportDot(boolean abbreviateFormulas, boolean abbreviateChains) {
         return DotExporter.exportDot(proof, abbreviateChains ? graph.removeChains() : graph,
             analysisResults, abbreviateFormulas);
     }
@@ -457,7 +456,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param node graph node to center export around
      * @return DOT string
      */
-    public String exportDotAround(boolean abbreviateFormulas, boolean omitBranch, GraphNode node) {
+    public @NonNull String exportDotAround(boolean abbreviateFormulas, boolean omitBranch,
+            @NonNull GraphNode node) {
         return DotExporter.exportDotAround(
             graph, analysisResults, abbreviateFormulas, omitBranch, node);
     }
@@ -490,8 +490,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param pio a sequent formula
      * @return the node that added this formula, or null
      */
-    public Node getNodeThatProduced(Node currentNode,
-            PosInOccurrence pio) {
+    public @Nullable Node getNodeThatProduced(@NonNull Node currentNode,
+            @NonNull PosInOccurrence pio) {
         if (proof == null) {
             return null;
         }
@@ -505,14 +505,14 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      *
      * @return analysis results or null (if not yet computed)
      */
-    public AnalysisResults getAnalysisResults() {
+    public @Nullable AnalysisResults getAnalysisResults() {
         return analysisResults;
     }
 
     /**
      * @return the dependency graph populated by this tracker
      */
-    public DependencyGraph getDependencyGraph() {
+    public @NonNull DependencyGraph getDependencyGraph() {
         return graph;
     }
 }

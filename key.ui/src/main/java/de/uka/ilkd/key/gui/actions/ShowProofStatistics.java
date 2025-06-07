@@ -34,6 +34,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +56,7 @@ public class ShowProofStatistics extends MainWindowAction {
      */
     private final Proof proof;
 
-    public ShowProofStatistics(MainWindow mainWindow, Proof proof) {
+    public ShowProofStatistics(@NonNull MainWindow mainWindow, Proof proof) {
         super(mainWindow);
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
@@ -81,7 +83,7 @@ public class ShowProofStatistics extends MainWindowAction {
      * @param proof the proof
      * @return the CSV statistics message
      */
-    public static String getCSVStatisticsMessage(Proof proof) {
+    public static @NonNull String getCSVStatisticsMessage(@NonNull Proof proof) {
         final int openGoals = proof.openGoals().size();
         StringBuilder stats = new StringBuilder();
         stats.append("open goals" + CSV_SEPERATOR).append(openGoals).append("\n");
@@ -118,7 +120,7 @@ public class ShowProofStatistics extends MainWindowAction {
         return stats.toString();
     }
 
-    private static String getHTMLStatisticsMessage(Node node) {
+    private static @NonNull String getHTMLStatisticsMessage(@NonNull Node node) {
         int openGoals = 0;
         int cachedGoals = 0;
 
@@ -136,7 +138,7 @@ public class ShowProofStatistics extends MainWindowAction {
         return getHTMLStatisticsMessage(openGoals, cachedGoals, node.statistics());
     }
 
-    private static String getHTMLStatisticsMessage(Proof proof) {
+    private static @NonNull String getHTMLStatisticsMessage(@NonNull Proof proof) {
         int openGoals = proof.openGoals().size();
         int cachedGoals =
             (int) proof.closedGoals().stream().filter(g -> g.node().lookup(ClosedBy.class) != null)
@@ -144,8 +146,8 @@ public class ShowProofStatistics extends MainWindowAction {
         return getHTMLStatisticsMessage(openGoals, cachedGoals, proof.getStatistics());
     }
 
-    private static String getHTMLStatisticsMessage(int openGoals, int cachedGoals,
-            Statistics statistics) {
+    private static @NonNull String getHTMLStatisticsMessage(int openGoals, int cachedGoals,
+            @NonNull Statistics statistics) {
         StringBuilder stats = new StringBuilder("<html><head>" + "<style type=\"text/css\">"
             + "body {font-weight: normal; text-align: center;}" + "td {padding: 1px;}"
             + "th {padding: 2px; font-weight: bold;}" + "</style></head><body>");
@@ -173,7 +175,7 @@ public class ShowProofStatistics extends MainWindowAction {
         return stats.toString();
     }
 
-    private static String getStatisticsTable(Statistics s) {
+    private static @NonNull String getStatisticsTable(@NonNull Statistics s) {
         StringBuilder stats = new StringBuilder();
         stats.append("<table>");
 
@@ -232,7 +234,7 @@ public class ShowProofStatistics extends MainWindowAction {
     public static final class Window extends JDialog {
 
         private static final long serialVersionUID = 1266280148508192284L;
-        private final Proof proof;
+        private final @NonNull Proof proof;
 
         /**
          * Creates a new (initially invisible) proof statistics window.
@@ -240,7 +242,7 @@ public class ShowProofStatistics extends MainWindowAction {
          * @param mainWindow the main windown.
          * @param proof the proof whose statistics to show.
          */
-        public Window(MainWindow mainWindow, Proof proof) {
+        public Window(@NonNull MainWindow mainWindow, @NonNull Proof proof) {
             super(mainWindow, "Proof Statistics");
 
             if (!EventQueue.isDispatchThread()) {
@@ -259,7 +261,7 @@ public class ShowProofStatistics extends MainWindowAction {
          * @param mainWindow the main windown.
          * @param node the node for which to show subtree statistics
          */
-        public Window(MainWindow mainWindow, Node node) {
+        public Window(@NonNull MainWindow mainWindow, @NonNull Node node) {
             super(mainWindow, "Proof Statistics");
             this.proof = node.proof();
 
@@ -267,7 +269,7 @@ public class ShowProofStatistics extends MainWindowAction {
             init(mainWindow, stats);
         }
 
-        private void init(MainWindow mainWindow, String stats) {
+        private void init(@NonNull MainWindow mainWindow, String stats) {
 
             JEditorPane statisticsPane = new StatisticsEditorPane("text/html", stats);
             statisticsPane.setEditable(false);
@@ -342,7 +344,7 @@ public class ShowProofStatistics extends MainWindowAction {
             getRootPane().addKeyListener(new KeyAdapter() {
 
                 @Override
-                public void keyTyped(KeyEvent e) {
+                public void keyTyped(@NonNull KeyEvent e) {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                         getRootPane().getDefaultButton().doClick();
                     }
@@ -377,7 +379,7 @@ public class ShowProofStatistics extends MainWindowAction {
             }
         }
 
-        private void export(String fileExtension, String fileName, String text) {
+        private void export(String fileExtension, String fileName, @NonNull String text) {
             KeYFileChooser fileChooser =
                 KeYFileChooser.getFileChooser("Choose filename to save statistics");
             fileChooser.setFileFilter(KeYFileChooser.STATISTICS_FILTER);
@@ -403,13 +405,13 @@ public class ShowProofStatistics extends MainWindowAction {
      * @author Arne Keller
      */
     private static final class StatisticsEditorPane extends JEditorPane {
-        public StatisticsEditorPane(String type, String text) {
+        public StatisticsEditorPane(@NonNull String type, String text) {
             super(type, text);
             ToolTipManager.sharedInstance().registerComponent(this);
         }
 
         @Override
-        public String getToolTipText(MouseEvent evt) {
+        public @Nullable String getToolTipText(@NonNull MouseEvent evt) {
             int pos = viewToModel2D(evt.getPoint());
             if (pos >= 0) {
                 HTMLDocument hdoc = (HTMLDocument) getDocument();

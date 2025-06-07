@@ -17,6 +17,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -199,7 +200,7 @@ public class TestTriggersSet {
 
     }
 
-    private Term parseTerm(String termstr) {
+    private @NonNull Term parseTerm(@NonNull String termstr) {
         return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
             new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }

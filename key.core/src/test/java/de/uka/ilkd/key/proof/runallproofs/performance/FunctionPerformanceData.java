@@ -14,6 +14,8 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+
 public class FunctionPerformanceData {
 
     private final Map<Integer, NodeData> nodeId2NodeData = new HashMap<>();
@@ -28,7 +30,7 @@ public class FunctionPerformanceData {
         this.dataDir = dataDir;
     }
 
-    private NodeData getDataMapForGoal(Goal goal) {
+    private @NonNull NodeData getDataMapForGoal(@NonNull Goal goal) {
         NodeData nodeData = nodeId2NodeData.get(goal.node().serialNr());
         if (nodeData == null) {
             nodeData = new NodeData(goal);
@@ -37,7 +39,7 @@ public class FunctionPerformanceData {
         return nodeData;
     }
 
-    public void addDurationToData(RuleApp app, Goal goal, long duration) {
+    public void addDurationToData(@NonNull RuleApp app, @NonNull Goal goal, long duration) {
         NodeData map = getDataMapForGoal(goal);
         String ruleName = app.rule().displayName();
         RuleData ruleData = map.ruleName2RuleData.get(ruleName);
@@ -52,7 +54,8 @@ public class FunctionPerformanceData {
         totalDuration += duration;
     }
 
-    private DataRecordingTable getTable(String ruleName, Map<String, DataRecordingTable> tables) {
+    private @NonNull DataRecordingTable getTable(String ruleName,
+            @NonNull Map<String, DataRecordingTable> tables) {
         DataRecordingTable table = tables.get(ruleName);
         if (table == null) {
             try {

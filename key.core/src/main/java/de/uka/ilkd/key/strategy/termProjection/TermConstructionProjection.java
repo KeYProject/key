@@ -13,6 +13,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
  * operator.
@@ -38,7 +40,8 @@ public class TermConstructionProjection implements ProjectionToTerm<Goal> {
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Term[] subs = new Term[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {
             subs[i] = (Term) subTerms[i].toTerm(app, pos, goal, mState);

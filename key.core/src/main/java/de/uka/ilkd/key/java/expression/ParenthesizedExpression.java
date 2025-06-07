@@ -11,6 +11,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Redundant Parentheses. Modelled as a special "identity" unary "infix" operator.
  */
@@ -25,7 +27,7 @@ public class ParenthesizedExpression extends Operator
      *        the children is IMPORTANT. May contain: several of Expression (should be one, the
      *        first is taken as parenthesized expression), Comments
      */
-    public ParenthesizedExpression(ExtList children) {
+    public ParenthesizedExpression(@NonNull ExtList children) {
         super(children);
     }
 
@@ -61,11 +63,11 @@ public class ParenthesizedExpression extends Operator
         /* Only unary infix operator;) */
     }
 
-    public SourceElement getFirstElement() {
+    public @NonNull SourceElement getFirstElement() {
         return this;
     }
 
-    public SourceElement getLastElement() {
+    public @NonNull SourceElement getLastElement() {
         return this;
     }
 
@@ -75,7 +77,7 @@ public class ParenthesizedExpression extends Operator
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnParenthesizedExpression(this);
     }
 
@@ -84,15 +86,15 @@ public class ParenthesizedExpression extends Operator
      *
      * @author VK
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @NonNull ReferencePrefix getReferencePrefix() {
         return null;
     }
 
-    public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
+    public @NonNull ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @NonNull KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getExpressionAt(0).getKeYJavaType(javaServ, ec);
     }
 

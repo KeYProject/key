@@ -8,6 +8,8 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Sets the behavior if an already closed proof is encountered: Either throw an exception (default
  * behavior, sensible for specially tailored scripts for which a prematurely closed proof is
@@ -22,22 +24,24 @@ public class SetFailOnClosedCommand extends AbstractCommand<SetFailOnClosedComma
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "@failonclosed";
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters args,
+            @NonNull EngineState state)
             throws ScriptException, InterruptedException {
         state.setFailOnClosedOn(!"off".equalsIgnoreCase(args.command));
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         /**
          * The command: "on" or "off". Anything else defaults to "on".

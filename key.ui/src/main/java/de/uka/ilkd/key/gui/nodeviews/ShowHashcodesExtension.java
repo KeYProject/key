@@ -11,6 +11,9 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Extension adapter for showing hash codes for terms. Useful for debugging.
  *
@@ -24,7 +27,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 public class ShowHashcodesExtension implements KeYGuiExtension, KeYGuiExtension.Tooltip {
 
     @Override
-    public List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos) {
+    public @NonNull List<String> getTooltipStrings(MainWindow mainWindow,
+            @Nullable PosInSequent pos) {
         if (pos == null || pos.isSequent()) {
             return Collections.emptyList();
         }

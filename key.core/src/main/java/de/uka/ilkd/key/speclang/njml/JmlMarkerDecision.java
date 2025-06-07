@@ -22,7 +22,7 @@ import org.jspecify.annotations.NonNull;
  */
 public class JmlMarkerDecision {
     private final JmlLexer lexer;
-    private Set<String> enabledKeys = new HashSet<>();
+    private @NonNull Set<String> enabledKeys = new HashSet<>();
 
     /**
      * Initialize this class with default {@code enabledKeys} of {@code "key"}.
@@ -45,7 +45,7 @@ public class JmlMarkerDecision {
         this.enabledKeys = markers.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 
-    public Collection<String> getEnabledKeys() {
+    public @NonNull Collection<String> getEnabledKeys() {
         return Collections.unmodifiableCollection(enabledKeys);
     }
 
@@ -89,7 +89,7 @@ public class JmlMarkerDecision {
      *
      * @return true if lexer is at a comment, and not in front of a JML specification.
      */
-    public boolean isComment(String expectedCommentStart) {
+    public boolean isComment(@NonNull String expectedCommentStart) {
         int mark = lexer._input.mark();
         int startPos = lexer._input.index();
 
@@ -118,7 +118,7 @@ public class JmlMarkerDecision {
         }
     }
 
-    private boolean consume(String str) {
+    private boolean consume(@NonNull String str) {
         for (int i = 0; i < str.length(); i++) {
             if (lexer._input.LA(1) == str.charAt(i)) {
                 lexer._input.consume();
@@ -138,7 +138,7 @@ public class JmlMarkerDecision {
      * @return true whether the given conditions are met and the comment should be considered as
      *         active.
      */
-    public boolean isActiveJmlSpec(String foundKeys) {
+    public boolean isActiveJmlSpec(@NonNull String foundKeys) {
         if (foundKeys.isEmpty()) {
             // a JML annotation with no keys is always included,
             return true;
@@ -168,16 +168,16 @@ public class JmlMarkerDecision {
         return (!plusKeyFound || enabledPlusKeyFound) && !enabledNegativeKeyFound;
     }
 
-    private boolean isNegative(String marker) {
+    private boolean isNegative(@NonNull String marker) {
         return marker.charAt(0) == '-';
     }
 
-    private boolean isEnabled(String marker) {
+    private boolean isEnabled(@NonNull String marker) {
         // remove [+-] prefix
         return enabledKeys.contains(marker.substring(1).toLowerCase());
     }
 
-    private boolean isPositive(String marker) {
+    private boolean isPositive(@NonNull String marker) {
         return marker.charAt(0) == '+';
     }
 }

@@ -15,7 +15,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
-
+import org.jspecify.annotations.Nullable;
 
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
@@ -32,7 +32,7 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      *         indicates that the rule shall not be applied at all (it is discarded by
      *         the strategy).
      */
-    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    default @Nullable RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         return computeCost(app, pos, goal, new MutableState());
     }
 
@@ -68,7 +68,7 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      * @param proof The {@link Proof} the strategy of which should be updated.
      * @param p The new {@link StrategyProperties}
      */
-    static void updateStrategySettings(Proof proof, StrategyProperties p) {
+    static void updateStrategySettings(@NonNull Proof proof, @NonNull StrategyProperties p) {
         final Strategy strategy = proof.getActiveStrategy();
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);

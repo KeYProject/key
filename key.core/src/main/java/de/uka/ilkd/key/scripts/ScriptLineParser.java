@@ -12,6 +12,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -50,7 +51,7 @@ class ScriptLineParser {
     /**
      * the file URL from which the script is taken.
      */
-    private URI fileURI;
+    private @Nullable URI fileURI;
 
     /**
      * While within a string literal, this stores the character with which the string has started.
@@ -84,7 +85,7 @@ class ScriptLineParser {
         }
     }
 
-    public ParsedCommand parseCommand() throws IOException, ScriptException {
+    public @Nullable ParsedCommand parseCommand() throws IOException, ScriptException {
         Map<String, String> result = new HashMap<>();
 
         StringBuilder cmdBuilder = new StringBuilder();
@@ -246,7 +247,7 @@ class ScriptLineParser {
             String.format("Unexpected char '%s' at %d:%d", (char) c, line, col), getLocation());
     }
 
-    private Location getLocation() {
+    private @NonNull Location getLocation() {
         return new Location(fileURI, Position.newOneBased(line, col));
     }
 

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This class contains the set of four sets of ProofObligationVars necessary for information flow
@@ -24,17 +26,17 @@ public class IFProofObligationVars {
 
     public final ProofObligationVars c1, c2, symbExecVars;
 
-    private final Map<ProofObligationVars, Map<Term, Term>> infFlowToSymbExecVarsMaps;
+    private final @NonNull Map<ProofObligationVars, Map<Term, Term>> infFlowToSymbExecVarsMaps;
 
 
-    public IFProofObligationVars(ProofObligationVars symbExecVars, Services services) {
+    public IFProofObligationVars(@NonNull ProofObligationVars symbExecVars, Services services) {
         this(new ProofObligationVars(symbExecVars, "_A", services),
             new ProofObligationVars(symbExecVars, "_B", services), symbExecVars);
     }
 
 
     public IFProofObligationVars(ProofObligationVars c1, ProofObligationVars c2,
-            ProofObligationVars symbExecVars) {
+            @NonNull ProofObligationVars symbExecVars) {
         this.c1 = c1;
         this.c2 = c2;
         this.symbExecVars = symbExecVars;
@@ -47,7 +49,7 @@ public class IFProofObligationVars {
     }
 
 
-    public IFProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
+    public @NonNull IFProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
         ProofObligationVars newC1 = c1.labelHeapAtPreAsAnonHeapFunc();
         ProofObligationVars newC2 = c2.labelHeapAtPreAsAnonHeapFunc();
         ProofObligationVars sev = symbExecVars.labelHeapAtPreAsAnonHeapFunc();
@@ -63,7 +65,8 @@ public class IFProofObligationVars {
     }
 
 
-    private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<Term, Term> map) {
+    private void linkStateVarsToCopies(@NonNull StateVars ifVars, @NonNull StateVars seVars,
+            @NonNull Map<Term, Term> map) {
         final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
         for (final Term symbTerm : seVars.termList) {
             final Term ifTerm;
@@ -85,7 +88,7 @@ public class IFProofObligationVars {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return "[" + symbExecVars + "," + c1 + "," + c2 + "]";
     }
 }

@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Action to toggle {@link ViewSettings#isHighlightOrigin()}.
  *
@@ -24,7 +26,7 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public ToggleOriginHighlightAction(MainWindow mainWindow) {
+    public ToggleOriginHighlightAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setIcon(IconFactory.ORIGIN_HIGHLIGHT_ICON.get());
         setEnabled(true);

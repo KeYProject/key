@@ -19,6 +19,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Makes sure that {@link SymbolicExecutionUtil#LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL} is introduced
  * when a {@link WhileInvariantRule} is applied.
@@ -41,7 +43,7 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
     public void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
-            Set<TermLabel> labels) {
+            @NonNull Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyImplication".equals(hint)
                 && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
             labels.add(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);

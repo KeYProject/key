@@ -11,6 +11,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 public final class AddCast extends AbstractTermTransformer {
 
@@ -20,7 +22,7 @@ public final class AddCast extends AbstractTermTransformer {
 
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
         Term sub = term.sub(0);
         Sort sort = term.sub(1).sort();
 

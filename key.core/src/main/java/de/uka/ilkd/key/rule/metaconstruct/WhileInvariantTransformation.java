@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,20 +28,20 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(WhileInvariantTransformation.class);
 
-    private JavaInfo javaInfo = null;
+    private @Nullable JavaInfo javaInfo = null;
 
-    private ProgramVariable cont = null;
-    private ProgramVariable exc = null;
-    private ProgramVariable rtrn = null;
-    private ProgramVariable brk = null;
-    private ProgramVariable thrownExc = null;
-    private ProgramVariable excParam = null;
-    private ProgramVariable returnExpr = null;
+    private @Nullable ProgramVariable cont = null;
+    private @Nullable ProgramVariable exc = null;
+    private @Nullable ProgramVariable rtrn = null;
+    private @Nullable ProgramVariable brk = null;
+    private @Nullable ProgramVariable thrownExc = null;
+    private @Nullable ProgramVariable excParam = null;
+    private @Nullable ProgramVariable returnExpr = null;
 
     private boolean continueOccurred = false;
     private boolean returnOccurred = false;
 
-    private LinkedList<BreakToBeReplaced> breakList = null;
+    private @Nullable LinkedList<BreakToBeReplaced> breakList = null;
 
     /**
      * creates the WhileLoopTransformation for the transformation mode
@@ -48,11 +50,11 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @param outerLabel the ProgramElementName of the outer label
      * @param innerLabel the ProgramElementName of the inner label
      */
-    public WhileInvariantTransformation(ProgramElement root, ProgramElementName outerLabel,
+    public WhileInvariantTransformation(@NonNull ProgramElement root, ProgramElementName outerLabel,
             ProgramElementName innerLabel, ProgramVariable cont, ProgramVariable exc,
             ProgramVariable excParam, ProgramVariable thrownException, ProgramVariable brk,
             ProgramVariable rtrn, ProgramVariable returnExpr,
-            LinkedList<BreakToBeReplaced> breakList, Services services) {
+            LinkedList<BreakToBeReplaced> breakList, @NonNull Services services) {
 
         super(root, outerLabel, innerLabel, services);
         this.cont = cont;
@@ -72,8 +74,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @param root the ProgramElement where to begin
      * @param inst the SVInstantiations if available
      */
-    public WhileInvariantTransformation(ProgramElement root, SVInstantiations inst,
-            Services services) {
+    public WhileInvariantTransformation(@NonNull ProgramElement root, SVInstantiations inst,
+            @NonNull Services services) {
         super(root, inst, services);
         this.breakList = new LinkedList<>();
     }
@@ -96,7 +98,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     /**
      * returns a list of breaks that lead to abrupt termination of the loop and have to be replaced
      */
-    public LinkedList<BreakToBeReplaced> breakList() {
+    public @Nullable LinkedList<BreakToBeReplaced> breakList() {
         return breakList;
     }
 

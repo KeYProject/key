@@ -11,6 +11,8 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Binary feature that returns zero iff the focus of a rule contains a quantifier
@@ -24,7 +26,8 @@ public class ContainsQuantifierFeature extends AbstractBetaFeature {
     private ContainsQuantifierFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected RuleAppCost doComputation(PosInOccurrence pos, @NonNull Term findTerm,
+            @NonNull ServiceCaches caches) {
         return containsQuantifier(findTerm, caches) ? BinaryFeature.ZERO_COST
                 : BinaryFeature.TOP_COST;
     }

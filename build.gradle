@@ -92,11 +92,11 @@ subprojects {
         //compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.0'
         //compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.0'
 
-        compileOnly("org.jspecify:jspecify:1.0.0")
+        implementation("org.jspecify:jspecify:1.0.0")
         testCompileOnly("org.jspecify:jspecify:1.0.0")
         def eisop_version = "3.49.3-eisop1"
-        compileOnly "io.github.eisop:checker-qual:$eisop_version"
-        compileOnly "io.github.eisop:checker-util:$eisop_version"
+        implementation "io.github.eisop:checker-qual:$eisop_version"
+        implementation "io.github.eisop:checker-util:$eisop_version"
         testCompileOnly "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker-qual:$eisop_version"
         checkerFramework "io.github.eisop:checker:$eisop_version"
@@ -137,6 +137,10 @@ subprojects {
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
+
+        // RAC non-null references.
+        jvmArgs("-javaagent:$rootDir/nonnull-0.1.0-SNAPSHOT-all.jar=VERBOSE,org.key_project,de.uka")
+
 
         forkEvery = 0 //default
         maxParallelForks = 1 // weigl: test on master

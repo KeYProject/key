@@ -90,7 +90,8 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
         return new TacletPrefix(prefix.remove(var), context);
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A window to contain a {@link AuxiliaryContractSelectionPanel}.
  *
@@ -115,7 +117,7 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
     /**
      * Returns the selected contract.
      */
-    public T getContract() {
+    public @NonNull T getContract() {
         return contractPanel.getContract();
     }
 

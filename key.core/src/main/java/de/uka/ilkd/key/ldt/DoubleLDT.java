@@ -219,7 +219,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public @Nullable Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_DOUBLE;
         } else {

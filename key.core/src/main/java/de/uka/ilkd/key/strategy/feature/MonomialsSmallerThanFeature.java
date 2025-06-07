@@ -23,6 +23,8 @@ import org.key_project.prover.strategy.costbased.termfeature.SubTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Feature that returns zero iff each monomial of one polynomial is smaller than all monomials of a
@@ -30,14 +32,14 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
 
-    private final TermFeature hasCoeff;
+    private final @NonNull TermFeature hasCoeff;
 
     private final ProjectionToTerm<Goal> left, right;
-    private final Function Z, mul, add;
+    private final @NonNull Function Z, mul, add;
 
 
     private MonomialsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
+            @NonNull IntegerLDT numbers) {
         super(numbers);
         this.left = left;
         this.right = right;
@@ -48,21 +50,21 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         hasCoeff = createHasCoeffTermFeature(numbers);
     }
 
-    static TermFeature createHasCoeffTermFeature(final IntegerLDT numbers) {
+    static @NonNull TermFeature createHasCoeffTermFeature(final @NonNull IntegerLDT numbers) {
         return BinarySumTermFeature.createSum(OperatorTF.create(numbers.getMul()),
             SubTermFeature.create(
                 new TermFeature[] { ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()),
                     OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
+    public static @NonNull Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            @NonNull IntegerLDT numbers) {
         return new MonomialsSmallerThanFeature(left, right, numbers);
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
         m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();
@@ -76,7 +78,9 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(@NonNull Term t1,
+            @NonNull Term t2, PosInOccurrence focus,
+            @NonNull Goal goal) {
 
         // here, the ordering is graded concerning multiplication on integers
         final int t1Deg = degree(t1);
@@ -123,8 +127,9 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         return super.lessThan(t1, t2, focus, goal);
     }
 
-    private int compareLexNewSyms(ImmutableList<Term> atoms1, ImmutableList<Term> atoms2,
-            Goal goal) {
+    private int compareLexNewSyms(@NonNull ImmutableList<Term> atoms1,
+            @NonNull ImmutableList<Term> atoms2,
+            @NonNull Goal goal) {
         while (!atoms1.isEmpty()) {
             final Term t1 = atoms1.head();
             final Term t2 = atoms2.head();
@@ -147,7 +152,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
      *         ensure that also cases like <tt>f(a*b)=a*b</tt> are handled properly, we simply count
      *         the total number of multiplication operators in the term.
      */
-    private int degree(Term t) {
+    private int degree(@NonNull Term t) {
         int res = 0;
 
         if (t.op() == mul && t.sub(0).op() != Z && t.sub(1).op() != Z) {
@@ -162,7 +167,8 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     private class MonomialCollector extends Collector {
-        protected void collect(Term te, MutableState mState, Services services) {
+        protected void collect(@NonNull Term te, MutableState mState,
+                Services services) {
             if (te.op() == add) {
                 collect(te.sub(0), mState, services);
                 collect(te.sub(1), mState, services);
@@ -171,7 +177,9 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             }
         }
 
-        private Term stripOffLiteral(Term te, MutableState mState, Services services) {
+        private @NonNull Term stripOffLiteral(
+                @NonNull Term te, MutableState mState,
+                Services services) {
             if (!(hasCoeff.compute(te, mState, services) instanceof TopRuleAppCost))
             // we leave out literals/coefficients on the right, because we
             // do not want to compare these literals

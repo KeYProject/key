@@ -119,7 +119,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public @NonNull IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 
@@ -225,7 +225,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return NAME;
     }
 
@@ -233,7 +233,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public String displayName() {
+    public @NonNull String displayName() {
         return NAME.toString();
     }
 
@@ -241,7 +241,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return displayName();
     }
 }

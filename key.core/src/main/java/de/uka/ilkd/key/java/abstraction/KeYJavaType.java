@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
@@ -13,6 +12,9 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The KeY java type realises a tuple (sort, type) of a logic sort and the java type (for example a
@@ -22,12 +24,12 @@ import org.key_project.logic.sort.Sort;
 public class KeYJavaType implements Type {
 
     /** Special return "type" for void methods. */
-    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null, JavaDLTheory.ANY);
+    public static final KeYJavaType VOID_TYPE = new KeYJavaType(JavaDLTheory.ANY);
 
     /** the AST type */
-    private Type javaType = null;
+    private @Nullable Type javaType = null;
     /** the logic sort */
-    private Sort sort = null;
+    private @Nullable Sort sort = null;
 
     /** creates a new KeYJavaType */
     public KeYJavaType() {
@@ -40,28 +42,28 @@ public class KeYJavaType implements Type {
     }
 
     /** creates a new KeYJavaType */
-    public KeYJavaType(Sort sort) {
+    public KeYJavaType(@Nullable Sort sort) {
         this.sort = sort;
     }
 
     /** creates a new KeYJavaType */
-    public KeYJavaType(Type type) {
+    public KeYJavaType(@Nullable Type type) {
         this.javaType = type;
     }
 
-    public void setJavaType(Type type) {
+    public void setJavaType(@Nullable Type type) {
         javaType = type;
     }
 
-    public void setSort(Sort s) {
+    public void setSort(@Nullable Sort s) {
         sort = s;
     }
 
-    public Type getJavaType() {
+    public @Nullable Type getJavaType() {
         return javaType;
     }
 
-    public Sort getSort() {
+    public @Nullable Sort getSort() {
         return sort;
     }
 
@@ -71,14 +73,14 @@ public class KeYJavaType implements Type {
      *
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
-    public Literal getDefaultValue() {
+    public @Nullable Literal getDefaultValue() {
         if (javaType == null) {
             return null;
         }
         return javaType.getDefaultValue();
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         if (this == VOID_TYPE) {
             return "KeYJavaType:void";
         }
@@ -88,20 +90,25 @@ public class KeYJavaType implements Type {
         return "(type, sort): (" + javaType.getName() + "," + sort + ")";
     }
 
-    public String getFullName() {
-        return Optional.ofNullable(getJavaType()).map(Type::getFullName)
-                .orElse(
-                    getSort() != null ? getSort().name().toString() : "This should never be seen");
+    public @NonNull String getFullName() {
+        Type type = getJavaType();
+        if (type != null) {
+            String fullName = type.getFullName();
+            if (fullName != null)
+                return fullName;
+        }
+        return getSort().name().toString();
     }
 
-    public String getName() {
-        return Optional.ofNullable(getJavaType()).map(Type::getName)
-                .orElse(
-                    getSort() != null ? getSort().name().toString() : "This should never be seen");
+    public @NonNull String getName() {
+        Type type = getJavaType();
+        if (type != null)
+            return type.getName();
+        return getSort().name().toString();
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -122,7 +129,7 @@ public class KeYJavaType implements Type {
     }
 
 
-    public PackageReference createPackagePrefix() {
+    public @Nullable PackageReference createPackagePrefix() {
         PackageReference ref = null;
         String rest = getFullName();
         if (rest.indexOf('.') > 0) {
@@ -138,7 +145,7 @@ public class KeYJavaType implements Type {
 
     public static final class LexicographicalKeYJavaTypeOrder<T extends KeYJavaType>
             implements Comparator<T> {
-        public int compare(T arg0, T arg1) {
+        public int compare(@NonNull T arg0, @NonNull T arg1) {
             return arg0.getFullName().compareTo(arg1.getFullName());
         }
     }

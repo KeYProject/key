@@ -13,6 +13,7 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.util.Position;
 
 import org.antlr.v4.runtime.CharStream;
+import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -54,7 +55,7 @@ public class Configuration {
     /**
      * Loads a configuration using the given char stream.
      *
-     * @param input existing file path
+     * @param input input stream
      * @return a configuration based on the file contents
      * @throws IOException i/o error on the steram
      */
@@ -106,10 +107,10 @@ public class Configuration {
      * @param name property name
      * @param defaultValue the returned instead of {@code null}.
      */
-
-    public <T> @NonNull T get(String name, Class<T> clazz, @NonNull T defaultValue) {
+    @SuppressWarnings("unchecked")
+    public <T extends @NonNull Object> T get(String name, T defaultValue) {
         if (exists(name, defaultValue.getClass()))
-            return clazz.cast(data.get(name));
+            return (T) defaultValue.getClass().cast(data.get(name));
         else
             return defaultValue;
     }
@@ -128,8 +129,8 @@ public class Configuration {
      * Returns an integer from the configuration.
      *
      * @param name property name
-     * @throws ClassCastException if the entry is not a {@link Long}
-     * @throws NullPointerException if no such value entry exists
+     * @throw ClassCastException if the entry is not an {@link Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public int getInt(String name) {
         return (int) getLong(name);
@@ -154,14 +155,15 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
-        return get(name, Long.class);
+        return Objects.requireNonNull(get(name, Long.class));
     }
 
     /**
      * Returns a long value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
-     * @throws ClassCastException if the entry is not a {@link Long}
+     * @throws ClassCastException if the entry is not an {@link Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name, long defaultValue) {
         Long value = get(name, Long.class);
@@ -172,21 +174,22 @@ public class Configuration {
      * Returns a boolean value for the given name.
      *
      * @param name property name
-     * @throws ClassCastException if the entry is not a {@link Boolean}
-     * @throws NullPointerException if no such value entry exists
+     * @throw ClassCastException if the entry is not an {@link Long}
+     * @throw NullPointerException if no such value entry exists
      */
     public boolean getBool(String name) {
-        return get(name, Boolean.class);
+        return Objects.requireNonNull(get(name, Boolean.class));
     }
 
     /**
      * Returns a boolean value for the given name. {@code defaultValue} if no such value is present.
      *
      * @param name property name
-     * @throws ClassCastException if the entry is not a {@link Boolean}
+     * @throws ClassCastException if the entry is not an {@link Long}
+     * @throws NullPointerException if no such value entry exists
      */
     public boolean getBool(String name, boolean defaultValue) {
-        return get(name, Boolean.class, defaultValue);
+        return get(name, defaultValue);
     }
 
     /**
@@ -194,11 +197,11 @@ public class Configuration {
      * present.
      *
      * @param name property name
-     * @throws ClassCastException if the entry is not an {@link Double}
+     * @throws ClassCastException if the entry is not an {@link Long}
      * @throws NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
-        return get(name, Double.class);
+        return Objects.requireNonNull(get(name, Double.class));
     }
 
     /**
@@ -207,8 +210,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link String}
      */
-    @Nullable
-    public String getString(String name) {
+    public @Nullable String getString(String name) {
         return get(name, String.class);
     }
 
@@ -219,7 +221,7 @@ public class Configuration {
      * @throws ClassCastException if the entry is not an {@link String}
      */
     public String getString(String name, String defaultValue) {
-        return get(name, String.class, defaultValue);
+        return get(name, defaultValue);
     }
 
     /**
@@ -239,8 +241,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link List}
      */
-    @Nullable
-    public List<Object> getList(String name) {
+    public @Nullable List<Object> getList(String name) {
         return getList(name, Object.class);
     }
 
@@ -268,7 +269,7 @@ public class Configuration {
 
     /**
      * Returns a list of strings for the given name.
-     *
+     * <p>
      * In contrast to the other methods, this method does not throw an exception if the entry does
      * not
      * exist in the configuration. Instead, it returns an empty list.
@@ -296,8 +297,7 @@ public class Configuration {
      * @param defaultValue a default value
      * @throws ClassCastException if the given entry has non-string elements
      */
-    @NonNull
-    public String[] getStringArray(String name, @NonNull String[] defaultValue) {
+    public String[] getStringArray(String name, String[] defaultValue) {
         if (exists(name)) {
             return getStringList(name).toArray(String[]::new);
         } else
@@ -334,15 +334,13 @@ public class Configuration {
     /**
      * Returns the meta data corresponding to the given entry.
      */
-    @Nullable
-    public ConfigurationMeta getMeta(String name) {
+    public @Nullable ConfigurationMeta getMeta(String name) {
         return meta.get(name);
     }
 
     /**
      * Returns the meta data corresponding to the given entry, creates the entry if not existing.
      */
-    @NonNull
     private ConfigurationMeta getOrCreateMeta(String name) {
         return Objects.requireNonNull(meta.putIfAbsent(name, new ConfigurationMeta()));
     }
@@ -350,7 +348,7 @@ public class Configuration {
     /**
      * @see #getTable(String)
      */
-    public Configuration getSection(String name) {
+    public @Nullable Configuration getSection(String name) {
         return getTable(name);
     }
 
@@ -362,46 +360,46 @@ public class Configuration {
         if (!exists(name) && createIfNotExists) {
             set(name, new Configuration());
         }
-        return getSection(name);
+        return Objects.requireNonNull(getSection(name));
     }
 
-    public Object set(String name, Object obj) {
+    public @Nullable Object set(String name, Object obj) {
         return data.put(name, obj);
     }
 
-    public Object set(String name, Boolean obj) {
+    public @Nullable Object set(String name, Boolean obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, String obj) {
+    public @Nullable Object set(String name, String obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, Long obj) {
+    public @Nullable Object set(String name, Long obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, int obj) {
+    public @Nullable Object set(String name, int obj) {
         return set(name, (long) obj);
     }
 
-    public Object set(String name, Double obj) {
+    public @Nullable Object set(String name, Double obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, Configuration obj) {
+    public @Nullable Object set(String name, Configuration obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, List<?> obj) {
+    public @Nullable Object set(String name, List<?> obj) {
         return set(name, (Object) obj);
     }
 
-    public Object set(String name, String[] seq) {
+    public @Nullable Object set(String name, String[] seq) {
         return set(name, (Object) Arrays.asList(seq));
     }
 
-    public Set<Map.Entry<String, Object>> getEntries() {
+    public Set<Map.Entry<@KeyFor("this.data") String, Object>> getEntries() {
         return data.entrySet();
     }
 
@@ -420,17 +418,22 @@ public class Configuration {
     }
 
     // TODO Add documentation for this.
+
     /**
      * POJO for metadata of configuration entries.
      */
     public static class ConfigurationMeta {
-        /** Position of declaration within a file */
-        private Position position;
+        /**
+         * Position of declaration within a file
+         */
+        private @Nullable Position position;
 
-        /** documentation given in the file */
-        private String documentation;
+        /**
+         * documentation given in the file
+         */
+        private @Nullable String documentation;
 
-        public Position getPosition() {
+        public @Nullable Position getPosition() {
             return position;
         }
 
@@ -438,7 +441,7 @@ public class Configuration {
             this.position = position;
         }
 
-        public String getDocumentation() {
+        public @Nullable String getDocumentation() {
             return documentation;
         }
 
@@ -567,7 +570,7 @@ public class Configuration {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (!(o instanceof Configuration that))

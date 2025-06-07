@@ -18,6 +18,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Complete this class if you want to add support for the JML \real type.
  *
@@ -83,8 +85,7 @@ public final class RealLDT extends LDT {
     public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 
@@ -95,13 +96,13 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(Term t, ExtList children, Services services) {
         return null;
     }
 
 
     @Override
-    public Type getType(Term t) {
+    public @Nullable Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_REAL;
         } else {

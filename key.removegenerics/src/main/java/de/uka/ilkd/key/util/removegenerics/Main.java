@@ -13,6 +13,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.util.removegenerics.monitor.ConsoleGenericRemoverMonitor;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * That's the entry point when the transformation is to be applied outside from the KeY-tool.
  *
@@ -54,7 +56,7 @@ public class Main {
      * @param args
      * @throws Exception if something goes wrong like opening a file etc.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String @NonNull [] args) throws Exception {
 
         System.out.println("Version - 071019 - 1546");
 
@@ -122,7 +124,7 @@ public class Main {
         System.exit(0);
     }
 
-    private static List<String> addLinesFromFile(String file) throws IOException {
+    private static @NonNull List<String> addLinesFromFile(String file) throws IOException {
         List<String> files = new LinkedList<>();
         BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8));
 

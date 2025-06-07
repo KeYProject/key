@@ -11,6 +11,8 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The purpose of this class is to write rule-independent data to the filesystem, that is obtained
  * from a {@link DataRecordingStrategy} run.
@@ -19,13 +21,13 @@ public class RuleIndependentData {
 
     private static final String APPLY_STRATEGY_DURATION = "applyStrategyDuration";
 
-    private final File ruleIndependentDataDir;
+    private final @NonNull File ruleIndependentDataDir;
 
-    private final File totalTimesFile;
+    private final @NonNull File totalTimesFile;
 
     private final Properties totalTimesData = new Properties();
 
-    private RuleIndependentData(ProfilingDirectories directories) {
+    private RuleIndependentData(@NonNull ProfilingDirectories directories) {
         ruleIndependentDataDir = directories.ruleIndependentDataDir;
         totalTimesFile = new File(ruleIndependentDataDir, "totaltimes.properties");
 
@@ -51,7 +53,8 @@ public class RuleIndependentData {
         totalTimesData.setProperty(key, value + "");
     }
 
-    private void addTotalDurationAndInvocations(String functionName, FunctionPerformanceData data) {
+    private void addTotalDurationAndInvocations(String functionName,
+            @NonNull FunctionPerformanceData data) {
         add(functionName + "Invocations", data.totalInvocations);
         add(functionName + "Duration", data.totalDuration);
     }
@@ -106,7 +109,7 @@ public class RuleIndependentData {
      * {@link DataRecordingStrategy}.
      */
     public static void updateData(long applyStrategyDuration,
-            DataRecordingStrategy dataRecordingStrategy) {
+            @NonNull DataRecordingStrategy dataRecordingStrategy) {
         RuleIndependentData t = new RuleIndependentData(
             dataRecordingStrategy.dataRecordingTestFile.getProfileDirectories());
 

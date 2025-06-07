@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,7 +141,7 @@ public class HTMLSyntaxHighlighter {
      *
      * @param document The {@link HTMLDocument}
      */
-    public static void addCSSRulesTo(HTMLDocument document) {
+    public static void addCSSRulesTo(@NonNull HTMLDocument document) {
         document.getStyleSheet().addRule("""
                 .prop_logic_highlight { color: #000000; font-weight: bold; }
                 .dynamic_logic_highlight { color: #0000C0; font-weight: bold; }
@@ -161,7 +162,7 @@ public class HTMLSyntaxHighlighter {
      *        highlighting.
      * @return A HTML version of the input String with added syntax highlighting.
      */
-    public static String process(String plainTextString, Node displayedNode) {
+    public static String process(@NonNull String plainTextString, @NonNull Node displayedNode) {
         try {
             // NOTE: Highlighting program variables is the most expensive operation.
             // There are at least two options to do this:
@@ -212,8 +213,8 @@ public class HTMLSyntaxHighlighter {
      * @param programVariables The program variables to highlight.
      * @return The input String augmented by syntax highlighting tags.
      */
-    private static String addSyntaxHighlighting(String htmlString,
-            Iterable<? extends IProgramVariable> programVariables) {
+    private static @NonNull String addSyntaxHighlighting(String htmlString,
+            @NonNull Iterable<? extends IProgramVariable> programVariables) {
 
         htmlString = PROP_LOGIC_KEYWORDS_PATTERN.matcher(htmlString)
                 .replaceAll(PROP_LOGIC_KEYWORDS_REPLACEMENT);
@@ -262,7 +263,7 @@ public class HTMLSyntaxHighlighter {
      * @param plainTextString The String to transform.
      * @return A HTML-compatible version of plainTextString.
      */
-    public static String toHTML(String plainTextString) {
+    public static @NonNull String toHTML(@NonNull String plainTextString) {
         return LogicPrinter.escapeHTML(plainTextString, true);
     }
 
@@ -274,7 +275,7 @@ public class HTMLSyntaxHighlighter {
      * @param strings Strings to concatenate.
      * @return The concatenated array, elements separated by the given delimiter.
      */
-    private static String concat(String delim, Iterable<?> strings) {
+    private static String concat(@NonNull String delim, @NonNull Iterable<?> strings) {
         return concat(delim, strings, Object::toString);
     }
 
@@ -288,8 +289,8 @@ public class HTMLSyntaxHighlighter {
      *        performed.
      * @return The concatenated array, elements separated by the given delimiter.
      */
-    private static String concat(String delim, Iterable<?> strings,
-            StringTransformer strTransformer) {
+    private static String concat(@NonNull String delim, @NonNull Iterable<?> strings,
+            @NonNull StringTransformer strTransformer) {
         StringBuilder sb = new StringBuilder();
         boolean loopEntered = false;
         for (Object str : strings) {
@@ -322,7 +323,7 @@ public class HTMLSyntaxHighlighter {
      */
     public static final class Args {
         /** The node */
-        public final WeakReference<Node> node;
+        public final @NonNull WeakReference<Node> node;
         /** The printed node */
         public final String text;
         /** whether to use html highlighting */
@@ -335,7 +336,7 @@ public class HTMLSyntaxHighlighter {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (this == o) {
                 return true;
             }

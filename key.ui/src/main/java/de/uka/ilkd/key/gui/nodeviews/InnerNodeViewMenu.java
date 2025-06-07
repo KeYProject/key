@@ -5,6 +5,8 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The menu shown by a {@link InnerNodeViewListener} when the user clicks on an
  * {@link InnerNodeView}.
@@ -23,7 +25,7 @@ public class InnerNodeViewMenu extends SequentViewMenu<InnerNodeView> {
      * @param sequentView the SequentView that is the parent of this menu
      * @param pos the PosInSequent
      */
-    InnerNodeViewMenu(InnerNodeView sequentView, PosInSequent pos) {
+    InnerNodeViewMenu(@NonNull InnerNodeView sequentView, @NonNull PosInSequent pos) {
         super(sequentView, pos);
 
         createMenu(new MenuControl());

@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Int literal.
  *
@@ -27,7 +29,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
     /**
      * Textual representation of the value as a decimal number.
      */
-    private final String valueStr;
+    private final @NonNull String valueStr;
 
     /**
      * The actual value of the literal.
@@ -69,19 +71,19 @@ public class IntLiteral extends AbstractIntegerLiteral {
      * @throws NumberFormatException if the given String does not represent a syntactically valid
      *         literal or represents a value out of int range
      */
-    public IntLiteral(ExtList children, String valStr) {
+    public IntLiteral(@NonNull ExtList children, String valStr) {
         super(children);
         this.value = parseFromString(valStr);
         this.valueStr = Long.toString(value).intern();
     }
 
     @Override
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnIntLiteral(this);
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @NonNull KeYJavaType getKeYJavaType(@NonNull Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
     }
 
@@ -91,7 +93,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
     }
 
     @Override
-    public String getValueString() {
+    public @NonNull String getValueString() {
         return valueStr;
     }
 

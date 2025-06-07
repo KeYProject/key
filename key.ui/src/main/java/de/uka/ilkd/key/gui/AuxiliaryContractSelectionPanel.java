@@ -15,6 +15,8 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This panel used to select which {@code T}(s) to use for a {@link AbstractAuxiliaryContractRule}.
  *
@@ -114,7 +116,7 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
         updateUI();
     }
 
-    public T getContract() {
+    public @NonNull T getContract() {
         final List<T> selection = contractList.getSelectedValuesList();
         return computeContract(services, selection);
     }

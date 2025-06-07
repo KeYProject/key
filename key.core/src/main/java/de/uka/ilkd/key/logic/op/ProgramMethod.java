@@ -267,7 +267,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (!(obj instanceof IProgramMethod ipm)) {
             return false;
         }

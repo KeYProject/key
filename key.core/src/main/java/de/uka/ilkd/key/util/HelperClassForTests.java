@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -39,6 +40,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
@@ -109,7 +112,7 @@ public class HelperClassForTests {
      *        value.
      * @return {@code true} one step simplification is enabled, {@code false} if disabled.
      */
-    public static boolean isOneStepSimplificationEnabled(Proof proof) {
+    public static boolean isOneStepSimplificationEnabled(@Nullable Proof proof) {
         StrategyProperties props;
         if (proof != null && !proof.isDisposed()) {
             props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
@@ -118,7 +121,8 @@ public class HelperClassForTests {
                 ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
         }
 
-        return props.get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
+        return Objects.equals(props.get(StrategyProperties.OSS_OPTIONS_KEY),
+            StrategyProperties.OSS_ON);
     }
 
     /**
@@ -215,7 +219,7 @@ public class HelperClassForTests {
                 IObserverFunction target =
                     CollectionUtil.search(targets,
                         element -> targetName.equals(element.toString()));
-                // Assert.assertNotNull(target);
+                assert target != null;
                 // Find first contract.
                 ImmutableSet<Contract> contracts =
                     environment.getSpecificationRepository().getContracts(containerKJT, target);
@@ -299,11 +303,13 @@ public class HelperClassForTests {
                 element -> methodFullName.equals(element.getFullName()));
         }
         // Assert.assertNotNull(pm);
-        return pm;
+        return Objects.requireNonNull(pm);
     }
 
     public static Services createServices(Path keyFile) {
-        JavaInfo javaInfo = new HelperClassForTests().parse(keyFile).getFirstProof().getJavaInfo();
+        Proof proof = new HelperClassForTests().parse(keyFile).getFirstProof();
+        assert proof != null;
+        JavaInfo javaInfo = proof.getJavaInfo();
         return javaInfo.getServices();
     }
 

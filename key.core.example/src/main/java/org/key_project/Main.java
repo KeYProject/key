@@ -23,6 +23,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -52,14 +54,12 @@ public class Main {
         }
     }
 
-    /**
-     * sets up the environment with the Java project described by its location
-     *
-     * @param location the Path with the path to the source directory of the Java project
-     *        to be verified
-     * @return the {@KeYEnvironment} that provides the context for all following verification tasks
-     * @throws ProblemLoaderException if the setup fails
-     */
+    /// sets up the environment with the Java project described by its location
+    ///
+    /// @param location the Path with the path to the source directory of the Java project
+    /// to be verified
+    /// @return the [KeYEnvironment] that provides the context for all following verification tasks
+    /// @throws ProblemLoaderException if the setup fails
     private static KeYEnvironment<?> setupEnvironment(Path location) throws ProblemLoaderException {
         List<Path> classPaths = null; // Optionally: Additional specifications for API classes
         Path bootClassPath = null; // Optionally: Different default specifications for Java API
@@ -77,10 +77,8 @@ public class Main {
         newSettings.putAll(MiscTools.getDefaultTacletOptions());
         choiceSettings.setDefaultChoices(newSettings);
         // Load source code
-        KeYEnvironment<?> env =
-            KeYEnvironment.load(location, classPaths, bootClassPath, includes);
+        return KeYEnvironment.load(location, classPaths, bootClassPath, includes);
         // env.getLoadedProof() returns performed proof if a *.proof file is loaded
-        return env;
     }
 
     /**
@@ -93,7 +91,7 @@ public class Main {
             final List<Contract> proofContracts = getContracts(env);
 
             for (Contract contract : proofContracts) {
-                LOGGER.info("Found contract '" + contract.getDisplayName());
+                LOGGER.info("Found contract '{}'", contract.getDisplayName());
                 proveContract(env, contract);
             }
         } finally {
@@ -166,9 +164,8 @@ public class Main {
             env.getUi().getProofControl().startAndWaitForAutoMode(proof);
             // Show proof result
             boolean closed = proof.openGoals().isEmpty();
-            LOGGER.info("Contract '" + contract.getDisplayName() + "' of "
-                + contract.getTarget() + " is " + (closed ? "verified" : "still open")
-                + ".");
+            LOGGER.info("Contract '{}' of {} is {}.", contract.getDisplayName(),
+                contract.getTarget(), closed ? "verified" : "still open");
         } catch (ProofInputException e) {
             LOGGER.error("Exception at {} of {}", contract.getDisplayName(),
                 contract.getTarget());

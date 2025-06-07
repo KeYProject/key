@@ -22,7 +22,7 @@ import org.jspecify.annotations.NonNull;
 
 public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 
-    private final TermFeature tf;
+    private final @NonNull TermFeature tf;
 
     private SeqContainsExecutableCodeFeature(boolean considerQueries) {
         if (considerQueries) {
@@ -38,13 +38,14 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 
     @Override
     protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+            PosInOccurrence pos, @NonNull Goal goal,
+            MutableState mState) {
         final Services services = (Services) goal.proof().getServices();
         return containsExec(goal.sequent().succedent().iterator(), mState, services)
                 || containsExec(goal.sequent().antecedent().iterator(), mState, services);
     }
 
-    private boolean containsExec(Iterator<SequentFormula> it, MutableState mState,
+    private boolean containsExec(@NonNull Iterator<SequentFormula> it, MutableState mState,
             Services services) {
         while (it.hasNext()) {
             if (tf.compute(it.next().formula(), mState, services)

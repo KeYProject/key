@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This variable condition checks if a context is affected by the strictfp modifier
@@ -31,7 +33,8 @@ public final class InStrictFp extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate,
+            @NonNull SVInstantiations instMap,
             Services services) {
 
         ExecutionContext ec = instMap.getExecutionContext();
@@ -60,7 +63,7 @@ public final class InStrictFp extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String prefix = negated ? "\\not" : "";
         return prefix + "\\isStrictFp";
     }

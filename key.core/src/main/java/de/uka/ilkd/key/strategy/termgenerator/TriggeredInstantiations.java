@@ -39,15 +39,17 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 public class TriggeredInstantiations implements TermGenerator<Goal> {
 
-    public static TermGenerator<Goal> create(boolean skipConditions) {
+    public static @NonNull TermGenerator<Goal> create(boolean skipConditions) {
         return new TriggeredInstantiations(skipConditions);
     }
 
-    private Sequent last = JavaDLSequentKit.getInstance().getEmptySequent();
-    private Set<Term> lastCandidates = new HashSet<>();
-    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
+    private @NonNull Sequent last = JavaDLSequentKit.getInstance().getEmptySequent();
+    private @NonNull Set<Term> lastCandidates = new HashSet<>();
+    private @NonNull ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
 
     private final boolean checkConditions;
 
@@ -63,8 +65,9 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
      * Generates all instances
      */
     @Override
-    public Iterator<org.key_project.logic.Term> generate(RuleApp app, PosInOccurrence pos,
-            Goal goal,
+    public @NonNull Iterator<org.key_project.logic.Term> generate(RuleApp app,
+            @NonNull PosInOccurrence pos,
+            @NonNull Goal goal,
             MutableState mState) {
         if (app instanceof TacletApp tapp) {
 
@@ -137,24 +140,28 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
 
     }
 
-    private Term instantiateTerm(final Term term, final Services services,
-            SVInstantiations svInst) {
+    private @NonNull Term instantiateTerm(final @NonNull Term term,
+            final @NonNull Services services,
+            @NonNull SVInstantiations svInst) {
         final SyntacticalReplaceVisitor syn = new SyntacticalReplaceVisitor(new TermLabelState(),
             svInst, services);
         term.execPostOrder(syn);
         return syn.getTerm();
     }
 
-    private void computeAxiomAndCandidateSets(final Sequent seq, final Set<Term> terms,
-            final Set<Term> axioms, Services services) {
+    private void computeAxiomAndCandidateSets(final @NonNull Sequent seq,
+            final @NonNull Set<Term> terms,
+            final @NonNull Set<Term> axioms, @NonNull Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.antecedent(), true, services);
         collectAxiomsAndCandidateTerms(terms, axioms, integerLDT, seq.succedent(), false, services);
     }
 
-    private void collectAxiomsAndCandidateTerms(final Set<Term> terms, final Set<Term> axioms,
-            final IntegerLDT integerLDT, Semisequent antecedent, boolean inAntecedent,
-            TermServices services) {
+    private void collectAxiomsAndCandidateTerms(final @NonNull Set<Term> terms,
+            final @NonNull Set<Term> axioms,
+            final @NonNull IntegerLDT integerLDT, @NonNull Semisequent antecedent,
+            boolean inAntecedent,
+            @NonNull TermServices services) {
 
         for (SequentFormula sf : antecedent) {
             Term formula = (Term) sf.formula();
@@ -168,7 +175,7 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
     }
 
     private boolean isAvoidConditionProvable(Term cond, ImmutableSet<Term> axioms,
-            Services services) {
+            @NonNull Services services) {
 
         long cost = PredictCostProver.computerInstanceCost(
             new Substitution(DefaultImmutableMap.nilMap()), cond,
@@ -178,10 +185,12 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
         return cost == -1;
     }
 
-    private HashSet<org.key_project.logic.Term> computeInstances(Services services,
+    private @NonNull HashSet<org.key_project.logic.Term> computeInstances(
+            @NonNull Services services,
             final Term comprehension,
-            final Metavariable mv, final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms,
-            TacletApp app) {
+            final Metavariable mv, final Term trigger, @NonNull Set<Term> terms,
+            ImmutableSet<Term> axioms,
+            @NonNull TacletApp app) {
 
         final HashSet<org.key_project.logic.Term> instances = new HashSet<>();
         final HashSet<Term> alreadyChecked = new HashSet<>();
@@ -212,8 +221,9 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
         return instances;
     }
 
-    private ImmutableList<Term> instantiateConditions(Services services, TacletApp app,
-            final Term middle) {
+    private @NonNull ImmutableList<Term> instantiateConditions(@NonNull Services services,
+            @NonNull TacletApp app,
+            final @NonNull Term middle) {
         ImmutableList<Term> conditions;
         conditions = ImmutableSLList.nil();
         for (var singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {
@@ -225,7 +235,8 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
         return conditions;
     }
 
-    private void collectTerms(Term instanceCandidate, Set<Term> terms, IntegerLDT intLDT) {
+    private void collectTerms(@NonNull Term instanceCandidate, @NonNull Set<Term> terms,
+            @NonNull IntegerLDT intLDT) {
         if (instanceCandidate.freeVars().isEmpty()
                 && !instanceCandidate.containsJavaBlockRecursive()) {
             terms.add(instanceCandidate);

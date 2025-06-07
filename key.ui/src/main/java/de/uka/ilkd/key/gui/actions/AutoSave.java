@@ -10,11 +10,13 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NonNull;
+
 public class AutoSave extends MainWindowAction {
     private static final long serialVersionUID = -2598146925208531491L;
     public static final int DEFAULT_PERIOD = 2000;
 
-    public AutoSave(MainWindow mainWindow) {
+    public AutoSave(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Proofs will be automatically saved to +" + IOUtil.getTempDirectory()
             + "periodically and when finished.");

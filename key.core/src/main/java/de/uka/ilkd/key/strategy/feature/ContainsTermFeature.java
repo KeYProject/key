@@ -51,7 +51,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    public static Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
+    public static @NonNull Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
         return new ContainsTermFeature(proj1, proj2);
     }
 
@@ -87,7 +87,7 @@ public class ContainsTermFeature implements Feature {
         }
 
         @Override
-        public void visit(Term visited) {
+        public void visit(@NonNull Term visited) {
             found = found || RENAMING_TERM_PROPERTY.equalsModThisProperty(visited, term);
         }
 

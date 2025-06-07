@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,18 +37,18 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      */
     private final boolean throwDirect;
 
-    private final Logger logger;
+    private final @Nullable Logger logger;
 
-    public SyntaxErrorReporter(Logger logger, boolean throwDirect) {
+    public SyntaxErrorReporter(@Nullable Logger logger, boolean throwDirect) {
         this.logger = logger;
         this.throwDirect = throwDirect;
     }
 
-    public SyntaxErrorReporter(Class<?> loggerCategory) {
+    public SyntaxErrorReporter(@Nullable Class<?> loggerCategory) {
         this(loggerCategory, false);
     }
 
-    public SyntaxErrorReporter(Class<?> loggerCategory, boolean throwDirect) {
+    public SyntaxErrorReporter(@Nullable Class<?> loggerCategory, boolean throwDirect) {
         this(loggerCategory != null ? LoggerFactory.getLogger(loggerCategory) : null, throwDirect);
     }
 
@@ -88,7 +87,6 @@ public class SyntaxErrorReporter extends BaseErrorListener {
     /**
      * Throws an exception if an error has occured.
      *
-     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
      * @see #hasErrors()
      */
     public void throwException() {
@@ -102,7 +100,6 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * Throws an exception if an error has occured, like {@link #throwException()}, but with an
      * beautiful exception message based on input {@code lines}.
      *
-     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
      * @see #hasErrors()
      */
     public void throwException(String[] lines) {
@@ -117,7 +114,6 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * Throws an exception if an error has occured, like {@link #throwException()}, but with an
      * beautiful exception message based on input {@code lines}.
      *
-     * @throws de.uka.ilkd.key.parser.proofjava.ParseException
      * @see #hasErrors()
      */
     public void throwException(Supplier<String[]> lines) {
@@ -137,11 +133,11 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         final Token offendingSymbol;
         final int charPositionInLine;
         final String msg;
-        final URI source;
+        final @Nullable URI source;
         final String stack;
 
         public SyntaxError(Recognizer<?, ?> recognizer, int line, Token offendingSymbol,
-                int charPositionInLine, String msg, URI source, String stack) {
+                int charPositionInLine, String msg, @Nullable URI source, String stack) {
             this.recognizer = recognizer;
             this.line = line;
             this.offendingSymbol = offendingSymbol;
@@ -192,9 +188,9 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         }
 
         @Override
-        public Location getLocation() throws MalformedURLException {
+        public @Nullable Location getLocation() {
             if (!errors.isEmpty()) {
-                SyntaxError e = errors.get(0);
+                SyntaxError e = errors.getFirst();
                 // e.charPositionInLine is 0 based!
                 return new Location(e.source,
                     Position.fromOneZeroBased(e.line, e.charPositionInLine));

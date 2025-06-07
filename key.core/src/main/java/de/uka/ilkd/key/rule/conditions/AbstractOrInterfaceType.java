@@ -11,6 +11,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This variable condition checks if a given type denotes an abstract class or interface type.
@@ -46,7 +48,7 @@ public final class AbstractOrInterfaceType extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         String prefix = negated ? "\\not" : "";
         return prefix + "\\isAbstractOrInterface (" + resolver + ")";
     }

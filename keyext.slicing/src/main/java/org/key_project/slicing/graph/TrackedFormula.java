@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A sequent formula tracked by the dependency graph.
  * The position in the sequent (antecedent / succedent)
@@ -61,12 +63,12 @@ public class TrackedFormula extends GraphNode {
     }
 
     @Override
-    public GraphNode popLastBranchID() {
+    public @NonNull GraphNode popLastBranchID() {
         return new TrackedFormula(formula, branchLocation.removeLast(), inAntec, services);
     }
 
     @Override
-    public String toString(boolean abbreviated, boolean omitBranch) {
+    public @NonNull String toString(boolean abbreviated, boolean omitBranch) {
         if (abbreviated) {
             return Integer.toHexString(hashCode());
         }
@@ -83,7 +85,7 @@ public class TrackedFormula extends GraphNode {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (this == o) {
             return true;
         }

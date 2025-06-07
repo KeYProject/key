@@ -12,6 +12,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Adds the hit count functionality to an {@link AbstractBreakpoint}.
  *
@@ -52,7 +54,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      *
      * @return true if the Hitcount is exceeded or the {@link LineBreakpoint} has no Hitcount.
      */
-    protected boolean hitcountExceeded(Node node) {
+    protected boolean hitcountExceeded(@NonNull Node node) {
         if (!(hitCount == -1)) {
             if (!hittedNodes.containsKey(node.serialNr())) {
                 if (hitCount == hitted + 1) {

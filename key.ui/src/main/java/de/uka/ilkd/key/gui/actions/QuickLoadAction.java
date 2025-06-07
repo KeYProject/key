@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Load the file saved at the location described by {@link QuickSaveAction}. Use the F6 key to
  * access this feature.
@@ -23,7 +25,7 @@ public class QuickLoadAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public QuickLoadAction(MainWindow mainWindow) {
+    public QuickLoadAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName("Quickload");
         setTooltip("Load previously quicksaved file");
@@ -35,7 +37,7 @@ public class QuickLoadAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
-    public static void quickLoad(MainWindow mainWindow) {
+    public static void quickLoad(@NonNull MainWindow mainWindow) {
         final String filename = QuickSaveAction.QUICK_SAVE_PATH;
         mainWindow.loadProblem(Paths.get(filename));
     }

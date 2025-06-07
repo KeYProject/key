@@ -41,6 +41,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPos
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link IExecutionOperationContract}.
  *
@@ -56,12 +59,12 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     /**
      * The result {@link Term} used by the applied {@link Contract}.
      */
-    private Term resultTerm;
+    private @Nullable Term resultTerm;
 
     /**
      * The self {@link Term} or {@code null} if not available.
      */
-    private Term selfTerm;
+    private @Nullable Term selfTerm;
 
     /**
      * The current contract parameters.
@@ -75,7 +78,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public ExecutionOperationContract(ITreeSettings settings, Node proofNode) {
+    public ExecutionOperationContract(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -83,7 +86,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    protected String lazyComputeName() throws ProofInputException {
+    protected @Nullable String lazyComputeName() throws ProofInputException {
         if (!isDisposed()) {
             final Services services = getServices();
             // Make sure that the contract is compatible
@@ -145,8 +148,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @param services The {@link Services} to use.
      * @return The found self {@link Term} or {@code null} if not available.
      */
-    protected Term searchConstructorSelfDefinition(Term term, KeYJavaType staticType,
-            Services services) {
+    protected @Nullable Term searchConstructorSelfDefinition(@NonNull Term term,
+            KeYJavaType staticType,
+            @NonNull Services services) {
         if (term.op() == Junctor.NOT && term.sub(0).op() == Equality.EQUALS
                 && term.sub(0).sub(0).op() instanceof LocationVariable
                 && SymbolicExecutionUtil.isNullSort(term.sub(0).sub(1).sort(), services)
@@ -219,7 +223,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public String getFormatedResultTerm() throws ProofInputException {
+    public @Nullable String getFormatedResultTerm() throws ProofInputException {
         Term resultTerm = getResultTerm();
         return resultTerm != null ? formatTerm(resultTerm, getServices()) : null;
     }
@@ -228,7 +232,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public String getFormatedExceptionTerm() throws ProofInputException {
+    public @Nullable String getFormatedExceptionTerm() throws ProofInputException {
         Term exceptionTerm = getExceptionTerm();
         return exceptionTerm != null ? formatTerm(exceptionTerm, getServices()) : null;
     }
@@ -237,7 +241,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public String getFormatedSelfTerm() throws ProofInputException {
+    public @Nullable String getFormatedSelfTerm() throws ProofInputException {
         Term selfTerm = getSelfTerm();
         return selfTerm != null ? formatTerm(selfTerm, getServices()) : null;
     }
@@ -246,7 +250,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public String getFormatedContractParams() throws ProofInputException {
+    public @Nullable String getFormatedContractParams() throws ProofInputException {
         ImmutableList<Term> contractParams = getContractParams();
         if (contractParams != null && !contractParams.isEmpty()) {
             StringBuilder sb = new StringBuilder();
@@ -273,8 +277,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @param services The {@link Services}.
      * @return The found result {@link Term} or {@code null} otherwise.
      */
-    protected Term searchResultTerm(FunctionalOperationContract contract, Instantiation inst,
-            Services services) {
+    protected @Nullable Term searchResultTerm(@NonNull FunctionalOperationContract contract,
+            @NonNull Instantiation inst,
+            @NonNull Services services) {
         Term resultTerm = null;
         if (contract.hasResultVar()) {
             ProgramVariable resultVar =
@@ -297,8 +302,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * @param services The {@link Services} to use.
      * @return The found {@link LocationVariable} or {@code null} if not found.
      */
-    protected static LocationVariable extractResultVariableFromPostBranch(Node node,
-            Services services) {
+    protected static @Nullable LocationVariable extractResultVariableFromPostBranch(
+            @NonNull Node node,
+            @NonNull Services services) {
         Term postModality = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node,
             node.getAppliedRuleApp().posInOccurrence(), node.child(0));
         postModality = TermBuilder.goBelowUpdates(postModality);
@@ -318,7 +324,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public Contract getContract() {
+    public @NonNull Contract getContract() {
         return ((AbstractContractRuleApp) getProofNode().getAppliedRuleApp()).getInstantiation();
     }
 
@@ -326,7 +332,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public IProgramMethod getContractProgramMethod() {
+    public @Nullable IProgramMethod getContractProgramMethod() {
         Contract contract = getContract();
         if (contract instanceof OperationContract) {
             return ((OperationContract) contract).getTarget();
@@ -339,7 +345,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    public String getElementType() {
+    public @NonNull String getElementType() {
         return "Operation Contract";
     }
 
@@ -347,7 +353,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint[] lazyComputeConstraints() {
+    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 

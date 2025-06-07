@@ -12,6 +12,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides static utility methods to get the following service:
  * <ul>
@@ -91,7 +93,7 @@ public final class ProofInitServiceUtil {
      * @return The {@link Profile} with the given name for usage in the {@link Thread} of the user
      *         interface or {@code null} if not available.
      */
-    public static Profile getDefaultProfile(String profileName) {
+    public static @Nullable Profile getDefaultProfile(String profileName) {
         DefaultProfileResolver resolver =
             getDefaultProfileResolver(profileName);
         if (resolver != null) {
@@ -107,7 +109,7 @@ public final class ProofInitServiceUtil {
      * @param profileName The name of the profile.
      * @return The corresponding {@link DefaultProfileResolver} or {@code null} if not available.
      */
-    public static DefaultProfileResolver getDefaultProfileResolver(String profileName) {
+    public static @Nullable DefaultProfileResolver getDefaultProfileResolver(String profileName) {
         return resolver.get(profileName);
     }
 

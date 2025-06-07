@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 import org.key_project.logic.Visitor;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Simple visitor to find instances of non-model {@link ProgramMethod} in terms.
  *
@@ -27,7 +29,7 @@ public class ProgramMethodFinder implements Visitor<Term> {
     }
 
     @Override
-    public void visit(Term visited) {
+    public void visit(@NonNull Term visited) {
         if (visited.op() instanceof ProgramMethod pm) {
             if (!pm.isModel()) {
                 foundProgramMethod = true;

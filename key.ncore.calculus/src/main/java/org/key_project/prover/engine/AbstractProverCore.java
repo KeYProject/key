@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
+
 /// Common class for provers which takes care of listener registration and task event propagation.
 ///
 /// @author Richard Bubel

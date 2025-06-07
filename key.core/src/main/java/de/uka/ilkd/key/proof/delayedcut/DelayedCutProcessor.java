@@ -26,6 +26,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * This class is responsible for processing the delayed cut. The information about the cut is stored
@@ -87,7 +90,7 @@ public class DelayedCutProcessor implements Runnable {
         listeners.remove(listener);
     }
 
-    public static List<ApplicationCheck> getApplicationChecks() {
+    public static @NonNull List<ApplicationCheck> getApplicationChecks() {
         List<ApplicationCheck> list = new LinkedList<>();
         list.add(new ApplicationCheck.NoNewSymbolsCheck());
         return list;
@@ -101,7 +104,7 @@ public class DelayedCutProcessor implements Runnable {
         this.mode = mode;
     }
 
-    private Goal find(Proof proof, Node node) {
+    private @Nullable Goal find(@NonNull Proof proof, Node node) {
         for (Goal goal : proof.openGoals()) {
             if (goal.node() == node) {
                 return goal;
@@ -110,7 +113,7 @@ public class DelayedCutProcessor implements Runnable {
         return null;
     }
 
-    public DelayedCut cut() {
+    public @NonNull DelayedCut cut() {
         if (used) {
             throw new IllegalStateException(
                 "For each cut a new object of this class must be created.");
@@ -149,12 +152,12 @@ public class DelayedCutProcessor implements Runnable {
         return delayedCut;
     }
 
-    private ImmutableList<Goal> cut(DelayedCut cut) {
+    private @Nullable ImmutableList<Goal> cut(@NonNull DelayedCut cut) {
         Goal goal = find(cut.getProof(), cut.getNode());
 
         TacletFilter filter = new TacletFilter() {
             @Override
-            protected boolean filter(Taclet taclet) {
+            protected boolean filter(org.key_project.prover.rules.Taclet taclet) {
                 return taclet.name().toString().equals(CUT_TACLET);
             }
         };
@@ -169,11 +172,11 @@ public class DelayedCutProcessor implements Runnable {
         return goal.apply(app);
     }
 
-    private ImmutableList<Goal> apply(final String tacletName, Goal goal,
-            PosInOccurrence pio) {
+    private @Nullable ImmutableList<Goal> apply(final String tacletName, @NonNull Goal goal,
+            @NonNull PosInOccurrence pio) {
         TacletFilter filter = new TacletFilter() {
             @Override
-            protected boolean filter(Taclet taclet) {
+            protected boolean filter(@NonNull Taclet taclet) {
                 return taclet.name().toString().equals(tacletName);
             }
         };
@@ -190,7 +193,7 @@ public class DelayedCutProcessor implements Runnable {
     /**
      * Hides the formula that has been added by the hide process.
      */
-    private ImmutableList<Goal> hide(DelayedCut cut, Goal goal) {
+    private @NonNull ImmutableList<Goal> hide(@NonNull DelayedCut cut, @NonNull Goal goal) {
 
         SequentFormula sf =
             getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
@@ -207,7 +210,7 @@ public class DelayedCutProcessor implements Runnable {
      * After applying the cut rule two goal result. The pruned subtree is added to one of these
      * goals. This method finds the the goal.
      */
-    private int getGoalForHiding(ImmutableList<Goal> goals, DelayedCut cut) {
+    private int getGoalForHiding(@NonNull ImmutableList<Goal> goals, @NonNull DelayedCut cut) {
         assert goals.size() == 2;
         Goal[] goal = { goals.head(), goals.tail().head() };
 
@@ -226,11 +229,11 @@ public class DelayedCutProcessor implements Runnable {
             "After a cut a goal belongs to the left or right side of the tree");
     }
 
-    private String getHideTacletName(DelayedCut cut) {
+    private @NonNull String getHideTacletName(@NonNull DelayedCut cut) {
         return cut.isDecisionPredicateInAntecendet() ? HIDE_LEFT_TACLET : HIDE_RIGHT_TACLET;
     }
 
-    private SequentFormula getSequentFormula(Goal goal, boolean decPredInAnte) {
+    private @NonNull SequentFormula getSequentFormula(@NonNull Goal goal, boolean decPredInAnte) {
         return decPredInAnte ? goal.sequent().antecedent().get(DEC_PRED_INDEX)
                 : goal.sequent().succedent().get(DEC_PRED_INDEX);
 
@@ -239,7 +242,8 @@ public class DelayedCutProcessor implements Runnable {
     /**
      * Rebuilds the subtree pruned by the process, that is the rules are replayed.
      */
-    private List<NodeGoalPair> rebuildSubTrees(DelayedCut cut, Goal goal) {
+    private @NonNull List<NodeGoalPair> rebuildSubTrees(@NonNull DelayedCut cut,
+            @NonNull Goal goal) {
         LinkedList<NodeGoalPair> pairs = new LinkedList<>();
         LinkedList<NodeGoalPair> openLeaves = new LinkedList<>();
 
@@ -279,7 +283,8 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
+    private @NonNull LinkedList<Goal> apply(@NonNull Goal goal, RuleApp app,
+            @NonNull TermServices services) {
         if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
             for (var entry : insts.getInstantiationMap()) {
@@ -304,7 +309,8 @@ public class DelayedCutProcessor implements Runnable {
         return goals;
     }
 
-    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, TermServices services) {
+    private @NonNull LinkedList<Goal> apply(@NonNull Node oldNode, @NonNull Goal goal, RuleApp app,
+            @NonNull TermServices services) {
         try {
             return apply(goal, app, services);
         } catch (Throwable e) {
@@ -316,7 +322,8 @@ public class DelayedCutProcessor implements Runnable {
      * Based on an old rule application a new rule application is built. Mainly the position is
      * updated.
      */
-    private RuleApp createNewRuleApp(NodeGoalPair pair, Services services) {
+    private @Nullable RuleApp createNewRuleApp(@NonNull NodeGoalPair pair,
+            @NonNull Services services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
 
         PosInOccurrence newPos = translate(pair, services);
@@ -339,8 +346,8 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private void check(Goal goal, final RuleApp app,
-            PosInOccurrence newPos, Services services) {
+    private void check(@NonNull Goal goal, final RuleApp app, @Nullable PosInOccurrence newPos,
+            @NonNull Services services) {
         if (newPos == null) {
             return;
         }
@@ -388,7 +395,7 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private PosInOccurrence translate(NodeGoalPair pair, TermServices services) {
+    private @Nullable PosInOccurrence translate(@NonNull NodeGoalPair pair, TermServices services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if (oldRuleApp == null || oldRuleApp.posInOccurrence() == null) {
             return null;
@@ -406,8 +413,9 @@ public class DelayedCutProcessor implements Runnable {
      * in the new tree to one object. Return by reference: both <code>pairs</code> and
      * <code>openLeaves</code> are manipulated.
      */
-    private int add(LinkedList<NodeGoalPair> pairs, LinkedList<NodeGoalPair> openLeaves,
-            Iterator<Node> iterator, LinkedList<Goal> goals) {
+    private int add(@NonNull LinkedList<NodeGoalPair> pairs,
+            @NonNull LinkedList<NodeGoalPair> openLeaves,
+            @NonNull Iterator<Node> iterator, @NonNull LinkedList<Goal> goals) {
 
         int leafNumber = 0;
         if (goals.isEmpty()) {
@@ -433,7 +441,8 @@ public class DelayedCutProcessor implements Runnable {
     /**
      * This function uncovers the decision predicate that is hidden after applying the cut rule.
      */
-    private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves) {
+    private void uncoverDecisionPredicate(@NonNull DelayedCut cut,
+            @NonNull List<NodeGoalPair> openLeaves) {
         ImmutableList<NodeGoalPair> list = ImmutableSLList.nil();
         for (NodeGoalPair pair : openLeaves) {
             list =

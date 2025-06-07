@@ -19,6 +19,8 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Action which generates test cases for all open nodes. If the proof is closed, test cases will be
@@ -34,7 +36,7 @@ public class TestGenerationAction extends MainWindowAction implements PropertyCh
     private static final String TOOLTIP_EXTRA = ". Install Z3 to enable this functionality!";
     private boolean haveZ3CE = false;
 
-    public TestGenerationAction(MainWindow mainWindow) {
+    public TestGenerationAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOLTIP);

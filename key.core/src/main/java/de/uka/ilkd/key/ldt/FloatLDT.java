@@ -192,7 +192,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public FloatLiteral translateTerm(Term t, ExtList children, Services services) {
+    public @Nullable FloatLiteral translateTerm(Term t, ExtList children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }
@@ -212,7 +212,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(Term t) {
+    public @Nullable Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_FLOAT;
         } else {

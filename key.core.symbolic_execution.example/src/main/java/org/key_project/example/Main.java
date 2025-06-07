@@ -35,6 +35,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,8 +149,8 @@ public class Main {
      * @param builder The {@link SymbolicExecutionTreeBuilder} providing the root of the symbolic
      *        execution tree.
      */
-    protected static void printSymbolicExecutionTree(String title,
-            SymbolicExecutionTreeBuilder builder) {
+    protected static void printSymbolicExecutionTree(@NonNull String title,
+            @NonNull SymbolicExecutionTreeBuilder builder) {
         System.out.println(title);
         System.out.println(StringUtil.repeat("=", title.length()));
         ExecutionNodePreorderIterator iterator =

@@ -9,6 +9,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class for managing a list of goals on which rules are applied. The class provides methods
@@ -20,7 +21,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
      *
      * @see de.uka.ilkd.key.proof.IGoalChooser#getNextGoal()
      */
-    public Goal getNextGoal() {
+    public @Nullable Goal getNextGoal() {
         Goal result;
 
         if (allGoalsSatisfiable) {
@@ -52,7 +53,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
      * protected static IList<Goal> rotateList ( IList<Goal> p_list ) { if ( p_list.isEmpty() )
      * return ImmSLList.<Goal>nil(); return p_list; }
      */
-    protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
+    protected ImmutableList<Goal> insertNewGoals(@NonNull ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 
         for (final Goal g : newGoals) {
@@ -67,7 +68,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
     }
 
     @Override
-    protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
+    protected void updateGoalListHelp(Object node, @NonNull ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 

@@ -160,7 +160,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, @Nullable Term sub,
             TermServices services, ExecutionContext ec) {
         return op instanceof Singleton || op instanceof SetUnion || op instanceof Intersect
                 || op instanceof SetMinus || op instanceof AllFields;
@@ -188,8 +188,7 @@ public final class LocSetLDT extends LDT {
         } else if (op instanceof AllFields) {
             return allFields;
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 
@@ -204,15 +203,13 @@ public final class LocSetLDT extends LDT {
         if (t.op().equals(empty)) {
             return EmptySetLiteral.LOCSET;
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 
     @Override
     public Type getType(Term t) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override

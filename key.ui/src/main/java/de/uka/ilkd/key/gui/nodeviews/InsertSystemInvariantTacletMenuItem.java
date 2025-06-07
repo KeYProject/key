@@ -18,6 +18,9 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This menu item groups all taclets which allow to insert class invariants
  */
@@ -47,7 +50,7 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
      * @param t the Taclet
      * @return the sequent with the formulas to be added or null
      */
-    protected Sequent checkTaclet(Taclet t) {
+    protected @Nullable Sequent checkTaclet(Taclet t) {
         if (!(t instanceof NoFindTaclet)
                 || !t.displayName().startsWith("Insert implicit invariants of")) {
             return null;
@@ -63,17 +66,17 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
     /**
      * show the taclets sorted
      */
-    protected Collection<TacletAppListItem> createInsertionList() {
+    protected @NonNull Collection<TacletAppListItem> createInsertionList() {
         return new TreeSet<>(new Lexicographical());
     }
 
 
-    public TacletAppListItem createListItem(TacletApp app) {
+    public @NonNull TacletAppListItem createListItem(@NonNull TacletApp app) {
         return new ClassInvAppItem(app, checkTaclet(app.taclet()), notInfo, services);
     }
 
     final static class Lexicographical implements Comparator<TacletAppListItem> {
-        public int compare(TacletAppListItem arg0, TacletAppListItem arg1) {
+        public int compare(@NonNull TacletAppListItem arg0, @NonNull TacletAppListItem arg1) {
 
             return arg0.shortDescription().compareTo(arg1.shortDescription());
         }
@@ -89,12 +92,12 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
             super(app, seq, notInfo, services);
         }
 
-        public String shortDescription() {
+        public @NonNull String shortDescription() {
             final String displayName = getTacletApp().taclet().displayName();
             return displayName.replaceFirst("Insert invariants of ", "");
         }
 
-        public String toString() {
+        public @NonNull String toString() {
             return shortDescription();
         }
     }

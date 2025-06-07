@@ -6,10 +6,12 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.Nullable;
+
 class BreakToBeReplaced {
 
     private final Break brk;
-    private ProgramVariable pvar;
+    private @Nullable ProgramVariable pvar;
 
     public BreakToBeReplaced(Break brk, ProgramVariable pvar) {
         this.brk = brk;
@@ -25,6 +27,7 @@ class BreakToBeReplaced {
         return brk;
     }
 
+    @Nullable
     ProgramVariable getProgramVariable() {
         return pvar;
     }

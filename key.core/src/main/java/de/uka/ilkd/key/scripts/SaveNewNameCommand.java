@@ -20,6 +20,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
  * introduced by the last {@link TacletApp} which matches certain criteria into an abbreviation for
@@ -36,13 +38,13 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+    public Parameters evaluateArguments(@NonNull EngineState state, Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Parameters params,
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Parameters params,
             EngineState stateMap) throws ScriptException, InterruptedException {
 
         if (!params.abbreviation.startsWith("@")) {
@@ -95,6 +97,7 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
         }
     }
 
+    @SuppressWarnings("initialization")
     public static class Parameters {
         @Option(value = "#2", required = true)
         public String abbreviation;
@@ -103,7 +106,7 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "saveNewName";
     }
 }

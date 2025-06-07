@@ -46,6 +46,7 @@ import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,10 +81,10 @@ public class CachingExtension
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
     private ReferenceSearchButton referenceSearchButton;
-    private CachingToggleAction toggleAction = null;
-    private CachingPruneHandler cachingPruneHandler = null;
+    private @Nullable CachingToggleAction toggleAction = null;
+    private @Nullable CachingPruneHandler cachingPruneHandler = null;
 
-    private void initActions(MainWindow mainWindow) {
+    private void initActions(@NonNull MainWindow mainWindow) {
         if (toggleAction == null) {
             toggleAction = new CachingToggleAction(mainWindow);
         }
@@ -99,7 +100,7 @@ public class CachingExtension
     }
 
     @Override
-    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(@NonNull MainWindow mainWindow) {
         initActions(mainWindow);
         JToolBar tb = new JToolBar("Proof Caching");
         JToggleButton comp = new JToggleButton(toggleAction);
@@ -119,7 +120,7 @@ public class CachingExtension
     }
 
     @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
+    public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
         if (p == null || trackedProofs.contains(p)) {
             return;
@@ -179,7 +180,7 @@ public class CachingExtension
     }
 
     @Override
-    public void preInit(MainWindow window, KeYMediator mediator) {
+    public void preInit(MainWindow window, @NonNull KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addKeYSelectionListener(this);
         mediator.getUI().addProverTaskListener(this);
@@ -191,7 +192,7 @@ public class CachingExtension
     }
 
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
+    public void proofDisposing(@NonNull ProofDisposedEvent e) {
         trackedProofs.remove(e.getSource());
     }
 
@@ -221,13 +222,13 @@ public class CachingExtension
     }
 
     @Override
-    public List<JComponent> getStatusLineComponents() {
+    public @NonNull List<JComponent> getStatusLineComponents() {
         referenceSearchButton = new ReferenceSearchButton(mediator);
         return List.of(referenceSearchButton);
     }
 
     @Override
-    public void taskStarted(TaskStartedInfo info) {
+    public void taskStarted(@NonNull TaskStartedInfo info) {
         if (info.kind().equals(TaskStartedInfo.TaskKind.Macro)
                 && info.message().equals(new TryCloseMacro().getName())) {
             tryToClose = false;
@@ -240,7 +241,7 @@ public class CachingExtension
     }
 
     @Override
-    public void taskFinished(TaskFinishedInfo info) {
+    public void taskFinished(@NonNull TaskFinishedInfo info) {
         tryToClose = info.getSource() instanceof TryCloseMacro;
         if (tryToClose) {
             return; // try close macro was running, no need to do anything here
@@ -329,7 +330,7 @@ public class CachingExtension
     }
 
     @Override
-    public SettingsProvider getSettings() {
+    public @NonNull SettingsProvider getSettings() {
         return new CachingSettingsProvider();
     }
 }

@@ -46,6 +46,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +61,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     private static final String PROGRESS_MARK = ">";
 
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
+    @NonNull
     ImmutableList<Proof> proofStack = ImmutableSLList.nil();
 
-    final KeYMediator mediator;
+    final @NonNull KeYMediator mediator;
 
     // for a progress bar
     int progressMax = 0;
@@ -75,7 +78,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Current key problem file that is attempted to be proven.
      */
-    private Path keyProblemFile = null;
+    private @Nullable Path keyProblemFile = null;
 
     /**
      * We want to record whether there was a proof that could not be proven. {@link Main} calls
@@ -91,7 +94,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         this.loadOnly = loadOnly;
     }
 
-    private void printResults(final int openGoals, TaskFinishedInfo info, final Object result2) {
+    private void printResults(final int openGoals, @NonNull TaskFinishedInfo info,
+            final Object result2) {
         LOGGER.info("]"); // end progress bar
         LOGGER.info("[ DONE  ... rule application ]");
         if (LOGGER.isDebugEnabled()) {
@@ -199,7 +203,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public void loadProblem(Path file) {
+    public void loadProblem(@NonNull Path file) {
         /*
          * Current file is stored in a private field. It will be used in method printResults() to
          * determine file names, in which proofs will be written.
@@ -232,13 +236,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public void registerProofAggregate(ProofAggregate pa) {
+    public void registerProofAggregate(@NonNull ProofAggregate pa) {
         super.registerProofAggregate(pa);
         mediator.getSelectionModel().setSelectedProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
 
-    void finish(Proof proof) {
+    void finish(@NonNull Proof proof) {
         // setInteractive(false) has to be called because the ruleAppIndex
         // has to be notified that we work in auto mode (CS)
         mediator.setInteractive(false);
@@ -308,7 +312,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public final ProblemInitializer createProblemInitializer(Profile profile) {
+    public final @NonNull ProblemInitializer createProblemInitializer(Profile profile) {
         return new ProblemInitializer(this, new Services(profile), this);
     }
 
@@ -316,7 +320,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * {@inheritDoc}
      */
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
+    public void proofDisposing(@NonNull ProofDisposedEvent e) {
         super.proofDisposing(e);
         if (!proofStack.isEmpty()) {
             Proof p = proofStack.head();
@@ -340,7 +344,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * {@inheritDoc}
      */
     @Override
-    public KeYMediator getMediator() {
+    public @NonNull KeYMediator getMediator() {
         return mediator;
     }
 
@@ -350,7 +354,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @NonNull IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
+            boolean forced) {
         return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
     }
 
@@ -358,7 +363,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * {@inheritDoc}
      */
     @Override
-    public void reportWarnings(ImmutableSet<PositionedString> warnings) {
+    public void reportWarnings(@NonNull ImmutableSet<PositionedString> warnings) {
         warnings.forEach(it -> LOGGER.info("{}", it));
     }
 
@@ -413,7 +418,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+    public @NonNull TermLabelVisibilityManager getTermLabelVisibilityManager() {
         return null;
     }
 }

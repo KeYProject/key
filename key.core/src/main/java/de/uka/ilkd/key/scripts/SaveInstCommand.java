@@ -15,6 +15,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves the
  * instantiation of a {@link SchemaVariable} by the last {@link TacletApp} into an abbreviation for
@@ -36,8 +38,8 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
-            EngineState stateMap) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, @NonNull Map<String, Object> args,
+            @NonNull EngineState stateMap) throws ScriptException, InterruptedException {
 
         AbbrevMap abbrMap = stateMap.getAbbreviations();
         for (Map.Entry<String, Object> entry : args.entrySet()) {
@@ -85,7 +87,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
     }
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "saveInst";
     }
 }

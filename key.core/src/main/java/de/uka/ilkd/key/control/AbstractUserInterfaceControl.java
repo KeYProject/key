@@ -28,6 +28,7 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,10 +208,14 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
-            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
+    public AbstractProblemLoader load(@Nullable Profile profile,
+            @Nullable Path file,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
-            Consumer<Proof> callback) throws ProblemLoaderException {
+            @Nullable Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
         try {
             loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes,
@@ -257,7 +262,8 @@ public abstract class AbstractUserInterfaceControl
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+            @Nullable ProofAggregate proofList, @Nullable ReplayResult result)
+            throws ProblemLoaderException {
         if (proofList != null) {
             // avoid double registration at spec repos as that is done already earlier in
             // createProof

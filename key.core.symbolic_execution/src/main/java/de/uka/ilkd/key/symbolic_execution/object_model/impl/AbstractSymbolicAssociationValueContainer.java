@@ -16,6 +16,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default implementation of {@link ISymbolicAssociationValueContainer}.
  *
@@ -26,12 +29,12 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * The contained {@link ISymbolicAssociation}s.
      */
-    private ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
+    private @NonNull ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
 
     /**
      * The contained {@link ISymbolicValue}s.
      */
-    private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+    private @NonNull ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
 
     /**
      * Constructor.
@@ -63,7 +66,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      * {@inheritDoc}
      */
     @Override
-    public ISymbolicAssociation getAssociation(final IProgramVariable programVariable,
+    public @Nullable ISymbolicAssociation getAssociation(final IProgramVariable programVariable,
             final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
         return CollectionUtil.search(associations,
             element -> element.getProgramVariable() == programVariable
@@ -93,7 +96,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
      * {@inheritDoc}
      */
     @Override
-    public ISymbolicValue getValue(final IProgramVariable programVariable,
+    public @Nullable ISymbolicValue getValue(final IProgramVariable programVariable,
             final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
         return CollectionUtil.search(values,
             element -> element.getProgramVariable() == programVariable

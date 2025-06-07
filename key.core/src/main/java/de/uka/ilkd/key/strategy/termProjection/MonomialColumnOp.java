@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
 
     private MonomialColumnOp(ProjectionToTerm<Goal> leftCoefficient,
@@ -20,13 +22,14 @@ public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
         super(leftCoefficient, polynomial);
     }
 
-    public static ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> leftCoefficient,
+    public static @NonNull ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> leftCoefficient,
             ProjectionToTerm<Goal> polynomial) {
         return new MonomialColumnOp(leftCoefficient, polynomial);
     }
 
     @Override
-    protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
+    protected @NonNull Term divide(@NonNull Monomial numerator, @NonNull BigInteger denominator,
+            @NonNull Services services) {
         final BigInteger newRightCoeff =
             LexPathOrdering.divide(numerator.getCoefficient(), denominator);
         return numerator.setCoefficient(newRightCoeff).toTerm(services);

@@ -13,30 +13,32 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class TacletVisitor implements DefaultVisitor {
-    private String failureDescription = null;
+    private @Nullable String failureDescription = null;
 
-    private void visit(Semisequent semiseq) {
+    private void visit(@NonNull Semisequent semiseq) {
         for (SequentFormula aSemiseq : semiseq) {
             aSemiseq.formula().execPostOrder(this);
         }
     }
 
 
-    public void visit(Sequent seq) {
+    public void visit(@NonNull Sequent seq) {
         visit(seq.antecedent());
         visit(seq.succedent());
     }
 
-    public String visit(Taclet taclet, boolean visitAddrules) {
+    public @Nullable String visit(@NonNull Taclet taclet, boolean visitAddrules) {
         visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
         return failureDescription;
     }
 
-    public String visit(Taclet taclet) {
+    public @Nullable String visit(@NonNull Taclet taclet) {
         return visit(taclet, false);
     }
 
@@ -50,7 +52,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
         }
     }
 
-    protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
+    protected void visitGoalTemplates(@NonNull Taclet taclet, boolean visitAddrules) {
         for (var gt : taclet.goalTemplates()) {
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate) {

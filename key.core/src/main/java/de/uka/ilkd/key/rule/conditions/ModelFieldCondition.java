@@ -26,6 +26,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This variable condition checks if the instantiation of a schemavariable (of
  * type Field) refers to a Java field declared as "model".
@@ -68,7 +70,7 @@ public class ModelFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negated ? "\\not" : "") + "\\isModelField(" + field + ")";
     }
 }

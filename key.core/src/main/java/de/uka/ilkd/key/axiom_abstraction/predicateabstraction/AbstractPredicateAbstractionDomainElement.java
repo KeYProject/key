@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.java.Services;
@@ -14,6 +15,8 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A base class for abstract domain elements in a predicate abstraction lattice.
  *
@@ -21,7 +24,7 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public abstract class AbstractPredicateAbstractionDomainElement extends AbstractDomainElement {
 
-    private ImmutableSet<AbstractionPredicate> predicates = null;
+    private ImmutableSet<AbstractionPredicate> predicates;
     private boolean topElem = false;
 
     /**
@@ -29,7 +32,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * abstraction predicates.
      */
     protected AbstractPredicateAbstractionDomainElement(
-            final ImmutableSet<AbstractionPredicate> predicates) {
+            ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
     }
 
@@ -75,7 +78,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
             return new Name("TOP");
         }
 
-        if (predicates.size() == 0) {
+        if (predicates.isEmpty()) {
             return new Name("BOTTOM");
         }
 
@@ -111,7 +114,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
             return tb.tt();
         }
 
-        if (predicates.size() == 0) {
+        if (predicates.isEmpty()) {
             return tb.ff();
         }
 
@@ -125,7 +128,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
             }
         }
 
-        return result;
+        return Objects.requireNonNull(result);
     }
 
     /**
@@ -165,7 +168,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     }
 
     @Override
-    public abstract boolean equals(Object obj);
+    public abstract boolean equals(@Nullable Object obj);
 
     @Override
     public abstract int hashCode();

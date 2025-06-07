@@ -52,24 +52,24 @@ import org.jspecify.annotations.Nullable;
 public class KeYMediator {
 
     /** The user interface */
-    private final AbstractMediatorUserInterfaceControl ui;
+    private final @NonNull AbstractMediatorUserInterfaceControl ui;
 
     /** the notation info used to print sequents */
-    private final NotationInfo notationInfo;
+    private final @NonNull NotationInfo notationInfo;
 
     /** listenerList with to gui listeners */
     private final EventListenerList listenerList = new EventListenerList();
 
     /** listens to the proof */
-    private final KeYMediatorProofListener proofListener;
+    private final @NonNull KeYMediatorProofListener proofListener;
 
     /** listens to the ProofTree */
-    private final KeYMediatorProofTreeListener proofTreeListener;
+    private final @NonNull KeYMediatorProofTreeListener proofTreeListener;
 
     /**
      * current proof and node the user works with. All user interaction is relative to this model
      */
-    private final KeYSelectionModel keySelectionModel;
+    private final @NonNull KeYSelectionModel keySelectionModel;
 
     /**
      * Registered proof load listeners.
@@ -83,7 +83,7 @@ public class KeYMediator {
     /**
      * An optional used {@link AutoSaver}.
      */
-    private AutoSaver autoSaver = AutoSaver.getDefaultInstance();
+    private @Nullable AutoSaver autoSaver = AutoSaver.getDefaultInstance();
 
     /**
      * Currently opened proofs.
@@ -106,7 +106,7 @@ public class KeYMediator {
      * creates the KeYMediator with a reference to the application's main frame and the current
      * proof settings
      */
-    public KeYMediator(AbstractMediatorUserInterfaceControl ui) {
+    public KeYMediator(@NonNull AbstractMediatorUserInterfaceControl ui) {
         this.ui = ui;
 
         notationInfo = new NotationInfo();
@@ -134,12 +134,12 @@ public class KeYMediator {
      *
      * @return the used NotationInfo
      */
-    public NotationInfo getNotationInfo() {
+    public @NonNull NotationInfo getNotationInfo() {
         return notationInfo;
     }
 
     /** returns the Services with the java service classes */
-    public Services getServices() {
+    public @Nullable Services getServices() {
         Proof selectedProof = getSelectedProof();
         return selectedProof != null ? selectedProof.getServices() : null;
     }
@@ -156,12 +156,12 @@ public class KeYMediator {
      * Returns a filter that is used for filtering taclets that should not be showed while
      * interactive proving.
      */
-    public TacletFilter getFilterForInteractiveProving() {
+    public @NonNull TacletFilter getFilterForInteractiveProving() {
         if (filterForInteractiveProving == null) {
             filterForInteractiveProving = new TacletFilter() {
 
                 @Override
-                protected boolean filter(Taclet taclet) {
+                protected boolean filter(@NonNull Taclet taclet) {
                     for (String name : JoinProcessor.SIMPLIFY_UPDATE) {
                         if (name.equals(taclet.name().toString())) {
                             return false;
@@ -175,13 +175,13 @@ public class KeYMediator {
         return filterForInteractiveProving;
     }
 
-    public void setBack(Node node) {
+    public void setBack(@NonNull Node node) {
         getUI().getProofControl().pruneTo(node);
         finishSetBack(node.proof());
         keySelectionModel.setSelectedNode(node);
     }
 
-    public void setBack(Goal goal) {
+    public void setBack(@NonNull Goal goal) {
         if (getSelectedProof() != null) {
             getUI().getProofControl().pruneTo(goal);
             final Proof proof = goal.proof();
@@ -191,11 +191,11 @@ public class KeYMediator {
         }
     }
 
-    private void finishSetBack(final Proof proof) {
+    private void finishSetBack(final @NonNull Proof proof) {
         TaskFinishedInfo info =
             new DefaultTaskFinishedInfo(this, null, proof, 0, 0, getNrGoalsClosedByAutoMode()) {
                 @Override
-                public String toString() {
+                public @NonNull String toString() {
                     return "Proof has been pruned: "
                         + (proof.openGoals().size() == 1 ? "one open goal remains."
                                 : (proof.openGoals().size() + " open goals remain."));
@@ -222,7 +222,7 @@ public class KeYMediator {
      * @param newProof the proof to select.
      * @param previousProof the previously selected proof
      */
-    void setProof(Proof newProof, Proof previousProof) {
+    void setProof(@Nullable Proof newProof, @Nullable Proof previousProof) {
         if (previousProof == newProof) {
             return;
         }
@@ -276,7 +276,7 @@ public class KeYMediator {
      *
      * @param listener the KeYSelectionListener to add
      */
-    public void addKeYSelectionListener(KeYSelectionListener listener) {
+    public void addKeYSelectionListener(@NonNull KeYSelectionListener listener) {
         keySelectionModel.addKeYSelectionListener(listener);
     }
 
@@ -288,7 +288,7 @@ public class KeYMediator {
      *
      * @param listener the KeYSelectionListener to add
      */
-    public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
+    public void addKeYSelectionListenerChecked(@NonNull KeYSelectionListener listener) {
         keySelectionModel.addKeYSelectionListenerChecked(listener);
     }
 
@@ -297,7 +297,7 @@ public class KeYMediator {
      *
      * @param listener the KeYSelectionListener to be removed
      */
-    public void removeKeYSelectionListener(KeYSelectionListener listener) {
+    public void removeKeYSelectionListener(@NonNull KeYSelectionListener listener) {
         keySelectionModel.removeKeYSelectionListener(listener);
     }
 
@@ -332,7 +332,7 @@ public class KeYMediator {
      *
      * @param goal the Goal being displayed in the view of the sequent
      */
-    public void goalChosen(Goal goal) {
+    public void goalChosen(@NonNull Goal goal) {
         keySelectionModel.setSelectedGoal(goal);
     }
 
@@ -341,7 +341,7 @@ public class KeYMediator {
      *
      * @return the user interface
      */
-    public AbstractMediatorUserInterfaceControl getUI() {
+    public @NonNull AbstractMediatorUserInterfaceControl getUI() {
         return ui;
     }
 
@@ -359,7 +359,7 @@ public class KeYMediator {
      *
      * @param src Object that is the asking component
      */
-    public synchronized void requestModalAccess(Object src) {
+    public synchronized void requestModalAccess(@NonNull Object src) {
         fireModalDialogOpened(new EventObject(src));
     }
 
@@ -368,7 +368,7 @@ public class KeYMediator {
      *
      * @param src Object that is the asking component
      */
-    public synchronized void freeModalAccess(Object src) {
+    public synchronized void freeModalAccess(@NonNull Object src) {
         fireModalDialogClosed(new EventObject(src));
     }
 
@@ -376,7 +376,7 @@ public class KeYMediator {
      * fires the request of a GUI component for modal access this can be used to disable all views
      * even if the GUI component has no built in modal support
      */
-    public synchronized void fireModalDialogOpened(EventObject e) {
+    public synchronized void fireModalDialogOpened(@NonNull EventObject e) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == GUIListener.class) {
@@ -389,7 +389,7 @@ public class KeYMediator {
      * fires that a GUI component that has asked for modal access has been closed, so views can be
      * enabled again
      */
-    public synchronized void fireModalDialogClosed(EventObject e) {
+    public synchronized void fireModalDialogClosed(@NonNull EventObject e) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == GUIListener.class) {
@@ -401,7 +401,7 @@ public class KeYMediator {
     /**
      * Fires the shut-down event.
      */
-    public synchronized void fireShutDown(EventObject e) {
+    public synchronized void fireShutDown(@NonNull EventObject e) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == GUIListener.class) {
@@ -415,7 +415,7 @@ public class KeYMediator {
      *
      * @param p the proof that was just loaded and is about to be replayed
      */
-    public synchronized void fireProofLoaded(Proof p) {
+    public synchronized void fireProofLoaded(@Nullable Proof p) {
         if (p == null) {
             return;
         }
@@ -438,7 +438,7 @@ public class KeYMediator {
      *
      * @return the current selected goal
      */
-    public Goal getSelectedGoal() {
+    public @Nullable Goal getSelectedGoal() {
         return keySelectionModel.getSelectedGoal();
     }
 
@@ -447,7 +447,7 @@ public class KeYMediator {
      *
      * @return the current selected goal
      */
-    public KeYSelectionModel getSelectionModel() {
+    public @NonNull KeYSelectionModel getSelectionModel() {
         return keySelectionModel;
     }
 
@@ -456,7 +456,7 @@ public class KeYMediator {
      *
      * @return the current selected node
      */
-    public Node getSelectedNode() {
+    public @Nullable Node getSelectedNode() {
         return keySelectionModel.getSelectedNode();
     }
 
@@ -533,7 +533,7 @@ public class KeYMediator {
      * @param interactive whether the needed taclet index is for interactove or automatic use
      *        (normally false)
      */
-    public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {
+    public void initiateAutoMode(@NonNull Proof proof, boolean fullStop, boolean interactive) {
         stopInterface(fullStop);
         getUI().getProofControl().fireAutoModeStarted(new ProofEvent(proof));
         setInteractive(interactive);
@@ -556,8 +556,8 @@ public class KeYMediator {
      *        (normally true)
      * @param selection a Runnable that selects the correct node after unfreezing the interface
      */
-    public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
-            Runnable selection) {
+    public void finishAutoMode(@NonNull Proof proof, boolean fullStop, boolean interactive,
+            @Nullable Runnable selection) {
         setInteractive(interactive);
         startInterface(fullStop);
         getUI().getProofControl().fireAutoModeStopped(new ProofEvent(proof));
@@ -588,7 +588,7 @@ public class KeYMediator {
      * @return null or the previous data
      * @see #register(Object, Class)
      */
-    public <T> T lookup(Class<T> service) {
+    public <T> @Nullable T lookup(@NonNull Class<T> service) {
         try {
             if (userData == null) {
                 return null;
@@ -606,7 +606,7 @@ public class KeYMediator {
      * @param service the key under it should be registered
      * @param <T>
      */
-    public <T> void register(T obj, Class<T> service) {
+    public <T> void register(@NonNull T obj, @NonNull Class<T> service) {
         getUserData().register(obj, service);
     }
 
@@ -617,7 +617,7 @@ public class KeYMediator {
      * @param service the key under which the data was registered
      * @param <T> arbitray object
      */
-    public <T> void deregister(T obj, Class<T> service) {
+    public <T> void deregister(@NonNull T obj, @NonNull Class<T> service) {
         if (userData != null) {
             userData.deregister(obj, service);
         }
@@ -639,7 +639,7 @@ public class KeYMediator {
         private boolean pruningInProcess;
 
         @Override
-        public void proofClosed(ProofTreeEvent e) {
+        public void proofClosed(@NonNull ProofTreeEvent e) {
             Proof p = e.getSource();
             assert p.name().equals(getSelectedProof().name());
             assert p.closed();
@@ -651,7 +651,7 @@ public class KeYMediator {
         }
 
         @Override
-        public void proofPruned(final ProofTreeEvent e) {
+        public void proofPruned(final @NonNull ProofTreeEvent e) {
             SwingUtilities.invokeLater(() -> {
                 if (!e.getSource().find(getSelectedNode())) {
                     keySelectionModel.setSelectedNode(e.getNode());
@@ -662,7 +662,7 @@ public class KeYMediator {
         }
 
         @Override
-        public void proofGoalsAdded(ProofTreeEvent e) {
+        public void proofGoalsAdded(@NonNull ProofTreeEvent e) {
             ImmutableList<Goal> newGoals = e.getGoals();
             // Check for a closed goal ...
             if (newGoals.size() == 0) {
@@ -707,12 +707,12 @@ public class KeYMediator {
     /*
      * Disable certain actions until a proof is loaded.
      */
-    public void enableWhenProofLoaded(final Action a) {
+    public void enableWhenProofLoaded(final @NonNull Action a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
                 a.setEnabled(e.getSource().getSelectedProof() != null);
             }
         });
@@ -723,12 +723,12 @@ public class KeYMediator {
      * macro menu in the GUI. Remove this method as soon as another solution can be found.
      */
     @Deprecated
-    public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
+    public void enableWhenProofLoaded(final javax.swing.@NonNull AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(@NonNull KeYSelectionEvent e) {
                 a.setEnabled(e.getSource().getSelectedProof() != null);
             }
         });
@@ -744,7 +744,7 @@ public class KeYMediator {
     }
 
     /** return the chosen profile */
-    public Profile getProfile() {
+    public @NonNull Profile getProfile() {
         Proof selectedProof = getSelectedProof();
         if (selectedProof != null) {
             return selectedProof.getServices().getProfile();
@@ -793,7 +793,7 @@ public class KeYMediator {
      *
      * @return The {@link AutoSaver} to use or {@code null} if no {@link AutoSaver} should be used.
      */
-    public AutoSaver getAutoSaver() {
+    public @Nullable AutoSaver getAutoSaver() {
         return autoSaver;
     }
 
@@ -822,7 +822,7 @@ public class KeYMediator {
      *
      * @param action the user action
      */
-    public void fireActionPerformed(UserAction action) {
+    public void fireActionPerformed(@NonNull UserAction action) {
         for (UserActionListener listener : userActionListeners) {
             listener.actionPerformed(action);
         }

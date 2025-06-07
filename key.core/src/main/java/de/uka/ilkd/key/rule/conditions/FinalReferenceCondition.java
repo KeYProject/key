@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * ensures that the given instantiation for the schema variable denotes a final field
@@ -54,7 +56,7 @@ public final class FinalReferenceCondition extends VariableConditionAdapter {
 
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negation ? " \\not " : "") + "\\final(" + reference + ")";
     }
 }

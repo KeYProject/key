@@ -11,6 +11,8 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Feature that returns the maximum number of positive literals occurring within a d-path of the
@@ -24,7 +26,8 @@ public class CountPosDPathFeature extends AbstractBetaFeature {
     private CountPosDPathFeature() {}
 
     @Override
-    protected RuleAppCost doComputation(PosInOccurrence pos, Term findTerm, ServiceCaches caches) {
+    protected @NonNull RuleAppCost doComputation(@NonNull PosInOccurrence pos,
+            @NonNull Term findTerm, @NonNull ServiceCaches caches) {
         return NumberRuleAppCost.create(maxPosPath(findTerm, !pos.isInAntec(), caches));
     }
 

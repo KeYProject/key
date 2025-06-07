@@ -14,6 +14,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -28,7 +30,8 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
     private DiffFindAndReplacewithFeature() {}
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@NonNull TacletApp app, @NonNull PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null && app.rule() instanceof RewriteTaclet
                 : "Feature is only applicable to rewrite taclets";
 

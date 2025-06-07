@@ -24,6 +24,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Extracts the current state and represents it as {@link IExecutionVariable}s.
  *
@@ -43,17 +46,17 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * The layout term.
      */
-    private final Term layoutTerm;
+    private final @NonNull Term layoutTerm;
 
     /**
      * The current locations.
      */
-    private final Set<ExtractLocationParameter> currentLocations;
+    private final @NonNull Set<ExtractLocationParameter> currentLocations;
 
     /**
      * The found {@link IExecutionVariable}s available via {@link #analyse()}.
      */
-    private final Map<LocationDef, StateExecutionVariable> allStateVariables;
+    private final @NonNull Map<LocationDef, StateExecutionVariable> allStateVariables;
 
     /**
      * {@code true} simplify conditions, {@code false} do not simplify conditions.
@@ -71,9 +74,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      *        conditions.
      * @throws ProofInputException Occurred Exception
      */
-    public ExecutionVariableExtractor(Node node,
-            PosInOccurrence modalityPio,
-            IExecutionNode<?> executionNode, Term condition, boolean simplifyConditions)
+    public ExecutionVariableExtractor(@NonNull Node node, @NonNull PosInOccurrence modalityPio,
+            @NonNull IExecutionNode<?> executionNode, Term condition, boolean simplifyConditions)
             throws ProofInputException {
         super(node, modalityPio);
         this.executionNode = executionNode;
@@ -125,7 +127,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @return The {@link IExecutionVariable}s representing the current state.
      * @throws ProofInputException Occurred Exception.
      */
-    public IExecutionVariable[] analyse() throws ProofInputException {
+    public IExecutionVariable @NonNull [] analyse() throws ProofInputException {
         Collection<StateExecutionVariable> variables = allStateVariables.values();
         return variables.toArray(new StateExecutionVariable[0]);
     }
@@ -137,9 +139,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @param topVariables The state locations,
      * @param childrenInfo the child locations.
      */
-    protected void analyzeTreeStructure(Set<ExecutionVariableValuePair> pairs,
-            Map<LocationDef, List<ExecutionVariableValuePair>> topVariables,
-            Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo) {
+    protected void analyzeTreeStructure(@NonNull Set<ExecutionVariableValuePair> pairs,
+            @NonNull Map<LocationDef, List<ExecutionVariableValuePair>> topVariables,
+            @NonNull Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo) {
         for (ExecutionVariableValuePair pair : pairs) {
             if (pair.isStateMember()) {
                 LocationDef locDef =
@@ -172,11 +174,11 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @return The created {@link IExecutionVariable}.
      * @throws ProofInputException Occurred Exception.
      */
-    protected IExecutionVariable createVariablesValueStructure(
-            List<ExecutionVariableValuePair> pairs,
-            Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo,
-            ExtractedExecutionValue parentValue,
-            ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
+    protected @NonNull IExecutionVariable createVariablesValueStructure(
+            @NonNull List<ExecutionVariableValuePair> pairs,
+            @NonNull Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo,
+            @Nullable ExtractedExecutionValue parentValue,
+            @NonNull ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
         assert !pairs.isEmpty();
         // Create variable
         ExecutionVariableValuePair firstPair = pairs.get(0);
@@ -207,11 +209,11 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected void createValues(final IExecutionVariable variable,
-            final List<ExecutionVariableValuePair> pairs,
-            final ExecutionVariableValuePair firstPair,
-            final Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> contentMap,
-            final List<IExecutionValue> valueListToFill,
-            final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
+            final @NonNull List<ExecutionVariableValuePair> pairs,
+            final @NonNull ExecutionVariableValuePair firstPair,
+            final @NonNull Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> contentMap,
+            final @NonNull List<IExecutionValue> valueListToFill,
+            final @NonNull ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
         // Group pairs with same value but with different conditions
         Map<Term, List<ExecutionVariableValuePair>> groupedPairs =
             new LinkedHashMap<>();
@@ -300,8 +302,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @return The new already visited objects list or the original one if the current value is not
      *         an object.
      */
-    protected Pair<Boolean, ImmutableList<Term>> updateAlreadyVisitedObjects(
-            final ImmutableList<Term> alreadyVisitedObjects, Term value) {
+    protected @NonNull Pair<Boolean, ImmutableList<Term>> updateAlreadyVisitedObjects(
+            final @NonNull ImmutableList<Term> alreadyVisitedObjects, @Nullable Term value) {
         ImmutableList<Term> alreadyVisitedObjectsForChildren = alreadyVisitedObjects;
         boolean cycleDetected = false;
         if (value != null && SymbolicExecutionUtil.hasReferenceSort(getServices(), value)
@@ -336,7 +338,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof ParentDef(Term parent1, Node goalNode1)) {
                 return Objects.equals(parent, parent1)
                         && Objects.equals(goalNode, goalNode1);
@@ -372,7 +374,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof LocationDef(ProgramVariable variable, Term index)) {
                 return programVariable == variable
                         && Objects.equals(arrayIndex, index);
@@ -405,7 +407,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param arrayIndex The index in the parent array.
          * @param additionalCondition An optional additional condition to consider.
          */
-        public StateExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
+        public StateExecutionVariable(@NonNull IExecutionNode<?> parentNode, Node proofNode,
                 PosInOccurrence modalityPIO,
                 IProgramVariable programVariable, Term arrayIndex,
                 Term additionalCondition) {
@@ -492,7 +494,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param additionalCondition An optional additional condition to consider.
          * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
          */
-        public ExtractedExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
+        public ExtractedExecutionVariable(@NonNull IExecutionNode<?> parentNode, Node proofNode,
                 PosInOccurrence modalityPIO,
                 IProgramVariable programVariable, Term arrayIndex,
                 Term arrayStartIndex, Term arrayEndIndex, Term additionalCondition,
@@ -516,7 +518,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionValue[] getValues() throws ProofInputException {
+        public IExecutionValue @NonNull [] getValues() throws ProofInputException {
             return values.toArray(new IExecutionValue[0]);
         }
 
@@ -542,7 +544,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          *
          * @return The human-readable array start index.
          */
-        public String getArrayStartIndexString() {
+        public @Nullable String getArrayStartIndexString() {
             return arrayStartIndex != null ? formatTerm(arrayStartIndex, getServices()) : null;
         }
 
@@ -560,7 +562,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          *
          * @return The human-readable array end index.
          */
-        public String getArrayEndIndexString() {
+        public @Nullable String getArrayEndIndexString() {
             return arrayEndIndex != null ? formatTerm(arrayEndIndex, getServices()) : null;
         }
 
@@ -602,7 +604,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         /**
          * The {@link IExecutionNode} providing the {@link IExecutionConstraint}s.
          */
-        private final IExecutionNode<?> parentNode;
+        private final @NonNull IExecutionNode<?> parentNode;
 
         /**
          * Constructor.
@@ -614,7 +616,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param condition The condition.
          * @param value The value.
          */
-        public ExtractedExecutionValue(IExecutionNode<?> parentNode, Node proofNode,
+        public ExtractedExecutionValue(@NonNull IExecutionNode<?> parentNode, Node proofNode,
                 IExecutionVariable variable, Term condition, Term value) {
             super(parentNode.getSettings(), proofNode, variable, condition, value);
             this.parentNode = parentNode;
@@ -624,7 +626,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public String getConditionString() throws ProofInputException {
+        public @Nullable String getConditionString() throws ProofInputException {
             return getCondition() != null ? formatTerm(getCondition(), getServices()) : null;
         }
 
@@ -640,7 +642,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public String getValueString() throws ProofInputException {
+        public @Nullable String getValueString() throws ProofInputException {
             return getValue() != null ? formatTerm(getValue(), getServices()) : null;
         }
 
@@ -648,7 +650,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public String getTypeString() throws ProofInputException {
+        public @Nullable String getTypeString() throws ProofInputException {
             return getValue() != null && getValue().sort() != null ? getValue().sort().toString()
                     : null;
         }
@@ -658,7 +660,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          *
          * @param variable The {@link ExtractedExecutionVariable} to add.
          */
-        protected void addChildVariable(ExtractedExecutionVariable variable) {
+        protected void addChildVariable(@Nullable ExtractedExecutionVariable variable) {
             if (variable != null) {
                 childVariables.add(variable);
             }
@@ -668,7 +670,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public ExtractedExecutionVariable[] getChildVariables() {
+        public ExtractedExecutionVariable @NonNull [] getChildVariables() {
             return childVariables.toArray(new ExtractedExecutionVariable[0]);
         }
 

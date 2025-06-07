@@ -18,6 +18,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Information about a node replacing its parent after a rule application, currently giving
@@ -28,6 +31,7 @@ public class NodeReplacement {
     final Node node;
     final Node parent;
     ImmutableList<SequentChangeInfo> rawChanges;
+    @Nullable
     ImmutableList<NodeChange> changes = null;
 
     /**
@@ -57,7 +61,7 @@ public class NodeReplacement {
     }
 
     private void addNodeChange(
-            SequentChangeInfo p_sci) {
+            @NonNull SequentChangeInfo p_sci) {
         Iterator<SequentFormula> it;
         Iterator<FormulaChangeInfo> it2;
 
@@ -124,7 +128,7 @@ public class NodeReplacement {
 
     }
 
-    private void addAddedChange(SequentFormula p_cf,
+    private void addAddedChange(@NonNull SequentFormula p_cf,
             boolean p_inAntec) {
         Sequent oldS = parent.sequent();
         Semisequent oldSS = (p_inAntec ? oldS.antecedent() : oldS.succedent());
@@ -147,7 +151,7 @@ public class NodeReplacement {
      * @param p_cf
      * @param p_inAntec
      */
-    private void addAddedRedundantChange(SequentFormula p_cf,
+    private void addAddedRedundantChange(@NonNull SequentFormula p_cf,
             boolean p_inAntec) {
 
         final PosInOccurrence pio =
@@ -158,7 +162,7 @@ public class NodeReplacement {
 
 
 
-    private void addRemovedChange(SequentFormula p_cf,
+    private void addRemovedChange(@NonNull SequentFormula p_cf,
             boolean p_inAntec) {
         Sequent oldS = parent.sequent();
         Semisequent oldSS = (p_inAntec ? oldS.antecedent() : oldS.succedent());
@@ -203,7 +207,7 @@ public class NodeReplacement {
     /**
      * @return Modifications that have been made to node
      */
-    public Iterator<NodeChange> getNodeChanges() {
+    public @NonNull Iterator<NodeChange> getNodeChanges() {
         if (changes == null) {
             changes = ImmutableSLList.nil();
             addNodeChanges();
@@ -211,7 +215,7 @@ public class NodeReplacement {
         return changes.iterator();
     }
 
-    public String toString() {
+    public @NonNull String toString() {
         getNodeChanges();
         return "Changes: " + changes;
     }

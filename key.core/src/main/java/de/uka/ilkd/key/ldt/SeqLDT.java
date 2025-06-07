@@ -133,7 +133,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, Term sub,
+    public boolean isResponsible(Operator op, @Nullable Term sub,
             TermServices services, ExecutionContext ec) {
         return op instanceof SeqSingleton || op instanceof SeqConcat || op instanceof SeqSub
                 || op instanceof SeqReverse || op instanceof SeqIndexOf || op instanceof SeqGet
@@ -168,8 +168,7 @@ public final class SeqLDT extends LDT {
         } else if (op instanceof SeqLength) {
             return seqLen;
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
     @Override
@@ -192,15 +191,13 @@ public final class SeqLDT extends LDT {
         if (t.op().equals(seqEmpty)) {
             return EmptySeqLiteral.INSTANCE;
         }
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 
     @Override
     public Type getType(Term t) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 

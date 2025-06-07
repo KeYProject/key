@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * A map from some type to the same type.
  *
@@ -42,7 +44,8 @@ public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
      * @param newSelf the new self variable.
      * @param services services.
      */
-    public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, TermServices services) {
+    public void replaceSelf(final ProgramVariable oldSelf, final @Nullable S newSelf,
+            TermServices services) {
         if (newSelf != null) {
             if (!newSelf.sort().extendsTrans(oldSelf.sort())) {
                 throw new IllegalArgumentException("new self variable has to be compatible");
@@ -77,7 +80,7 @@ public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
      * @param newVariable new variable.
      * @param services services.
      */
-    public void replaceVariable(final ProgramVariable oldVariable, final S newVariable,
+    public void replaceVariable(final ProgramVariable oldVariable, final @Nullable S newVariable,
             TermServices services) {
         if (newVariable != null) {
             if (!oldVariable.sort().equals(newVariable.sort())) {

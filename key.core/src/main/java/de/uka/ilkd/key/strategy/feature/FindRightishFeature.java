@@ -24,20 +24,20 @@ import org.jspecify.annotations.NonNull;
  * upper/righter/bigger summands in a polynomial that is arranged in a left-associated way.
  */
 public class FindRightishFeature implements Feature {
-    private final Operator add;
+    private final @NonNull Operator add;
     private final static RuleAppCost one = NumberRuleAppCost.create(1);
 
-    public static Feature create(IntegerLDT numbers) {
+    public static @NonNull Feature create(@NonNull IntegerLDT numbers) {
         return new FindRightishFeature(numbers);
     }
 
-    private FindRightishFeature(IntegerLDT numbers) {
+    private FindRightishFeature(@NonNull IntegerLDT numbers) {
         add = numbers.getAdd();
     }
 
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+            @NonNull PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

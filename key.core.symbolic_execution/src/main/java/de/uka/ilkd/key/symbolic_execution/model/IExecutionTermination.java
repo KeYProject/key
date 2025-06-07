@@ -12,6 +12,8 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A node in the symbolic execution tree which represents the normal termination of a branch, e.g.
@@ -46,6 +48,7 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
      *
      * @return The {@link IProgramVariable} which is used to caught global exceptions.
      */
+    @Nullable
     IProgramVariable getExceptionVariable();
 
     /**
@@ -53,6 +56,7 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
      *
      * @return The {@link Sort} of the caught exception.
      */
+    @Nullable
     Sort getExceptionSort();
 
     /**

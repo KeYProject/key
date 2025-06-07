@@ -12,6 +12,9 @@ import de.uka.ilkd.key.proof.Node;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 public class NodeData {
 
     final Map<String, RuleData> ruleName2RuleData = new HashMap<>();
@@ -19,7 +22,7 @@ public class NodeData {
     final int proofTreeDepth;
     final int astDepth;
 
-    private static int getDepth(Node node) {
+    private static int getDepth(@Nullable Node node) {
         int depth = -1;
         while (node != null) {
             node = node.parent();
@@ -28,18 +31,18 @@ public class NodeData {
         return depth;
     }
 
-    NodeData(Goal goal) {
+    NodeData(@NonNull Goal goal) {
         Node node = goal.node();
         id = node.serialNr();
         proofTreeDepth = getDepth(node);
         astDepth = countAST(node);
     }
 
-    private static int countAST(Node n) {
+    private static int countAST(@NonNull Node n) {
         return countAST(n.sequent());
     }
 
-    private static int countAST(Sequent sequent) {
+    private static int countAST(@NonNull Sequent sequent) {
         int sum = 0;
         for (SequentFormula f : sequent.antecedent().asList()) {
             sum += countAST(f.formula());

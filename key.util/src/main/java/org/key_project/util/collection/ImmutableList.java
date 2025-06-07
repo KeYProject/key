@@ -10,6 +10,7 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.checkerframework.dataflow.qual.Pure;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -224,7 +225,7 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * @return int representing number of elements in list
      */
-
+    @Pure
     int size();
 
     /**

@@ -1096,7 +1096,7 @@ public abstract class SMTTerm {
     }
 
     // // @Override
-    // public boolean equals(Object t) {
+    // boolean equals(@org.jspecify.annotations.Nullable Object t) {
     // return super.equals(t);
     // }
     //

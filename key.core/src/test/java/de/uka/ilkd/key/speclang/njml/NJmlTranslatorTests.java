@@ -20,6 +20,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class NJmlTranslatorTests {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
         + "speclang" + File.separator + "testFile.key";
-    private final PreParser preParser;
+    private final @NonNull PreParser preParser;
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =

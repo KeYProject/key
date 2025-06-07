@@ -157,8 +157,8 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * @param pio The {@link PosInOccurrence} in the {@link Goal}.
      * @return {@code true} is applicable, {@code false} is not applicable
      */
-    private boolean isApplicableQuery(Goal goal, Term pmTerm,
-            PosInOccurrence pio) {
+    private boolean isApplicableQuery(@NonNull Goal goal, @NonNull Term pmTerm,
+            @NonNull PosInOccurrence pio) {
         if (pmTerm.op() instanceof IProgramMethod pm && pmTerm.freeVars().isEmpty()) {
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic()
@@ -181,7 +181,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public @NonNull IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 
@@ -276,7 +276,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return NAME;
     }
 
@@ -284,7 +284,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public String displayName() {
+    public @NonNull String displayName() {
         return NAME.toString();
     }
 
@@ -292,7 +292,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return displayName();
     }
 

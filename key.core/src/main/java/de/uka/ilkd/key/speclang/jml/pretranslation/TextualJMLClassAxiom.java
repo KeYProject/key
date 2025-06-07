@@ -8,13 +8,15 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * A JML axiom declaration in textual form. According to Sect. 8 of the JML reference manual, axioms
  * may not have any modifiers.
  */
 public final class TextualJMLClassAxiom extends TextualJMLConstruct {
-    private final LabeledParserRuleContext inv;
+    private final @NonNull LabeledParserRuleContext inv;
 
     /**
      * new textual representation.
@@ -23,7 +25,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      * @param inv the expression in this clause
      */
     public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers,
-            LabeledParserRuleContext inv) {
+            @NonNull LabeledParserRuleContext inv) {
         super(ImmutableSLList.nil()); // no modifiers allowed in axiom clause (see
                                       // Sect. 8 of reference manual)
         assert inv != null;
@@ -31,14 +33,15 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers, LabeledParserRuleContext inv,
+    public TextualJMLClassAxiom(ImmutableList<JMLModifier> modifiers,
+            @NonNull LabeledParserRuleContext inv,
             String name) {
         this(modifiers, inv);
         this.name = name;
     }
 
 
-    public LabeledParserRuleContext getAxiom() {
+    public @NonNull LabeledParserRuleContext getAxiom() {
         return inv;
     }
 
@@ -50,7 +53,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLClassAxiom ci)) {
             return false;
         }

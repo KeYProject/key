@@ -7,6 +7,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Defines that a user interface control which edits a single key-value-pair of the
  * {@link StrategyProperties} allows the user to select predefined values. It might be realized via
@@ -20,7 +22,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
     /**
      * The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
-    private final ImmutableArray<StrategyPropertyValueDefinition> values;
+    private final @NonNull ImmutableArray<StrategyPropertyValueDefinition> values;
 
     /**
      * Defines optionally how many columns are shown per row. A negative value means unlimited
@@ -90,7 +92,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
      *
      * @return The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
-    public ImmutableArray<StrategyPropertyValueDefinition> getValues() {
+    public @NonNull ImmutableArray<StrategyPropertyValueDefinition> getValues() {
         return values;
     }
 

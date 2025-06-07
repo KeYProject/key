@@ -16,6 +16,9 @@ import java.util.stream.Stream;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * ProofBundleHandler for a directory that respects the bundle file hierarchy.
  *
@@ -43,7 +46,8 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
      * @return the list of paths
      * @throws IOException if the directory can not be opened
      */
-    private static List<Path> getFiles(Path directory, PathMatcher matcher) throws IOException {
+    private static @NonNull List<Path> getFiles(@NonNull Path directory,
+            @NonNull PathMatcher matcher) throws IOException {
         if (Files.isDirectory(directory)) {
             // IMPORTANT: use try-with-resources here to ensure the stream is closed and does not
             // prevent the files from deletion on Windows!
@@ -56,22 +60,22 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public String getBundleName() {
+    public @NonNull String getBundleName() {
         return rootPath.getFileName().toString();
     }
 
     @Override
-    public Path getBundlePath() {
+    public @NonNull Path getBundlePath() {
         return rootPath.toAbsolutePath().normalize();
     }
 
     @Override
-    public Path relativize(Path path) {
+    public @NonNull Path relativize(@NonNull Path path) {
         return rootPath.toAbsolutePath().normalize().relativize(path);
     }
 
     @Override
-    public List<Path> getProofFiles() throws ProofManagementException {
+    public @NonNull List<Path> getProofFiles() throws ProofManagementException {
         try {
             return getFiles(rootPath, PROOF_MATCHER);
         } catch (IOException e) {
@@ -81,24 +85,24 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public List<Path> getKeYFiles() throws IOException {
+    public @NonNull List<Path> getKeYFiles() throws IOException {
         return getFiles(rootPath, KEY_MATCHER);
     }
 
     @Override
-    public List<Path> getSourceFiles() throws IOException {
+    public @NonNull List<Path> getSourceFiles() throws IOException {
         Path srcPath = rootPath.resolve(Paths.get("src"));
         return getFiles(srcPath, SRC_MATCHER);
     }
 
     @Override
-    public List<Path> getClasspathFiles() throws IOException {
+    public @NonNull List<Path> getClasspathFiles() throws IOException {
         Path classpath = rootPath.resolve(Paths.get("classpath"));
         return getFiles(classpath, CLASSPATH_MATCHER);
     }
 
     @Override
-    public Path getBootclasspath() throws IOException {
+    public @Nullable Path getBootclasspath() throws IOException {
         Path bootclasspath = rootPath.resolve(Paths.get("bootclasspath"));
         if (Files.isDirectory(bootclasspath)) {
             return bootclasspath;
@@ -116,7 +120,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public Path getPath(String entryName) {
+    public @NonNull Path getPath(@NonNull String entryName) {
         return rootPath.resolve(entryName);
     }
 

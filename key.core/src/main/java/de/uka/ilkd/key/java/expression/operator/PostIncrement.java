@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Post increment.
  */
@@ -22,7 +24,7 @@ public class PostIncrement extends Assignment {
      * @param unary the Expression to be incremented by one
      */
 
-    public PostIncrement(Expression unary) {
+    public PostIncrement(@NonNull Expression unary) {
         super(unary);
     }
 
@@ -33,7 +35,7 @@ public class PostIncrement extends Assignment {
      * @param children an ExtList with all children of this node
      */
 
-    public PostIncrement(ExtList children) {
+    public PostIncrement(@NonNull ExtList children) {
         super(children);
     }
 
@@ -74,7 +76,7 @@ public class PostIncrement extends Assignment {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {
+    public void visit(@NonNull Visitor v) {
         v.performActionOnPostIncrement(this);
     }
 }

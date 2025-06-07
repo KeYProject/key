@@ -60,18 +60,15 @@ import org.slf4j.LoggerFactory;
 public class ExpressionBuilder extends DefaultBuilder {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExpressionBuilder.class);
 
-    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE =
-        "Expecting select term before '@', not: ";
-
     /**
      * The current abbreviation used for resolving "@name" terms.
      */
-    private AbbrevMap abbrevMap;
+    private @Nullable AbbrevMap abbrevMap;
 
     /**
      * Altlast.
      */
-    private Term quantifiedArrayGuard;
+    private @Nullable Term quantifiedArrayGuard;
 
     /**
      * A list of terms, that are marked for having an already set heap.
@@ -179,7 +176,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitParallel_term(KeYParser.Parallel_termContext ctx) {
         List<Term> t = mapOf(ctx.elementary_update_term());
-        Term a = t.get(0);
+        Term a = t.getFirst();
         for (int i = 1; i < t.size(); i++) {
             a = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, a, t.get(i));
         }
@@ -188,12 +185,12 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitTermEOF(KeYParser.TermEOFContext ctx) {
-        return accept(ctx.term());
+        return Objects.requireNonNull(accept(ctx.term()));
     }
 
     @Override
     public Term visitElementary_update_term(KeYParser.Elementary_update_termContext ctx) {
-        Term a = accept(ctx.a);
+        Term a = Objects.requireNonNull(accept(ctx.a));
         Term b = accept(ctx.b);
         if (b != null) {
             return updateOrigin(getServices().getTermBuilder().elementary(a, b), ctx, services);
@@ -203,7 +200,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
-        Term a = accept(ctx.a);
+        Term a = Objects.requireNonNull(accept(ctx.a));
         if (ctx.b.isEmpty()) {
             return a;
         }
@@ -218,7 +215,8 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private Term binaryTerm(ParserRuleContext ctx, org.key_project.logic.op.Operator operator,
-            Term left, Term right) {
+            Term left,
+            @Nullable Term right) {
         if (right == null) {
             return updateOrigin(left, ctx, services);
         }
@@ -229,14 +227,14 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitImplication_term(KeYParser.Implication_termContext ctx) {
-        Term termL = accept(ctx.a);
+        Term termL = Objects.requireNonNull(accept(ctx.a));
         Term termR = accept(ctx.b);
         return binaryTerm(ctx, Junctor.IMP, termL, termR);
     }
 
     @Override
     public Term visitDisjunction_term(KeYParser.Disjunction_termContext ctx) {
-        Term t = accept(ctx.a);
+        Term t = Objects.requireNonNull(accept(ctx.a));
         for (KeYParser.Conjunction_termContext c : ctx.b) {
             t = binaryTerm(ctx, Junctor.OR, t, accept(c));
         }
@@ -245,7 +243,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitConjunction_term(KeYParser.Conjunction_termContext ctx) {
-        Term t = accept(ctx.a);
+        Term t = Objects.requireNonNull(accept(ctx.a));
         for (KeYParser.Term60Context c : ctx.b) {
             t = binaryTerm(ctx, Junctor.AND, t, accept(c));
         }
@@ -256,8 +254,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitUnary_minus_term(KeYParser.Unary_minus_termContext ctx) {
-        Term result = accept(ctx.sub);
-        assert result != null;
+        Term result = Objects.requireNonNull(accept(ctx.sub));
         if (ctx.MINUS() != null) {
             JFunction Z = (JFunction) functions().lookup("Z");
             if (result.op() == Z) {
@@ -301,7 +298,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Term visitEquality_term(KeYParser.Equality_termContext ctx) {
-        Term termL = accept(ctx.a);
+        Term termL = Objects.requireNonNull(accept(ctx.a));
         Term termR = accept(ctx.b);
         Term eq = binaryTerm(ctx, Equality.EQUALS, termL, termR);
         if (ctx.NOT_EQUALS() != null) {
@@ -556,7 +553,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitTermorseq(KeYParser.TermorseqContext ctx) {
+    public @Nullable Object visitTermorseq(KeYParser.TermorseqContext ctx) {
         Term head = accept(ctx.head);
         Sequent s = accept(ctx.s);
         ImmutableList<SequentFormula> ss = accept(ctx.ss);
@@ -830,7 +827,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * pm.name().toString().equals(kjt.getFullName() + "::" + mn)) { List<Term> arguments =
      * mapOf(suffix.attribute_or_query_suffix().result.args.argument()); Term[] args =
      * arguments.toArray(new Term[0]); return getJavaInfo().getStaticProgramMethodTerm(mn, args,
-     * kjt.getFullName()); } } } assert false; return null; }
+     * kjt.getFullName()); } } } throw new RuntimeException("Not Implemented"); }
      */
 
     @Override

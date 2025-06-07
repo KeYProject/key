@@ -7,6 +7,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.*;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (15.03.19)
@@ -55,7 +57,7 @@ public class ShowIcons extends JFrame {
         new ShowIcons().setVisible(true);
     }
 
-    private void filter(String text) {
+    private void filter(@NonNull String text) {
         box.removeAll();
         if (text.isEmpty()) {
             for (Component c : icons) {
@@ -72,7 +74,7 @@ public class ShowIcons extends JFrame {
         box.revalidate();
     }
 
-    private void add(IconFont fa) {
+    private void add(@NonNull IconFont fa) {
         JLabel lbl = new JLabel();
         lbl.setIcon(IconFontSwing.buildIcon(fa, 32f));
         lbl.setToolTipText(fa.getClass().getName() + "." + fa);

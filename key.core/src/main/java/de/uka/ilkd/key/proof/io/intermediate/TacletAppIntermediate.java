@@ -10,6 +10,8 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Encapsulates intermediate information for constructing a taclet application.
  *
@@ -17,12 +19,12 @@ import org.key_project.util.collection.Pair;
  */
 public class TacletAppIntermediate extends AppIntermediate {
 
-    private String tacletName = null;
-    private Pair<Integer, PosInTerm> posInfo = null;
-    private LinkedList<String> insts = null;
-    private ImmutableList<String> ifSeqFormulaList = null;
-    private ImmutableList<String> ifDirectFormulaList = null;
-    private ImmutableList<Name> newNames = null;
+    private final String tacletName;
+    private final @Nullable Pair<Integer, PosInTerm> posInfo;
+    private final @Nullable LinkedList<String> insts;
+    private final @Nullable ImmutableList<String> ifSeqFormulaList;
+    private final @Nullable ImmutableList<String> ifDirectFormulaList;
+    private final @Nullable ImmutableList<Name> newNames;
 
     /**
      * Constructs a new intermediate taclet application.
@@ -52,19 +54,19 @@ public class TacletAppIntermediate extends AppIntermediate {
         return tacletName;
     }
 
-    public Pair<Integer, PosInTerm> getPosInfo() {
+    public @Nullable Pair<Integer, PosInTerm> getPosInfo() {
         return posInfo;
     }
 
-    public LinkedList<String> getInsts() {
+    public @Nullable LinkedList<String> getInsts() {
         return insts;
     }
 
-    public ImmutableList<String> getIfSeqFormulaList() {
+    public @Nullable ImmutableList<String> getIfSeqFormulaList() {
         return ifSeqFormulaList;
     }
 
-    public ImmutableList<String> getIfDirectFormulaList() {
+    public @Nullable ImmutableList<String> getIfDirectFormulaList() {
         return ifDirectFormulaList;
     }
 
@@ -74,7 +76,7 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
      */
     @Override
-    public ImmutableList<Name> getNewNames() {
+    public @Nullable ImmutableList<Name> getNewNames() {
         return newNames;
     }
 

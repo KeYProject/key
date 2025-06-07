@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Represents an association of an {@link ISymbolicState} or {@link ISymbolicObject} which is a
@@ -39,6 +41,7 @@ public interface ISymbolicAssociation extends ISymbolicElement {
      *
      * @return The represented array index or {@code null} if a program variable is represented..
      */
+    @Nullable
     Term getArrayIndex();
 
     /**
@@ -53,6 +56,7 @@ public interface ISymbolicAssociation extends ISymbolicElement {
      *
      * @return The represented {@link IProgramVariable}.
      */
+    @Nullable
     IProgramVariable getProgramVariable();
 
     /**
@@ -80,6 +84,7 @@ public interface ISymbolicAssociation extends ISymbolicElement {
      *
      * @return The optional condition under which this association is valid.
      */
+    @Nullable
     Term getCondition();
 
     /**

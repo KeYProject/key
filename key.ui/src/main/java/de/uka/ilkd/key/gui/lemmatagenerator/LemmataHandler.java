@@ -31,6 +31,7 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,7 +125,7 @@ public class LemmataHandler implements TacletFilter {
         loader.start();
     }
 
-    private Collection<Path> createFilesForAxioms(Collection<String> filenames) {
+    private @NonNull Collection<Path> createFilesForAxioms(@NonNull Collection<String> filenames) {
         Collection<Path> list = new LinkedList<>();
         for (String filename : filenames) {
             list.add(Paths.get(filename));
@@ -138,7 +139,7 @@ public class LemmataHandler implements TacletFilter {
         printException(exception);
     }
 
-    private void startProofs(ProofAggregate pa) {
+    private void startProofs(@NonNull ProofAggregate pa) {
         println("Start the proving:");
         for (Proof p : pa.getProofs()) {
             try {
@@ -152,13 +153,13 @@ public class LemmataHandler implements TacletFilter {
         }
     }
 
-    private void saveProof(Proof p) {
+    private void saveProof(@NonNull Proof p) {
         ProofSaver saver =
             new ProofSaver(p, options.createProofPath(p), options.getInternalVersion());
         saver.save();
     }
 
-    private void startProof(Proof proof) {
+    private void startProof(@NonNull Proof proof) {
         print(proof.name() + "...");
         AutomaticProver prover = new AutomaticProver();
         try {
@@ -212,7 +213,7 @@ public class LemmataHandler implements TacletFilter {
     }
 
     @Override
-    public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
+    public @NonNull ImmutableSet<Taclet> filter(@NonNull List<TacletInfo> taclets) {
         ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
         for (TacletInfo tacletInfo : taclets) {
             if (!tacletInfo.isAlreadyInUse() && !tacletInfo.isNotSupported()) {

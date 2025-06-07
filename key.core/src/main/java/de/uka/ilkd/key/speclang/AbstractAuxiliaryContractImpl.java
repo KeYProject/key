@@ -28,6 +28,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Abstract base class for all default implementations of the sub-interfaces of
  * {@link AuxiliaryContract}.
@@ -653,7 +655,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (this == obj) {
             return true;
         } else if (obj == null || getClass() != obj.getClass()) {
@@ -1633,7 +1635,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *
          * @param contract the contract whose conditions to add.
          */
-        protected void addConditionsFrom(final T contract) {
+        protected void addConditionsFrom(final @NonNull T contract) {
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 final Term precondition = addPreconditionFrom(contract, heap);
                 addFreePreconditionFrom(contract, heap);
@@ -1650,7 +1652,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param heap the heap to use.
          * @return the precondition.
          */
-        private Term addPreconditionFrom(final T contract, final LocationVariable heap) {
+        private Term addPreconditionFrom(final @NonNull T contract, final LocationVariable heap) {
             final Term precondition = contract.getPrecondition(heap, placeholderVariables.self,
                 placeholderVariables.remembranceHeaps, services);
             if (precondition != null) {
@@ -1664,7 +1666,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contract the contract whose free precondition to add.
          * @param heap the heap to use.
          */
-        private void addFreePreconditionFrom(final T contract, final LocationVariable heap) {
+        private void addFreePreconditionFrom(final @NonNull T contract,
+                final LocationVariable heap) {
             final Term freePrecondition = contract.getFreePrecondition(heap,
                 placeholderVariables.self, placeholderVariables.remembranceHeaps, services);
             if (freePrecondition != null) {
@@ -1679,7 +1682,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contract the contract the postcondition belongs to.
          * @param heap the heap to use.
          */
-        private void addPostconditionFrom(final Term precondition, final T contract,
+        private void addPostconditionFrom(final Term precondition, final @NonNull T contract,
                 final LocationVariable heap) {
             final Term unconditionalPostcondition =
                 contract.getPostcondition(heap, placeholderVariables, services);
@@ -1697,7 +1700,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contract the contract the free postcondition belongs to.
          * @param heap the heap to use.
          */
-        private void addFreePostconditionFrom(final Term precondition, final T contract,
+        private void addFreePostconditionFrom(final Term precondition, final @NonNull T contract,
                 final LocationVariable heap) {
             final Term unconditionalFreePostcondition =
                 contract.getFreePostcondition(heap, placeholderVariables, services);
@@ -1714,7 +1717,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contract the contract whose modifiable clause to add.
          * @param heap the heap to use.
          */
-        private void addModifiableClauseFrom(final T contract, final LocationVariable heap) {
+        private void addModifiableClauseFrom(final @NonNull T contract,
+                final LocationVariable heap) {
             final Term additionalModifiableClause =
                 contract.getModifiableClause(heap, placeholderVariables.self, services);
             if (additionalModifiableClause != null) {
@@ -1730,7 +1734,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param heap
          *        the heap to use.
          */
-        private void addFreeModifiableClauseFrom(final T contract, final LocationVariable heap) {
+        private void addFreeModifiableClauseFrom(final @NonNull T contract,
+                final LocationVariable heap) {
             final Term additionalModifiableClause =
                 contract.getModifiableClause(heap, placeholderVariables.self, services);
             if (additionalModifiableClause != null) {

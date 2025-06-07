@@ -20,6 +20,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This class inherits from LDT and implements all method that are necessary to handle the primitive
@@ -108,7 +110,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public @Nullable Term translateLiteral(Literal lit, Services services) {
         if (lit instanceof BooleanLiteral) {
             return (((BooleanLiteral) lit).getValue() ? term_bool_true : term_bool_false);
         }
@@ -121,8 +123,7 @@ public final class BooleanLDT extends LDT {
     public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
-        assert false;
-        return null;
+        throw new RuntimeException("Not Implemented");
     }
 
 
@@ -139,8 +140,7 @@ public final class BooleanLDT extends LDT {
         } else if (t.op() == bool_false) {
             return BooleanLiteral.FALSE;
         } else {
-            assert false : "BooleanLDT: Cannot convert term to program: " + t;
-            return null;
+            throw new AssertionError("BooleanLDT: Cannot convert term to program: " + t);
         }
     }
 
@@ -150,8 +150,7 @@ public final class BooleanLDT extends LDT {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_BOOLEAN;
         } else {
-            assert false : "BooleanLDT: Cannot get Java type for term: " + t;
-            return null;
+            throw new AssertionError("BooleanLDT: Cannot get Java type for term: " + t);
         }
     }
 }
