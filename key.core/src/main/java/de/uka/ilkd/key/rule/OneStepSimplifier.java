@@ -38,7 +38,6 @@ import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
-import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
