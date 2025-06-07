@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Modality;
 
 public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
         extends TermProgramVariableCollector {
@@ -28,7 +28,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
     @Override
     public void visit(Term t) {
         super.visit(t);
-        if (t.op() instanceof JModality) {
+        if (t.op() instanceof Modality) {
             addVarsToKeep();
         }
     }
