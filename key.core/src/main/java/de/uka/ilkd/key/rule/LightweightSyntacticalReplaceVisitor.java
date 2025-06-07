@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -127,14 +128,14 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
     }
 
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
-        final UpdateableJOperator originalLhs = op.lhs();
+        final UpdateableOperator originalLhs = op.lhs();
         if (originalLhs instanceof SchemaVariable originalLhsAsSV) {
             Object lhsInst = svInst.getInstantiation(originalLhsAsSV);
             if (lhsInst instanceof JTerm) {
                 lhsInst = ((JTerm) lhsInst).op();
             }
 
-            if (!(lhsInst instanceof final UpdateableJOperator newLhs)) {
+            if (!(lhsInst instanceof final UpdateableOperator newLhs)) {
                 assert false : "not updateable: " + lhsInst;
                 throw new IllegalStateException("Encountered non-updateable operator " + lhsInst
                     + " on left-hand side of update.");

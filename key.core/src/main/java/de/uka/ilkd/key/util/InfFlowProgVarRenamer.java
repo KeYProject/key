@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.VariableNameProposer;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.UpdateableOperator;
 
 
 /**
@@ -174,7 +175,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final JTerm renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
         final JTerm[] renamedSubs = renameSubs(term);
         final ElementaryUpdate renamedU =
-            ElementaryUpdate.getInstance((UpdateableJOperator) renamedLhs.op());
+            ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
         final JTerm uTerm = label(tf().createTerm(renamedU, renamedSubs), term.getLabels());
         replaceMap.put(term, uTerm);
     }

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -174,7 +175,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             if (op instanceof ElementaryUpdate) {
                 ElementaryUpdate uop = (ElementaryUpdate) t.op();
                 if (replaceMap.containsKey(uop.lhs())) {
-                    UpdateableJOperator replacedLhs = replaceMap.get(uop.lhs());
+                    UpdateableOperator replacedLhs = replaceMap.get(uop.lhs());
                     op = ElementaryUpdate.getInstance(replacedLhs);
                     changed = changed || uop != op;
                 }

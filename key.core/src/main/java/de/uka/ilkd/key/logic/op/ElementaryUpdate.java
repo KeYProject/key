@@ -10,6 +10,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 
 
@@ -20,14 +21,14 @@ import org.key_project.logic.sort.Sort;
  */
 public final class ElementaryUpdate extends JAbstractSortedOperator {
 
-    private static final WeakHashMap<UpdateableJOperator, WeakReference<ElementaryUpdate>> instances =
+    private static final WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>> instances =
         new WeakHashMap<>();
 
 
-    private final UpdateableJOperator lhs;
+    private final UpdateableOperator lhs;
 
 
-    private ElementaryUpdate(UpdateableJOperator lhs) {
+    private ElementaryUpdate(UpdateableOperator lhs) {
         super(new Name("elem-update(" + lhs + ")"), new Sort[] { lhs.sort() }, JavaDLTheory.UPDATE,
             false);
         this.lhs = lhs;
@@ -38,7 +39,7 @@ public final class ElementaryUpdate extends JAbstractSortedOperator {
     /**
      * Returns the elementary update operator for the passed left hand side.
      */
-    public static ElementaryUpdate getInstance(UpdateableJOperator lhs) {
+    public static ElementaryUpdate getInstance(UpdateableOperator lhs) {
         WeakReference<ElementaryUpdate> ref = instances.get(lhs);
         ElementaryUpdate result = null;
         if (ref != null) {
@@ -56,7 +57,7 @@ public final class ElementaryUpdate extends JAbstractSortedOperator {
     /**
      * Returns the left hand side of this elementary update operator.
      */
-    public UpdateableJOperator lhs() {
+    public UpdateableOperator lhs() {
         return lhs;
     }
 
