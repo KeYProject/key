@@ -281,7 +281,7 @@ public abstract class Notation {
                 Object object = (sp.getInstantiations().getInstantiation((SchemaVariable) v));
                 if (object != null) {
                     Debug.assertTrue(object instanceof JTerm);
-                    Debug.assertTrue(((JTerm) object).op() instanceof JQuantifiableVariable);
+                    Debug.assertTrue(((JTerm) object).op() instanceof QuantifiableVariable);
                     v = (QuantifiableVariable) (((JTerm) object).op());
                 }
             }

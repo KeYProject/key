@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.Term;
@@ -321,7 +320,7 @@ public class EqualityConstraint implements Constraint {
 
         final Operator op0 = t0.op();
 
-        if (op0 instanceof JQuantifiableVariable) {
+        if (op0 instanceof QuantifiableVariable) {
             return handleQuantifiableVariable(t0, t1, ownBoundVars, cmpBoundVars);
         }
 
@@ -517,7 +516,7 @@ public class EqualityConstraint implements Constraint {
     private Constraint handleQuantifiableVariable(JTerm t0, JTerm t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
-        if (!((t1.op() instanceof JQuantifiableVariable)
+        if (!((t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
                     (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
             return TOP;

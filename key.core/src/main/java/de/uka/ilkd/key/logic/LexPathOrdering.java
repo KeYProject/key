@@ -13,12 +13,12 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -470,7 +470,7 @@ public class LexPathOrdering implements TermOrdering {
      * @return true iff <code>op</code> is a logic variable
      */
     private boolean isVar(Operator op) {
-        return op instanceof JQuantifiableVariable;
+        return op instanceof QuantifiableVariable;
     }
 
     /**

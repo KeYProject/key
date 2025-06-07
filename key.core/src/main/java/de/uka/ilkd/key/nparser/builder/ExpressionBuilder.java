@@ -32,10 +32,10 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
-import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;

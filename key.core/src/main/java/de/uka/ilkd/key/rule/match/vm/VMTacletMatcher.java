@@ -8,7 +8,6 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoFindTaclet;
@@ -283,7 +282,7 @@ public class VMTacletMatcher implements TacletMatcher {
      * @param v the bound variable to be searched
      */
     private boolean varIsBound(SchemaVariable v) {
-        return (v instanceof JQuantifiableVariable) && boundVars.contains(v);
+        return (v instanceof QuantifiableVariable) && boundVars.contains(v);
     }
 
     /**
@@ -296,7 +295,7 @@ public class VMTacletMatcher implements TacletMatcher {
             LogicServices services) {
         if (matchCond != null) {
             if (instantiationCandidate instanceof JTerm term) {
-                if (!(term.op() instanceof JQuantifiableVariable)) {
+                if (!(term.op() instanceof QuantifiableVariable)) {
                     if (varIsBound(var) || varDeclaredNotFree(var)) {
                         // match(x) is not a variable, but the corresponding template variable is
                         // bound

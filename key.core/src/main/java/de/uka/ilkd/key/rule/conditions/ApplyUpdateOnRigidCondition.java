@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.*;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -157,7 +156,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * for collisions. In the future, it might be needed to check for collisions with variable names
      * on higher levels.
      *
-     * @param var the {@link JQuantifiableVariable} to get a new {@link Name} for
+     * @param var the {@link QuantifiableVariable} to get a new {@link Name} for
      * @param u the update that is checked for variables
      * @param phi the formula or term that is checked for variables
      * @param services the {@link TermServices} to help create terms
@@ -183,11 +182,11 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
     /**
      * Checks whether the given <code>name</code> is already used by some
-     * {@link JQuantifiableVariable} in the set
+     * {@link QuantifiableVariable} in the set
      * <code>qvars</code> or the {@link NamespaceSet}.
      *
      * @param name the {@link Name} that is checked for occurrence in set <code>qvars</code>
-     * @param qvars the set of {@link JQuantifiableVariable}s to be checked for use of
+     * @param qvars the set of {@link QuantifiableVariable}s to be checked for use of
      *        <code>name</code>
      * @param services the {@link TermServices} to help create terms
      * @return true iff <code>name</code> is already used in <code>qvars</code>

@@ -130,7 +130,7 @@ class TermImpl implements JTerm {
         ImmutableSet<QuantifiableVariable> localFreeVars =
             DefaultImmutableSet.nil();
 
-        if (op instanceof JQuantifiableVariable) {
+        if (op instanceof QuantifiableVariable) {
             localFreeVars = localFreeVars.add((QuantifiableVariable) op);
         }
         for (int i = 0, ar = arity(); i < ar; i++) {
