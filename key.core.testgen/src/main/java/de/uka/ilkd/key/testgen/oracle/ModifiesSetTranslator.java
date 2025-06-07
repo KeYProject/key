@@ -5,7 +5,8 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.JTerm;
+
+import org.key_project.logic.Term;
 
 public class ModifiesSetTranslator {
 
@@ -13,27 +14,27 @@ public class ModifiesSetTranslator {
     private final OracleGenerator gen;
 
 
-    public boolean isSingleTon(JTerm t) {
+    public boolean isSingleTon(Term t) {
         return t.op().equals(getLocSetLDT().getSingleton());
     }
 
-    public boolean isUnion(JTerm t) {
+    public boolean isUnion(Term t) {
         return t.op().equals(getLocSetLDT().getUnion());
     }
 
-    public boolean isIntersection(JTerm t) {
+    public boolean isIntersection(Term t) {
         return t.op().equals(getLocSetLDT().getIntersect());
     }
 
-    public boolean isAllFields(JTerm t) {
+    public boolean isAllFields(Term t) {
         return t.op().equals(getLocSetLDT().getAllFields());
     }
 
-    public boolean isAllLocs(JTerm t) {
+    public boolean isAllLocs(Term t) {
         return t.op().equals(getLocSetLDT().getAllLocs());
     }
 
-    public boolean isEmpty(JTerm t) {
+    public boolean isEmpty(Term t) {
         return t.op().equals(getLocSetLDT().getEmpty());
     }
 
@@ -47,11 +48,11 @@ public class ModifiesSetTranslator {
     }
 
 
-    public OracleLocationSet translate(JTerm t) {
+    public OracleLocationSet translate(Term t) {
 
         if (isSingleTon(t)) {
-            JTerm obj = t.sub(0);
-            JTerm field = t.sub(1);
+            Term obj = t.sub(0);
+            Term field = t.sub(1);
             String objString = gen.generateOracle(obj, false).toString();
             String fieldString = gen.generateOracle(field, false).toString();
             OracleLocation loc = new OracleLocation(objString, fieldString);
@@ -71,7 +72,7 @@ public class ModifiesSetTranslator {
         }
 
         else if (isAllFields(t)) {
-            JTerm obj = t.sub(0);
+            Term obj = t.sub(0);
             String objString = gen.generateOracle(obj, false).toString();
             OracleLocation loc = new OracleLocation(objString);
             return OracleLocationSet.singleton(loc);

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.RecognitionException;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.SequentFormula;
@@ -49,7 +50,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
         };
 
     private String manualInput;
-    private final JTerm ifFma;
+    private final Term ifFma;
 
     private final NamespaceSet nss;
     private final AbbrevMap scm;
@@ -57,7 +58,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
     private final TacletApp app;
     private final Goal goal;
 
-    public TacletAssumesModel(JTerm ifFma, ImmutableList<AssumesFormulaInstantiation> candidates,
+    public TacletAssumesModel(Term ifFma, ImmutableList<AssumesFormulaInstantiation> candidates,
             TacletApp app, Goal goal, Services services, NamespaceSet nss, AbbrevMap scm) {
         super(createIfInsts(candidates));
 
@@ -76,7 +77,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
         manualInput = s;
     }
 
-    public JTerm ifFma() {
+    public Term ifFma() {
         return ifFma;
     }
 

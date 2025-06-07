@@ -72,7 +72,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
 
         if (lattice != null) {
 
-            AbstractDomainElement mergeElem = null;
+            AbstractDomainElement mergeElem;
             LinkedHashSet<JTerm> sideConditions = new LinkedHashSet<>();
 
             assert v.op() instanceof ProgramVariable;
