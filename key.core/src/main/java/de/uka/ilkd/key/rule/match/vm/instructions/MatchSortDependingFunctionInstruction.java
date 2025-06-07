@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -68,13 +68,14 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
      * match is possible because the top level operator is not a sort depending function or the
      * resulting constraints on the sorts are unsatisfiable.
      *
-     * @param instantiationCandidate the {@link Term} to be matched
+     * @param instantiationCandidate the {@link JTerm} to be matched
      * @param matchConditions the {@link MatchConditions} specifying the constraints to be
      *        considered
      * @param services the {@link Services}
      */
     @Override
-    public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
+    public final MatchConditions match(JTerm instantiationCandidate,
+            MatchConditions matchConditions,
             LogicServices services) {
         MatchConditions result = null;
         if (instantiationCandidate.op() instanceof SortDependingFunction sdp) {

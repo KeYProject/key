@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -41,9 +41,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final Term target = term.sub(0);
+        final JTerm target = term.sub(0);
 
         final ProgramElement pe = target.javaBlock().program();
         assert pe != null;
@@ -110,7 +110,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         /**
          * The Term for {@code this} of the methodframe.
          */
-        private final Term selfTerm;
+        private final JTerm selfTerm;
         /**
          * A TermBuilder
          */
@@ -118,7 +118,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         /**
          * renamings Term form.
          */
-        private final Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
+        private final Map<LocationVariable, JTerm> atPres = new LinkedHashMap<>();
         /**
          * renamings LocationVariable form.
          */
@@ -130,7 +130,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         /**
          * update Term for the prestate variables. Will get completed as the visitor runs.
          */
-        private Term atPreUpdate;
+        private JTerm atPreUpdate;
 
         public PrestateVariablesUpdater(final MethodFrame frame, final Services services,
                 final TermBuilder tb) {
@@ -198,30 +198,30 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         @Override
         public void performActionOnLoopInvariant(final LoopSpecification spec) {
             addNeededVariables(spec.getInternalAtPres().keySet());
-            Term self = selfTerm;
+            JTerm self = selfTerm;
             if (spec.getInternalSelfTerm() == null) {
                 // we're calling a static method from an instance context
                 self = null;
             }
-            final Term newVariant = spec.getVariant(self, atPres, services);
-            Map<LocationVariable, Term> newModifiables = new LinkedHashMap<>();
-            Map<LocationVariable, Term> newFreeModifiables = new LinkedHashMap<>();
+            final JTerm newVariant = spec.getVariant(self, atPres, services);
+            Map<LocationVariable, JTerm> newModifiables = new LinkedHashMap<>();
+            Map<LocationVariable, JTerm> newFreeModifiables = new LinkedHashMap<>();
             Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
                 new LinkedHashMap<>();
-            Map<LocationVariable, Term> newInvariants = new LinkedHashMap<>();
-            Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<>();
+            Map<LocationVariable, JTerm> newInvariants = new LinkedHashMap<>();
+            Map<LocationVariable, JTerm> newFreeInvariants = new LinkedHashMap<>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                final Term term = spec.getInternalModifiable().getOrDefault(
+                final JTerm term = spec.getInternalModifiable().getOrDefault(
                     services.getTypeConverter().getHeapLDT().getHeap(), tb.allLocs());
-                final Term freeTerm = spec.getInternalFreeModifiable().getOrDefault(
+                final JTerm freeTerm = spec.getInternalFreeModifiable().getOrDefault(
                     services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
                         || !tb.strictlyNothing().equalsModProperty(term,
                             IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    final Term m = spec.getModifiable(heap, self, atPres, services);
+                    final JTerm m = spec.getModifiable(heap, self, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, self, atPres, services);
-                    final Term inv = spec.getInvariant(heap, self, atPres, services);
+                    final JTerm inv = spec.getInvariant(heap, self, atPres, services);
                     if (inv != null) {
                         newInvariants.put(heap, inv);
                     }
@@ -233,10 +233,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
                         || !tb.strictlyNothing().equalsModProperty(
                             freeTerm, IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    final Term m = spec.getFreeModifiable(heap, selfTerm, atPres, services);
+                    final JTerm m = spec.getFreeModifiable(heap, selfTerm, atPres, services);
                     final ImmutableList<InfFlowSpec> infFlowSpecs =
                         spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
-                    final Term freeInv = spec.getFreeInvariant(heap, self, atPres, services);
+                    final JTerm freeInv = spec.getFreeInvariant(heap, self, atPres, services);
                     if (freeInv != null) {
                         newFreeInvariants.put(heap, freeInv);
                     }
@@ -248,8 +248,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
             }
             final LoopStatement loop = spec.getLoop();
-            ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(loop, services));
-            ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, services));
+            ImmutableList<JTerm> newLocalIns = tb.var(MiscTools.getLocalIns(loop, services));
+            ImmutableList<JTerm> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, services));
             final LoopSpecification newInv = spec.create(loop, frame.getProgramMethod(),
                 frame.getProgramMethod().getContainerType(), newInvariants, newFreeInvariants,
                 newModifiables, newFreeModifiables, newInfFlowSpecs, newVariant, self, newLocalIns,
@@ -269,7 +269,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     var.getKeYJavaType(), true);
                 services.getNamespaces().programVariables().addSafely(l);
 
-                final Term u = tb.elementary(l, tb.var(var));
+                final JTerm u = tb.elementary(l, tb.var(var));
                 atPreUpdate = tb.parallel(atPreUpdate, u);
 
                 atPres.put(var, tb.var(l));
@@ -288,7 +288,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     tb.locationVariable(var.name() + "Before_" + methodName, var.sort(), true);
                 services.getNamespaces().programVariables().addSafely(l);
 
-                final Term u = tb.elementary(l, tb.var(var));
+                final JTerm u = tb.elementary(l, tb.var(var));
                 atPreUpdate = tb.parallel(atPreUpdate, u);
 
                 atPres.put(var, tb.var(l));
@@ -321,12 +321,12 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             variables.self, variables.breakFlags, variables.continueFlags, variables.returnFlag,
             variables.result, variables.exception, variables.remembranceHeaps,
             variables.remembranceLocalVariables, atPreHeapVars, nonHeapVars, services);
-        final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreePreconditions = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreePostconditions = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newModifiableClauses = new LinkedHashMap<>();
-        final Map<LocationVariable, Term> newFreeModifiableClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> newPreconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> newFreePreconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> newPostconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> newFreePostconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> newModifiableClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, JTerm> newFreeModifiableClauses = new LinkedHashMap<>();
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             // why does the saved heap just get ignored here?

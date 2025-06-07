@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
 
 import org.key_project.logic.sort.Sort;
@@ -25,7 +25,7 @@ public interface ISymbolicObject extends ISymbolicAssociationValueContainer {
      *
      * @return The name of this object.
      */
-    Term getName();
+    JTerm getName();
 
     /**
      * Returns the name of this object as human readable {@link String}.

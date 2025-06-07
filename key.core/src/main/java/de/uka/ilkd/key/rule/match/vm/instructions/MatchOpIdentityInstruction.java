@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Operator;
 
 /**
  * The match instruction reports a success if the top level operator of the term to be matched is
@@ -28,7 +28,8 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
+    public final MatchConditions match(JTerm instantiationCandidate,
+            MatchConditions matchConditions,
             LogicServices services) {
         if (instantiationCandidate.op() == op) {
             return matchConditions;

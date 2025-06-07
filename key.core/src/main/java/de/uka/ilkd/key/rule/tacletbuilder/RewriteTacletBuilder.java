@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
 import org.key_project.prover.rules.TacletApplPart;
@@ -25,7 +25,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      *
      * @return this RewriteTacletBuilder
      */
-    public RewriteTacletBuilder<T> setFind(Term findTerm) {
+    public RewriteTacletBuilder<T> setFind(JTerm findTerm) {
         checkContainsFreeVarSV(findTerm, this.getName(), "find term");
         find = findTerm;
         return this;
@@ -53,7 +53,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
             new TacletApplPart(ifseq, applicationRestriction, varsNew, varsNotFreeIn,
                 varsNewDependingOn,
                 variableConditions),
-            goals, ruleSets, attrs, (Term) find, prefixBuilder.getPrefixMap(),
+            goals, ruleSets, attrs, (JTerm) find, prefixBuilder.getPrefixMap(),
             choices, surviveSmbExec, tacletAnnotations);
         t.setOrigin(origin);
         return (T) t;
@@ -75,7 +75,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
     }
 
 
-    public void addGoalTerm(Term goalTerm) {
+    public void addGoalTerm(JTerm goalTerm) {
         final TacletGoalTemplate axiomTemplate = new RewriteTacletGoalTemplate(goalTerm);
         addTacletGoalTemplate(axiomTemplate);
     }

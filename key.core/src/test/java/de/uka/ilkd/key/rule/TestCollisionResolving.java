@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.*;
@@ -67,16 +68,16 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
-        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        Function q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
 
-        Term t_x = services.getTermFactory().createTerm(x);
-        Term t_p_x = services.getTermFactory().createTerm(p, new Term[] { t_x }, null, null);
-        Term t_q_x = services.getTermFactory().createTerm(q, new Term[] { t_x }, null, null);
+        JTerm t_x = services.getTermFactory().createTerm(x);
+        JTerm t_p_x = services.getTermFactory().createTerm(p, new JTerm[] { t_x }, null, null);
+        JTerm t_q_x = services.getTermFactory().createTerm(q, new JTerm[] { t_x }, null, null);
         TermBuilder tb = services.getTermBuilder();
-        Term t_all_p_x = tb.all(x, t_p_x);
-        Term t_ex_q_x = tb.ex(x, t_q_x);
-        Term term = services.getTermFactory().createTerm(Junctor.AND, t_all_p_x, t_ex_q_x);
+        JTerm t_all_p_x = tb.all(x, t_p_x);
+        JTerm t_ex_q_x = tb.ex(x, t_q_x);
+        JTerm term = services.getTermFactory().createTerm(Junctor.AND, t_all_p_x, t_ex_q_x);
         FindTaclet coll_varSV =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_coll_varSV").taclet();
 
@@ -90,13 +91,13 @@ public class TestCollisionResolving {
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
 
         SVInstantiations insts = result.instantiations();
-        assertNotSame(((Term) insts.getInstantiation(b)).sub(0).op(),
-            ((Term) insts.getInstantiation(c)).sub(0).op(),
+        assertNotSame(((JTerm) insts.getInstantiation(b)).sub(0).op(),
+            ((JTerm) insts.getInstantiation(c)).sub(0).op(),
             "Same object for different conceptual variables");
-        assertSame(((Term) insts.getInstantiation(u)).op(),
-            ((Term) insts.getInstantiation(b)).sub(0).op());
-        assertSame(((Term) insts.getInstantiation(v)).op(),
-            ((Term) insts.getInstantiation(c)).sub(0).op());
+        assertSame(((JTerm) insts.getInstantiation(u)).op(),
+            ((JTerm) insts.getInstantiation(b)).sub(0).op());
+        assertSame(((JTerm) insts.getInstantiation(v)).op(),
+            ((JTerm) insts.getInstantiation(c)).sub(0).op());
     }
 
     @Test
@@ -104,22 +105,22 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
-        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        Function q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
 
         TermBuilder tb = services.getTermBuilder();
 
         final TermFactory tf = services.getTermFactory();
 
-        Term t_x = tf.createTerm(x);
-        Term t_p_x = tf.createTerm(p, new Term[] { t_x }, null, null);
-        Term t_q_x = tf.createTerm(q, new Term[] { t_x }, null, null);
+        JTerm t_x = tf.createTerm(x);
+        JTerm t_p_x = tf.createTerm(p, new JTerm[] { t_x }, null, null);
+        JTerm t_q_x = tf.createTerm(q, new JTerm[] { t_x }, null, null);
 
 
-        Term t_ex_q_x = tb.ex(x, t_q_x);
+        JTerm t_ex_q_x = tb.ex(x, t_q_x);
 
-        Term t_px_and_exxqx = tf.createTerm(Junctor.AND, t_p_x, t_ex_q_x);
-        Term term = tb.all(x, t_px_and_exxqx);
+        JTerm t_px_and_exxqx = tf.createTerm(Junctor.AND, t_p_x, t_ex_q_x);
+        JTerm term = tb.all(x, t_px_and_exxqx);
 
         FindTaclet coll_varSV =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_coll_context").taclet();
@@ -136,16 +137,16 @@ public class TestCollisionResolving {
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
 
         SVInstantiations insts = result.instantiations();
-        assertNotSame(((Term) insts.getInstantiation(b)).sub(0).op(),
-            ((Term) insts.getInstantiation(c)).sub(0).op(),
+        assertNotSame(((JTerm) insts.getInstantiation(b)).sub(0).op(),
+            ((JTerm) insts.getInstantiation(c)).sub(0).op(),
             "Same object for different conceptual variables");
-        assertSame(((Term) insts.getInstantiation(u)).op(),
-            ((Term) insts.getInstantiation(c)).sub(0).op());
+        assertSame(((JTerm) insts.getInstantiation(u)).op(),
+            ((JTerm) insts.getInstantiation(c)).sub(0).op());
     }
 
     @Test
     public void testVarNamespaceCreationWithContext() {
-        Term term = TacletForTests.parseTerm("\\forall s x; p(x)");
+        JTerm term = TacletForTests.parseTerm("\\forall s x; p(x)");
 
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_ns1").taclet();
@@ -241,8 +242,8 @@ public class TestCollisionResolving {
         assertNotSame(app, app1,
             "A different TacletApp should have been created to resolve" + " name conflicts");
 
-        assertNotEquals(((Term) app1.instantiations().getInstantiation(u)).op().name(),
-            ((Term) app1.instantiations().getInstantiation(v)).op().name(),
+        assertNotEquals(((JTerm) app1.instantiations().getInstantiation(u)).op().name(),
+            ((JTerm) app1.instantiations().getInstantiation(v)).op().name(),
             "The names of the instantiations of u and v should be different");
     }
 
@@ -330,7 +331,7 @@ public class TestCollisionResolving {
 
         FindTaclet taclet = (FindTaclet) TacletForTests
                 .getTaclet("TestCollisionResolving_name_conflict_with_context2").taclet();
-        Term term = TacletForTests.parseTerm("\\forall s x; p(x)");
+        JTerm term = TacletForTests.parseTerm("\\forall s x; p(x)");
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
         MatchConditions mc =

@@ -15,17 +15,18 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.ParsableVariable;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -122,7 +123,7 @@ public class SeqDefHandler implements SMTHandler {
         }
 
         ImmutableSet<QuantifiableVariable> localBind = boundVars;
-        for (var boundVar : ((de.uka.ilkd.key.logic.Term) term).boundVars()) {
+        for (var boundVar : ((JTerm) term).boundVars()) {
             localBind = localBind.add(boundVar);
         }
 
@@ -225,7 +226,7 @@ public class SeqDefHandler implements SMTHandler {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
             SExpr ref =
-                trans.translate(termFactory.createTerm((de.uka.ilkd.key.logic.op.Operator) var));
+                trans.translate(termFactory.createTerm((Operator) var));
             args.add(SExprs.coerce(ref, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);

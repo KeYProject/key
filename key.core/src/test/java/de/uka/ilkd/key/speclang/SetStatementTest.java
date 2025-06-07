@@ -10,8 +10,8 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
@@ -115,7 +115,7 @@ public class SetStatementTest {
         assertInstanceOf(TextualJMLSetStatement.class, constructs.head());
         var statement = (TextualJMLSetStatement) constructs.head();
         JmlParser.Set_statementContext context = statement.getAssignment();
-        Term assignee = jmlIO.translateTerm(context.assignee);
+        JTerm assignee = jmlIO.translateTerm(context.assignee);
         return jsf.checkSetStatementAssignee(assignee);
     }
 }

@@ -10,15 +10,15 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
+import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableSLList;
 
 
@@ -46,7 +46,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * The original invariant from which the class invariant is derived.
      */
-    private final Term originalInv;
+    private final JTerm originalInv;
     /**
      * The original self variable of the receiver object.
      */
@@ -77,7 +77,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, LocationVariable selfVar) {
+            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar) {
         this(name, displayName, kjt, visibility, inv, selfVar, false);
     }
 
@@ -93,7 +93,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param free whether this contract is free.
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, LocationVariable selfVar,
+            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
             boolean free) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
@@ -116,7 +116,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(AbstractSortedOperator selfVar,
+    private Map<Operator, Operator> getReplaceMap(JAbstractSortedOperator selfVar,
             TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<>();
 
@@ -135,7 +135,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // -------------------------------------------------------------------------
 
     @Override
-    public ClassInvariant map(UnaryOperator<Term> op, Services services) {
+    public ClassInvariant map(UnaryOperator<JTerm> op, Services services) {
         return new ClassInvariantImpl(name, displayName, kjt, visibility, op.apply(originalInv),
             originalSelfVar, isFree);
     }
@@ -159,17 +159,17 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
 
     @Override
-    public Term getInv(AbstractSortedOperator selfVar, TermServices services) {
+    public JTerm getInv(JAbstractSortedOperator selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
-        Term res = or.replace(originalInv);
+        JTerm res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);
         return res;
     }
 
 
     @Override
-    public Term getOriginalInv() {
+    public JTerm getOriginalInv() {
         return originalInv;
     }
 

@@ -11,11 +11,11 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
@@ -26,9 +26,9 @@ import org.key_project.util.collection.Pair;
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
+    public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        ImmutableList<Term> posts = ImmutableSLList.nil();
+        ImmutableList<JTerm> posts = ImmutableSLList.nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
@@ -38,11 +38,11 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
             posts =
                 posts.append(d.tb.box(guardJb, d.tb.equals(poVars.post.guard, d.origVars.guard)));
         }
-        Iterator<Term> localVars = d.origVars.localVars.iterator();
-        Iterator<Term> localVarsAtPost = poVars.post.localVars.iterator();
+        Iterator<JTerm> localVars = d.origVars.localVars.iterator();
+        Iterator<JTerm> localVarsAtPost = poVars.post.localVars.iterator();
         while (localVars.hasNext()) {
-            Term i = localVars.next();
-            Term o = localVarsAtPost.next();
+            JTerm i = localVars.next();
+            JTerm o = localVarsAtPost.next();
             if (i != null && o != null) {
                 posts = posts.append(d.tb.equals(o, i));
             }
@@ -52,44 +52,44 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         return buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
     }
 
-    private Term buildProgramTerm(BasicSnippetData d, ProofObligationVars vs, Term postTerm,
+    private JTerm buildProgramTerm(BasicSnippetData d, ProofObligationVars vs, JTerm postTerm,
             TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a loop without modality.");
         }
         // create java block
-        Modality.JavaModalityKind kind =
-            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
+        JModality.JavaModalityKind kind =
+            (JModality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
         final Pair<JavaBlock, JavaBlock> jb = buildJavaBlock(d);
 
         // create program term
-        final Modality.JavaModalityKind symbExecMod;
-        if (kind == Modality.JavaModalityKind.BOX) {
-            symbExecMod = Modality.JavaModalityKind.DIA;
+        final JModality.JavaModalityKind symbExecMod;
+        if (kind == JModality.JavaModalityKind.BOX) {
+            symbExecMod = JModality.JavaModalityKind.DIA;
         } else {
-            symbExecMod = Modality.JavaModalityKind.BOX;
+            symbExecMod = JModality.JavaModalityKind.BOX;
         }
-        final Term guardPreTrueTerm = d.tb.equals(vs.pre.guard, d.tb.TRUE());
-        final Term guardPreFalseTerm = d.tb.equals(vs.pre.guard, d.tb.FALSE());
-        final Term guardPreEqTerm = d.tb.equals(d.origVars.guard, vs.pre.guard);
-        final Term bodyTerm = tb.prog(symbExecMod, jb.first, postTerm);
-        final Term guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
-        final Term guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
-        final Term guardPreAndTrueTerm =
+        final JTerm guardPreTrueTerm = d.tb.equals(vs.pre.guard, d.tb.TRUE());
+        final JTerm guardPreFalseTerm = d.tb.equals(vs.pre.guard, d.tb.FALSE());
+        final JTerm guardPreEqTerm = d.tb.equals(d.origVars.guard, vs.pre.guard);
+        final JTerm bodyTerm = tb.prog(symbExecMod, jb.first, postTerm);
+        final JTerm guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
+        final JTerm guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
+        final JTerm guardPreAndTrueTerm =
             tb.prog(kind, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
-        final Term programTerm = d.tb.and(guardPreAndTrueTerm, guardFalseBody);
+        final JTerm programTerm = d.tb.and(guardPreAndTrueTerm, guardFalseBody);
 
         // create update
-        Term update = tb.skip();
-        Iterator<Term> paramIt = vs.pre.localVars.iterator();
-        Iterator<Term> origParamIt = d.origVars.localVars.iterator();
+        JTerm update = tb.skip();
+        Iterator<JTerm> paramIt = vs.pre.localVars.iterator();
+        Iterator<JTerm> origParamIt = d.origVars.localVars.iterator();
         while (paramIt.hasNext()) {
-            Term paramUpdate = d.tb.elementary(origParamIt.next(), paramIt.next());
+            JTerm paramUpdate = d.tb.elementary(origParamIt.next(), paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
         if (vs.post.self != null) {
-            Term selfUpdate = d.tb.elementary(d.origVars.self, vs.pre.self);
+            JTerm selfUpdate = d.tb.elementary(d.origVars.self, vs.pre.self);
             update = tb.parallel(selfUpdate, update);
         }
         return tb.apply(update, programTerm);

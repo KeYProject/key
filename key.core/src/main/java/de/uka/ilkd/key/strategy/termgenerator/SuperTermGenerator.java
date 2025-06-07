@@ -8,7 +8,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Name;
@@ -16,6 +16,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.Modifier;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -102,11 +103,11 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         protected Term generateOneTerm(Term superterm, int child) {
             final var index = services.getTermBuilder().zTerm(String.valueOf(child));
             return services.getTermBuilder().tf().createTerm(binFunc,
-                (de.uka.ilkd.key.logic.Term) superterm, index);
+                (JTerm) superterm, index);
         }
 
         private static class SuperTermGeneratedOp
-                implements SortedOperator, Operator, TerminalSyntaxElement {
+                implements SortedOperator, TerminalSyntaxElement, Operator {
             private final Name NAME;
             private final IntegerLDT numbers;
 
@@ -161,7 +162,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
             }
 
             @Override
-            public void validTopLevelException(org.key_project.logic.Term term)
+            public void validTopLevelException(Term term)
                     throws TermCreationException {
                 if (!(term.arity() == 2 && term.sub(1).sort()
                         .extendsTrans(numbers.getNumberSymbol().sort()))) {

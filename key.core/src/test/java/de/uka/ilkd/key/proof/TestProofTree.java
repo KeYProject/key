@@ -57,13 +57,13 @@ public class TestProofTree {
 
         TermFactory tf = TacletForTests.services().getTermFactory();
 
-        Term t_b1 = tf.createTerm(Equality.EQUALS, tf.createTerm(b1), tf.createTerm(b1));
-        Term t_b2 = tf.createTerm(Equality.EQUALS, tf.createTerm(b2), tf.createTerm(b2));
-        Term t_b3 = tf.createTerm(Equality.EQUALS, tf.createTerm(b3), tf.createTerm(b3));
-        Term t_b4 = tf.createTerm(Equality.EQUALS, tf.createTerm(b4), tf.createTerm(b4));
-        Term t_b5 = tf.createTerm(Equality.EQUALS, tf.createTerm(b5), tf.createTerm(b5));
-        Term t_b6 = tf.createTerm(Equality.EQUALS, tf.createTerm(b6), tf.createTerm(b6));
-        Term t_b7 = tf.createTerm(Equality.EQUALS, tf.createTerm(b7), tf.createTerm(b7));
+        JTerm t_b1 = tf.createTerm(Equality.EQUALS, tf.createTerm(b1), tf.createTerm(b1));
+        JTerm t_b2 = tf.createTerm(Equality.EQUALS, tf.createTerm(b2), tf.createTerm(b2));
+        JTerm t_b3 = tf.createTerm(Equality.EQUALS, tf.createTerm(b3), tf.createTerm(b3));
+        JTerm t_b4 = tf.createTerm(Equality.EQUALS, tf.createTerm(b4), tf.createTerm(b4));
+        JTerm t_b5 = tf.createTerm(Equality.EQUALS, tf.createTerm(b5), tf.createTerm(b5));
+        JTerm t_b6 = tf.createTerm(Equality.EQUALS, tf.createTerm(b6), tf.createTerm(b6));
+        JTerm t_b7 = tf.createTerm(Equality.EQUALS, tf.createTerm(b7), tf.createTerm(b7));
 
         Sequent s1 = JavaDLSequentKit.createSequent(
             ImmutableSLList.singleton(new SequentFormula(t_b1)), ImmutableSLList.nil());

@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.Named;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -14,25 +15,26 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Abstract base class for schema variables.
  */
-public abstract class OperatorSV extends AbstractSortedOperator
-        implements org.key_project.logic.op.sv.OperatorSV, SchemaVariable, ParsableVariable {
+public abstract class JOperatorSV extends JAbstractSortedOperator
+        implements OperatorSV, SchemaVariable, Named {
 
     private final boolean isStrict;
 
 
-    protected OperatorSV(Name name, ImmutableArray<Sort> argSorts, Sort sort, boolean isRigid,
+    protected JOperatorSV(Name name, ImmutableArray<Sort> argSorts, Sort sort, boolean isRigid,
             boolean isStrict) {
         super(name, argSorts, sort, isRigid);
         this.isStrict = isStrict;
     }
 
 
-    protected OperatorSV(Name name, Sort[] argSorts, Sort sort, boolean isRigid, boolean isStrict) {
+    protected JOperatorSV(Name name, Sort[] argSorts, Sort sort, boolean isRigid,
+            boolean isStrict) {
         this(name, new ImmutableArray<>(argSorts), sort, isRigid, isStrict);
     }
 
 
-    protected OperatorSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {
+    protected JOperatorSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {
         this(name, new ImmutableArray<>(), sort, isRigid, isStrict);
     }
 

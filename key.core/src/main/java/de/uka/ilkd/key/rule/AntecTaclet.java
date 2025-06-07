@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.executor.javadl.AntecTacletExecutor;
 
 import org.key_project.logic.ChoiceExpr;
@@ -50,8 +50,8 @@ public class AntecTaclet extends FindTaclet {
     }
 
     @Override
-    public Term find() {
-        return (Term) ((Sequent) find).antecedent().getFirst().formula();
+    public JTerm find() {
+        return (JTerm) ((Sequent) find).antecedent().getFirst().formula();
     }
 
     /** toString for the find part */

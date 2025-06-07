@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
@@ -24,8 +24,8 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
             PosInOccurrence newPio,
             PosInOccurrence oldPio) {
-        final Term newFocus = (Term) newPio.subTerm();
-        final Term oldFocus = (Term) oldPio.subTerm();
+        final JTerm newFocus = (JTerm) newPio.subTerm();
+        final JTerm oldFocus = (JTerm) oldPio.subTerm();
         if (!newFocus.equalsModProperty(oldFocus, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             return false;
         }

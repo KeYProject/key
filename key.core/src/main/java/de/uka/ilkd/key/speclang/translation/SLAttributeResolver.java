@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.TermCreationException;
@@ -78,7 +78,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
-        Term recTerm = receiver.getTerm();
+        JTerm recTerm = receiver.getTerm();
 
         // <inv> and <inv_free> are special cases
         // (because they're predicates, not boolean attributes)
@@ -133,7 +133,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 try {
                     final Function fieldSymbol =
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
-                    Term attributeTerm;
+                    JTerm attributeTerm;
                     if (attribute.isStatic()) {
                         if (attribute.isFinal() &&
                                 FinalHeapResolution.recallIsFinalEnabled()) {

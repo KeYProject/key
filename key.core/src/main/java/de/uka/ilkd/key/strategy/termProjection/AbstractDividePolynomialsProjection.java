@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.termProjection;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
@@ -41,7 +42,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
     protected abstract Term divide(Monomial numerator, BigInteger denominator, Services services);
 
-    private de.uka.ilkd.key.logic.Term quotient(BigInteger monoCoeff, Term rightPoly,
+    private JTerm quotient(BigInteger monoCoeff, Term rightPoly,
             Services services) {
         final Function add = services.getTypeConverter().getIntegerLDT().getAdd();
         if (rightPoly.op() == add) {
@@ -51,7 +52,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
         }
 
         final Monomial rightMono = Monomial.create(rightPoly, services);
-        return (de.uka.ilkd.key.logic.Term) divide(rightMono, monoCoeff, services);
+        return (JTerm) divide(rightMono, monoCoeff, services);
     }
 
 }
