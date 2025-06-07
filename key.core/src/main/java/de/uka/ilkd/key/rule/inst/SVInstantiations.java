@@ -30,6 +30,9 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -386,33 +389,10 @@ public class SVInstantiations
      *         stored
      */
     @Override
-    public Object getInstantiation(SchemaVariable sv) {
-        final InstantiationEntry<?> entry = getInstantiationEntry(sv);
+    public <T> T getInstantiation(SchemaVariable sv) {
+        final InstantiationEntry<T> entry = getInstantiationEntry(sv);
         return entry == null ? null : entry.getInstantiation();
     }
-
-    /**
-     * returns the instantiation of the given SchemaVariable
-     *
-     * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
-     *         stored
-     */
-    public JTerm getInstantiation(SkolemTermSV sv) {
-        final InstantiationEntry<JTerm> entry = getInstantiationEntry(sv);
-        return entry == null ? null : entry.getInstantiation();
-    }
-
-    /**
-     * returns the instantiation of the given SchemaVariable
-     *
-     * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
-     *         stored
-     */
-    public JTerm getInstantiation(TermSV sv) {
-        final InstantiationEntry<JTerm> entry = getInstantiationEntry(sv);
-        return entry == null ? null : entry.getInstantiation();
-    }
-
 
     /**
      * returns the instantiation of the given SchemaVariable as Term. If the instantiation is a
@@ -664,15 +644,15 @@ public class SVInstantiations
     }
 
     @Override
-    public SchemaVariable lookupVar(Name name) {
+    public @Nullable SchemaVariable lookupVar(@NonNull Name name) {
         final var e = lookupEntryForSV(name);
         return e == null ? null : e.key(); // handle this better!
     }
 
     @Override
-    public Object lookupValue(Name name) {
+    public <T> @Nullable T lookupValue(@NonNull Name name) {
         final var e = lookupEntryForSV(name);
         // e.value() cannot be null here as null instantiations are not allowed
-        return e == null ? null : e.value().getInstantiation();
+        return e == null ? null : (T) e.value().getInstantiation();
     }
 }
