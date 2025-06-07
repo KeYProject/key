@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -34,7 +35,7 @@ public abstract class Instruction<OP extends Operator>
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static MatchModalityInstruction matchModalOperator(JModality mod) {
+    public static MatchModalityInstruction matchModalOperator(Modality mod) {
         return new MatchModalityInstruction(mod);
     }
 

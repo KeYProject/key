@@ -16,7 +16,6 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -47,6 +46,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -562,7 +562,7 @@ public class OutputStreamProofSaver {
             // -> needed for proof management tool
             if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
                 if (appliedRuleApp instanceof ContractRuleApp app) {
-                    JModality modality = (JModality) app.programTerm().op();
+                    Modality modality = (Modality) app.programTerm().op();
                     output.append(" (modality \"");
                     output.append(modality.toString());
                     output.append("\")");

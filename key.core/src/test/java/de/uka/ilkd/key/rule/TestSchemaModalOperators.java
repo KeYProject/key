@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.instantiation.MatchConditions;
@@ -165,7 +166,7 @@ public class TestSchemaModalOperators {
             (JTerm) t.getRewriteResult(TacletForTests.createGoal(), new TermLabelState(), services,
                 tacletApp).formula();
         assertNotNull(instReplace);
-        assertSame(JModality.JavaModalityKind.DIA, ((JModality) instReplace.op()).kind());
+        assertSame(JModality.JavaModalityKind.DIA, ((Modality) instReplace.op()).kind());
     }
 
     @Test

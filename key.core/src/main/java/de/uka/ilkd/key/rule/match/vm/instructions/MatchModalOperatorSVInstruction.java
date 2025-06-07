@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Modality;
 
 public class MatchModalOperatorSVInstruction implements MatchInstruction {
 
@@ -20,7 +21,7 @@ public class MatchModalOperatorSVInstruction implements MatchInstruction {
     }
 
     public MatchConditions match(JTerm t, MatchConditions mc, LogicServices services) {
-        if (t.op() instanceof JModality mod
+        if (t.op() instanceof Modality mod
                 && op.getModalities().contains(mod.kind())) {
             return mc.setInstantiations(
                 mc.getInstantiations().add(op, mod.<JModality.JavaModalityKind>kind(), services));

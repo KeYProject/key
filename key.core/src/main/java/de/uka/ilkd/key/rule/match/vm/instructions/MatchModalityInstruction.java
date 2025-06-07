@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 
 /**
@@ -16,10 +16,10 @@ import org.key_project.logic.op.Operator;
  * the <strong>same</strong> modality like the one for which this instruction has been
  * instantiated
  */
-public class MatchModalityInstruction extends Instruction<JModality>
+public class MatchModalityInstruction extends Instruction<Modality>
         implements MatchOperatorInstruction {
 
-    public MatchModalityInstruction(JModality op) {
+    public MatchModalityInstruction(Modality op) {
         super(op);
     }
 
@@ -38,7 +38,7 @@ public class MatchModalityInstruction extends Instruction<JModality>
     @Override
     public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
             LogicServices services) {
-        if (instantiationCandidate instanceof JModality mod1 && mod1.kind() == op.kind()) {
+        if (instantiationCandidate instanceof Modality mod1 && mod1.kind() == op.kind()) {
             return matchConditions;
         } else {
             return null;

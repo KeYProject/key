@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -50,7 +50,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final JTerm anonPermissionsHeapTerm = term.sub(3);
 
         return createHeapAnonUpdate(loopSpec,
-            MiscTools.isTransaction(((JModality) loopTerm.op()).kind()),
+            MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
             MiscTools.isPermissions(services),
             anonHeapTerm, anonSavedHeapTerm, anonPermissionsHeapTerm, services);
     }

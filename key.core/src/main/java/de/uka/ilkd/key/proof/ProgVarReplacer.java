@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.prover.rules.instantiation.ListInstantiation;
@@ -226,7 +227,7 @@ public final class ProgVarReplacer {
         // TODO (DD): Clean up
         final JavaBlock jb = t.javaBlock();
         JavaBlock newJb = jb;
-        if (op instanceof JModality mod) {
+        if (op instanceof Modality mod) {
             Statement s = (Statement) jb.program();
             Statement newS = (Statement) replace(s);
             if (newS != s) {

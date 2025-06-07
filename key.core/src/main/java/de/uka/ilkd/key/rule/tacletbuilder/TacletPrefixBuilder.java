@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.conditions.NotFreeIn;
@@ -67,7 +68,7 @@ public class TacletPrefixBuilder {
     }
 
     private void visit(JTerm t) {
-        if (t.op() instanceof JModality mod && mod.kind() instanceof ModalOperatorSV msv) {
+        if (t.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV msv) {
             // TODO: Is false correct?
             prefixMap.put(msv, new TacletPrefix(ImmutableSet.empty(), false));
         }

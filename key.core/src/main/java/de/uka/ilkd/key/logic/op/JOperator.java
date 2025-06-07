@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 
 /**
@@ -22,7 +23,7 @@ public interface JOperator extends Operator {
     static boolean opEquals(Operator fst,
             Operator snd) {
         return fst == snd ||
-                (fst instanceof JModality mod1 && snd instanceof JModality mod2
+                (fst instanceof Modality mod1 && snd instanceof Modality mod2
                         && mod1.kind() == mod2.kind());
     }
 }

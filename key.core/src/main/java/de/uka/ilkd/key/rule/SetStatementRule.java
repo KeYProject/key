@@ -10,13 +10,13 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -114,7 +114,7 @@ public final class SetStatementRule implements BuiltInRule {
         JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
 
         JTerm term =
-            tb.prog(((JModality) target.op()).kind(), javaBlock, target.sub(0), target.getLabels());
+            tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), target.getLabels());
         JTerm newTerm = tb.apply(update, tb.apply(newUpdate, term));
 
         ImmutableList<Goal> result = goal.split(1);
