@@ -224,7 +224,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return updateOrigin(left, ctx, services);
         }
         return capsulateTf(ctx,
-            () -> updateOrigin(getTermFactory().createTerm((JOperator) operator, left, right), ctx,
+            () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx,
                 services));
     }
 
@@ -653,12 +653,12 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public JTerm visitMetaTerm(KeYParser.MetaTermContext ctx) {
-        JOperator metaId = accept(ctx.metaId());
+        Operator metaId = accept(ctx.metaId());
         List<JTerm> t = mapOf(ctx.term());
         return capsulateTf(ctx, () -> getTermFactory().createTerm(metaId, t));
     }
 
-    public JTerm createAttributeTerm(JTerm prefix, JOperator attribute, ParserRuleContext ctx) {
+    public JTerm createAttributeTerm(JTerm prefix, Operator attribute, ParserRuleContext ctx) {
         JTerm result = prefix;
 
         if (attribute instanceof JOperatorSV sv) {
@@ -708,10 +708,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-    private JOperator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
+    private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
         final JavaInfo javaInfo = getJavaInfo();
 
-        JOperator result = (JOperatorSV) schemaVariables().lookup(new Name(attributeName));
+        Operator result = (JOperatorSV) schemaVariables().lookup(new Name(attributeName));
         // if (result == null) {
 
         final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
@@ -1029,7 +1029,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public JTerm visitQuantifierterm(KeYParser.QuantifiertermContext ctx) {
-        JOperator op = null;
+        Operator op = null;
         Namespace<JQuantifiableVariable> orig = variables();
         if (ctx.FORALL() != null) {
             op = Quantifier.ALL;
@@ -1138,7 +1138,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.MODALITY().getSymbol());
-        JOperator op;
+        Operator op;
         if (sjb.opName.charAt(0) == '#') {
             /*
              * if (!inSchemaMode()) { semanticError(ctx,
@@ -1177,7 +1177,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "'" + s + "' is not a valid character.");
             }
         }
-        return getTermFactory().createTerm((JOperator) functions().lookup(new Name("C")),
+        return getTermFactory().createTerm(functions().lookup(new Name("C")),
             toZNotation(String.valueOf(intVal), functions()).sub(0));
     }
 
@@ -1214,7 +1214,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return UpdateJunctor.SKIP;
         }
 
-        JOperator op;
+        Operator op;
         if (varfuncid.endsWith(LIMIT_SUFFIX)) {
             varfuncid = varfuncid.substring(0, varfuncid.length() - 5);
             op = lookupVarfuncId(ctx, varfuncid,
@@ -1245,7 +1245,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     }
                 }
                 memberName = StringUtil.trim(memberName, "()");
-                JOperator attr = getAttributeInPrefixSort(v.sort(), memberName);
+                Operator attr = getAttributeInPrefixSort(v.sort(), memberName);
                 return createAttributeTerm(tv, attr, ctx);
             }
         }
@@ -1312,7 +1312,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     String attributeName = accept(simpleContext.id);
                     ProgramVariable maybeAttr = getJavaInfo().getAttribute(attributeName, kjt);
                     if (maybeAttr != null) {
-                        JOperator op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
+                        Operator op = getAttributeInPrefixSort(kjt.getSort(), attributeName);
                         current = createAttributeTerm(current, op, ctx);
                     } else {
                         IProgramMethod pm = getStaticQuery(kjt, attributeName);
@@ -1400,7 +1400,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         current = getServices().getJavaInfo().getProgramMethodTerm(current,
                             memberName, sfxargs, classRef, true);
                     } else {
-                        JOperator attr = getAttributeInPrefixSort(current.sort(), memberName);
+                        Operator attr = getAttributeInPrefixSort(current.sort(), memberName);
                         current = createAttributeTerm(current, attr, ctxSuffix);
                     }
 
@@ -1424,7 +1424,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName,
                         sfxargs, classRef, false);
                 } else {
-                    JOperator op = getAttributeInPrefixSort(getTypeByClassName(classRef).getSort(),
+                    Operator op = getAttributeInPrefixSort(getTypeByClassName(classRef).getSort(),
                         classRef + "::" + memberName);
                     current = createAttributeTerm(current, op, ctxSuffix);
                 }
@@ -1482,7 +1482,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         assert firstName != null;
-        JOperator op;
+        Operator op;
 
         if ("skip".equals(firstName)) {
             op = UpdateJunctor.SKIP;
@@ -1502,7 +1502,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         JTerm current;
-        JOperator finalOp = op;
+        Operator finalOp = op;
         if (op instanceof ParsableVariable) {
             if (args != null) {
                 semanticError(ctx, "You used the variable `%s` like a predicate or function.", op);

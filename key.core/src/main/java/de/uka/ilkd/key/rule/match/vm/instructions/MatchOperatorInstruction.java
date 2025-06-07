@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Operator;
 
 public interface MatchOperatorInstruction extends MatchInstruction {
 
-    MatchConditions match(JOperator instantiationCandidate, MatchConditions matchConditions,
+    MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
             LogicServices services);
 
 }

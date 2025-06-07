@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JOperatorSV;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -83,7 +82,7 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        JTerm A = tf.createTerm((JOperator) TacletForTests.getFunctions().lookup(new Name("A")),
+        JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
         JTerm t1 = tb.all((JQuantifiableVariable) u, A);
         Sequent seq =
@@ -105,7 +104,7 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        JTerm A = tf.createTerm((JOperator) TacletForTests.getFunctions().lookup(new Name("A")),
+        JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
         JTerm t1 = tb.all((JQuantifiableVariable) u, A);
         JTerm t2 = tb.ex((JQuantifiableVariable) u, A);
@@ -128,7 +127,7 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVsInFind() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        JTerm A = tf.createTerm((JOperator) TacletForTests.getFunctions().lookup(new Name("A")),
+        JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
         JTerm t1 = tb.all((JQuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();

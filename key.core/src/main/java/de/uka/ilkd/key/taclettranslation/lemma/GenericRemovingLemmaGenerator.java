@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -41,7 +41,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
      * is a generic sort.
      */
     @Override
-    protected JOperator replaceOp(JOperator op, TermServices services) {
+    protected Operator replaceOp(Operator op, TermServices services) {
 
         if (op instanceof SortDependingFunction sdf) {
             Sort sort = sdf.getSortDependingOn();

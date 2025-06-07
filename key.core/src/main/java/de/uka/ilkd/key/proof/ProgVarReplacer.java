@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.prover.sequent.*;
@@ -220,7 +221,7 @@ public final class ProgVarReplacer {
             }
         }
 
-        JOperator op = t.op();
+        Operator op = t.op();
 
         // TODO (DD): Clean up
         final JavaBlock jb = t.javaBlock();
@@ -245,7 +246,7 @@ public final class ProgVarReplacer {
      * replaces in a term
      */
     public JTerm replace(JTerm t) {
-        final JOperator op = t.op();
+        final Operator op = t.op();
         if (op instanceof ProgramVariable) {
             return replaceProgramVariable(t);
         } else if (op instanceof ElementaryUpdate

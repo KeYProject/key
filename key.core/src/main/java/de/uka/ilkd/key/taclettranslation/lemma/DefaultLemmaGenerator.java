@@ -19,6 +19,7 @@ import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
@@ -279,7 +280,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             i++;
         }
 
-        JOperator newOp = replaceOp(term.op(), services);
+        Operator newOp = replaceOp(term.op(), services);
 
         return services.getTermFactory().createTerm(newOp, newSubs,
             new ImmutableArray<>(qvars), null);
@@ -296,7 +297,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * @param services A services object for lookups
      * @return the replacement operator, not <code>null</code>
      */
-    protected JOperator replaceOp(JOperator op, TermServices services) {
+    protected Operator replaceOp(Operator op, TermServices services) {
         return op;
     }
 

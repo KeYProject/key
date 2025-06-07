@@ -7,7 +7,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
@@ -336,18 +335,18 @@ public abstract class StaticFeatureCollection {
         return SubtermProjection.create(t, PosInTerm.getTopLevel().down(index));
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(JOperator op,
+    protected static ProjectionToTerm<Goal> opTerm(Operator op,
             ProjectionToTerm<Goal>[] subTerms) {
         return TermConstructionProjection.create(op, subTerms);
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(JOperator op,
+    protected static ProjectionToTerm<Goal> opTerm(Operator op,
             ProjectionToTerm<Goal> subTerm) {
         // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(JOperator op,
+    protected static ProjectionToTerm<Goal> opTerm(Operator op,
             ProjectionToTerm<Goal> subTerm0,
             ProjectionToTerm<Goal> subTerm1) {
         // noinspection unchecked

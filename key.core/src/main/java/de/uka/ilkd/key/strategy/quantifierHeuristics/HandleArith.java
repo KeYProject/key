@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.Pair;
 
@@ -91,7 +92,7 @@ public class HandleArith {
 
         boolean temp = true;
         JTerm pro = problem;
-        JOperator op = pro.op();
+        Operator op = pro.op();
         // may be here we should check wehre sub0 and sub1 is integer.
         while (op == Junctor.NOT) {
             pro = pro.sub(0);
@@ -198,7 +199,7 @@ public class HandleArith {
         }
 
         pro = problem;
-        JOperator op = pro.op();
+        Operator op = pro.op();
         boolean opNot = false;
         while (op == Junctor.NOT) {
             opNot = !opNot;

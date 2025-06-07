@@ -19,6 +19,7 @@ import de.uka.ilkd.key.speclang.njml.TranslatedDependencyContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -839,7 +840,7 @@ public class ContractFactory {
             LocationVariable originalResultVar, LocationVariable originalExcVar,
             ImmutableList<LocationVariable> originalParamVars,
             Map<LocationVariable, LocationVariable> originalAtPreVars) {
-        Map<JOperator, JOperator> map = new LinkedHashMap<>();
+        Map<Operator, Operator> map = new LinkedHashMap<>();
         addToMap(selfVar, originalSelfVar, map);
         addToMap(resultVar, originalResultVar, map);
         addToMap(excVar, originalExcVar, map);

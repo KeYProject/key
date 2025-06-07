@@ -17,7 +17,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -227,7 +226,7 @@ public class SeqDefHandler implements SMTHandler {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
             SExpr ref =
-                trans.translate(termFactory.createTerm((JOperator) var));
+                trans.translate(termFactory.createTerm((Operator) var));
             args.add(SExprs.coerce(ref, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);

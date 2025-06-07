@@ -9,11 +9,11 @@ import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 
 /**
  * resolve a program variable to an integer literal.
@@ -39,7 +39,7 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      */
     public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         term = term.sub(0);
-        JOperator op = term.op();
+        Operator op = term.op();
 
         if (op instanceof ProgramVariable pv) {
             int value;

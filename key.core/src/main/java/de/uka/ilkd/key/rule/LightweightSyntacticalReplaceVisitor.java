@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -141,7 +142,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         }
     }
 
-    private JOperator instantiateModality(JModality op, JavaBlock jb) {
+    private Operator instantiateModality(JModality op, JavaBlock jb) {
         JModality.JavaModalityKind kind = op.kind();
         if (op.kind() instanceof ModalOperatorSV) {
             kind = (JModality.JavaModalityKind) svInst.getInstantiation(op.kind());
@@ -152,8 +153,8 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         return op;
     }
 
-    private JOperator instantiateOperator(JOperator p_operatorToBeInstantiated, JavaBlock jb) {
-        JOperator instantiatedOp = p_operatorToBeInstantiated;
+    private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
+        Operator instantiatedOp = p_operatorToBeInstantiated;
         if (p_operatorToBeInstantiated instanceof SortDependingFunction sortDependingFunction) {
             instantiatedOp =
                 handleSortDependingSymbol(sortDependingFunction);
@@ -163,7 +164,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
             instantiatedOp = instantiateModality(mod, jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable sv) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV opSV && opSV.isListSV())) {
-                instantiatedOp = (JOperator) svInst.getInstantiation(sv);
+                instantiatedOp = (Operator) svInst.getInstantiation(sv);
             }
         }
         assert instantiatedOp != null;
@@ -205,7 +206,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
     public void visit(final org.key_project.logic.Term p_visited) {
         final JTerm visited = (JTerm) p_visited;
         // Sort equality has to be ensured before calling this method
-        final JOperator visitedOp = visited.op();
+        final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
                 && svInst.isInstantiated(visitedSV)
                 && (!(visitedOp instanceof ProgramSV visitedPSV && visitedPSV.isListSV()))) {
@@ -224,7 +225,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
                 }
             }
 
-            final JOperator newOp = instantiateOperator(visitedOp, jb);
+            final Operator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
             final ImmutableArray<JQuantifiableVariable> boundVars = //
@@ -248,13 +249,13 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         }
     }
 
-    private JOperator handleSortDependingSymbol(SortDependingFunction depOp) {
+    private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
         final Sort depSort = depOp.getSortDependingOn();
 
         final Sort realDepSort =
             svInst.getGenericSortInstantiations().getRealSort(depSort, services);
 
-        final JOperator res = depOp.getInstanceFor(realDepSort, services);
+        final Operator res = depOp.getInstanceFor(realDepSort, services);
         assert res != null
                 : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
         return res;

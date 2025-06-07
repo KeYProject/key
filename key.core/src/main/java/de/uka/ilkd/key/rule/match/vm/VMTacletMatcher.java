@@ -8,7 +8,6 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
@@ -327,7 +327,7 @@ public class VMTacletMatcher implements TacletMatcher {
     private Pair<JTerm, MatchConditions> matchAndIgnoreUpdatePrefix(
             final JTerm source,
             final MatchConditions matchCond) {
-        final JOperator sourceOp = source.op();
+        final Operator sourceOp = source.op();
 
         if (sourceOp instanceof UpdateApplication) {
             // updates can be ignored

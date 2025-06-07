@@ -11,9 +11,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.Junctor;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -94,7 +94,7 @@ public class PredictCostProver {
     private JTerm provedBySelf(JTerm problem) {
         boolean negated = false;
         JTerm pro = problem;
-        JOperator op = pro.op();
+        Operator op = pro.op();
         while (op == Junctor.NOT) {
             negated = !negated;
             pro = pro.sub(0);
@@ -308,7 +308,7 @@ public class PredictCostProver {
         public ImmutableSet<JTerm> refine(Iterable<? extends JTerm> assertLits) {
             ImmutableSet<JTerm> res = DefaultImmutableSet.nil();
             for (final JTerm lit : this) {
-                final JOperator op = proveLiteral(lit, assertLits).op();
+                final Operator op = proveLiteral(lit, assertLits).op();
                 if (op == Junctor.TRUE) {
                     res = DefaultImmutableSet.<JTerm>nil().add(trueT);
                     break;
@@ -341,7 +341,7 @@ public class PredictCostProver {
             JTerm axiom = opNot ? terms[0].sub(0) : tb.not(terms[0]);
             for (int j = 1; j < terms.length; j++) {
                 JTerm pro = provedByAnother(terms[j], axiom);
-                final JOperator op = pro.op();
+                final Operator op = pro.op();
                 if (op == Junctor.TRUE) {
                     return true;
                 }

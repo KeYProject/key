@@ -5,13 +5,13 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JModality;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -124,7 +124,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
 
             if (changeIndex == -1) {
                 final JTerm beforeChangeTerm = (JTerm) changePIO.getSubTerm();
-                final JOperator beforeChangeOp = beforeChangeTerm.op();
+                final Operator beforeChangeOp = beforeChangeTerm.op();
 
                 // special case: a taclet application is not affected by changes
                 // to a preceding program, as long as the post-condition of the

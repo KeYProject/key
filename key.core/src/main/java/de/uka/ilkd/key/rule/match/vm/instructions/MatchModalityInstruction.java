@@ -5,11 +5,11 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JModality;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Operator;
 
 /**
  * The match instruction reports a success if the top level operator of the term to be matched is
@@ -36,7 +36,7 @@ public class MatchModalityInstruction extends Instruction<JModality>
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(JOperator instantiationCandidate, MatchConditions matchConditions,
+    public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
             LogicServices services) {
         if (instantiationCandidate instanceof JModality mod1 && mod1.kind() == op.kind()) {
             return matchConditions;

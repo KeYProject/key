@@ -8,7 +8,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -260,7 +259,7 @@ public class OpReplacer {
         final JTerm result;
         if (newOp != term.op() || changedSubTerm || newBoundVars != term.boundVars()) {
             result =
-                tf.createTerm((JOperator) newOp, newSubTerms, newBoundVars,
+                tf.createTerm(newOp, newSubTerms, newBoundVars,
                     term.getLabels());
         } else {
             result = term;

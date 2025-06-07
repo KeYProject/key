@@ -31,6 +31,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -671,7 +672,7 @@ public abstract class WellDefinednessCheck implements Contract {
         assert find1.sub(0).op().name().equals(find2.sub(0).op().name());
         assert find1.sub(0).arity() == find2.sub(0).arity();
 
-        Map<JOperator, JOperator> map = new LinkedHashMap<>();
+        Map<Operator, Operator> map = new LinkedHashMap<>();
         int i = 0;
         for (JTerm sub : find1.sub(0).subs()) {
             map.put(find2.sub(0).sub(i).op(), sub.op());

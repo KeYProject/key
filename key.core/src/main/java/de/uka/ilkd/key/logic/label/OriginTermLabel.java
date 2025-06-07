@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -219,7 +219,7 @@ public class OriginTermLabel implements TermLabel {
      * @return {@code true} iff an {@code OriginTermLabel} can be added to a term with the specified
      *         operator.
      */
-    public static boolean canAddLabel(JOperator op, Services services) {
+    public static boolean canAddLabel(Operator op, Services services) {
         // TODO: Instead of not adding origin labels to certain terms, we should investigate why
         // adding labels to these kinds of terms breaks the prover and fix these issues.
 

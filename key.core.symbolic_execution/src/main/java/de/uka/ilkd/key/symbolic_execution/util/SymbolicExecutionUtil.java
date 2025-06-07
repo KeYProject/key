@@ -595,7 +595,7 @@ public final class SymbolicExecutionUtil {
         /**
          * The {@link JOperator} which is the predicate that contains the value interested in.
          */
-        private final JOperator operator;
+        private final Operator operator;
 
         /**
          * Constructor.
@@ -604,7 +604,7 @@ public final class SymbolicExecutionUtil {
          * @param operator The {@link JOperator} which is the predicate that contains the value
          *        interested in.
          */
-        public SiteProofVariableValueInput(Sequent sequentToProve, JOperator operator) {
+        public SiteProofVariableValueInput(Sequent sequentToProve, Operator operator) {
             super();
             this.sequentToProve = sequentToProve;
             this.operator = operator;
@@ -626,7 +626,7 @@ public final class SymbolicExecutionUtil {
          * @return The {@link JOperator} which is the predicate that contains the value interested
          *         in.
          */
-        public JOperator getOperator() {
+        public Operator getOperator() {
             return operator;
         }
     }
@@ -3867,7 +3867,7 @@ public final class SymbolicExecutionUtil {
      * @return {@code true} {@link JOperator} is the base heap, {@code false} {@link JOperator} is
      *         something else.
      */
-    public static boolean isBaseHeap(JOperator op, HeapLDT heapLDT) {
+    public static boolean isBaseHeap(Operator op, HeapLDT heapLDT) {
         return op == heapLDT.getHeapForName(HeapLDT.BASE_HEAP_NAME);
     }
 
@@ -4216,7 +4216,7 @@ public final class SymbolicExecutionUtil {
                 while (verified && leafsIter.hasNext()) {
                     Node leaf = leafsIter.next();
                     if (!leaf.isClosed()) {
-                        final Set<JOperator> additinalOperatos = new HashSet<>();
+                        final Set<Operator> additinalOperatos = new HashSet<>();
                         for (JTerm term : additinalPredicates) {
                             additinalOperatos.add(term.op());
                         }

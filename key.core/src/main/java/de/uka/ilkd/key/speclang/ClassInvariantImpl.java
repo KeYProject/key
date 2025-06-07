@@ -14,11 +14,11 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableSLList;
 
 
@@ -116,9 +116,9 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<JOperator, JOperator> getReplaceMap(JAbstractSortedOperator selfVar,
+    private Map<Operator, Operator> getReplaceMap(JAbstractSortedOperator selfVar,
             TermServices services) {
-        Map<JOperator, JOperator> result = new LinkedHashMap<>();
+        Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
@@ -160,7 +160,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
     @Override
     public JTerm getInv(JAbstractSortedOperator selfVar, TermServices services) {
-        final Map<JOperator, JOperator> replaceMap = getReplaceMap(selfVar, services);
+        final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         JTerm res = or.replace(originalInv);
         res = services.getTermBuilder().convertToFormula(res);

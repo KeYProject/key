@@ -76,7 +76,7 @@ public class FinalFieldsPOExtension implements POExtension {
         TermBuilder tb = services.getTermBuilder();
         JTerm self = tb.var(selfVar);
         for (Function finalField : finalFields) {
-            JTerm fieldRef = tb.tf().createTerm((JOperator) finalField);
+            JTerm fieldRef = tb.tf().createTerm(finalField);
             JTerm sel = tb.dot(JavaDLTheory.ANY, self, fieldRef);
             JTerm fsel = tb.finalDot(JavaDLTheory.ANY, self, fieldRef);
             JTerm eq = tb.equals(sel, fsel);

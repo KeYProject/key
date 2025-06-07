@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
@@ -57,7 +58,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
             (SVInstantiations) matchCond.getInstantiations();
 
         if (svSubst instanceof JTerm) {
-            JOperator op = ((JTerm) svSubst).op();
+            Operator op = ((JTerm) svSubst).op();
             if (op instanceof Function) {
                 HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
                 if (split == null) {

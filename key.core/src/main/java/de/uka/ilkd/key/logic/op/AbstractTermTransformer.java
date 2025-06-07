@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
@@ -131,7 +132,7 @@ public abstract class AbstractTermTransformer extends JAbstractSortedOperator
 
         var top = term.op();
         IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();
-        final JOperator numbers = intModel.getNumberSymbol();
+        final Operator numbers = intModel.getNumberSymbol();
         final var base = intModel.getNumberTerminator();
         final var minus = intModel.getNegativeNumberSign();
         // check whether term is really a "literal"

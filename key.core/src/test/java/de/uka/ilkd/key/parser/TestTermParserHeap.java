@@ -6,7 +6,8 @@ package de.uka.ilkd.key.parser;
 import java.io.IOException;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JOperator;
+
+import org.key_project.logic.op.Operator;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     private JTerm getSelectTerm(String sort, JTerm heap, JTerm object, JTerm field) {
-        JOperator op = (JOperator) lookup_func(sort + "::select");
+        Operator op = lookup_func(sort + "::select");
         JTerm[] params = { heap, object, field };
         return tf.createTerm(op, params);
     }

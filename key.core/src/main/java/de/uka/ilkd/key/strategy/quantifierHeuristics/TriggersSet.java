@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -273,7 +274,7 @@ public class TriggersSet {
             if (term.freeVars().isEmpty()) {
                 return false;
             }
-            final JOperator op = term.op();
+            final Operator op = term.op();
             if (op instanceof JModality || op instanceof UpdateApplication
                     || op instanceof QuantifiableVariable) {
                 return false;
@@ -286,7 +287,7 @@ public class TriggersSet {
          * framework for characterising acceptable triggers
          */
         private boolean isAcceptableTrigger(JTerm term, Services services) {
-            final JOperator op = term.op();
+            final Operator op = term.op();
 
             // we do not want to match on expressions a.<created>
 

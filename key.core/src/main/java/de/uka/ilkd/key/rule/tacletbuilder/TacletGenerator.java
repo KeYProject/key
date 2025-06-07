@@ -23,6 +23,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
@@ -860,7 +861,7 @@ public class TacletGenerator {
         ImmutableSet<VariableSV> svs = DefaultImmutableSet.nil();
 
         // prepare op replacer, new bound vars
-        final Map<JOperator, JOperator> map = new LinkedHashMap<>();
+        final Map<Operator, Operator> map = new LinkedHashMap<>();
         final ImmutableArray<JQuantifiableVariable> boundVars = t.boundVars();
         final JQuantifiableVariable[] newBoundVars = new JQuantifiableVariable[boundVars.size()];
         for (int i = 0; i < newBoundVars.length; i++) {
@@ -919,7 +920,7 @@ public class TacletGenerator {
         }
 
         // top level operator
-        JOperator newOp = t.op();
+        Operator newOp = t.op();
         if (t.op() instanceof IObserverFunction obs) {
             for (Pair<Sort, IObserverFunction> pair : toLimit) {
                 if (pair.second.equals(t.op())

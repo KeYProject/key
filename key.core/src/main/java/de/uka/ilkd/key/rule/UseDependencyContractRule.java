@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -102,7 +103,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private boolean hasRawSteps(JTerm heapTerm, Sequent seq, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final JOperator op = heapTerm.op();
+        final Operator op = heapTerm.op();
         assert heapTerm.sort().equals(heapLDT.targetSort());
         if (op == heapLDT.getStore() || op == heapLDT.getCreate() || op == heapLDT.getAnon()
                 || op == heapLDT.getMemset()) {
@@ -124,7 +125,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     private static void getRawSteps(JTerm heapTerm, Sequent seq, Services services,
             List<JTerm> result) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final JOperator op = heapTerm.op();
+        final Operator op = heapTerm.op();
         assert heapTerm.sort().equals(heapLDT.targetSort());
         if (op == heapLDT.getStore() || op == heapLDT.getCreate() || op == heapLDT.getAnon()
                 || op == heapLDT.getMemset()) {
@@ -174,7 +175,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             JTerm heapTerm,
             JTerm stepHeap, Sequent seq, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final JOperator op = heapTerm.op();
+        final Operator op = heapTerm.op();
         assert heapTerm.sort().equals(heapLDT.targetSort());
         final TermBuilder TB = services.getTermBuilder();
         if (heapTerm.equals(stepHeap)) {

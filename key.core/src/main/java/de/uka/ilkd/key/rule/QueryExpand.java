@@ -24,6 +24,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleApp;
@@ -337,7 +338,7 @@ public class QueryExpand implements BuiltInRule {
         if (t == null) {
             return;
         }
-        final JOperator op = t.op();
+        final Operator op = t.op();
         final int nextLevel = level + 1;
         if (op instanceof IProgramMethod && !((IProgramMethod) op).isModel()) { // Query found
             QueryEvalPos qep = new QueryEvalPos(t, Arrays.copyOf(pathInTerm, qepLevel + 1),

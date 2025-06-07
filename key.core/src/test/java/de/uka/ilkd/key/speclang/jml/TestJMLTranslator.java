@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -92,7 +93,7 @@ public class TestJMLTranslator {
     }
 
 
-    private boolean termContains(JTerm t, JOperator op) {
+    private boolean termContains(JTerm t, Operator op) {
 
         if (t.op().arity() == op.arity() && t.op().name().equals(op.name())) {
             return true;
@@ -250,7 +251,7 @@ public class TestJMLTranslator {
         final String input = "\\infinite_union(Object o; \\empty)";
         JTerm result = jmlIO.parseExpression(input);
         assertNotNull(result);
-        JOperator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
+        Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
             new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
         assertSame(unionOp, result.op());
@@ -271,7 +272,7 @@ public class TestJMLTranslator {
         final String input = "(\\infinite_union nullable Object o; \\empty)";
         JTerm result = jmlIO.parseExpression(input);
         assertNotNull(result);
-        JOperator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
+        Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
             new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
         assertSame(unionOp, result.op());

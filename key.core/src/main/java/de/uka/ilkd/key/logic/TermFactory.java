@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
@@ -55,7 +55,7 @@ public final class TermFactory {
      * Master method for term creation. Should be the only place where terms are created in the
      * entire system.
      */
-    public JTerm createTerm(@NonNull JOperator op, ImmutableArray<JTerm> subs,
+    public JTerm createTerm(@NonNull Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<JQuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
         if (op == null) {
@@ -69,41 +69,41 @@ public final class TermFactory {
         return doCreateTerm(op, subs, boundVars, labels, "");
     }
 
-    public JTerm createTerm(JOperator op, ImmutableArray<JTerm> subs,
+    public JTerm createTerm(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<JQuantifiableVariable> boundVars) {
 
         return createTerm(op, subs, boundVars, null);
     }
 
-    public JTerm createTerm(@NonNull JOperator op, JTerm... subs) {
+    public JTerm createTerm(@NonNull Operator op, JTerm... subs) {
         return createTerm(op, createSubtermArray(subs), null, null);
     }
 
-    public JTerm createTerm(JOperator op, JTerm[] subs,
+    public JTerm createTerm(Operator op, JTerm[] subs,
             ImmutableArray<JQuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 
-    public JTerm createTerm(JOperator op, JTerm[] subs, TermLabel label) {
+    public JTerm createTerm(Operator op, JTerm[] subs, TermLabel label) {
         return createTerm(op, subs, null, new ImmutableArray<>(label));
     }
 
-    public JTerm createTerm(JOperator op, JTerm[] subs, ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(Operator op, JTerm[] subs, ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), null, labels);
     }
 
-    public JTerm createTerm(JOperator op, JTerm sub, ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(Operator op, JTerm sub, ImmutableArray<TermLabel> labels) {
         return createTerm(op, new ImmutableArray<>(sub), null, labels);
     }
 
-    public JTerm createTerm(JOperator op, JTerm sub1, JTerm sub2,
+    public JTerm createTerm(Operator op, JTerm sub1, JTerm sub2,
             ImmutableArray<TermLabel> labels) {
         return createTerm(op, new JTerm[] { sub1, sub2 }, labels);
     }
 
 
-    public JTerm createTerm(JOperator op, ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(Operator op, ImmutableArray<TermLabel> labels) {
         return createTerm(op, NO_SUBTERMS, null, labels);
     }
 
@@ -115,7 +115,7 @@ public final class TermFactory {
         return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<>(subs);
     }
 
-    private JTerm doCreateTerm(JOperator op, ImmutableArray<JTerm> subs,
+    private JTerm doCreateTerm(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<JQuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels, String origin) {
 
@@ -150,7 +150,7 @@ public final class TermFactory {
      * @param junctor the left-associative operator to combine the terms together
      * @param terms a list of non-null temrs
      */
-    public @NonNull JTerm createTerm(@NonNull JOperator junctor, @NonNull List<JTerm> terms) {
+    public @NonNull JTerm createTerm(@NonNull Operator junctor, @NonNull List<JTerm> terms) {
         if (terms.size() == 1) {
             return terms.get(0);
         } else if (terms.size() == 2) {

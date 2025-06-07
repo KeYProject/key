@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableArray;
 public abstract class Instruction<OP extends Operator>
         implements MatchInstruction {
 
-    public static Instruction<JOperator> matchOp(JOperator op) {
+    public static Instruction<Operator> matchOp(Operator op) {
         return new MatchOpIdentityInstruction<>(op);
     }
 

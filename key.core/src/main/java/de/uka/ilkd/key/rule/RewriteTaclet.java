@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.JModality;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.TacletPrefix;
@@ -157,7 +157,7 @@ public class RewriteTaclet extends FindTaclet {
      *
      * (the {@code AntecSuccPrefixChecker} seems to reimplement this.
      */
-    private int polarity(final JOperator op, final PIOPathIterator it, int polarity) {
+    private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
         // toggle polarity if find term is
         // subterm of
         if ((op == Junctor.NOT) || // not

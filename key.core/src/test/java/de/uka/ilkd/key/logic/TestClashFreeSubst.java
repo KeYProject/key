@@ -18,6 +18,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -133,7 +134,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 
         public void visit(final Term p_visited) {
             final JTerm visited = (JTerm) p_visited;
-            JOperator op = visited.op();
+            Operator op = visited.op();
             int arity = visited.arity();
             if (op == Quantifier.ALL) {
                 JTerm top = subStack.peek();

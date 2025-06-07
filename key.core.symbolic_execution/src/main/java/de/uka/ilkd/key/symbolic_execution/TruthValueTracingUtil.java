@@ -127,7 +127,7 @@ public final class TruthValueTracingUtil {
      * @param subs The sub {@link JTerm}s.
      * @return {@code true} is logical operator, {@code false} is something else.
      */
-    public static boolean isLogicOperator(JOperator operator, ImmutableArray<JTerm> subs) {
+    public static boolean isLogicOperator(Operator operator, ImmutableArray<JTerm> subs) {
         if (operator instanceof Junctor) {
             return operator != Junctor.TRUE && operator != Junctor.FALSE;
         } else if (operator == Equality.EQV) {
@@ -158,7 +158,7 @@ public final class TruthValueTracingUtil {
      * @param subs The sub {@link JTerm}s.
      * @return {@code true} is if-then-else formula, {@code false} is something else.
      */
-    public static boolean isIfThenElseFormula(JOperator operator, ImmutableArray<JTerm> subs) {
+    public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<JTerm> subs) {
         if (operator == IfThenElse.IF_THEN_ELSE) {
             Sort[] sorts = new Sort[subs.size()];
             for (int i = 0; i < sorts.length; i++) {

@@ -12,9 +12,9 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.JOperator;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -230,7 +230,7 @@ public class Polynomial {
      * @return the resulting term
      */
     public Term toTerm(Services services) {
-        final JOperator add = services.getTypeConverter().getIntegerLDT().getAdd();
+        final Operator add = services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;
 
         final Iterator<Monomial> it = parts.iterator();
@@ -271,7 +271,7 @@ public class Polynomial {
         public ImmutableList<Monomial> parts = ImmutableSLList.nil();
         private final Services services;
         private final TypeConverter tc;
-        private final JOperator numbers, add;
+        private final Operator numbers, add;
 
         public Analyser(final Services services) {
             this.services = services;

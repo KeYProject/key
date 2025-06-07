@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
@@ -239,7 +240,7 @@ public class InfFlowProofSymbols {
         }
     }
 
-    private boolean isPredicate(JOperator f) {
+    private boolean isPredicate(Operator f) {
         assert f != null;
         return f.name().toString().startsWith("RELATED_BY")
                 || f.name().toString().startsWith("EXECUTION_OF");

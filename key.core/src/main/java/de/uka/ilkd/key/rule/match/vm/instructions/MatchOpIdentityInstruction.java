@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Operator;
 
 /**
  * The match instruction reports a success if the top level operator of the term to be matched is
@@ -17,7 +17,7 @@ import org.key_project.logic.LogicServices;
  *
  * @param <T> the type of the operator used as template
  */
-public class MatchOpIdentityInstruction<T extends JOperator> extends Instruction<T>
+public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<T>
         implements MatchOperatorInstruction {
 
     public MatchOpIdentityInstruction(T op) {
@@ -41,7 +41,7 @@ public class MatchOpIdentityInstruction<T extends JOperator> extends Instruction
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(JOperator instantiationCandidate, MatchConditions matchConditions,
+    public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
             LogicServices services) {
         if (instantiationCandidate == op) {
             return matchConditions;

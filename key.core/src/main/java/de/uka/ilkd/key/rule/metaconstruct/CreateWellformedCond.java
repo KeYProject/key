@@ -9,11 +9,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.JModality;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 
 /**
  * Creates the wellformedness condition for the given anonymizing heap terms if they apply for the
@@ -34,7 +34,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
         final JTerm anonSavedHeapTerm = term.sub(2);
         final JTerm anonPermissionsHeapTerm = term.sub(3);
 
-        final JOperator op = term.sub(0).op();
+        final Operator op = term.sub(0).op();
         assert op instanceof JModality;
 
         return createWellformedCond(MiscTools.isTransaction(((JModality) op).kind()),

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
@@ -267,7 +268,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
 
-    private JOperator instantiateModality(JModality op, JavaBlock jb) {
+    private Operator instantiateModality(JModality op, JavaBlock jb) {
         JModality.JavaModalityKind kind = op.kind();
         if (op.kind() instanceof ModalOperatorSV) {
             kind = (JModality.JavaModalityKind) svInst.getInstantiation(op.kind());
@@ -278,8 +279,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return op;
     }
 
-    private JOperator instantiateOperator(JOperator p_operatorToBeInstantiated, JavaBlock jb) {
-        JOperator instantiatedOp = p_operatorToBeInstantiated;
+    private Operator instantiateOperator(Operator p_operatorToBeInstantiated, JavaBlock jb) {
+        Operator instantiatedOp = p_operatorToBeInstantiated;
         if (p_operatorToBeInstantiated instanceof SortDependingFunction sortDependingFunction) {
             instantiatedOp = handleSortDependingSymbol(sortDependingFunction);
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate elementaryUpdate) {
@@ -288,7 +289,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             instantiatedOp = instantiateModality(mod, jb);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable opAsSV) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV opAsPSV) || !opAsPSV.isListSV()) {
-                instantiatedOp = (JOperator) svInst.getInstantiation(opAsSV);
+                instantiatedOp = (Operator) svInst.getInstantiation(opAsSV);
             }
         }
         assert instantiatedOp != null;
@@ -330,7 +331,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public void visit(final org.key_project.logic.Term p_visited) {
         final JTerm visited = (JTerm) p_visited;
         // Sort equality has to be ensured before calling this method
-        final JOperator visitedOp = visited.op();
+        final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
                 && svInst.isInstantiated(visitedSV)
                 && (!(visitedOp instanceof ProgramSV visitedAsPSV && visitedAsPSV.isListSV()))) {
@@ -351,7 +352,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 }
             }
 
-            final JOperator newOp = instantiateOperator(visitedOp, jb);
+            final Operator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
             final ImmutableArray<JQuantifiableVariable> boundVars =
@@ -385,7 +386,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         }
     }
 
-    private ImmutableArray<TermLabel> instantiateLabels(JTerm tacletTerm, JOperator newTermOp,
+    private ImmutableArray<TermLabel> instantiateLabels(JTerm tacletTerm, Operator newTermOp,
             ImmutableArray<JTerm> newTermSubs,
             ImmutableArray<JQuantifiableVariable> newTermBoundVars,
             ImmutableArray<TermLabel> newTermOriginalLabels) {
@@ -394,14 +395,14 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
     }
 
-    private JOperator handleSortDependingSymbol(SortDependingFunction depOp) {
+    private Operator handleSortDependingSymbol(SortDependingFunction depOp) {
         final Sort depSort = depOp.getSortDependingOn();
 
         final Sort realDepSort =
             svInst.getGenericSortInstantiations().getRealSort(depSort, services);
 
 
-        final JOperator res = depOp.getInstanceFor(realDepSort, services);
+        final Operator res = depOp.getInstanceFor(realDepSort, services);
         assert res != null
                 : "Did not find instance of symbol " + depOp + " for sort " + realDepSort;
         return res;

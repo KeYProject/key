@@ -27,6 +27,7 @@ import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.*;
@@ -272,7 +273,7 @@ public class LogicPrinter {
             for (SchemaVariable schemaVar : schemaVars) {
                 layouter.nl();
                 final Notation notation;
-                if (schemaVar instanceof JOperator opSV) {
+                if (schemaVar instanceof Operator opSV) {
                     notation = notationInfo.getNotation(opSV);
                 } else {
                     notation = notationInfo.getNotation(schemaVar.getClass());

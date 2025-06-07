@@ -18,6 +18,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
@@ -193,7 +194,7 @@ public abstract class TypeResolver {
                     : instMap.getInstantiation(memberSV));
 
             if (inst instanceof JOperator) {
-                result = getContainerSort((JOperator) inst, services);
+                result = getContainerSort((Operator) inst, services);
             } else {
                 if (inst instanceof Expression) {
                     result = getContainerSort(services.getTypeConverter()
@@ -210,7 +211,7 @@ public abstract class TypeResolver {
             return result;
         }
 
-        private Sort getContainerSort(JOperator op, TermServices services) {
+        private Sort getContainerSort(Operator op, TermServices services) {
             Sort result = null;
             if (op instanceof ProgramVariable) {
                 result = ((ProgramVariable) op).getContainerType().getSort();

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -43,7 +44,7 @@ public class EqualityModuloProofIrrelevancy {
      * @param that the second Operator
      * @return true if both arguments are equal modulo proof irrelevancy
      */
-    public static boolean equalsModProofIrrelevancy(JOperator _this, JOperator that) {
+    public static boolean equalsModProofIrrelevancy(Operator _this, Operator that) {
         if (_this == that) {
             return true;
         } else if (that == null || _this == null) {
@@ -72,7 +73,7 @@ public class EqualityModuloProofIrrelevancy {
      * @param op the Operator for which to compute the hash
      * @return the hash code modulo proof irrelevancy for the given argument
      */
-    public static int hashCodeModProofIrrelevancy(JOperator op) {
+    public static int hashCodeModProofIrrelevancy(Operator op) {
         return Objects.hash(op.arity(), op.name());
     }
 
