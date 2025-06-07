@@ -10,41 +10,43 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 public class PermissionLDT extends LDT {
 
     public static final Name NAME = new Name("Permission");
 
-    private final JFunction permissionsFor;
+    private final Function permissionsFor;
 
     public PermissionLDT(Services services) {
         super(NAME, services);
         permissionsFor = addFunction(services, "permissionsFor");
     }
 
-    public JFunction getPermissionsFor() {
+    public Function getPermissionsFor() {
         return permissionsFor;
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
-            de.uka.ilkd.key.logic.TermServices services, ExecutionContext ec) {
+    public boolean isResponsible(Operator op, Term sub,
+            TermServices services, ExecutionContext ec) {
         return false;
     }
 
@@ -54,7 +56,7 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         throw new AssertionError("PermissionLDT: there are no permission operators: " + op);
     }
 

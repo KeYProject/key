@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
-import org.jspecify.annotations.NonNull;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 public class QuanEliminationAnalyser {
 
@@ -21,7 +19,8 @@ public class QuanEliminationAnalyser {
      * @return the distance to the quantifier that can be eliminated; <code>Integer.MAX_VALUE</code>
      *         if the subformula is not an eliminable definition
      */
-    public int eliminableDefinition(@NonNull Term definition, @NonNull PosInOccurrence envPIO) {
+    public int eliminableDefinition(Term definition,
+            PosInOccurrence envPIO) {
         final PosInOccurrence matrixPIO = walkUpMatrix(envPIO);
         final Term matrix = matrixPIO.subTerm();
 
@@ -67,15 +66,15 @@ public class QuanEliminationAnalyser {
         }
     }
 
-    private boolean isDefinitionCandidate(@NonNull Term t, @NonNull Term env, boolean ex) {
+    private boolean isDefinitionCandidate(Term t, Term env, boolean ex) {
         if (!hasDefinitionShape(t, ex)) {
             return false;
         }
         return !ex || !isBelowOr(t, env);
     }
 
-    private boolean isBelowOr(Term t, @NonNull Term env) {
-        final Operator envOp = env.op();
+    private boolean isBelowOr(Term t, Term env) {
+        final var envOp = env.op();
         if (envOp == Junctor.OR && (env.sub(0) == t || env.sub(1) == t)) {
             return true;
         }
@@ -85,7 +84,7 @@ public class QuanEliminationAnalyser {
         return false;
     }
 
-    private boolean hasDefinitionShape(@NonNull Term t, boolean ex) {
+    private boolean hasDefinitionShape(Term t, boolean ex) {
         for (QuantifiableVariable quantifiableVariable : t.freeVars()) {
             if (isDefinition(t, quantifiableVariable, ex)) {
                 return true;
@@ -94,10 +93,11 @@ public class QuanEliminationAnalyser {
         return false;
     }
 
-    private @NonNull PosInOccurrence walkUpMatrix(@NonNull PosInOccurrence pio) {
+    private PosInOccurrence walkUpMatrix(
+            PosInOccurrence pio) {
         while (!pio.isTopLevel()) {
             final PosInOccurrence parent = pio.up();
-            final Operator parentOp = parent.subTerm().op();
+            final var parentOp = parent.subTerm().op();
             if (parentOp != Junctor.AND && parentOp != Junctor.OR) {
                 return pio;
             }
@@ -111,13 +111,14 @@ public class QuanEliminationAnalyser {
      * conjunctive/disjunctive paths through <code>matrix</code> (depending on whether
      * <code>ex</code> is true/false)
      */
-    public boolean isEliminableVariableSomePaths(QuantifiableVariable var, @NonNull Term matrix,
+    public boolean isEliminableVariableSomePaths(QuantifiableVariable var, Term matrix,
             boolean ex) {
-        if (!matrix.freeVars().contains(var)) {
+        if (!((de.uka.ilkd.key.logic.Term) matrix).freeVars()
+                .contains(var)) {
             return true;
         }
 
-        final Operator op = matrix.op();
+        final var op = matrix.op();
 
         if (op == (ex ? Junctor.OR : Junctor.AND)) {
             return isEliminableVariableSomePaths(var, matrix.sub(0), ex)
@@ -140,9 +141,8 @@ public class QuanEliminationAnalyser {
      * The variable <code>var</code> is eliminable on all conjunctive/disjunctive paths through
      * <code>matrix</code> (depending on whether <code>ex</code> is true/false)
      */
-    public boolean isEliminableVariableAllPaths(QuantifiableVariable var, @NonNull Term matrix,
-            boolean ex) {
-        final Operator op = matrix.op();
+    public boolean isEliminableVariableAllPaths(QuantifiableVariable var, Term matrix, boolean ex) {
+        final var op = matrix.op();
 
         if (op == (ex ? Junctor.OR : Junctor.AND)) {
             return isEliminableVariableAllPaths(var, matrix.sub(0), ex)
@@ -159,7 +159,7 @@ public class QuanEliminationAnalyser {
         }
     }
 
-    private boolean isDefinition(@NonNull Term t, QuantifiableVariable var, boolean ex) {
+    private boolean isDefinition(Term t, QuantifiableVariable var, boolean ex) {
         if (ex) {
             return isDefinitionEx(t, var);
         } else {
@@ -167,34 +167,36 @@ public class QuanEliminationAnalyser {
         }
     }
 
-    private boolean isDefinitionEx(@NonNull Term t, QuantifiableVariable var) {
+    private boolean isDefinitionEx(Term t, QuantifiableVariable var) {
         if (t.op() == Junctor.OR) {
             return isDefinitionEx(t.sub(0), var) && isDefinitionEx(t.sub(1), var);
         }
         return isDefiningEquationEx(t, var);
     }
 
-    private boolean isDefiningEquationAll(@NonNull Term t, QuantifiableVariable var) {
+    private boolean isDefiningEquationAll(Term t, QuantifiableVariable var) {
         if (t.op() != Junctor.NOT) {
             return false;
         }
         return isDefiningEquation(t.sub(0), var);
     }
 
-    private boolean isDefiningEquationEx(@NonNull Term t, QuantifiableVariable var) {
+    private boolean isDefiningEquationEx(Term t, QuantifiableVariable var) {
         return isDefiningEquation(t, var);
     }
 
-    private boolean isDefiningEquation(@NonNull Term t, QuantifiableVariable var) {
+    private boolean isDefiningEquation(Term t, QuantifiableVariable var) {
         if (t.op() != Equality.EQUALS) {
             return false;
         }
-        final Term left = t.sub(0);
-        final Term right = t.sub(1);
-        final Operator leftOp = left.op();
-        final Operator rightOp = right.op();
-        return leftOp == var && !right.freeVars().contains(var)
-                || rightOp == var && !left.freeVars().contains(var);
+        final var left = (de.uka.ilkd.key.logic.Term) t.sub(0);
+        final var right = (de.uka.ilkd.key.logic.Term) t.sub(1);
+        final var leftOp = left.op();
+        final var rightOp = right.op();
+        return leftOp == var
+                && !right.freeVars().contains(var)
+                || rightOp == var && !left.freeVars()
+                        .contains(var);
     }
 
 }

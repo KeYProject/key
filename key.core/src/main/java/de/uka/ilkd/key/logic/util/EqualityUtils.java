@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.util;
 
+import java.util.function.ToIntFunction;
+
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
-import de.uka.ilkd.key.logic.equality.Property;
 
 import org.jspecify.annotations.Nullable;
 
@@ -17,9 +18,9 @@ public class EqualityUtils {
      * @param iter iterable of terms
      * @return combined hashcode
      */
-    public static <T extends EqualsModProperty<T>> int hashCodeModPropertyOfIterable(
-            Property<T> property,
-            @Nullable Iterable<? extends @Nullable T> iter) {
+    public static <T> int hashCodeModPropertyOfIterable(
+            @Nullable Iterable<? extends @Nullable T> iter,
+            ToIntFunction<T> hasher) {
         // adapted from Arrays.hashCode
         if (iter == null) {
             return 0;
@@ -29,7 +30,7 @@ public class EqualityUtils {
 
         for (T element : iter) {
             result = 31 * result + (element == null ? 0
-                    : element.hashCodeModProperty(property));
+                    : hasher.applyAsInt(element));
         }
 
         return result;

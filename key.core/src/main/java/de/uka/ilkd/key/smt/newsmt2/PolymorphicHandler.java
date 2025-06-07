@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 
 /**
  * This handler treats polymorphic symbols, in particular if-then-else and equals.

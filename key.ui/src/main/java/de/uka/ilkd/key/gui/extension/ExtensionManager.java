@@ -136,6 +136,6 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
                 seq.add(v.getType().getName());
             }
         });
-        ExtensionManager.getExtensionSettings().setForbiddenClasses(seq);
+        getExtensionSettings().setForbiddenClasses(seq);
     }
 }

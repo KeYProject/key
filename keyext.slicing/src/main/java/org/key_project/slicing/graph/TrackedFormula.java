@@ -6,11 +6,12 @@ package org.key_project.slicing.graph;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
+import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.NonNull;
 
@@ -21,7 +22,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Arne Keller
  */
-public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevancy {
+public class TrackedFormula extends GraphNode {
     /**
      * Symbol used to indicate the position of the formula in the sequent.
      *
@@ -72,7 +73,7 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
             return Integer.toHexString(hashCode());
         }
         String term = LogicPrinter.quickPrintTerm(
-            formula.formula(),
+            (Term) formula.formula(),
             services,
             true, // pretty print
             true // using unicode symbols
@@ -102,7 +103,6 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
         return Objects.hash(System.identityHashCode(formula), branchLocation, inAntec);
     }
 
-    @Override
     public boolean equalsModProofIrrelevancy(Object o) {
         if (this == o) {
             return true;
@@ -111,13 +111,15 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
             return false;
         }
         TrackedFormula that = (TrackedFormula) o;
-        return inAntec == that.inAntec
-                && formula.equalsModProofIrrelevancy(that.formula)
+        final boolean b = inAntec == that.inAntec
+                && (that.formula instanceof SequentFormula that1
+                        && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(formula, that1))
                 && Objects.equals(branchLocation, that.branchLocation);
+        return b;
     }
 
-    @Override
     public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(inAntec, formula.hashCodeModProofIrrelevancy(), branchLocation);
+        return Objects.hash(inAntec,
+            EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(formula), branchLocation);
     }
 }

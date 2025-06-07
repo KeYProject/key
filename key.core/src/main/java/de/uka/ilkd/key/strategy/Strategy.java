@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Named;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -19,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
  */
-public interface Strategy extends Named, Feature {
+public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, Feature {
     /**
      * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
      *

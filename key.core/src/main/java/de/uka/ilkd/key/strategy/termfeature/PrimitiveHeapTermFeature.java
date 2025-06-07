@@ -5,11 +5,13 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 
 import org.jspecify.annotations.NonNull;
 
@@ -27,7 +29,7 @@ public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(@NonNull Term t, MutableState mState, Services services) {
+    protected boolean filter(@NonNull Term t, MutableState mState, LogicServices services) {
         // t.op() is the base heap or another primitive heap variable
         boolean isPrimitive = false;
         Iterator<LocationVariable> it = heapLDT.getAllHeaps().iterator();

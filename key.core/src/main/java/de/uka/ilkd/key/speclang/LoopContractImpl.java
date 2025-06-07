@@ -33,16 +33,15 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.InnerBreakAndContinueReplacer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -194,6 +193,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         EnhancedForElimination enhancedForElim = null;
 
         final LoopStatement loop;
+        EnhancedForElimination.TransformationData transformationData = null;
         if (first instanceof While || first instanceof For) {
             this.loop = (LoopStatement) first;
             loop = (LoopStatement) first;
@@ -202,25 +202,30 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
             ExecutionContext ec =
                 KeYJavaASTFactory.executionContext(method.getContainerType(), method, null);
-            enhancedForElim = new EnhancedForElimination(ec, (EnhancedFor) first);
-            enhancedForElim.transform((EnhancedFor) first, services, null);
-            loop = enhancedForElim.getLoop();
+            ProgramSV execContextSV =
+                SchemaVariableFactory.createProgramSV(new ProgramElementName("execContextSV"),
+                    ProgramSVSort.EXECUTIONCONTEXT, false);
+            enhancedForElim = new EnhancedForElimination(execContextSV, (EnhancedFor) first);
+            transformationData = enhancedForElim.doTransform((EnhancedFor) first, services,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS.add(PosInProgram.TOP,
+                    PosInProgram.TOP, ec, this.loop, services));
+            loop = transformationData.loop();
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
                 + "loop may have a loop contract! \n" + "This block begins with "
                 + block.getFirstElement());
         }
 
-        if (enhancedForElim == null) {
+        if (transformationData == null) {
             index = null;
             values = null;
         } else {
-            index = enhancedForElim.getIndexVariable();
-            values = enhancedForElim.getValuesVariable();
+            index = transformationData.indexVariable();
+            values = transformationData.valuesVariable();
         }
 
         this.loopLabels = new ArrayList<>(loopLabels);
-        head = getHeadStatement(loop, block, enhancedForElim);
+        head = getHeadStatement(loop, block, transformationData);
         guard = loop.getGuardExpression();
         body = getBodyStatement(loop, block, outerLabel, innerLabel, this.loopLabels, services);
         tail = getTailStatement(loop, block);
@@ -283,25 +288,28 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         loopLabels.add(outerLabel);
 
         EnhancedForElimination enhancedForElim = null;
+        EnhancedForElimination.TransformationData transformationData = null;
         LoopStatement nonEnhancedLoop = loop;
         if (loop instanceof EnhancedFor) {
             ExecutionContext ec =
                 KeYJavaASTFactory.executionContext(method.getContainerType(), method, null);
-            enhancedForElim = new EnhancedForElimination(ec, (EnhancedFor) loop);
-            enhancedForElim.transform(loop, services, null);
-            nonEnhancedLoop = enhancedForElim.getLoop();
+            enhancedForElim = new EnhancedForElimination(null, (EnhancedFor) loop);
+            transformationData = enhancedForElim.doTransform(loop, services,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS.add(PosInProgram.TOP,
+                    PosInProgram.TOP, ec, loop, services));
+            nonEnhancedLoop = transformationData.loop();
         }
 
-        if (enhancedForElim == null) {
+        if (transformationData == null) {
             index = null;
             values = null;
         } else {
-            index = enhancedForElim.getIndexVariable();
-            values = enhancedForElim.getValuesVariable();
+            index = transformationData.indexVariable();
+            values = transformationData.valuesVariable();
         }
 
         this.loopLabels = new ArrayList<>(loopLabels);
-        head = getHeadStatement(nonEnhancedLoop, block, enhancedForElim);
+        head = getHeadStatement(nonEnhancedLoop, block, transformationData);
         guard = nonEnhancedLoop.getGuardExpression();
         body = getBodyStatement(nonEnhancedLoop, block, outerLabel, innerLabel, this.loopLabels,
             services);
@@ -367,18 +375,18 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
      *
      * @param loop a loop.
      * @param block the block containing the loop.
-     * @param enhancedForElim the transformation used to transform the loop, or {@code null}.
+     * @param data the transformation data used to transform the loop, or {@code null}.
      * @return the initializers if the loop is a for-loop, {@code null} otherwise.
      */
     private static StatementBlock getHeadStatement(LoopStatement loop, StatementBlock block,
-            EnhancedForElimination enhancedForElim) {
+            EnhancedForElimination.TransformationData data) {
         final StatementBlock sb;
 
         if (loop instanceof For) {
             ExtList headStatements = new ExtList();
 
-            if (enhancedForElim != null) {
-                headStatements.add(enhancedForElim.getHead());
+            if (data != null) {
+                headStatements.add(data.head());
             }
 
             for (Statement statement : loop.getInitializers()) {
@@ -387,8 +395,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
             sb = new StatementBlock(headStatements);
         } else if (loop instanceof While) {
-            if (enhancedForElim != null) {
-                sb = enhancedForElim.getHead();
+            if (data != null) {
+                sb = data.head();
             } else {
                 sb = null;
             }

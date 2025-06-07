@@ -6,11 +6,11 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
@@ -46,7 +46,7 @@ public class SumProdHandler implements SMTHandler {
         Operator op = term.op();
         if (op == bsumOp) {
             for (Term t : usedBsumTerms.keySet()) {
-                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+                if (RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term)) {
                     return usedBsumTerms.get(t);
                 }
             }
@@ -60,7 +60,7 @@ public class SumProdHandler implements SMTHandler {
             return ret;
         } else if (op == bprodOp) {
             for (Term t : usedBprodTerms.keySet()) {
-                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+                if (RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term)) {
                     return usedBprodTerms.get(t);
                 }
             }

@@ -3,19 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.logic.LogicServices;
 
 public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<VariableSV> {
 
-    protected MatchVariableSVInstruction(@NonNull VariableSV op) {
+    protected MatchVariableSVInstruction(VariableSV op) {
         super(op);
     }
 
@@ -23,8 +21,7 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull Term subst, @NonNull MatchConditions mc,
-            @NonNull Services services) {
+    public MatchConditions match(Term subst, MatchConditions mc, LogicServices services) {
         if (subst.op() instanceof QuantifiableVariable) {
             final Term foundMapping = (Term) mc.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
@@ -37,9 +34,8 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
     }
 
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
-            @NonNull MatchConditions mc,
-            @NonNull Services services) {
+    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
+            LogicServices services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();

@@ -45,7 +45,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      */
     private final @Nullable Class<T> parameterClazz;
 
-    public AbstractCommand(@Nullable Class<T> clazz) {
+    protected AbstractCommand(@Nullable Class<T> clazz) {
         this.parameterClazz = clazz;
     }
 

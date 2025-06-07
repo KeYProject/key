@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
@@ -22,7 +22,8 @@ public class Includes {
     private final List<String> ldtIncludes;
     /** contains mappings from filenames to RuleSources */
     private final HashMap<String, RuleSource> name2Source;
-    private final List<File> files;
+
+    private final List<Path> files;
 
     public Includes() {
         includes = new LinkedList<>();
@@ -56,7 +57,7 @@ public class Includes {
         return Objects.requireNonNull(name2Source.get(name));
     }
 
-    public List<File> getFiles() {
+    public List<Path> getFiles() {
         return files;
     }
 

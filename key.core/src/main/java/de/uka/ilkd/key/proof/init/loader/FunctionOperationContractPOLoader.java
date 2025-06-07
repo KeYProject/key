@@ -29,6 +29,7 @@ public class FunctionOperationContractPOLoader implements ProofObligationLoader 
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
+    @Override
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) throws IOException {
         String contractName = Objects.requireNonNull(

@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Predicate;
@@ -559,7 +560,7 @@ public final class IOUtil {
      */
     public static InputStream unifyLineBreaks(InputStream in)
             throws IOException {
-        String text = IOUtil.readFrom(in);
+        String text = readFrom(in);
         text = text.replace("\r\n", "\n");
         text = text.replace("\r", "\n");
         return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
@@ -704,11 +705,8 @@ public final class IOUtil {
      *
      * @return The current directory.
      */
-    public static File getCurrentDirectory() {
-        File result = new File(".").getAbsoluteFile().getParentFile();
-        assert result != null
-                : "@AssumeAssertion(nullness): this always works, even in the toplevel directory ...";
-        return result;
+    public static Path getCurrentDirectory() {
+        return Paths.get(".").toAbsolutePath();
     }
 
     /**
@@ -816,5 +814,13 @@ public final class IOUtil {
         } catch (MalformedURLException e) {
             return new FileInputStream(resourceLocation);
         }
+    }
+
+
+    /// Returns a safe literal for the given path.
+    /// In particular, avoid backslashes coming from windows platforms.
+    public static String safePath(Path path) {
+        var s = path.toString();
+        return s.replace('\\', '/');
     }
 }

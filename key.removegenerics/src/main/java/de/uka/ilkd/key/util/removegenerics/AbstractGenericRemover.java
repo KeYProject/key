@@ -25,7 +25,7 @@ public abstract class AbstractGenericRemover {
 
     private final List<String> sourceFiles = new ArrayList<>();
 
-    public AbstractGenericRemover(@NonNull GenericRemoverMonitor monitor) {
+    protected AbstractGenericRemover(@NonNull GenericRemoverMonitor monitor) {
         assert monitor != null;
         this.monitor = monitor;
     }

@@ -129,8 +129,7 @@ public class ArrayUtilTest {
     @Test
     public void testRemove() {
         // Test remove on array
-        @Nullable
-        String[] array = new @Nullable String[] { "A", "B", "C", null, "D", null, null, "C", "A" };
+        var array = new String[] { "A", "B", "C", null, "D", null, null, "C", "A" };
         array = ArrayUtil.remove(array, "B"); // Remove B
         assertArrayEquals(array, "A", "C", null, "D", null, null, "C", "A");
         array = ArrayUtil.remove(array, "B"); // Remove B again
@@ -169,8 +168,8 @@ public class ArrayUtilTest {
      */
     @Test
     public void testAddAll() {
-        String[] first = new String[] { "A", "B", "C" };
-        String[] second = new String[] { "D", "E" };
+        String[] first = { "A", "B", "C" };
+        String[] second = { "D", "E" };
         @Nullable
         String[] combined = ArrayUtil.addAll(first, second);
         assertEquals(5, combined.length);
@@ -186,8 +185,8 @@ public class ArrayUtilTest {
      */
     @Test
     public void testAddAll_newType() {
-        String[] first = new String[] { "A", "B", "C" };
-        String[] second = new String[] { "D", "E" };
+        String[] first = { "A", "B", "C" };
+        String[] second = { "D", "E" };
         @Nullable
         Object[] combined = ArrayUtil.addAll(first, second, Object.class);
         assertEquals(Object.class, combined.getClass().getComponentType());
@@ -205,7 +204,7 @@ public class ArrayUtilTest {
     @Test
     public void testAdd_int() {
         // Test empty array
-        int[] array = new int[] {};
+        int[] array = {};
         int[] result = ArrayUtil.add(array, 1);
         assertNotNull(result);
         assertEquals(1, result.length);
@@ -243,7 +242,7 @@ public class ArrayUtilTest {
     public void testAdd_Object() {
         // Test empty array
         @Nullable
-        String[] array = new String[] {};
+        String[] array = {};
         @Nullable
         String[] result = ArrayUtil.add(array, "A");
         assertNotNull(result);

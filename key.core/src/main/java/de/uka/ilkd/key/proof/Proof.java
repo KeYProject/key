@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -32,6 +34,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
@@ -54,7 +59,7 @@ import org.jspecify.annotations.Nullable;
  * goals, namespaces and several other information about the current state of the proof.
  */
 @NullMarked
-public class Proof implements Named {
+public class Proof implements ProofObject<Goal>, Named {
 
     public static final String PROOF_OBJECT_WAS_DISPOSED = "Proof object was disposed";
     /**
@@ -157,7 +162,7 @@ public class Proof implements Named {
      * The {@link File} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
-    private @MonotonicNonNull @Nullable File proofFile;
+    private @MonotonicNonNull @Nullable Path proofFile;
 
     private Lookup userData;
 
@@ -237,7 +242,7 @@ public class Proof implements Named {
     }
 
     public Proof(String name, Sequent problem, String header, InitConfig initConfig,
-            File proofFile) {
+            Path proofFile) {
         this(name, problem, initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
             initConfig);
         problemHeader = header;
@@ -246,8 +251,8 @@ public class Proof implements Named {
 
     public Proof(String name, Term problem, String header, InitConfig initConfig) {
         this(name,
-            Sequent.createSuccSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),
+            JavaDLSequentKit
+                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
             initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;
     }
@@ -464,6 +469,7 @@ public class Proof implements Named {
      *
      * @return list with the open goals
      */
+    @Override
     public ImmutableList<Goal> openGoals() {
         return Objects.requireNonNull(openGoals, PROOF_OBJECT_WAS_DISPOSED);
     }
@@ -506,7 +512,6 @@ public class Proof implements Named {
         return filterEnabledGoals(openGoals());
     }
 
-
     /**
      * filter those goals from a list which are enabled
      *
@@ -526,15 +531,15 @@ public class Proof implements Named {
         return enabledGoals;
     }
 
-
     /**
      * removes the given goal and adds the new goals in list
      *
      * @param oldGoal the old goal that has to be removed from list
-     * @param newGoals the IList<Goal> with the new goals that were result of a rule application on
-     *        goal
+     * @param newGoals the Iterable<Goal> with the new goals that were result of a rule application
+     *        on goal
      */
-    public void replace(Goal oldGoal, ImmutableList<Goal> newGoals) {
+    @Override
+    public void replace(Goal oldGoal, Iterable<Goal> newGoals) {
         openGoals = openGoals().removeAll(oldGoal);
 
         if (closed()) {
@@ -551,6 +556,7 @@ public class Proof implements Named {
      *
      * @param goalToClose the goal to close.
      */
+    @Override
     public void closeGoal(Goal goalToClose) {
 
         Node closedSubtree = goalToClose.node().close();
@@ -648,10 +654,27 @@ public class Proof implements Named {
         fireProofGoalsAdded(goals);
     }
 
+    /**
+     * adds a list with new goals to the list of open goals
+     *
+     * @param goals the Iterable<Goal> to be prepended
+     */
+    @Override
+    public void add(Iterable<Goal> goals) {
+        ImmutableList<Goal> addGoals;
+        if (goals instanceof ImmutableList<Goal> asList) {
+            addGoals = asList;
+        } else {
+            addGoals = ImmutableList.fromList(goals);
+        }
+        add(addGoals);
+    }
+
 
     /**
      * returns true if the root node is marked as closed and all goals have been removed
      */
+    @Override
     public boolean closed() {
         return root().isClosed() && openGoals().isEmpty();
     }
@@ -971,7 +994,7 @@ public class Proof implements Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public @Nullable Goal getOpenGoal(Node node) {
+    public @Nullable Goal getOpenGoal(@NonNull Node node) {
         for (final Goal result : openGoals()) {
             if (result.node() == node) {
                 return result;
@@ -1222,7 +1245,7 @@ public class Proof implements Named {
      */
     protected void fireProofDisposing(ProofDisposedEvent e) {
         ProofDisposedListener[] listener = getProofDisposedListeners();
-        for (ProofDisposedListener l : listener) {
+        for (final ProofDisposedListener l : listener) {
             l.proofDisposing(e);
         }
     }
@@ -1237,7 +1260,7 @@ public class Proof implements Named {
      * @return The {@link File} under which the {@link Proof} was saved the last time or
      *         {@code null} if not available.
      */
-    public File getProofFile() {
+    public @Nullable Path getProofFile() {
         return Objects.requireNonNull(proofFile, PROOF_OBJECT_WAS_DISPOSED);
     }
 
@@ -1246,7 +1269,7 @@ public class Proof implements Named {
      *
      * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
      */
-    public void setProofFile(File proofFile) {
+    public void setProofFile(@Nullable Path proofFile) {
         this.proofFile = proofFile;
     }
 
@@ -1331,8 +1354,9 @@ public class Proof implements Named {
      * @param callbackTotal callback that gets the total number of branches to complete
      * @param callbackBranch callback notified every time a branch has been copied
      */
-    public void copyCachedGoals(Proof referencedFrom, Consumer<Integer> callbackTotal,
-            Runnable callbackBranch) {
+    public void copyCachedGoals(Proof referencedFrom,
+            @Nullable Consumer<Integer> callbackTotal,
+            @Nullable Runnable callbackBranch) {
         // first, ensure that all cached goals are copied over
         List<Goal> goals = closedGoals().toList();
         List<Goal> todo = new ArrayList<>();

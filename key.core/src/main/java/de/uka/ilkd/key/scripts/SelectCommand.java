@@ -9,15 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -142,7 +142,8 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private boolean contains(@NonNull Semisequent semiseq, @NonNull Term formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            if (sf.formula().equalsModProperty(formula, RENAMING_TERM_PROPERTY)) {
+            org.key_project.logic.Term term = sf.formula();
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
                 return true;
             }
         }

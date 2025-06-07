@@ -501,4 +501,16 @@ public final class StringUtil {
     public static String move(@NonNull String text, int line, int charPositionInLine) {
         return repeat("\n", line) + repeat(" ", charPositionInLine) + text;
     }
+
+    /// Returns the string until the first match of the given regex.
+    public static String takeUntil(String content, String regex) {
+        var array = content.split(regex, 1);
+        return array[0];
+    }
+
+    /// Returns the string after the first match of the given regex.
+    public static String takeAfter(String content, String regex) {
+        var array = content.split(regex, 1);
+        return array[0];
+    }
 }

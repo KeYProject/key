@@ -30,7 +30,7 @@ public final class FreeLDT extends LDT {
     public static final Name NAME = new Name("Free");
 
     // neutral element, the only pre-defined function
-    private final JFunction atom;
+    private final Function atom;
 
     public FreeLDT(TermServices services) {
         super(NAME, services);
@@ -63,7 +63,7 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         throw new RuntimeException("Not implemented");
     }
 
@@ -74,7 +74,7 @@ public final class FreeLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op() instanceof JFunction && hasLiteralFunction((JFunction) t.op())) {
+        if (t.op() instanceof Function && hasLiteralFunction((JFunction) t.op())) {
             return FreeLiteral.INSTANCE;
         }
         throw new RuntimeException("Not implemented");

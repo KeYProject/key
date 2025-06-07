@@ -193,7 +193,7 @@ public class SMTTermCall extends SMTTerm {
             newArgs.add(arg.instantiate(a, b));
         }
         // return new TermCall (func, newArgs);
-        return SMTTerm.call(func, newArgs);
+        return call(func, newArgs);
     }
 
     @Override

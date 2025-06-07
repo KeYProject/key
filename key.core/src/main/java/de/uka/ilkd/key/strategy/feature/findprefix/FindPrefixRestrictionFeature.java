@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,7 +21,6 @@ import org.jspecify.annotations.NonNull;
 public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
     public enum PrefixChecker {
-
         // checks, whether the position in occurrence is in the antecedent
         ANTEC(new AntecChecker()),
         // checks, whether the position in occurrence is in the succedent
@@ -60,8 +60,9 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.modifier = modifier;
         }
 
-        PosInOccurrence modifyPosistion(PosInOccurrence pos) {
-            return modifier.modifyPosistion(pos);
+        PosInOccurrence modifyPosistion(
+                PosInOccurrence pos) {
+            return modifier.modifyPosition(pos);
         }
     }
 
@@ -109,7 +110,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, @NonNull PosInOccurrence pos, Goal goal,
+    protected boolean filter(TacletApp app, @NonNull PosInOccurrence pos,
+            Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

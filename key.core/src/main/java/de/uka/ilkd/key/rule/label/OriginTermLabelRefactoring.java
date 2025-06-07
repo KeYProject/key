@@ -7,7 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -19,15 +18,13 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Refactoring for {@link OriginTermLabel}s.
@@ -39,13 +36,14 @@ import org.jspecify.annotations.Nullable;
 public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
-    public @Nullable ImmutableList<Name> getSupportedRuleNames() {
+    public ImmutableList<Name> getSupportedRuleNames() {
         return null;
     }
 
     @Override
-    public @NonNull RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
@@ -58,9 +56,9 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     @Override
-    public void refactorLabels(TermLabelState state, @NonNull Services services,
+    public void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, @NonNull Term term, @NonNull LabelCollection labels) {
+            Object hint, Term tacletTerm, Term term, LabelCollection labels) {
         if (services.getProof() == null) {
             return;
         }
@@ -105,8 +103,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
     }
 
-    private @NonNull Set<Origin> collectSubtermOrigins(@NonNull ImmutableArray<Term> terms,
-            @NonNull Set<Origin> result) {
+    private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms, Set<Origin> result) {
         for (Term term : terms) {
             collectSubtermOrigins(term, result);
         }
@@ -123,14 +120,13 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
      *
      * @see TermLabelRefactoring#shouldRefactorOnBuiltInRule(Rule, Goal, Object)
      */
-    private boolean shouldRefactorOnTaclet(@NonNull Taclet taclet) {
+    private boolean shouldRefactorOnTaclet(Taclet taclet) {
         return !taclet.name().toString().startsWith("arrayLength")
                 && taclet.goalTemplates().size() <= 1;
     }
 
     @SuppressWarnings("unchecked")
-    private @NonNull Set<Origin> collectSubtermOrigins(@NonNull Term term,
-            @NonNull Set<Origin> result) {
+    private Set<Origin> collectSubtermOrigins(Term term, Set<Origin> result) {
         TermLabel label = term.getLabel(OriginTermLabel.NAME);
 
         if (label != null) {

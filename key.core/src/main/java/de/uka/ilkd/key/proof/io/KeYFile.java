@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,7 +40,6 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ public class KeYFile implements EnvInput {
      * the RuleSource delivering the input stream for the file.
      */
     protected final RuleSource file;
+
     /**
      * the graphical entity to notify on the state of reading.
      */
@@ -104,7 +106,7 @@ public class KeYFile implements EnvInput {
      * creates a new representation for a given file by indicating a name and a file representing
      * the physical source of the .key file.
      */
-    public KeYFile(String name, File file, ProgressMonitor monitor, Profile profile) {
+    public KeYFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -118,7 +120,7 @@ public class KeYFile implements EnvInput {
      * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name, File file, @Nullable ProgressMonitor monitor, Profile profile,
+    public KeYFile(String name, Path file, @Nullable ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
     }
@@ -135,7 +137,7 @@ public class KeYFile implements EnvInput {
      * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name, File file, FileRepo fileRepo, ProgressMonitor monitor,
+    public KeYFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
             Profile profile, boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
         this.fileRepo = fileRepo;
@@ -212,7 +214,7 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 KeyAst.File ctx = getParseContext();
-                var inc = ctx.getIncludes(file.file().getAbsoluteFile().getParentFile().toURI());
+                var inc = ctx.getIncludes(file.file().getParent().toUri());
                 includes = inc;
                 return inc;
             } catch (ParseCancellationException e) {
@@ -226,17 +228,17 @@ public class KeYFile implements EnvInput {
 
 
     @Override
-    public File readBootClassPath() {
+    public Path readBootClassPath() {
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) {
             return null;
         }
-        File bootClassPathFile = new File(bootClassPath);
+        Path bootClassPathFile = Paths.get(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
-            String parentDirectory = file.file().getParent();
-            bootClassPathFile = new File(parentDirectory, bootClassPath);
+            var parentDirectory = file.file().getParent();
+            bootClassPathFile = parentDirectory.resolve(bootClassPath);
         }
 
         return bootClassPathFile;
@@ -252,38 +254,42 @@ public class KeYFile implements EnvInput {
 
 
     @Override
-    public @NonNull List<File> readClassPath() {
+    public List<Path> readClassPath() {
         ProblemInformation pi = getProblemInformation();
-        String parentDirectory = file.file().getParent();
-        List<File> fileList = new ArrayList<>();
+        var parentDirectory = file.file().getParent();
+        List<Path> fileList = new ArrayList<>();
         for (String cp : pi.getClasspath()) {
-            File f = new File(cp);
-            if (!f.isAbsolute()) {
-                f = new File(parentDirectory, cp);
+            if (cp == null) {
+                fileList.add(null);
+            } else {
+                var f = Paths.get(cp);
+                if (!f.isAbsolute()) {
+                    f = parentDirectory.resolve(cp);
+                }
+                fileList.add(f);
             }
-            fileList.add(f);
         }
         return fileList;
     }
 
     @Override
-    public String readJavaPath() throws ProofInputException {
+    public @Nullable Path readJavaPath() throws ProofInputException {
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
-            File absFile = new File(javaPath);
+            var absFile = Paths.get(javaPath);
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file
-                File parent = file.file().getParentFile();
-                absFile = new File(parent, javaPath);
+                var parent = file.file().getParent();
+                absFile = parent.resolve(javaPath);
             }
-            if (!absFile.exists()) {
+            if (!Files.exists(absFile)) {
                 throw new ProofInputException(
                     String.format("Declared Java source %s not found.", javaPath));
             }
-            return absFile.getAbsolutePath();
+            return absFile.toAbsolutePath();
         }
-        return javaPath;
+        return null;
     }
 
 
@@ -465,7 +471,7 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public File getInitialFile() {
+    public Path getInitialFile() {
         return file != null ? file.file() : null;
     }
 }

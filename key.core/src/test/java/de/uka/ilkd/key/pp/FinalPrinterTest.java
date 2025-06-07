@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.io.File;
-import java.net.URL;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
@@ -12,7 +10,6 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -84,7 +81,8 @@ public class FinalPrinterTest {
 
 
     private void assertEqualModAlpha(Term expected, Term actual) {
-        var value = expected.equalsModProperty(actual, RenamingTermProperty.RENAMING_TERM_PROPERTY);
+        var value =
+            RenamingTermProperty.RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, actual);
         if (!value) {
             System.err.println("Expected: " + expected);
             System.err.println("Actual  : " + actual);
@@ -93,10 +91,6 @@ public class FinalPrinterTest {
     }
 
     private static Services getServices() {
-        URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
-        assert url != null : "Could not find roundTripTest.key";
-        assert "file".equals(url.getProtocol()) : "URL is not a file URL";
-        File keyFile = new File(url.getPath());
-        return HelperClassForTests.createServices(keyFile);
+        return PrettyPrinterRoundtripTest.getServices();
     }
 }

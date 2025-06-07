@@ -4,4 +4,5 @@
  * {@link recoder.java.expression.operator.New} is also considered an
  * operator ({@link recoder.java.expression.operator.TypeOperator}).
  */
+@org.jspecify.annotations.NullMarked
 package de.uka.ilkd.key.java.expression.operator;

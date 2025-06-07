@@ -7,20 +7,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 
 public final class DropEffectlessStoresCondition implements VariableCondition {
@@ -39,9 +37,8 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static @Nullable Term dropEffectlessStoresHelper(@NonNull Term heapTerm,
-            @NonNull TermServices services,
-            @NonNull ImmutableSet<Pair<Term, Term>> overwrittenLocs, Function store) {
+    private static Term dropEffectlessStoresHelper(Term heapTerm, TermServices services,
+            ImmutableSet<Pair<Term, Term>> overwrittenLocs, Function store) {
         if (heapTerm.op() == store) {
             final Term subHeapTerm = heapTerm.sub(0);
             final Term objTerm = heapTerm.sub(1);
@@ -63,8 +60,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static @Nullable Term dropEffectlessStores(@NonNull Term t,
-            @NonNull Services services) {
+    private static Term dropEffectlessStores(Term t, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert t.sort() == heapLDT.targetSort();
         return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.nil(),
@@ -73,15 +69,16 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
 
     @Override
-    public @Nullable MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            @NonNull MatchConditions mc,
-            Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
-        Term hInst = (Term) svInst.getInstantiation(h);
-        Term oInst = (Term) svInst.getInstantiation(o);
-        Term fInst = (Term) svInst.getInstantiation(f);
-        Term xInst = (Term) svInst.getInstantiation(x);
-        Term resultInst = (Term) svInst.getInstantiation(result);
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
+            LogicServices p_services) {
+        final Services services = (Services) p_services;
+        var svInst = (SVInstantiations) mc.getInstantiations();
+        Term hInst = svInst.getInstantiation(h);
+        Term oInst = svInst.getInstantiation(o);
+        Term fInst = svInst.getInstantiation(f);
+        Term xInst = svInst.getInstantiation(x);
+        Term resultInst = svInst.getInstantiation(result);
         if (hInst == null || oInst == null || fInst == null || xInst == null) {
             return mc;
         }
@@ -102,7 +99,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return "\\dropEffectlessStores(" + h + ", " + o + ", " + f + ", " + x + ", " + result + ")";
     }
 }

@@ -4,12 +4,15 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
 
@@ -19,16 +22,18 @@ import org.jspecify.annotations.NonNull;
  * reduction ordering) by adding or subtracting <code>divisorSV</code>
  */
 public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
-    private final ProjectionToTerm dividend, divisor;
+    private final ProjectionToTerm<Goal> dividend, divisor;
 
-    private ReducibleMonomialsFeature(ProjectionToTerm dividend, ProjectionToTerm divisor) {
+    private ReducibleMonomialsFeature(ProjectionToTerm<Goal> dividend,
+            ProjectionToTerm<Goal> divisor) {
         this.dividend = dividend;
         this.divisor = divisor;
     }
 
-    public static @NonNull Feature createReducible(ProjectionToTerm dividend,
-            ProjectionToTerm divisor) {
+    public static @NonNull Feature createReducible(ProjectionToTerm<Goal> dividend,
+            ProjectionToTerm<Goal> divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
+            @Override
             protected boolean checkReducibility(@NonNull Monomial mDividend,
                     @NonNull Monomial mDivisor) {
                 return mDivisor.reducible(mDividend);
@@ -36,9 +41,10 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         };
     }
 
-    public static @NonNull Feature createDivides(ProjectionToTerm dividend,
-            ProjectionToTerm divisor) {
+    public static @NonNull Feature createDivides(ProjectionToTerm<Goal> dividend,
+            ProjectionToTerm<Goal> divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
+            @Override
             protected boolean checkReducibility(@NonNull Monomial mDividend,
                     @NonNull Monomial mDivisor) {
                 return mDivisor.divides(mDividend);
@@ -46,6 +52,7 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         };
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
             MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);

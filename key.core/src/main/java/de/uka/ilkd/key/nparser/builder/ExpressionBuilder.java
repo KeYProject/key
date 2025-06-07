@@ -18,7 +18,6 @@ import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -27,15 +26,22 @@ import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.RealLiteralContext;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 
@@ -208,13 +214,15 @@ public class ExpressionBuilder extends DefaultBuilder {
         return cur;
     }
 
-    private Term binaryTerm(ParserRuleContext ctx, Operator operator, Term left,
+    private Term binaryTerm(ParserRuleContext ctx, org.key_project.logic.op.Operator operator,
+            Term left,
             @Nullable Term right) {
         if (right == null) {
             return updateOrigin(left, ctx, services);
         }
         return capsulateTf(ctx,
-            () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx, services));
+            () -> updateOrigin(getTermFactory().createTerm((Operator) operator, left, right), ctx,
+                services));
     }
 
     @Override
@@ -248,11 +256,11 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitUnary_minus_term(KeYParser.Unary_minus_termContext ctx) {
         Term result = Objects.requireNonNull(accept(ctx.sub));
         if (ctx.MINUS() != null) {
-            Operator Z = functions().lookup("Z");
+            JFunction Z = (JFunction) functions().lookup("Z");
             if (result.op() == Z) {
                 // weigl: rewrite neg(Z(1(#)) to Z(neglit(1(#))
                 // This mimics the old KeyParser behaviour. Unknown if necessary.
-                final JFunction neglit = functions().lookup("neglit");
+                final JFunction neglit = (JFunction) functions().lookup("neglit");
                 final Term num = result.sub(0);
                 return capsulateTf(ctx,
                     () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
@@ -266,7 +274,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     // falling back to integer ldt (for instance for untyped schema variables)
                     ldt = services.getTypeConverter().getIntegerLDT();
                 }
-                JFunction op = ldt.getFunctionFor("neg", services);
+                JFunction op = (JFunction) ldt.getFunctionFor("neg", services);
                 if (op == null) {
                     semanticError(ctx, "Could not find function symbol 'neg' for sort '%s'.", sort);
                 }
@@ -337,11 +345,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < terms.size(); i++) {
             String opname = "";
             switch (ctx.op.get(i).getType()) {
-            case KeYLexer.UTF_INTERSECT -> opname = "intersect";
-            case KeYLexer.UTF_SETMINUS -> opname = "setMinus";
-            case KeYLexer.UTF_UNION -> opname = "union";
-            case KeYLexer.PLUS -> opname = "add";
-            case KeYLexer.MINUS -> opname = "sub";
+            case KeYLexer.UTF_INTERSECT -> opname = LocSetLDT.INTERSECT_STRING;
+            case KeYLexer.UTF_SETMINUS -> opname = LocSetLDT.SETMINUS_STRING;
+            case KeYLexer.UTF_UNION -> opname = LocSetLDT.UNION_STRING;
+            case KeYLexer.PLUS -> opname = IntegerLDT.ADD_STRING;
+            case KeYLexer.MINUS -> opname = IntegerLDT.SUB_STRING;
             default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
             }
             Term cur = terms.get(i);
@@ -360,7 +368,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             // falling back to integer ldt (for instance for untyped schema variables)
             ldt = services.getTypeConverter().getIntegerLDT();
         }
-        JFunction op = ldt.getFunctionFor(opname, services);
+        Function op = ldt.getFunctionFor(opname, services);
         if (op == null) {
             semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opname, sort);
         }
@@ -377,7 +385,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<Term> terms = mapOf(ctx.b);
         Term last = termL;
         for (Term cur : terms) {
-            last = binaryLDTSpecificTerm(ctx, "mul", last, cur);
+            last = binaryLDTSpecificTerm(ctx, IntegerLDT.MUL_STRING, last, cur);
         }
         return last;
     }
@@ -415,7 +423,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         for (int i = 0; i < termL.size(); i++) {
             var opName = ctx.op.get(i).getType() == KeYLexer.PERCENT ? "mod" : "div";
-            JFunction op = ldt.getFunctionFor(opName, services);
+            Function op = ldt.getFunctionFor(opName, services);
             if (op == null) {
                 semanticError(ctx, "Could not find function symbol '%s' for sort '%s'.", opName,
                     sort);
@@ -492,7 +500,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         namespaces().setVariables(new Namespace<>(variables()));
     }
 
-    private Term toZNotation(String literal, Namespace<JFunction> functions) {
+    private Term toZNotation(String literal, Namespace<Function> functions) {
         literal = literal.replace("_", "");
         final boolean negative = (literal.charAt(0) == '-');
         if (negative) {
@@ -514,27 +522,29 @@ public class ExpressionBuilder extends DefaultBuilder {
         return toZNotation(bi, functions);
     }
 
-    private Term toZNotation(BigInteger bi, Namespace<JFunction> functions) {
+    private Term toZNotation(BigInteger bi, Namespace<Function> functions) {
         boolean negative = bi.signum() < 0;
         String s = bi.abs().toString();
-        Term result = getTermFactory().createTerm(functions.lookup(new Name("#")));
+        Term result = getTermFactory().createTerm((JFunction) functions.lookup(new Name("#")));
 
         for (int i = 0; i < s.length(); i++) {
-            result = getTermFactory().createTerm(functions.lookup(new Name(s.substring(i, i + 1))),
+            result = getTermFactory().createTerm(
+                (JFunction) functions.lookup(new Name(s.substring(i, i + 1))),
                 result);
         }
 
         if (negative) {
-            result = getTermFactory().createTerm(functions.lookup(new Name("neglit")), result);
+            result = getTermFactory().createTerm((JFunction) functions.lookup(new Name("neglit")),
+                result);
         }
-        return getTermFactory().createTerm(functions.lookup(new Name("Z")), result);
+        return getTermFactory().createTerm((JFunction) functions.lookup(new Name("Z")), result);
     }
 
     @Override
     public Sequent visitSeq(KeYParser.SeqContext ctx) {
-        Semisequent ant = accept(ctx.ant);
-        Semisequent suc = accept(ctx.suc);
-        return Sequent.createSequent(ant, suc);
+        ImmutableList<SequentFormula> ant = accept(ctx.ant);
+        ImmutableList<SequentFormula> suc = accept(ctx.suc);
+        return JavaDLSequentKit.createSequent(ant, suc);
     }
 
     @Override
@@ -546,38 +556,36 @@ public class ExpressionBuilder extends DefaultBuilder {
     public @Nullable Object visitTermorseq(KeYParser.TermorseqContext ctx) {
         Term head = accept(ctx.head);
         Sequent s = accept(ctx.s);
-        Semisequent ss = accept(ctx.ss);
+        ImmutableList<SequentFormula> ss = accept(ctx.ss);
         if (head != null && s == null && ss == null) {
             return head;
         }
         if (head != null && ss != null) {
             // A sequent with only head in the antecedent.
-            Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
-            ant = ant.insertFirst(new SequentFormula(head)).semisequent();
-            return Sequent.createSequent(ant, ss);
+            var ant = ImmutableSLList.singleton(new SequentFormula(head));
+            return JavaDLSequentKit.createSequent(ant, ss);
         }
         if (head != null && s != null) {
             // A sequent. Prepend head to the antecedent.
-            Semisequent newAnt = s.antecedent();
-            newAnt = newAnt.insertFirst(new SequentFormula(head)).semisequent();
-            return Sequent.createSequent(newAnt, s.succedent());
+            var newAnt = s.antecedent().insertFirst(new SequentFormula(head)).getFormulaList();
+            return JavaDLSequentKit.createSequent(newAnt, s.succedent().asList());
         }
         if (ss != null) {
-            return Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, ss);
+            return JavaDLSequentKit.createSequent(ImmutableSLList.nil(), ss);
         }
         assert (false);
         return null;
     }
 
     @Override
-    public Semisequent visitSemisequent(KeYParser.SemisequentContext ctx) {
-        Semisequent ss = accept(ctx.ss);
+    public ImmutableList<SequentFormula> visitSemisequent(KeYParser.SemisequentContext ctx) {
+        ImmutableList<SequentFormula> ss = accept(ctx.ss);
         if (ss == null) {
-            ss = Semisequent.EMPTY_SEMISEQUENT;
+            ss = ImmutableSLList.nil();
         }
         Term head = accept(ctx.term());
         if (head != null) {
-            ss = ss.insertFirst(new SequentFormula(head)).semisequent();
+            ss = ss.prepend(new SequentFormula(head));
         }
         return ss;
     }
@@ -672,7 +680,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     capsulateTf(ctx, () -> getServices().getTermBuilder().dotLength(finalResult));
             } else {
                 ProgramVariable pv = (ProgramVariable) attribute;
-                JFunction fieldSymbol = getServices().getTypeConverter().getHeapLDT()
+                Function fieldSymbol = getServices().getTypeConverter().getHeapLDT()
                         .getFieldSymbolForPV((LocationVariable) pv, getServices());
                 if (pv.isFinal() && FinalHeapResolution
                         .isFinalEnabled(getServices().getProof().getSettings())) {
@@ -839,7 +847,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         String id = accept(ctx.simple_ident());
         List<Term> args = accept(ctx.args);
-        JFunction f = functions().lookup(new Name(id));
+        JFunction f = (JFunction) functions().lookup(new Name(id));
         if (f == null) {
             semanticError(ctx, "Unknown heap constructor " + id);
         }
@@ -860,7 +868,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term rangeFrom = toZNotation("0", functions());
         Term lt = getServices().getTermBuilder().dotLength(reference);
         Term one = toZNotation("1", functions());
-        Term rangeTo = getTermFactory().createTerm(functions().lookup(new Name("sub")), lt, one);
+        Term rangeTo =
+            getTermFactory().createTerm((JFunction) functions().lookup(new Name("sub")), lt, one);
         // TODO construct
         return null;
     }
@@ -899,7 +908,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     new LogicVariable(new Name("i"), sorts().lookup(new Name("int")));
                 Term indexTerm = capsulateTf(ctx, () -> getTermFactory().createTerm(indexVar));
 
-                JFunction leq = functions().lookup(new Name("leq"));
+                JFunction leq = (JFunction) functions().lookup(new Name("leq"));
                 Term fromTerm =
                     capsulateTf(ctx, () -> getTermFactory().createTerm(leq, rangeFrom, indexTerm));
                 Term toTerm =
@@ -1163,7 +1172,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "'" + s + "' is not a valid character.");
             }
         }
-        return getTermFactory().createTerm(functions().lookup(new Name("C")),
+        return getTermFactory().createTerm((Operator) functions().lookup(new Name("C")),
             toZNotation(String.valueOf(intVal), functions()).sub(0));
     }
 
@@ -1175,7 +1184,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * Handles "[sort]::a.name.or.something.else"
      *
      * @param ctx
-     * @return a Term or an operator, depending the referenced object.
+     * @return a Term or an operator, depending on the referenced object.
      */
     @Override
     public Object visitFuncpred_name(KeYParser.Funcpred_nameContext ctx) {
@@ -1360,9 +1369,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     addWarning("");
                 }
                 return current;
-            } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext attrid =
-                    (KeYParser.Attribute_simpleContext) ctxSuffix;
+            } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext attrid) {
                 String memberName = attrid.id.getText();
                 Sort seqSort = lookupSort("Seq");
                 if (current.sort() == seqSort) {
@@ -1396,9 +1403,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         current = replaceHeap(current, heap, ctxSuffix);
                     }
                 }
-            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
-                KeYParser.Attribute_complexContext attrid =
-                    (KeYParser.Attribute_complexContext) ctxSuffix;
+            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext attrid) {
                 Term heap = accept(attrid.heap);
                 String classRef = attrid.sort.getText();
                 String memberName = attrid.id.getText();
@@ -1507,7 +1512,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs));
             } else {
                 // sanity check
-                assert op instanceof JFunction;
+                assert op instanceof Function;
                 for (int i = 0; i < args.length; i++) {
                     if (i < op.arity() && !op.bindVarsAt(i)) {
                         for (QuantifiableVariable qv : args[i].freeVars()) {
@@ -1565,24 +1570,27 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private Term toZNotation(String number) {
-        return getTermFactory().createTerm(functions().lookup(new Name("Z")), toNum(number));
+        return getTermFactory().createTerm((JFunction) functions().lookup(new Name("Z")),
+            toNum(number));
     }
 
     private Term toCNotation(String number) {
-        return getTermFactory().createTerm(functions().lookup(new Name("C")), toNum(number));
+        return getTermFactory().createTerm((JFunction) functions().lookup(new Name("C")),
+            toNum(number));
     }
 
     private Term toFPNotation(String number) {
         String decBitString =
             Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
         // toNum("0")); // soon to disappear
-        return getTermFactory().createTerm(functions().lookup(new Name("FP")), toNum(decBitString));
+        return getTermFactory().createTerm((JFunction) functions().lookup(new Name("FP")),
+            toNum(decBitString));
     }
 
     private Term toDFPNotation(String number) {
         String decBitString =
             Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
-        return getTermFactory().createTerm(functions().lookup(new Name("DFP")),
+        return getTermFactory().createTerm((JFunction) functions().lookup(new Name("DFP")),
             toNum(decBitString)); // toNum("0")); // soon to disappear
     }
 
@@ -1600,15 +1608,17 @@ public class ExpressionBuilder extends DefaultBuilder {
                 Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
             }
         }
-        Term result = getTermFactory().createTerm(functions().lookup(new Name("#")));
+        Term result = getTermFactory().createTerm((JFunction) functions().lookup(new Name("#")));
 
         for (int i = 0; i < s.length(); i++) {
             result = getTermFactory()
-                    .createTerm(functions().lookup(new Name(s.substring(i, i + 1))), result);
+                    .createTerm((JFunction) functions().lookup(new Name(s.substring(i, i + 1))),
+                        result);
         }
 
         if (negative) {
-            result = getTermFactory().createTerm(functions().lookup(new Name("neglit")), result);
+            result = getTermFactory().createTerm((JFunction) functions().lookup(new Name("neglit")),
+                result);
         }
 
         return result;
@@ -1746,7 +1756,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // term);
                 return term;
             }
-            Term[] params = new Term[] { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
+            Term[] params = { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
             return capsulateTf(ctx,
                 () -> getServices().getTermFactory().createTerm(term.op(), params));
         } else if (term.op() instanceof ObserverFunction) {

@@ -18,11 +18,12 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -114,8 +115,13 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
         PosInOccurrence pio = pos.getPosInOccurrence();
 
-        OriginTermLabel label =
-            pio == null ? null : (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
+        OriginTermLabel label;
+        if (pio == null) {
+            label = null;
+        } else {
+            var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();
+            label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        }
 
         if (label != null && !label.getSubtermOrigins().isEmpty()) {
             result += "<b>Origin of (former) sub-terms:</b><br>" + label.getSubtermOrigins()

@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 public abstract class VisibilityModifier extends Modifier
         implements Comparable<VisibilityModifier> {
 
-    public VisibilityModifier() {
+    protected VisibilityModifier() {
     }
 
 
@@ -31,7 +31,7 @@ public abstract class VisibilityModifier extends Modifier
      *
      * @param children the children of this AST element as KeY classes. May contain: Comments
      */
-    public VisibilityModifier(ExtList children) {
+    protected VisibilityModifier(ExtList children) {
         super(children);
     }
 

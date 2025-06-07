@@ -47,7 +47,7 @@ public class BranchLocation {
             throw new IllegalArgumentException(
                 "can't determine common prefix of 0 branch locations");
         }
-        BranchLocation prefix = BranchLocation.ROOT;
+        BranchLocation prefix = ROOT;
         int i = 0;
         boolean keepGoing = true;
         while (keepGoing) {

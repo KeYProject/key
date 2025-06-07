@@ -9,13 +9,11 @@ import java.util.Map;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.Nullable;
+import org.key_project.prover.engine.SingleRuleApplicationInfo;
+import org.key_project.prover.engine.StopCondition;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Provides the basic functionality for {@link StopCondition}s which stops the auto mode when the
@@ -26,7 +24,7 @@ import org.jspecify.annotations.Nullable;
  * @see StepOverSymbolicExecutionTreeNodesStopCondition
  * @see StepReturnSymbolicExecutionTreeNodesStopCondition
  */
-public abstract class AbstractCallStackBasedStopCondition implements StopCondition {
+public abstract class AbstractCallStackBasedStopCondition implements StopCondition<Goal> {
     /**
      * Maps a {@link Goal} to the initial call stack size at which the auto mode was started.
      */
@@ -37,7 +35,7 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      * {@inheritDoc}
      */
     @Override
-    public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
+    public int getMaximalWork(int maxApplications, long timeout) {
         startingCallStackSizePerGoal.clear(); // Reset initial call stack size of all goals. Will be
                                               // filled in isGoalAllowed.
         return 0; // Return unknown because there is no relation between applied rules and step over
@@ -48,8 +46,8 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      * {@inheritDoc}
      */
     @Override
-    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, @Nullable Goal goal) {
+    public boolean isGoalAllowed(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
@@ -112,8 +110,8 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      * {@inheritDoc}
      */
     @Override
-    public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, @Nullable SingleRuleApplicationInfo singleRuleApplicationInfo) {
+    public boolean shouldStop(int maxApplications, long timeout, long startTime,
+            int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         // Check if a rule was applied
         if (singleRuleApplicationInfo != null) {
             // Get the node on which a rule was applied.
@@ -148,8 +146,7 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      * {@inheritDoc}
      */
     @Override
-    public @Nullable String getStopMessage(int maxApplications, long timeout, Proof proof,
-            long startTime,
+    public String getStopMessage(int maxApplications, long timeout, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return null;
     }

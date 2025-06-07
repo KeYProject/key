@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +40,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * EnvInput for standalone specification language front ends.
@@ -49,14 +53,14 @@ public final class SLEnvInput extends AbstractEnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
-    public SLEnvInput(String javaPath, List<File> classPath, File bootClassPath, Profile profile,
-            List<File> includes) {
+    public SLEnvInput(@Nullable Path javaPath, List<Path> classPath, @Nullable Path bootClassPath,
+            Profile profile, List<Path> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
             includes);
     }
 
 
-    public SLEnvInput(String javaPath, Profile profile) {
+    public SLEnvInput(@Nullable Path javaPath, Profile profile) {
         this(javaPath, null, null, profile, null);
     }
 
@@ -85,18 +89,21 @@ public final class SLEnvInput extends AbstractEnvInput {
 
 
     private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
-            String path) throws ProofInputException {
+            Path path) throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         for (KeYJavaType kjt : allKJTs) {
             if (kjt.getJavaType() instanceof TypeDeclaration
                     && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
                 final String filePath =
-                    String.format("%s/%s.key", path, kjt.getFullName().replace(".", "/"));
+                    String.format("%s/%s.key", path,
+                        kjt.getFullName().replace(".", "/")
+                                .replace('<', '_')
+                                .replace('>', '_'));
                 RuleSource rs = null;
 
                 // external or internal path?
-                File file = new File(filePath);
-                if (file.isFile()) {
+                var file = Paths.get(filePath);
+                if (Files.isRegularFile(file)) {
                     rs = RuleSourceFactory.initRuleFile(file);
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
@@ -112,7 +119,8 @@ public final class SLEnvInput extends AbstractEnvInput {
 
                 // rule source found? -> read
                 if (rs != null) {
-                    final KeYFile keyFile = new KeYFile(path, rs, null, getProfile());
+                    final KeYFile keyFile = new KeYFile(path.getFileName().toString(),
+                        rs, null, getProfile());
                     keyFile.setInitConfig(initConfig);
                     warnings = warnings.union(keyFile.read());
                 }
@@ -133,20 +141,20 @@ public final class SLEnvInput extends AbstractEnvInput {
         // either boot class path or JavaRedux
         if (bootClassPath != null) {
             warnings = warnings
-                    .union(createDLLibrarySpecsHelper(allKJTs, bootClassPath.getAbsolutePath()));
+                    .union(createDLLibrarySpecsHelper(allKJTs, bootClassPath.toAbsolutePath()));
         } else {
-            String path = JavaReduxFileCollection.JAVA_SRC_DIR;
+            Path path = JavaReduxFileCollection.JAVA_SRC_DIR;
             if (!initConfig.getProfile().getInternalClassDirectory().isEmpty()) {
-                path += "/" + initConfig.getProfile().getInternalClassDirectory();
+                path = path.resolve(initConfig.getProfile().getInternalClassDirectory());
             }
             warnings = warnings.union(createDLLibrarySpecsHelper(allKJTs, path));
         }
 
         // if applicable: class path
         if (classPath != null) {
-            for (File file : classPath) {
+            for (Path file : classPath) {
                 warnings =
-                    warnings.union(createDLLibrarySpecsHelper(allKJTs, file.getAbsolutePath()));
+                    warnings.union(createDLLibrarySpecsHelper(allKJTs, file.toAbsolutePath()));
             }
         }
         return warnings;
@@ -394,7 +402,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     @Override
-    public File getInitialFile() {
+    public Path getInitialFile() {
         return null;
     }
 }

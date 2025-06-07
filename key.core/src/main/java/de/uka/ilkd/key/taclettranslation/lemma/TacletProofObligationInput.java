@@ -5,6 +5,8 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -33,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mattias ulbrich
  */
-public class TacletProofObligationInput implements ProofOblInput, IPersistablePO {
+public class TacletProofObligationInput implements IPersistablePO {
     static final Logger LOGGER = LoggerFactory.getLogger(TacletProofObligationInput.class);
     public static final String AXIOM_FILE = "axiomFile";
 
@@ -117,8 +119,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     @Override
     public @NonNull Configuration createLoaderConfig() throws IOException {
         var c = new Configuration();
-        c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
-        c.set(IPersistablePO.PROPERTY_NAME, name());
+        c.set(PROPERTY_CLASS, getClass().getCanonicalName());
+        c.set(PROPERTY_NAME, name());
 
         // TODO MU ----- make the file names relative
         // MiscTools.makeFilenamesRelative. However ... I need the store save name ...
@@ -158,7 +160,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
                 new ProblemInitializer(environmentConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
-                new File(baseDir, tacletFile), fileCollection(axiomFiles), environmentConfig);
+                Paths.get(baseDir, tacletFile),
+                fileCollection(axiomFiles), environmentConfig);
         }
 
         ProofEnvironment proofEnv = createProofEnvironment();
@@ -179,10 +182,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     }
 
 
-    private @NonNull Collection<File> fileCollection(String @NonNull [] strings) {
-        ArrayList<File> result = new ArrayList<>();
+    private @NonNull Collection<Path> fileCollection(String @NonNull [] strings) {
+        ArrayList<Path> result = new ArrayList<>();
         for (String string : strings) {
-            result.add(new File(baseDir, string));
+            result.add(Paths.get(baseDir, string));
         }
         return result;
     }
@@ -203,7 +206,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     void setLoadInfo(@NonNull Configuration properties) {
         final var pathname =
-            Objects.requireNonNull(properties.getString(IPersistablePO.PROPERTY_FILENAME));
+            Objects.requireNonNull(properties.getString(PROPERTY_FILENAME));
         this.baseDir = new File(pathname).getParent();
         this.tacletFile = properties.getString("tacletFile");
         this.definitionFile = properties.getString("definitionFile");
@@ -218,14 +221,13 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         this.axiomFiles = axioms.toArray(new String[0]);
     }
 
-    public void setLoadInfo(@NonNull File tacletFile, @NonNull File definitionFile,
-            @NonNull Collection<File> axiomFiles) {
+    public void setLoadInfo(Path tacletFile, File definitionFile, Collection<Path> axiomFiles) {
         this.tacletFile = tacletFile.toString();
         this.definitionFile = definitionFile.toString();
         this.axiomFiles = new String[axiomFiles.size()];
 
         int i = 0;
-        for (File file : axiomFiles) {
+        for (Path file : axiomFiles) {
             this.axiomFiles[i] = file.toString();
             i++;
         }

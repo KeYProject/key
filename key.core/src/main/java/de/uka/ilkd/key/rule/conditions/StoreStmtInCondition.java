@@ -9,15 +9,14 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.LightweightSyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
-
-import org.jspecify.annotations.NonNull;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.SVInstantiations;
 
 /**
  * Stores the given {@link Statement}, after substitution of {@link SchemaVariable}s, into the given
@@ -40,8 +39,8 @@ public class StoreStmtInCondition implements VariableCondition {
     }
 
     @Override
-    public @NonNull MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            @NonNull MatchConditions matchCond, Services services) {
+    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
+            MatchConditions matchCond, LogicServices services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
@@ -49,7 +48,8 @@ public class StoreStmtInCondition implements VariableCondition {
         }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
-            new LightweightSyntacticalReplaceVisitor(svInst, services);
+            new LightweightSyntacticalReplaceVisitor(
+                (de.uka.ilkd.key.rule.inst.SVInstantiations) svInst, (Services) services);
         term.execPostOrder(replVisitor);
         final Term instantiatedTerm = replVisitor.getTerm();
 
@@ -58,15 +58,15 @@ public class StoreStmtInCondition implements VariableCondition {
 
         assert !instantiatedTerm.javaBlock().isEmpty();
         assert instantiatedTerm.javaBlock().program() instanceof StatementBlock;
-        assert ((StatementBlock) instantiatedTerm.javaBlock().program()).getChildCount() == 1;
+        assert instantiatedTerm.javaBlock().program().getChildCount() == 1;
 
         return matchCond.setInstantiations(//
-            svInst.add(storeInSV,
+            ((de.uka.ilkd.key.rule.inst.SVInstantiations) svInst).add(storeInSV,
                 (Statement) instantiatedTerm.javaBlock().program().getFirstElement(), services));
     }
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return String.format( //
             "\\varcond (\\storeStmtIn(%s, %s))", storeInSV, term);
     }

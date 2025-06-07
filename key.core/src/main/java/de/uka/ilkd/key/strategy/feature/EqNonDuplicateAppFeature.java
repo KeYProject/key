@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,19 +23,22 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new EqNonDuplicateAppFeature();
 
-    private EqNonDuplicateAppFeature() {}
+    private EqNonDuplicateAppFeature() {
+    }
 
+    @Override
     public boolean filter(@NonNull TacletApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        if (!app.ifInstsComplete()) {
+        if (!app.assumesInstantionsComplete()) {
             return true;
         }
 
         return noDuplicateFindTaclet(app, pos, goal);
     }
 
+    @Override
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
             @NonNull PosInOccurrence newPio,
             @NonNull PosInOccurrence oldPio) {

@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -35,7 +36,7 @@ public abstract class TacletLoader {
     protected final Profile profile;
     protected ProofEnvironment proofEnvironment;
 
-    public TacletLoader(ProgressMonitor monitor, ProblemInitializerListener listener,
+    protected TacletLoader(ProgressMonitor monitor, ProblemInitializerListener listener,
             Profile profile) {
         super();
         this.monitor = monitor;
@@ -118,13 +119,13 @@ public abstract class TacletLoader {
 
     public static class TacletFromFileLoader extends TacletLoader {
         private InitConfig initConfig;
-        private final File fileForTaclets;
-        private final Collection<File> filesForAxioms;
+        private final Path fileForTaclets;
+        private final Collection<Path> filesForAxioms;
         private final ProblemInitializer problemInitializer;
 
         public TacletFromFileLoader(ProgressMonitor pm, ProblemInitializerListener listener,
-                ProblemInitializer problemInitializer, File fileForTaclets,
-                Collection<File> filesForAxioms, @NonNull InitConfig initConfig) {
+                ProblemInitializer problemInitializer, Path fileForTaclets,
+                Collection<Path> filesForAxioms, @NonNull InitConfig initConfig) {
             super(pm, listener, initConfig.getProfile());
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
@@ -133,8 +134,8 @@ public abstract class TacletLoader {
         }
 
         public TacletFromFileLoader(ProgressMonitor pm, ProblemInitializerListener listener,
-                ProblemInitializer problemInitializer, Profile profile, File fileForTaclets,
-                Collection<File> filesForAxioms) {
+                ProblemInitializer problemInitializer, Profile profile, Path fileForTaclets,
+                Collection<Path> filesForAxioms) {
             super(pm, listener, profile);
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
@@ -156,8 +157,9 @@ public abstract class TacletLoader {
                 loader.listener);
         }
 
-        private void prepareKeYFile(@NonNull File file) throws ProofInputException {
-            KeYFile keyFileDefs = new KeYFile(file.getName(), file, monitor, profile);
+        private void prepareKeYFile(Path file) throws ProofInputException {
+            KeYFile keyFileDefs =
+                new KeYFile(file.getFileName().toString(), file, monitor, profile);
             if (initConfig != null) {
                 problemInitializer.readEnvInput(keyFileDefs, initConfig);
             } else {
@@ -185,7 +187,7 @@ public abstract class TacletLoader {
         @Override
         public @NonNull ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
-            for (File f : filesForAxioms) {
+            for (Path f : filesForAxioms) {
                 prepareKeYFile(f);
             }
 

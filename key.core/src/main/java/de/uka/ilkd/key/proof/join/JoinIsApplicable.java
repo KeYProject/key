@@ -6,12 +6,13 @@ package de.uka.ilkd.key.proof.join;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -81,7 +82,7 @@ public class JoinIsApplicable {
      */
     private @Nullable ProspectivePartner areProspectivePartners(@NonNull Goal g1,
             @NonNull PosInOccurrence pio, @NonNull Goal g2) {
-        Term referenceFormula = pio.subTerm();
+        Term referenceFormula = (Term) pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();
         TermBuilder tb = g1.proof().getServices().getTermBuilder();
@@ -94,18 +95,19 @@ public class JoinIsApplicable {
                     : referenceFormula;
 
         for (SequentFormula sf : g2.sequent().succedent()) {
-            Term formula = sf.formula();
-            Term update2 = tb.skip();
+            var formula = sf.formula();
+            org.key_project.logic.Term update2 = tb.skip();
             if (formula.op() instanceof UpdateApplication
-                    && !formula.equalsModProperty(referenceFormula, RENAMING_TERM_PROPERTY)) {
+                    && !RENAMING_TERM_PROPERTY.equalsModThisProperty(formula, referenceFormula)) {
                 update2 = formula.sub(0);// don't change the order of this and
                                          // the following line.
                 formula = formula.sub(1);
 
             }
-            if (formula.equalsModProperty(referenceFormula, RENAMING_TERM_PROPERTY)) {
-                return new ProspectivePartner(referenceFormula, g1.node(), pio.sequentFormula(),
-                    update1, g2.node(), sf, update2);
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(formula, referenceFormula)) {
+                return new ProspectivePartner(referenceFormula, g1.node(),
+                    pio.sequentFormula(),
+                    update1, g2.node(), sf, (Term) update2);
             }
         }
         return null;

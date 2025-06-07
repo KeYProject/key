@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,19 +50,18 @@ public final class Main {
     }
 
     private static void processFileOrDir(@NonNull Path path, boolean overwrite) {
-        var file = path.toFile();
-        if (file.isFile()) {
+        if (Files.isRegularFile(path)) {
             try {
                 if (!path.toString().endsWith(".proof")) {
                     LOGGER.debug("Ignoring non proof file " + path);
                     return;
                 }
-                processFile(file, overwrite);
+                processFile(path, overwrite);
             } catch (Exception e) {
                 LOGGER.error("error occurred in slicing ", e);
             }
-        } else if (file.isDirectory()) {
-            try (var s = Files.newDirectoryStream(file.toPath())) {
+        } else if (Files.isDirectory(path)) {
+            try (var s = Files.newDirectoryStream(path)) {
                 for (Path child : s) {
                     processFileOrDir(child, overwrite);
                 }
@@ -89,9 +87,9 @@ public final class Main {
             if (overwrite) {
                 LOGGER.info("--overwrite given, writing files");
             }
-            for (File file : fileArguments) {
+            for (var file : fileArguments) {
                 try {
-                    processFileOrDir(file.toPath(), overwrite);
+                    processFileOrDir(file, overwrite);
                 } catch (Exception e) {
                     LOGGER.error("error occurred in slicing", e);
                 }
@@ -104,15 +102,13 @@ public final class Main {
         }
     }
 
-    private static void processFile(@NonNull File proofFile, boolean overwrite) throws Exception {
-        LOGGER.info("Processing proof: {}", proofFile.getName());
+    private static void processFile(Path proofFile, boolean overwrite) throws Exception {
+        LOGGER.info("Processing proof: {}", proofFile.getFileName());
         GeneralSettings.noPruningClosed = false;
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         KeYEnvironment<?> environment =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
-                null, proof -> {
-                    tracker.set(new DependencyTracker(proof));
-                }, true);
+                null, proof -> tracker.set(new DependencyTracker(proof)), true);
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
@@ -120,7 +116,7 @@ public final class Main {
             AnalysisResults results = tracker.get().analyze(true, false);
             // slice proof
             ProblemLoaderControl control = new DefaultUserInterfaceControl();
-            File saved = SlicingProofReplayer
+            Path saved = SlicingProofReplayer
                     .constructSlicer(control, proof, results, null).slice();
             KeYEnvironment<?> environment2 =
                 KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved, null, null,
@@ -136,10 +132,10 @@ public final class Main {
 
                 if (overwrite) {
                     LOGGER.info("Saving sliced proof");
-                    Files.move(saved.toPath(), proofFile.toPath(),
+                    Files.move(saved, proofFile,
                         StandardCopyOption.REPLACE_EXISTING);
                 } else {
-                    Files.delete(saved.toPath());
+                    Files.delete(saved);
                 }
             } finally {
                 environment2.dispose();

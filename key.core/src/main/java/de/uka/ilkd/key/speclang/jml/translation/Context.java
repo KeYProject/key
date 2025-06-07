@@ -45,7 +45,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
     public static @NonNull Context inMethod(@NonNull IProgramMethod pm, @NonNull TermBuilder tb) {
         var classType = pm.getContainerType();
         var selfVar = createSelfVar(tb, classType, pm.isStatic());
-        return Context.inMethodWithSelfVar(pm, selfVar);
+        return inMethodWithSelfVar(pm, selfVar);
     }
 
     /**

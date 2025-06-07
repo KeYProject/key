@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,29 +69,27 @@ public class ProveSMTLemmasTest {
             Files.writeString(path, HEADER + "\\problem { " + lemmaString + "}");
         }
 
-        File file = path.toFile();
+        LOGGER.info("Now processing file {}", path);
 
-        LOGGER.info("Now processing file {}", file);
-
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(path);
         try {
             Proof loadedProof = env.getLoadedProof();
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
             if (!loadedProof.closed()) {
-                File saveFile = new File(file.getAbsoluteFile() + ".proof");
+                var saveFile = Paths.get(path.toAbsolutePath() + ".proof");
                 ProofSaver saver = new ProofSaver(loadedProof, saveFile);
                 saver.save();
-                Assertions.fail("Proof does not close. See " + file + " and " + saveFile);
+                Assertions.fail("Proof does not close. See " + path + " and " + saveFile);
             } else {
                 if (proofFile == null) {
                     // delete temp files
-                    file.delete();
+                    Files.delete(path);
                 } else {
                     // and check if proofs are actually for the right theorem!
                     KeyIO io = new KeyIO(loadedProof.getServices());
                     Term parsedLemma = io.parseExpression(lemmaString);
-                    Term actual = loadedProof.root().sequent().succedent().get(0).formula();
-                    if (!actual.equalsModProperty(parsedLemma, RENAMING_TERM_PROPERTY)) {
+                    var actual = loadedProof.root().sequent().succedent().get(0).formula();
+                    if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(actual, parsedLemma)) {
                         LOGGER.info("Stored : {}", parsedLemma);
                         LOGGER.warn("Proven : {}", actual);
                         Assertions.fail("The proven lemma is different from the stored one.");

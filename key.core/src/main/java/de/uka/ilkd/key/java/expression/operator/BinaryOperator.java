@@ -21,11 +21,11 @@ import org.jspecify.annotations.NonNull;
  */
 public abstract class BinaryOperator extends Operator {
 
-    public BinaryOperator(@NonNull ExtList children) {
+    protected BinaryOperator(@NonNull ExtList children) {
         super(children);
     }
 
-    public BinaryOperator(@NonNull Expression lhs, @NonNull Expression rhs) {
+    protected BinaryOperator(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 

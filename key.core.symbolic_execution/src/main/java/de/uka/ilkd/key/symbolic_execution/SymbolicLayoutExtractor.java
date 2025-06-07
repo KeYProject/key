@@ -9,13 +9,11 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -26,6 +24,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -271,7 +274,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
                 Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
-                ApplyStrategyInfo info = null;
+                ApplyStrategyInfo<Proof, Goal> info = null;
                 try {
                     // Instantiate proof in which equivalent classes of symbolic objects are
                     // computed.
@@ -313,7 +316,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         Sequent sequent = getRoot().sequent();
         assert sequent.antecedent().isEmpty();
         assert sequent.succedent().size() == 1;
-        Term sf = sequent.succedent().get(0).formula();
+        Term sf = (Term) sequent.succedent().get(0).formula();
         assert sf.op() == Junctor.IMP;
         Term modality = sf.sub(1);
         return TermBuilder.goBelowUpdates2(modality).first;
@@ -423,8 +426,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
 
                 TacletApp t2 = c.addInstantiation(cutF, term, false, getServices());
 
-                final ImmutableList<Goal> branches = g.apply(t2);
-                starter.start(branches);
+                starter.start(g.apply(t2));
             }
         }
     }
@@ -688,7 +690,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         Set<Term> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
-                result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
+                result.addAll(collectSymbolicObjectsFromTerm((Term) sf.formula(), objectsToIgnore));
             }
         }
         return result;

@@ -31,7 +31,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
     @Override
     public @Nullable String check(@NonNull String toBeChecked) {
         if (toBeChecked.isEmpty()) {
-            return CheckedUserInputInspector.NO_USER_INPUT;
+            return NO_USER_INPUT;
         }
         Term term = translate(services, toBeChecked);
 

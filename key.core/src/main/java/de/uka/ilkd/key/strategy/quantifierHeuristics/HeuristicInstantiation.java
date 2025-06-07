@@ -6,31 +6,27 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
+public class HeuristicInstantiation implements TermGenerator<Goal> {
 
-public class HeuristicInstantiation implements TermGenerator {
-
-    public final static TermGenerator INSTANCE = new HeuristicInstantiation();
+    public final static TermGenerator<Goal> INSTANCE = new HeuristicInstantiation();
 
     private HeuristicInstantiation() {}
 
     @Override
-    public @NonNull Iterator<Term> generate(RuleApp app, @NonNull PosInOccurrence pos,
-            @NonNull Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
@@ -38,6 +34,7 @@ public class HeuristicInstantiation implements TermGenerator {
         final Instantiation ia =
             Instantiation.create(qf, goal.sequent(), goal.proof().getServices());
         final QuantifiableVariable var = qf.varsBoundHere(0).last();
+        assert var != null;
         return new HIIterator(ia.getSubstitution().iterator(), var, goal.proof().getServices());
     }
 
@@ -45,20 +42,16 @@ public class HeuristicInstantiation implements TermGenerator {
     private static class HIIterator implements Iterator<Term> {
         private final Iterator<Term> instances;
 
-        private final QuantifiableVariable quantifiedVar;
+        private final Sort quantifiedVarSort;
+        private final Function quantifiedVarSortCast;
 
-        private final @NonNull Sort quantifiedVarSort;
-        private final @NonNull JFunction quantifiedVarSortCast;
+        private Term nextInst = null;
+        private final TermServices services;
 
-        private @Nullable Term nextInst = null;
-        private final @NonNull TermServices services;
-
-        private HIIterator(Iterator<Term> it, QuantifiableVariable var,
-                @NonNull Services services) {
+        private HIIterator(Iterator<Term> it, QuantifiableVariable var, Services services) {
             this.instances = it;
-            this.quantifiedVar = var;
             this.services = services;
-            quantifiedVarSort = quantifiedVar.sort();
+            quantifiedVarSort = var.sort();
             quantifiedVarSortCast =
                 services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
             findNextInst();
@@ -72,22 +65,26 @@ public class HeuristicInstantiation implements TermGenerator {
                         nextInst = null;
                         continue;
                     }
-                    nextInst = services.getTermBuilder().func(quantifiedVarSortCast, nextInst);
+                    nextInst = services.getTermBuilder().func(quantifiedVarSortCast,
+                        (de.uka.ilkd.key.logic.Term) nextInst);
                 }
             }
         }
 
+        @Override
         public boolean hasNext() {
             return nextInst != null;
         }
 
-        public @Nullable Term next() {
+        @Override
+        public Term next() {
             final Term res = nextInst;
             nextInst = null;
             findNextInst();
             return res;
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

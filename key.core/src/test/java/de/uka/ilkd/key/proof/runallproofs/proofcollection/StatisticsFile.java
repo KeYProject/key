@@ -32,7 +32,7 @@ public class StatisticsFile implements Serializable {
     private final File statisticsFile;
 
     @SuppressWarnings("rawtypes")
-    private static final Column[] columns = new Column[] { new Column<String>("Name") {
+    private static final Column[] columns = { new Column<String>("Name") {
         @Override
         @NonNull
         String addEntry(Statistics statistics, @NonNull File keyFile, boolean proofClosed) {
@@ -282,7 +282,7 @@ public class StatisticsFile implements Serializable {
                 // Create *.sum.properties file
                 Path sumFile =
                     new File(statisticsDir, columns[i].name + ".sum.properties").toPath();
-                String[] lines = new String[] { "YVALUE=" + sums.get(i), url };
+                String[] lines = { "YVALUE=" + sums.get(i), url };
                 Files.write(sumFile, Arrays.asList(lines), Charset.defaultCharset());
                 LOGGER.info("{} is written", sumFile);
 
@@ -300,7 +300,7 @@ public class StatisticsFile implements Serializable {
              */
             int countFiles = lists[0].size();
             Path countFilesPath = new File(statisticsDir, "NumberTestFiles.properties").toPath();
-            String[] lines = new String[] { "YVALUE=" + countFiles, url };
+            String[] lines = { "YVALUE=" + countFiles, url };
             Files.write(countFilesPath, Arrays.asList(lines), Charset.defaultCharset());
             LOGGER.info("{} is written", countFilesPath);
         }

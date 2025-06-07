@@ -3,16 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.jspecify.annotations.Nullable;
+import org.key_project.logic.LogicServices;
 
 public interface MatchOperatorInstruction extends MatchInstruction {
 
-    @Nullable
     MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-            Services services);
+            LogicServices services);
 
 }

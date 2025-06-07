@@ -3,21 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
 
 
 class UniTrigger implements Trigger {
@@ -42,9 +39,9 @@ class UniTrigger implements Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
 
-    public @NonNull ImmutableSet<Substitution> getSubstitutionsFromTerms(
-            @NonNull ImmutableSet<Term> targetTerm,
-            @NonNull Services services) {
+    @Override
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
+            Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         for (Term aTargetTerm : targetTerm) {
             allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
@@ -52,8 +49,7 @@ class UniTrigger implements Trigger {
         return allsubs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTerm(@NonNull Term t,
-            @NonNull Services services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, Services services) {
         ImmutableSet<Substitution> res = matchResults.get(t);
         if (res == null) {
             res = getSubstitutionsFromTermHelp(t, services);
@@ -62,8 +58,7 @@ class UniTrigger implements Trigger {
         return res;
     }
 
-    private @NonNull ImmutableSet<Substitution> getSubstitutionsFromTermHelp(@NonNull Term t,
-            @NonNull Services services) {
+    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, Services services) {
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.nil();
         if (t.freeVars().size() > 0 || t.op() instanceof Quantifier) {
             newSubs = Matching.twoSidedMatching(this, t, services);
@@ -74,12 +69,12 @@ class UniTrigger implements Trigger {
     }
 
 
+    @Override
     public Term getTriggerTerm() {
         return trigger;
     }
 
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object arg0) {
+    public boolean equals(Object arg0) {
         if (!(arg0 instanceof UniTrigger a)) {
             return false;
         }
@@ -110,7 +105,7 @@ class UniTrigger implements Trigger {
      * @param candidate
      * @param searchTerm
      */
-    public static boolean passedLoopTest(@NonNull Term candidate, @NonNull Term searchTerm) {
+    public static boolean passedLoopTest(Term candidate, Term searchTerm) {
         final ImmutableSet<Substitution> substs =
             BasicMatching.getSubstitutions(candidate, searchTerm);
 
@@ -126,8 +121,8 @@ class UniTrigger implements Trigger {
     /**
      * Test whether this substitution constains loop. It is mainly used for unitrigger's loop test.
      */
-    private static boolean containsLoop(@NonNull Substitution subst) {
-        final Iterator<QuantifiableVariable> it = subst.getVarMap().keyIterator();
+    private static boolean containsLoop(Substitution subst) {
+        final var it = subst.getVarMap().keyIterator();
         while (it.hasNext()) {
             if (containsLoop(subst.getVarMap(), it.next())) {
                 return true;
@@ -139,8 +134,9 @@ class UniTrigger implements Trigger {
     /**
      * Code copied from logic.EqualityConstraint
      */
-    private static boolean containsLoop(@NonNull ImmutableMap<QuantifiableVariable, Term> varMap,
-            @NonNull QuantifiableVariable var) {
+    private static boolean containsLoop(
+            ImmutableMap<QuantifiableVariable, Term> varMap,
+            QuantifiableVariable var) {
         ImmutableList<QuantifiableVariable> body = ImmutableSLList.nil();
         ImmutableList<Term> fringe = ImmutableSLList.nil();
         Term checkForCycle = varMap.get(var);
@@ -150,10 +146,10 @@ class UniTrigger implements Trigger {
         }
 
         while (true) {
-            for (QuantifiableVariable quantifiableVariable : checkForCycle.freeVars()) {
+            for (var quantifiableVariable : checkForCycle.freeVars()) {
                 final QuantifiableVariable termVar = quantifiableVariable;
                 if (!body.contains(termVar)) {
-                    final Term termVarterm = varMap.get(termVar);
+                    final var termVarterm = (de.uka.ilkd.key.logic.Term) varMap.get(termVar);
                     if (termVarterm != null) {
                         if (termVarterm.freeVars().contains(var)) {
                             return true;

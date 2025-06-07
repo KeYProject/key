@@ -22,7 +22,7 @@ public abstract class NodeIntermediateWalker {
      *
      * @param root the root of the intermediate proof representation
      */
-    public NodeIntermediateWalker(NodeIntermediate root) {
+    protected NodeIntermediateWalker(NodeIntermediate root) {
         this.root = root;
     }
 

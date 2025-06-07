@@ -29,11 +29,11 @@ public abstract class ComparativeOperator extends Operator {
      *        the one on the left side, the second the one on the right side.
      */
 
-    public ComparativeOperator(@NonNull ExtList children) {
+    protected ComparativeOperator(@NonNull ExtList children) {
         super(children);
     }
 
-    public ComparativeOperator(@NonNull Expression lhs, @NonNull Expression rhs) {
+    protected ComparativeOperator(@NonNull Expression lhs, @NonNull Expression rhs) {
         super(lhs, rhs);
     }
 

@@ -7,10 +7,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
@@ -25,7 +23,11 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -297,7 +299,8 @@ public class InitConfig {
         justifInfo.addJustification(r, j);
     }
 
-    public void registerRuleIntroducedAtNode(RuleApp r, Node node, boolean isAxiom) {
+    public void registerRuleIntroducedAtNode(RuleApp r, Node node,
+            boolean isAxiom) {
         justifInfo.addJustification(r.rule(), new RuleJustificationByAddRules(node, isAxiom));
     }
 
@@ -350,7 +353,7 @@ public class InitConfig {
      *
      * @return a non-null namespace
      */
-    public Namespace<JFunction> funcNS() {
+    public Namespace<@NonNull Function> funcNS() {
         return namespaces().functions();
     }
 
@@ -358,7 +361,7 @@ public class InitConfig {
     /**
      * returns the sort namespace of this initial configuration
      */
-    public Namespace<Sort> sortNS() {
+    public Namespace<@NonNull Sort> sortNS() {
         return namespaces().sorts();
     }
 
@@ -366,7 +369,7 @@ public class InitConfig {
     /**
      * returns the heuristics namespace of this initial configuration
      */
-    public Namespace<RuleSet> ruleSetNS() {
+    public Namespace<@NonNull RuleSet> ruleSetNS() {
         return namespaces().ruleSets();
     }
 
@@ -374,7 +377,7 @@ public class InitConfig {
     /**
      * returns the variable namespace of this initial configuration
      */
-    public Namespace<QuantifiableVariable> varNS() {
+    public Namespace<@NonNull QuantifiableVariable> varNS() {
         return namespaces().variables();
     }
 
@@ -382,7 +385,7 @@ public class InitConfig {
     /**
      * returns the program variable namespace of this initial configuration
      */
-    public Namespace<IProgramVariable> progVarNS() {
+    public Namespace<@NonNull IProgramVariable> progVarNS() {
         return namespaces().programVariables();
     }
 
@@ -390,7 +393,7 @@ public class InitConfig {
     /**
      * returns the choice namespace of this initial configuration
      */
-    public Namespace<Choice> choiceNS() {
+    public Namespace<@NonNull Choice> choiceNS() {
         return namespaces().choices();
     }
 

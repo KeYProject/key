@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.proof.init.Includes;
+
+import org.key_project.util.java.IOUtil;
 
 import org.jspecify.annotations.Nullable;
 
@@ -17,30 +21,29 @@ public final class JavaModel {
     /**
      * Directory of Java source files. May be null if the proof doesn't refer to any Java code.
      */
-    private final @Nullable String modelDir;
+    private final @Nullable Path modelDir;
     private final @Nullable String modelTag;
     private final String descr;
-    private final @Nullable String classPath;
-    private final @Nullable List<File> classPathEntries;
-    private final @Nullable String bootClassPath;
-    private final @Nullable String includedFiles;
-    private final @Nullable File initialFile;
+    private final @Nullable List<Path> classPath;
+    private final @Nullable Path bootClassPath;
+    private final @Nullable List<Path> includedFiles;
+    private final @Nullable Path initialFile;
 
     public static final JavaModel NO_MODEL = new JavaModel();
-
 
 
     /**
      *
      */
-    public static JavaModel createJavaModel(@Nullable String javaPath,
-            @Nullable List<File> classPath,
-            @Nullable File bootClassPath,
+    public static JavaModel createJavaModel(
+            @Nullable Path javaPath,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath,
             @Nullable Includes includes,
-            @Nullable File initialFile) {
+            @Nullable Path initialFile) {
         JavaModel result;
         if (javaPath == null) {
-            result = JavaModel.NO_MODEL;
+            result = NO_MODEL;
         } else {
             result = new JavaModel(javaPath, classPath, bootClassPath, includes, initialFile);
         }
@@ -53,44 +56,31 @@ public final class JavaModel {
         modelTag = null;
         descr = "no model";
         classPath = null;
-        classPathEntries = null;
         bootClassPath = null;
         includedFiles = null;
         initialFile = null;
     }
 
-    private JavaModel(String modelDir, @Nullable List<File> classPathEntries,
-            @Nullable File bootClassPath,
-            @Nullable Includes includes, @Nullable File initialFile) {
-        this.modelDir = (new File(modelDir)).getAbsolutePath();
+    private JavaModel(Path modelDir,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath,
+            Includes includes, Path initialFile) {
+        this.modelDir = modelDir;
         this.modelTag = "KeY_" + (new Date()).getTime();
-        this.descr = "model " + (new File(modelDir)).getName() + "@"
+        this.descr = "model " + modelDir.getFileName() + "@"
             + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
-        StringBuilder sb = new StringBuilder();
-        if (classPathEntries != null && !classPathEntries.isEmpty()) {
-            for (File f : classPathEntries) {
-                sb.append("\"").append(f.getAbsolutePath()).append("\", ");
-            }
-            sb.setLength(sb.length() - 2);
+
+        if (classPath != null) {
+            this.classPath = new ArrayList<>(classPath);
+        } else {
+            this.classPath = new ArrayList<>();
         }
-        this.classPath = sb.toString();
-        this.classPathEntries = classPathEntries;
-        this.bootClassPath = bootClassPath == null ? null : bootClassPath.getAbsolutePath();
-        StringBuilder sb2 = new StringBuilder();
-        if (includes != null) {
-            List<File> includeList = includes.getFiles();
-            if (!includeList.isEmpty()) {
-                for (File f : includeList) {
-                    sb2.append("\"").append(f.getAbsolutePath()).append("\", ");
-                }
-                sb2.setLength(sb2.length() - 2);
-            }
-        }
-        includedFiles = sb2.toString();
+        this.bootClassPath = bootClassPath == null ? null : bootClassPath.toAbsolutePath();
+        this.includedFiles = new ArrayList<>(includes.getFiles());
         this.initialFile = initialFile;
     }
 
-    public @Nullable String getModelDir() {
+    public @Nullable Path getModelDir() {
         return modelDir;
     }
 
@@ -98,23 +88,19 @@ public final class JavaModel {
         return modelTag;
     }
 
-    public @Nullable String getClassPath() {
+    public @Nullable List<Path> getClassPath() {
         return classPath;
     }
 
-    public @Nullable List<File> getClassPathEntries() {
-        return classPathEntries;
-    }
-
-    public @Nullable String getBootClassPath() {
+    public @Nullable Path getBootClassPath() {
         return bootClassPath;
     }
 
-    public @Nullable String getIncludedFiles() {
+    public @Nullable List<Path> getIncludedFiles() {
         return includedFiles;
     }
 
-    public @Nullable File getInitialFile() {
+    public @Nullable Path getInitialFile() {
         return initialFile;
     }
 
@@ -155,5 +141,29 @@ public final class JavaModel {
     public String toString() {
         return "---Program model---\nModel dir: " + modelDir + "\nModel tag: " + modelTag
             + "\nDescription: " + descr;
+    }
+
+    /// Transform the current state into a string with valid declarations inside a KeY file.
+    /// In particular, it uses `\bootclasspath`, `\classpath`, `\javaSource` and `\includes`
+    /// directive
+    /// if necessary.
+    public String asKeyString() {
+        return (bootClassPath != null
+                ? "\n\\bootclasspath \"%s\";".formatted(IOUtil.safePath(bootClassPath))
+                : "") +
+                (classPath != null && !classPath.isEmpty() ? "\n\\classpath %s;".formatted(
+                    classPath.stream().map(IOUtil::safePath)
+                            .map("\"%s\""::formatted)
+                            .collect(Collectors.joining(", ")))
+                        : "")
+                +
+                (modelDir != null ? "\n\\javaSource \"%s\";".formatted(IOUtil.safePath(modelDir))
+                        : "")
+                +
+                (includedFiles != null && !includedFiles.isEmpty() ? "\n\\include %s;".formatted(
+                    includedFiles.stream().map(IOUtil::safePath)
+                            .map("\"%s\""::formatted)
+                            .collect(Collectors.joining(", ")))
+                        : "");
     }
 }

@@ -196,8 +196,6 @@ public class KeYResourceManager {
         URL resourceURL = cl.getResource(resourcename);
         if (resourceURL == null && cl.getSuperclass() != null) {
             return getResourceFile(cl.getSuperclass(), resourcename);
-        } else if (resourceURL == null && cl.getSuperclass() == null) {
-            return null;
         }
         return resourceURL;
     }

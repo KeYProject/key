@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -15,11 +14,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The default implementation of {@link IExecutionStart}.
@@ -31,7 +28,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
     /**
      * The up to know discovered {@link IExecutionTermination}s.
      */
-    private @NonNull ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+    private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
 
     /**
      * Constructor.
@@ -40,7 +37,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public ExecutionStart(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
+    public ExecutionStart(ITreeSettings settings, Node proofNode) {
         super(settings, proofNode);
     }
 
@@ -48,7 +45,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected @NonNull String lazyComputeName() {
+    protected String lazyComputeName() {
         return DEFAULT_START_NODE_NAME;
     }
 
@@ -56,7 +53,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
+    protected IExecutionConstraint[] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -64,7 +61,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String getElementType() {
+    public String getElementType() {
         return "Start";
     }
 
@@ -81,7 +78,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      *
      * @param termination The {@link IExecutionTermination} to register.
      */
-    public void addTermination(@Nullable IExecutionTermination termination) {
+    public void addTermination(IExecutionTermination termination) {
         if (termination != null) {
             terminations = terminations.append(termination);
         }
@@ -100,8 +97,8 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      * {@inheritDoc}
      */
     @Override
-    public @Nullable SourceElement getActiveStatement() {
-        Term modalityTerm = getModalityPIO().subTerm();
+    public SourceElement getActiveStatement() {
+        Term modalityTerm = (Term) getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);
     }

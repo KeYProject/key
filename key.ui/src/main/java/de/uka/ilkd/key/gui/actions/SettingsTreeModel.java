@@ -135,7 +135,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
     private @NonNull JComponent generateJTable(@NonNull Properties properties) {
         String[] columnNames = { "Name", "Value" };
-        Object[][] data = new Object[properties.entrySet().size()][2];
+        Object[][] data = new Object[properties.size()][2];
 
         int i = 0;
         for (Entry<Object, Object> entry : properties.entrySet()) {

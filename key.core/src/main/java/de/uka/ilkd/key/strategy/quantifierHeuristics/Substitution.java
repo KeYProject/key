@@ -6,17 +6,17 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.ClashFreeSubst;
+import de.uka.ilkd.key.logic.TermBuilder;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,11 +37,11 @@ public class Substitution {
         return varMap;
     }
 
-    public @Nullable Term getSubstitutedTerm(@NonNull QuantifiableVariable var) {
+    public Term getSubstitutedTerm(QuantifiableVariable var) {
         return varMap.get(var);
     }
 
-    public boolean isTotalOn(@NonNull ImmutableSet<QuantifiableVariable> vars) {
+    public boolean isTotalOn(ImmutableSet<? extends QuantifiableVariable> vars) {
         for (QuantifiableVariable var : vars) {
             if (!varMap.containsKey(var)) {
                 return false;
@@ -67,35 +67,36 @@ public class Substitution {
     }
 
 
-    public Term apply(Term t, @NonNull Services services) {
+    public Term apply(Term t, Services services) {
         assert isGround() : "non-ground substitutions are not yet implemented: " + this;
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
         final TermBuilder tb = services.getTermBuilder();
         while (it.hasNext()) {
             final QuantifiableVariable var = it.next();
             final Sort quantifiedVarSort = var.sort();
-            final JFunction quantifiedVarSortCast =
+            final Function quantifiedVarSortCast =
                 services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
             Term instance = getSubstitutedTerm(var);
             if (!instance.sort().extendsTrans(quantifiedVarSort)) {
-                instance = tb.func(quantifiedVarSortCast, instance);
+                instance = tb.func(quantifiedVarSortCast, (de.uka.ilkd.key.logic.Term) instance);
             }
             t = applySubst(var, instance, t, tb);
         }
         return t;
     }
 
-    private @NonNull Term applySubst(@NonNull QuantifiableVariable var, @NonNull Term instance,
-            @NonNull Term t, @NonNull TermBuilder tb) {
-        final ClashFreeSubst subst = new ClashFreeSubst(var, instance, tb);
-        return subst.apply(t);
+    private Term applySubst(QuantifiableVariable var, Term instance, Term t, TermBuilder tb) {
+        final ClashFreeSubst subst =
+            new ClashFreeSubst((de.uka.ilkd.key.logic.op.QuantifiableVariable) var,
+                (de.uka.ilkd.key.logic.Term) instance, tb);
+        return subst.apply((de.uka.ilkd.key.logic.Term) t);
     }
 
     /**
      * Try to apply the substitution to a term, introducing casts if necessary (may never be the
      * case any more, XXX)
      */
-    public Term applyWithoutCasts(Term t, @NonNull Services services) {
+    public Term applyWithoutCasts(Term t, Services services) {
         assert isGround() : "non-ground substitutions are not yet implemented: " + this;
         final TermBuilder tb = services.getTermBuilder();
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
@@ -107,9 +108,10 @@ public class Substitution {
             } catch (TermCreationException e) {
                 final Sort quantifiedVarSort = var.sort();
                 if (!instance.sort().extendsTrans(quantifiedVarSort)) {
-                    final JFunction quantifiedVarSortCast =
+                    final Function quantifiedVarSortCast =
                         services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
-                    instance = tb.func(quantifiedVarSortCast, instance);
+                    instance =
+                        tb.func(quantifiedVarSortCast, (de.uka.ilkd.key.logic.Term) instance);
                     t = applySubst(var, instance, t, tb);
                 } else {
                     throw e;
@@ -119,8 +121,7 @@ public class Substitution {
         return t;
     }
 
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object arg0) {
+    public boolean equals(Object arg0) {
         if (!(arg0 instanceof Substitution s)) {
             return false;
         }
@@ -135,7 +136,7 @@ public class Substitution {
         return String.valueOf(varMap);
     }
 
-    public boolean termContainsValue(@NonNull Term term) {
+    public boolean termContainsValue(Term term) {
         Iterator<Term> it = varMap.valueIterator();
         while (it.hasNext()) {
             if (recOccurCheck(it.next(), term)) {
@@ -148,7 +149,7 @@ public class Substitution {
     /**
      * check whether term "sub" is in term "term"
      */
-    private boolean recOccurCheck(@NonNull Term sub, @NonNull Term term) {
+    private boolean recOccurCheck(Term sub, Term term) {
         if (sub.equals(term)) {
             return true;
         }

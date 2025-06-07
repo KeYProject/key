@@ -15,9 +15,6 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,6 +23,12 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -55,7 +58,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private final @NonNull InnerNodeViewListener listener;
 
-    public final @NonNull JTextArea tacletInfo;
+    private @NonNull JTextArea tacletInfo = new JTextArea();
 
     private @Nullable Node node;
     private final RuleApp ruleApp;
@@ -79,14 +82,6 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
                 mainWindow.getMediator().getServices(), getVisibleTermLabels()));
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
-
-        tacletInfo = new JTextArea(
-            TacletDescriber.getTacletDescription(mainWindow.getMediator(), ruleApp,
-                SequentView.getLineWidth()));
-        tacletInfo.setBackground(getBackground());
-        tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
-            new EmptyBorder(new Insets(4, 0, 0, 0))));
-        tacletInfo.setEditable(false);
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER =
@@ -105,10 +100,10 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
                 highlightPos(app.posInOccurrence(), RULEAPP_HIGHLIGHTER);
             }
 
-            if (app instanceof TacletApp) {
-                highlightIfFormulas((TacletApp) app);
-            } else if (app instanceof IBuiltInRuleApp) {
-                highlightIfInsts((IBuiltInRuleApp) app);
+            if (app instanceof TacletApp tacletApp) {
+                highlightIfFormulas(tacletApp);
+            } else if (app instanceof IBuiltInRuleApp builtInRuleApp) {
+                highlightIfInsts(builtInRuleApp);
             }
 
         } catch (BadLocationException badLocation) {
@@ -118,26 +113,27 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     /**
-     * @param tapp The taclet app for which the if formulae should be highlighted.
-     * @throws BadLocationException
+     * @param tapp The taclet app whose assumes-formulas should be highlighted.
+     * @throws BadLocationException if the highlight is placed at a non-existing position
      */
     private void highlightIfFormulas(@NonNull TacletApp tapp) throws BadLocationException {
-        final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> ifs = tapp.assumesFormulaInstantiations();
         if (ifs == null) {
             return;
         }
-        for (final IfFormulaInstantiation inst2 : ifs) {
-            if (!(inst2 instanceof IfFormulaInstSeq inst)) {
+        for (final AssumesFormulaInstantiation inst2 : ifs) {
+            if (!(inst2 instanceof AssumesFormulaInstSeq inst)) {
                 continue;
             }
-            final PosInOccurrence pos = new PosInOccurrence(inst.getConstrainedFormula(),
-                PosInTerm.getTopLevel(), inst.inAntec());
+            final PosInOccurrence pos =
+                new PosInOccurrence(inst.getSequentFormula(),
+                    PosInTerm.getTopLevel(), inst.inAntecedent());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
         }
     }
 
     private void highlightIfInsts(@NonNull IBuiltInRuleApp bapp) throws BadLocationException {
-        final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
+        final ImmutableList<PosInOccurrence> ifs = bapp.assumesInsts();
         if (bapp instanceof SMTRuleApp && ifs.isEmpty()) {
             /*
              * Special case for SMTRuleApp: If no unsat core is used, we highlight all formulas.
@@ -145,8 +141,10 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
              * clutter saved proofs very much.
              */
             for (int i = 0; i < node.sequent().size(); i++) {
-                PosInOccurrence pio = PosInOccurrence.findInSequent(node.sequent(), i + 1,
-                    PosInTerm.getTopLevel());
+                PosInOccurrence pio =
+                    PosInOccurrence.findInSequent(node.sequent(),
+                        i + 1,
+                        PosInTerm.getTopLevel());
                 highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
             }
         } else {
@@ -163,7 +161,8 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      *         highlighted.
      * @throws BadLocationException
      */
-    private @NonNull Range highlightPos(@NonNull PosInOccurrence pos, HighlightPainter light)
+    private @NonNull Range highlightPos(@NonNull PosInOccurrence pos,
+            HighlightPainter light)
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, getFilter());
         if (path != null) {
@@ -245,6 +244,27 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         LOGGER.debug("Total printSequent took " + (after - time) / 1e6 + "ms");
     }
 
+    private void updateTacletInfo() {
+        tacletInfo.setText(
+            TacletDescriber.getTacletDescription(getMainWindow().getMediator(), ruleApp,
+                getLineWidth()));
+        tacletInfo.setBackground(getBackground());
+        tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
+            new EmptyBorder(new Insets(4, 0, 0, 0))));
+        tacletInfo.setEditable(false);
+    }
+
+    public void makeTacletInfoVisible(boolean visible) {
+        if (visible) {
+            updateTacletInfo();
+        }
+        tacletInfo.setVisible(visible);
+    }
+
+    public JTextArea getTacletInfo() {
+        return tacletInfo;
+    }
+
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
         node = null;
@@ -255,4 +275,5 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     public void proofDisposed(ProofDisposedEvent e) {
 
     }
+
 }

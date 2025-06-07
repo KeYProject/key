@@ -5,12 +5,11 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 
@@ -59,7 +58,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
 
         charLiteral = op(C);
 
-        constant = ConstantTermFeature.INSTANCE;
+        constant = constantTermFeature();
 
         atom = add(not(addF), not(mulF));
         linearMonomial = or(atom, opSub(mul, atom, literal));
@@ -92,18 +91,18 @@ class ArithTermFeatures extends StaticFeatureCollection {
 
     final @NonNull Sort intS;
 
-    final @NonNull JFunction Z;
-    final @NonNull JFunction C;
-    final @NonNull JFunction add;
-    final @NonNull JFunction mul;
-    final @NonNull JFunction mod;
-    final @NonNull JFunction div;
-    final @NonNull JFunction jmod;
-    final @NonNull JFunction jdiv;
+    final Function Z;
+    final Function C;
+    final Function add;
+    final Function mul;
+    final Function mod;
+    final Function div;
+    final Function jmod;
+    final Function jdiv;
 
-    final @NonNull Operator eq;
-    final @NonNull JFunction leq;
-    final @NonNull JFunction geq;
+    final Operator eq;
+    final Function leq;
+    final Function geq;
 
     final @NonNull TermFeature intF;
 

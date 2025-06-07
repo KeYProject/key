@@ -95,7 +95,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             }
             // Compute instantiation
             Instantiation inst = UseOperationContractRule.computeInstantiation(
-                getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
+                (Term) getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
             // Extract used result and exception variable from proof nodes
             resultTerm = searchResultTerm(contract, inst, services);
             ContractPostOrExcPostExceptionVariableResult search =

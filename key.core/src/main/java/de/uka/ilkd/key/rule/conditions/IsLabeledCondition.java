@@ -6,19 +6,17 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
-
-import org.jspecify.annotations.NonNull;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 /**
  * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
@@ -36,15 +34,16 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public @NonNull MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            @NonNull MatchConditions matchCond, Services services) {
-        final SVInstantiations svInst = matchCond.getInstantiations();
+    public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
+            MatchConditions matchCond, LogicServices services) {
+        final var svInst =
+            (SVInstantiations) matchCond.getInstantiations();
 
         final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);
 
         final ArrayList<ProgramElement> labels = new ArrayList<>();
         ProgramPrefix prefix = //
-            (ProgramPrefix) svInst.getContextInstantiation().contextProgram();
+            (ProgramPrefix) svInst.getContextInstantiation().program();
         do {
             if (prefix instanceof LabeledStatement
                     && ((LabeledStatement) prefix).getBody().equals(stmt)) {
@@ -60,7 +59,7 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return String.format("\\varcond (%s\\isLabeled(%s)", negated ? "\\not" : "", stmtSV);
     }
 }

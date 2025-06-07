@@ -29,7 +29,7 @@ public final class MapLDT extends LDT {
 
     public static final Name NAME = new Name("Map");
 
-    public final JFunction mapEmpty;
+    public final Function mapEmpty;
 
     public MapLDT(TermServices services) {
         super(NAME, services);
@@ -37,7 +37,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return isResponsible(op, (Term) null, services, ec);
     }
@@ -61,7 +61,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
         throw new RuntimeException("Not Implemented");
     }
 

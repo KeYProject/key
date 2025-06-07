@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Container for RuleApp instances with cost as determined by a given Strategy. Instances of this
@@ -38,7 +38,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     }
 
     @Override
-    public final int compareTo(@NonNull RuleAppContainer o) {
+    public final int compareTo(RuleAppContainer o) {
         return cost.compareTo(o.cost);
     }
 
@@ -50,7 +50,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * Create a <code>RuleApp</code> that is suitable to be applied or <code>null</code>.
      */
-    public abstract @Nullable RuleApp completeRuleApp(Goal p_goal);
+    public abstract RuleApp completeRuleApp(Goal p_goal);
 
     protected final RuleApp getRuleApp() {
         return ruleApp;
@@ -67,9 +67,10 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return container for the currently applicable RuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    public static @Nullable RuleAppContainer createAppContainer(RuleApp p_app,
+    public static @NonNull RuleAppContainer createAppContainer(
+            RuleApp p_app,
             PosInOccurrence p_pio,
-            @NonNull Goal p_goal) {
+            Goal p_goal) {
 
         if (p_app instanceof NoPosTacletApp) {
             return TacletAppContainer.createAppContainers((NoPosTacletApp) p_app, p_pio, p_goal);
@@ -91,9 +92,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return list of containers for the currently applicable RuleApps, the cost may be an instance
      *         of <code>TopRuleAppCost</code>.
      */
-    public static @NonNull ImmutableList<RuleAppContainer> createAppContainers(
-            @NonNull ImmutableList<? extends RuleApp> rules, PosInOccurrence pos,
-            @NonNull Goal goal) {
+    public static ImmutableList<RuleAppContainer> createAppContainers(
+            ImmutableList<? extends RuleApp> rules,
+            PosInOccurrence pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         if (rules.size() == 1) {

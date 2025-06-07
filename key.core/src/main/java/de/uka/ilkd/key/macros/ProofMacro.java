@@ -4,16 +4,16 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
@@ -40,7 +40,8 @@ import org.jspecify.annotations.Nullable;
  * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence)}).
  * A macro is offered to the user iff it returns <code>true</code>. No changes should be made there.
  *
- * A macro is then applied using {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence,
+ * A macro is then applied using
+ * {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence,
  * ProverTaskListener)}/
  * {@link #applyTo(UserInterfaceControl, Proof, ImmutableList, PosInOccurrence, ProverTaskListener)}.
  * This may change the proof by applying rule applications. It is allowed to use automatic runs,
@@ -48,7 +49,8 @@ import org.jspecify.annotations.Nullable;
  * ...
  *
  * A proof macro needs to extract all necessary information on the application from the mediator
- * passed to one {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence, ProverTaskListener)}
+ * passed to one
+ * {@link #applyTo(UserInterfaceControl, Node, PosInOccurrence, ProverTaskListener)}
  * or
  * {@link #applyTo(UserInterfaceControl, Proof, ImmutableList, PosInOccurrence, ProverTaskListener)}.
  * You will be able to access any interesting data from that starting point,
@@ -155,7 +157,8 @@ public interface ProofMacro {
      * This method may be called from within the GUI thread and be compatible with that fact.
      *
      * This method must be implemented to have the same effect as calling
-     * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence)} with <code>node.proof()</code> as
+     * {@link #canApplyTo(Proof, ImmutableList, PosInOccurrence)} with
+     * <code>node.proof()</code> as
      * proof and all open goals below <code>node</code>.
      *
      * @param node the node (not <code>null</code>)

@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 
 
 public class FieldReference extends VariableReference
-        implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
+        implements MemberReference, ReferenceSuffix, TypeReferenceContainer {
 
     /**
      * Reference prefix.

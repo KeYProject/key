@@ -10,12 +10,12 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.logic.LogicServices;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MatchProgramSVInstruction.class);
 
-    public MatchProgramSVInstruction(@NonNull ProgramSV sv) {
+    public MatchProgramSVInstruction(ProgramSV sv) {
         super(sv);
     }
 
@@ -34,9 +34,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * match conditions are returned, otherwise <tt>null</tt>. Such an addition can fail, e.g. if
      * already a pair <tt>(this,x)</tt> exists where <tt>x!=pe</tt>
      */
-    protected @Nullable MatchConditions addInstantiation(@NonNull ProgramElement pe,
-            @NonNull MatchConditions matchCond,
-            @NonNull Services services) {
+    protected MatchConditions addInstantiation(ProgramElement pe, MatchConditions matchCond,
+            LogicServices services) {
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
         final Object inMap = instantiations.getInstantiation(op);
@@ -51,8 +50,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
             Object peForCompare = pe;
             if (inMap instanceof Term) {
                 try {
-                    peForCompare = services.getTypeConverter().convertToLogicElement(pe,
-                        matchCond.getInstantiations().getExecutionContext());
+                    peForCompare =
+                        ((Services) services).getTypeConverter().convertToLogicElement(pe,
+                            matchCond.getInstantiations().getExecutionContext());
                 } catch (RuntimeException re) {
                     return null;
                 }
@@ -69,9 +69,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(Operator instantiationCandidate,
-            @NonNull MatchConditions matchConditions,
-            @NonNull Services services) {
+    public MatchConditions match(Operator instantiationCandidate,
+            MatchConditions matchConditions,
+            LogicServices services) {
         if (instantiationCandidate instanceof ProgramElement) {
             return match((ProgramElement) instantiationCandidate, matchConditions, services);
         }
@@ -82,9 +82,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull Term instantiationCandidate,
-            @NonNull MatchConditions matchCond,
-            @NonNull Services services) {
+    public MatchConditions match(Term instantiationCandidate,
+            MatchConditions matchCond,
+            LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate)) {
@@ -98,13 +98,13 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull ProgramElement instantiationCandidate,
-            @NonNull MatchConditions matchCond,
-            @NonNull Services services) {
+    public MatchConditions match(ProgramElement instantiationCandidate,
+            MatchConditions matchCond,
+            LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate,
-            matchCond.getInstantiations().getExecutionContext(), services)) {
+            matchCond.getInstantiations().getExecutionContext(), (Services) services)) {
             return addInstantiation(instantiationCandidate, matchCond, services);
         }
 
@@ -116,10 +116,11 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
-            @NonNull MatchConditions mc,
-            @NonNull Services services) {
-        MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
+    public MatchConditions match(TermNavigator termPosition,
+            MatchConditions mc,
+            LogicServices services) {
+        MatchConditions result =
+            match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();
         }

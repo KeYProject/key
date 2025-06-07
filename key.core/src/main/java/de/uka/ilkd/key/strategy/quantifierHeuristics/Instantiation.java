@@ -8,18 +8,17 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -27,43 +26,39 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 class Instantiation {
 
 
     /** universally quantifiable variable bound in<code>allTerm</code> */
-    private final @NonNull QuantifiableVariable firstVar;
+    private final QuantifiableVariable firstVar;
 
-    private final @NonNull Term matrix;
+    private final Term matrix;
 
     /**
      * Literals occurring in the sequent at hand. This is used for branch prediction
      */
-    private @NonNull ImmutableSet<Term> assumedLiterals = DefaultImmutableSet.nil();
+    private ImmutableSet<de.uka.ilkd.key.logic.Term> assumedLiterals = DefaultImmutableSet.nil();
 
     /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
     private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<>();
 
     /** the <code>TriggersSet</code> of this <code>allTerm</code> */
-    private final @NonNull TriggersSet triggersSet;
+    private final TriggersSet triggersSet;
 
-    private Instantiation(@NonNull Term allterm, @NonNull Sequent seq, @NonNull Services services) {
+    private Instantiation(Term allterm, Sequent seq, Services services) {
         firstVar = allterm.varsBoundHere(0).get(0);
         matrix = TriggerUtils.discardQuantifiers(allterm);
         /* Terms bound in every formula on <code>goal</code> */
-        triggersSet = TriggersSet.create(allterm, services);
+        triggersSet = TriggersSet.create((de.uka.ilkd.key.logic.Term) allterm, services);
         assumedLiterals = initAssertLiterals(seq, services);
         addInstances(sequentToTerms(seq), services);
     }
 
-    private static @Nullable Term lastQuantifiedFormula = null;
-    private static @Nullable Sequent lastSequent = null;
-    private static @Nullable Instantiation lastResult = null;
+    private static Term lastQuantifiedFormula = null;
+    private static Sequent lastSequent = null;
+    private static Instantiation lastResult = null;
 
-    static @Nullable Instantiation create(@NonNull Term qf, @NonNull Sequent seq,
-            @NonNull Services services) {
+    static Instantiation create(Term qf, Sequent seq, Services services) {
         synchronized (Instantiation.class) {
             if (qf == lastQuantifiedFormula && seq == lastSequent) {
                 return lastResult;
@@ -78,7 +73,7 @@ class Instantiation {
         return result;
     }
 
-    private static @NonNull ImmutableSet<Term> sequentToTerms(@NonNull Sequent seq) {
+    private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
         ImmutableList<Term> res = ImmutableSLList.nil();
         for (final SequentFormula cf : seq) {
             res = res.prepend(cf.formula());
@@ -92,7 +87,7 @@ class Instantiation {
      *        compute their cost and store the pair of instance (Term) and cost(Long) in
      *        <code>instancesCostCache</code>
      */
-    private void addInstances(ImmutableSet<Term> terms, @NonNull Services services) {
+    private void addInstances(ImmutableSet<Term> terms, Services services) {
         for (final Trigger t : triggersSet.getAllTriggers()) {
             for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services)) {
                 addInstance(sub, services);
@@ -103,7 +98,7 @@ class Instantiation {
         // addArbitraryInstance ();
     }
 
-    private void addArbitraryInstance(@NonNull Services services) {
+    private void addArbitraryInstance(Services services) {
         ImmutableMap<QuantifiableVariable, Term> varMap =
             DefaultImmutableMap.nilMap();
 
@@ -115,16 +110,16 @@ class Instantiation {
         addInstance(new Substitution(varMap), services);
     }
 
-    private @NonNull Term createArbitraryInstantiation(@NonNull QuantifiableVariable var,
-            @NonNull Services services) {
+    private Term createArbitraryInstantiation(QuantifiableVariable var, Services services) {
         return services.getTermBuilder().func(
             services.getJavaDLTheory().getCastSymbol(var.sort(), services),
             services.getTermBuilder().zero());
     }
 
-    private void addInstance(@NonNull Substitution sub, @NonNull Services services) {
+    private void addInstance(Substitution sub, Services services) {
         final long cost =
-            PredictCostProver.computerInstanceCost(sub, getMatrix(), assumedLiterals, services);
+            PredictCostProver.computerInstanceCost(sub, (de.uka.ilkd.key.logic.Term) getMatrix(),
+                assumedLiterals, services);
         if (cost != -1) {
             addInstance(sub, cost);
         }
@@ -138,8 +133,9 @@ class Instantiation {
      * @param sub
      * @param cost
      */
-    private void addInstance(@NonNull Substitution sub, long cost) {
-        final Term inst = sub.getSubstitutedTerm(firstVar);
+    private void addInstance(Substitution sub, long cost) {
+        final Term inst =
+            sub.getSubstitutedTerm(firstVar);
         final Long oldCost = instancesWithCosts.get(inst);
         if (oldCost == null || oldCost >= cost) {
             instancesWithCosts.put(inst, cost);
@@ -151,21 +147,22 @@ class Instantiation {
      * @param services TODO
      * @return all literals in antesequent, and all negation of literal in succedent
      */
-    private @NonNull ImmutableSet<Term> initAssertLiterals(@NonNull Sequent seq,
-            @NonNull TermServices services) {
-        ImmutableList<Term> assertLits = ImmutableSLList.nil();
+    private ImmutableSet<de.uka.ilkd.key.logic.Term> initAssertLiterals(Sequent seq,
+            TermServices services) {
+        ImmutableList<de.uka.ilkd.key.logic.Term> assertLits = ImmutableSLList.nil();
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
-            final Operator op = atom.op();
+            final var op = atom.op();
             if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
-                assertLits = assertLits.prepend(atom);
+                assertLits = assertLits.prepend((de.uka.ilkd.key.logic.Term) atom);
             }
         }
         for (final SequentFormula cf : seq.succedent()) {
             final Term atom = cf.formula();
-            final Operator op = atom.op();
+            final var op = atom.op();
             if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
-                assertLits = assertLits.prepend(services.getTermBuilder().not(atom));
+                assertLits = assertLits
+                        .prepend(services.getTermBuilder().not((de.uka.ilkd.key.logic.Term) atom));
             }
         }
         return DefaultImmutableSet.fromImmutableList(assertLits);
@@ -174,12 +171,11 @@ class Instantiation {
     /**
      * Try to find the cost of an instance(inst) according its quantified formula and current goal.
      */
-    static RuleAppCost computeCost(@NonNull Term inst, @NonNull Term form, @NonNull Sequent seq,
-            @NonNull Services services) {
-        return Instantiation.create(form, seq, services).computeCostHelp(inst);
+    static RuleAppCost computeCost(Term inst, Term form, Sequent seq, Services services) {
+        return create(form, seq, services).computeCostHelp(inst);
     }
 
-    private @NonNull RuleAppCost computeCostHelp(@NonNull Term inst) {
+    private RuleAppCost computeCostHelp(Term inst) {
         Long cost = instancesWithCosts.get(inst);
         if (cost == null && (inst.op() instanceof SortDependingFunction
                 && ((SortDependingFunction) inst.op()).getKind().equals(JavaDLTheory.CAST_NAME))) {
@@ -198,7 +194,6 @@ class Instantiation {
     }
 
     /** get all instances from instancesCostCache subsCache */
-    @NonNull
     ImmutableSet<Term> getSubstitution() {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (final Term inst : instancesWithCosts.keySet()) {
@@ -207,7 +202,7 @@ class Instantiation {
         return res;
     }
 
-    private @NonNull Term getMatrix() {
+    private Term getMatrix() {
         return matrix;
     }
 

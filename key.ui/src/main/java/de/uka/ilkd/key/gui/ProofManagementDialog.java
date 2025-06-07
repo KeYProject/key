@@ -651,7 +651,7 @@ public final class ProofManagementDialog extends JDialog {
 
         @Override
         public boolean equals(@Nullable Object o) {
-            return o instanceof final @NonNull ProofWrapper pw && proof.equals(pw.proof);
+            return o instanceof ProofWrapper(Proof proof1) && proof.equals(proof1);
         }
 
         @Override

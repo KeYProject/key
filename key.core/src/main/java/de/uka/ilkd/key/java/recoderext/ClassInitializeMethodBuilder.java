@@ -23,6 +23,7 @@ import recoder.java.statement.*;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import recoder.service.ConstantEvaluator;
 
 /**
  * Each class is prepared before it is initialised. The preparation of a class consists of
@@ -78,7 +79,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         if (!result) {
             return false;
         }
-        recoder.service.ConstantEvaluator ce = services.getConstantEvaluator();
+        ConstantEvaluator ce = services.getConstantEvaluator();
 
         try {
             result = ce.isCompileTimeConstant(spec.getInitializer());
@@ -252,7 +253,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         if (td instanceof ClassDeclaration cd && td != javaLangObject) {
             initializerExecutionBody.add(0, new PassiveExpression(new MethodReference(
                 class2super.get(cd).deepClone(),
-                new ImplicitIdentifier(ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));
+                new ImplicitIdentifier(CLASS_INITIALIZE_IDENTIFIER))));
         }
 
         // catch clauses

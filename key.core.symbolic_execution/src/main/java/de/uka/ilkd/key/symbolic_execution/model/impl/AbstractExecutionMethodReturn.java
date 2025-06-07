@@ -8,8 +8,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
@@ -23,8 +21,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * The default implementation of {@link IExecutionBaseMethodReturn}.
@@ -36,7 +34,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
     /**
      * The {@link IExecutionMethodCall} which is now returned.
      */
-    private final @NonNull ExecutionMethodCall methodCall;
+    private final ExecutionMethodCall methodCall;
 
     /**
      * The signature.
@@ -52,7 +50,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * The human-readable method return condition to reach this node from its calling
      * {@link IExecutionMethodCall}.
      */
-    private @Nullable String formattedMethodReturnCondition;
+    private String formattedMethodReturnCondition;
 
     /**
      * The variable value pairs of the state when the method has been called.
@@ -67,8 +65,8 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      *        {@link IExecutionNode}.
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
-    public AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
-            @NonNull ExecutionMethodCall methodCall) {
+    protected AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
+            ExecutionMethodCall methodCall) {
         super(settings, proofNode);
         assert methodCall != null;
         this.methodCall = methodCall;
@@ -183,8 +181,10 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         assert proofNode.childrenCount() == 1;
         PosInOccurrence originalPIO = methodCall.getModalityPIO();
         int index = originalPIO.isInAntec()
-                ? proofNode.sequent().antecedent().indexOf(originalPIO.sequentFormula())
-                : proofNode.sequent().succedent().indexOf(originalPIO.sequentFormula());
+                ? proofNode.sequent().antecedent()
+                        .indexOf(originalPIO.sequentFormula())
+                : proofNode.sequent().succedent()
+                        .indexOf(originalPIO.sequentFormula());
         // Search relevant position in child node
         Node childNode = proofNode.child(0);
         SequentFormula nodeSF =
@@ -192,7 +192,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
                     : childNode.sequent().succedent().get(index);
         PosInOccurrence modalityPIO =
             new PosInOccurrence(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
-        Term modalityTerm = modalityPIO.subTerm();
+        var modalityTerm = modalityPIO.subTerm();
         while (modalityTerm.op() instanceof UpdateApplication) {
             modalityPIO = modalityPIO.down(1);
             modalityTerm = modalityPIO.subTerm();

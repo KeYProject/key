@@ -48,7 +48,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      * Path to dot executable config key.
      */
     private final PropertyEntry<String> dotExecutable =
-        createStringProperty(KEY_DOT_EXECUTABLE, null);
+        createStringProperty(KEY_DOT_EXECUTABLE, "");
 
     /**
      * Override map for aggressive deduplication config.
@@ -102,7 +102,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     public @NonNull String getDotExecutable() {
         String path = dotExecutable.get();
-        if (path != null) {
+        if (path != null && !path.isBlank()) {
             return path;
         }
         if (System.getProperty("os.name").startsWith("Windows")) {

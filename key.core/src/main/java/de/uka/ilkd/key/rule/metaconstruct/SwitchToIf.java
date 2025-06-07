@@ -23,11 +23,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
@@ -47,8 +45,8 @@ public class SwitchToIf extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
-            @NonNull SVInstantiations insts) {
+    public ProgramElement[] transform(ProgramElement pe, Services services,
+            SVInstantiations insts) {
         Switch sw = (Switch) pe;
 
         VariableNamer varNamer = services.getVariableNamer();
@@ -113,8 +111,7 @@ public class SwitchToIf extends ProgramTransformer {
      * @return an if-statement that performs a null check
      */
 
-    private @NonNull If mkIfNullCheck(@NonNull Services services, @NonNull ProgramVariable var,
-            @Nullable Statement elseBlock) {
+    private If mkIfNullCheck(Services services, ProgramVariable var, Statement elseBlock) {
         final New exception = KeYJavaASTFactory.newOperator(
             services.getJavaInfo().getKeYJavaType("java.lang.NullPointerException"));
         Throw t = KeYJavaASTFactory.throwClause(exception);
@@ -133,7 +130,7 @@ public class SwitchToIf extends ProgramTransformer {
     /**
      * Replaces all breaks in <code>sw</code>, whose target is sw, with <code>b</code>
      */
-    private @NonNull Switch changeBreaks(@NonNull Switch sw, Break b) {
+    private Switch changeBreaks(Switch sw, Break b) {
         int n = sw.getBranchCount();
         Branch[] branches = new Branch[n];
         for (int i = 0; i < n; i++) {
@@ -142,7 +139,7 @@ public class SwitchToIf extends ProgramTransformer {
         return KeYJavaASTFactory.switchBlock(sw.getExpression(), branches);
     }
 
-    private ProgramElement recChangeBreaks(@Nullable ProgramElement p, Break b) {
+    private ProgramElement recChangeBreaks(ProgramElement p, Break b) {
         if (p == null) {
             return null;
         }
@@ -204,7 +201,7 @@ public class SwitchToIf extends ProgramTransformer {
      * @param s the switch statement.
      * @param count the branch where the collecting of statements starts.
      */
-    private @NonNull StatementBlock collectStatements(@NonNull Switch s, int count) {
+    private StatementBlock collectStatements(Switch s, int count) {
         List<Statement> stats = new ArrayList<>();
         outer: for (int i = count; i < s.getBranchCount(); i++) {
             for (int j = 0; j < s.getBranchAt(i).getStatementCount(); j++) {

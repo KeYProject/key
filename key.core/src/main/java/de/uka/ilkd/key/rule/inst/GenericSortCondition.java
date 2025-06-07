@@ -5,16 +5,14 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.OperatorSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 
 
 /**
@@ -33,31 +31,16 @@ public abstract class GenericSortCondition {
      *         are either always compatible (no generic sorts) or never compatible (non generic
      *         sorts that don't match)
      */
-    public static GenericSortCondition createCondition(@NonNull SchemaVariable sv,
+    public static GenericSortCondition createCondition(
+            SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
-        if (!(p_entry instanceof TermInstantiation ti)) {
+        if (!(p_entry.getInstantiation() instanceof Term instantiation)) {
             return null;
         }
 
-        return createCondition(((OperatorSV) sv).sort(), ti.getInstantiation().sort(),
+        return createCondition(((OperatorSV) sv).sort(), instantiation.sort(),
             !subSortsAllowed(sv));
-    }
-
-    /**
-     * Create a condition ensuring that the two given symbols become identical; "p0" may be of
-     * generic sort, "p1" not
-     *
-     * @return the resulting condition; null if the symbols are either incompatible or equal
-     */
-    public static @Nullable GenericSortCondition createCondition(@NonNull SortDependingFunction p0,
-            @NonNull SortDependingFunction p1) {
-
-        if (!p0.isSimilar(p1)) {
-            return null;
-        }
-
-        return createCondition(p0.getSortDependingOn(), p1.getSortDependingOn(), true);
     }
 
     /**
@@ -79,8 +62,7 @@ public abstract class GenericSortCondition {
      *         always compatible (no generic sorts) or never compatible (e.g. non generic sorts that
      *         don't match)
      */
-    protected static GenericSortCondition createCondition(Sort s0, @NonNull Sort s1,
-            boolean p_identity) {
+    protected static GenericSortCondition createCondition(Sort s0, Sort s1, boolean p_identity) {
         while (s0 instanceof ArraySort) {
             // Currently the sort hierarchy is not inherited by
             // collection sorts; therefore identity has to be ensured
@@ -114,7 +96,7 @@ public abstract class GenericSortCondition {
      *        GenericSortInstantiations)
      * @return the resulting condition, or null if "p_s" is not generic
      */
-    public static @Nullable GenericSortCondition forceInstantiation(Sort p_s, boolean p_maximum) {
+    public static GenericSortCondition forceInstantiation(Sort p_s, boolean p_maximum) {
 
         if (p_s instanceof GenericSort) {
             return createForceInstantiationCondition((GenericSort) p_s, p_maximum);
@@ -129,8 +111,7 @@ public abstract class GenericSortCondition {
      * @return a condition that specifies the given generic sort to be instantiated with a supersort
      *         of the given concrete sort
      */
-    public static @NonNull GenericSortCondition createSupersortCondition(GenericSort p_gs,
-            Sort p_s) {
+    public static GenericSortCondition createSupersortCondition(GenericSort p_gs, Sort p_s) {
         return new GSCSupersort(p_gs, p_s);
     }
 
@@ -138,8 +119,7 @@ public abstract class GenericSortCondition {
      * @return a condition that specifies the given generic sort to be instantiated (exactly) with
      *         the given concrete sort
      */
-    public static @NonNull GenericSortCondition createIdentityCondition(GenericSort p_gs,
-            Sort p_s) {
+    public static GenericSortCondition createIdentityCondition(GenericSort p_gs, Sort p_s) {
         return new GSCIdentity(p_gs, p_s);
     }
 
@@ -149,7 +129,7 @@ public abstract class GenericSortCondition {
      *        mimimum possible concrete sort (this hint is currently not used by
      *        GenericSortInstantiations)
      */
-    public static @NonNull GenericSortCondition createForceInstantiationCondition(GenericSort p_gs,
+    public static GenericSortCondition createForceInstantiationCondition(GenericSort p_gs,
             boolean p_maximum) {
         return new GSCForceInstantiation(p_gs, p_maximum);
     }
@@ -189,13 +169,13 @@ public abstract class GenericSortCondition {
         /**
          * checks if sort <code>p_s</code> is a supersort of the <code>getSubsort</code>
          */
-        public boolean check(@NonNull Sort p_s, GenericSortInstantiations insts) {
+        public boolean check(Sort p_s, GenericSortInstantiations insts) {
             return getSubsort().extendsTrans(p_s);
         }
 
 
         /** toString */
-        public @NonNull String toString() {
+        public String toString() {
             return "Supersort condition: " + getGenericSort() + " >= " + getSubsort();
         }
 
@@ -222,7 +202,7 @@ public abstract class GenericSortCondition {
         }
 
         /** toString */
-        public @NonNull String toString() {
+        public String toString() {
             return "Sort Identity: " + getGenericSort() + " = " + getSort();
         }
     }
@@ -244,12 +224,12 @@ public abstract class GenericSortCondition {
          * checks if @link GenericSortcondition#getgenericSort() has been already instantiated by
          * some sort (maximum, minimum is currently not checked)
          */
-        public boolean check(Sort p_s, @NonNull GenericSortInstantiations insts) {
+        public boolean check(Sort p_s, GenericSortInstantiations insts) {
             return insts.isInstantiated(getGenericSort());
         }
 
         /** toString */
-        public @NonNull String toString() {
+        public String toString() {
             return "Force instantiation: " + getGenericSort() + ", "
                 + (getMaximum() ? "maximum" : "minimum");
         }

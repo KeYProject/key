@@ -20,8 +20,13 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
@@ -82,18 +87,18 @@ public class OriginTermLabel implements TermLabel {
      * @return the term's origin, or the origin of one of its parents.
      */
     public static @Nullable Origin getOrigin(PosInOccurrence pio) {
-        Term term = pio.subTerm();
+        Term term = (Term) pio.subTerm();
 
-        OriginTermLabel originLabel = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        OriginTermLabel originLabel = (OriginTermLabel) term.getLabel(NAME);
 
         // If the term has no origin label,
         // iterate over its parent terms until we find one with an origin label,
         // then show that term's origin.
         while (originLabel == null && !pio.isTopLevel()) {
             pio = pio.up();
-            term = pio.subTerm();
+            term = (Term) pio.subTerm();
 
-            originLabel = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+            originLabel = (OriginTermLabel) term.getLabel(NAME);
         }
 
         if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
@@ -227,7 +232,7 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
         } else {
-            return !(op instanceof JFunction) || (op.getClass().equals(JFunction.class)
+            return !(op instanceof Function) || (op.getClass().equals(JFunction.class)
                     && ((Function) op).sort().extendsTrans(JavaDLTheory.FORMULA));
         }
     }
@@ -239,15 +244,19 @@ public class OriginTermLabel implements TermLabel {
      * @param services services.
      * @return the resulting sequent change info.
      */
-    public static @Nullable SequentChangeInfo removeOriginLabels(Sequent seq, Services services) {
+    public static @Nullable SequentChangeInfo removeOriginLabels(
+            Sequent seq,
+            Services services) {
         SequentChangeInfo changes = null;
 
         for (int i = 1; i <= seq.size(); ++i) {
-            SequentFormula oldFormula = seq.getFormulabyNr(i);
+            SequentFormula oldFormula = seq.getFormulaByNr(i);
             SequentFormula newFormula = new SequentFormula(
-                OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
-            SequentChangeInfo change = seq.changeFormula(newFormula,
-                PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel()));
+                removeOriginLabels((Term) oldFormula.formula(), services));
+            SequentChangeInfo change =
+                seq.changeFormula(newFormula,
+                    PosInOccurrence.findInSequent(seq, i,
+                        PosInTerm.getTopLevel()));
 
             if (changes == null) {
                 changes = change;
@@ -717,7 +726,7 @@ public class OriginTermLabel implements TermLabel {
                 return specType + " @ [no file]";
             } else {
                 var path = fileName.toString();
-                var name = path.substring(path.lastIndexOf('/') + 1, path.length());
+                var name = path.substring(path.lastIndexOf('/') + 1);
                 return specType + " @ file " + name + " @ line " + line;
             }
         }

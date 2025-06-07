@@ -375,7 +375,7 @@ public class HeatmapOptionsDialog extends JDialog {
             p.add(l, BorderLayout.NORTH);
             this.setContentPane(p);
             this.pack();
-            this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             this.setLocationRelativeTo(owner);
             this.setAlwaysOnTop(true);
             this.setVisible(true);

@@ -26,35 +26,26 @@ import org.jspecify.annotations.Nullable;
  * @author Dominic Scheurer
  */
 public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCondition,
-        Term programCounter,
-        @Nullable Node correspondingNode) {
+        Term programCounter, @Nullable Node correspondingNode) {
     /**
      * @return The symbolic state.
      */
-    public Term getSymbolicState() {
-        return symbolicState;
-    }
+    public Term getSymbolicState() { return symbolicState; }
 
     /**
      * @return The path condition.
      */
-    public Term getPathCondition() {
-        return pathCondition;
-    }
+    public Term getPathCondition() { return pathCondition; }
 
     /**
      * @return The program counter (and post condition).
      */
-    public Term getProgramCounter() {
-        return programCounter;
-    }
+    public Term getProgramCounter() { return programCounter; }
 
     /**
      * @return The node corresponding to this SE state.
      */
-    public @Nullable Node getCorrespondingNode() {
-        return correspondingNode;
-    }
+    public @Nullable Node getCorrespondingNode() { return correspondingNode; }
 
     /**
      * @return The corresponding SE state (without the program counter).

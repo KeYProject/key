@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.Location;
@@ -20,11 +21,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExceptionToolsTest {
-    public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final Path testCaseDirectory =
+        Objects.requireNonNull(FindResources.getTestCasesDirectory());
 
     @Test
     void missingSemicolon() throws MalformedURLException {
-        var fileToRead = testCaseDirectory.toPath();
+        var fileToRead = testCaseDirectory;
         fileToRead = fileToRead.resolve("parserErrorTest/missing_semicolon.key");
         try {
             var result = ParsingFacade.parseFile(fileToRead);

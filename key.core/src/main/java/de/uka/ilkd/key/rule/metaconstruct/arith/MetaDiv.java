@@ -13,11 +13,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-
-import org.jspecify.annotations.NonNull;
-
-
 
 public final class MetaDiv extends AbstractTermTransformer {
 
@@ -29,8 +26,7 @@ public final class MetaDiv extends AbstractTermTransformer {
     /**
      * checks whether the result is consistent with the axiom div_axiom
      */
-    private boolean checkResult(@NonNull BigInteger a, @NonNull BigInteger b,
-            @NonNull BigInteger result) {
+    private boolean checkResult(BigInteger a, BigInteger b, BigInteger result) {
 
         // (gt(b,0) -> (leq(0,sub(a,mul(result,b))) & lt(sub(a,mul(result,b)),b)) )
         if (b.compareTo(BigInteger.ZERO) > 0) {
@@ -49,7 +45,7 @@ public final class MetaDiv extends AbstractTermTransformer {
 
 
     /** calculates the resulting term. */
-    public Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         Term arg1 = term.sub(0);
         Term arg2 = term.sub(1);
         BigInteger bigIntArg1;
@@ -59,13 +55,13 @@ public final class MetaDiv extends AbstractTermTransformer {
         bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
         if (bigIntArg2.compareTo(new BigInteger("0")) == 0) {
             Name undefName = new Name("undef(" + term + ")");
-            JFunction undef = services.getNamespaces().functions().lookup(undefName);
+            Function undef = services.getNamespaces().functions().lookup(undefName);
             if (undef == null) {
                 undef = new JFunction(undefName,
                     services.getTypeConverter().getIntegerLDT().targetSort(), new Sort[0]);
                 services.getNamespaces().functions().add(undef);
             }
-            return services.getTermFactory().createTerm(undef);
+            return services.getTermBuilder().func(undef);
         }
         BigInteger remainder = bigIntArg1.remainder(bigIntArg2);
         BigInteger bigIntResult = bigIntArg1.divide(bigIntArg2);

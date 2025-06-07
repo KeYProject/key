@@ -3,15 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -27,14 +29,14 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     private CheckApplyEqFeature() {}
 
+    @Override
     protected boolean filter(@NonNull TacletApp p_app, @Nullable PosInOccurrence pos, Goal goal,
             MutableState mState) {
-        Debug.assertTrue(pos != null,
-            "Need to know the position of " + "the application of the taclet");
+        assert pos != null : "Need to know the position of " + "the application of the taclet";
 
-        IfFormulaInstantiation ifInst = p_app.ifFormulaInstantiations().head();
+        AssumesFormulaInstantiation ifInst = p_app.assumesFormulaInstantiations().head();
 
-        Debug.assertTrue(ifInst != null, "Need to know the equation the taclet" + " is used with");
+        assert ifInst != null : "Need to know the equation the taclet is used with";
 
         return isNotSelfApplication(pos, ifInst)
         // && equationIsDirected ( ifInst, p_app.constraint() )
@@ -42,10 +44,10 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     }
 
     private boolean isNotSelfApplication(@NonNull PosInOccurrence pos,
-            IfFormulaInstantiation ifInst) {
-        if (!(ifInst instanceof IfFormulaInstSeq)
-                || ifInst.getConstrainedFormula() != pos.sequentFormula()
-                || ((IfFormulaInstSeq) ifInst).inAntec() != pos.isInAntec()) {
+            AssumesFormulaInstantiation assumesInstantiation) {
+        if (!(assumesInstantiation instanceof AssumesFormulaInstSeq assumesFormulaInstSeq)
+                || assumesInstantiation.getSequentFormula() != pos.sequentFormula()
+                || assumesFormulaInstSeq.inAntecedent() != pos.isInAntec()) {
             return true;
         }
 

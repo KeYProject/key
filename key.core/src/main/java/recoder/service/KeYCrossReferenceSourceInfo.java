@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
 import de.uka.ilkd.key.java.recoderext.EscapeExpression;
@@ -72,7 +73,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
     public static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceSourceInfo.class);
 
-    private @Nullable HashMap<String, recoder.java.declaration.VariableSpecification> names2vars =
+    private @Nullable HashMap<String, VariableSpecification> names2vars =
         null;
     private PrimitiveType locsetType;
     private PrimitiveType seqType;
@@ -88,7 +89,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     }
 
     public void setNames2Vars(
-            HashMap<String, recoder.java.declaration.VariableSpecification> names2vars) {
+            HashMap<String, VariableSpecification> names2vars) {
         this.names2vars = names2vars;
     }
 
@@ -633,7 +634,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             throw new IllegalStateException("try to resolve an unknown type twice");
         }
 
-        recoder.abstraction.Type ty;
+        Type ty;
 
         try {
             ty = ni.getType(typeString);
@@ -649,13 +650,13 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                     tyref);
             }
 
-            recoder.java.CompilationUnit cu;
+            CompilationUnit cu;
             try {
                 cu = ClassFileDeclarationBuilder.makeEmptyClassDeclaration(
                     serviceConfiguration.getProgramFactory(), typeString);
                 cu.setDataLocation(new SpecDataLocation("stub", typeString));
             } catch (ParserException e) {
-                throw new de.uka.ilkd.key.java.ConvertException(e);
+                throw new ConvertException(e);
             }
 
             ChangeHistory changeHistory = serviceConfiguration.getChangeHistory();

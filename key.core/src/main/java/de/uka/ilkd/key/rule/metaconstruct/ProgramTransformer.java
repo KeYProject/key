@@ -12,15 +12,12 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * ProgramTransformers are used to describe schematic transformations that cannot be expressed by
@@ -48,7 +45,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param name the Name of the meta construct
      * @param body the ProgramElement contained by the meta construct
      */
-    public ProgramTransformer(Name name, ProgramElement body) {
+    protected ProgramTransformer(Name name, ProgramElement body) {
         this.name = name;
         this.body = body;
     }
@@ -59,7 +56,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param name the String with the name of the meta construct
      * @param body the ProgramElement contained by the meta construct
      */
-    public ProgramTransformer(@NonNull String name, ProgramElement body) {
+    protected ProgramTransformer(String name, ProgramElement body) {
         this(new Name(name), body);
     }
 
@@ -71,7 +68,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param svInst the instantiations of the schemavariables
      * @return the transformated program
      */
-    public abstract ProgramElement @Nullable [] transform(ProgramElement pe, Services services,
+    public abstract ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst);
 
     /**
@@ -98,7 +95,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return the last source element in the syntactical representation of this element, may be
      *         equals to this element.
      */
-    public @NonNull SourceElement getLastElement() {
+    public SourceElement getLastElement() {
         return (body != null) ? body : this;
     }
 
@@ -121,7 +118,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      *
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
-    public @NonNull Statement getStatementAt(int index) {
+    public Statement getStatementAt(int index) {
         if (index == 0 && body instanceof Statement) {
             return (Statement) body;
         } else if (!(body instanceof Statement)) {
@@ -148,7 +145,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
-    public @NonNull ProgramElement getChildAt(int index) {
+    public ProgramElement getChildAt(int index) {
         return body;
     }
 
@@ -156,11 +153,11 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     // -------------some methods to pretend being a type reference --------
 
 
-    public @NonNull ReferencePrefix getReferencePrefix() {
+    public ReferencePrefix getReferencePrefix() {
         return null;
     }
 
-    public @NonNull ReferencePrefix setReferencePrefix(ReferencePrefix r) {
+    public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }
 
@@ -174,11 +171,11 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         return 0;
     }
 
-    public @NonNull TypeReference getTypeReferenceAt(int index) {
+    public TypeReference getTypeReferenceAt(int index) {
         return this;
     }
 
-    public @NonNull PackageReference getPackageReference() {
+    public PackageReference getPackageReference() {
         return null;
     }
 
@@ -186,16 +183,16 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         return 0;
     }
 
-    public @NonNull Expression getExpressionAt(int index) {
+    public Expression getExpressionAt(int index) {
         return null;
     }
 
 
-    public @NonNull ProgramElementName getProgramElementName() {
+    public ProgramElementName getProgramElementName() {
         return new ProgramElementName(toString());
     }
 
-    public @NonNull String getName() {
+    public String getName() {
         return toString();
     }
 
@@ -205,20 +202,20 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      *
      * @param v the Visitor
      */
-    public void visit(@NonNull Visitor v) {
+    public void visit(Visitor v) {
         v.performActionOnProgramMetaConstruct(this);
     }
 
     /** to String */
-    public @NonNull String toString() {
+    public String toString() {
         return name + "( " + body + ");";
     }
 
-    public @NonNull KeYJavaType getKeYJavaType() {
+    public KeYJavaType getKeYJavaType() {
         return null;
     }
 
-    public @NonNull KeYJavaType getKeYJavaType(TermServices javaServ) {
+    public KeYJavaType getKeYJavaType(TermServices javaServ) {
         return getKeYJavaType();
     }
 
@@ -232,7 +229,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      *
      * @return a list of schema variables relevant for this entity;
      */
-    public @NonNull ImmutableList<SchemaVariable> needs() {
+    public ImmutableList<SchemaVariable> needs() {
         return ImmutableSLList.nil();
     }
 
@@ -243,7 +240,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param svInst the instatiations of SV so far.
      * @return a list of schema variables relevant for this entity;
      */
-    public @NonNull ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         return ImmutableSLList.nil();
     }
 

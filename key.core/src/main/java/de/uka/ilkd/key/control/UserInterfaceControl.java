@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -17,7 +17,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.prover.ProverTaskListener;
+
+import org.key_project.prover.engine.ProverTaskListener;
 
 import org.jspecify.annotations.Nullable;
 
@@ -25,7 +26,7 @@ import org.jspecify.annotations.Nullable;
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
  * <li>Functionality to load files via
- * {@link #load(Profile, File, List, File, List, Properties, boolean, Consumer)}.</li>
+ * {@link #load(Profile, Path, List, Path, List, Properties, boolean, Consumer)}.</li>
  * <li>Functionality to instantiate new {@link Proof}s via
  * {@link #createProof(InitConfig, ProofOblInput)}.</li>
  * <li>Functionality to register existing {@link Proof}s in the user interface via
@@ -75,9 +76,9 @@ public interface UserInterfaceControl {
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    AbstractProblemLoader load(@Nullable Profile profile, @Nullable File file,
-            @Nullable List<File> classPaths,
-            @Nullable File bootClassPath, @Nullable List<File> includes,
+    AbstractProblemLoader load(@Nullable Profile profile, @Nullable Path file,
+            @Nullable List<Path> classPaths,
+            @Nullable Path bootClassPath, @Nullable List<Path> includes,
             @Nullable Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             @Nullable Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;

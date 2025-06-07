@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-public class WarningException extends antlr.ANTLRException {
+import antlr.ANTLRException;
+
+public class WarningException extends ANTLRException {
 
     /**
      *

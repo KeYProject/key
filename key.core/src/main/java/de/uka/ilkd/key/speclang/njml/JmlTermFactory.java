@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -30,7 +29,9 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -690,7 +691,7 @@ public final class JmlTermFactory {
 
             Sort os = typeExpr.getType().getSort();
 
-            JFunction ioFunc =
+            Function ioFunc =
                 services.getJavaDLTheory().getExactInstanceofSymbol(os, services);
             Term instanceOf = tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE());
             IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
@@ -775,7 +776,7 @@ public final class JmlTermFactory {
             @NonNull Term term) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
-            JFunction cast = integerLDT.getSpecCast(resultType.getJavaType());
+            Function cast = integerLDT.getSpecCast(resultType.getJavaType());
             if (cast != null) {
                 return new SLExpression(tb.func(cast, term), resultType);
             } else {
@@ -1035,7 +1036,7 @@ public final class JmlTermFactory {
             @NonNull LocationVariable excVar) {
         Term result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
-            JFunction instance =
+            Function instance =
                 services.getJavaDLTheory().getInstanceofSymbol(kjt.getSort(), services);
             result = tb.or(result, tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()));
         }
@@ -1055,7 +1056,7 @@ public final class JmlTermFactory {
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
             Sort os = excType.getSort();
-            JFunction instance = services.getJavaDLTheory().getInstanceofSymbol(os, services);
+            Function instance = services.getJavaDLTheory().getInstanceofSymbol(os, services);
 
             result = tb.imp(tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()),
                 tb.convertToFormula(excVarReplacer.replace(result)));
@@ -1180,14 +1181,14 @@ public final class JmlTermFactory {
 
     public @NonNull SLExpression createSkolemExprBool(@NonNull String jmlKeyWord) {
         exc.addUnderspecifiedWarning(jmlKeyWord);
-        final Namespace<JFunction> fns = services.getNamespaces().functions();
+        final Namespace<Function> fns = services.getNamespaces().functions();
         final String shortName = jmlKeyWord.replace("\\", "");
         int x = -1;
         Name name;
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
-        final JFunction sk = new JFunction(name, JavaDLTheory.FORMULA);
+        final Function sk = new JFunction(name, JavaDLTheory.FORMULA);
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t);
@@ -1245,14 +1246,14 @@ public final class JmlTermFactory {
             @NonNull TermServices services,
             @NonNull String shortName) {
         shortName = shortName.replace("\\", "");
-        final Namespace<JFunction> fns = services.getNamespaces().functions();
+        final Namespace<Function> fns = services.getNamespaces().functions();
         final Sort sort = type.getSort();
         int x = -1;
         Name name;
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
-        final JFunction sk = new JFunction(name, sort);
+        final Function sk = new JFunction(name, sort);
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t, type);
@@ -1262,7 +1263,7 @@ public final class JmlTermFactory {
 
     public @NonNull SLExpression translateToJDLTerm(final @NonNull String functName,
             @Nullable ImmutableList<SLExpression> list) {
-        Namespace<JFunction> funcs = services.getNamespaces().functions();
+        Namespace<Function> funcs = services.getNamespaces().functions();
         Named symbol = funcs.lookup(new Name(functName));
 
         // weigl 2021-07-20: Handling of typed parameter in functions,
@@ -1282,9 +1283,9 @@ public final class JmlTermFactory {
         if (symbol != null) {
             // Function or predicate symbol found
 
-            assert symbol instanceof JFunction
+            assert symbol instanceof Function
                     : "Expecting a function symbol in this namespace";
-            JFunction function = (JFunction) symbol;
+            Function function = (Function) symbol;
 
             Term[] args;
             if (list == null) {
@@ -1336,7 +1337,7 @@ public final class JmlTermFactory {
         ProgramVariable pv = (ProgramVariable) symbol;
         try {
             Term resultTerm =
-                pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var((LocationVariable) pv);
+                pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var(pv);
             return new SLExpression(resultTerm);
         } catch (TermCreationException ex) {
             throw exc.createException0("Cannot create term " + pv.name(), ex);

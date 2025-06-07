@@ -3,19 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.util.collection.ImmutableArray;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * This match instruction implements the matching logic for term labels.
@@ -28,19 +24,18 @@ public class MatchTermLabelInstruction implements MatchInstruction {
         this.labels = labels;
     }
 
-    private @Nullable MatchConditions match(@NonNull TermLabelSV sv,
-            @NonNull Term instantiationCandidate,
-            @NonNull MatchConditions matchCond, Services services) {
+    private MatchConditions match(TermLabelSV sv, Term instantiationCandidate,
+            MatchConditions matchCond, LogicServices services) {
 
         final SVInstantiations svInsts = matchCond.getInstantiations();
-        final TermLabelInstantiationEntry inst =
-            (TermLabelInstantiationEntry) svInsts.getInstantiation(sv);
+        final ImmutableArray<TermLabel> inst =
+            (ImmutableArray<TermLabel>) svInsts.getInstantiation(sv);
 
         if (inst == null) {
             return matchCond.setInstantiations(
-                svInsts.add(sv, instantiationCandidate.getLabels(), services));
+                svInsts.add(sv, instantiationCandidate.getLabels(), TermLabel.class, services));
         } else {
-            for (TermLabel o : inst.getInstantiation()) {
+            for (TermLabel o : inst) {
                 if (!instantiationCandidate.containsLabel(o)) {
                     return null;
                 }
@@ -53,9 +48,8 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
-            MatchConditions matchConditions,
-            Services services) {
+    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+            LogicServices services) {
         final Term term = termPosition.getCurrentSubterm();
         MatchConditions result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels

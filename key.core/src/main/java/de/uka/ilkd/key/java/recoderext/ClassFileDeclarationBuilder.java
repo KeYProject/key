@@ -604,7 +604,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             tys = resolveTypeVariable(tys, constr.getTypeParameters());
             // filter out those constructors with a Classname$1 argument
             // that are only introduced for technical reasons
-            if (ClassFileDeclarationBuilder.isAnononymous(tys)) {
+            if (isAnononymous(tys)) {
                 return;
             }
             type = createTypeReference(tys);

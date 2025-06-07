@@ -17,17 +17,16 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.ListInstantiation;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.util.collection.*;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * For the loop scope rule, if a local program variable that may be altered by the loop body appears
@@ -69,9 +68,10 @@ public class NewLocalVarsCondition implements VariableCondition {
     }
 
     @Override
-    public @NonNull MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            @NonNull MatchConditions matchCond, Services services) {
-        SVInstantiations svInst = matchCond.getInstantiations();
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions matchCond, LogicServices lServices) {
+        var services = (Services) lServices;
+        var svInst = matchCond.getInstantiations();
         if (svInst.getInstantiation(varDeclsSV) != null) {
             return matchCond;
         }
@@ -100,13 +100,17 @@ public class NewLocalVarsCondition implements VariableCondition {
             updatesFrame = updatesFrame.append(tb.elementary(tb.var(v), tb.var(locVar)));
         }
         return matchCond.setInstantiations(
-            svInst.add(varDeclsSV, new ProgramList(new ImmutableArray<>(decls)), services)
+            ((SVInstantiations) svInst)
+                    .add(varDeclsSV,
+                        new ListInstantiation<>(new ImmutableArray<>(decls),
+                            VariableDeclaration.class),
+                        services)
                     .add(updateBeforeSV, tb.parallel(updatesBefore), services)
                     .add(updateFrameSV, tb.parallel(updatesFrame), services));
     }
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return "\\newLocalVars(" + varDeclsSV + ", " + updateBeforeSV + ", " + updateFrameSV + ", "
             + bodySV + ")";
     }

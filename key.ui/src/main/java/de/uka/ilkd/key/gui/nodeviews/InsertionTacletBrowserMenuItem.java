@@ -12,11 +12,12 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -52,7 +53,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     /** the base title; used title = basetitle + ( nrOfItems ) */
     private final String baseTitle;
 
-    public InsertionTacletBrowserMenuItem(String title, JFrame parent, NotationInfo notInfo,
+    protected InsertionTacletBrowserMenuItem(String title, JFrame parent, NotationInfo notInfo,
             Services services) {
 
         super(title);

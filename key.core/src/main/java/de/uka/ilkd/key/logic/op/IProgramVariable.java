@@ -8,12 +8,13 @@ import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 
-import org.key_project.logic.Named;
+import org.key_project.logic.op.SortedOperator;
 
 import org.jspecify.annotations.Nullable;
 
+
 public interface IProgramVariable
-        extends TerminalProgramElement, Named, org.key_project.logic.op.SortedOperator, Operator {
+        extends TerminalProgramElement, SortedOperator, Operator {
     @Nullable
     KeYJavaType getKeYJavaType();
 

@@ -76,8 +76,6 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
      * operator represented by the subclass. The default implementation here does not impose any
      * such demands. protected boolean additionalValidTopLevel2(Term term) { return true; }
      */
-
-
     @Override
     public <T extends org.key_project.logic.Term> void validTopLevelException(@NonNull T term)
             throws TermCreationException {

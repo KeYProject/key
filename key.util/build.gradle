@@ -1,4 +1,4 @@
-description "Utility library of the key-project"
+description = "Utility library of the key-project"
 
 dependencies {
     implementation("org.jspecify:jspecify:1.0.0")

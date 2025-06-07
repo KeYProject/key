@@ -31,7 +31,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * Constructs a new {@link AbstractPredicateAbstractionDomainElement} from a given list of
      * abstraction predicates.
      */
-    public AbstractPredicateAbstractionDomainElement(
+    protected AbstractPredicateAbstractionDomainElement(
             ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
     }

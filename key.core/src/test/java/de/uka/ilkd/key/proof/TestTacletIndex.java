@@ -3,18 +3,25 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.IHTacletFilter;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -49,9 +56,9 @@ public class TestTacletIndex {
 
     @BeforeEach
     public void setUp() {
-        File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-            + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
-        assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
+        Path tacletFile = HelperClassForTests.TESTCASE_DIRECTORY.resolve(
+            "../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+        assertTrue(Files.exists(tacletFile), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
         h1 = TacletForTests.getHeuristics().lookup(new Name("h1"));
@@ -152,7 +159,8 @@ public class TestTacletIndex {
 
         SequentFormula cfma = new SequentFormula(term_p1);
 
-        PosInOccurrence posSucc = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
+        PosInOccurrence posSucc =
+            new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
 
         assertTrue(
             isRuleIn(variante_one.getSuccedentTaclet(posSucc,
@@ -232,9 +240,10 @@ public class TestTacletIndex {
 
         Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
         SequentFormula cfma_p5 = new SequentFormula(term_p5);
-        Sequent seq_p5 = Sequent.createAnteSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
-        PosInOccurrence pio_p5 = new PosInOccurrence(cfma_p5, PosInTerm.getTopLevel(), true);
+        Sequent seq_p5 = JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList.singleton(cfma_p5));
+        PosInOccurrence pio_p5 =
+            new PosInOccurrence(cfma_p5, PosInTerm.getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
 
         assertFalse(
@@ -244,9 +253,10 @@ public class TestTacletIndex {
         Term term_p6 = TacletForTests.parseTerm("\\forall nat z; p(zero, z)");
 
         SequentFormula cfma_p6 = new SequentFormula(term_p6);
-        Sequent seq_p6 = Sequent.createAnteSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
-        PosInOccurrence pio_p6 = new PosInOccurrence(cfma_p6, PosInTerm.getTopLevel(), true);
+        Sequent seq_p6 = JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList.singleton(cfma_p6));
+        PosInOccurrence pio_p6 =
+            new PosInOccurrence(cfma_p6, PosInTerm.getTopLevel(), true);
         appIdx = createGoalFor(seq_p6, ruleIdx);
 
         assertTrue(

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -12,19 +12,18 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.util.helper.FindResources;
 
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Issue3437Test {
-    public static final @Nullable File testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
     void loadsAndSlicesCorrectly() throws Exception {
         GeneralSettings.noPruningClosed = false;
 
-        var file = new File(testCaseDirectory,
+        var file = testCaseDirectory.resolve(
             "issues/3437/Newnames(Newnames__createArray()).JML normal_behavior operation contract.0.proof");
         var env = KeYEnvironment.load(file);
         var proof = env.getLoadedProof();

@@ -17,15 +17,15 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.prover.engine.ProofSearchInformation;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -56,7 +56,8 @@ public class MediatorProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
+    public boolean selectedTaclet(Taclet taclet, Goal goal,
+            PosInOccurrence pos) {
         boolean result = super.selectedTaclet(taclet, goal, pos);
         if (!result) {
             ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
@@ -155,12 +156,12 @@ public class MediatorProofControl extends AbstractProofControl {
      * mediator().stopInterface(true); mediator().setInteractive(false); }. The thread itself
      * unfreezes the UI when it is finished. </p>
      */
-    private class AutoModeWorker extends SwingWorker<ApplyStrategyInfo, Object> {
+    private class AutoModeWorker extends SwingWorker<ProofSearchInformation<Proof, Goal>, Object> {
         private final @NonNull Proof proof;
         private final @NonNull List<Node> initialGoals;
         private final @NonNull ImmutableList<Goal> goals;
         private final @NonNull ApplyStrategy applyStrategy;
-        private ApplyStrategyInfo info;
+        private ProofSearchInformation<Proof, Goal> info;
 
         public AutoModeWorker(final @NonNull Proof proof, final @NonNull ImmutableList<Goal> goals,
                 @Nullable ProverTaskListener ptl) {
@@ -168,7 +169,8 @@ public class MediatorProofControl extends AbstractProofControl {
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
             this.applyStrategy = new ApplyStrategy(
-                proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+                proof.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder()
+                        .create());
             if (ptl != null) {
                 applyStrategy.addProverTaskObserver(ptl);
             }
@@ -204,9 +206,8 @@ public class MediatorProofControl extends AbstractProofControl {
             }
         }
 
-        protected void emitInteractiveAutoMode(@NonNull List<Node> initialGoals,
-                @NonNull Proof proof,
-                @NonNull ApplyStrategyInfo info) {
+        protected void emitInteractiveAutoMode(List<Node> initialGoals, Proof proof,
+                ProofSearchInformation<Proof, Goal> info) {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
@@ -216,7 +217,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         @Override
-        protected @NonNull ApplyStrategyInfo doInBackground() throws Exception {
+        protected ProofSearchInformation<Proof, Goal> doInBackground() {
             boolean stopMode =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties()
                         .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)

@@ -6,21 +6,26 @@ package de.uka.ilkd.key.strategy.termProjection;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
 
 public abstract class DividePolynomialsProjection extends AbstractDividePolynomialsProjection {
 
-    private DividePolynomialsProjection(ProjectionToTerm leftCoefficient,
-            ProjectionToTerm polynomial) {
+    private DividePolynomialsProjection(ProjectionToTerm<Goal> leftCoefficient,
+            ProjectionToTerm<Goal> polynomial) {
         super(leftCoefficient, polynomial);
     }
 
-    public static @NonNull ProjectionToTerm createRoundingDown(ProjectionToTerm leftCoefficient,
-            ProjectionToTerm polynomial) {
+    public static @NonNull ProjectionToTerm<Goal> createRoundingDown(
+            ProjectionToTerm<Goal> leftCoefficient,
+            ProjectionToTerm<Goal> polynomial) {
         return new DividePolynomialsProjection(leftCoefficient, polynomial) {
+            @Override
             protected @NonNull Term divide(@NonNull Monomial numerator,
                     @NonNull BigInteger denominator, @NonNull Services services) {
                 final BigInteger newRightCoeff = divide(numerator.getCoefficient(), denominator);
@@ -30,9 +35,11 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
         };
     }
 
-    public static @NonNull ProjectionToTerm createRoundingUp(ProjectionToTerm leftCoefficient,
-            ProjectionToTerm polynomial) {
+    public static @NonNull ProjectionToTerm<Goal> createRoundingUp(
+            ProjectionToTerm<Goal> leftCoefficient,
+            ProjectionToTerm<Goal> polynomial) {
         return new DividePolynomialsProjection(leftCoefficient, polynomial) {
+            @Override
             protected @NonNull Term divide(@NonNull Monomial numerator,
                     @NonNull BigInteger denominator, @NonNull Services services) {
                 final BigInteger newRightCoeff =

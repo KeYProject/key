@@ -10,14 +10,12 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Provides a basic implementation of {@link IExecutionElement}.
@@ -28,12 +26,12 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     /**
      * The used {@link TreeSettings}.
      */
-    private final @NonNull ITreeSettings settings;
+    private final ITreeSettings settings;
 
     /**
      * The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
      */
-    private final @NonNull Node proofNode;
+    private final Node proofNode;
 
     /**
      * The human-readable name of this node.
@@ -47,7 +45,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionElement(@NonNull ITreeSettings settings, @NonNull Node proofNode) {
+    protected AbstractExecutionElement(ITreeSettings settings, Node proofNode) {
         assert settings != null;
         assert proofNode != null;
         this.settings = settings;
@@ -58,7 +56,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable Services getServices() {
+    public Services getServices() {
         Proof proof = getProof();
         return proof != null && !proof.isDisposed() ? proof.getServices() : null;
     }
@@ -67,7 +65,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable RuleApp getAppliedRuleApp() {
+    public RuleApp getAppliedRuleApp() {
         return proofNode.getAppliedRuleApp();
     }
 
@@ -75,7 +73,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable InitConfig getInitConfig() {
+    public InitConfig getInitConfig() {
         Proof proof = getProof();
         return proof != null && !proof.isDisposed() ? proof.getInitConfig() : null;
     }
@@ -84,7 +82,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull Proof getProof() {
+    public Proof getProof() {
         return getProofNode().proof();
     }
 
@@ -92,7 +90,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull Node getProofNode() {
+    public Node getProofNode() {
         return proofNode;
     }
 
@@ -100,7 +98,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull NodeInfo getProofNodeInfo() {
+    public NodeInfo getProofNodeInfo() {
         return getProofNode().getNodeInfo();
     }
 
@@ -150,7 +148,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * @param services The {@link Services} to use.
      * @return The {@link String} representation of the given {@link Term}.
      */
-    protected @Nullable String formatTerm(@NonNull Term term, Services services) {
+    protected String formatTerm(Term term, Services services) {
         return SymbolicExecutionUtil.formatTerm(term, services, settings.useUnicode(),
             settings.usePrettyPrinting());
     }
@@ -159,7 +157,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         try {
             return getElementType() + " " + getName();
         } catch (ProofInputException e) {
@@ -179,7 +177,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * {@inheritDoc}
      */
     @Override
-    public @NonNull ITreeSettings getSettings() {
+    public ITreeSettings getSettings() {
         return settings;
     }
 }
