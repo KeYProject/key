@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.util.properties.Properties;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.prover.rules.instantiation.MatchConditions;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
@@ -68,7 +68,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
     @Override
     protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos, PosInOccurrence applicationPosInOccurrence,
-            MatchConditions matchCond, @NonNull Goal goal,
+            MatchResultInfo matchCond, @NonNull Goal goal,
             @NonNull TacletApp tacletApp,
             LogicServices services, Object... instantiationInfo) {
 

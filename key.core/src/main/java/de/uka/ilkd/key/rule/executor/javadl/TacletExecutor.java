@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -85,7 +86,7 @@ public abstract class TacletExecutor
     @Override
     protected Term syntacticalReplace(Term term,
             PosInOccurrence applicationPosInOccurrence,
-            org.key_project.prover.rules.instantiation.MatchConditions mc,
+            MatchResultInfo mc,
             @NonNull Goal goal,
             @NonNull TacletApp tacletApp,
             LogicServices services,
@@ -132,7 +133,7 @@ public abstract class TacletExecutor
     protected ImmutableList<SequentFormula> instantiateSemisequent(
             Semisequent semi,
             PosInOccurrence applicationPosInOccurrence,
-            org.key_project.prover.rules.instantiation.MatchConditions matchCond, Goal goal,
+            MatchResultInfo matchCond, Goal goal,
             TacletApp tacletApp, LogicServices services,
             Object... instantiationInfo) { // TermLabelState termLabelState, TacletLabelHint
                                            // labelHint) {
@@ -162,7 +163,7 @@ public abstract class TacletExecutor
     protected void applyAddrule(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules,
             @NonNull Goal goal,
             LogicServices services,
-            org.key_project.prover.rules.instantiation.MatchConditions p_matchCond) {
+            MatchResultInfo p_matchCond) {
         var matchCond = (MatchConditions) p_matchCond;
         for (var tacletToAdd : rules) {
             final Node n = goal.node();
@@ -210,7 +211,7 @@ public abstract class TacletExecutor
             Goal goal,
             PosInOccurrence posOfFind,
             LogicServices p_services,
-            org.key_project.prover.rules.instantiation.MatchConditions matchCond) {
+            MatchResultInfo matchCond) {
         final Services services = (Services) p_services;
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {
