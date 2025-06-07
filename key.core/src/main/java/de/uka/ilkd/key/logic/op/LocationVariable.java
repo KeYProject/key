@@ -8,13 +8,14 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 
 /**
  * This class represents proper program variables, which are not program constants. See the
  * description of the superclass ProgramVariable for more information.
  */
-public final class LocationVariable extends ProgramVariable implements UpdateableJOperator {
+public final class LocationVariable extends ProgramVariable implements UpdateableOperator {
     public LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
             boolean isStatic, boolean isModel, boolean isGhost, boolean isFinal) {
         super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
