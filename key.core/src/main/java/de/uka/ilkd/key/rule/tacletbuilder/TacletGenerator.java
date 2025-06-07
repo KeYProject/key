@@ -25,6 +25,7 @@ import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.Taclet.ApplicationRestriction;
 import org.key_project.prover.sequent.Sequent;

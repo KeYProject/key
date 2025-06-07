@@ -5,10 +5,8 @@ package org.key_project.prover.strategy.costbased;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Singleton implementation of the <code>RuleAppCost</code> interface, which denotes a maximum cost
- * (rule applications with this cost can't be afforded at all)
- */
+/// Singleton implementation of the <code>RuleAppCost</code> interface, which denotes a maximum cost
+/// (rule applications with this cost can't be afforded at all)
 public class TopRuleAppCost implements RuleAppCost {
 
     private TopRuleAppCost() {}
@@ -31,24 +29,20 @@ public class TopRuleAppCost implements RuleAppCost {
         return 91879827;
     }
 
-    /**
-     * TOP costs cannot be further increased!
-     *
-     * @param cost2 the other costs
-     * @return this instance
-     */
+    /// TOP costs cannot be further increased!
+    ///
+    /// @param cost2 the other costs
+    /// @return this instance
     public final RuleAppCost add(@NonNull RuleAppCost cost2) {
         return INSTANCE;
     }
 
-    /**
-     * Multiply the TOP costs with given cost. TOP times any other costs results into TOP cost.
-     * <p>
-     * (weigl: Dicussable whether {@code TOP times 0 = 0}?)
-     *
-     * @param cost - non-null {@link RuleAppCost}
-     * @return this instance
-     */
+    /// Multiply the TOP costs with given cost. TOP times any other costs results into TOP cost.
+    ///
+    /// (weigl: Dicussable whether `TOP times 0 = 0`?)
+    ///
+    /// @param cost - non-null [RuleAppCost]
+    /// @return this instance
     @Override
     public @NonNull RuleAppCost mul(@NonNull RuleAppCost cost) {
         return this;

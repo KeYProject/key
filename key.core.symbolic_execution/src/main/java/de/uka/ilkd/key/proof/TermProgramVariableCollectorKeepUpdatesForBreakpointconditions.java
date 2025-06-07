@@ -10,6 +10,8 @@ import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
+import org.key_project.logic.Term;
+
 public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
         extends TermProgramVariableCollector {
     private final IBreakpointStopCondition breakpointStopCondition;

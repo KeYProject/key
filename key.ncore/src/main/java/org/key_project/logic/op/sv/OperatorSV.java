@@ -7,6 +7,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 public interface OperatorSV extends SchemaVariable, Operator {
-    /** returns the target sort of the operator */
+    /// returns the target sort of the operator
     Sort sort();
 }

@@ -7,9 +7,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-/**
- * return zero cost if given term does not contain any free variables.
- */
+/// return zero cost if given term does not contain any free variables.
 public class ClosedExpressionTermFeature extends BinaryTermFeature {
 
     public static final TermFeature INSTANCE = new ClosedExpressionTermFeature();

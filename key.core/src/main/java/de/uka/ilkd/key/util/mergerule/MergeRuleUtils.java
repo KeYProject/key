@@ -1431,7 +1431,7 @@ public class MergeRuleUtils {
             org.key_project.logic.Term programCounterTerm,
             Services services) {
         final var mod = (Modality) programCounterTerm.op();
-        final JavaProgramElement program = mod.program().program();
+        final JavaProgramElement program = mod.programBlock().program();
         if (program instanceof StatementBlock && (((StatementBlock) program).isEmpty()
                 || (((StatementBlock) program).getInnerMostMethodFrame() != null
                         && ((StatementBlock) program).getInnerMostMethodFrame().getBody()

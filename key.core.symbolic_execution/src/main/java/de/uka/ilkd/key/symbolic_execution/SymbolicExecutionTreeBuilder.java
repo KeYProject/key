@@ -284,7 +284,7 @@ public class SymbolicExecutionTreeBuilder {
         // Check if modality contains method frames
         if (!modalityTerms.isEmpty()) {
             final Modality mod = (Modality) modalityTerm.op();
-            JavaBlock javaBlock = mod.program();
+            JavaBlock javaBlock = mod.programBlock();
             final ProgramElement program = javaBlock.program();
             final List<Node> initialStack = new LinkedList<>();
             new JavaASTVisitor(program, services) {

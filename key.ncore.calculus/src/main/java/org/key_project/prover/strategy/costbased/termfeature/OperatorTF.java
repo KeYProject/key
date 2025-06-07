@@ -8,9 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-/**
- * Term feature for checking whether the top operator of a term is identical to a given one
- */
+/// Term feature for checking whether the top operator of a term is identical to a given one
 public class OperatorTF extends BinaryTermFeature {
 
     private final Operator op;
