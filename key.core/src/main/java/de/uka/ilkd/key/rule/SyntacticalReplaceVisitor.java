@@ -29,6 +29,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
@@ -248,15 +249,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
 
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
-        final UpdateableJOperator originalLhs = op.lhs();
+        final UpdateableOperator originalLhs = op.lhs();
         if (originalLhs instanceof SchemaVariable originalLhsAsSV) {
             Object lhsInst = svInst.getInstantiation(originalLhsAsSV);
             if (lhsInst instanceof JTerm lhsInstAsTerm) {
                 lhsInst = lhsInstAsTerm.op();
             }
 
-            final UpdateableJOperator newLhs;
-            if (lhsInst instanceof UpdateableJOperator updateableLhs) {
+            final UpdateableOperator newLhs;
+            if (lhsInst instanceof UpdateableOperator updateableLhs) {
                 newLhs = updateableLhs;
             } else {
                 assert false : "not updateable: " + lhsInst;

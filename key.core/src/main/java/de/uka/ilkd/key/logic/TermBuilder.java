@@ -34,6 +34,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 
@@ -409,7 +410,7 @@ public class TermBuilder {
     }
 
     // TODO: Inline?
-    public JTerm varOfUpdateableOp(UpdateableJOperator op) {
+    public JTerm varOfUpdateableOp(UpdateableOperator op) {
         if (op instanceof LocationVariable lv)
             return var(lv);
         return var((ProgramSV) op);
@@ -940,7 +941,7 @@ public class TermBuilder {
     // updates
     // -------------------------------------------------------------------------
 
-    public JTerm elementary(UpdateableJOperator lhs, JTerm rhs) {
+    public JTerm elementary(UpdateableOperator lhs, JTerm rhs) {
         ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
         return tf.createTerm(eu, rhs);
     }
@@ -949,7 +950,7 @@ public class TermBuilder {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         if (lhs.op() instanceof UpdateableJOperator) {
             assert lhs.arity() == 0 : "uh oh: " + lhs;
-            return elementary((UpdateableJOperator) lhs.op(), rhs);
+            return elementary((UpdateableOperator) lhs.op(), rhs);
         } else if (heapLDT.getSortOfSelect(lhs.op()) != null
                 && lhs.sub(0).op().equals(heapLDT.getHeap())) {
             final JTerm heapTerm = lhs.sub(0);

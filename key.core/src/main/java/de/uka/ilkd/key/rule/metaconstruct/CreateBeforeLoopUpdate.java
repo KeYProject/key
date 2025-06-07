@@ -13,6 +13,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.UpdateableOperator;
 
 
 /**
@@ -71,16 +72,16 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         JTerm beforeLoopUpdate =
-            tb.elementary((UpdateableJOperator) anonHeapTerm.op(), tb.var(heapLDT.getHeap()));
+            tb.elementary((UpdateableOperator) anonHeapTerm.op(), tb.var(heapLDT.getHeap()));
 
         if (isTransaction) {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate, tb.elementary(
-                (UpdateableJOperator) anonSavedHeapTerm.op(), tb.var(heapLDT.getSavedHeap())));
+                (UpdateableOperator) anonSavedHeapTerm.op(), tb.var(heapLDT.getSavedHeap())));
         }
 
         if (isPermissions) {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                tb.elementary((UpdateableJOperator) anonPermissionsHeapTerm.op(),
+                tb.elementary((UpdateableOperator) anonPermissionsHeapTerm.op(),
                     tb.var(heapLDT.getPermissionHeap())));
         }
 

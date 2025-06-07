@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchConditions;
@@ -42,12 +43,12 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
 
     private static class ElementaryUpdateWrapper {
-        private final UpdateableJOperator op;
+        private final UpdateableOperator op;
 
         private JTerm rhs1;
         private JTerm rhs2;
 
-        public ElementaryUpdateWrapper(UpdateableJOperator op, TermServices services) {
+        public ElementaryUpdateWrapper(UpdateableOperator op, TermServices services) {
             super();
             this.op = op;
             JTerm identity = services.getTermFactory().createTerm(op);
@@ -76,16 +77,16 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     }
 
-    private TreeMap<UpdateableJOperator, ElementaryUpdateWrapper> createMap() {
+    private TreeMap<UpdateableOperator, ElementaryUpdateWrapper> createMap() {
         return new TreeMap<>(
             Comparator.comparing(Named::name));
     }
 
-    private TreeSet<UpdateableJOperator> createTree() {
+    private TreeSet<UpdateableOperator> createTree() {
         return new TreeSet<>(Comparator.comparing(Named::name));
     }
 
-    private void collectSingleTerm(final TreeMap<UpdateableJOperator, ElementaryUpdateWrapper> map,
+    private void collectSingleTerm(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
             JTerm update, final boolean firstTerm, TermServices services) {
         ElementaryUpdate eu = (ElementaryUpdate) update.op();
         ElementaryUpdateWrapper euw = null;
@@ -103,10 +104,10 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
 
 
-    private boolean collect(final TreeMap<UpdateableJOperator, ElementaryUpdateWrapper> map,
+    private boolean collect(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
             JTerm update, final boolean firstTerm, TermServices services) {
         LinkedList<JTerm> updates = new LinkedList<>();
-        TreeSet<UpdateableJOperator> collected = createTree();
+        TreeSet<UpdateableOperator> collected = createTree();
         updates.add(update);
         // consider only parallel updates, where each variable occurs only once on
         // the left hand side.
@@ -133,7 +134,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     private JTerm simplify(JTerm phi, JTerm u1, JTerm u2, JTerm t, TermServices services) {
 
-        TreeMap<UpdateableJOperator, ElementaryUpdateWrapper> map = createMap();
+        TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map = createMap();
 
         if (!collect(map, u1, true, services)) {
 

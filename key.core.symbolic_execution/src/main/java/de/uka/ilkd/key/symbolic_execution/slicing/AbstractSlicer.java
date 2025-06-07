@@ -31,6 +31,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -373,7 +374,7 @@ public abstract class AbstractSlicer {
                     thisReference);
             }
         } else if (term.op() instanceof ElementaryUpdate) {
-            UpdateableJOperator target = ((ElementaryUpdate) term.op()).lhs();
+            UpdateableOperator target = ((ElementaryUpdate) term.op()).lhs();
             if (SymbolicExecutionUtil.isHeap(target, heapLDT)) {
                 analyzeHeapUpdate(term.sub(0), services, heapLDT, aliases, thisReference);
             } else {
@@ -454,7 +455,7 @@ public abstract class AbstractSlicer {
                     relevantLocations, node);
             }
         } else if (term.op() instanceof ElementaryUpdate) {
-            UpdateableJOperator target = ((ElementaryUpdate) term.op()).lhs();
+            UpdateableOperator target = ((ElementaryUpdate) term.op()).lhs();
             if (SymbolicExecutionUtil.isBaseHeap(target, heapLDT)) {
                 listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference,
                     relevantLocations, node);
