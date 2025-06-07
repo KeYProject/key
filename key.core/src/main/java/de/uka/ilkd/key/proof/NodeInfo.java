@@ -166,7 +166,7 @@ public class NodeInfo {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
-            JTerm t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+            JTerm t = TermBuilder.goBelowUpdates((JTerm) pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();

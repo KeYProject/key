@@ -357,7 +357,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         try {
             // initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            var t = pio.subTerm();
+            JTerm t = (JTerm) pio.subTerm();
             JTerm term = TermBuilder.goBelowUpdates(t);
             IExecutionContext ec =
                 JavaTools.getInnermostExecutionContext(term.javaBlock(), getProof().getServices());

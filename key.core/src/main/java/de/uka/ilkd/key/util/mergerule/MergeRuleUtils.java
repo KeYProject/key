@@ -35,6 +35,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
@@ -252,7 +253,7 @@ public class MergeRuleUtils {
      * @return All program variables of the given term.
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(
-            org.key_project.logic.Term term,
+            Term term,
             Services services) {
         HashSet<LocationVariable> result = new HashSet<>();
 
@@ -556,7 +557,7 @@ public class MergeRuleUtils {
      * @param u Update to check.
      * @return true iff u is in normal form.
      */
-    public static boolean isUpdateNormalForm(org.key_project.logic.Term u) {
+    public static boolean isUpdateNormalForm(Term u) {
         if (u.op() instanceof ElementaryUpdate) {
             return true;
         } else if (u.op() instanceof UpdateJunctor) {
@@ -1432,7 +1433,7 @@ public class MergeRuleUtils {
      * @return The set of contained program locations.
      */
     private static HashSet<LocationVariable> getProgramLocationsHashSet(
-            org.key_project.logic.Term programCounterTerm,
+            Term programCounterTerm,
             Services services) {
         final var mod = (JModality) programCounterTerm.op();
         final JavaProgramElement program = mod.programBlock().program();

@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.key_project.logic.Term;
+
 /**
  * Extended {@link OpCollector} that also descends into Java blocks
  * and collects all {@link LocationVariable} there.
@@ -16,7 +18,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
  */
 public class OpCollectorJavaBlock extends OpCollector {
     @Override
-    public void visit(org.key_project.logic.Term t) {
+    public void visit(Term t) {
         super.visit(t);
         if (t.op() instanceof JModality mod && !mod.programBlock().isEmpty()) {
             var collect =

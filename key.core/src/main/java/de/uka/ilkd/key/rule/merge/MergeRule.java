@@ -31,6 +31,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleAbortException;
@@ -616,7 +617,7 @@ public class MergeRule implements BuiltInRule {
 
         var selected = pio.subTerm();
 
-        org.key_project.logic.Term termAfterUpdate = selected;
+        Term termAfterUpdate = selected;
 
         if (selected.op() instanceof UpdateApplication) {
             var update = selected.sub(0);

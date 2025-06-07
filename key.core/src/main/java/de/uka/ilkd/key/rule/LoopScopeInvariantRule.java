@@ -425,7 +425,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         Statement stmtToRepl = whileLoop;
 
         ImmutableArray<ProgramPrefix> prefixElems =
-            ((StatementBlock) TermBuilder.goBelowUpdates(ruleApp.posInOccurrence().subTerm())
+            ((StatementBlock) TermBuilder
+                    .goBelowUpdates((JTerm) ruleApp.posInOccurrence().subTerm())
                     .javaBlock().program()).getPrefixElements();
 
         if (prefixElems.size() > 0

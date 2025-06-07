@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
@@ -65,7 +66,7 @@ public class EqualityConstraint implements Constraint {
     }
 
 
-    public static ImmutableSet<Metavariable> metaVars(org.key_project.logic.Term t,
+    public static ImmutableSet<Metavariable> metaVars(Term t,
             Services services) {
 
         var mvCache = services.getCaches().getMVCache();

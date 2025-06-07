@@ -17,6 +17,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -91,7 +92,7 @@ public class ProofObligationCreator {
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
-            public void visit(org.key_project.logic.Term visited) {
+            public void visit(Term visited) {
                 collectUserDefinedSymbols(visited, userDefinedSymbols);
 
             }
@@ -104,7 +105,7 @@ public class ProofObligationCreator {
 
 
 
-    private void collectUserDefinedSymbols(org.key_project.logic.Term term,
+    private void collectUserDefinedSymbols(Term term,
             UserDefinedSymbols userDefinedSymbols) {
         for (var sub : term.subs()) {
             collectUserDefinedSymbols(sub, userDefinedSymbols);

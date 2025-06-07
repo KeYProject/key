@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -168,8 +169,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         }
 
         @Override
-        public void visit(org.key_project.logic.Term visited) {
-            for (JTerm searchTerm : searchTerms) {
+        public void visit(Term visited) {
+            for (Term searchTerm : searchTerms) {
                 termFound = termFound || visited.equals(searchTerm);
             }
         }

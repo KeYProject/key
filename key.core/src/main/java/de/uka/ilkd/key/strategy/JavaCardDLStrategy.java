@@ -40,6 +40,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
@@ -1440,18 +1441,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 applyTF("subsumRightBigger", tf.polynomial), PolynomialValuesCmpFeature
                         .lt(instOf("subsumRightSmaller"), instOf("subsumRightBigger"))));
 
-        final JTerm tOne = getServices().getTermBuilder().zTerm("1");
+        final Term tOne = getServices().getTermBuilder().zTerm("1");
         final TermBuffer one = new TermBuffer() {
             @Override
-            public void setContent(org.key_project.logic.Term term, MutableState mState) {}
+            public void setContent(Term term, MutableState mState) {}
 
             @Override
-            public JTerm getContent(MutableState mState) {
+            public Term getContent(MutableState mState) {
                 return tOne;
             }
 
             @Override
-            public JTerm toTerm(RuleApp app, PosInOccurrence pos,
+            public Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tOne;
             }
@@ -1460,7 +1461,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final JTerm tTwo = getServices().getTermBuilder().zTerm("2");
         final TermBuffer two = new TermBuffer() {
             @Override
-            public void setContent(org.key_project.logic.Term term, MutableState mState) {}
+            public void setContent(Term term, MutableState mState) {}
 
             @Override
             public JTerm getContent(MutableState mState) {

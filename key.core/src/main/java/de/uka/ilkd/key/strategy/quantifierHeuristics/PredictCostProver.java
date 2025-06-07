@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -101,8 +102,8 @@ public class PredictCostProver {
             op = pro.op();
         }
         if ((op == Equality.EQUALS || op == Equality.EQV)) {
-            org.key_project.logic.Term term = pro.sub(0);
-            org.key_project.logic.Term formula = pro.sub(1);
+            Term term = pro.sub(0);
+            Term formula = pro.sub(1);
             if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
                 return negated ? falseT : trueT;
             }

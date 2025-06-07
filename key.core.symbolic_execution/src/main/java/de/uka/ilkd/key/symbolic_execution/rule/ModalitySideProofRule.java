@@ -92,8 +92,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             if (Transformer.inTransformer(pio)) {
                 return false;
             }
-            var t = pio.subTerm();
-            JTerm term = TermBuilder.goBelowUpdates(t);
+            JTerm term = TermBuilder.goBelowUpdates((JTerm) pio.subTerm());
             if (term.op() instanceof JModality
                     && SymbolicExecutionUtil.getSymbolicExecutionLabel(term) == null) {
                 JTerm equalityTerm = term.sub(0);

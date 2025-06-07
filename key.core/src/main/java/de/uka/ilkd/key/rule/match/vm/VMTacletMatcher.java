@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -116,7 +117,7 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> p_toMatch,
-            org.key_project.logic.Term p_template,
+            Term p_template,
             org.key_project.prover.rules.instantiation.MatchConditions p_matchCond,
             LogicServices p_services) {
         TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
@@ -348,7 +349,7 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final MatchConditions matchFind(
-            org.key_project.logic.Term term,
+            Term term,
             MatchConditions p_matchCond,
             LogicServices services) {
         if (findMatchProgram == TacletMatchProgram.EMPTY_PROGRAM) {

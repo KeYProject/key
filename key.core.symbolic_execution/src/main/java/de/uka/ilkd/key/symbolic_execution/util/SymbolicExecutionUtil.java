@@ -1562,7 +1562,7 @@ public final class SymbolicExecutionUtil {
          * {@inheritDoc}
          */
         @Override
-        public void subtreeEntered(org.key_project.logic.Term subtreeRoot) {
+        public void subtreeEntered(Term subtreeRoot) {
             if (currentPosInTerm == null) {
                 currentPosInTerm = PosInTerm.getTopLevel();
             } else {
@@ -1576,7 +1576,7 @@ public final class SymbolicExecutionUtil {
          * {@inheritDoc}
          */
         @Override
-        public void subtreeLeft(org.key_project.logic.Term subtreeRoot) {
+        public void subtreeLeft(Term subtreeRoot) {
             currentPosInTerm = currentPosInTerm.up();
             indexStack.removeFirst();
             if (!indexStack.isEmpty()) {
@@ -1761,7 +1761,7 @@ public final class SymbolicExecutionUtil {
             PosInOccurrence pio) {
         if (node != null && pio != null) {
             // Get current program method
-            JTerm term = TermBuilder.goBelowUpdates(pio.subTerm());
+            JTerm term = TermBuilder.goBelowUpdates((JTerm) pio.subTerm());
             Services services = node.proof().getServices();
             MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
             if (mf != null) {
@@ -2738,9 +2738,9 @@ public final class SymbolicExecutionUtil {
      * @param replaceTerm The {@link JTerm} to compare with.
      * @return {@code true} equal modulo labels, {@code false} not equal at all.
      */
-    private static boolean checkReplaceTerm(org.key_project.logic.Term toCheck,
+    private static boolean checkReplaceTerm(Term toCheck,
             PosInOccurrence posInOccurrence,
-            org.key_project.logic.Term replaceTerm) {
+            Term replaceTerm) {
         var termAtPio = followPosInOccurrence(posInOccurrence, toCheck);
         if (termAtPio != null) {
             return RENAMING_TERM_PROPERTY.equalsModThisProperty(termAtPio, replaceTerm);
@@ -2782,7 +2782,7 @@ public final class SymbolicExecutionUtil {
      * @param services The {@link Services} to use.
      * @return The instantiated {@link JTerm} or {@code null} if no {@link JTerm} was given.
      */
-    public static JTerm instantiateTerm(Node node, org.key_project.logic.Term term,
+    public static JTerm instantiateTerm(Node node, Term term,
             TacletApp tacletApp,
             Services services) {
         if (term != null) {
@@ -3878,7 +3878,7 @@ public final class SymbolicExecutionUtil {
      * @param term The {@link JTerm} to check.
      * @return {@code true} is select, {@code false} is something else.
      */
-    public static boolean isSelect(Services services, org.key_project.logic.Term term) {
+    public static boolean isSelect(Services services, Term term) {
         if (!isNullSort(term.sort(), services)) {
             Function select =
                 services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services);
@@ -4351,7 +4351,7 @@ public final class SymbolicExecutionUtil {
     public static boolean isBlockContractValidityBranch(
             PosInOccurrence pio) {
         if (pio != null) {
-            JTerm applicationTerm = TermBuilder.goBelowUpdates(pio.subTerm());
+            JTerm applicationTerm = TermBuilder.goBelowUpdates((JTerm) pio.subTerm());
             return applicationTerm.getLabel(BlockContractValidityTermLabel.NAME) != null;
         } else {
             return false;

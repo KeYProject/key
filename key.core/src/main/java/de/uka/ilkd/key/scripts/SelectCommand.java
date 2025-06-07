@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -135,7 +136,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private boolean contains(Semisequent semiseq, JTerm formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            org.key_project.logic.Term term = sf.formula();
+            Term term = sf.formula();
             if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
                 return true;
             }

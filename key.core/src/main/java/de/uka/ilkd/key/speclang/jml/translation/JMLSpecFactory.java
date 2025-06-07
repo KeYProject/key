@@ -48,6 +48,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.*;
 
@@ -1056,16 +1057,16 @@ public class JMLSpecFactory {
 
         boolean createContract = true;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
-            org.key_project.logic.Term term1 = clauses.accessibles.get(heap);
-            org.key_project.logic.Term formula1 = tb.allLocs();
+            Term term1 = clauses.accessibles.get(heap);
+            Term formula1 = tb.allLocs();
             if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, formula1)) {
                 createContract = false;
                 break;
             }
             if (pm.isModel() && pm.getStateCount() > 1) {
-                org.key_project.logic.Term term =
+                Term term =
                     clauses.accessibles.get(progVars.atPreVars.get(heap));
-                org.key_project.logic.Term formula = tb.allLocs();
+                Term formula = tb.allLocs();
                 if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
                     createContract = false;
                     break;

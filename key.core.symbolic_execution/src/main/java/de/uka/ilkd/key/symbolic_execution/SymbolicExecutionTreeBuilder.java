@@ -1128,7 +1128,7 @@ public class SymbolicExecutionTreeBuilder {
                     node.getAppliedRuleApp())) {
                     if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
                         JTerm modalityTerm = TermBuilder.goBelowUpdates(
-                            node.getAppliedRuleApp().posInOccurrence().subTerm());
+                            (JTerm) node.getAppliedRuleApp().posInOccurrence().subTerm());
                         BlockContractValidityTermLabel bcLabel =
                             (BlockContractValidityTermLabel) modalityTerm
                                     .getLabel(BlockContractValidityTermLabel.NAME);
@@ -1538,7 +1538,7 @@ public class SymbolicExecutionTreeBuilder {
      * @return {@code true} is not implicit, {@code false} is implicit
      */
     protected boolean isNotInImplicitMethod(Node node) {
-        var term = node.getAppliedRuleApp().posInOccurrence().subTerm();
+        final JTerm term = (JTerm) node.getAppliedRuleApp().posInOccurrence().subTerm();
         JTerm termNoUpdates = TermBuilder.goBelowUpdates(term);
         Services services = proof.getServices();
         IExecutionContext ec =
@@ -1583,7 +1583,7 @@ public class SymbolicExecutionTreeBuilder {
     protected void initNewMethodCallStack(Node currentNode,
             PosInOccurrence childPIO) {
         JTerm newModality =
-            childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
+            childPIO != null ? TermBuilder.goBelowUpdates((JTerm) childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
@@ -1592,8 +1592,8 @@ public class SymbolicExecutionTreeBuilder {
         MethodFrameCounterJavaASTVisitor newCounter =
             new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
         int newCount = newCounter.run();
-        var oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
-        oldModality = TermBuilder.goBelowUpdates(oldModality);
+        JTerm oldModalityTerm = (JTerm) currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
+        oldModalityTerm = TermBuilder.goBelowUpdates(oldModalityTerm);
         Map<Node, ImmutableList<Node>> currentMethodCallStackMap =
             getMethodCallStack(currentNode.getAppliedRuleApp());
         Map<Node, ImmutableList<Node>> newMethodCallStackMap = getMethodCallStack(label.id());

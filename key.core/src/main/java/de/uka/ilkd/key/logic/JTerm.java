@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
@@ -42,7 +43,7 @@ import org.jspecify.annotations.Nullable;
  * supported: {@link JTerm#execPostOrder(Visitor)} and {@link JTerm#execPreOrder(Visitor)}.
  */
 public interface JTerm
-        extends Sorted, EqualsModProperty<JTerm>, org.key_project.logic.Term {
+        extends Sorted, EqualsModProperty<JTerm>, Term {
     @Override
     Operator op();
 

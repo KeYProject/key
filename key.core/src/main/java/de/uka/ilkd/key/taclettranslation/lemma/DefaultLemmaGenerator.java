@@ -17,6 +17,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
@@ -68,7 +69,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
-            public void visit(org.key_project.logic.Term visited) {
+            public void visit(Term visited) {
                 String res = checkForIllegalOps(visited, taclet, true);
                 if (res != null) {
                     failureOccurred(res);
@@ -106,7 +107,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         return null;
     }
 
-    public static String checkForIllegalOps(org.key_project.logic.Term formula, Taclet owner,
+    public static String checkForIllegalOps(Term formula, Taclet owner,
             boolean schemaVarsAreAllowed) {
         if ((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable)
                 || formula.op() instanceof Modality

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.sort.Sort;
@@ -100,7 +101,7 @@ public class JModality extends Modality implements JOperator {
     }
 
     @Override
-    public void validTopLevelException(org.key_project.logic.Term term)
+    public void validTopLevelException(Term term)
             throws TermCreationException {
         if (1 != term.arity()) {
             throw new TermCreationException(this, term);

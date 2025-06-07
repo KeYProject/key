@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -73,7 +74,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     private static List<Pair<JTerm, PosInOccurrence>> getEqualityDefsAndPos(
-            org.key_project.logic.Term term, Sequent seq) {
+            Term term, Sequent seq) {
         final List<Pair<JTerm, PosInOccurrence>> result =
             new LinkedList<>();
         for (SequentFormula cf : seq.antecedent()) {
