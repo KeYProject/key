@@ -16,11 +16,11 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
@@ -284,7 +284,7 @@ public final class IntegerLDT extends LDT {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private boolean isNumberLiteral(JOperator f) {
+    private boolean isNumberLiteral(Operator f) {
         String n = f.name().toString();
         if (n.length() == 1) {
             char c = n.charAt(0);
@@ -779,7 +779,7 @@ public final class IntegerLDT extends LDT {
 
     public String toNumberString(JTerm t) {
         StringBuilder sb = new StringBuilder();
-        JOperator f = t.op();
+        Operator f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));
             t = t.sub(0);

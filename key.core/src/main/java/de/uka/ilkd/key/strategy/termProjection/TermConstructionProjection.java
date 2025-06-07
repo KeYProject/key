@@ -5,9 +5,9 @@ package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JModality;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -22,18 +22,18 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  */
 public class TermConstructionProjection implements ProjectionToTerm<Goal> {
 
-    private final JOperator op;
+    private final Operator op;
     private final ProjectionToTerm<Goal>[] subTerms;
 
 
-    private TermConstructionProjection(JOperator op, ProjectionToTerm<Goal>[] subTerms) {
+    private TermConstructionProjection(Operator op, ProjectionToTerm<Goal>[] subTerms) {
         assert !(op instanceof JModality); // XXX
         this.op = op;
         this.subTerms = subTerms;
         assert op.arity() == subTerms.length;
     }
 
-    public static ProjectionToTerm<Goal> create(JOperator op, ProjectionToTerm<Goal>[] subTerms) {
+    public static ProjectionToTerm<Goal> create(Operator op, ProjectionToTerm<Goal>[] subTerms) {
         return new TermConstructionProjection(op, subTerms);
     }
 

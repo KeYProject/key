@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.rule.match.vm.TacletMatchProgram;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Operator;
 
 public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpdate> {
 
@@ -33,7 +33,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
     @Override
     public MatchConditions match(JTerm instantiationCandidate, MatchConditions matchCond,
             LogicServices services) {
-        final JOperator instantiationCandidateOp = instantiationCandidate.op();
+        final Operator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {
             if (instantiationCandidateOp instanceof ElementaryUpdate instElUpdate) {
                 matchCond = leftHandSide.match(instElUpdate.lhs(), matchCond, services);

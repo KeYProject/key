@@ -9,8 +9,7 @@ import org.key_project.logic.op.Operator;
  * All symbols acting as members of a term e.g. logical operators, predicates, functions, variables
  * etc. have to implement this interface.
  */
-public interface JOperator
-        extends Operator {
+public interface JOperator extends Operator {
 
     /**
      * comparator to compare operators; for modalities only their kind is compared

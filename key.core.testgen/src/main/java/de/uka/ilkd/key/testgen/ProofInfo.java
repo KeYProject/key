@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
@@ -116,7 +117,7 @@ public class ProofInfo {
     }
 
     private boolean isRelevantConstant(JTerm c) {
-        JOperator op = c.op();
+        Operator op = c.op();
 
         if (isTrueConstant(op) || isFalseConstant(op)) {
             return false;
@@ -137,11 +138,11 @@ public class ProofInfo {
 
     }
 
-    private boolean isTrueConstant(JOperator o) {
+    private boolean isTrueConstant(Operator o) {
         return o.equals(services.getTypeConverter().getBooleanLDT().getTrueConst());
     }
 
-    private boolean isFalseConstant(JOperator o) {
+    private boolean isFalseConstant(Operator o) {
         return o.equals(services.getTypeConverter().getBooleanLDT().getFalseConst());
     }
 

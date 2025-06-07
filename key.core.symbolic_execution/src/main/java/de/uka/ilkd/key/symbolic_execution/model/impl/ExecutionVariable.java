@@ -29,6 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -194,7 +195,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      */
     protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
             Services services, TermBuilder tb, ApplyStrategyInfo<Proof, Goal> info,
-            JOperator resultOperator,
+            Operator resultOperator,
             JTerm siteProofSelectTerm, JTerm siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
             new ArrayList<>(info.getProof().openGoals().size());
@@ -255,7 +256,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param operator The {@link JOperator} of the {@link JTerm} which provides the value.
      * @param services The {@link Services} to use.
      */
-    protected void groupGoalsByValue(ImmutableList<Goal> goals, JOperator operator,
+    protected void groupGoalsByValue(ImmutableList<Goal> goals, Operator operator,
             JTerm siteProofSelectTerm, JTerm siteProofCondition, Map<JTerm, List<Goal>> valueMap,
             List<Goal> unknownValues, Services services) throws ProofInputException {
         for (Goal goal : goals) {

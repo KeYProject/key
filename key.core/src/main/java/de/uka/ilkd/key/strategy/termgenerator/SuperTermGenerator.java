@@ -17,6 +17,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.Modifier;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -75,7 +76,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
         private Services services;
-        private JOperator binFunc;
+        private Operator binFunc;
 
         protected SuperTermWithIndexGenerator(TermFeature cond) {
             super(cond);

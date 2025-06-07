@@ -20,6 +20,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -110,19 +111,19 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final HashMap<JTerm, StringBuilder> uninterpretedBindingPredicateNames =
         new LinkedHashMap<>();
 
-    private final HashMap<JOperator, ArrayList<Sort>> functionDecls = new LinkedHashMap<>();
+    private final HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<>();
 
     private final HashSet<Function> specialFunctions = new LinkedHashSet<>();
 
-    private final HashMap<JOperator, ArrayList<Sort>> predicateDecls = new LinkedHashMap<>();
+    private final HashMap<Operator, ArrayList<Sort>> predicateDecls = new LinkedHashMap<>();
 
-    private final HashMap<JOperator, StringBuilder> usedVariableNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedVariableNames = new LinkedHashMap<>();
 
-    private final HashMap<JOperator, StringBuilder> usedFunctionNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedFunctionNames = new LinkedHashMap<>();
 
     private final Collection<FunctionWrapper> usedFunctions = new LinkedList<>();
 
-    private final HashMap<JOperator, StringBuilder> usedPredicateNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedPredicateNames = new LinkedHashMap<>();
 
     protected final HashMap<Sort, StringBuilder> usedDisplaySort = new LinkedHashMap<>();
 
@@ -448,7 +449,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         ArrayList<StringBuilder> toReturn = new ArrayList<>();
 
         // add the type definitions for functions
-        for (JOperator op : functionDecls.keySet()) {
+        for (Operator op : functionDecls.keySet()) {
             StringBuilder currentForm = this.getSingleFunctionDef(this.usedFunctionNames.get(op),
                 functionDecls.get(op), services);
             if (currentForm.length() > 0) {
@@ -570,7 +571,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private ArrayList<ArrayList<StringBuilder>> buildTranslatedFuncDecls(Services services) {
         ArrayList<ArrayList<StringBuilder>> toReturn = new ArrayList<>();
         // add the function declarations for each used function
-        for (JOperator op : this.functionDecls.keySet()) {
+        for (Operator op : this.functionDecls.keySet()) {
             ArrayList<StringBuilder> element = new ArrayList<>();
             element.add(usedFunctionNames.get(op));
             for (Sort s : functionDecls.get(op)) {
@@ -671,7 +672,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         int start = toReturn.size();
         // add the predicates
 
-        for (JOperator op : this.predicateDecls.keySet()) {
+        for (Operator op : this.predicateDecls.keySet()) {
             ArrayList<StringBuilder> element = new ArrayList<>();
             element.add(usedPredicateNames.get(op));
             for (Sort s : predicateDecls.get(op)) {
@@ -1490,7 +1491,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             Services services) throws IllegalFormulaException {
 
 
-        JOperator op = term.op();
+        Operator op = term.op();
         if (op == Junctor.NOT) {
             StringBuilder arg = translateTerm(term.sub(0), quantifiedVars, services);
             return this.translateLogicalNot(arg);
@@ -2034,7 +2035,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         return translateFunc(fun, subterms);
     }
 
-    private boolean isNumberSymbol(Services services, JOperator op) {
+    private boolean isNumberSymbol(Services services, Operator op) {
         return op == services.getTypeConverter().getIntegerLDT().getNumberSymbol();
     }
 
@@ -2183,7 +2184,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             throws IllegalFormulaException {
 
         // translate the term as uninterpreted function/predicate
-        JOperator op = term.op();
+        Operator op = term.op();
         if (term.sort() == JavaDLTheory.FORMULA) {
             // predicate
             LOGGER.debug("Translated as uninterpreted predicate: {}", term);
@@ -2219,7 +2220,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
     }
 
-    protected final StringBuilder translateVariable(JOperator op) {
+    protected final StringBuilder translateVariable(Operator op) {
         if (usedVariableNames.containsKey(op)) {
             return usedVariableNames.get(op);
         } else {
@@ -2236,7 +2237,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param sub The StringBuilders representing the arguments of this Function.
      * @return a StringBuilder representing the complete Function.
      */
-    protected final StringBuilder translateFunc(JOperator o, ArrayList<StringBuilder> sub) {
+    protected final StringBuilder translateFunc(Operator o, ArrayList<StringBuilder> sub) {
         StringBuilder name;
         if (usedFunctionNames.containsKey(o)) {
             name = usedFunctionNames.get(o);
@@ -2330,7 +2331,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param sorts the list of sort parameter of this function
      * @result the function's result sort
      */
-    private void addFunction(JOperator op, ArrayList<Sort> sorts, Sort result, Services services) {
+    private void addFunction(Operator op, ArrayList<Sort> sorts, Sort result, Services services) {
         if (!this.functionDecls.containsKey(op)) {
             sorts.add(result);
             this.functionDecls.put(op, sorts);
@@ -2341,7 +2342,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
     }
 
-    private void addPredicate(JOperator op, ArrayList<Sort> sorts, Services services) {
+    private void addPredicate(Operator op, ArrayList<Sort> sorts, Services services) {
         if (!this.predicateDecls.containsKey(op)) {
             this.predicateDecls.put(op, sorts);
             // add all sorts
@@ -2358,7 +2359,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param sub The terms representing the arguments.
      * @return a StringBuilder representing the complete predicate.
      */
-    private final StringBuilder translatePred(JOperator o, ArrayList<StringBuilder> sub) {
+    private final StringBuilder translatePred(Operator o, ArrayList<StringBuilder> sub) {
         StringBuilder name;
         if (usedPredicateNames.containsKey(o)) {
             name = usedPredicateNames.get(o);
@@ -2506,7 +2507,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
         HashSet<Sort> tempSorts = new LinkedHashSet<>(usedRealSort.keySet());
 
-        for (JOperator op : usedFunctionNames.keySet()) {
+        for (Operator op : usedFunctionNames.keySet()) {
 
             if (op instanceof SortDependingFunction) {
                 Sort s = ((SortDependingFunction) op).getSortDependingOn();

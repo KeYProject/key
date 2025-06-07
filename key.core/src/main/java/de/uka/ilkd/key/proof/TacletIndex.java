@@ -17,6 +17,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
@@ -316,7 +317,7 @@ public abstract class TacletIndex {
             final boolean ignoreUpdates, final PrefixOccurrences prefixOccurrences) {
 
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
-        final JOperator op = term.op();
+        final Operator op = term.op();
 
         assert !(op instanceof Metavariable)
                 : "metavariables are disabled";

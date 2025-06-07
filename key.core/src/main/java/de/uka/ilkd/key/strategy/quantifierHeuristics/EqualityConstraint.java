@@ -15,10 +15,10 @@ import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
@@ -317,13 +317,13 @@ public class EqualityConstraint implements Constraint {
             return this;
         }
 
-        final JOperator op0 = t0.op();
+        final Operator op0 = t0.op();
 
         if (op0 instanceof JQuantifiableVariable) {
             return handleQuantifiableVariable(t0, t1, ownBoundVars, cmpBoundVars);
         }
 
-        final JOperator op1 = t1.op();
+        final Operator op1 = t1.op();
 
         if (op1 instanceof Metavariable) {
             if (op0 == op1) {

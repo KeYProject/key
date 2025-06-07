@@ -17,6 +17,7 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.taclettranslation.DefaultTacletTranslator;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -70,7 +71,7 @@ public class SMTTacletTranslator {
     private JTerm variablify(JTerm term, Map<JOperatorSV, LogicVariable> variables)
             throws SMTTranslationException {
 
-        JOperator op = term.op();
+        Operator op = term.op();
         if (op instanceof JOperatorSV sv) {
             if (!(sv instanceof TermSV || sv instanceof FormulaSV)) {
                 throw new SMTTranslationException("Only a few schema variables can be translated. "

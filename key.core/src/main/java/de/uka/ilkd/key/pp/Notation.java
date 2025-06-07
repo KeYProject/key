@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
@@ -215,7 +216,7 @@ public abstract class Notation {
 
         public void print(JTerm t, LogicPrinter sp) {
             assert t.op() == UpdateApplication.UPDATE_APPLICATION;
-            final JOperator targetOp = UpdateApplication.getTarget(t).op();
+            final Operator targetOp = UpdateApplication.getTarget(t).op();
             final int assTarget =
                 (t.sort() == JavaDLTheory.FORMULA ? (targetOp.arity() == 1 ? 60 : 85) : 110);
 

@@ -6,9 +6,9 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.Junctor;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -33,7 +33,7 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
 
         while (it.next() != -1) {
             final JTerm subTerm = (JTerm) it.getSubTerm();
-            final JOperator op = subTerm.op();
+            final Operator op = subTerm.op();
 
             if (it.getChild() == 0) {
                 if (op == Junctor.NOT || op == Junctor.IMP) {

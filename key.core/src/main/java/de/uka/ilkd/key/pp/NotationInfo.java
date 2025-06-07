@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 
@@ -443,7 +444,7 @@ public final class NotationInfo {
      * Get the Notation for a given Operator. If no notation is registered, a Function notation is
      * returned.
      */
-    Notation getNotation(JOperator op) {
+    Notation getNotation(Operator op) {
         Notation result = notationTable.get(op);
         if (result != null) {
             return result;

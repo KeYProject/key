@@ -48,6 +48,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.*;
 
 import org.antlr.v4.runtime.Token;
@@ -1526,7 +1527,7 @@ public class JMLSpecFactory {
             }
         } else if (services.getTypeConverter().getHeapLDT().isSelectOp(assignee.op())) {
             JTerm field = assignee.subs().last();
-            JOperator op = field.op();
+            Operator op = field.op();
             SplitFieldName split = HeapLDT.trySplitFieldName(op);
             if (split != null) {
                 ProgramVariable attribute =

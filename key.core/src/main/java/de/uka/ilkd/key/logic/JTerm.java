@@ -6,11 +6,11 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -44,7 +44,7 @@ import org.jspecify.annotations.Nullable;
 public interface JTerm
         extends Sorted, EqualsModProperty<JTerm>, org.key_project.logic.Term {
     @Override
-    JOperator op();
+    Operator op();
 
     /**
      * The subterms.

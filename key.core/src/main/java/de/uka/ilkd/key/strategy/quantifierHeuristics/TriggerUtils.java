@@ -5,11 +5,11 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -30,11 +30,11 @@ class TriggerUtils {
     /**
      * @return set of terms that are that the term splite d through the operator <code>op</code>
      */
-    public static Iterator<Term> iteratorByOperator(Term term, JOperator op) {
+    public static Iterator<Term> iteratorByOperator(Term term, Operator op) {
         return setByOperator(term, op).iterator();
     }
 
-    public static ImmutableSet<Term> setByOperator(Term term, JOperator op) {
+    public static ImmutableSet<Term> setByOperator(Term term, Operator op) {
         if (term.op() == op) {
             return setByOperator(term.sub(0), op).union(setByOperator(term.sub(1), op));
         }

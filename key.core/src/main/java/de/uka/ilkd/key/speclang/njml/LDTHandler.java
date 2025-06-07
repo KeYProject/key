@@ -9,12 +9,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperatorHandler;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.Nullable;
@@ -26,7 +26,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
      * @param type type
      * @param operator operator
      */
-    public record TypedOperator(KeYJavaType type, JOperator operator) {
+    public record TypedOperator(KeYJavaType type, Operator operator) {
     }
 
     protected final Services services;

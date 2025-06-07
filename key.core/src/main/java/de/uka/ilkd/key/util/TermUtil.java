@@ -7,7 +7,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JOperator;
+
+import org.key_project.logic.op.Operator;
 
 import org.jspecify.annotations.NonNull;
 
@@ -29,7 +30,7 @@ public class TermUtil {
      * @param op the operator to search for
      * @return true if the term or any of its subterms contains the operator, false otherwise
      */
-    public static boolean contains(@NonNull JTerm term, @NonNull JOperator op) {
+    public static boolean contains(@NonNull JTerm term, @NonNull Operator op) {
         Queue<JTerm> queue = new LinkedList<>();
         queue.add(term);
         while (!queue.isEmpty()) {

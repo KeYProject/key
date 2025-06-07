@@ -11,7 +11,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.JQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.smt.SMTTranslationException;
@@ -101,7 +100,7 @@ public class QuantifierHandler implements SMTHandler {
     }
 
     private Term collectQuantifications(Term term) {
-        final var type = (JOperator) term.op();
+        final var type = term.op();
         assert type == Quantifier.ALL || type == Quantifier.EX;
         var current = (JTerm) term.sub(0);
         if (current.op() != type) {

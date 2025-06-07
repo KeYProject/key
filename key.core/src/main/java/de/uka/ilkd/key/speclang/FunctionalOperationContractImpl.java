@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -666,8 +667,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             LocationVariable baseHeap, JTerm baseHeapTerm, List<LocationVariable> heapContext,
             Map<LocationVariable, JTerm> atPres, boolean includeHtmlMarkup, Services services,
             boolean usePrettyPrinting, boolean useUnicodeSymbols) {
-        JOperator originalSelfVar = contractSelf != null ? contractSelf.op() : null;
-        JOperator originalResultVar = resultTerm != null ? resultTerm.op() : null;
+        Operator originalSelfVar = contractSelf != null ? contractSelf.op() : null;
+        Operator originalResultVar = resultTerm != null ? resultTerm.op() : null;
         final TermBuilder tb = services.getTermBuilder();
 
         Map<LocationVariable, JTerm> heapTerms = new LinkedHashMap<>();
@@ -750,8 +751,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
-    private static String getSignatureText(IProgramMethod pm, JOperator originalResultVar,
-            JOperator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
+    private static String getSignatureText(IProgramMethod pm, Operator originalResultVar,
+            Operator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
             LocationVariable originalExcVar, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
         final StringBuilder sig = new StringBuilder();
@@ -874,8 +875,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return posts;
     }
 
-    private static String getText(IProgramMethod pm, JOperator originalResultVar,
-            JOperator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
+    private static String getText(IProgramMethod pm, Operator originalResultVar,
+            Operator originalSelfVar, ImmutableList<? extends SyntaxElement> originalParamVars,
             LocationVariable originalExcVar, boolean hasMby, JTerm originalMby,
             Map<LocationVariable, JTerm> originalModifiables,
             Map<LocationVariable, Boolean> hasRealModifiable, JTerm globalDefs,

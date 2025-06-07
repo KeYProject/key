@@ -7,11 +7,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 
 /**
  * Replace a program variable that is a compile-time constant with the value of the initializer
@@ -26,7 +26,7 @@ public final class ConstantValue extends AbstractTermTransformer {
 
     public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         term = term.sub(0);
-        JOperator op = term.op();
+        Operator op = term.op();
 
         if (op instanceof ProgramConstant) {
             Literal lit = ((ProgramConstant) op).getCompileTimeConstant();

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Property;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -49,7 +50,7 @@ class TermImpl implements JTerm {
     private final int serialNumber = serialNumberCounter.incrementAndGet();
 
     // content
-    private final JOperator op;
+    private final Operator op;
     private final ImmutableArray<JTerm> subs;
     private final ImmutableArray<JQuantifiableVariable> boundVars;
 
@@ -92,7 +93,7 @@ class TermImpl implements JTerm {
      *        operator)
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
-    public TermImpl(JOperator op, ImmutableArray<JTerm> subs,
+    public TermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<JQuantifiableVariable> boundVars,
             String origin) {
         assert op != null;
@@ -103,7 +104,7 @@ class TermImpl implements JTerm {
         this.origin = origin;
     }
 
-    TermImpl(JOperator op, ImmutableArray<JTerm> subs,
+    TermImpl(Operator op, ImmutableArray<JTerm> subs,
             ImmutableArray<JQuantifiableVariable> boundVars) {
         this(op, subs, boundVars, "");
     }
@@ -160,7 +161,7 @@ class TermImpl implements JTerm {
     }
 
     @Override
-    public JOperator op() {
+    public Operator op() {
         return op;
     }
 

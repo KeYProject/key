@@ -24,6 +24,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
@@ -139,18 +140,18 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      *
      * @param varfuncName the String with the symbols name
      */
-    protected JOperator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
+    protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
             Sort sort) {
         Name name = new Name(varfuncName);
-        JOperator[] operators =
+        Operator[] operators =
             { (JOperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
-                (JOperator) functions().lookup(name),
+                functions().lookup(name),
                 AbstractTermTransformer.name2metaop(varfuncName),
 
             };
 
-        for (JOperator op : operators) {
+        for (Operator op : operators) {
             if (op != null) {
                 return op;
             }
@@ -160,13 +161,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Name fqName =
                 new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
             operators =
-                new JOperator[] { (JOperatorSV) schemaVariables().lookup(fqName),
+                new Operator[] { (JOperatorSV) schemaVariables().lookup(fqName),
                     variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    (JOperator) functions().lookup(fqName),
+                    functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };
 
-            for (JOperator op : operators) {
+            for (Operator op : operators) {
                 if (op != null) {
                     return op;
                 }

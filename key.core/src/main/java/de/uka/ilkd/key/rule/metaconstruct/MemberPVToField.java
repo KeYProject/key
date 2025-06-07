@@ -11,6 +11,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 
 
 public final class MemberPVToField extends AbstractTermTransformer {
@@ -25,7 +26,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
 
-        JOperator op = term.sub(0).op();
+        Operator op = term.sub(0).op();
         if (op instanceof LocationVariable fieldPV) {
             Function fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
             return services.getTermBuilder().func(fieldSymbol);

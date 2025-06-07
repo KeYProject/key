@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -243,7 +244,7 @@ public final class WhileInvariantTransformer {
     private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
             Services services, PosInOccurrence applicationPos,
             Rule rule, RuleApp ruleApp,
-            Goal goal, JOperator loopBodyModality, JTerm result, JavaBlock mainJavaBlock,
+            Goal goal, Operator loopBodyModality, JTerm result, JavaBlock mainJavaBlock,
             Sequent applicationSequent, ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyModality", null,
@@ -435,7 +436,7 @@ public final class WhileInvariantTransformer {
     private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,
             Services services, PosInOccurrence applicationPos,
             Rule rule, RuleApp ruleApp,
-            Goal goal, JOperator operator, ImmutableArray<JTerm> subs, Sequent applicationSequent) {
+            Goal goal, Operator operator, ImmutableArray<JTerm> subs, Sequent applicationSequent) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyImplication", null,
             tf.createTerm(operator, subs, null, post.getLabels()));

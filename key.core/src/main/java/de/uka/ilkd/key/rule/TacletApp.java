@@ -23,6 +23,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
@@ -1064,7 +1065,7 @@ public abstract class TacletApp implements RuleApp {
         for (var pair : instantiations.getInstantiationMap()) {
             if (pair.key() instanceof SkolemTermSV skolemSV) {
                 JTerm inst = instantiations.getInstantiation(skolemSV);
-                JOperator op = inst.op();
+                Operator op = inst.op();
                 assert op instanceof Function
                         : "At this point the skolem instantiation is expected to "
                             + "be a function symbol, not " + inst;

@@ -5,9 +5,9 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JOperator;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
@@ -98,7 +98,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
     final Function jmod;
     final Function jdiv;
 
-    final JOperator eq;
+    final Operator eq;
     final Function leq;
     final Function geq;
 

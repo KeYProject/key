@@ -12,10 +12,10 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -199,7 +199,7 @@ public class Monomial {
 
 
     public Term toTerm(Services services) {
-        final JOperator mul = services.getTypeConverter().getIntegerLDT().getMul();
+        final Operator mul = services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
 
         final Iterator<Term> it = parts.iterator();
@@ -239,7 +239,7 @@ public class Monomial {
         public BigInteger coeff = BigInteger.ONE;
         public ImmutableList<Term> parts = ImmutableSLList.nil();
         private final Services services;
-        private final JOperator numbers, mul;
+        private final Operator numbers, mul;
 
         public Analyser(final Services services) {
             this.services = services;
