@@ -28,14 +28,14 @@ public abstract class Literal extends JavaProgramElement
      *
      * @param children the children of this AST element as KeY classes. May contain: Comments
      */
-    public Literal(@NonNull ExtList children) {
+    protected Literal(@NonNull ExtList children) {
         super(children);
     }
 
     /**
      * Literal
      */
-    public Literal() {
+    protected Literal() {
 
     }
 
@@ -45,7 +45,7 @@ public abstract class Literal extends JavaProgramElement
      * @param children the children of this AST element as KeY classes. May contain: Comments
      * @param pos The specific source code position.
      */
-    public Literal(@NonNull ExtList children, @NonNull PositionInfo pos) {
+    protected Literal(@NonNull ExtList children, @NonNull PositionInfo pos) {
         super(children, pos);
     }
 
@@ -54,7 +54,7 @@ public abstract class Literal extends JavaProgramElement
      *
      * @param pos The specific source code position.
      */
-    public Literal(@NonNull PositionInfo pos) {
+    protected Literal(@NonNull PositionInfo pos) {
         super(pos);
     }
 

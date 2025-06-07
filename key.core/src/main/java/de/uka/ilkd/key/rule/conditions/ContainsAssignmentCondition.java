@@ -10,10 +10,11 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NonNull;
 
@@ -25,7 +26,7 @@ import org.jspecify.annotations.NonNull;
  * @author Dominic Scheurer
  *
  */
-public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableConditionAdapter {
+public class ContainsAssignmentCondition extends VariableConditionAdapter {
 
     /* the schemavariable matched agains an expression */
     private final @NonNull SchemaVariable expression;

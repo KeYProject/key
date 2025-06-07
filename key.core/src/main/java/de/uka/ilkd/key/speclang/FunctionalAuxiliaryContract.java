@@ -68,7 +68,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * @param contract a block contract.
      */
     FunctionalAuxiliaryContract(@NonNull T contract) {
-        this(contract, Contract.INVALID_ID);
+        this(contract, INVALID_ID);
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
         this.contract = contract;
         this.id = id;
 
-        if (id != Contract.INVALID_ID) {
+        if (id != INVALID_ID) {
             contract.setFunctionalContract(this);
         }
 

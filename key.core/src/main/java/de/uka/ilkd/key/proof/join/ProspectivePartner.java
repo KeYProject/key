@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.join;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
+
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -19,7 +20,8 @@ import org.jspecify.annotations.Nullable;
 public class ProspectivePartner {
     private final Term[] updates = new Term[2];
     private final Term commonFormula;
-    private final SequentFormula[] formula = new SequentFormula[2];
+    private final SequentFormula[] formula =
+        new SequentFormula[2];
     private final Node[] nodes = new Node[2];
     private @Nullable Term commonPredicate = null;
     private @Nullable Node commonParent = null;
@@ -38,7 +40,8 @@ public class ProspectivePartner {
      * @param formula2 The second join formula.
      * @param update2 The second symbolic state.
      */
-    public ProspectivePartner(Term commonFormula, Node node1, SequentFormula formula1, Term update1,
+    public ProspectivePartner(Term commonFormula, Node node1,
+            SequentFormula formula1, Term update1,
             Node node2, SequentFormula formula2, Term update2) {
         super();
         this.commonFormula = commonFormula;
@@ -75,11 +78,13 @@ public class ProspectivePartner {
         if (commonParent.getAppliedRuleApp() != null
                 && commonParent.getAppliedRuleApp().posInOccurrence() != null) {
             setFormulaForHiding(
-                commonParent.getAppliedRuleApp().posInOccurrence().sequentFormula());
+                commonParent.getAppliedRuleApp().posInOccurrence()
+                        .sequentFormula());
         }
     }
 
-    private void setFormulaForHiding(SequentFormula formulaForHiding) {
+    private void setFormulaForHiding(
+            SequentFormula formulaForHiding) {
         this.formulaForHiding = formulaForHiding;
     }
 

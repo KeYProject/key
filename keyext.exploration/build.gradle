@@ -1,4 +1,4 @@
-description "Proof exploration capabilities for key.ui"
+description = "Proof exploration capabilities for key.ui"
 
 dependencies {
     implementation project(":key.core")

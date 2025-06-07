@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -11,7 +10,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
-import org.jspecify.annotations.NonNull;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The default implementation of {@link IExecutionConstraint}.
@@ -22,12 +21,12 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
     /**
      * The {@link Term} representing the constraint.
      */
-    private final @NonNull Term term;
+    private final Term term;
 
     /**
      * The {@link PosInOccurrence} of the modality of interest.
      */
-    private final @NonNull PosInOccurrence modalityPIO;
+    private final PosInOccurrence modalityPIO;
 
     /**
      * Constructor.
@@ -37,9 +36,9 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      *        {@link IExecutionNode}.
      * @param term The {@link Term} representing the constraint.
      */
-    public ExecutionConstraint(@NonNull ITreeSettings settings, @NonNull Node proofNode,
-            @NonNull PosInOccurrence modalityPIO,
-            @NonNull Term term) {
+    public ExecutionConstraint(ITreeSettings settings, Node proofNode,
+            PosInOccurrence modalityPIO,
+            Term term) {
         super(settings, proofNode);
         assert term != null;
         assert modalityPIO != null;
@@ -59,7 +58,7 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String getElementType() {
+    public String getElementType() {
         return "Constraint";
     }
 

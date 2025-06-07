@@ -12,17 +12,15 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
-import org.jspecify.annotations.NonNull;
-
 public abstract class MetaArithBitMaskOp extends AbstractTermTransformer {
 
-    public MetaArithBitMaskOp(@NonNull Name name) {
+    protected MetaArithBitMaskOp(Name name) {
         super(name, 2);
     }
 
     protected abstract BigInteger bitmaskOp(BigInteger left, BigInteger right);
 
-    public Term transform(@NonNull Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         Term arg1 = term.sub(0);
         Term arg2 = term.sub(1);
         BigInteger left;

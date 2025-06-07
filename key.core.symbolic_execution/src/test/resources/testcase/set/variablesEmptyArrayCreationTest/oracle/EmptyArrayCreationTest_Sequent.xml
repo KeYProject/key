@@ -46,7 +46,7 @@
             <variable name="obj" isArrayIndex="false">
                <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="array" isArrayIndex="false">
-                     <value name="array {true}" typeString="int[]" valueString="x_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <value name="array {true}" typeString="int[]" valueString="i_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
@@ -63,7 +63,7 @@
                <variable name="obj" isArrayIndex="false">
                   <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="array" isArrayIndex="false">
-                        <value name="array {true}" typeString="int[]" valueString="x_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <value name="array {true}" typeString="int[]" valueString="i_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -80,7 +80,7 @@
                   <variable name="obj" isArrayIndex="false">
                      <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="array" isArrayIndex="false">
-                           <value name="array {true}" typeString="int[]" valueString="x_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <value name="array {true}" typeString="int[]" valueString="i_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>

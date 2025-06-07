@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -174,7 +175,7 @@ public class JavaDLTheory extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         throw new IllegalStateException("Not implemented.");
     }
 

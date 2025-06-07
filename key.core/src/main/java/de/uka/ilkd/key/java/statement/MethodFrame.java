@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
  * The statement inserted by KeY if a method call is executed.
  */
 public class MethodFrame extends JavaStatement
-        implements Statement, StatementContainer, ProgramPrefix {
+        implements StatementContainer, ProgramPrefix {
 
     /**
      * result

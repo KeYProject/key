@@ -1,5 +1,5 @@
 /**
- * This package provides a facility for a settings UI.
+ * This @org.jspecify.annotations.NullMarked packageprovides a facility for a settings UI.
  * <p>
  * The settings UI consists out of a tree on left and customizable panes on the right.
  * <p>
@@ -13,4 +13,5 @@
  *
  * @author Alexander Weigl
  */
+@org.jspecify.annotations.NullMarked
 package de.uka.ilkd.key.gui.settings;

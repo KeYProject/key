@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -140,7 +143,7 @@ public final class Main {
     /**
      * The file names provided on the command line
      */
-    private static List<File> fileArguments;
+    private static List<Path> fileArguments;
 
     /**
      * Lists all features currently marked as experimental. Unless invoked with command line option
@@ -151,7 +154,7 @@ public final class Main {
     /**
      * Path to a RIFL specification file.
      */
-    private static @Nullable File riflFileName = null;
+    private static @Nullable Path riflFileName = null;
 
     /**
      * Save all contracts in selected location to automate the creation of multiple ".key"-files
@@ -220,17 +223,17 @@ public final class Main {
     }
 
     public static void loadCommandLineFiles(@NonNull AbstractMediatorUserInterfaceControl ui,
-            @NonNull List<File> fileArguments) {
+            @NonNull List<Path> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
-            for (File f : fileArguments) {
+            for (Path f : fileArguments) {
                 ui.loadProblem(f);
             }
             if (ui instanceof ConsoleUserInterfaceControl) {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
-        } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined
+        } else if (getExamplesDir() != null && showExampleChooserIfExamplesDirIsDefined
                 && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                         .getShowLoadExamplesDialog()) {
             ui.openExamples();
@@ -413,7 +416,7 @@ public final class Main {
         }
 
         if (cl.isSet(RIFL)) {
-            riflFileName = new File(cl.getString(RIFL, null));
+            riflFileName = Paths.get(cl.getString(RIFL, null));
             LOGGER.info("Loading RIFL specification from {}", riflFileName);
         }
 
@@ -503,7 +506,7 @@ public final class Main {
      * @return a <code>UserInterfaceControl</code> based on the value of <code>uiMode</code>
      */
     private static @NonNull AbstractMediatorUserInterfaceControl createUserInterface(
-            @NonNull List<File> fileArguments) {
+            @NonNull List<Path> fileArguments) {
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see
@@ -536,7 +539,7 @@ public final class Main {
                 if (mostRecent != null) {
                     File mostRecentFile = new File(mostRecent);
                     if (mostRecentFile.exists()) {
-                        fileArguments.add(mostRecentFile);
+                        fileArguments.add(mostRecentFile.toPath());
                     } else {
                         LOGGER.info("File does not exist anymore: {}", mostRecentFile);
                     }
@@ -627,13 +630,13 @@ public final class Main {
      *
      * @return {@link File} object representing working directory.
      */
-    public static File getWorkingDir() {
+    public static Path getWorkingDir() {
         if (fileArguments != null && !fileArguments.isEmpty()) {
-            File f = fileArguments.get(0);
-            if (f.isDirectory()) {
+            var f = fileArguments.get(0);
+            if (Files.isDirectory(f)) {
                 return f;
             } else {
-                return f.getParentFile();
+                return f.getParent();
             }
         } else {
             return IOUtil.getCurrentDirectory();
@@ -644,8 +647,8 @@ public final class Main {
      * Perform necessary actions before loading any problem files. Currently only performs RIFL to
      * JML transformation.
      */
-    private static @NonNull List<File> preProcessInput(@NonNull List<File> filesOnStartup) {
-        List<File> result = new ArrayList<>();
+    private static @NonNull List<Path> preProcessInput(@NonNull List<Path> filesOnStartup) {
+        List<Path> result = new ArrayList<>();
         // RIFL to JML transformation
         if (riflFileName != null) {
             if (filesOnStartup.isEmpty()) {
@@ -653,7 +656,7 @@ public final class Main {
                 System.exit(-130826);
             }
             // only use one input file
-            File fileNameOnStartUp = filesOnStartup.get(0).getAbsoluteFile();
+            Path fileNameOnStartUp = filesOnStartup.getFirst().toAbsolutePath();
             // final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
             try {
                 RIFLTransformer transformer = new RIFLTransformer();

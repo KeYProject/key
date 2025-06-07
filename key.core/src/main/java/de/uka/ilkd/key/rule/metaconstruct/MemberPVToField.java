@@ -10,9 +10,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
-
-import org.jspecify.annotations.NonNull;
-
+import org.key_project.logic.op.Function;
 
 
 public final class MemberPVToField extends AbstractTermTransformer {
@@ -23,18 +21,19 @@ public final class MemberPVToField extends AbstractTermTransformer {
 
 
     @Override
-    public Term transform(@NonNull Term term, SVInstantiations svInst, @NonNull Services services) {
+    public Term transform(Term term, SVInstantiations svInst, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
 
         Operator op = term.sub(0).op();
         if (op instanceof LocationVariable fieldPV) {
-            JFunction fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
+            Function fieldSymbol = heapLDT.getFieldSymbolForPV(fieldPV, services);
             return services.getTermBuilder().func(fieldSymbol);
         } else if (heapLDT.getSortOfSelect(op) != null) {
             return term.sub(0).sub(2);
         } else {
-            throw new RuntimeException("Not Implemented");
+            assert false;
+            return null;
         }
     }
 }

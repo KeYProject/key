@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -18,6 +20,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +50,7 @@ public class AbstractTestTermParser {
         return nss.sorts().lookup(new Name(name));
     }
 
-    protected JFunction lookup_func(String name) {
+    protected Function lookup_func(String name) {
         return nss.functions().lookup(new Name(name));
     }
 
@@ -94,7 +97,7 @@ public class AbstractTestTermParser {
 
     /**
      * Remove whitespaces before executing
-     * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
+     * {@link org.junit.jupiter.api.Assertions#assertEquals(Object, Object)}.
      */
     protected static void assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
@@ -171,8 +174,9 @@ public class AbstractTestTermParser {
     }
 
     protected Services getServices() {
-        File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "termParser" + File.separator + "parserTest.key");
+        Path keyFile = HelperClassForTests.TESTCASE_DIRECTORY
+                .resolve("termParser")
+                .resolve("parserTest.key");
         return HelperClassForTests.createServices(keyFile);
     }
 

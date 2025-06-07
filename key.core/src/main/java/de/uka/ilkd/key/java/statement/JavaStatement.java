@@ -21,7 +21,7 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
     /**
      * Java statement.
      */
-    public JavaStatement() {
+    protected JavaStatement() {
     }
 
     /**
@@ -29,15 +29,15 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
      *
      * @param children the children of this AST element as KeY classes. May contain: Comments
      */
-    public JavaStatement(ExtList children) {
+    protected JavaStatement(ExtList children) {
         super(children);
     }
 
-    public JavaStatement(ExtList children, PositionInfo pos) {
+    protected JavaStatement(ExtList children, PositionInfo pos) {
         super(children, pos);
     }
 
-    public JavaStatement(PositionInfo pos) {
+    protected JavaStatement(PositionInfo pos) {
         super(pos);
     }
 

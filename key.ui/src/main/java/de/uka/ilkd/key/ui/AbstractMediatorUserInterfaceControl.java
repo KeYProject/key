@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -29,14 +29,16 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskStartedInfo;
+
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +106,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      *
      * @param file the File with the problem description or the proof
      */
-    public abstract void loadProblem(File file);
+    public abstract void loadProblem(Path file);
 
     /**
      * Loads the proof with the given filename from the proof bundle with the given path.
@@ -112,11 +114,13 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * @param proofBundle the File with the problem description or the proof
      * @param proofFilename the filename of the proof in the bundle
      */
-    public abstract void loadProofFromBundle(File proofBundle, File proofFilename);
+    public abstract void loadProofFromBundle(Path proofBundle, Path proofFilename);
 
-    public @NonNull ProblemLoader getProblemLoader(@NonNull File file,
-            @NonNull List<File> classPath, @NonNull File bootClassPath,
-            @NonNull List<File> includes, @NonNull KeYMediator mediator) {
+    public ProblemLoader getProblemLoader(@NonNull Path file,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
+            KeYMediator mediator) {
         final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
             AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
         return pl;
@@ -207,15 +211,15 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         String proofName = proof.name().toString();
         proofName = MiscTools.removeFileExtension(proofName);
         final String filename = MiscTools.toValidFileName(proofName) + ".proof";
-        final File proofFolder;
+        final Path proofFolder;
         if (proof.getProofFile() != null) {
-            proofFolder = proof.getProofFile().getParentFile();
+            proofFolder = proof.getProofFile().getParent();
         } else { // happens when a Java file is loaded
             proofFolder = Main.getWorkingDir();
         }
-        final File toSave = new File(proofFolder, filename);
+        final Path toSave = proofFolder.resolve(filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
-        final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
+        final ProofSaver ps = new ProofSaver(proof, toSave.toAbsolutePath(), krm.getSHA1());
         final String errorMsg = ps.save();
         if (errorMsg != null) {
             reportException(this, null, new IOException(errorMsg));

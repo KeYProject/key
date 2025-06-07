@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -25,6 +24,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.*;
 
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -59,7 +60,9 @@ public abstract class AbstractPO implements IPersistablePO {
     private final ArrayDeque<Vertex> stack = new ArrayDeque<>();
 
 
-    /** number of currently visited nodes */
+    /**
+     * number of currently visited nodes
+     */
     private int index = 0;
 
 
@@ -168,15 +171,11 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(JFunction f, Services services) {
-        Namespace<JFunction> functionNames = services.getNamespaces().functions();
+    protected final void register(Function f, Services services) {
+        Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
-            if (f.sort() == JavaDLTheory.FORMULA) {
-                functionNames.addSafely(f);
-            } else {
-                functionNames.addSafely(f);
-            }
+            functionNames.addSafely(f);
         }
     }
 
@@ -259,13 +258,19 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     static class Vertex {
 
-        /** to avoid linear lookup in the stack */
+        /**
+         * to avoid linear lookup in the stack
+         */
         boolean onStack;
 
-        /** the index (number of already visited nodes) and -1 if not yet visited */
+        /**
+         * the index (number of already visited nodes) and -1 if not yet visited
+         */
         int index;
 
-        /** an SCC is identified by the node that was visited first */
+        /**
+         * an SCC is identified by the node that was visited first
+         */
         int lowLink;
 
         private final ClassAxiom axiom;
@@ -400,7 +405,6 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
@@ -413,30 +417,14 @@ public abstract class AbstractPO implements IPersistablePO {
     /**
      * Creates declarations necessary to save/load proof in textual form (helper for createProof()).
      */
-    private void createProofHeader(String javaPath, String classPath, String bootClassPath,
-            String includedFiles, Services services) {
+    private void createProofHeader(
+            JavaModel model, Services services) {
+
         if (header != null) {
             return;
         }
-        final StringBuilder sb = new StringBuilder();
 
-        // bootclasspath
-        if (bootClassPath != null && !bootClassPath.isEmpty()) {
-            sb.append("\\bootclasspath \"").append(bootClassPath).append("\";\n\n");
-        }
-
-        // classpath
-        if (classPath != null && !classPath.isEmpty()) {
-            sb.append("\\classpath ").append(classPath).append(";\n\n");
-        }
-
-        // javaSource
-        sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
-
-        // include
-        if (includedFiles != null && !includedFiles.isEmpty()) {
-            sb.append("\\include ").append(includedFiles).append(";\n\n");
-        }
+        final StringBuilder sb = new StringBuilder(model.asKeyString());
 
         // contracts
         ImmutableSet<Contract> contractsToSave = specRepos.getAllContracts();
@@ -470,8 +458,7 @@ public abstract class AbstractPO implements IPersistablePO {
             proofConfig = environmentConfig.deepCopy();
         }
         final JavaModel javaModel = proofConfig.getServices().getJavaModel();
-        createProofHeader(javaModel.getModelDir(), javaModel.getClassPath(),
-            javaModel.getBootClassPath(), javaModel.getIncludedFiles(), proofConfig.getServices());
+        createProofHeader(javaModel, proofConfig.getServices());
 
         final Proof proof = createProofObject(proofName, header, poTerm, proofConfig);
 
@@ -533,8 +520,8 @@ public abstract class AbstractPO implements IPersistablePO {
     @Override
     public Configuration createLoaderConfig() {
         var c = new Configuration();
-        c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
-        c.set(IPersistablePO.PROPERTY_NAME, name);
+        c.set(PROPERTY_CLASS, getClass().getCanonicalName());
+        c.set(PROPERTY_NAME, name);
         return c;
     }
 
@@ -545,7 +532,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return The name value.
      */
     public static String getName(Configuration properties) {
-        return properties.getString(IPersistablePO.PROPERTY_NAME);
+        return properties.getString(PROPERTY_NAME);
     }
 
     /**

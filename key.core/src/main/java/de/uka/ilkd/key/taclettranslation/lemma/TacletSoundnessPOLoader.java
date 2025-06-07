@@ -99,7 +99,7 @@ public class TacletSoundnessPOLoader {
 
         @Override
         public @NonNull String toString() {
-            return taclet.name().toString() + (notSupported ? " (not supported)"
+            return taclet.name() + (notSupported ? " (not supported)"
                     : isAlreadyInUse() ? "(already in use)" : "");
         }
 

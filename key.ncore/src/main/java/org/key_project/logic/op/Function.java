@@ -14,8 +14,8 @@ import org.jspecify.annotations.Nullable;
  * Objects of this class represent function and predicate symbols. Note that program variables are a
  * separate syntactic category, and not a type of function.
  */
-public abstract class Function extends org.key_project.logic.op.AbstractSortedOperator {
-    public Function(Name name, ImmutableArray<Sort> argSorts, Sort sort,
+public abstract class Function extends AbstractSortedOperator {
+    protected Function(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             @Nullable ImmutableArray<Boolean> whereToBind, boolean isRigid, boolean unique,
             boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, toModifier(isRigid, unique, isSkolemConstant));

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -68,7 +67,8 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
         return prevGoalList;
     }
 
-    protected void updateGoalListHelp(Node node, @NonNull ImmutableList<Goal> newGoals) {
+    @Override
+    protected void updateGoalListHelp(Object node, @NonNull ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 
@@ -76,7 +76,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
 
         // Remove "node" and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {
-            final Goal goal = selectedList.head();
+            final @NonNull Goal goal = selectedList.head();
             selectedList = selectedList.tail();
 
             if (node == goal.node() || newGoals.contains(goal)) {

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -37,11 +38,11 @@ public final class CharListLDT extends LDT {
     // LexPathOrdering and into CharListNotation!
 
     // functions
-    private final JFunction clIndexOfChar;
+    private final Function clIndexOfChar;
     private final Function clIndexOfCl;
-    private final JFunction clLastIndexOfChar;
+    private final Function clLastIndexOfChar;
     private final Function clLastIndexOfCl;
-    private final JFunction clReplace;
+    private final Function clReplace;
     private final Function clTranslateInt;
     private final Function clRemoveZeros;
     private final Function clHashCode;
@@ -112,7 +113,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
 
-    public JFunction getClIndexOfChar() {
+    public Function getClIndexOfChar() {
         return clIndexOfChar;
     }
 
@@ -122,7 +123,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public JFunction getClLastIndexOfChar() {
+    public Function getClLastIndexOfChar() {
         return clLastIndexOfChar;
     }
 
@@ -132,7 +133,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public JFunction getClReplace() {
+    public Function getClReplace() {
         return clReplace;
     }
 
@@ -168,21 +169,21 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -220,7 +221,7 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         throw new RuntimeException("Not Implemented");
     }
@@ -250,7 +251,7 @@ public final class CharListLDT extends LDT {
     }
 
     @Override
-    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
         if (operationName.equals("add")) {
             return services.getNamespaces().functions().lookup("seqConcat");

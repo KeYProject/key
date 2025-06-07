@@ -9,7 +9,7 @@ package de.uka.ilkd.key.java.reference;
  * @author <TT>AutoDoc</TT>
  */
 
-public interface ConstructorReference extends MethodOrConstructorReference, MemberReference {
+public interface ConstructorReference extends MethodOrConstructorReference {
 
 
 }

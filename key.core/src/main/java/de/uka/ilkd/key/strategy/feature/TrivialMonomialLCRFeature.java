@@ -4,11 +4,14 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,17 +23,18 @@ import org.jspecify.annotations.NonNull;
  * "A critical-pair/completion algorithm for finitely generated ideals in rings"
  */
 public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
-    private final ProjectionToTerm a, b;
+    private final ProjectionToTerm<Goal> a, b;
 
-    private TrivialMonomialLCRFeature(ProjectionToTerm a, ProjectionToTerm b) {
+    private TrivialMonomialLCRFeature(ProjectionToTerm<Goal> a, ProjectionToTerm<Goal> b) {
         this.a = a;
         this.b = b;
     }
 
-    public static @NonNull Feature create(ProjectionToTerm a, ProjectionToTerm b) {
+    public static @NonNull Feature create(ProjectionToTerm<Goal> a, ProjectionToTerm<Goal> b) {
         return new TrivialMonomialLCRFeature(a, b);
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
             MutableState mState) {
         final Services services = goal.proof().getServices();

@@ -5,20 +5,23 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -76,11 +79,13 @@ public class QueryExpandCost implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, @NonNull PosInOccurrence pos, @NonNull Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            @NonNull PosInOccurrence pos, @NonNull Goal p_goal,
             MutableState mState) {
+        final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
         final Services services = goal.proof().getServices();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        final Term t = pos.subTerm();
+        final Term t = (Term) pos.subTerm();
 
         long cost = baseCost;
 
@@ -177,13 +182,15 @@ public class QueryExpandCost implements Feature {
     protected int queryExpandAlreadyAppliedAtPos(RuleApp app, @NonNull PosInOccurrence pos,
             @NonNull Goal goal) {
         int count = 0;
-        ImmutableList<RuleApp> appliedRuleApps = goal.appliedRuleApps();
+        ImmutableList<RuleApp> appliedRuleApps =
+            goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
             for (RuleApp appliedRuleApp : appliedRuleApps) {
-                final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
+                final PosInOccurrence pio =
+                    appliedRuleApp.posInOccurrence();
                 if (pio != null) {
-                    final Term oldterm = pio.subTerm();
-                    final Term curterm = pos.subTerm();
+                    final Term oldterm = (Term) pio.subTerm();
+                    final Term curterm = (Term) pos.subTerm();
                     if (appliedRuleApp.rule().equals(QueryExpand.INSTANCE)
                             && oldterm.equalsModProperty(curterm,
                                 IRRELEVANT_TERM_LABELS_PROPERTY)) {

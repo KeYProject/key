@@ -6,11 +6,11 @@ plugins {
 
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
-    // https://imperceptiblethoughts.com/shadow/
-    id 'com.github.johnrengelman.shadow' version "8.1.1"
+    // https://github.com/GradleUp/shadow
+    id 'com.gradleup.shadow' version "8.3.6"
 }
 
-description "User interface for the deductive verification of Java programs"
+description = "User interface for the deductive verification of Java programs"
 
 dependencies {
     implementation project(":key.core")
@@ -33,10 +33,11 @@ dependencies {
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.slicing")
     runtimeOnly project(":keyext.proofmanagement")
+    runtimeOnly project(":keyext.isabelletranslation")
 }
 
 task createExamplesZip(type: Zip) {
-    description 'Create "examples.zip" containing all KeY examples'
+    description = 'Create "examples.zip" containing all KeY examples'
     destinationDirectory = file("$buildDir/resources/main/")
     archiveFileName = "examples.zip"
     from "examples"
@@ -72,9 +73,9 @@ run {
 }
 
 task runWithProfiler(type: JavaExec) {
-    group("application")
-    description("""Run key.ui with flight recoder enabled. 
-                   See https://www.baeldung.com/java-flight-recorder-monitoring for a how to.""")
+    group = "application"
+    description = """Run key.ui with flight recoder enabled. 
+                   See https://www.baeldung.com/java-flight-recorder-monitoring for a how to."""
 
     classpath = sourceSets.main.runtimeClasspath
     mainClass.set("de.uka.ilkd.key.core.Main")

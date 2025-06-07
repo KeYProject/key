@@ -12,8 +12,6 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -28,13 +26,15 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -85,18 +85,17 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public @NonNull Name name() {
+    public Name name() {
         return RULE_NAME;
     }
 
     @Override
-    public @NonNull String displayName() {
+    public String displayName() {
         return DISPLAY_NAME;
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final @NonNull Goal goal,
-            final @NonNull Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 
@@ -122,7 +121,7 @@ public class CloseAfterMerge implements BuiltInRule {
         // node has also been closed, and to remove the mark as linked
         // node if the merge node has been pruned.
         final Node mergeNodeF = closeApp.getCorrespondingMergeNode();
-        services.getProof().addProofTreeListener(new ProofTreeAdapter() {
+        goal.proof().addProofTreeListener(new ProofTreeAdapter() {
 
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
@@ -134,7 +133,7 @@ public class CloseAfterMerge implements BuiltInRule {
                 // a closed goal when loading a proof without the GUI (e.g.
                 // in a JUnit test).
 
-                if (e.getGoals().size() == 0 && mergeNodeF.isClosed()) {
+                if (e.getGoals().isEmpty() && mergeNodeF.isClosed()) {
                     // The merged node was closed; now also close this node.
 
                     e.getSource().closeGoal(linkedGoal);
@@ -148,7 +147,7 @@ public class CloseAfterMerge implements BuiltInRule {
         if (generateIsWeakeningGoal) {
             final Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
             ruleIsWeakeningGoal.setBranchLabel(MERGED_NODE_IS_WEAKENING_TITLE);
-
+            var services = goal.getOverlayServices();
             Term isWeakeningForm = getSyntacticWeakeningFormula(closeApp, ruleIsWeakeningGoal);
             isWeakeningForm = TermLabelManager.refactorTerm(termLabelState, services, null,
                 isWeakeningForm, this, ruleIsWeakeningGoal, FINAL_WEAKENING_TERM_HINT, null);
@@ -173,9 +172,8 @@ public class CloseAfterMerge implements BuiltInRule {
      * @return The syntactic weakening formula for the instantiated
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    private @NonNull Term getSyntacticWeakeningFormula(
-            @NonNull CloseAfterMergeRuleBuiltInRuleApp closeApp,
-            @NonNull Goal isWeakeningGoal) {
+    private Term getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
+            Goal isWeakeningGoal) {
         final Services services = isWeakeningGoal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -202,7 +200,7 @@ public class CloseAfterMerge implements BuiltInRule {
         // Create and register the new predicate symbol
         final Name predicateSymbName = new Name(tb.newName("P"));
 
-        final JFunction predicateSymb =
+        final Function predicateSymb =
             new JFunction(predicateSymbName, JavaDLTheory.FORMULA,
                 new ImmutableArray<>(argSorts));
 
@@ -247,9 +245,8 @@ public class CloseAfterMerge implements BuiltInRule {
      *         Skolem constants in {@code constsToReplace} having been replaced by fresh variables
      *         before.
      */
-    private @NonNull Term allClosure(final @NonNull Term term,
-            final HashSet<Function> constsToReplace,
-            @NonNull Services services) {
+    private Term allClosure(final Term term, final HashSet<Function> constsToReplace,
+            Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         Term termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
@@ -269,7 +266,7 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public @NonNull IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pos);
     }
 
@@ -290,8 +287,7 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param newNames The set of new names (of Skolem constants) introduced in the merge.
      * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
-    public @NonNull CloseAfterMergeRuleBuiltInRuleApp createApp(@NonNull PosInOccurrence pio,
-            Node thePartnerNode,
+    public CloseAfterMergeRuleBuiltInRuleApp createApp(PosInOccurrence pio, Node thePartnerNode,
             Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
             SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pio, thePartnerNode,

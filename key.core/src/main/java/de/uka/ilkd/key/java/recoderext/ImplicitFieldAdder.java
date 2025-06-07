@@ -140,7 +140,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      *
      * @param td the recoder.java.TypeDeclaration to be enriched with implicit fields
      */
-    private void addImplicitRecoderFields(recoder.java.declaration.TypeDeclaration td) {
+    private void addImplicitRecoderFields(TypeDeclaration td) {
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true),
             td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
@@ -165,7 +165,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         }
     }
 
-    protected void addClassInitializerStatusFields(recoder.java.declaration.TypeDeclaration td) {
+    protected void addClassInitializerStatusFields(TypeDeclaration td) {
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true),
             td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);

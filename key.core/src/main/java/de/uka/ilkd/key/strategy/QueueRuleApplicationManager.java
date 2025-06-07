@@ -7,29 +7,36 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.feature.Feature;
 
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.RuleApplicationManager;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Implementation of {@link AutomatedRuleApplicationManager} that stores possible {@link RuleApp}s
+ * Implementation of {@link RuleApplicationManager} that stores possible {@link RuleApp}s
  * in a priority queue. The element with highest priority in the queue can be obtained via
  * {@link #next()}. This operation will remove the element from the queue. The priority of a given
  * {@link RuleApp} corresponds to its {@link RuleAppCost}. A {@link RuleApp} can be equipped with a
  * {@link RuleAppCost} by converting it into a {@link RuleAppContainer}. The cost of a
  * {@link RuleApp} is computed according to a given {@link Strategy} (see
- * {@link Feature#computeCost(RuleApp, PosInOccurrence, Goal, de.uka.ilkd.key.strategy.feature.MutableState)}).
+ * {@link Feature#computeCost(RuleApp, PosInOccurrence, ProofGoal, MutableState)}).
  */
-public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
+@NullMarked
+public class QueueRuleApplicationManager implements RuleApplicationManager<Goal> {
     public static final AtomicLong PERF_QUEUE_OPS = new AtomicLong();
     public static final AtomicLong PERF_PEEK = new AtomicLong();
     public static final AtomicLong PERF_CREATE_CONTAINER = new AtomicLong();
@@ -61,8 +68,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private long nextRuleTime;
 
     @Override
-    public void setGoal(Goal goal) {
-        this.goal = goal;
+    public void setGoal(Goal p_goal) {
+        goal = p_goal;
     }
 
     /**
@@ -131,7 +138,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * the heap
      */
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules,
+            PosInOccurrence pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -148,7 +156,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         }
     }
 
-    private void addRuleApp(@NonNull RuleAppContainer rac) {
+    private void addRuleApp(RuleAppContainer rac) {
         var time = System.nanoTime();
         try {
             queue = push(rac, queue);
@@ -160,7 +168,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     /**
      * Add a number of new rule apps to the heap
      */
-    private static ImmutableHeap<RuleAppContainer> push(@NonNull Iterator<RuleAppContainer> it,
+    private static ImmutableHeap<RuleAppContainer> push(Iterator<RuleAppContainer> it,
             ImmutableHeap<RuleAppContainer> sourceQueue) {
         while (it.hasNext()) {
             sourceQueue = push(it.next(), sourceQueue);
@@ -171,8 +179,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     /**
      * Add a new rule app to the heap, provided that the rule app is not infinitely expensive
      */
-    private static @NonNull ImmutableHeap<RuleAppContainer> push(@NonNull RuleAppContainer c,
-            @NonNull ImmutableHeap<RuleAppContainer> sourceQueue) {
+    private static ImmutableHeap<RuleAppContainer> push(RuleAppContainer c,
+            ImmutableHeap<RuleAppContainer> sourceQueue) {
         if (c.getCost() == TopRuleAppCost.INSTANCE) {
             return sourceQueue;
         } else {
@@ -180,7 +188,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         }
     }
 
-    private static @NonNull ImmutableHeap<RuleAppContainer> createFurtherApps(
+    private static ImmutableHeap<RuleAppContainer> createFurtherApps(
             @Nullable RuleAppContainer from, Goal goal) {
         if (from == null) {
             return ImmutableLeftistHeap.nilHeap();
@@ -233,7 +241,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
              * Create further appcontainers from previous minimum, which was removed from queue in a
              * previous round.
              */
-            ImmutableHeap<RuleAppContainer> furtherAppsQueue =
+            ImmutableHeap<@NonNull RuleAppContainer> furtherAppsQueue =
                 createFurtherApps(previousMinimum, goal);
             previousMinimum = null;
 
@@ -264,7 +272,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * iteration includes all rule app containers that are contained either in primary or secondary
      * queue.
      */
-    private void computeNextRuleApp(@NonNull ImmutableHeap<RuleAppContainer> furtherAppsQueue) {
+    private void computeNextRuleApp(ImmutableHeap<@NonNull RuleAppContainer> furtherAppsQueue) {
         /*
          * Working list contains rule apps that cannot be completed in the current round but will be
          * reconsidered during the next round.
@@ -375,12 +383,13 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     }
 
     @Override
-    public @NonNull AutomatedRuleApplicationManager copy() {
-        return (AutomatedRuleApplicationManager) clone();
+    public RuleApplicationManager<Goal> copy() {
+        // noinspection unchecked
+        return (RuleApplicationManager<Goal>) clone();
     }
 
     @Override
-    public @NonNull Object clone() {
+    public Object clone() {
         QueueRuleApplicationManager res = new QueueRuleApplicationManager();
         res.queue = queue;
         res.previousMinimum = previousMinimum;

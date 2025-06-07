@@ -19,6 +19,7 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.*;
@@ -168,7 +169,7 @@ public final class JavaInfo {
     // ------------------- common services ----------------------
 
     /**
-     * returns the full name of a given {@link de.uka.ilkd.key.java.abstraction.KeYJavaType}.
+     * returns the full name of a given {@link KeYJavaType}.
      *
      * @param t the KeYJavaType including the package prefix
      * @return the full name
@@ -1132,7 +1133,7 @@ public final class JavaInfo {
         }
 
         final String[] fullNames =
-            new String[] { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
+            { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
 
         for (int i = 0; i < fullNames.length; i++) {
             commonTypes[i] = getTypeByClassName(fullNames[i]);

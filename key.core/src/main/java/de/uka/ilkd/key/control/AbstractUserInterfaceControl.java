@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -22,12 +22,14 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
+
+import org.key_project.prover.engine.ProverCore;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
 
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -37,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractUserInterfaceControl
         implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
-    private static final org.slf4j.Logger LOGGER =
+    private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractUserInterfaceControl.class);
     protected AtomicInteger numOfInvokedMacros = new AtomicInteger(0);
 
@@ -49,7 +51,7 @@ public abstract class AbstractUserInterfaceControl
     /**
      * Constructor.
      */
-    public AbstractUserInterfaceControl() {
+    protected AbstractUserInterfaceControl() {
         addProverTaskListener(new ProofMacroListenerAdapter());
     }
 
@@ -207,10 +209,10 @@ public abstract class AbstractUserInterfaceControl
      */
     @Override
     public AbstractProblemLoader load(@Nullable Profile profile,
-            @Nullable File file,
-            @Nullable List<File> classPath,
-            @Nullable File bootClassPath,
-            @Nullable List<File> includes,
+            @Nullable Path file,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
             @Nullable Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             @Nullable Consumer<Proof> callback) throws ProblemLoaderException {

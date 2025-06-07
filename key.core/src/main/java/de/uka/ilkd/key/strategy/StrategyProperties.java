@@ -9,8 +9,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.settings.Configuration;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,7 +236,7 @@ public final class StrategyProperties extends Properties {
         put(AUTO_INDUCTION_OPTIONS_KEY, DEFAULT_MAP.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
     }
 
-    public static @NonNull String userTacletsOptionsKey(int i) {
+    public static String userTacletsOptionsKey(int i) {
         return USER_TACLETS_OPTIONS_KEY_BASE + i;
     }
 
@@ -246,7 +244,7 @@ public final class StrategyProperties extends Properties {
         return DEFAULT_MAP.getProperty(key);
     }
 
-    public static @NonNull StrategyProperties read(@NonNull Properties p) {
+    public static StrategyProperties read(Properties p) {
         StrategyProperties sp = new StrategyProperties();
 
         sp.put(SPLITTING_OPTIONS_KEY, readSingleOption(p, SPLITTING_OPTIONS_KEY));
@@ -288,7 +286,7 @@ public final class StrategyProperties extends Properties {
      *        side proofs, {@code false} do not hide execution branch labels.
      * @param aliasChecks Do alias checks?
      */
-    public static void setDefaultStrategyProperties(@NonNull StrategyProperties sp,
+    public static void setDefaultStrategyProperties(StrategyProperties sp,
             boolean quantifierInstantiationWithSplitting, boolean methodTreatmentContract,
             boolean loopTreatmentInvariant, boolean blockTreatmentContract,
             boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
@@ -296,48 +294,48 @@ public final class StrategyProperties extends Properties {
         // invariant for the SED. For this, one would
         // however have to change the SED's
         // implementation and to update the tests.
-        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-            loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT
-                    : StrategyProperties.LOOP_EXPAND);
-        sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-            blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT_INTERNAL
-                    : StrategyProperties.BLOCK_EXPAND);
-        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-            methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT
-                    : StrategyProperties.METHOD_EXPAND);
-        sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
-        sp.setProperty(StrategyProperties.MPS_OPTIONS_KEY, StrategyProperties.MPS_MERGE);
-        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
-        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
-            StrategyProperties.AUTO_INDUCTION_OFF);
-        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
-        sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
-        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-            StrategyProperties.SPLITTING_DELAYED);
-        sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-            StrategyProperties.STOPMODE_DEFAULT);
-        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-            StrategyProperties.CLASS_AXIOM_FREE);
-        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-            quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE
-                    : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-        sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
-            aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
-                    : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
+        sp.setProperty(LOOP_OPTIONS_KEY,
+            loopTreatmentInvariant ? LOOP_INVARIANT
+                    : LOOP_EXPAND);
+        sp.setProperty(BLOCK_OPTIONS_KEY,
+            blockTreatmentContract ? BLOCK_CONTRACT_INTERNAL
+                    : BLOCK_EXPAND);
+        sp.setProperty(METHOD_OPTIONS_KEY,
+            methodTreatmentContract ? METHOD_CONTRACT
+                    : METHOD_EXPAND);
+        sp.setProperty(OSS_OPTIONS_KEY, OSS_ON);
+        sp.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
+        sp.setProperty(QUERY_OPTIONS_KEY, QUERY_RESTRICTED);
+        sp.setProperty(NON_LIN_ARITH_OPTIONS_KEY,
+            NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(AUTO_INDUCTION_OPTIONS_KEY,
+            AUTO_INDUCTION_OFF);
+        sp.setProperty(DEP_OPTIONS_KEY, DEP_OFF);
+        sp.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
+        sp.setProperty(SPLITTING_OPTIONS_KEY,
+            SPLITTING_DELAYED);
+        sp.setProperty(STOPMODE_OPTIONS_KEY,
+            STOPMODE_DEFAULT);
+        sp.setProperty(CLASS_AXIOM_OPTIONS_KEY,
+            CLASS_AXIOM_FREE);
+        sp.setProperty(QUANTIFIERS_OPTIONS_KEY,
+            quantifierInstantiationWithSplitting ? QUANTIFIERS_INSTANTIATE
+                    : QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        sp.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
+            aliasChecks ? SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
+                    : SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         sp.setProperty(
-            StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
+            SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
             nonExecutionBranchHidingSideProofs
-                    ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
-                    : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
+                    ? SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
+                    : SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
 
 
     /**
      * @param p
      */
-    private static @NonNull Object readSingleOption(@NonNull Properties p, String key) {
+    private static Object readSingleOption(Properties p, String key) {
         String o = (String) p.get(STRATEGY_PROPERTY + key);
         if (o != null) {
             o = getUniqueString(o);
@@ -355,7 +353,7 @@ public final class StrategyProperties extends Properties {
      *        <code>stringPool</code>.
      * @return Returns the same string but possibly with a different but unique object identity.
      */
-    private static @Nullable String getUniqueString(String in) {
+    private static String getUniqueString(String in) {
         for (String id : STRING_POOL) {
             if (id.equals(in)) {
                 return id;
@@ -373,7 +371,7 @@ public final class StrategyProperties extends Properties {
         return null;
     }
 
-    public static @NonNull StrategyProperties read(Configuration category) {
+    public static StrategyProperties read(Configuration category) {
         category = category.getOrCreateSection("options");
         StrategyProperties sp = new StrategyProperties();
         for (Map.Entry<Object, Object> entry : DEFAULT_MAP.entrySet()) {
@@ -397,6 +395,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    @Override
     public String getProperty(String key) {
         String val = super.getProperty(key);
         if (val != null) {
@@ -405,7 +404,7 @@ public final class StrategyProperties extends Properties {
         return DEFAULT_MAP.getProperty(key);
     }
 
-    public void write(@NonNull Properties p) {
+    public void write(Properties p) {
         p.put(STRATEGY_PROPERTY + SPLITTING_OPTIONS_KEY, get(SPLITTING_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY + LOOP_OPTIONS_KEY, get(LOOP_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY + BLOCK_OPTIONS_KEY, get(BLOCK_OPTIONS_KEY));
@@ -438,7 +437,8 @@ public final class StrategyProperties extends Properties {
     }
 
 
-    public synchronized @NonNull Object clone() {
+    @Override
+    public synchronized Object clone() {
         final Properties p = (Properties) super.clone();
         final StrategyProperties sp = new StrategyProperties();
         sp.putAll(p);

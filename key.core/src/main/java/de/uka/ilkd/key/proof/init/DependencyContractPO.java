@@ -17,6 +17,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -189,7 +190,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             }
             // prepare anon heap
             final Name anonHeapName = new Name(tb.newName("anon_" + h.toString()));
-            final JFunction anonHeapFunc =
+            final Function anonHeapFunc =
                 new JFunction(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc, proofServices);
             final Term anonHeap =

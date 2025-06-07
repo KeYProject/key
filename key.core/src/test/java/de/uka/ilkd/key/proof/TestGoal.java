@@ -6,14 +6,15 @@ package de.uka.ilkd.key.proof;
 import java.lang.reflect.Method;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,8 +44,8 @@ public class TestGoal {
 
     @Test
     public void testSetBack0() {
-        Sequent seq = Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());
+        Sequent seq = JavaDLSequentKit.createSuccSequent(
+            ImmutableSLList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
 
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
@@ -85,8 +86,8 @@ public class TestGoal {
 
     @Test
     public void testSetBack1() throws Exception {
-        Sequent seq = Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());
+        Sequent seq = JavaDLSequentKit.createSuccSequent(
+            ImmutableSLList.singleton(new SequentFormula(TacletForTests.parseTerm("A"))));
         Node root = new Node(proof, seq);
         proof.setRoot(root);
         Goal g = new Goal(root, TacletIndexKit.getKit().createTacletIndex(),

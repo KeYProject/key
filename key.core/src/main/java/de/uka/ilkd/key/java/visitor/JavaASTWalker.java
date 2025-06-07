@@ -28,7 +28,7 @@ public abstract class JavaASTWalker {
      *
      * @param root the ProgramElement where to begin
      */
-    public JavaASTWalker(ProgramElement root) {
+    protected JavaASTWalker(ProgramElement root) {
         this.root = root;
     }
 

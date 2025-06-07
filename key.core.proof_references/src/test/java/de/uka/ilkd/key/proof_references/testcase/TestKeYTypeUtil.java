@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.testcase;
 
-import java.io.File;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,8 +25,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testIsInnerType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -54,9 +52,9 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
             // Test class with package
             assertFalse(KeYTypeUtil.isInnerType(services, typeWithPackage));
             // Test inner class without package
-            Assertions.assertTrue(KeYTypeUtil.isInnerType(services, innerTypeWithoutPackage));
+            assertTrue(KeYTypeUtil.isInnerType(services, innerTypeWithoutPackage));
             // Test inner class with package
-            Assertions.assertTrue(KeYTypeUtil.isInnerType(services, innerTypeWithPackage));
+            assertTrue(KeYTypeUtil.isInnerType(services, innerTypeWithPackage));
         } finally {
             environment.dispose();
         }
@@ -68,8 +66,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testGetParentName() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -87,11 +85,11 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
                 KeYTypeUtil.getType(services, "model.InnerAndAnonymousTypeTest.IGetter");
             assertNotNull(innerTypeWithPackage);
             // Test null
-            Assertions.assertNull(KeYTypeUtil.getParentName(services, null));
-            Assertions.assertNull(KeYTypeUtil.getParentName(null, typeWithoutPackage));
-            Assertions.assertNull(KeYTypeUtil.getParentName(null, null));
+            assertNull(KeYTypeUtil.getParentName(services, null));
+            assertNull(KeYTypeUtil.getParentName(null, typeWithoutPackage));
+            assertNull(KeYTypeUtil.getParentName(null, null));
             // Test class without package
-            Assertions.assertNull(KeYTypeUtil.getParentName(services, typeWithoutPackage));
+            assertNull(KeYTypeUtil.getParentName(services, typeWithoutPackage));
             // Test class with package
             assertEquals("model", KeYTypeUtil.getParentName(services, typeWithPackage));
             // Test inner class without package
@@ -111,8 +109,8 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testIsType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
@@ -127,14 +125,13 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
             assertFalse(KeYTypeUtil.isType(services, "InnerAndAnonymousTypeTest.Invalid"));
             assertFalse(KeYTypeUtil.isType(services, "model.InnerAndAnonymousTypeTest.Invalid"));
             // Test class without package
-            Assertions.assertTrue(KeYTypeUtil.isType(services, "InnerAndAnonymousTypeTest"));
+            assertTrue(KeYTypeUtil.isType(services, "InnerAndAnonymousTypeTest"));
             // Test class with package
-            Assertions.assertTrue(KeYTypeUtil.isType(services, "model.InnerAndAnonymousTypeTest"));
+            assertTrue(KeYTypeUtil.isType(services, "model.InnerAndAnonymousTypeTest"));
             // Test inner class without package
-            Assertions
-                    .assertTrue(KeYTypeUtil.isType(services, "InnerAndAnonymousTypeTest.IGetter"));
+            assertTrue(KeYTypeUtil.isType(services, "InnerAndAnonymousTypeTest.IGetter"));
             // Test inner class with package
-            Assertions.assertTrue(
+            assertTrue(
                 KeYTypeUtil.isType(services, "model.InnerAndAnonymousTypeTest.IGetter"));
         } finally {
             environment.dispose();
@@ -147,22 +144,21 @@ public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
     @Test
     public void testGetType() throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(
-            new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null,
-            null);
+            TESTCASE_DIRECTORY.resolve("proofReferences/InnerAndAnonymousTypeTest"),
+            null, null, null);
         try {
             Services services = environment.getServices();
             assertNotNull(services);
             // Test null
-            Assertions.assertNull(KeYTypeUtil.getType(services, null));
-            Assertions.assertNull(KeYTypeUtil.getType(null, "InnerAndAnonymousTypeTest"));
-            Assertions.assertNull(KeYTypeUtil.getType(null, null));
+            assertNull(KeYTypeUtil.getType(services, null));
+            assertNull(KeYTypeUtil.getType(null, "InnerAndAnonymousTypeTest"));
+            assertNull(KeYTypeUtil.getType(null, null));
             // Test invalid names
-            Assertions.assertNull(KeYTypeUtil.getType(services, "Invalid"));
-            Assertions.assertNull(KeYTypeUtil.getType(services, "model.Invalid"));
-            Assertions.assertNull(KeYTypeUtil.getType(services, "invalid.Invalid"));
-            Assertions
-                    .assertNull(KeYTypeUtil.getType(services, "InnerAndAnonymousTypeTest.Invalid"));
-            Assertions.assertNull(
+            assertNull(KeYTypeUtil.getType(services, "Invalid"));
+            assertNull(KeYTypeUtil.getType(services, "model.Invalid"));
+            assertNull(KeYTypeUtil.getType(services, "invalid.Invalid"));
+            assertNull(KeYTypeUtil.getType(services, "InnerAndAnonymousTypeTest.Invalid"));
+            assertNull(
                 KeYTypeUtil.getType(services, "model.InnerAndAnonymousTypeTest.Invalid"));
             // Test class without package
             KeYJavaType kjt = KeYTypeUtil.getType(services, "InnerAndAnonymousTypeTest");

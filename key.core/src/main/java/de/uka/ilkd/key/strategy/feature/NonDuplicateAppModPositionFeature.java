@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -25,8 +26,8 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
     protected boolean comparePio(@NonNull TacletApp newApp, @NonNull TacletApp oldApp,
             @NonNull PosInOccurrence newPio,
             @NonNull PosInOccurrence oldPio) {
-        final Term newFocus = newPio.subTerm();
-        final Term oldFocus = oldPio.subTerm();
+        final Term newFocus = (Term) newPio.subTerm();
+        final Term oldFocus = (Term) oldPio.subTerm();
         if (!newFocus.equalsModProperty(oldFocus, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             return false;
         }

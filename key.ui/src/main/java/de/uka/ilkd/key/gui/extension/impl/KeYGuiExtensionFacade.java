@@ -67,7 +67,7 @@ public final class KeYGuiExtensionFacade {
             }
         };
 
-        return KeYGuiExtensionFacade.getMainMenuExtensions().stream()
+        return getMainMenuExtensions().stream()
                 .flatMap(it -> it.getMainMenuActions(mainWindow).stream())
                 .sorted(Comparator.comparingInt(func));
     }
@@ -319,7 +319,7 @@ public final class KeYGuiExtensionFacade {
             return false;
         }
         String sys = System.getProperty(a.getName());
-        return sys == null || !sys.equalsIgnoreCase("false");
+        return !"false".equalsIgnoreCase(sys);
     }
     // endregion
 

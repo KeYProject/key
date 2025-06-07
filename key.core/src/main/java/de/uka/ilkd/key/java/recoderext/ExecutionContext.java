@@ -146,8 +146,8 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
         astParent = parent;
     }
 
-    public boolean replaceChild(recoder.java.ProgramElement child,
-            recoder.java.ProgramElement newChild) {
+    public boolean replaceChild(ProgramElement child,
+            ProgramElement newChild) {
         if (child == classContext) {
             classContext = (TypeReference) newChild;
         } else if (child == runtimeInstance) {

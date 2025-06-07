@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,10 +42,10 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
      */
     @Test
     public void test1ImproveReadability() throws ProblemLoaderException {
-        File location = new File(testCaseDirectory,
+        Path location = testCaseDirectory.resolve(
             "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
-                .getAbsoluteFile();
-        assertTrue(location.exists(), "Could not find required resource: " + location);
+                .toAbsolutePath();
+        assertTrue(Files.exists(location), "Could not find required resource: " + location);
 
         KeYEnvironment<?> environment = KeYEnvironment.load(location, null, null, null);
         Services services = environment.getServices();

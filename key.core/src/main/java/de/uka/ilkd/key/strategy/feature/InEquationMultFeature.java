@@ -4,11 +4,14 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,9 +23,9 @@ import org.jspecify.annotations.NonNull;
  */
 public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
 
-    protected final ProjectionToTerm targetCandidate;
-    protected final ProjectionToTerm mult1Candidate;
-    protected final ProjectionToTerm mult2Candidate;
+    protected final ProjectionToTerm<Goal> targetCandidate;
+    protected final ProjectionToTerm<Goal> mult1Candidate;
+    protected final ProjectionToTerm<Goal> mult2Candidate;
 
     /**
      * Return zero iff the multiplication of mult1 and mult2 is allowed, because the resulting
@@ -33,9 +36,10 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
      * @param targetCandidate the left side of the inequation that is supposed to bound the other
      *        two inequations
      */
-    public static @NonNull Feature partiallyBounded(ProjectionToTerm mult1Candidate,
-            ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate) {
+    public static @NonNull Feature partiallyBounded(ProjectionToTerm<Goal> mult1Candidate,
+            ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+            @Override
             protected boolean filter(@NonNull Monomial targetM, @NonNull Monomial mult1M,
                     @NonNull Monomial mult2M) {
                 return !mult2M.reduce(targetM).variablesDisjoint(mult1M)
@@ -47,9 +51,10 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     /**
      * Return zero iff the product of mult1 and mult2 is a factor of target
      */
-    public static @NonNull Feature totallyBounded(ProjectionToTerm mult1Candidate,
-            ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate) {
+    public static @NonNull Feature totallyBounded(ProjectionToTerm<Goal> mult1Candidate,
+            ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+            @Override
             protected boolean filter(@NonNull Monomial targetM, @NonNull Monomial mult1M,
                     @NonNull Monomial mult2M) {
                 return targetM.variablesSubsume(mult1M.multiply(mult2M));
@@ -60,9 +65,10 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     /**
      * Return zero iff the product of mult1 and mult2 is target
      */
-    public static @NonNull Feature exactlyBounded(ProjectionToTerm mult1Candidate,
-            ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate) {
+    public static @NonNull Feature exactlyBounded(ProjectionToTerm<Goal> mult1Candidate,
+            ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+            @Override
             protected boolean filter(@NonNull Monomial targetM, @NonNull Monomial mult1M,
                     @NonNull Monomial mult2M) {
                 return targetM.variablesEqual(mult1M.multiply(mult2M));
@@ -70,13 +76,14 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
         };
     }
 
-    protected InEquationMultFeature(ProjectionToTerm mult1Candidate,
-            ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate) {
+    protected InEquationMultFeature(ProjectionToTerm<Goal> mult1Candidate,
+            ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         this.mult1Candidate = mult1Candidate;
         this.mult2Candidate = mult2Candidate;
         this.targetCandidate = targetCandidate;
     }
 
+    @Override
     protected final boolean filter(TacletApp app, PosInOccurrence pos, @NonNull Goal goal,
             MutableState mState) {
         final Services services = goal.proof().getServices();

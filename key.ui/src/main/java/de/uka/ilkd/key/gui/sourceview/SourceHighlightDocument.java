@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 
-import java.awt.*;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;

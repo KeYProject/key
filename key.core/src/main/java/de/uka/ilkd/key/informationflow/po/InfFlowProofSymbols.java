@@ -8,7 +8,6 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -20,8 +19,10 @@ import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -302,12 +303,10 @@ public class InfFlowProofSymbols {
         assert symb != null;
         boolean l = false;
 
-        if (symb instanceof Sort) {
-            final Sort s = (Sort) symb;
+        if (symb instanceof Sort s) {
             addSort(s, l);
         }
-        if (symb instanceof SortedOperator) {
-            final SortedOperator s = (SortedOperator) symb;
+        if (symb instanceof SortedOperator s) {
             addSort(s.sort(), l);
         }
         if (symb instanceof JFunction f) {

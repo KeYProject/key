@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
@@ -24,11 +23,9 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Rule application class for merge rule applications. Is complete iff the mergePartners field as
@@ -40,27 +37,27 @@ import org.jspecify.annotations.Nullable;
 public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     // TODO: Make fields final and remove setters (create new app instead)
-    private @Nullable Node mergeNode = null;
-    private @Nullable ImmutableList<MergePartner> mergePartners = null;
-    private @Nullable MergeProcedure concreteRule = null;
+    private Node mergeNode = null;
+    private ImmutableList<MergePartner> mergePartners = null;
+    private MergeProcedure concreteRule = null;
 
-    private @Nullable SymbolicExecutionStateWithProgCnt thisSEState = null;
-    private @Nullable ImmutableList<SymbolicExecutionState> mergePartnerStates = null;
-    private @Nullable Term distForm = null;
+    private SymbolicExecutionStateWithProgCnt thisSEState = null;
+    private ImmutableList<SymbolicExecutionState> mergePartnerStates = null;
+    private Term distForm = null;
 
     private ArrayList<MergeRule.MergeRuleProgressListener> progressListeners = new ArrayList<>();
 
-    public MergeRuleBuiltInRuleApp(@NonNull BuiltInRule builtInRule, @NonNull PosInOccurrence pio) {
+    public MergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
-    protected MergeRuleBuiltInRuleApp(@NonNull BuiltInRule rule, @NonNull PosInOccurrence pio,
-            @NonNull ImmutableList<PosInOccurrence> ifInsts) {
+    protected MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> ifInsts) {
         super(rule, pio, ifInsts);
     }
 
-    public MergeRuleBuiltInRuleApp(@NonNull BuiltInRule rule, @NonNull PosInOccurrence pio,
-            @NonNull ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
+    public MergeRuleBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
             ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
             SymbolicExecutionStateWithProgCnt thisSEState,
             ImmutableList<SymbolicExecutionState> mergePartnerStates, Term distForm,
@@ -76,18 +73,19 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public @NonNull AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+    public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
     }
 
     @Override
-    public @NonNull IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
 
     @Override
-    public @NonNull AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
         // We assume that this method is *only* called for situations where the
         // current active statement is a MergePointStatement. Manual state
         // merging is still possible, but then this method shouldn't be called
@@ -160,16 +158,16 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     // GETTERS AND SETTERS //
 
-    public @Nullable ImmutableList<MergePartner> getMergePartners() {
+    public ImmutableList<MergePartner> getMergePartners() {
         return mergePartners;
     }
 
-    public void setMergePartners(@NonNull ImmutableList<MergePartner> mergePartners) {
+    public void setMergePartners(ImmutableList<MergePartner> mergePartners) {
         this.mergePartners = mergePartners;
         mergePartnerStates = MergeRuleUtils.sequentsToSEPairs(mergePartners);
     }
 
-    public @Nullable MergeProcedure getConcreteRule() {
+    public MergeProcedure getConcreteRule() {
         return concreteRule;
     }
 
@@ -177,17 +175,17 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.concreteRule = concreteRule;
     }
 
-    public @Nullable Node getMergeNode() {
+    public Node getMergeNode() {
         return mergeNode;
     }
 
-    public void setMergeNode(@NonNull Node mergeNode) {
+    public void setMergeNode(Node mergeNode) {
         this.mergeNode = mergeNode;
         this.thisSEState =
             MergeRuleUtils.sequentToSETriple(mergeNode, super.pio, mergeNode.proof().getServices());
     }
 
-    public void setDistinguishingFormula(@Nullable Term distForm) {
+    public void setDistinguishingFormula(Term distForm) {
         // null is OK: In this case, we generate the distinguishing
         // formula automatically. Otherwise, the term must indeed be
         // a formula.
@@ -196,15 +194,15 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.distForm = distForm;
     }
 
-    public @Nullable Term getDistinguishingFormula() {
+    public Term getDistinguishingFormula() {
         return distForm;
     }
 
-    public @Nullable SymbolicExecutionStateWithProgCnt getMergeSEState() {
+    public SymbolicExecutionStateWithProgCnt getMergeSEState() {
         return thisSEState;
     }
 
-    public @Nullable ImmutableList<SymbolicExecutionState> getMergePartnerStates() {
+    public ImmutableList<SymbolicExecutionState> getMergePartnerStates() {
         return mergePartnerStates;
     }
 

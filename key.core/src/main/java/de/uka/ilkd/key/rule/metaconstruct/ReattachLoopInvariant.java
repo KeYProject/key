@@ -33,12 +33,12 @@ public class ReattachLoopInvariant extends ProgramTransformer {
     public ProgramElement @NonNull [] transform(ProgramElement pe, @NonNull Services services,
             @NonNull SVInstantiations svInst) {
         final ProgramElement context = //
-            svInst.getContextInstantiation().contextProgram();
+            svInst.getContextInstantiation().program();
 
         if (context != null) {
             final Statement activeStmt =
                 (Statement) JavaTools.getActiveStatement(JavaBlock.createJavaBlock(
-                    (StatementBlock) svInst.getContextInstantiation().contextProgram()));
+                    (StatementBlock) svInst.getContextInstantiation().program()));
             assert activeStmt instanceof LoopStatement;
 
             final LoopStatement loop = (LoopStatement) activeStmt;

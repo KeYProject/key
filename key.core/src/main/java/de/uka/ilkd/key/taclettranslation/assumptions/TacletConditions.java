@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
 import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.VariableCondition;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;

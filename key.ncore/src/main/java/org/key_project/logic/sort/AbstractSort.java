@@ -21,18 +21,9 @@ public abstract class AbstractSort implements Sort {
      */
     private @Nullable String documentation;
 
-    public AbstractSort(Name name, boolean isAbstract) {
+    protected AbstractSort(Name name, boolean isAbstract) {
         this.name = name;
         this.isAbstract = isAbstract;
-    }
-
-    public boolean equals(@Nullable Object o) {
-        if (o instanceof AbstractSort sort) {
-            // TODO: Potential bug should check for sort identity not name equality
-            return sort.name().equals(name());
-        } else {
-            return false;
-        }
     }
 
     @Override

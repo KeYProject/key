@@ -7,20 +7,22 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class TestGenMacro extends StrategyProofMacro {
@@ -64,12 +66,12 @@ class TestGenStrategy extends FilterStrategy {
 
     static {
         unwindRules = new HashSet<>();
-        TestGenStrategy.unwindRules.add("loopUnwind");
-        TestGenStrategy.unwindRules.add("doWhileUnwind");
-        TestGenStrategy.unwindRules.add("methodCall");
-        TestGenStrategy.unwindRules.add("methodCallWithAssignment");
-        TestGenStrategy.unwindRules.add("staticMethodCall");
-        TestGenStrategy.unwindRules.add("staticMethodCallWithAssignment");
+        unwindRules.add("loopUnwind");
+        unwindRules.add("doWhileUnwind");
+        unwindRules.add("methodCall");
+        unwindRules.add("methodCallWithAssignment");
+        unwindRules.add("staticMethodCall");
+        unwindRules.add("staticMethodCallWithAssignment");
     }
 
     private static boolean isUnwindRule(@Nullable Rule rule) {
@@ -77,7 +79,7 @@ class TestGenStrategy extends FilterStrategy {
             return false;
         }
         final String name = rule.name().toString();
-        return TestGenStrategy.unwindRules.contains(name);
+        return unwindRules.contains(name);
     }
 
     public TestGenStrategy(Strategy delegate) {
@@ -86,10 +88,12 @@ class TestGenStrategy extends FilterStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
+            Goal goal,
             MutableState mState) {
-        if (TestGenStrategy.isUnwindRule(app.rule())) {
-            return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
+        if (isUnwindRule(app.rule())) {
+            return NumberRuleAppCost.create(UNWIND_COST);
         }
         return super.computeCost(app, pio, goal, mState);
     }
@@ -101,7 +105,7 @@ class TestGenStrategy extends FilterStrategy {
             final RuleApp app = node.getAppliedRuleApp();
             if (app != null) {
                 final Rule rule = app.rule();
-                if (TestGenStrategy.isUnwindRule(rule)) {
+                if (isUnwindRule(rule)) {
                     ++totalUnwinds;
                 }
             }
@@ -115,7 +119,7 @@ class TestGenStrategy extends FilterStrategy {
         if (!modalityCache.hasModality(goal.node().sequent())) {
             return false;
         }
-        if (TestGenStrategy.isUnwindRule(app.rule())) {
+        if (isUnwindRule(app.rule())) {
             final int noUnwindRules = computeUnwindRules(goal);
             return noUnwindRules < limit;
         }
@@ -124,7 +128,7 @@ class TestGenStrategy extends FilterStrategy {
 
     @Override
     public Name name() {
-        return TestGenStrategy.NAME;
+        return NAME;
     }
 
     @Override

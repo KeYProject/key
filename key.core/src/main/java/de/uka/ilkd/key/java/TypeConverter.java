@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
@@ -127,7 +128,7 @@ public final class TypeConverter {
         return LDTs.values();
     }
 
-    private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op,
+    private Term translateOperator(Operator op,
             ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
@@ -226,7 +227,7 @@ public final class TypeConverter {
                 || exact && !context.getSort().equals(s)) {
             inst = (LocationVariable) services.getJavaInfo()
                     .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
-            final JFunction fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
+            final Function fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
             result = tb.dot(inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
@@ -265,20 +266,20 @@ public final class TypeConverter {
         } else if (var == services.getJavaInfo().getArrayLength()) {
             return tb.dotLength(convertReferencePrefix(prefix, ec));
         } else if (var.isStatic()) {
-            final JFunction fieldSymbol =
+            final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.staticDot(var.sort(), fieldSymbol);
         } else if (prefix == null) {
             if (var.isMember()) {
-                final JFunction fieldSymbol =
+                final Function fieldSymbol =
                     heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
                 return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
                     fieldSymbol);
             } else {
-                return tb.var((LocationVariable) var);
+                return tb.var(var);
             }
         } else if (!(prefix instanceof PackageReference)) {
-            final JFunction fieldSymbol =
+            final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
         }
@@ -300,7 +301,7 @@ public final class TypeConverter {
     private Term convertToInstanceofTerm(Instanceof io, ExecutionContext ec) {
         final KeYJavaType type = ((TypeReference) io.getChildAt(1)).getKeYJavaType();
         final Term obj = convertToLogicElement(io.getChildAt(0), ec);
-        final JFunction instanceOfSymbol =
+        final Function instanceOfSymbol =
             getJavaDLTheory().getInstanceofSymbol(type.getSort(), services);
 
         // in JavaDL S::instance(o) is also true if o (for reference types S)
@@ -336,8 +337,8 @@ public final class TypeConverter {
             return convertToLogicElement(((ParenthesizedExpression) pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
             return convertToInstanceofTerm((Instanceof) pe, ec);
-        } else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
-            return translateOperator((de.uka.ilkd.key.java.expression.Operator) pe, ec);
+        } else if (pe instanceof Operator) {
+            return translateOperator((Operator) pe, ec);
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException(
                 "TypeConverter could not handle" + " this primitive type");
@@ -370,7 +371,7 @@ public final class TypeConverter {
         }
     }
 
-    public static boolean isArithmeticOperator(de.uka.ilkd.key.java.expression.Operator op) {
+    public static boolean isArithmeticOperator(Operator op) {
         return op instanceof Divide || op instanceof Times || op instanceof Plus
                 || op instanceof Minus
                 || op instanceof Modulo || op instanceof ShiftLeft || op instanceof ShiftRight
@@ -589,7 +590,7 @@ public final class TypeConverter {
         KeYJavaType result = null;
         if (t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
             result = services.getJavaInfo().getKeYJavaType(t.sort());
-        } else if (t.op() instanceof JFunction) {
+        } else if (t.op() instanceof Function) {
             for (LDT ldt : LDTs.values()) {
                 if (ldt.containsFunction((Function) t.op())) {
                     Type type = ldt.getType(t);
@@ -962,7 +963,7 @@ public final class TypeConverter {
         return TC;
     }
 
-    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    private LDT getResponsibleLDT(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {

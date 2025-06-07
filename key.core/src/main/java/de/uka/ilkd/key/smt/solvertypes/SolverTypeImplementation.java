@@ -152,7 +152,7 @@ public final class SolverTypeImplementation implements SolverType {
     private final String[] handlerOptions;
 
     /**
-     * The class of the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket} to be created
+     * The class of the {@link AbstractSolverSocket} to be created
      * with {@link #getSocket(ModelExtractor)}.
      */
     private final Class<?> solverSocketClass;
@@ -198,7 +198,7 @@ public final class SolverTypeImplementation implements SolverType {
      * @param handlerNames the names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be
      *        used by the {@link SMTTranslator} created by this solver type
      * @param handlerOptions arbitrary String options used by the SMTHandlers
-     * @param solverSocketClass the {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}
+     * @param solverSocketClass the {@link AbstractSolverSocket}
      *        class used by the solver type at hand
      * @param preamble the preamble String for the created {@link SMTTranslator}, may be null
      */

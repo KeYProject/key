@@ -10,9 +10,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -92,7 +97,7 @@ class TacletDescriber {
 
     private static void writeTacletSchemaVariablesHelper(@NonNull StringBuffer out,
             final @NonNull Taclet t) {
-        ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
+        ImmutableSet<SchemaVariable> schemaVars = t.getAssumesAndFindVariables();
 
         for (final NewVarcond nvc : t.varsNew()) {
             schemaVars = schemaVars.add(nvc.getSchemaVariable());
@@ -136,11 +141,11 @@ class TacletDescriber {
 
         if (app != null) {
             s.append("The following rule was applied on this node: \n\n");
-            if (app.rule() instanceof Taclet) {
+            if (app.rule() instanceof de.uka.ilkd.key.rule.Taclet taclet) {
                 SequentViewLogicPrinter logicPrinter =
                     SequentViewLogicPrinter.purePrinter(width, mediator.getNotationInfo(),
                         mediator.getServices(), getVisibleTermLabels());
-                logicPrinter.printTaclet((Taclet) (app.rule()));
+                logicPrinter.printTaclet(taclet);
                 s.append(logicPrinter.result());
             } else {
                 s.append(app.rule());

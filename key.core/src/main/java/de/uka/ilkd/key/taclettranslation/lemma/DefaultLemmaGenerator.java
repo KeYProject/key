@@ -9,19 +9,23 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletPrefix;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -82,7 +86,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             public String visit(Taclet taclet, boolean visitAddrules) {
 
                 if (taclet instanceof RewriteTaclet rwTaclet) {
-                    Sequent assumptions = rwTaclet.ifSequent();
+                    Sequent assumptions = rwTaclet.assumesSequent();
                     int appRestr = rwTaclet.getApplicationRestriction();
                     if (!assumptions.isEmpty() && appRestr == 0) {
                         // any restriction is fine. The polarity switches are equiv
@@ -178,8 +182,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             return createInstantiation(owner, (FormulaSV) sv, services);
         }
         throw new IllegalTacletException("The taclet contains a schema variable which"
-            + "is not supported.\n" + "Taclet: " + owner.name().toString() + "\n"
-            + "SchemaVariable: " + sv.name().toString() + "\n");
+            + "is not supported.\n" + "Taclet: " + owner.name() + "\n"
+            + "SchemaVariable: " + sv.name() + "\n");
     }
 
     /**
@@ -193,7 +197,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      */
     private @NonNull Term createInstantiation(Taclet owner, @NonNull VariableSV sv,
             @NonNull TermServices services) {
-        Name name = createUniqueName(services, "v_" + sv.name().toString());
+        Name name = createUniqueName(services, "v_" + sv.name());
         Sort sort = replaceSort(sv.sort(), services);
         LogicVariable variable = new LogicVariable(name, sort);
         return services.getTermFactory().createTerm(variable);
@@ -225,13 +229,13 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      */
     private @NonNull Term createSimpleInstantiation(@NonNull Taclet owner, @NonNull OperatorSV sv,
             @NonNull TermServices services) {
-        ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv).prefix();
+        ImmutableSet<SchemaVariable> prefix = ((TacletPrefix) owner.getPrefix(sv)).prefix();
 
         Sort[] argSorts = computeArgSorts(prefix, services);
         Term[] args = computeArgs(owner, prefix, services);
-        Name name = createUniqueName(services, "f_" + sv.name().toString());
+        Name name = createUniqueName(services, "f_" + sv.name());
 
-        JFunction function =
+        Function function =
             new JFunction(name, replaceSort(sv.sort(), services), argSorts);
         return services.getTermBuilder().func(function, args);
     }

@@ -28,7 +28,7 @@ public final class CharListNotation extends Notation {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
-            return printlastfirst(t.sub(0)).append(t.op().name().toString());
+            return printlastfirst(t.sub(0)).append(t.op().name());
         }
     }
 

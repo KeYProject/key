@@ -49,8 +49,6 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
         return result;
     }
 
-    public @NonNull String toString() {
-        return parameters == null ? "" : parameters.toString();
-    }
+    public @NonNull String toString() { return parameters == null ? "" : parameters.toString(); }
 
 }

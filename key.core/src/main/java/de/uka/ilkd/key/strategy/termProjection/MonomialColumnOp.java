@@ -7,22 +7,27 @@ import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.LexPathOrdering;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
 
 public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
 
-    private MonomialColumnOp(ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial) {
+    private MonomialColumnOp(ProjectionToTerm<Goal> leftCoefficient,
+            ProjectionToTerm<Goal> polynomial) {
         super(leftCoefficient, polynomial);
     }
 
-    public static @NonNull ProjectionToTerm create(ProjectionToTerm leftCoefficient,
-            ProjectionToTerm polynomial) {
+    public static @NonNull ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> leftCoefficient,
+            ProjectionToTerm<Goal> polynomial) {
         return new MonomialColumnOp(leftCoefficient, polynomial);
     }
 
+    @Override
     protected @NonNull Term divide(@NonNull Monomial numerator, @NonNull BigInteger denominator,
             @NonNull Services services) {
         final BigInteger newRightCoeff =

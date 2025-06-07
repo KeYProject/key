@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import de.uka.ilkd.key.rule.VariableCondition;
+import org.key_project.prover.rules.VariableCondition;
 
 import org.jspecify.annotations.NonNull;
 

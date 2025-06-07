@@ -12,7 +12,5 @@ package de.uka.ilkd.key.smt.newsmt2;
 record VerbatimSMT(String string) implements Writable {
 
     @Override
-    public void appendTo(StringBuilder sb) {
-        sb.append(string);
-    }
+    public void appendTo(StringBuilder sb) { sb.append(string); }
 }

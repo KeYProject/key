@@ -7,50 +7,49 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
-    private final ProjectionToTerm left, right;
+    private final ProjectionToTerm<Goal> left, right;
     private final IntegerLDT numbers;
 
     private final QuanEliminationAnalyser quanAnalyser = new QuanEliminationAnalyser();
 
 
-    private LiteralsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+    private LiteralsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         this.left = left;
         this.right = right;
         this.numbers = numbers;
     }
 
-    public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new LiteralsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
         return compareTerms(leftTerm, rightTerm, pos, goal);
     }
 
-    protected boolean compareTerms(@NonNull Term leftTerm, @NonNull Term rightTerm,
+    protected boolean compareTerms(Term leftTerm, Term rightTerm,
             PosInOccurrence pos, Goal goal) {
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
@@ -64,8 +63,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, @NonNull PosInOccurrence focus,
-            @NonNull Goal goal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);
 
@@ -78,12 +76,12 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
         // HACK: we move literals that do not contain any variables to the left,
         // so that they can be moved out of the scope of the quantifiers
-        if (t1.freeVars().size() == 0) {
-            if (t2.freeVars().size() > 0) {
+        if (t1.freeVars().isEmpty()) {
+            if (!t2.freeVars().isEmpty()) {
                 return false;
             }
         } else {
-            if (t2.freeVars().size() == 0) {
+            if (t2.freeVars().isEmpty()) {
                 return true;
             }
         }
@@ -162,19 +160,19 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         }
     }
 
-    private @NonNull Term discardNegation(@NonNull Term t) {
+    private Term discardNegation(Term t) {
         while (t.op() == Junctor.NOT) {
             t = t.sub(0);
         }
         return t;
     }
 
-    private boolean isBinaryIntRelation(@NonNull Term t) {
+    private boolean isBinaryIntRelation(Term t) {
         return formulaKind(t) >= 0;
     }
 
-    private int formulaKind(@NonNull Term t) {
-        final Operator op = t.op();
+    private int formulaKind(Term t) {
+        final var op = t.op();
         if (op == numbers.getLessOrEquals()) {
             return 1;
         }
@@ -189,8 +187,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     private class MonomialIterator implements Iterator<Term> {
-        private @Nullable Term polynomial;
-        private @Nullable Term nextMonomial = null;
+        private Term polynomial;
+        private Term nextMonomial = null;
 
         private MonomialIterator(Term polynomial) {
             this.polynomial = polynomial;
@@ -213,11 +211,13 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
             }
         }
 
+        @Override
         public boolean hasNext() {
             return nextMonomial != null;
         }
 
-        public @Nullable Term next() {
+        @Override
+        public Term next() {
             final Term res = nextMonomial;
             nextMonomial = null;
             findNextMonomial();
@@ -227,14 +227,15 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         /**
          * throw an unsupported operation exception
          */
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
     }
 
     private static class LiteralCollector extends Collector {
-        protected void collect(@NonNull Term te) {
-            final Operator op = te.op();
+        protected void collect(Term te) {
+            final var op = te.op();
             if (op == Junctor.OR) {
                 collect(te.sub(0));
                 collect(te.sub(1));

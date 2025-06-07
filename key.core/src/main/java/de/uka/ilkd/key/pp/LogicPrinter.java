@@ -23,12 +23,21 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
+import org.key_project.prover.rules.conditions.NotFreeIn;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -248,7 +257,8 @@ public class LogicPrinter {
      * @param declareSchemaVars Should declarations for the schema variables used in the taclet be
      *        pretty-printed?
      */
-    public void printTaclet(Taclet taclet, SVInstantiations sv, boolean showWholeTaclet,
+    public void printTaclet(org.key_project.prover.rules.Taclet taclet, SVInstantiations sv,
+            boolean showWholeTaclet,
             boolean declareSchemaVars) {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
@@ -258,16 +268,23 @@ public class LogicPrinter {
             layouter.print(taclet.name().toString()).print(" {");
         }
         if (declareSchemaVars) {
-            Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
+            Set<SchemaVariable> schemaVars =
+                ((de.uka.ilkd.key.rule.Taclet) taclet).collectSchemaVars();
             for (SchemaVariable schemaVar : schemaVars) {
                 layouter.nl();
-                schemaVar.layout(layouter);
+                final Notation notation;
+                if (schemaVar instanceof Operator opSV) {
+                    notation = notationInfo.getNotation(opSV);
+                } else {
+                    notation = notationInfo.getNotation(schemaVar.getClass());
+                }
+                ((Notation.SchemaVariableNotation) notation).printDeclaration(schemaVar, this);
                 layouter.print(";");
             }
             layouter.nl();
         }
-        if (!(taclet.ifSequent().isEmpty())) {
-            printTextSequent(taclet.ifSequent(), "\\assumes");
+        if (!(taclet.assumesSequent().isEmpty())) {
+            printTextSequent(taclet.assumesSequent(), "\\assumes");
         }
         if (showWholeTaclet) {
             printFind(taclet);
@@ -307,11 +324,11 @@ public class LogicPrinter {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
 
-    protected void printAttribs(Taclet taclet) {
+    protected void printAttribs(org.key_project.prover.rules.Taclet taclet) {
         // no attributes exist for non-rewrite taclets at the moment
     }
 
-    protected void printDisplayName(Taclet taclet) {
+    protected void printDisplayName(org.key_project.prover.rules.Taclet taclet) {
         final String displayName = taclet.displayName();
         if (displayName.equals(taclet.name().toString())) {
             // this means there is no special display name
@@ -339,10 +356,14 @@ public class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) {
-        final ImmutableList<NewVarcond> varsNew = taclet.varsNew();
-        final ImmutableList<NewDependingOn> varsNewDependingOn = taclet.varsNewDependingOn();
-        final ImmutableList<NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
-        final ImmutableList<VariableCondition> variableConditions = taclet.getVariableConditions();
+        final ImmutableList<? extends NewVarcond> varsNew =
+            taclet.varsNew();
+        final ImmutableList<? extends NewDependingOn> varsNewDependingOn =
+            taclet.varsNewDependingOn();
+        final ImmutableList<? extends NotFreeIn> varsNotFreeIn =
+            taclet.varsNotFreeIn();
+        final ImmutableList<? extends VariableCondition> variableConditions =
+            taclet.getVariableConditions();
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()
                 || !varsNewDependingOn.isEmpty()) {
@@ -358,7 +379,7 @@ public class LogicPrinter {
                 printNewVarDepOnCond(ndo);
             }
 
-            for (final NewVarcond nvc : varsNew) {
+            for (final var nvc : varsNew) {
                 if (first) {
                     first = false;
                 } else {
@@ -399,7 +420,8 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printNewVarcond(NewVarcond sv) {
+    protected void printNewVarcond(NewVarcond p_sv) {
+        de.uka.ilkd.key.rule.NewVarcond sv = (de.uka.ilkd.key.rule.NewVarcond) p_sv;
         layouter.beginC();
         layouter.print("\\new(");
         printSchemaVariable(sv.getSchemaVariable());
@@ -457,23 +479,24 @@ public class LogicPrinter {
         Trigger trigger = taclet.getTrigger();
         printSchemaVariable(trigger.triggerVar());
         layouter.print("} ");
-        printTerm(trigger.getTerm());
+        printTerm((Term) trigger.trigger());
         if (trigger.hasAvoidConditions()) {
-            Iterator<Term> itTerms = trigger.avoidConditions().iterator();
             layouter.brk(1, 2);
             layouter.print(" \\avoid ");
-            while (itTerms.hasNext()) {
-                Term cond = itTerms.next();
-                printTerm(cond);
-                if (itTerms.hasNext()) {
+            boolean notFirst = false;
+            for (var cond : trigger.avoidConditions()) {
+                if (notFirst) {
                     layouter.print(", ");
+                } else {
+                    notFirst = true;
                 }
+                printTerm((Term) cond);
             }
         }
         layouter.print(";").end();
     }
 
-    protected void printFind(Taclet taclet) {
+    protected void printFind(org.key_project.prover.rules.Taclet taclet) {
         if (!(taclet instanceof FindTaclet)) {
             return;
         }
@@ -507,12 +530,14 @@ public class LogicPrinter {
             layouter.nl().print("\\closegoal").brk();
         }
 
-        for (final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().reverse().iterator(); it
-                .hasNext();) {
-            printGoalTemplate(it.next());
-            if (it.hasNext()) {
+        boolean notFirst = false;
+        for (final var goalTemplate : taclet.goalTemplates().reverse()) {
+            if (notFirst) {
                 layouter.print(";");
+            } else {
+                notFirst = true;
             }
+            printGoalTemplate(goalTemplate);
         }
     }
 
@@ -549,10 +574,10 @@ public class LogicPrinter {
         }
     }
 
-    protected void printRules(ImmutableList<Taclet> rules) {
+    protected void printRules(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules) {
         layouter.nl().beginC().print("\\addrules(");
         SVInstantiations svi = instantiations;
-        for (Taclet rule : rules) {
+        for (org.key_project.prover.rules.Taclet rule : rules) {
             layouter.nl();
             printTaclet(rule, instantiations, true, false);
             instantiations = svi;
@@ -560,9 +585,9 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printAddProgVars(ImmutableSet<SchemaVariable> apv) {
+    protected void printAddProgVars(ImmutableSet<? extends SchemaVariable> apv) {
         layouter.beginC().print("\\addprogvars(");
-        Iterator<SchemaVariable> it = apv.iterator();
+        Iterator<? extends SchemaVariable> it = apv.iterator();
         if (it.hasNext()) {
             layouter.brk();
             while (true) {
@@ -755,7 +780,7 @@ public class LogicPrinter {
      * @param cfma the constrained formula to be printed
      */
     public void printConstrainedFormula(SequentFormula cfma) {
-        printTerm(cfma.formula());
+        printTerm((Term) cfma.formula());
     }
 
     /**

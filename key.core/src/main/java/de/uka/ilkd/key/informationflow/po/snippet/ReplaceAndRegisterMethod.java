@@ -8,18 +8,18 @@ import java.util.*;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
+import org.key_project.logic.Namespace;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -126,9 +126,8 @@ abstract class ReplaceAndRegisterMethod {
         }
 
         OpReplacer or = new OpReplacer(map, tb.tf());
-        Term result = or.replace(term);
 
-        return result;
+        return or.replace(term);
     }
 
 
@@ -147,8 +146,8 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final void register(@Nullable JFunction f, @NonNull Services services) {
-        Namespace<JFunction> functionNames = services.getNamespaces().functions();
+    final void register(Function f, Services services) {
+        Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
             functionNames.addSafely(f);

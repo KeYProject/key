@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -25,7 +26,7 @@ public class RuleSourceFactory {
         if (stdTacletDir == null) {
             return fromBuiltInRule(ruleFileName);
         } else {
-            return initRuleFile(new File(stdTacletDir, ruleFileName));
+            return initRuleFile(Paths.get(stdTacletDir, ruleFileName));
         }
     }
 
@@ -47,7 +48,7 @@ public class RuleSourceFactory {
         return new UrlRuleSource(url);
     }
 
-    public static RuleSource initRuleFile(final File file) {
+    public static RuleSource initRuleFile(final Path file) {
         return initRuleFile(file, false);
     }
 
@@ -58,7 +59,7 @@ public class RuleSourceFactory {
      * @param compressed <code>true</code> iff the file is gzip-compressed
      * @return the rule source read from the file.
      */
-    public static RuleSource initRuleFile(final File file, boolean compressed) {
+    public static RuleSource initRuleFile(final Path file, boolean compressed) {
         if (compressed) {
             return new GZipFileRuleSource(file);
         } else {

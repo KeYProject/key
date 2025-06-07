@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -15,9 +14,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * Rule application class for close-after-merge rule applications.
@@ -32,8 +30,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private Term pc;
     private Set<Name> newNames;
 
-    public CloseAfterMergeRuleBuiltInRuleApp(@NonNull BuiltInRule builtInRule,
-            @NonNull PosInOccurrence pio,
+    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio,
             Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
             SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
         this(builtInRule, pio);
@@ -45,24 +42,24 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         setNewNames(newNames);
     }
 
-    public CloseAfterMergeRuleBuiltInRuleApp(@NonNull BuiltInRule builtInRule,
-            @NonNull PosInOccurrence pio) {
+    public CloseAfterMergeRuleBuiltInRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
     @Override
-    public @NonNull AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+    public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
     }
 
     @Override
-    public @NonNull IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public IBuiltInRuleApp setAssumesInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
 
     @Override
-    public @NonNull AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
+    public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
         return this;
     }
 

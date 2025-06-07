@@ -4,19 +4,15 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Matching triggers within another quantifier expression. Problems with the current implementation:
@@ -29,11 +25,11 @@ import org.jspecify.annotations.Nullable;
  */
 class TwoSidedMatching {
 
-    private final @NonNull UniTrigger trigger;
-    private final @Nullable Term triggerWithMVs;
-    private final @NonNull Substitution targetSubstWithMVs;
-    private final @NonNull Substitution triggerSubstWithMVs;
-    private final @Nullable Term targetWithMVs;
+    private final UniTrigger trigger;
+    private final Term triggerWithMVs;
+    private final Substitution targetSubstWithMVs;
+    private final Substitution triggerSubstWithMVs;
+    private final Term targetWithMVs;
 
     /**
      * creates an instance of a two sided matching
@@ -42,7 +38,7 @@ class TwoSidedMatching {
      * @param targetTerm the term to match
      * @param services the Services
      */
-    TwoSidedMatching(@NonNull UniTrigger trigger, Term targetTerm, @NonNull Services services) {
+    TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
         this.trigger = trigger;
         this.targetSubstWithMVs = ReplacerOfQuanVariablesWithMetavariables
                 .createSubstitutionForVars(targetTerm, services);
@@ -67,7 +63,6 @@ class TwoSidedMatching {
      * @param services the Services
      * @return the found matchings
      */
-    @NonNull
     ImmutableSet<Substitution> getSubstitutions(Services services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
@@ -76,8 +71,7 @@ class TwoSidedMatching {
         return getAllSubstitutions(targetWithMVs, services);
     }
 
-    private @NonNull ImmutableSet<Substitution> getAllSubstitutions(@NonNull Term target,
-            Services services) {
+    private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         Substitution sub = match(triggerWithMVs, target, services);
         if (sub != null
@@ -87,7 +81,7 @@ class TwoSidedMatching {
                 )) {
             allsubs = allsubs.add(sub);
         }
-        final Operator op = target.op();
+        final var op = target.op();
         if (!(op instanceof Modality || op instanceof UpdateApplication)) {
             for (int i = 0; i < target.arity(); i++) {
                 allsubs = allsubs.union(getAllSubstitutions(target.sub(i), services));
@@ -97,8 +91,9 @@ class TwoSidedMatching {
     }
 
     /** find a substitution in a allterm by using unification */
-    private @Nullable Substitution match(Term triggerTerm, Term targetTerm, Services services) {
-        final Constraint c = Constraint.BOTTOM.unify(targetTerm, triggerTerm, services);
+    private Substitution match(Term triggerTerm, Term targetTerm, Services services) {
+        final Constraint c = Constraint.BOTTOM.unify((de.uka.ilkd.key.logic.Term) targetTerm,
+            (de.uka.ilkd.key.logic.Term) triggerTerm, services);
         if (c.isSatisfiable()) {
             ImmutableMap<QuantifiableVariable, Term> sub =
                 DefaultImmutableMap.nilMap();
@@ -120,7 +115,7 @@ class TwoSidedMatching {
         return null;
     }
 
-    private boolean isGround(@NonNull Term t) {
+    private boolean isGround(Term t) {
         return !triggerSubstWithMVs.termContainsValue(t)
                 && !targetSubstWithMVs.termContainsValue(t);
     }

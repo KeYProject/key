@@ -37,10 +37,8 @@ import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -62,6 +60,10 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -276,12 +278,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name methodHeapName = new Name(tb.newName(heap + "After_" + pm.getName()));
-        final JFunction methodHeapFunc =
+        final Function methodHeapFunc =
             new JFunction(methodHeapName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(methodHeapFunc);
         final Term methodHeap = tb.func(methodHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_" + pm.getName()));
-        final JFunction anonHeapFunc = new JFunction(anonHeapName, heap.sort());
+        final Function anonHeapFunc = new JFunction(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeap =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
@@ -512,7 +514,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         // instantiation must succeed
-        final Instantiation inst = instantiate(pio.subTerm(), goal.proof().getServices());
+        final Instantiation inst = instantiate((Term) pio.subTerm(), goal.proof().getServices());
         if (inst == null) {
             return false;
         }
@@ -554,10 +556,12 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
+        var services = goal.getOverlayServices();
         // get instantiation
-        final Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), services);
+        final Instantiation inst =
+            instantiate((Term) ruleApp.posInOccurrence().subTerm(), services);
         final JavaBlock jb = inst.progPost.javaBlock();
         final TermBuilder tb = services.getTermBuilder();
 

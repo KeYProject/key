@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-
-import org.jspecify.annotations.NonNull;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Checks, whether the position in occurrence is in the antecedent.
@@ -15,7 +13,7 @@ import org.jspecify.annotations.NonNull;
 class AntecChecker implements Checker {
 
     @Override
-    public boolean check(@NonNull PosInOccurrence pio) {
+    public boolean check(PosInOccurrence pio) {
         return pio.isInAntec();
     }
 

@@ -9,7 +9,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -21,8 +20,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The default implementation of {@link IExecutionBranchCondition}.
@@ -44,7 +42,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     /**
      * The human readable branch condition.
      */
-    private @Nullable String formatedBranchCondition;
+    private String formatedBranchCondition;
 
     /**
      * The path condition to reach this node.
@@ -54,7 +52,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     /**
      * The human readable path condition to reach this node.
      */
-    private @Nullable String formatedPathCondition;
+    private String formatedPathCondition;
 
     /**
      * Merged branch conditions.
@@ -74,7 +72,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      *        {@link IExecutionNode}.
      * @param additionalBranchLabel The optional additional branch label.
      */
-    public ExecutionBranchCondition(@NonNull ITreeSettings settings, @NonNull Node proofNode,
+    public ExecutionBranchCondition(ITreeSettings settings, Node proofNode,
             String additionalBranchLabel) {
         super(settings, proofNode);
         this.additionalBranchLabel = additionalBranchLabel;
@@ -92,7 +90,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public @NonNull String getElementType() {
+    public String getElementType() {
         return "Branch Condition";
     }
 
@@ -240,7 +238,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public Node @NonNull [] getMergedProofNodes() {
+    public Node[] getMergedProofNodes() {
         return mergedProofNodes != null
                 ? mergedProofNodes.toArray(new Node[0])
                 : new Node[0];
@@ -263,7 +261,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      *
      * @throws ProofInputException Occurred Exception
      */
-    protected Term @NonNull [] lazyComputeMergedBranchCondtions() throws ProofInputException {
+    protected Term[] lazyComputeMergedBranchCondtions() throws ProofInputException {
         if (isMergedBranchCondition()) {
             Term[] result = new Term[mergedProofNodes.size()];
             Iterator<Node> iter = mergedProofNodes.iterator();
@@ -297,7 +295,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    protected IExecutionConstraint @NonNull [] lazyComputeConstraints() {
+    protected IExecutionConstraint[] lazyComputeConstraints() {
         return SymbolicExecutionUtil.createExecutionConstraints(this);
     }
 
@@ -314,8 +312,8 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      * {@inheritDoc}
      */
     @Override
-    public @Nullable SourceElement getActiveStatement() {
-        Term modalityTerm = getModalityPIO().subTerm();
+    public SourceElement getActiveStatement() {
+        Term modalityTerm = (Term) getModalityPIO().subTerm();
         SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
         return NodeInfo.computeActiveStatement(firstStatement);
     }

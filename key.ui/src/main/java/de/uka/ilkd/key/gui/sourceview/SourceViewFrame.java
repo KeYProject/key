@@ -43,7 +43,7 @@ public class SourceViewFrame extends JSplitPane {
      * @param mainWindow the main window.
      */
     public SourceViewFrame(@NonNull MainWindow mainWindow) {
-        super(JSplitPane.VERTICAL_SPLIT);
+        super(VERTICAL_SPLIT);
 
         sourceView = SourceView.getSourceView(mainWindow);
         tabbedPane = new JTabbedPane();

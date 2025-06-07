@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
@@ -95,11 +97,11 @@ public abstract class KeyAction extends AbstractAction {
     }
 
     protected String getTooltip() {
-        return (String) getValue(Action.SHORT_DESCRIPTION);
+        return (String) getValue(SHORT_DESCRIPTION);
     }
 
     protected void setTooltip(@UnderInitialization KeyAction this, String toolTip) {
-        putValue(Action.SHORT_DESCRIPTION, toolTip);
+        putValue(SHORT_DESCRIPTION, toolTip);
     }
 
     protected void setIcon(Icon icon) {

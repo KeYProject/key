@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 
 public abstract class Assignment extends Operator implements ExpressionStatement {
 
-    public Assignment() {
+    protected Assignment() {
 
     }
 
@@ -31,7 +31,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      *        the children is IMPORTANT. May contain: 2 of Expression (the first Expression as left
      *        hand side, the second as right hand side), Comments
      */
-    public Assignment(@NonNull ExtList children) {
+    protected Assignment(@NonNull ExtList children) {
         super(children);
     }
 
@@ -41,7 +41,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      *
      * @param lhs an expression.
      */
-    public Assignment(Expression lhs) {
+    protected Assignment(Expression lhs) {
         super(lhs);
     }
 
@@ -51,7 +51,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      * @param lhs an expression.
      * @param rhs an expression.
      */
-    public Assignment(Expression lhs, Expression rhs) {
+    protected Assignment(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }
 

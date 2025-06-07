@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.rule.RuleApp;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 /**
  * Interface for collecting <code>RuleApp</code>s, together with their assigned cost. This interface

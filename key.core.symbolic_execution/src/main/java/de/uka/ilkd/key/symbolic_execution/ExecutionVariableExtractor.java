@@ -6,7 +6,6 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -339,9 +339,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
-            if (obj instanceof ParentDef other) {
-                return Objects.equals(parent, other.parent)
-                        && Objects.equals(goalNode, other.goalNode);
+            if (obj instanceof ParentDef(Term parent1, Node goalNode1)) {
+                return Objects.equals(parent, parent1)
+                        && Objects.equals(goalNode, goalNode1);
             } else {
                 return false;
             }
@@ -375,9 +375,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
-            if (obj instanceof LocationDef other) {
-                return programVariable == other.programVariable
-                        && Objects.equals(arrayIndex, other.arrayIndex);
+            if (obj instanceof LocationDef(ProgramVariable variable, Term index)) {
+                return programVariable == variable
+                        && Objects.equals(arrayIndex, index);
             } else {
                 return false;
             }
@@ -408,7 +408,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param additionalCondition An optional additional condition to consider.
          */
         public StateExecutionVariable(@NonNull IExecutionNode<?> parentNode, Node proofNode,
-                PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
+                PosInOccurrence modalityPIO,
+                IProgramVariable programVariable, Term arrayIndex,
                 Term additionalCondition) {
             super(parentNode.getSettings(), proofNode, programVariable, null, arrayIndex,
                 additionalCondition, modalityPIO);
@@ -494,7 +495,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
          */
         public ExtractedExecutionVariable(@NonNull IExecutionNode<?> parentNode, Node proofNode,
-                PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
+                PosInOccurrence modalityPIO,
+                IProgramVariable programVariable, Term arrayIndex,
                 Term arrayStartIndex, Term arrayEndIndex, Term additionalCondition,
                 ExtractedExecutionValue parentValue) {
             super(parentNode.getSettings(), proofNode, programVariable, parentValue, arrayIndex,

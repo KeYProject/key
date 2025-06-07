@@ -35,7 +35,7 @@ import org.jspecify.annotations.Nullable;
  */
 
 public class New extends TypeOperator implements ConstructorReference, ExpressionStatement,
-        ReferencePrefix, ReferenceSuffix, TypeDeclarationContainer {
+        ReferenceSuffix, TypeDeclarationContainer {
 
 
     protected final @Nullable ClassDeclaration anonymousClass;

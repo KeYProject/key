@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.SwingWorker;
@@ -12,12 +12,13 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 
 /**
  * This class extends the functionality of the {@link AbstractProblemLoader}. It allows to do the
@@ -36,7 +37,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     private final KeYMediator mediator;
 
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, List<File> includes,
+    public ProblemLoader(Path file, List<Path> classPath, Path bootClassPath, List<Path> includes,
             Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs, KeYMediator mediator,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce, ProverTaskListener ptl) {

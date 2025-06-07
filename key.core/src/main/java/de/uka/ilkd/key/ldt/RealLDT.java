@@ -8,12 +8,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
@@ -36,21 +38,21 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -59,7 +61,7 @@ public final class RealLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
         // return skolem term
-        final JFunction sk =
+        final Function sk =
             new JFunction(new Name(String.valueOf(NAME) + lit), targetSort());
         return services.getTermBuilder().func(sk);
     }
@@ -80,7 +82,7 @@ public final class RealLDT extends LDT {
     // }
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
         throw new RuntimeException("Not Implemented");

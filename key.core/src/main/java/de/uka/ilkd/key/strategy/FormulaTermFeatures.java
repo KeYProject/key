@@ -7,8 +7,10 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.logic.op.Function;
+import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 
@@ -54,7 +56,7 @@ class FormulaTermFeatures extends StaticFeatureCollection {
         notContainsExecutable = not(ContainsExecutableCodeTermFeature.PROGRAMS);
 
         cutAllowed = add(notContainsExecutable, tf.notContainsProduct,
-            or(tf.eqF, OperatorClassTF.create(JFunction.class),
+            or(tf.eqF, OperatorClassTF.create(Function.class),
                 OperatorClassTF.create(ProgramVariable.class),
                 OperatorClassTF.create(LogicVariable.class))); // XXX
         cutAllowedBelowQuantifier = add(not(propJunctor), notContainsExecutable);
@@ -63,6 +65,8 @@ class FormulaTermFeatures extends StaticFeatureCollection {
                 ifZero(tf.eqF, longTermConst(100), longTermConst(200))),
             rec(any(), longTermConst(1)));
         // directCutAllowed = add ( tf.intInEquation, notContainsQuery );
+
+
 
     }
 

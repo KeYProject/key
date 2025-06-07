@@ -6,14 +6,13 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.OperatorSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +23,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
 
-    public MatchSchemaVariableInstruction(@NonNull SV op) {
+    protected MatchSchemaVariableInstruction(SV op) {
         super(op);
     }
 
@@ -34,9 +33,8 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * schemavariable has been already matched to a term <tt>t2</tt> which is not unifiable with the
      * given term.
      */
-    protected final @Nullable MatchConditions addInstantiation(@NonNull Term term,
-            @NonNull MatchConditions matchCond,
-            @NonNull Services services) {
+    protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
+            LogicServices services) {
 
         if (op.isRigid() && !term.isRigid()) {
             return null;
@@ -46,7 +44,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
 
         final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
         if (t != null) {
-            if (!t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+            if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term)) {
                 return null;
             } else {
                 return matchCond;
@@ -67,14 +65,14 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      *
      * @param instantiationCandidate the {@link ProgramElement} to be matched
      * @param mc the {@link MatchConditions} with additional constraints (e.g. previous matches of
-     *        this instructions {@link SchemaVariable})
+     *        this instructions {@link org.key_project.logic.op.sv.SchemaVariable})
      * @param services the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
-     *         the pair ({@link SchemaVariable}, {@link ProgramElement}) added
+     *         the pair ({@link org.key_project.logic.op.sv.SchemaVariable}, {@link ProgramElement})
+     *         added
      */
-    public @Nullable MatchConditions match(ProgramElement instantiationCandidate,
-            MatchConditions mc,
-            Services services) {
+    public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc,
+            LogicServices services) {
         return null;
     }
 

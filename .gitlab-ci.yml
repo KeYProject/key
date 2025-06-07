@@ -26,10 +26,10 @@ before_script:
   - export SONAR_SCANNER_OPTS="-Xmx8G"
 
 stages:
-    - primary
-    - secondary
-    - ternary
-    - deploy
+  - primary
+  - secondary
+  - ternary
+  - deploy
 
 compile:classes:
   stage: primary

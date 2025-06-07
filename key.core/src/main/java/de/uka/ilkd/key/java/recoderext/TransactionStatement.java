@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
 import recoder.java.statement.JavaStatement;
@@ -35,7 +36,7 @@ public class TransactionStatement extends JavaStatement {
         return type;
     }
 
-    public recoder.java.ProgramElement getChildAt(int index) {
+    public ProgramElement getChildAt(int index) {
         return null;
     }
 
@@ -57,13 +58,13 @@ public class TransactionStatement extends JavaStatement {
 
 
     @Override
-    public int getChildPositionCode(recoder.java.ProgramElement arg0) {
+    public int getChildPositionCode(ProgramElement arg0) {
         return 0;
     }
 
     @Override
-    public boolean replaceChild(recoder.java.ProgramElement arg0,
-            recoder.java.ProgramElement arg1) {
+    public boolean replaceChild(ProgramElement arg0,
+            ProgramElement arg1) {
         return false;
     }
 

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -26,30 +27,35 @@ import recoder.io.DataLocation;
  *
  * @author MU
  */
-public class ZipFileCollection implements FileCollection {
+public class ZipFileCollection implements FileCollection, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
     private final File file;
     private @Nullable ZipFile zipFile;
 
-    public ZipFileCollection(File file) {
-        this.file = file;
+    public ZipFileCollection(Path file) throws IOException {
+        this.file = file.toFile();
+        try {
+            zipFile = new ZipFile(this.file);
+        } catch (ZipException ex) {
+            throw new IOException("can't open " + file + ": " + ex.getMessage(), ex);
+        }
     }
 
 
     public Walker createWalker(String[] extensions) throws IOException {
-        if (zipFile == null) {
-            try {
-                zipFile = new ZipFile(file);
-            } catch (ZipException ex) {
-                throw new IOException("can't open " + file + ": " + ex.getMessage(), ex);
-            }
-        }
         return new Walker(extensions);
     }
 
     public Walker createWalker(String extension) throws IOException {
         return createWalker(new String[] { extension });
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (zipFile != null) {
+            zipFile.close();
+        }
     }
 
     public class Walker implements FileCollection.Walker {

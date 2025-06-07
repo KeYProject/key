@@ -8,10 +8,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -19,10 +15,13 @@ import de.uka.ilkd.key.macros.ProofMacroListener;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -39,7 +38,8 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
-    private PosInOccurrence getApplicablePosInOcc(@NonNull Proof proof, Goal goal,
+    private PosInOccurrence getApplicablePosInOcc(@NonNull Proof proof,
+            Goal goal,
             @Nullable PosInOccurrence posInOcc,
             @NonNull ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
@@ -47,7 +47,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
         } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
             return posInOcc;
         } else {
-            final Term subTerm = posInOcc.subTerm();
+            final var subTerm = posInOcc.subTerm();
             PosInOccurrence res = null;
             for (int i = 0; i < subTerm.arity() && res == null; i++) {
                 res = getApplicablePosInOcc(proof, goal, posInOcc.down(i), macro);
@@ -96,7 +96,8 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     for (int i = 1; i <= seq.size()
                             && applicableOnNodeAtPos.get(goal.node()) == null; i++) {
                         PosInOccurrence searchPos =
-                            PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+                            PosInOccurrence.findInSequent(seq, i,
+                                PosInTerm.getTopLevel());
                         PosInOccurrence applicableAt =
                             getApplicablePosInOcc(proof, goal, searchPos, macro);
                         applicableOnNodeAtPos.put(goal.node(), applicableAt);

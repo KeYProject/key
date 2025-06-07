@@ -5,6 +5,9 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -75,10 +78,10 @@ public class ProveTest {
     }
 
     private void runKey(@NonNull String file, @NonNull TestProperty testProperty) throws Exception {
-        File keyFile = new File(file);
+        var keyFile = new File(file).toPath();
 
         // a name for this run. helps to find it in the mass of logger
-        final var caseId = "%s|%d".formatted(keyFile.getName(), keyFile.hashCode());
+        final var caseId = "%s|%d".formatted(keyFile.getFileName(), keyFile.hashCode());
 
         LOGGER.info("{}: Run Test: {} with {}", caseId, file, testProperty);
 
@@ -92,10 +95,10 @@ public class ProveTest {
         LOGGER.info("({}) Active Settings: {}", caseId,
             ProofSettings.DEFAULT_SETTINGS.settingsToString());
 
-        assertTrue(keyFile.exists(), "File " + keyFile + " does not exists");
+        assertTrue(Files.exists(keyFile), "File " + keyFile + " does not exists");
 
         // File that the created proof will be saved to.
-        File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
+        var proofFile = Paths.get(keyFile.toAbsolutePath() + ".proof");
 
         LOGGER.info("({}) Proof will be saved to: {}", caseId, proofFile);
 
@@ -136,7 +139,7 @@ public class ProveTest {
                     success = (testProperty == TestProperty.PROVABLE) == closed;
                     LOGGER.info("({}) Finished proof: {}", caseId,
                         (closed ? "closed." : "open goal(s)"));
-                    appendStatistics(loadedProof, keyFile);
+                    appendStatistics(loadedProof, keyFile.toFile());
                     if (success) {
                         reload(proofFile, loadedProof);
                     }
@@ -164,7 +167,7 @@ public class ProveTest {
     /**
      * Override this method in order to change reload behaviour.
      */
-    private void reload(@NonNull File proofFile, @NonNull Proof loadedProof) throws Exception {
+    private void reload(Path proofFile, Proof loadedProof) throws Exception {
         if (reloadEnabled) {
             System.err.println("Test reloadability.");
             // Save the available proof to a temporary file.
@@ -198,8 +201,7 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private @NonNull Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(
-            @NonNull File keyFile)
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(Path keyFile)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
@@ -211,7 +213,7 @@ public class ProveTest {
      *
      * @param proofFile File that contains the proof that will be (re-)loaded.
      */
-    private boolean reloadProof(@NonNull File proofFile) throws Exception {
+    private boolean reloadProof(Path proofFile) throws Exception {
         /*
          * Reload proof and dispose corresponding KeY environment immediately afterwards. If no
          * exception is thrown it is assumed that loading works properly.
@@ -227,7 +229,7 @@ public class ProveTest {
                 for (Throwable ex : errorList) {
                     LOGGER.error("Error", ex);
                 }
-                throw errorList.get(0);
+                throw errorList.getFirst();
             }
 
             reloadedProof = proofLoadEnvironment.getLoadedProof();

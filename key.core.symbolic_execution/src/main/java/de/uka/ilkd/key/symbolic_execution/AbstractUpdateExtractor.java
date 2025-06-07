@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAllArrayIndicesVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
@@ -26,7 +25,12 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -62,7 +66,7 @@ public abstract class AbstractUpdateExtractor {
      * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
      * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
      */
-    public AbstractUpdateExtractor(@NonNull Node node, @NonNull PosInOccurrence modalityPio) {
+    protected AbstractUpdateExtractor(@NonNull Node node, @NonNull PosInOccurrence modalityPio) {
         assert node != null;
         assert modalityPio != null;
         this.node = node;
@@ -156,7 +160,7 @@ public abstract class AbstractUpdateExtractor {
             // are not part of the source code and should be ignored.
             Sequent sequent = getRoot().sequent();
             for (SequentFormula sf : sequent.succedent()) {
-                Term term = sf.formula();
+                Term term = (Term) sf.formula();
                 if (Junctor.IMP.equals(term.op())) {
                     fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
                 }
@@ -217,7 +221,7 @@ public abstract class AbstractUpdateExtractor {
         // Go up in parent hierarchy and collect updates on all update applications
         PosInOccurrence pio = modalityPio;
         while (pio != null) {
-            Term updateApplication = pio.subTerm();
+            Term updateApplication = (Term) pio.subTerm();
             if (updateApplication.op() == UpdateApplication.UPDATE_APPLICATION) {
                 Term topUpdate = UpdateApplication.getUpdate(updateApplication);
                 collectLocationsFromTerm(topUpdate, locationsToFill, updateCreatedObjectsToFill,
@@ -444,7 +448,8 @@ public abstract class AbstractUpdateExtractor {
         Set<ExtractLocationParameter> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             result.addAll(extractLocationsFromTerm(
-                OriginTermLabel.removeOriginLabels(sf.formula(), getServices()), objectsToIgnore));
+                OriginTermLabel.removeOriginLabels((Term) sf.formula(), getServices()),
+                objectsToIgnore));
         }
         return result;
     }
@@ -481,8 +486,7 @@ public abstract class AbstractUpdateExtractor {
             @NonNull Set<Term> objectsToIgnore) throws ProofInputException {
         term = OriginTermLabel.removeOriginLabels(term, getServices());
         final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
-        if (term.op() instanceof ProgramVariable) {
-            ProgramVariable var = (ProgramVariable) term.op();
+        if (term.op() instanceof ProgramVariable var) {
             if (!SymbolicExecutionUtil.isHeap(var, heapLDT) && !isImplicitProgramVariable(var)
                     && !objectsToIgnore.contains(term) && !hasFreeVariables(term)) {
                 toFill.add(new ExtractLocationParameter(var, true));
@@ -580,7 +584,7 @@ public abstract class AbstractUpdateExtractor {
             sorts[i] = arguments[i].sort();
         }
         // Create predicate which will be used in formulas to store the value interested in.
-        JFunction newPredicate =
+        Function newPredicate =
             new JFunction(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
                 JavaDLTheory.FORMULA, sorts);
         // Create formula which contains the value interested in.
@@ -806,11 +810,11 @@ public abstract class AbstractUpdateExtractor {
                 OriginTermLabel.removeOriginLabels(arrayStartIndex, getServices());
             this.arrayEndIndex = OriginTermLabel.removeOriginLabels(arrayEndIndex, getServices());
             TermBuilder tb = getServices().getTermBuilder();
-            JFunction constantFunction = new JFunction(
+            Function constantFunction = new JFunction(
                 new Name(tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)),
                 getServices().getTypeConverter().getIntegerLDT().targetSort());
             this.arrayRangeConstant = tb.func(constantFunction);
-            JFunction notAValueFunction = new JFunction(
+            Function notAValueFunction = new JFunction(
                 new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)),
                 JavaDLTheory.ANY);
             this.notAValue = tb.func(notAValueFunction);
@@ -959,11 +963,11 @@ public abstract class AbstractUpdateExtractor {
                 } else {
                     if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                         // Special handling for length attribute of arrays
-                        JFunction function =
+                        Function function =
                             getServices().getTypeConverter().getHeapLDT().getLength();
                         return tb.func(function, createPreParentTerm());
                     } else {
-                        JFunction function =
+                        Function function =
                             getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                                 (LocationVariable) programVariable, getServices());
                         return tb.dot(programVariable.sort(), createPreParentTerm(), function);
@@ -971,7 +975,7 @@ public abstract class AbstractUpdateExtractor {
                 }
             } else {
                 if (programVariable.isStatic()) {
-                    JFunction function = getServices().getTypeConverter().getHeapLDT()
+                    Function function = getServices().getTypeConverter().getHeapLDT()
                             .getFieldSymbolForPV((LocationVariable) programVariable, getServices());
                     return tb.staticDot(programVariable.sort(), function);
                 } else {
@@ -1138,7 +1142,7 @@ public abstract class AbstractUpdateExtractor {
         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
             modalityPio, layoutCondition, updateLayoutTerm, null, false);
         // Instantiate and run proof
-        ApplyStrategyInfo info =
+        ApplyStrategyInfo<Proof, Goal> info =
             SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
                 StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
                 StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_NORMAL);
@@ -1283,7 +1287,7 @@ public abstract class AbstractUpdateExtractor {
             if (node.proof().root() == node) {
                 originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
             } else {
-                Term originalModifiedFormula = pio.subTerm();
+                Term originalModifiedFormula = (Term) pio.subTerm();
                 originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
             }
         }

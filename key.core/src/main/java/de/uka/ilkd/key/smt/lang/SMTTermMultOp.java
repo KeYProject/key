@@ -36,8 +36,8 @@ public class SMTTermMultOp extends SMTTerm {
 
         public SMTTerm getIdem() {
             return switch (this) {
-            case AND -> SMTTerm.TRUE;
-            case OR -> SMTTerm.FALSE;
+            case AND -> TRUE;
+            case OR -> FALSE;
             default -> throw new RuntimeException(
                 "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
             };
@@ -495,7 +495,7 @@ public class SMTTermMultOp extends SMTTerm {
     }
 
     public SMTTerm mkChain() {
-        SMTTerm ret = SMTTerm.TRUE;
+        SMTTerm ret = TRUE;
         for (int i = 0; i < subs.size() - 1; i++) {
             SMTTerm subi = subs.get(i);
             SMTTerm subiPlus1 = subs.get(i + 1);

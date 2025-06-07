@@ -125,7 +125,7 @@ public class KeYJavaType implements Type {
 
     @Override
     public int hashCode() {
-        return 0;
+        return getFullName().hashCode();
     }
 
 

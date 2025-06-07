@@ -7,9 +7,6 @@ import java.util.ArrayDeque;
 
 import de.uka.ilkd.key.logic.Term;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 /**
  * An iterator that walks in first-depth order through the term. It allows to jump to siblings.
  */
@@ -38,7 +35,7 @@ public class TermNavigator {
      * @return a pooled {@link TermNavigator} or a new one if the TERM_NAVIGATOR_POOL is currently
      *         empty
      */
-    public static @NonNull TermNavigator get(Term term) {
+    public static TermNavigator get(Term term) {
         TermNavigator tn = null;
         synchronized (TERM_NAVIGATOR_POOL) {
             if (!TERM_NAVIGATOR_POOL.isEmpty()) {
@@ -78,8 +75,7 @@ public class TermNavigator {
         return stack.size() > 1;
     }
 
-
-    public @Nullable Term getCurrentSubterm() {
+    public Term getCurrentSubterm() {
         return stack.peek().first;
     }
 
@@ -154,7 +150,7 @@ public class TermNavigator {
          * @return a pooled {@link MutablePair} or a new one if the TERM_NAVIGATOR_POOL is currently
          *         empty
          */
-        static @NonNull MutablePair get(Term first, Integer second) {
+        static MutablePair get(Term first, Integer second) {
             MutablePair pair = null;
             synchronized (PAIR_POOL) {
                 if (!PAIR_POOL.isEmpty()) {
@@ -170,9 +166,7 @@ public class TermNavigator {
         }
 
 
-        @Nullable
         Term first;
-        @Nullable
         Integer second;
 
         public MutablePair(Term first, Integer second) {
@@ -196,7 +190,7 @@ public class TermNavigator {
         }
 
         @Override
-        public @NonNull String toString() {
+        public String toString() {
             return "MutablePair [first=" + first + ", second=" + second + "]";
         }
     }

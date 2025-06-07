@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
@@ -16,10 +18,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -35,11 +35,11 @@ import org.slf4j.LoggerFactory;
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
 public final class ProgramSV extends OperatorSV
-        implements ProgramConstruct, UpdateableOperator, SyntaxElement {
+        implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
-    private static final ProgramList EMPTY_LIST_INSTANTIATION =
-        new ProgramList(new ImmutableArray<>(new ProgramElement[0]));
+    private static final ImmutableArray<ProgramElement> EMPTY_LIST_INSTANTIATION =
+        new ImmutableArray<>(new ProgramElement[0]);
 
     private final boolean isListSV;
 
@@ -258,7 +258,7 @@ public final class ProgramSV extends OperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
-    private @Nullable MatchConditions addProgramInstantiation(ProgramList list,
+    private @Nullable MatchConditions addProgramInstantiation(ImmutableArray<ProgramElement> list,
             MatchConditions matchCond,
             Services services) {
         if (matchCond == null) {
@@ -266,7 +266,7 @@ public final class ProgramSV extends OperatorSV
         }
 
         SVInstantiations insts = matchCond.getInstantiations();
-        final ProgramList pl = (ProgramList) insts.getInstantiation(this);
+        final var pl = (ImmutableArray<ProgramElement>) insts.getInstantiation(this);
         if (pl != null) {
             if (pl.equals(list)) {
                 return matchCond;
@@ -275,7 +275,7 @@ public final class ProgramSV extends OperatorSV
             }
         }
 
-        insts = insts.add(this, list, services);
+        insts = insts.add(this, list, ProgramElement.class, services);
         return insts == null ? null : matchCond.setInstantiations(insts);
     }
 
@@ -291,8 +291,8 @@ public final class ProgramSV extends OperatorSV
 
         final ExecutionContext ec = instantiations.getExecutionContext();
 
-        final java.util.ArrayList<ProgramElement> matchedElements =
-            new java.util.ArrayList<>();
+        final ArrayList<ProgramElement> matchedElements =
+            new ArrayList<>();
 
         while (src != null) {
             if (!check(src, ec, services)) {
@@ -303,9 +303,7 @@ public final class ProgramSV extends OperatorSV
             src = source.getSource();
         }
 
-        return addProgramInstantiation(
-            new ProgramList(new ImmutableArray<>(matchedElements)), matchCond,
-            services);
+        return addProgramInstantiation(new ImmutableArray<>(matchedElements), matchCond, services);
     }
 
     /**
@@ -363,12 +361,6 @@ public final class ProgramSV extends OperatorSV
     @Override
     public String toString() {
         return toString("program " + sort().name());
-    }
-
-    @Override
-    public void layout(Layouter<?> layouter) {
-        layouter.print("\\schemaVar \\program ").print(sort().declarationString()).print(" ")
-                .print(name().toString());
     }
 
     @Override

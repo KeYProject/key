@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.rule.Rule;
+import org.key_project.prover.rules.Rule;
 
 import org.jspecify.annotations.NonNull;
 

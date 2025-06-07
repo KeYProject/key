@@ -11,12 +11,12 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -100,7 +100,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
                 mergeElem = lattice.join(abstrElem1, abstrElem2);
             }
 
-            JFunction newSkolemConst =
+            Function newSkolemConst =
                 getNewSkolemConstantForPrefix(mergeElem.toString(), valueInState1.sort(), services);
             LinkedHashSet<Name> newNames = new LinkedHashSet<>();
             newNames.add(newSkolemConst.name());

@@ -4,10 +4,9 @@
 package de.uka.ilkd.key.rule.match;
 
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 
-import org.jspecify.annotations.NonNull;
+import org.key_project.prover.rules.TacletMatcher;
 
 
 /**
@@ -28,7 +27,7 @@ public abstract class TacletMatcherKit {
      */
     private static final class VMTacletMatcherKit extends TacletMatcherKit {
         @Override
-        public @NonNull TacletMatcher createTacletMatcher(@NonNull Taclet taclet) {
+        public TacletMatcher createTacletMatcher(Taclet taclet) {
             return new VMTacletMatcher(taclet);
         }
     }
@@ -39,7 +38,7 @@ public abstract class TacletMatcherKit {
      */
     private static final String TACLET_MATCHER_SELECTION_VALUE =
         System.getProperty("taclet.match", "vm");
-    private static final @NonNull TacletMatcherKit ACTIVE_TACLET_MATCHER_KIT;
+    private static final TacletMatcherKit ACTIVE_TACLET_MATCHER_KIT;
     static {
         if ("vm".equals(TACLET_MATCHER_SELECTION_VALUE)) {
             ACTIVE_TACLET_MATCHER_KIT = new VMTacletMatcherKit();
@@ -53,7 +52,7 @@ public abstract class TacletMatcherKit {
      *
      * @return the concrete factory to create taclet matchers
      */
-    public static @NonNull TacletMatcherKit getKit() {
+    public static TacletMatcherKit getKit() {
         return ACTIVE_TACLET_MATCHER_KIT;
     }
 

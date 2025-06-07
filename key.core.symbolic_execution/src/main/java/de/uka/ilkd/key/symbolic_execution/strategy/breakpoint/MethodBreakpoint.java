@@ -16,11 +16,12 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
 
@@ -84,13 +85,12 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, @NonNull RuleApp ruleApp,
-            @NonNull Proof proof,
-            @NonNull Node node) {
-        return !proof.isDisposed()
+    public boolean isBreakpointHit(SourceElement activeStatement,
+            RuleApp ruleApp, Node node) {
+        return !node.proof().isDisposed()
                 && ((isEntry && isMethodCallNode(node, ruleApp))
                         || (isExit && isMethodReturnNode(node, ruleApp)))
-                && (!isConditionEnabled() || conditionMet(ruleApp, proof, node)) && isEnabled()
+                && (!isConditionEnabled() || conditionMet(ruleApp, node)) && isEnabled()
                 && hitcountExceeded(node);
     }
 
@@ -137,8 +137,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     private boolean isCorrectMethodReturn(@NonNull Node node, @NonNull RuleApp ruleApp) {
-        Term term = ruleApp.posInOccurrence().subTerm();
-        term = TermBuilder.goBelowUpdates(term);
+        var t = ruleApp.posInOccurrence().subTerm();
+        Term term = TermBuilder.goBelowUpdates(t);
         MethodFrame mf =
             JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
         return Objects.equals(getPm(), mf.getProgramMethod());

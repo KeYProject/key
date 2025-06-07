@@ -6,11 +6,14 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,7 +23,7 @@ import org.jspecify.annotations.NonNull;
  *
  * The negated condition is true if the instantiation refers to an instance (non-static) field.
  *
- * Inspired by {@link de.uka.ilkd.key.rule.conditions.FieldTypeToSortCondition}.
+ * Inspired by {@link FieldTypeToSortCondition}.
  *
  * @author Michael Kirsten
  */
@@ -43,7 +46,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
             return false;
         }
         final Operator op = f.op();
-        if (op instanceof JFunction) {
+        if (op instanceof Function) {
             HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
             if (split == null) {
                 return false;

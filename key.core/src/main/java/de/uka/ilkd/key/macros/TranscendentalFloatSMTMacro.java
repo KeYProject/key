@@ -6,9 +6,10 @@ package de.uka.ilkd.key.macros;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.Strategy;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * This class captures a proof macro which is meant to fully automise KeY proof workflow.

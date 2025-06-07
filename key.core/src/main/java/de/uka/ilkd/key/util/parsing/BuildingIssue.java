@@ -15,8 +15,7 @@ import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.Nullable;
 
 public record BuildingIssue(String message, @Nullable Throwable cause, boolean isWarning,
-        Position position,
-        @Nullable String sourceName) {
+        Position position, @Nullable String sourceName) {
 
     private static final URI URI_UNKNOWN = URI.create("file:unknown");
 

@@ -5,8 +5,10 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.prover.StopCondition;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
+
+import org.key_project.prover.engine.StopCondition;
 
 /**
  * Defines the basic functionality of an {@link StopCondition} which stops applying rules when at
@@ -14,7 +16,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
  *
  * @author Martin Hentschel
  */
-public interface IBreakpointStopCondition extends StopCondition {
+public interface IBreakpointStopCondition extends StopCondition<Goal> {
     /**
      * Adds a new {@link IBreakpoint}.
      *

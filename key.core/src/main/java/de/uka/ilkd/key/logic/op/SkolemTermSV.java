@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -30,18 +29,12 @@ public final class SkolemTermSV extends OperatorSV implements TerminalSyntaxElem
     }
 
     @Override
-    public String toString() {
-        return toString(sort().toString() + " skolem term");
+    public boolean isSkolemTerm() {
+        return true;
     }
 
     @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar ");
-        if (sort() == JavaDLTheory.FORMULA) {
-            l.print("\\skolemFormula");
-        } else {
-            l.print("\\skolemTerm ").print(sort().name().toString());
-        }
-        l.print(" ").print(name().toString());
+    public String toString() {
+        return toString(sort() + " skolem term");
     }
 }

@@ -4,16 +4,14 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 
-import org.jspecify.annotations.NonNull;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**
@@ -26,23 +24,23 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
     @Deprecated
     private final Constraint metavariableInst;
 
-    public ConstraintAwareSyntacticalReplaceVisitor(@NonNull TermLabelState termLabelState,
-            @NonNull Services services, Constraint metavariableInst,
-            @NonNull PosInOccurrence applicationPosInOccurrence, @NonNull Rule rule,
-            @NonNull RuleApp ruleApp,
-            @NonNull TacletLabelHint labelHint, @NonNull Goal goal) {
-        super(termLabelState, labelHint, applicationPosInOccurrence, goal, rule, ruleApp, services,
-            services.getTermBuilder(false));
+    public ConstraintAwareSyntacticalReplaceVisitor(TermLabelState termLabelState,
+            Services services, Constraint metavariableInst,
+            PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
+            TacletLabelHint labelHint) {
+        super(termLabelState, labelHint, applicationPosInOccurrence, services, rule, ruleApp,
+            false);
         this.metavariableInst = metavariableInst;
     }
 
-    protected @NonNull Term toTerm(Term t) {
+    @Override
+    protected Term toTerm(Term t) {
         if (!EqualityConstraint.metaVars(t, services).isEmpty() && !metavariableInst.isBottom()) {
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =
                 new ConstraintAwareSyntacticalReplaceVisitor(termLabelState, services,
-                    metavariableInst, applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
+                    metavariableInst, applicationPosInOccurrence, rule, ruleApp, labelHint);
             t.execPostOrder(srv);
             return srv.getTerm();
         } else {
@@ -50,7 +48,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
         }
     }
 
-    public void visited(@NonNull Term visited) {
+    public void visited(Term visited) {
         if (visited.op() instanceof Metavariable mv &&
                 metavariableInst.getInstantiation(mv, services).op() != visited.op()) {
             pushNew(metavariableInst.getInstantiation(mv, services));

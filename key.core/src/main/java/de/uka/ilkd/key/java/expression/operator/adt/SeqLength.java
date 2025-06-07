@@ -53,7 +53,7 @@ public class SeqLength extends Operator {
 
     @Override
     public int getNotation() {
-        return Operator.PREFIX;
+        return PREFIX;
     }
 
 }

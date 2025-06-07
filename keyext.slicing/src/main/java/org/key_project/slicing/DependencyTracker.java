@@ -11,9 +11,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -28,11 +25,14 @@ import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.slicing.graph.AddedRule;
@@ -112,7 +112,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
         }
-        inputs.addAll(RuleAppUtil.ifInstsOfRuleApp(ruleApp, node));
+        inputs.addAll(RuleAppUtil.assumesInstantiationsOfRuleApp(ruleApp, node));
         return inputs;
     }
 
@@ -210,7 +210,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         for (final var parentFormula : seqParent) {
             if (!seqNew.contains(parentFormula)) {
                 removed.add(new PosInOccurrence(parentFormula, PosInTerm.getTopLevel(),
-                    seqParent.numberInAntec(i)));
+                    seqParent.numberInAntecedent(i)));
             }
             i++;
         }
@@ -251,7 +251,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             for (var f : newSeq) {
                 if (!oldSeq.contains(f)) {
                     var pio = new PosInOccurrence(f, PosInTerm.getTopLevel(),
-                        newSeq.numberInAntec(index));
+                        newSeq.numberInAntecedent(index));
                     outputs.add(new Pair<>(pio, node.childrenCount() > 1 ? sibling : -1));
                 }
                 index++;
@@ -285,7 +285,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                         justAddRule.node() == n) {
                     AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
                     output.add(ruleNode);
-                    dynamicRules.put((Taclet) newRule.rule(), ruleNode);
+                    dynamicRules.put(newRule.rule(), ruleNode);
                 }
             }
         }
@@ -299,7 +299,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         // Newly created sequent formulas and the index of the branch they are created in.
         // If no new branches are created, use index -1.
-        List<Pair<PosInOccurrence, Integer>> outputs = outputsOfNode(ruleAppInfo);
+        List<Pair<PosInOccurrence, Integer>> outputs =
+            outputsOfNode(ruleAppInfo);
 
         for (Pair<PosInOccurrence, Integer> out : outputs) {
             BranchLocation loc = n.getBranchLocation();
@@ -383,7 +384,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         // Newly created sequent formulas and the index of the branch they are created in.
         // If no new branches are created, use index -1.
-        List<Pair<PosInOccurrence, Integer>> outputs = outputsOfNode(n);
+        List<Pair<PosInOccurrence, Integer>> outputs =
+            outputsOfNode(n);
 
         for (Pair<PosInOccurrence, Integer> out : outputs) {
             BranchLocation loc = n.getBranchLocation();

@@ -10,12 +10,6 @@ import org.key_project.util.collection.ImmutableArray;
 
 
 public class TermCreationException extends RuntimeException {
-
-    /**
-     * generated serial version UID
-     */
-    private static final long serialVersionUID = -7173044450561438150L;
-
     public TermCreationException(String errorMessage) {
         super(errorMessage);
     }

@@ -16,7 +16,6 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
@@ -28,11 +27,11 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -82,7 +81,7 @@ public class MasterHandlerTest {
         }
 
         Path directory = Paths.get(url.toURI());
-        Assertions.assertTrue(Files.isDirectory(directory));
+        assertTrue(Files.isDirectory(directory));
 
         List<Path> files;
         try (var s = Files.list(directory)) {
@@ -132,7 +131,7 @@ public class MasterHandlerTest {
             Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
             Files.write(tmpKey, lines);
 
-            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
             Proof proof = env.getLoadedProof();
             Sequent sequent = proof.root().sequent();

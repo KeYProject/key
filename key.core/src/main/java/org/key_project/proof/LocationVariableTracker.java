@@ -11,7 +11,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
 
@@ -26,7 +27,8 @@ public class LocationVariableTracker implements RuleAppListener {
      * The "origin" of the variables. Used to indicate which
      * {@link de.uka.ilkd.key.rule.TacletApp} created a new program variable.
      */
-    private final Map<LocationVariable, RuleApp> createdBy = new WeakHashMap<>();
+    private final Map<LocationVariable, RuleApp> createdBy =
+        new WeakHashMap<>();
 
     /**
      * Register a new tracker on the provided proof.

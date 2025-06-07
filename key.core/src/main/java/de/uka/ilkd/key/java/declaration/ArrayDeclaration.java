@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
- * KeY used to model arrays using only the {@link de.uka.ilkd.key.java.abstraction.ArrayType}. As
+ * KeY used to model arrays using only the {@link ArrayType}. As
  * the only attribute of an array has been the length attribute, it has been handled in a different
  * way than members of usual classes. As we need some implicit fields for array creation and
  * initialisation, the special handling of arrays is not any longer practicable. So, this class

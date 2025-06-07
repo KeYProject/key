@@ -3,16 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * This class is used to create metavariables for every universal variables in quantified formula
@@ -24,20 +23,19 @@ class ReplacerOfQuanVariablesWithMetavariables {
 
     private ReplacerOfQuanVariablesWithMetavariables() {}
 
-    public static @NonNull Substitution createSubstitutionForVars(Term allTerm,
-            @NonNull TermServices services) {
-        ImmutableMap<QuantifiableVariable, Term> res =
+    public static Substitution createSubstitutionForVars(Term allTerm, TermServices services) {
+        ImmutableMap<org.key_project.logic.op.QuantifiableVariable, Term> res =
             DefaultImmutableMap.nilMap();
         Term t = allTerm;
-        Operator op = t.op();
+        var op = t.op();
         while (op instanceof Quantifier) {
-            QuantifiableVariable q = t.varsBoundHere(0).get(0);
+            QuantifiableVariable q = (QuantifiableVariable) t.varsBoundHere(0).get(0);
             Term m;
             if (op == Quantifier.ALL) {
                 Metavariable mv = new Metavariable(ARBITRARY_NAME, q.sort());
                 m = services.getTermBuilder().var(mv);
             } else {
-                JFunction f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
+                Function f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
                 m = services.getTermBuilder().func(f);
             }
             res = res.put(q, m);

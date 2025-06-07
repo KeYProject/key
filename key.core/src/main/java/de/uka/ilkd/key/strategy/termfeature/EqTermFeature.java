@@ -3,10 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 
@@ -32,7 +35,8 @@ public class EqTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(@NonNull Term term, @NonNull MutableState mState, Services services) {
-        return term.equalsModProperty(pattern.getContent(mState), RENAMING_TERM_PROPERTY);
+    protected boolean filter(@NonNull Term term, @NonNull MutableState mState,
+            LogicServices services) {
+        return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, pattern.getContent(mState));
     }
 }

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -13,14 +12,13 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TacletMatchProgram;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.key_project.logic.LogicServices;
 
 public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpdate> {
 
-    private final @NonNull MatchOperatorInstruction leftHandSide;
+    private final MatchOperatorInstruction leftHandSide;
 
-    protected MatchElementaryUpdateInstruction(@NonNull ElementaryUpdate op) {
+    protected MatchElementaryUpdateInstruction(ElementaryUpdate op) {
         super(op);
         if (op.lhs() instanceof LocationVariable) {
             leftHandSide =
@@ -33,9 +31,8 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
     }
 
     @Override
-    public @Nullable MatchConditions match(@NonNull Term instantiationCandidate,
-            MatchConditions matchCond,
-            Services services) {
+    public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
+            LogicServices services) {
         final Operator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {
             if (instantiationCandidateOp instanceof ElementaryUpdate instElUpdate) {
@@ -48,9 +45,8 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
     }
 
     @Override
-    public @Nullable MatchConditions match(@NonNull TermNavigator termPosition,
-            MatchConditions matchConditions,
-            Services services) {
+    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
+            LogicServices services) {
         final MatchConditions result =
             match(termPosition.getCurrentSubterm(), matchConditions, services);
         if (result != null) {

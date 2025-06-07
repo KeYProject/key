@@ -6,12 +6,6 @@ package de.uka.ilkd.key.scripts;
 import java.util.Map;
 import java.util.Objects;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -19,6 +13,13 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.scripts.meta.Option;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.NonNull;
 
@@ -63,7 +64,8 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
             SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s2.formula(), Objects.requireNonNull(service),
+            app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) s2.formula(),
+                Objects.requireNonNull(service),
                 true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
                 Objects.requireNonNull(service));
@@ -77,7 +79,8 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
             SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s2.formula(), Objects.requireNonNull(service),
+            app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) s2.formula(),
+                Objects.requireNonNull(service),
                 true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
                 Objects.requireNonNull(service));
@@ -88,7 +91,9 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
     private @NonNull SequentFormula find(@NonNull SequentFormula sf, @NonNull Semisequent semiseq)
             throws ScriptException {
         for (SequentFormula s : semiseq) {
-            if (s.formula().equalsModProperty(sf.formula(), TERM_LABELS_PROPERTY)) {
+            Term term = s.formula();
+            Term formula = sf.formula();
+            if ((TERM_LABELS_PROPERTY).equalsModThisProperty(term, formula)) {
                 return s;
             }
         }

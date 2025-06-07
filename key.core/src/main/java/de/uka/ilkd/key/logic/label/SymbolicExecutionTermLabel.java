@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * Label attached to a symbolic execution thread.
@@ -36,16 +36,12 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
-        return this == o;
-    }
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) { return this == o; }
 
     /**
      * {@inheritDoc}
      */
-    public String toString() {
-        return NAME + "(" + id() + ")";
-    }
+    public String toString() { return NAME + "(" + id() + ")"; }
 
     /**
      * {@inheritDoc}
@@ -62,9 +58,7 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public int getTLChildCount() {
-        return 1;
-    }
+    public int getTLChildCount() { return 1; }
 
     /**
      * Returns the unique ID of this label in the {@link Sequent}.
@@ -72,15 +66,11 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * @return The unique ID of this label in the {@link Sequent}.
      */
     @Override
-    public int id() {
-        return id;
-    }
+    public int id() { return id; }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
-        return NAME;
-    }
+    public Name name() { return NAME; }
 }

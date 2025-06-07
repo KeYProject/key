@@ -23,7 +23,7 @@ public abstract class NotificationEvent {
      * @param eventID the int identifying the kind of this event
      * @see NotificationEventID
      */
-    public NotificationEvent(NotificationEventID eventID) {
+    protected NotificationEvent(NotificationEventID eventID) {
         this.eventID = eventID;
     }
 

@@ -8,11 +8,11 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -59,7 +59,7 @@ public class MergeTotalWeakening extends MergeProcedure implements UnparametricM
 
         final TermBuilder tb = services.getTermBuilder();
 
-        final JFunction newSkolemConstant =
+        final Function newSkolemConstant =
             getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConstant.name());

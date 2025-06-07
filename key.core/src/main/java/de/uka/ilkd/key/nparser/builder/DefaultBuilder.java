@@ -18,16 +18,18 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.rule.RuleSet;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -144,9 +146,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Sort sort) {
         Name name = new Name(varfuncName);
         Operator[] operators =
-            new Operator[] { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
+            { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
-                functions().lookup(name), AbstractTermTransformer.name2metaop(varfuncName),
+                (Operator) functions().lookup(name),
+                AbstractTermTransformer.name2metaop(varfuncName),
 
             };
 
@@ -163,7 +166,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 new Operator[] { (OperatorSV) schemaVariables().lookup(fqName),
                     variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    functions().lookup(fqName),
+                    (Operator) functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };
 
             for (Operator op : operators) {
@@ -235,7 +238,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().sorts();
     }
 
-    protected Namespace<JFunction> functions() {
+    protected Namespace<Function> functions() {
         return namespaces().functions();
     }
 

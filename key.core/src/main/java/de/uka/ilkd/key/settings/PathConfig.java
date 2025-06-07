@@ -65,6 +65,19 @@ public final class PathConfig {
     }
 
     /**
+     * Sets the path to the directory that contains KeY configuration files.
+     *
+     * @param keyConfigDir The new directory to use.
+     */
+    public static void setKeyConfigDir(String keyConfigDir) {
+        PathConfig.keyConfigDir = keyConfigDir;
+        recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.json";
+        proofIndependentSettings =
+            getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
+        logDirectory = new File(keyConfigDir, "logs");
+    }
+
+    /**
      * Returns the path to the file that is used to store recent files.
      *
      * @return The path to the file.
@@ -77,7 +90,7 @@ public final class PathConfig {
      *
      */
     public static File getLogDirectory() {
-        return PathConfig.logDirectory;
+        return logDirectory;
     }
 
     /**

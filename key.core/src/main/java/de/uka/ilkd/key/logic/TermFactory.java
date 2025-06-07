@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
  * {@link Term} class offers them.
  *
  * This class is used to encapsulate knowledge about the internal term structures. See
- * {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to create terms.
+ * {@link TermBuilder} for more convenient methods to create terms.
  */
 public final class TermFactory {
 

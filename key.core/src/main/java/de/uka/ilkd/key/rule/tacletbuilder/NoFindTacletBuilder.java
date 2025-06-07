@@ -7,7 +7,8 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import de.uka.ilkd.key.rule.BoundUniquenessChecker;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApplPart;
+
+import org.key_project.prover.rules.TacletApplPart;
 
 import org.jspecify.annotations.NonNull;
 

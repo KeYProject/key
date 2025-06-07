@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import javax.swing.*;
 
@@ -43,7 +43,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
 
 
-    public LemmaGenerationAction(@NonNull MainWindow mainWindow) {
+    protected LemmaGenerationAction(@NonNull MainWindow mainWindow) {
         super(mainWindow);
 
         putValue(NAME, getTitle());
@@ -206,9 +206,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 return;
             }
 
-            final File fileForLemmata = chooser.getFileForTaclets();
+            final Path fileForLemmata = chooser.getFileForTaclets();
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
-            List<File> filesForAxioms = chooser.getFilesForAxioms();
+            List<Path> filesForAxioms = chooser.getFilesForAxioms();
             Profile profile = mainWindow.getMediator().getProfile();
             final ProblemInitializer problemInitializer =
                 new ProblemInitializer(mainWindow.getUserInterface(), new Services(profile),
@@ -283,9 +283,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 return;
             }
             final Proof proof = getMediator().getSelectedProof();
-            final File fileForLemmata = chooser.getFileForTaclets();
+            final Path fileForLemmata = chooser.getFileForTaclets();
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
-            List<File> filesForAxioms = chooser.getFilesForAxioms();
+            List<Path> filesForAxioms = chooser.getFilesForAxioms();
             final ProblemInitializer problemInitializer =
                 new ProblemInitializer(mainWindow.getUserInterface(),
                     new Services(proof.getServices().getProfile()), mainWindow.getUserInterface());

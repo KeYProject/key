@@ -3,15 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Schema variable matching modal operators.
  */
-public final class ModalOperatorSV extends Modality.JavaModalityKind implements SchemaVariable {
+public final class ModalOperatorSV extends Modality.JavaModalityKind
+        implements ParsableVariable, SchemaVariable {
 
     /**
      * the set of modalities this sv can match
@@ -41,7 +43,7 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
     @Override
     public String toString() {
         // TODO: HACKS, remove new-line and re-generate taclets.old.txt
-        return name().toString() + " ((modal operator))";
+        return name() + " ((modal operator))";
     }
 
 
@@ -51,17 +53,24 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
     }
 
     @Override
-    public void layout(Layouter<?> l) {
-        l.beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
-        boolean first = true;
-        for (Modality.JavaModalityKind modality : modalities) {
-            if (!first) {
-                l.print(",").brk();
-            } else {
-                first = false;
-            }
-            l.print(modality.name().toString());
-        }
-        l.end().brk(0).print("}").end().print(" ").print(name().toString());
+    public boolean isVariable() {
+        return false;
     }
+
+    @Override
+    public boolean isTerm() {
+        return false;
+    }
+
+    @Override
+    public boolean isFormula() {
+        return false;
+    }
+
+    @Override
+    public boolean isSkolemTerm() {
+        return false;
+    }
+
+
 }

@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * appropriate constant symbols.
  */
 public abstract class ProgramVariable extends AbstractSortedOperator
-        implements SourceElement, ProgramElement, Expression, ReferencePrefix, IProgramVariable,
+        implements Expression, ReferencePrefix, IProgramVariable,
         ParsableVariable, ReferenceSuffix, ProgramInLogic {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramVariable.class);
 

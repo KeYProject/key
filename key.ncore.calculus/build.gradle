@@ -1,0 +1,34 @@
+plugins { }
+
+group = 'org.key-project'
+version = '2.13.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(':key.util')
+    api project(':key.ncore')
+    implementation 'org.jspecify:jspecify:1.0.0'
+}
+
+tasks.withType(Test) {
+    enableAssertions = true
+}
+
+checkerFramework {
+    if (System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.logic",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}

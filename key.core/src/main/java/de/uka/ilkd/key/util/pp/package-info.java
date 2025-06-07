@@ -1,5 +1,5 @@
 /**
- * A package to pretty-print information using line breaks and
+ * A @org.jspecify.annotations.NullMarked packageto pretty-print information using line breaks and
  * indentation. For instance, it can be used to print
  *
  * <pre>
@@ -28,4 +28,5 @@
  *
  * @author Martin Giese
  */
+@org.jspecify.annotations.NullMarked
 package de.uka.ilkd.key.util.pp;

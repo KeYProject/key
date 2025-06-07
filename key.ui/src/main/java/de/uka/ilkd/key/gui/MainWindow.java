@@ -10,9 +10,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
@@ -54,11 +54,9 @@ import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.LruCached;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -69,6 +67,8 @@ import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.Sequent;
 
 import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
@@ -298,7 +298,7 @@ public final class MainWindow extends JFrame {
         setIconImages(IconFactory.applicationLogos());
 
 
-        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
@@ -1405,12 +1405,12 @@ public final class MainWindow extends JFrame {
         openExampleAction.actionPerformed(null);
     }
 
-    public void loadProblem(File file) {
+    public void loadProblem(Path file) {
         getUserInterface().loadProblem(file);
     }
 
-    public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
+    public void loadProblem(Path file, List<Path> classPath, Path bootClassPath,
+            List<Path> includes) {
         getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
     }
 
@@ -1421,7 +1421,7 @@ public final class MainWindow extends JFrame {
      * @param proofPath the path of the proof to load (relative to the root of the bundle ->
      *        filename only)
      */
-    public void loadProofFromBundle(File proofBundle, File proofPath) {
+    public void loadProofFromBundle(Path proofBundle, Path proofPath) {
         getUserInterface().loadProofFromBundle(proofBundle, proofPath);
     }
 

@@ -4,15 +4,16 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -21,11 +22,11 @@ import org.jspecify.annotations.NonNull;
  */
 public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
 
-    private final ProjectionToTerm left, right;
-    private final @NonNull Function Z;
+    private final ProjectionToTerm<Goal> left, right;
+    private final Function Z;
 
-    private AtomsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
-            @NonNull IntegerLDT numbers) {
+    private AtomsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            IntegerLDT numbers) {
         super(numbers);
         this.left = left;
         this.right = right;
@@ -33,12 +34,14 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     }
 
 
-    public static @NonNull Feature create(ProjectionToTerm left, ProjectionToTerm right,
-            @NonNull IntegerLDT numbers) {
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            IntegerLDT numbers) {
         return new AtomsSmallerThanFeature(left, right, numbers);
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         return lessThan(collectAtoms(left.toTerm(app, pos, goal, mState)),
             collectAtoms(right.toTerm(app, pos, goal, mState)), pos, goal);
     }
@@ -47,8 +50,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(@NonNull Term t1, @NonNull Term t2, PosInOccurrence focus,
-            @NonNull Goal goal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
         if (t1.op() == Z) {
             if (t2.op() != Z) {
                 return true;

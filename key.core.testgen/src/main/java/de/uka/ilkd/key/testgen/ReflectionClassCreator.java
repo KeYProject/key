@@ -314,7 +314,7 @@ public class ReflectionClassCreator {
         r.append(NEW_LINE);
         r.append("  public static ").append(sort).append(" new").append(cleanTypeName(sort))
                 .append("(int dim){").append(NEW_LINE);
-        r.append("    return new ").append(sort.substring(0, sort.length() - 2)).append("[dim];")
+        r.append("    return new ").append(sort, 0, sort.length() - 2).append("[dim];")
                 .append(NEW_LINE);
         r.append("  }").append(NEW_LINE);
         return r;
