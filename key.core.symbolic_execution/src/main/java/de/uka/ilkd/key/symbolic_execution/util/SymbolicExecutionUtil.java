@@ -65,6 +65,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
@@ -2320,7 +2321,7 @@ public final class SymbolicExecutionUtil {
                 }
                 loopConditionModalityTerm = loopConditionModalityTerm.sub(0);
             } else { // Use Case
-                if (!(loopConditionModalityTerm.op() instanceof JModality mod)) {
+                if (!(loopConditionModalityTerm.op() instanceof Modality mod)) {
                     throw new ProofInputException(
                         "Expected Box modality but is " + loopConditionModalityTerm);
                 } else if (mod.kind() != JModality.JavaModalityKind.BOX) {
@@ -2335,7 +2336,7 @@ public final class SymbolicExecutionUtil {
                 loopConditionModalityTerm = services.getTermBuilder()
                         .box(loopConditionModalityTerm.javaBlock(), sub.sub(0));
             }
-            if (!(loopConditionModalityTerm.op() instanceof JModality mod) ||
+            if (!(loopConditionModalityTerm.op() instanceof Modality mod) ||
                     mod.kind() != JModality.JavaModalityKind.BOX
                     || loopConditionModalityTerm.sub(0).op() != Equality.EQUALS
                     || !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable)

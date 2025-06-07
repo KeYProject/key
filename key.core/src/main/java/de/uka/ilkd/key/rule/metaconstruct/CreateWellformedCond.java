@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 
 /**
@@ -37,7 +38,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
         final Operator op = term.sub(0).op();
         assert op instanceof JModality;
 
-        return createWellformedCond(MiscTools.isTransaction(((JModality) op).kind()),
+        return createWellformedCond(MiscTools.isTransaction(((Modality) op).kind()),
             MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
             anonPermissionsHeapTerm, services);
     }

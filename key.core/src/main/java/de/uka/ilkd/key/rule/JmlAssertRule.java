@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kin
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -175,7 +175,7 @@ public final class JmlAssertRule implements BuiltInRule {
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
         final JTerm newTerm = tb.apply(update,
             tb.imp(condition,
-                tb.prog(((JModality) target.op()).kind(), javaBlock, target.sub(0), null)));
+                tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), null)));
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
     }

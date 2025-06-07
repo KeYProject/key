@@ -53,6 +53,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
@@ -511,7 +512,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final LocationVariable variantPV = new LocationVariable(variantName, JavaDLTheory.ANY);
         services.getNamespaces().programVariables().addSafely(variantPV);
 
-        JModality modality = ((JModality) inst.progPost.op());
+        Modality modality = ((Modality) inst.progPost.op());
         final boolean dia = modality.<JModality.JavaModalityKind>kind().terminationSensitive();
         final JTerm variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final JTerm variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
@@ -558,7 +559,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         JavaBlock useJavaBlock =
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-        var modality = (JModality) inst.progPost.op();
+        var modality = (Modality) inst.progPost.op();
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
             "UseModality", null,

@@ -43,6 +43,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Modality;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.ExtList;
@@ -1247,7 +1248,7 @@ public final class AuxiliaryContractBuilders {
          * @return the sequent for the validity branch in a loop contract rule.
          */
         private static JTerm buildLoopValiditySequent(final Goal goal, final LoopContract contract,
-                JavaBlock unfold, JavaBlock body, JavaBlock tail, final JModality modality,
+                JavaBlock unfold, JavaBlock body, JavaBlock tail, final Modality modality,
                 boolean bodyBreakFound, final JTerm context, final JTerm remember,
                 final JTerm rememberNext, final JTerm decreasesCheck, JTerm anonOut, JTerm anonOut2,
                 JTerm post, JTerm postNext, JTerm postAfterTail, JTerm pre, JTerm brokeLoop,
@@ -1313,7 +1314,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         private static JTerm buildFullPostBody(boolean bodyBreakFound, JavaBlock tail,
-                final JModality modality, final JTerm rememberNext, final JTerm decreasesCheck,
+                final Modality modality, final JTerm rememberNext, final JTerm decreasesCheck,
                 JTerm anonOut, JTerm post, JTerm postNext, JTerm postAfterTail, JTerm pre,
                 JTerm brokeLoop, JTerm notBrokeLoop, JTerm abrupt, JTerm notAbrupt,
                 final TermBuilder tb) {
@@ -1469,7 +1470,7 @@ public final class AuxiliaryContractBuilders {
                 final JTerm[] postconditionsNext, final LocationVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms, final AuxiliaryContract.Variables nextVars) {
             final TermBuilder tb = services.getTermBuilder();
-            final JModality modality = instantiation.modality();
+            final Modality modality = instantiation.modality();
 
             final LocationVariable[] loopVariables = createLoopVariables(services);
             OuterBreakContinueAndReturnCollector collector =

@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PIOPathIterator;
@@ -131,11 +131,11 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // program does not change. this is a pretty common situation
                 // during symbolic program execution; also consider
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
-                if (beforeChangeOp instanceof JModality beforeChangeMod) {
+                if (beforeChangeOp instanceof Modality beforeChangeMod) {
                     final PosInOccurrence afterChangePos =
                         changePos.replaceSequentFormula(newFormula);
                     final JTerm afterChangeTerm = (JTerm) afterChangePos.subTerm();
-                    if (afterChangeTerm.op() instanceof JModality afterChangeMod) {
+                    if (afterChangeTerm.op() instanceof Modality afterChangeMod) {
                         return beforeChangeMod.kind() == afterChangeMod.kind()
                                 && beforeChangeTerm.sub(0)
                                         .equalsModProperty(afterChangeTerm.sub(0),

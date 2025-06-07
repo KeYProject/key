@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
 
 
 /**
@@ -44,7 +45,7 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         final JTerm anonSavedHeapTerm = term.sub(2);
         final JTerm anonPermissionsHeapTerm = term.sub(3);
 
-        return createBeforeLoopUpdate(MiscTools.isTransaction(((JModality) loopTerm.op()).kind()),
+        return createBeforeLoopUpdate(MiscTools.isTransaction(((Modality) loopTerm.op()).kind()),
             MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
             anonPermissionsHeapTerm, services);
     }

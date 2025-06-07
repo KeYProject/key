@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -120,7 +120,7 @@ public class TacletMatchProgram {
             program.add(Instruction.matchSortDependingFunction((SortDependingFunction) op));
         } else if (op instanceof ElementaryUpdate) {
             program.add(Instruction.matchElementaryUpdate((ElementaryUpdate) op));
-        } else if (op instanceof JModality mod) {
+        } else if (op instanceof Modality mod) {
             final var kind = mod.kind();
             if (kind instanceof ModalOperatorSV sv) {
                 program.add(Instruction.matchModalOperatorSV(sv));

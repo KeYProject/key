@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -78,7 +78,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         var services = goal.getOverlayServices();
         TermBuilder tb = services.getTermBuilder();
         AbstractLoopContractRule.Instantiation instantiation = ruleApp.instantiation;
-        JModality modality = instantiation.modality();
+        Modality modality = instantiation.modality();
         JTerm update = instantiation.update();
         JTerm target = instantiation.formula();
 

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 
@@ -455,7 +456,7 @@ public final class NotationInfo {
             return result;
         }
 
-        if (op instanceof JModality mod) {
+        if (op instanceof Modality mod) {
             result = notationTable.get(mod.kind());
             if (result != null) {
                 return result;

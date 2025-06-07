@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
@@ -59,7 +60,7 @@ public final class WhileInvariantTransformer {
     private ProgramElement body;
     private JTerm inv, post;
     private JavaNonTerminalProgramElement root;
-    private JModality modality;
+    private Modality modality;
 
     private KeYJavaType returnType;
 
@@ -75,7 +76,7 @@ public final class WhileInvariantTransformer {
      */
     private void init(JTerm initialPost, JTerm invariantFramingTermination, Services services) {
         root = (JavaNonTerminalProgramElement) initialPost.javaBlock().program();
-        modality = (JModality) initialPost.op();
+        modality = (Modality) initialPost.op();
 
         ReplaceWhileLoop removeWhile = new ReplaceWhileLoop(root, null, services);
         removeWhile.start();

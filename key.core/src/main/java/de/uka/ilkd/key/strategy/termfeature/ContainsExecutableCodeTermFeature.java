@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Modality;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -45,7 +45,7 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
         case Quantifier ignored -> {
             return false;
         }
-        case JModality ignored -> {
+        case Modality ignored -> {
             return true;
         }
         case IProgramMethod ignored when considerQueries -> {

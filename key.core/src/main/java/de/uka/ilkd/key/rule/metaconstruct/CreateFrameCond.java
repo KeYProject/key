@@ -18,6 +18,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Modality;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -50,7 +51,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
         final boolean isTransaction =
-            MiscTools.isTransaction(((JModality) loopFormula.op()).kind());
+            MiscTools.isTransaction(((Modality) loopFormula.op()).kind());
         final boolean isPermissions = MiscTools.isPermissions(services);
 
         final Map<LocationVariable, Map<JTerm, JTerm>> heapToBeforeLoopMap = //
