@@ -76,8 +76,8 @@ public final class SameObserverCondition implements VariableCondition {
             LogicServices p_services) {
         final Services services = (Services) p_services;
         var svInst = (SVInstantiations) mc.getInstantiations();
-        final JTerm term1 = (JTerm) svInst.getInstantiation(schema1);
-        final JTerm term2 = (JTerm) svInst.getInstantiation(schema2);
+        final JTerm term1 = svInst.getInstantiation(schema1);
+        final JTerm term2 = svInst.getInstantiation(schema2);
 
         if ((term1 != null && !(term1.op() instanceof IObserverFunction))
                 || (term2 != null && !(term2.op() instanceof IObserverFunction))) {
