@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.logic.op.Modality;
@@ -13,7 +16,7 @@ public class JavaDLOperatorUtil {
      *         kind
      */
     public static boolean opEquals(Operator fst,
-                                   Operator snd) {
+            Operator snd) {
         return fst == snd ||
                 (fst instanceof Modality mod1 && snd instanceof Modality mod2
                         && mod1.kind() == mod2.kind());

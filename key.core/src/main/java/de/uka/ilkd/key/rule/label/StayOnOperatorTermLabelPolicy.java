@@ -29,8 +29,9 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
             PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm,
             JTerm newTerm, TermLabel label) {
-        return applicationTerm != null && JavaDLOperatorUtil.opEquals(newTerm.op(), applicationTerm.op())
-                ? label
-                : null;
+        return applicationTerm != null
+                && JavaDLOperatorUtil.opEquals(newTerm.op(), applicationTerm.op())
+                        ? label
+                        : null;
     }
 }
