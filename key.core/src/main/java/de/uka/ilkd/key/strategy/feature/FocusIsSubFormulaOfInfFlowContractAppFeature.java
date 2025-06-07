@@ -5,9 +5,9 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -51,9 +51,9 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
             return NumberRuleAppCost.getZeroCost();
         }
 
-        final Term focusFor = (Term) pos.sequentFormula().formula();
+        final Term focusFor = pos.sequentFormula().formula();
         final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
-        ImmutableList<Term> contractAppls =
+        ImmutableList<de.uka.ilkd.key.logic.Term> contractAppls =
             goal.getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (contractAppls == null) {
             return TopRuleAppCost.INSTANCE;

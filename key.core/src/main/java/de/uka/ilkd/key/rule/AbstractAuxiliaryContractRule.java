@@ -295,7 +295,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          */
         private JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
                 final Modality modality, final Goal goal) {
-            SourceElement element = modality.program().program().getFirstElement();
+            SourceElement element = modality.programBlock().program().getFirstElement();
             while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
                     && !(element instanceof StatementBlock
                             && ((StatementBlock) element).isEmpty())) {

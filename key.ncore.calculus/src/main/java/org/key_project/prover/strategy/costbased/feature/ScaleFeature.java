@@ -13,54 +13,48 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * A feature that applies an affine transformation to the result of a given feature. As a special
- * case, it can be used to scale the given feature.
- */
+/// A feature that applies an affine transformation to the result of a given feature. As a special
+/// case, it can be used to scale the given feature.
 public abstract class ScaleFeature implements Feature {
 
-    /** the base feature */
+    /// the base feature
     private final Feature feature;
 
     protected ScaleFeature(Feature p_feature) {
         feature = p_feature;
     }
 
-    /**
-     * Create a feature that scales the result of the base feature.
-     *
-     * @param f the base feature
-     * @param coeff the coefficient to be applied to the result of <code>f</code>
-     */
+    /// Create a feature that scales the result of the base feature.
+    ///
+    /// @param f the base feature
+    /// @param coeff the coefficient to be applied to the result of <code>f</code>
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature createScaled(
             Feature f, double coeff) {
         return createAffine(f, coeff, 0);
     }
 
-    /**
-     * Create a feature that applies an affine transformation to the result of the base feature. The
-     * transformation is described by a coefficient and an offset.
-     *
-     * @param f the base feature
-     * @param coeff the coefficient to be applied to the result of <code>f</code>
-     * @param offset the offset to be added to the result of <code>f</code> (after multiplication
-     *        with <code>coeff</code>)
-     */
+    /// Create a feature that applies an affine transformation to the result of the base feature.
+    /// The
+    /// transformation is described by a coefficient and an offset.
+    ///
+    /// @param f the base feature
+    /// @param coeff the coefficient to be applied to the result of <code>f</code>
+    /// @param offset the offset to be added to the result of <code>f</code> (after multiplication
+    /// with <code>coeff</code>)
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature createAffine(
             Feature f, double coeff, long offset) {
         return new MultFeature(f, coeff, offset);
     }
 
-    /**
-     * Create a feature that applies an affine transformation to the result of the base feature. The
-     * transformation is described by two points in the domain and their images.
-     *
-     * @param f the base feature
-     * @param dom0 point 0 in the domain
-     * @param dom1 point 1 in the domain
-     * @param img0 point 0 in the image
-     * @param img1 point 1 in the image
-     */
+    /// Create a feature that applies an affine transformation to the result of the base feature.
+    /// The
+    /// transformation is described by two points in the domain and their images.
+    ///
+    /// @param f the base feature
+    /// @param dom0 point 0 in the domain
+    /// @param dom1 point 1 in the domain
+    /// @param img0 point 0 in the image
+    /// @param img1 point 1 in the image
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature createAffine(
             Feature f, RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img0, RuleAppCost img1) {
@@ -130,9 +124,7 @@ public abstract class ScaleFeature implements Feature {
         return createAffine(f, coeff, offset);
     }
 
-    /**
-     * @param cost
-     */
+    /// @param cost
     private static long getValue(RuleAppCost cost) {
         if (cost instanceof NumberRuleAppCost costValue) {
             return costValue.getValue();
@@ -157,9 +149,9 @@ public abstract class ScaleFeature implements Feature {
 
     private static class MultFeature
             extends ScaleFeature {
-        /** the coefficient */
+        /// the coefficient
         private final double coeff;
-        /** the offset */
+        /// the offset
         private final long offset;
 
         private MultFeature(Feature f, double p_coeff, long p_offset) {

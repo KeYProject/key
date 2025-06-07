@@ -23,6 +23,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -95,7 +96,8 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             new RewriteTacletBuilder<>();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.ANTECEDENT_POLARITY));
         final RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate(schemaReplaceWith);
         tacletBuilder.addTacletGoalTemplate(goal);
         tacletBuilder.addRuleSet(new RuleSet(new Name("concrete")));

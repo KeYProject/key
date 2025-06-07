@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.logic;
 
 
+import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 
 /**

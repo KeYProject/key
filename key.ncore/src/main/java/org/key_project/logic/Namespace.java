@@ -7,66 +7,52 @@ import java.util.*;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A Namespace keeps track of already used {@link Name}s and the objects carrying these names. These
- * objects have to implement the interface {@link Named}. It is possible to have nested namespaces
- * in order to represent different visibility scopes.
- */
+/// A Namespace keeps track of already used [Name]s and the objects carrying these names. These
+/// objects have to implement the interface [Named]. It is possible to have nested namespaces
+/// in order to represent different visibility scopes.
 public class Namespace<E extends Named> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Namespace.class);
 
-    /**
-     * The fall-back namespace for symbols not present in this Namespace.
-     */
+    /// The fall-back namespace for symbols not present in this Namespace.
     private @Nullable Namespace<E> parent;
 
-    /**
-     * The map that maps a name to a symbols of that name if it is defined in this Namespace.
-     */
+    /// The map that maps a name to a symbols of that name if it is defined in this Namespace.
     private @Nullable Map<Name, E> symbols;
 
-    /**
-     * A namespace can be made immutable, this is called "sealing". This flag indicates whether this
-     * namespace has been sealed or not.
-     */
+    /// A namespace can be made immutable, this is called "sealing". This flag indicates whether
+    /// this
+    /// namespace has been sealed or not.
     private boolean sealed;
 
-    /**
-     * Construct an empty Namespace without a parent namespace.
-     */
+    /// Construct an empty Namespace without a parent namespace.
     public Namespace() {
         this(null);
     }
 
-    /**
-     * Construct a Namespace that uses <code>parent</code> as a fallback for finding symbols not
-     * defined in this one.
-     */
+    /// Construct a Namespace that uses <code>parent</code> as a fallback for finding symbols not
+    /// defined in this one.
     public Namespace(@Nullable Namespace<E> parent) {
         this.parent = parent;
     }
 
-    /**
-     * Adds the object <code>sym</code> to this Namespace. If an object with the same name is
-     * already there, it is quietly replaced by <code>sym</code>. Use addSafely() instead if
-     * possible.
-     * <br>
-     * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet. (This is
-     * no longer self-explanatory. mu 2016)
-     * <br>
-     * If the local table is empty, then the new symbol is added as "singleton map". This has been
-     * adapted from an earlier implementation, done for memory efficiency reasons: Many namespaces
-     * only contain a single element; no need to allocate a hash map. The hash map is only created
-     * when the 2nd element is added.
-     * <br>
-     * This is not threadsafe.
-     */
-    public void add(@NonNull E sym) {
+    /// Adds the object <code>sym</code> to this Namespace. If an object with the same name is
+    /// already there, it is quietly replaced by <code>sym</code>. Use addSafely() instead if
+    /// possible.
+    ///
+    /// TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet. (This is
+    /// no longer self-explanatory. mu 2016)
+    ///
+    /// If the local table is empty, then the new symbol is added as "singleton map". This has been
+    /// adapted from an earlier implementation, done for memory efficiency reasons: Many namespaces
+    /// only contain a single element; no need to allocate a hash map. The hash map is only created
+    /// when the 2nd element is added.
+    ///
+    /// This is not threadsafe.
+    public void add(E sym) {
 
         if (sealed) {
             LOGGER.warn("Namespace is SEALED");
@@ -101,11 +87,9 @@ public class Namespace<E extends Named> {
         }
     }
 
-    /**
-     * Adds the object <code>sym</code> to this namespace. Throws a runtime exception if an object
-     * with the same name is already there.
-     */
-    public void addSafely(@NonNull E sym) {
+    /// Adds the object <code>sym</code> to this namespace. Throws a runtime exception if an object
+    /// with the same name is already there.
+    public void addSafely(E sym) {
         Named old = lookup(sym.name());
         if (old != null && old != sym) {
             throw new RuntimeException("Name already in namespace: " + sym.name());
@@ -120,13 +104,11 @@ public class Namespace<E extends Named> {
         }
     }
 
-    /**
-     * Remove a name from the namespace.
-     * <br>
-     * Removal is not delegated to the parent namespace.
-     *
-     * @param name non-null name whose symbol is to be removed.
-     */
+    /// Remove a name from the namespace.
+    ///
+    /// Removal is not delegated to the parent namespace.
+    ///
+    /// @param name non-null name whose symbol is to be removed.
     public void remove(Name name) {
         if (symbols != null) {
             symbols.remove(name);
@@ -142,11 +124,9 @@ public class Namespace<E extends Named> {
     }
 
 
-    /**
-     * creates a new Namespace that has this as parent, and contains an entry for <code>sym</code>.
-     *
-     * @return the new Namespace
-     */
+    /// creates a new Namespace that has this as parent, and contains an entry for <code>sym</code>.
+    ///
+    /// @return the new Namespace
     public Namespace<E> extended(E sym) {
         return extended(Collections.singleton(sym));
     }
@@ -157,12 +137,10 @@ public class Namespace<E extends Named> {
         return result;
     }
 
-    /**
-     * looks if a registered object is declared in this namespace, if negative it asks its parent
-     *
-     * @param name a Name representing the name of the symbol to look for
-     * @return Object with name "name" or null if no such an object has been found
-     */
+    /// looks if a registered object is declared in this namespace, if negative it asks its parent
+    ///
+    /// @param name a Name representing the name of the symbol to look for
+    /// @return Object with name "name" or null if no such an object has been found
     public @Nullable E lookup(Name name) {
         E symbol = lookupLocally(name);
         if (symbol != null) {
@@ -176,17 +154,15 @@ public class Namespace<E extends Named> {
         return null;
     }
 
-    /** Convenience method to look up. */
+    /// Convenience method to look up.
     public @Nullable E lookup(String name) {
         return lookup(new Name(name));
     }
 
-    /**
-     * returns list of the elements (not the keys) in this namespace (not about the one of the
-     * parent)
-     *
-     * @return the list of the named objects
-     */
+    /// returns list of the elements (not the keys) in this namespace (not about the one of the
+    /// parent)
+    ///
+    /// @return the list of the named objects
     public Collection<E> elements() {
         if (symbols == null) {
             return Collections.emptyList();
@@ -206,10 +182,8 @@ public class Namespace<E extends Named> {
         }
     }
 
-    /**
-     * returns the fall-back Namespace of this Namespace, i.e. the one where symbols are looked up
-     * that are not found in this one.
-     */
+    /// returns the fall-back Namespace of this Namespace, i.e. the one where symbols are looked up
+    /// that are not found in this one.
     public @Nullable Namespace<E> parent() {
         return parent;
     }
@@ -268,7 +242,7 @@ public class Namespace<E extends Named> {
         return result;
     }
 
-    public boolean contains(@NonNull E var) {
+    public boolean contains(E var) {
         return lookup(var.name()) == var;
     }
 

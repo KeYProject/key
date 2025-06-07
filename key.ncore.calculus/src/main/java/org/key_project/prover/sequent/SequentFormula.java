@@ -5,47 +5,40 @@ package org.key_project.prover.sequent;
 
 import org.key_project.logic.Term;
 
-/**
- * A sequent formula is a wrapper around a formula that occurs as top level formula in a sequent.
- * SequentFormula instances have to be unique in the sequent as they are used by PosInOccurrence to
- * determine the exact position. In earlier KeY versions this class was called ConstrainedFormula as
- * it was equipped with an additional constraints. It would be interesting to add more value to this
- * class by providing a way to add additional annotations or to cache local information about the
- * formula.
- */
+/// A sequent formula is a wrapper around a formula that occurs as top level formula in a sequent.
+/// SequentFormula instances have to be unique in the sequent as they are used by PosInOccurrence to
+/// determine the exact position. In earlier KeY versions this class was called ConstrainedFormula
+/// as
+/// it was equipped with an additional constraints. It would be interesting to add more value to
+/// this
+/// class by providing a way to add additional annotations or to cache local information about the
+/// formula.
 public class SequentFormula {
     private final Term term;
 
-    /**
-     * Cached value for {@link #hashCode()}.
-     */
+    /// Cached value for [#hashCode()].
     private final int hashCode;
 
-    /**
-     * creates a new SequentFormula
-     *
-     * @param term a formula
-     */
+    /// creates a new SequentFormula
+    ///
+    /// @param term a formula
     public SequentFormula(Term term) {
         this.term = term;
         this.hashCode = term.hashCode() * 13;
     }
 
-    /**
-     * @return the stored Term
-     */
+    /// @return the stored Term
     public Term formula() {
         return term;
     }
 
-    /** String representation */
+    /// String representation
     public String toString() {
         return term.toString();
     }
 
-    /** equal if terms and constraints are equal */
-    @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+    /// equal if terms and constraints are equal
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }

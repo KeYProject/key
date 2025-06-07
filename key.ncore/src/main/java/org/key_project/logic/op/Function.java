@@ -10,10 +10,9 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * Objects of this class represent function and predicate symbols. Note that program variables are a
- * separate syntactic category, and not a type of function.
- */
+/// Objects of this class represent function and predicate symbols. Note that program variables are
+/// a
+/// separate syntactic category, and not a type of function.
 public abstract class Function extends AbstractSortedOperator {
     protected Function(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             @Nullable ImmutableArray<Boolean> whereToBind, boolean isRigid, boolean unique,
@@ -37,11 +36,10 @@ public abstract class Function extends AbstractSortedOperator {
     // public interface
     // -------------------------------------------------------------------------
 
-    /**
-     * Indicates whether the function or predicate symbol has the "uniqueness" property. For two
-     * unique symbols f1: A1 -> B1, f2: A2 -> B2 by definition we have (1) f1(x) != f1(y) for all x,
-     * y in A1 with x != y (i.e., injectivity), and (2) f1(x) != f2(y) for all x in A1, y in A2.
-     */
+    /// Indicates whether the function or predicate symbol has the "uniqueness" property. For two
+    /// unique symbols f1: A1 -> B1, f2: A2 -> B2 by definition we have (1) f1(x) != f1(y) for all
+    /// x,
+    /// y in A1 with x != y (i.e., injectivity), and (2) f1(x) != f2(y) for all x in A1, y in A2.
     public final boolean isUnique() {
         return hasModifier(Modifier.UNIQUE);
     }

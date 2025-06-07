@@ -26,15 +26,14 @@ public class PosInTerm {
         copy = false;
     }
 
-    /**
-     * creates an instance representing the position <code>positions[0..size-1]</code>
-     *
-     * @param positions the integer array where each element describes the position to be taken (in
-     *        top-to-bottom order)
-     * @param size the size of the integer list (attention: might be shorter than the length of the
-     *        position array)
-     * @param copy indicates (i.e. true) if the position array has to be copied when going downwards
-     */
+    /// creates an instance representing the position <code>positions[0..size-1]</code>
+    ///
+    /// @param positions the integer array where each element describes the position to be taken (in
+    /// top-to-bottom order)
+    /// @param size the size of the integer list (attention: might be shorter than the length of the
+    /// position array)
+    /// @param copy indicates (i.e. true) if the position array has to be copied when going
+    /// downwards
     private PosInTerm(char[] positions, char size, boolean copy) {
         assert size > 0 && size <= positions.length;
         this.positions = positions;
@@ -42,9 +41,7 @@ public class PosInTerm {
         this.copy = (copy || (size == positions.length));
     }
 
-    /**
-     * only used once to create the singleton for the top level position
-     */
+    /// only used once to create the singleton for the top level position
     private PosInTerm() {
         positions = new char[0];
         size = 0;
@@ -52,16 +49,13 @@ public class PosInTerm {
         copy = true;
     }
 
-    /**
-     * create a position from the string
-     *
-     * The string contains a comma separated list of integers. The position created from the string
-     * encapsulated the given list but in reverse order
-     *
-     * @param s the String with the list of integers to be interpreted as term indices in reverse
-     *        order
-     * @return the PosInTerm encapsulating the integer list in reverse order
-     */
+    /// create a position from the string
+    /// The string contains a comma separated list of integers. The position created from the string
+    /// encapsulated the given list but in reverse order
+    ///
+    /// @param s the String with the list of integers to be interpreted as term indices in reverse
+    /// order
+    /// @return the PosInTerm encapsulating the integer list in reverse order
     public static PosInTerm parseReverseString(String s) {
         if ("".equals(s)) {
             return getTopLevel();
@@ -88,38 +82,30 @@ public class PosInTerm {
                 : new PosInTerm(positions, (char) positions.length, true);
     }
 
-    /**
-     * returns the instance representing the top level position
-     *
-     * @return the top level position
-     */
+    /// returns the instance representing the top level position
+    ///
+    /// @return the top level position
     public static PosInTerm getTopLevel() {
         return TOP_LEVEL;
     }
 
-    /**
-     * the depth of the sub term described by this position
-     *
-     * @return the term depth
-     */
+    /// the depth of the sub term described by this position
+    ///
+    /// @return the term depth
     public int depth() {
         return size;
     }
 
-    /**
-     * true if the position describes the top level position, i.e., the term as a whole
-     *
-     * @return true iff top level
-     */
+    /// true if the position describes the top level position, i.e., the term as a whole
+    ///
+    /// @return true iff top level
     public boolean isTopLevel() {
         return size == 0;
     }
 
-    /**
-     * returns the position of the enclosing term
-     *
-     * @return the position of the parent
-     */
+    /// returns the position of the enclosing term
+    ///
+    /// @return the position of the parent
     public @Nullable PosInTerm up() {
         if (size == 0) {
             return null;
@@ -127,14 +113,12 @@ public class PosInTerm {
         return size == 1 ? getTopLevel() : new PosInTerm(positions, (char) (size - 1), true);
     }
 
-    /**
-     * returns the position of the <code>depth-n</code> parent term
-     *
-     * @param n the integer specifying the length of the prefix
-     * @return the prefix of this position of length <code>n</code>
-     * @throws IndexOutOfBoundsException if <code>n</code> is greater than the depth of this
-     *         position
-     */
+    /// returns the position of the <code>depth-n</code> parent term
+    ///
+    /// @param n the integer specifying the length of the prefix
+    /// @return the prefix of this position of length <code>n</code>
+    /// @throws IndexOutOfBoundsException if <code>n</code> is greater than the depth of this
+    /// position
     public PosInTerm firstN(int n) {
         if (n > size) {
             throw new IndexOutOfBoundsException("Position is shorter than " + n);
@@ -146,13 +130,11 @@ public class PosInTerm {
         return new PosInTerm(positions, (char) n, true);
     }
 
-    /**
-     * returns the position for the <code>i</code>-th subterm of the subterm described by this
-     * position
-     *
-     * @param i the index of the subterm
-     * @return the position of the i-th subterm
-     */
+    /// returns the position for the <code>i</code>-th subterm of the subterm described by this
+    /// position
+    ///
+    /// @param i the index of the subterm
+    /// @return the position of the i-th subterm
     public PosInTerm down(int i) {
         if (i > Character.MAX_VALUE) {
             throw new ArithmeticException("Position " + i + " out of bounds");
@@ -182,13 +164,11 @@ public class PosInTerm {
         return result;
     }
 
-    /**
-     * returns the index of the subterm at depth <code>i</code>
-     *
-     * @param i the depth of the subterm whose index it to be returned
-     * @return an int such that
-     *         <code>term.subAt(this).sub(getIndex(i)) == term.subAt(firstN(i+1))</code>
-     */
+    /// returns the index of the subterm at depth <code>i</code>
+    ///
+    /// @param i the depth of the subterm whose index it to be returned
+    /// @return an int such that
+    /// <code>term.subAt(this).sub(getIndex(i)) == term.subAt(firstN(i+1))</code>
     public int getIndexAt(int i) {
         if (i < 0 || i >= size) {
             throw new IndexOutOfBoundsException("No position at index " + i);
@@ -196,24 +176,20 @@ public class PosInTerm {
         return positions[i];
     }
 
-    /**
-     * equivalent to <code>getIndexAt(depth() - 1)</code>
-     *
-     * @return the index of the subterm described by this position
-     */
+    /// equivalent to <code>getIndexAt(depth() - 1)</code>
+    ///
+    /// @return the index of the subterm described by this position
     public int getIndex() {
         return size == 0 ? -1 : positions[size - 1];
     }
 
 
-    /**
-     * navigate to the subterm described by this position and return it if the described position
-     * does not exist in the term an {@link IndexOutOfBoundsException} is thrown
-     *
-     * @param t the {@link Term}
-     * @return the sub term of term <code>t</code> at this position
-     * @throws IndexOutOfBoundsException if no subterm exists at this position
-     */
+    /// navigate to the subterm described by this position and return it if the described position
+    /// does not exist in the term an [IndexOutOfBoundsException] is thrown
+    ///
+    /// @param t the [Term]
+    /// @return the sub term of term <code>t</code> at this position
+    /// @throws IndexOutOfBoundsException if no subterm exists at this position
     public Term getSubTerm(Term t) {
         Term sub = t;
         for (int i = 0; i < size; i++) {
@@ -256,13 +232,11 @@ public class PosInTerm {
         return false;
     }
 
-    /**
-     * returns a comma separated list of integers enclosed in brackets (the list contains all
-     * integers in the order as returned by the iterator)
-     *
-     * @param it the iterator
-     * @return the String with the list of integers
-     */
+    /// returns a comma separated list of integers enclosed in brackets (the list contains all
+    /// integers in the order as returned by the iterator)
+    ///
+    /// @param it the iterator
+    /// @return the String with the list of integers
     public String integerList(IntIterator it) {
         final StringBuilder list = new StringBuilder("[");
         while (it.hasNext()) {
@@ -276,20 +250,16 @@ public class PosInTerm {
     }
 
 
-    /**
-     * iterates through all indices in top to bottom order
-     *
-     * @return iterator through all indices
-     */
+    /// iterates through all indices in top to bottom order
+    ///
+    /// @return iterator through all indices
     public IntIterator iterator() {
         return new PiTIterator(this, true);
     }
 
-    /**
-     * iterates through all indices in bottom to top order
-     *
-     * @return iterator through all indices in reverse order
-     */
+    /// iterates through all indices in bottom to top order
+    ///
+    /// @return iterator through all indices in reverse order
     public IntIterator reverseIterator() {
         return new PiTIterator(this, false);
     }
@@ -335,12 +305,10 @@ public class PosInTerm {
         }
     }
 
-    /**
-     * Checks whether this pit is the prefix of a given pit.
-     *
-     * @param pit the given pit
-     * @return true if this is a prefix of the given pit
-     */
+    /// Checks whether this pit is the prefix of a given pit.
+    ///
+    /// @param pit the given pit
+    /// @return true if this is a prefix of the given pit
     public boolean isPrefixOf(PosInTerm pit) {
         if (size >= pit.size) {
             return false;

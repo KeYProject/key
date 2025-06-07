@@ -18,6 +18,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.collection.WeakValueLinkedHashMap;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
@@ -59,7 +61,8 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     }
 
     @Override
-    public JavaBlock program() {
+    @NonNull
+    public JavaBlock programBlock() {
         return javaBlock;
     }
 

@@ -43,16 +43,13 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
     private ProgressModel progressModel;
     // Every intern SMT problem refers to one solver
     private final Collection<InternSMTProblem> problems = new LinkedList<>();
     // Every SMT problem refers to many solvers.
-    private @NonNull Collection<SMTProblem> smtProblems = new LinkedList<>();
+    private Collection<SMTProblem> smtProblems = new LinkedList<>();
     private boolean[][] problemProcessed;
     private int finishedCounter;
     private final Timer timer = new Timer();
@@ -152,16 +149,15 @@ public class SolverListener implements SolverLauncherListener {
             solver.getException();
         }
 
-        public @NonNull LinkedList<Information> getInformation() {
+        public LinkedList<Information> getInformation() {
             return information;
         }
 
         @Override
-        public @NonNull String toString() {
+        public String toString() {
             return solver.name() + " applied on " + problem.getName();
         }
 
-        @NonNull
         String getTimeInSecAsString() {
             long intPart = timeToSolve / 1000;
             long decPart = timeToSolve % 1000;
@@ -262,13 +258,13 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private void showInformation(@NonNull InternSMTProblem problem) {
+    private void showInformation(InternSMTProblem problem) {
         new InformationWindow(progressDialog, problem.solver, problem.information,
             "Information for " + problem);
     }
 
-    private void prepareDialog(@NonNull Collection<SMTProblem> smtproblems,
-            @NonNull Collection<SolverType> solverTypes, final SolverLauncher launcher) {
+    private void prepareDialog(Collection<SMTProblem> smtproblems,
+            Collection<SolverType> solverTypes, final SolverLauncher launcher) {
         this.smtProblems = smtproblems;
         progressModel = new ProgressModel();
 
@@ -314,7 +310,7 @@ public class SolverListener implements SolverLauncherListener {
     }
 
 
-    private @Nullable InternSMTProblem getProblem(int col, int row) {
+    private InternSMTProblem getProblem(int col, int row) {
         for (InternSMTProblem problem : problems) {
             if (problem.problemIndex == row && problem.solverIndex == col) {
                 return problem;
@@ -324,16 +320,16 @@ public class SolverListener implements SolverLauncherListener {
         return null;
     }
 
-    private void stopEvent(final @NonNull SolverLauncher launcher) {
+    private void stopEvent(final SolverLauncher launcher) {
         launcher.stop();
     }
 
-    private void discardEvent(final @NonNull SolverLauncher launcher) {
+    private void discardEvent(final SolverLauncher launcher) {
         launcher.stop();
         progressDialog.dispose();
     }
 
-    private void applyEvent(final @NonNull SolverLauncher launcher) {
+    private void applyEvent(final SolverLauncher launcher) {
         launcher.stop();
         applyResults();
         /*
@@ -365,7 +361,7 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private long calculateProgress(@NonNull InternSMTProblem problem) {
+    private long calculateProgress(InternSMTProblem problem) {
         long maxTime = problem.solver.getTimeout();
         long startTime = problem.solver.getStartTime();
         long currentTime = System.currentTimeMillis();
@@ -373,7 +369,7 @@ public class SolverListener implements SolverLauncherListener {
         return RESOLUTION - ((startTime - currentTime) * RESOLUTION) / maxTime;
     }
 
-    private float calculateRemainingTime(@NonNull InternSMTProblem problem) {
+    private float calculateRemainingTime(InternSMTProblem problem) {
         long startTime = problem.solver.getStartTime();
         long currentTime = System.currentTimeMillis();
         long temp = (startTime - currentTime) / 100;
@@ -381,7 +377,7 @@ public class SolverListener implements SolverLauncherListener {
     }
 
 
-    private boolean refreshProgessOfProblem(@NonNull InternSMTProblem problem) {
+    private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
         return switch (state) {
         case Running -> {
@@ -404,7 +400,7 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
-    private void running(@NonNull InternSMTProblem problem) {
+    private void running(InternSMTProblem problem) {
         problem.startTime();
         long progress = calculateProgress(problem);
         progressModel.setProgress((int) progress, problem.getSolverIndex(),
@@ -426,7 +422,7 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
-    private void stopped(@NonNull InternSMTProblem problem) {
+    private void stopped(InternSMTProblem problem) {
         problem.stopTime();
 
         int x = problem.getSolverIndex();
@@ -456,7 +452,7 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
-    private void interrupted(@NonNull InternSMTProblem problem) {
+    private void interrupted(InternSMTProblem problem) {
         ReasonOfInterruption reason = problem.solver.getReasonOfInterruption();
         int x = problem.getSolverIndex();
         int y = problem.getProblemIndex();
@@ -475,7 +471,7 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private void successfullyStopped(@NonNull InternSMTProblem problem, int x, int y) {
+    private void successfullyStopped(InternSMTProblem problem, int x, int y) {
         String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
 
         progressModel.setProgress(0, x, y);
@@ -489,7 +485,7 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
-    private void unsuccessfullyStopped(@NonNull InternSMTProblem problem, int x, int y) {
+    private void unsuccessfullyStopped(InternSMTProblem problem, int x, int y) {
         String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
         if (problem.solver.getType() == SolverTypes.Z3_CE_SOLVER) {
             progressModel.setProgress(0, x, y);
@@ -520,7 +516,7 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
-    private void storeInformation(@NonNull SMTProblem problem) {
+    private void storeInformation(SMTProblem problem) {
         for (SMTSolver solver : problem.getSolvers()) {
             if (settings.storeSMTTranslationToFile()) {
                 storeSMTTranslation(solver, problem.getGoal(), solver.getTranslation());
@@ -532,15 +528,14 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private void storeTacletTranslation(@NonNull SMTSolver solver, @NonNull Goal goal,
-            @NonNull TacletSetTranslation translation) {
+    private void storeTacletTranslation(SMTSolver solver, Goal goal,
+            TacletSetTranslation translation) {
         String path = settings.getPathForTacletTranslation();
         path = finalizePath(path, solver, goal);
         storeToFile(translation.toString(), path);
     }
 
-    private void storeSMTTranslation(@NonNull SMTSolver solver, @NonNull Goal goal,
-            @NonNull String problemString) {
+    private void storeSMTTranslation(SMTSolver solver, Goal goal, String problemString) {
         String path = settings.getPathForSMTTranslation();
 
         String fileName = goal.proof().name() + "_" + goal.getTime() + "_" + solver.name() + ".smt";
@@ -550,7 +545,7 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
-    private void storeToFile(@NonNull String text, String path) {
+    private void storeToFile(String text, String path) {
         try {
             final BufferedWriter out2 =
                 new BufferedWriter(new FileWriter(path, StandardCharsets.UTF_8));
@@ -561,8 +556,7 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private @NonNull String finalizePath(String path, @NonNull SMTSolver solver,
-            @NonNull Goal goal) {
+    private String finalizePath(String path, SMTSolver solver, Goal goal) {
         Calendar c = Calendar.getInstance();
         String date =
             c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DATE);
@@ -579,7 +573,7 @@ public class SolverListener implements SolverLauncherListener {
     }
 
 
-    public static @NonNull String computeSolverTypeWarningMessage(@NonNull SolverType type) {
+    public static String computeSolverTypeWarningMessage(SolverType type) {
         return ("""
                 You are using a version of %s which has not been tested for this version of KeY.
                 It can therefore be that errors occur that would not occur
@@ -654,7 +648,7 @@ public class SolverListener implements SolverLauncherListener {
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */
-    public static boolean containsModalityOrQuery(@NonNull Term term) {
+    public static boolean containsModalityOrQuery(Term term) {
         ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
         term.execPostOrder(visitor);
         return visitor.containsModOrQuery();
@@ -677,7 +671,7 @@ public class SolverListener implements SolverLauncherListener {
          * {@inheritDoc}
          */
         @Override
-        public void visit(@NonNull Term visited) {
+        public void visit(org.key_project.logic.Term visited) {
             if (visited.op() instanceof Modality || visited.op() instanceof IProgramMethod) {
                 containsModQuery = true;
             }

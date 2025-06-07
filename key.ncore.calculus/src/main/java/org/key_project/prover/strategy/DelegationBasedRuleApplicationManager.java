@@ -7,15 +7,11 @@ import org.key_project.prover.proof.ProofGoal;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * An {@link RuleApplicationManager} based on delegation.
- *
- * @author Dominic Steinhoefel
- */
+/// An [RuleApplicationManager] based on delegation.
+///
+/// @author Dominic Steinhoefel
 public interface DelegationBasedRuleApplicationManager<G extends ProofGoal<@NonNull G>>
         extends RuleApplicationManager<G> {
-    /**
-     * @return The delegate.
-     */
+    /// @return The delegate.
     RuleApplicationManager<G> getDelegate();
 }

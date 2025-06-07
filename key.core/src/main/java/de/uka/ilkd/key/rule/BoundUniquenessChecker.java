@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -34,6 +35,14 @@ public class BoundUniquenessChecker {
 
     public BoundUniquenessChecker(Term t, Sequent seq) {
         addTerm(t);
+        addAll(seq);
+    }
+
+    public BoundUniquenessChecker(SyntaxElement find, Sequent seq) {
+        if (find instanceof Term t)
+            addTerm(t);
+        else if (find instanceof Sequent s)
+            addAll(s);
         addAll(seq);
     }
 

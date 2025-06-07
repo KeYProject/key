@@ -21,9 +21,11 @@ public class TacletVariableSVCollector extends TacletSchemaVariableCollector {
      * visits term t in post order ({@link Term#execPostOrder(Visitor)}) and
      * collects all bound schema variables
      *
-     * @param visited the Term to be visited (<code>t</code> must not be <code>null</code>
+     * @param p_visited the Term to be visited (<code>t</code> must not be <code>null</code>
      */
-    public void visit(Term visited) {
+    @Override
+    public void visit(org.key_project.logic.Term p_visited) {
+        final Term visited = (Term) p_visited;
         for (int j = 0; j < visited.arity(); j++) {
             for (int i = 0; i < visited.varsBoundHere(j).size(); i++) {
                 QuantifiableVariable boundVar = visited.varsBoundHere(j).get(i);

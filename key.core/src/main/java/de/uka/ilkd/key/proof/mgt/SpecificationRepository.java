@@ -37,6 +37,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -198,7 +199,8 @@ public final class SpecificationRepository {
             JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(cf));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
             ImmutableSLList.nil(), tb.func(unlimited, subs)));
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
+        tacletBuilder.setApplicationRestriction(
+            new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE));
         tacletBuilder.setName(
             MiscTools.toValidTacletName("limit " + getUniqueNameForObserver(unlimited)));
         tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));

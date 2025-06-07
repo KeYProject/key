@@ -3,34 +3,39 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.SuccTaclet;
 
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.TacletApplPart;
-
-import org.jspecify.annotations.NonNull;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.collection.ImmutableList;
 
 
 /** class builds SuccTaclet objects. */
 public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
-
-    private boolean ignoreTopLevelUpdates = true;
-
     /**
-     * sets the <I>find</I> of the Taclet that is to build to the given term, if the sort of the
-     * given term is of Sort.FORMULA otherwise nothing happens.
+     * sets the <I>find</I> of the Taclet that is to build to the given sequent.
      *
      * @return this SuccTacletBuilder
      */
-    public @NonNull SuccTacletBuilder setFind(@NonNull Term findTerm) {
-        if (findTerm.sort() == JavaDLTheory.FORMULA) {
-            find = findTerm;
-        }
-        checkContainsFreeVarSV(findTerm, this.getName(), "find term");
+    public SuccTacletBuilder setFind(Sequent findSeq) {
+        find = findSeq;
+        checkContainsFreeVarSV(findSeq, this.getName(), "find sequent");
         return this;
     }
 
+    /**
+     * sets the <I>find</I> of the Taclet that is to build to the sequent {@code ==> findTerm}.
+     *
+     * @return this SuccTacletBuilder
+     */
+    public SuccTacletBuilder setFind(Term findTerm) {
+        return setFind(
+            JavaDLSequentKit.createSuccSequent(ImmutableList.of(new SequentFormula(findTerm))));
+    }
 
     /**
      * adds a new goal descriptions to the goal descriptions of the Taclet. the TacletGoalTemplate
@@ -55,7 +60,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if and find or an
      * InvalidPrefixException if the building of the Taclet Prefix fails.
      */
-    public @NonNull SuccTaclet getSuccTaclet() {
+    public SuccTaclet getSuccTaclet() {
         if (find == null) {
             throw new TacletBuilderException(this, "No find part specified");
 
@@ -64,9 +69,12 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         final TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         SuccTaclet t = new SuccTaclet(name,
-            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+            new TacletApplPart(ifseq,
+                applicationRestriction.combine(ApplicationRestriction.SUCCEDENT_POLARITY), varsNew,
+                varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
-            goals, ruleSets, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
+            goals, ruleSets, attrs, (Sequent) find,
+            prefixBuilder.getPrefixMap(),
             choices, tacletAnnotations);
         t.setOrigin(origin);
         return t;
@@ -80,12 +88,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * semisequences. No specification for the interactive or recursive flags imply that the flags
      * are not set. No specified find part causes an IllegalStateException.
      */
-    public @NonNull SuccTaclet getTaclet() {
+    public SuccTaclet getTaclet() {
         return getSuccTaclet();
-    }
-
-
-    public void setIgnoreTopLevelUpdates(boolean ignore) {
-        ignoreTopLevelUpdates = ignore;
     }
 }

@@ -5,11 +5,7 @@ package org.key_project.prover.proof.rulefilter;
 
 import org.key_project.prover.rules.Rule;
 
-import org.jspecify.annotations.NonNull;
-
-/**
- * Inversion of a rule filter
- */
+/// Inversion of a rule filter
 public class NotRuleFilter implements RuleFilter {
 
     private final RuleFilter a;
@@ -22,7 +18,7 @@ public class NotRuleFilter implements RuleFilter {
         return !a.filter(rule);
     }
 
-    public @NonNull String toString() {
+    public String toString() {
         return "Not:" + a;
     }
 

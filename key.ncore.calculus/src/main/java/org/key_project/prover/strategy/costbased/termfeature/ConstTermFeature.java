@@ -8,11 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
-/**
- * A feature that returns a constant value
- */
+/// A feature that returns a constant value
 public class ConstTermFeature implements TermFeature {
     public RuleAppCost compute(Term term, MutableState mState, LogicServices services) {
         return val;
@@ -22,7 +18,7 @@ public class ConstTermFeature implements TermFeature {
         val = p_val;
     }
 
-    public static @NonNull TermFeature createConst(RuleAppCost p_val) {
+    public static TermFeature createConst(RuleAppCost p_val) {
         return new ConstTermFeature(p_val);
     }
 
