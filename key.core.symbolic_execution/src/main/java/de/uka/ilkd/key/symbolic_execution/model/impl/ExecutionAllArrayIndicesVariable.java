@@ -124,7 +124,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             JTerm resultIf = tb.ife(arrayRange, arrayIndex, notAValue);
 
             // Create predicate which will be used in formulas to store the value interested in.
-            JFunction resultPredicate =
+            Function resultPredicate =
                 new JFunction(new Name(tb.newName("ResultPredicate")),
                     JavaDLTheory.FORMULA, resultIf.sort());
             // Create formula which contains the value interested in.

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.*;
@@ -67,8 +68,8 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
-        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        Function q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
 
         JTerm t_x = services.getTermFactory().createTerm(x);
         JTerm t_p_x = services.getTermFactory().createTerm(p, new JTerm[] { t_x }, null, null);
@@ -104,8 +105,8 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
-        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        Function q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
 
         TermBuilder tb = services.getTermBuilder();
 

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -34,18 +35,18 @@ public class TestTerm {
     private final Sort sort3 = new SortImpl(new Name("S3"));
 
 
-    private final JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+    private final Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
     // p(:S1):BOOL
     private final LogicVariable x = new LogicVariable(new Name("x"), sort1); // x:S1
     // q(:Whatever):BOOL
     private final LogicVariable z = new LogicVariable(new Name("z"), sort1); // z:S1
     private final LogicVariable zz = new LogicVariable(new Name("zz"), sort1); // zz:S1
-    private final JFunction r =
+    private final Function r =
         new JFunction(new Name("r"), JavaDLTheory.FORMULA, sort1, sort2);
     // r(:S1, :S2):BOOL
     private final LogicVariable y = new LogicVariable(new Name("y"), sort3); // y:S3
     private final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
-    private final JFunction f = new JFunction(new Name("f"), sort1, sort3);
+    private final Function f = new JFunction(new Name("f"), sort1, sort3);
     // f(:S3):S1
 
     private final ProgramVariable pv0 = new LocationVariable(new ProgramElementName("pv0"), sort1); // pv0:S1

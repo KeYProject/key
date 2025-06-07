@@ -16,7 +16,7 @@
  * The function of {@link de.uka.ilkd.key.logic.JTerm}s (e.g., if
  * they represent a conjunction of subterms, a quantified
  * formula,...) is only determined by an {@link
- * de.uka.ilkd.key.logic.op.JOperator} that is assigned to a {@link
+ * org.key_project.logic.op.Operator} that is assigned to a {@link
  * de.uka.ilkd.key.logic.JTerm} when the {@link
  * de.uka.ilkd.key.logic.JTerm} is constructed.
  * </p>

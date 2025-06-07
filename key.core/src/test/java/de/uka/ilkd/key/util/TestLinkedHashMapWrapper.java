@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.Pair;
@@ -245,7 +246,7 @@ public class TestLinkedHashMapWrapper {
         final LogicVariable y = new LogicVariable(new Name("y"), sort);
         final JTerm tx = tf.createTerm(x);
         final JTerm ty = tf.createTerm(y);
-        final JFunction f = new JFunction(new Name("f"), JavaDLTheory.FORMULA, sort, sort);
+        final Function f = new JFunction(new Name("f"), JavaDLTheory.FORMULA, sort, sort);
         final JTerm t1 = tb.all(x, tf.createTerm(f, tx, tx));
         final JTerm t2 = tb.all(y, tf.createTerm(f, ty, ty));
         final JTerm t3 = tb.all(y, tf.createTerm(f, ty, tx));

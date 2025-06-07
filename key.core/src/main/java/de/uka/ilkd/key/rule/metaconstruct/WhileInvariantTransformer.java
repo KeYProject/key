@@ -429,7 +429,7 @@ public final class WhileInvariantTransformer {
      * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
      * @param rule The {@link Rule} to apply.
      * @param goal The {@link Goal} to compute the result for.
-     * @param operator The {@link JOperator} of the new {@link JTerm}.
+     * @param operator The {@link Operator} of the new {@link JTerm}.
      * @param subs The children of the new {@link JTerm}.
      * @param applicationSequent The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the new {@link JTerm}.

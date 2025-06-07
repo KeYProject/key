@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -24,7 +25,7 @@ import org.key_project.util.collection.ImmutableArray;
  * <strong>As soon as {@link AbstractTermTransformer#METASORT} is generalized, this class
  * may be deleted.</strong>
  */
-public class JFunction extends Function implements JOperator, Sorted {
+public class JFunction extends Function implements Sorted, Operator {
 
 
     // -------------------------------------------------------------------------

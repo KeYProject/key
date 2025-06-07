@@ -89,7 +89,7 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return false;
     }
 

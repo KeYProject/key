@@ -117,7 +117,7 @@ public final class ProgVarReplacer {
                     result = result.replace(cie.prefix(), cie.suffix(),
                         cie.activeStatementContext(), newPe, services);
                 }
-            } else if (inst instanceof JOperator) {
+            } else if (inst instanceof Operator) {
                 /* nothing to be done (currently) */
             } else if (inst instanceof ProgramElement pe) {
                 final ProgramElement newPe = replace(pe);

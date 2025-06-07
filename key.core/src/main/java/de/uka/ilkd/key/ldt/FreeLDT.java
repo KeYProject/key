@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -71,13 +70,13 @@ public final class FreeLDT extends LDT {
     }
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return "atom".equals(f.name().toString());
     }
 
     @Override
     public Expression translateTerm(JTerm t, ExtList children, Services services) {
-        if (t.op() instanceof Function && hasLiteralFunction((JFunction) t.op())) {
+        if (t.op() instanceof Function && hasLiteralFunction((Function) t.op())) {
             return FreeLiteral.INSTANCE;
         }
         assert false;

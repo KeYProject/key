@@ -21,6 +21,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -168,7 +169,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goal.sequent(),
                         pio.sequentFormula());
-            JFunction newPredicate = createResultFunction(sideProofServices, varTerm.sort());
+            Function newPredicate = createResultFunction(sideProofServices, varTerm.sort());
             final TermBuilder tb = sideProofServices.getTermBuilder();
             JTerm newTerm = tb.func(newPredicate, varTerm);
             JTerm newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(),

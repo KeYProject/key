@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -83,9 +82,9 @@ public final class TruthValueTracingUtil {
     }
 
     /**
-     * Checks if the given {@link JOperator} is a predicate.
+     * Checks if the given {@link Operator} is a predicate.
      *
-     * @param operator The {@link JOperator} to check.
+     * @param operator The {@link Operator} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(Operator operator) {
@@ -121,9 +120,9 @@ public final class TruthValueTracingUtil {
     }
 
     /**
-     * Checks if the given {@link JOperator} and its sub {@link JTerm}s specify a logical operator.
+     * Checks if the given {@link Operator} and its sub {@link JTerm}s specify a logical operator.
      *
-     * @param operator The {@link JOperator}.
+     * @param operator The {@link Operator}.
      * @param subs The sub {@link JTerm}s.
      * @return {@code true} is logical operator, {@code false} is something else.
      */
@@ -151,10 +150,10 @@ public final class TruthValueTracingUtil {
     }
 
     /**
-     * Checks if the given {@link JOperator} and its sub {@link JTerm}s specify an if-then-else
+     * Checks if the given {@link Operator} and its sub {@link JTerm}s specify an if-then-else
      * formula.
      *
-     * @param operator The {@link JOperator}.
+     * @param operator The {@link Operator}.
      * @param subs The sub {@link JTerm}s.
      * @return {@code true} is if-then-else formula, {@code false} is something else.
      */

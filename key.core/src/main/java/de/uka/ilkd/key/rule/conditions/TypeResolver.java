@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -193,7 +192,7 @@ public abstract class TypeResolver {
             final SyntaxElement inst = (SyntaxElement) (memberSV == sv ? instCandidate
                     : instMap.getInstantiation(memberSV));
 
-            if (inst instanceof JOperator) {
+            if (inst instanceof Operator) {
                 result = getContainerSort((Operator) inst, services);
             } else {
                 if (inst instanceof Expression) {

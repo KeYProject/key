@@ -489,7 +489,7 @@ public final class SymbolicExecutionUtil {
             new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
         JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
         // Create predicate which will be used in formulas to store the value interested in.
-        JFunction newPredicate =
+        Function newPredicate =
             new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
                 JavaDLTheory.FORMULA, variable.sort());
         // Create formula which contains the value interested in.
@@ -529,7 +529,7 @@ public final class SymbolicExecutionUtil {
         assert node != null;
         assert variable instanceof ProgramVariable;
         // Create predicate which will be used in formulas to store the value interested in.
-        JFunction newPredicate =
+        Function newPredicate =
             new JFunction(new Name(services.getTermBuilder().newName("ResultPredicate")),
                 JavaDLTheory.FORMULA, variable.sort());
         // Create formula which contains the value interested in.
@@ -563,7 +563,7 @@ public final class SymbolicExecutionUtil {
         assert node != null;
         assert term != null;
         // Create predicate which will be used in formulas to store the value interested in.
-        JFunction newPredicate =
+        Function newPredicate =
             new JFunction(
                 new Name(sideProofServices.getTermBuilder().newName("ResultPredicate")),
                 JavaDLTheory.FORMULA, term.sort());
@@ -594,7 +594,7 @@ public final class SymbolicExecutionUtil {
         private final Sequent sequentToProve;
 
         /**
-         * The {@link JOperator} which is the predicate that contains the value interested in.
+         * The {@link Operator} which is the predicate that contains the value interested in.
          */
         private final Operator operator;
 
@@ -602,7 +602,7 @@ public final class SymbolicExecutionUtil {
          * Constructor.
          *
          * @param sequentToProve he sequent to prove.
-         * @param operator The {@link JOperator} which is the predicate that contains the value
+         * @param operator The {@link Operator} which is the predicate that contains the value
          *        interested in.
          */
         public SiteProofVariableValueInput(Sequent sequentToProve, Operator operator) {
@@ -621,10 +621,10 @@ public final class SymbolicExecutionUtil {
         }
 
         /**
-         * Returns the {@link JOperator} which is the predicate that contains the value interested
+         * Returns the {@link Operator} which is the predicate that contains the value interested
          * in.
          *
-         * @return The {@link JOperator} which is the predicate that contains the value interested
+         * @return The {@link Operator} which is the predicate that contains the value interested
          *         in.
          */
         public Operator getOperator() {
@@ -3843,11 +3843,11 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Checks if the given {@link JOperator} is a heap.
+     * Checks if the given {@link Operator} is a heap.
      *
-     * @param op The {@link JOperator} to check.
+     * @param op The {@link Operator} to check.
      * @param heapLDT The {@link HeapLDT} which provides the available heaps.
-     * @return {@code true} {@link JOperator} is heap, {@code false} {@link JOperator} is something
+     * @return {@code true} {@link Operator} is heap, {@code false} {@link Operator} is something
      *         else.
      */
     public static boolean isHeap(Operator op, HeapLDT heapLDT) {
@@ -3861,11 +3861,11 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Checks if the given {@link JOperator} is the base heap.
+     * Checks if the given {@link Operator} is the base heap.
      *
-     * @param op The {@link JOperator} to check.
+     * @param op The {@link Operator} to check.
      * @param heapLDT The {@link HeapLDT} which provides the available heaps.
-     * @return {@code true} {@link JOperator} is the base heap, {@code false} {@link JOperator} is
+     * @return {@code true} {@link Operator} is the base heap, {@code false} {@link Operator} is
      *         something else.
      */
     public static boolean isBaseHeap(Operator op, HeapLDT heapLDT) {
@@ -3890,9 +3890,9 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Checks if the given {@link JOperator} is a number.
+     * Checks if the given {@link Operator} is a number.
      *
-     * @param op The {@link JOperator} to check.
+     * @param op The {@link Operator} to check.
      * @return {@code true} is number, {@code false} is something else.
      */
     public static boolean isNumber(Operator op) {
@@ -3908,9 +3908,9 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Checks if the given {@link JOperator} is a boolean.
+     * Checks if the given {@link Operator} is a boolean.
      *
-     * @param op The {@link JOperator} to check.
+     * @param op The {@link Operator} to check.
      * @return {@code true} is boolean, {@code false} is something else.
      */
     public static boolean isBoolean(Services services, Operator op) {
@@ -4183,7 +4183,7 @@ public final class SymbolicExecutionUtil {
                         SequentFormula topLevelPredicate =
                             CollectionUtil
                                     .search(leaf.sequent().succedent(),
-                                        element -> JOperator.opEquals(toSearch.op(),
+                                        element -> JavaDLOperatorUtil.opEquals(toSearch.op(),
                                             element.formula().op()));
                         if (topLevelPredicate == null) {
                             verified = false;

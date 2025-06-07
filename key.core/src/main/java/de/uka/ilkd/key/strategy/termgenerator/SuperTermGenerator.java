@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JOperator;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Name;
@@ -108,7 +107,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         }
 
         private static class SuperTermGeneratedOp
-                implements SortedOperator, JOperator, TerminalSyntaxElement {
+                implements SortedOperator, TerminalSyntaxElement, Operator {
             private final Name NAME;
             private final IntegerLDT numbers;
 

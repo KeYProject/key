@@ -1599,7 +1599,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         } else if (op == Junctor.FALSE) {
             return this.translateLogicalFalse();
         } else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
-            JFunction nullOp = services.getTypeConverter().getHeapLDT().getNull();
+            Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
 
             addFunction(nullOp, new ArrayList<>(), nullOp.sort(), services);
             translateSort(nullOp.sort(), services);
@@ -1623,7 +1623,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 return translateFunc(op, subterms);
             }
-        } else if (op instanceof JFunction fun) {
+        } else if (op instanceof Function fun) {
             if (fun.sort() == JavaDLTheory.FORMULA) {
                 // This Function is a predicate, so translate it
                 // as such
@@ -2012,7 +2012,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
     }
 
-    private StringBuilder translateAsUninterpretedFunction(JFunction fun,
+    private StringBuilder translateAsUninterpretedFunction(Function fun,
             List<QuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
             Services services) throws IllegalFormulaException {
         // an uninterpreted function. just

@@ -424,19 +424,19 @@ public class TermBuilder {
     }
 
     public JTerm func(Function f) {
-        return tf.createTerm((JFunction) f);
+        return tf.createTerm(f);
     }
 
     public JTerm func(Function f, JTerm s) {
-        return tf.createTerm((JFunction) f, s);
+        return tf.createTerm(f, s);
     }
 
     public JTerm func(Function f, JTerm s1, JTerm s2) {
-        return tf.createTerm((JFunction) f, s1, s2);
+        return tf.createTerm(f, s1, s2);
     }
 
     public JTerm func(Function f, JTerm... s) {
-        return tf.createTerm((JFunction) f, s);
+        return tf.createTerm(f, s);
     }
 
     public JTerm func(IObserverFunction f, JTerm... s) {
@@ -444,7 +444,7 @@ public class TermBuilder {
     }
 
     public JTerm func(Function f, JTerm[] s, ImmutableArray<QuantifiableVariable> boundVars) {
-        return tf.createTerm((JFunction) f, s, boundVars, null);
+        return tf.createTerm(f, s, boundVars, null);
     }
 
     // public Term prog(Modality modality, Term t) {

@@ -12,6 +12,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -20,7 +21,7 @@ import org.key_project.util.collection.ImmutableSet;
  * This singleton class implements a general conditional operator
  * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
-public final class IfThenElse extends AbstractOperator implements JOperator {
+public final class IfThenElse extends AbstractOperator implements Operator {
 
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse();
 

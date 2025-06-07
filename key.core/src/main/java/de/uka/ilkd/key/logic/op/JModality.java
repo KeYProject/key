@@ -16,6 +16,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.collection.WeakValueLinkedHashMap;
@@ -26,7 +27,7 @@ import org.jspecify.annotations.NonNull;
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
  */
-public class JModality extends Modality implements JOperator {
+public class JModality extends Modality implements Operator {
     /**
      * keeps track of created modalities
      */

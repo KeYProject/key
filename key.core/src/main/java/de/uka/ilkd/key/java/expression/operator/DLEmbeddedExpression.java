@@ -12,24 +12,24 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
 public class DLEmbeddedExpression extends Operator {
 
-    private final JFunction functionSymbol;
+    private final Function functionSymbol;
 
     /**
      * @return the functionSymbol
      */
-    public JFunction getFunctionSymbol() {
+    public Function getFunctionSymbol() {
         return functionSymbol;
     }
 
-    public DLEmbeddedExpression(JFunction f, ExtList children) {
+    public DLEmbeddedExpression(Function f, ExtList children) {
         super(children);
         this.functionSymbol = f;
     }

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -33,13 +32,13 @@ public final class LocSetLDT extends LDT {
     public static final String SETMINUS_STRING = "setMinus";
     public static final String UNION_STRING = "union";
 
-    private final JFunction empty;
+    private final Function empty;
     private final Function allLocs;
     private final Function singleton;
     private final Function union;
     private final Function intersect;
     private final Function setMinus;
-    private final JFunction infiniteUnion;
+    private final Function infiniteUnion;
     private final Function allFields;
     private final Function allObjects;
     private final Function arrayRange;
@@ -70,7 +69,7 @@ public final class LocSetLDT extends LDT {
     }
 
 
-    public JFunction getEmpty() {
+    public Function getEmpty() {
         return empty;
     }
 
@@ -100,7 +99,7 @@ public final class LocSetLDT extends LDT {
     }
 
 
-    public JFunction getInfiniteUnion() {
+    public Function getInfiniteUnion() {
         return infiniteUnion;
     }
 
@@ -194,7 +193,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return f.equals(empty);
     }
 

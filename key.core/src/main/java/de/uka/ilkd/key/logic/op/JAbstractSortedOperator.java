@@ -11,6 +11,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -19,7 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Abstract sorted operator class offering some common functionality.
  */
 public abstract class JAbstractSortedOperator extends AbstractSortedOperator
-        implements JOperator, Sorted {
+        implements Sorted, Operator {
 
     protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, Modifier modifier) {

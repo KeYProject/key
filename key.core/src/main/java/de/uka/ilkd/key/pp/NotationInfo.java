@@ -22,7 +22,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 /**
  * <p>
  * Stores the mapping from operators to {@link Notation}s. Each {@link Notation} represents the
- * concrete syntax for some {@link JOperator}. The {@link LogicPrinter} asks
+ * concrete syntax for some {@link Operator}. The {@link LogicPrinter} asks
  * the NotationInfo to find out which Notation to use for a given term.
  * <p>
  * The Notation associated with an operator might change. New Notations can be added.

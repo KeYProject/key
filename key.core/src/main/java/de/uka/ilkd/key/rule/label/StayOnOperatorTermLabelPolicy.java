@@ -7,15 +7,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JOperator;
+import de.uka.ilkd.key.logic.op.JavaDLOperatorUtil;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long the new {@link JTerm} has the
- * same {@link JOperator} as the previous best matching {@link JTerm} from which it was created.
+ * same {@link Operator} as the previous best matching {@link JTerm} from which it was created.
  *
  * @author Martin Hentschel
  */
@@ -28,7 +29,7 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
             PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm,
             JTerm newTerm, TermLabel label) {
-        return applicationTerm != null && JOperator.opEquals(newTerm.op(), applicationTerm.op())
+        return applicationTerm != null && JavaDLOperatorUtil.opEquals(newTerm.op(), applicationTerm.op())
                 ? label
                 : null;
     }

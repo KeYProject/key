@@ -10,6 +10,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 
@@ -18,7 +19,7 @@ import org.key_project.logic.sort.Sort;
  * where iv is an integer logic variable, phi is a formula, and where t1 and t2 are terms with the
  * same sort. The variable iv is bound in phi and in t1, but not in t2.
  */
-public final class IfExThenElse extends AbstractOperator implements JOperator {
+public final class IfExThenElse extends AbstractOperator implements Operator {
 
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse();
 

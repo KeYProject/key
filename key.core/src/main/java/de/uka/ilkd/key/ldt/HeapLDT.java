@@ -76,7 +76,7 @@ public final class HeapLDT extends LDT {
     private final Function length;
 
     // null
-    private final JFunction nullFunc;
+    private final Function nullFunc;
 
     // predicates
     private final Function wellFormed;
@@ -343,7 +343,7 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public JFunction getNull() {
+    public Function getNull() {
         return nullFunc;
     }
 
@@ -495,7 +495,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(JFunction f) {
+    public boolean hasLiteralFunction(Function f) {
         return false;
     }
 

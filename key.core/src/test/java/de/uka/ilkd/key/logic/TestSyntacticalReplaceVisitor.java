@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
@@ -56,7 +57,7 @@ public class TestSyntacticalReplaceVisitor {
 
         LogicVariable x = new LogicVariable(new Name("x"), s);
         LogicVariable y = new LogicVariable(new Name("y"), s);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
 
         JTerm t_x = TB.tf().createTerm(x);
         JTerm t_px = TB.tf().createTerm(p, new JTerm[] { t_x }, null, null);
