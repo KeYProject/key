@@ -19,12 +19,10 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Term generator that enumerates the sub-terms or sub-formulas of a given term. Similarly to
- * {@link org.key_project.prover.strategy.costbased.termfeature.RecSubTermFeature}, a term feature
- * can be given that determines when traversal should
- * be stopped, i.e., when one should not descend further into a term.
- */
+/// Term generator that enumerates the sub-terms or sub-formulas of a given term. Similarly to
+/// [org.key_project.prover.strategy.costbased.termfeature.RecSubTermFeature], a term feature
+/// can be given that determines when traversal should
+/// be stopped, i.e., when one should not descend further into a term.
 public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
         implements TermGenerator<Goal> {
 
@@ -36,10 +34,8 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
         this.completeTerm = completeTerm;
     }
 
-    /**
-     * Left-traverse the subterms of a term in depth-first order. Each term is returned before its
-     * proper subterms.
-     */
+    /// Left-traverse the subterms of a term in depth-first order. Each term is returned before its
+    /// proper subterms.
     public static <Goal extends ProofGoal<@NonNull Goal>> TermGenerator<Goal> leftTraverse(
             ProjectionToTerm<Goal> cTerm, TermFeature cond) {
         return new SubtermGenerator<>(cTerm, cond) {
@@ -52,10 +48,8 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
         };
     }
 
-    /**
-     * Right-traverse the subterms of a term in depth-first order. Each term is returned before its
-     * proper subterms.
-     */
+    /// Right-traverse the subterms of a term in depth-first order. Each term is returned before its
+    /// proper subterms.
     public static <Goal extends ProofGoal<@NonNull Goal>> TermGenerator<Goal> rightTraverse(
             ProjectionToTerm<Goal> cTerm, TermFeature cond) {
         return new SubtermGenerator<>(cTerm, cond) {
@@ -110,9 +104,7 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
             return res;
         }
 
-        /**
-         * throw an unsupported operation exception as generators do not remove
-         */
+        /// throw an unsupported operation exception as generators do not remove
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -137,9 +129,7 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
             return res;
         }
 
-        /**
-         * throw an unsupported operation exception as generators do not remove
-         */
+        /// throw an unsupported operation exception as generators do not remove
         public void remove() {
             throw new UnsupportedOperationException();
         }

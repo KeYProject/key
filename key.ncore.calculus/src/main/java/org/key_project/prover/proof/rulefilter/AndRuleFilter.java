@@ -5,9 +5,7 @@ package org.key_project.prover.proof.rulefilter;
 
 import org.key_project.prover.rules.Rule;
 
-/**
- * Intersection (conjunction) of two rule filters
- */
+/// Intersection (conjunction) of two rule filters
 public class AndRuleFilter implements RuleFilter {
 
     private final RuleFilter a;

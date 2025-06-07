@@ -10,11 +10,9 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-/**
- * Projection that can store and returns an arbitrary term or formula. Objects of this class are
- * mainly used like bound variables and together with features like <code>LetFeature</code> and
- * <code>ForEachCP</code>.
- */
+/// Projection that can store and returns an arbitrary term or formula. Objects of this class are
+/// mainly used like bound variables and together with features like <code>LetFeature</code> and
+/// <code>ForEachCP</code>.
 public class TermBuffer<Goal extends ProofGoal<Goal>> implements ProjectionToTerm<Goal> {
 
     public Term getContent(MutableState mState) {

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.Taclet.ApplicationRestriction;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;

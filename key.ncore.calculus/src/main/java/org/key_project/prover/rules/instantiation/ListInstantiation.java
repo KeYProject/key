@@ -5,34 +5,27 @@ package org.key_project.prover.rules.instantiation;
 
 import org.key_project.util.collection.ImmutableArray;
 
-/**
- * This class is used to store the instantiation of a SchemaVariable if it is a ProgramElement.
- */
-
+/// This class is used to store the instantiation of a SchemaVariable if it is a ProgramElement.
 public class ListInstantiation<T> extends InstantiationEntry<ImmutableArray<T>> {
 
-    /** type of the stored elements */
+    /// type of the stored elements
     private final Class<T> type;
 
-    /**
-     * creates a new ContextInstantiationEntry
-     *
-     * @param pes the ProgramElement array the SchemaVariable is instantiated with
-     */
+    /// creates a new ContextInstantiationEntry
+    ///
+    /// @param pes the ProgramElement array the SchemaVariable is instantiated with
     public ListInstantiation(ImmutableArray<T> pes, Class<T> type) {
         super(pes);
         this.type = type;
     }
 
-    /** {@inheritDoc} */
+    /// {@inheritDoc}
     @Override
     public ImmutableArray<T> getInstantiation() {
         return super.getInstantiation();
     }
 
-    /**
-     * returns the element type of the contained instantiations
-     */
+    /// returns the element type of the contained instantiations
     public Class<T> getType() {
         return type;
     }

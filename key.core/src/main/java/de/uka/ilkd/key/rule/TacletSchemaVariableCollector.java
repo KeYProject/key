@@ -14,7 +14,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
-import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Taclet;
@@ -91,7 +90,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
             if (mod.kind() instanceof ModalOperatorSV msv) {
                 varList = varList.prepend(msv);
             }
-            varList = collectSVInProgram(mod.program(), varList);
+            varList = collectSVInProgram(mod.programBlock(), varList);
         } else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate) op, varList);
         }

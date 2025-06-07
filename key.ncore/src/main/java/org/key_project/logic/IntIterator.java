@@ -4,9 +4,9 @@
 package org.key_project.logic;
 
 public interface IntIterator {
-    /** @return Integer the next element of collection */
+    /// @return Integer the next element of collection
     int next();
 
-    /** @return boolean true iff collection has more unseen elements */
+    /// @return boolean true iff collection has more unseen elements
     boolean hasNext();
 }
