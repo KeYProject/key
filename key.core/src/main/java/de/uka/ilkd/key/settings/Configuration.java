@@ -12,6 +12,8 @@ import java.util.*;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.util.Position;
 
+import org.key_project.util.collection.Pair;
+
 import org.antlr.v4.runtime.CharStream;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -417,6 +419,27 @@ public class Configuration {
 
     public void overwriteWith(Configuration other) {
         data.putAll(other.data);
+    }
+
+    /// Returns all section in the current configuration.
+    public List<Configuration> getSections() {
+        return this.data.values().stream()
+                .filter(it -> it instanceof Configuration)
+                .map(it -> (Configuration) it)
+                .toList();
+    }
+
+    /// Returns all section in the current configuration with their name.
+    public List<Pair<String, Configuration>> getSectionsWithNames() {
+        return this.data.entrySet().stream()
+                .filter(it -> it.getValue() instanceof Configuration)
+                .map(it -> new Pair<>(it.getKey(), (Configuration) it.getValue()))
+                .toList();
+    }
+
+    /// Returns the set of known keys
+    public Set<String> keys() {
+        return this.data.keySet();
     }
 
     // TODO Add documentation for this.
