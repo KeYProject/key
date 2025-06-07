@@ -22,10 +22,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;

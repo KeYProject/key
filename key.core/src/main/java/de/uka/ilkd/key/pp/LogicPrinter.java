@@ -1582,7 +1582,7 @@ public class LogicPrinter {
      * </pre>
      *
      * @param l the String used as left brace symbol
-     * @param v the {@link JQuantifiableVariable} to be substituted
+     * @param v the {@link QuantifiableVariable} to be substituted
      * @param t the Term to be used as new value
      * @param ass2 the int defining the associativity for the new value
      * @param r the String used as right brace symbol

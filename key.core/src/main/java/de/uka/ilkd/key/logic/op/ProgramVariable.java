@@ -15,8 +15,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * The objects of this class represent program variables and program constants (resulting from
  * static final declarations in programs; TODO: it is weird that constants are a special case of
  * variables).
- *
+ * <br>
  * Additionally, as a legacy of the past, the RecodeR front end of KeY still creates objects of this
  * class also for fields (aka. attributes, member variables), even though theoretically, these are
  * *not* program variables (not any more)! Such fake "program variables" can be recognized by the

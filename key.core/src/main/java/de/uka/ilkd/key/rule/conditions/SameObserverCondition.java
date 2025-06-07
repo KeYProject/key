@@ -13,8 +13,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchConditions;

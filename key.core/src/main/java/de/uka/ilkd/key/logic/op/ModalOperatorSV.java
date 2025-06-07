@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic.op;
 
 
 import org.key_project.logic.Name;
-import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.Named;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Schema variable matching modal operators.
  */
 public final class ModalOperatorSV extends JModality.JavaModalityKind
-        implements ParsableVariable, SchemaVariable {
+        implements SchemaVariable, Named {
 
     /**
      * the set of modalities this sv can match

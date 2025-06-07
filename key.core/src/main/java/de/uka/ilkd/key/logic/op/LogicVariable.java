@@ -8,6 +8,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 
 
@@ -15,7 +16,7 @@ import org.key_project.logic.sort.Sort;
  * The objects of this class represent logical variables, used e.g. for quantification.
  */
 public final class LogicVariable extends JAbstractSortedOperator
-        implements JQuantifiableVariable {
+        implements QuantifiableVariable {
 
     public LogicVariable(Name name, Sort sort) {
         super(name, sort, true);
